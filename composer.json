@@ -1,5 +1,5 @@
 {
-    "name": "kapitancho/lang-walnut",
+    "name": "walnut/lang",
     "autoload": {
         "psr-4": {
             "Walnut\\Lang\\Test\\": "tests/Walnut/Lang",
