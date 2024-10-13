@@ -1,2 +1,1 @@
-# lang-walnut
-Walnut Language v2
+# Walnut Language v2
