@@ -448,7 +448,8 @@ final readonly class ParserStateMachine {
 						default => throw new ParserException(
 							$state,
 							"Constructors are only allowed for subtypes and sealed types",
-							$token
+							$token,
+							'unknown'
 						)
 					};
 					$errorType = $this->s->result['error_type'] ?? null;

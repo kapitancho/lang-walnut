@@ -9,6 +9,7 @@ interface Parser {
 	public function parseAndBuildCodeFromTokens(
 		ModuleImporter $moduleImporter,
 		CodeBuilder $codeBuilder,
-		array $tokens
+		array $tokens,
+		string $moduleName
 	): mixed;
 }

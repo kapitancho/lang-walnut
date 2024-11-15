@@ -31,7 +31,7 @@ final class ModuleImporter implements ModuleImporterInterface {
 		$this->cache[$moduleName] = false;
 		$sourceCode = $this->moduleLookupContext->sourceOf($moduleName);
 		$tokens = $this->lexer->tokensFromSource($sourceCode);
-		$this->parser->parseAndBuildCodeFromTokens($this, $this->codeBuilder, $tokens);
+		$this->parser->parseAndBuildCodeFromTokens($this, $this->codeBuilder, $tokens, $moduleName);
 		$this->cache[$moduleName] = true;
 	}
 }

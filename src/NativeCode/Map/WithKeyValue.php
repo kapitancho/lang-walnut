@@ -10,6 +10,7 @@ use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
 use Walnut\Lang\Blueprint\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\RecordType;
+use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
@@ -27,16 +28,25 @@ final readonly class WithKeyValue implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof RecordType) {
-			$targetType = $targetType->asMapType();
-		}
-		if ($targetType instanceof MapType) {
+		if ($targetType instanceof RecordType || $targetType instanceof MapType) {
 			if ($parameterType->isSubtypeOf(
 				$this->context->typeRegistry()->record([
 					'key' => $this->context->typeRegistry()->string(),
 					'value' => $this->context->typeRegistry()->any()
 				])
 			)) {
+				$keyType = $parameterType->types()['key'] ?? null;
+				if ($targetType instanceof RecordType) {
+					if ($keyType instanceof StringSubsetType && count($keyType->subsetValues()) === 1) {
+						$keyValue = $keyType->subsetValues()[0];
+						return $this->context->typeRegistry()->record(
+							$targetType->types() + [
+								$keyValue->literalValue() => $parameterType->types()['value']
+							]
+						);
+					}
+					$targetType = $targetType->asMapType();
+				}
 				$valueType = $parameterType->types()['value'] ?? null;
 				return $this->context->typeRegistry()->map(
 					$this->context->typeRegistry()->union([

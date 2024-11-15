@@ -20,7 +20,8 @@ final readonly class Parser implements ParserInterface {
 	public function parseAndBuildCodeFromTokens(
 		ModuleImporter $moduleImporter,
 		CodeBuilder $codeBuilder,
-		array $tokens
+		array $tokens,
+		string $moduleName
 	): mixed {
 		$s = new ParserState;
 		$s->push(-1);
@@ -38,7 +39,7 @@ final readonly class Parser implements ParserInterface {
 		while($s->i < $l) {
 			$token = $tokens[$s->i];
 			if (++$ctr > 20000) {
-				throw new ParserException($s, "Recursion limit reached", $token);
+				throw new ParserException($s, "Recursion limit reached", $token, $moduleName);
 			}
             $tag = is_string($token->rule->tag) ? $token->rule->tag :
                 strtoupper($token->rule->tag->name);
@@ -57,7 +58,7 @@ final readonly class Parser implements ParserInterface {
                     sprintf("No transition found for token '%s' in state '%s'",
                         $tag,
                         $stateName
-                    ), $token);
+                    ), $token, $moduleName);
 			}
 			if (is_callable($transition)) {
 				$lastI = $s->i;
@@ -65,14 +66,14 @@ final readonly class Parser implements ParserInterface {
 				try {
 					$transition($token, $s, $codeBuilder);
 				} catch (UnknownType $e) {
-					throw new ParserException($s, "Unknown type: " . $e->getMessage(), $token);
+					throw new ParserException($s, "Unknown type: " . $e->getMessage(), $token, $moduleName);
                 } catch (FunctionBodyException|UnknownContextVariable $e) {
-                    throw new ParserException($s, $e->getMessage(), $token);
+                    throw new ParserException($s, $e->getMessage(), $token, $moduleName);
 				} catch (AnalyserException $e) {
-					throw new ParserException($s, "Analyser exception: " . $e->getMessage(), $token);
+					throw new ParserException($s, "Analyser exception: " . $e->getMessage(), $token, $moduleName);
 				}
 				if ($s->i === $lastI && $s->state === $lastState) {
-					throw new ParserException($s, "Transition did not change state or index ($lastI, $lastState)", $token);
+					throw new ParserException($s, "Transition did not change state or index ($lastI, $lastState)", $token, $moduleName);
 				}
 			} else {
 				$s->state = (int)$transition;

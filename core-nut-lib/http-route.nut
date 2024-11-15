@@ -166,6 +166,14 @@ httpPostJson = ^[pattern: RoutePattern, handler: Type<^Nothing => Any>, bodyArgN
     response: NoResponseBody[204]
 ];
 
+httpPutJson = ^[pattern: RoutePattern, handler: Type<^Nothing => Any>, bodyArgName: String<1..>] => HttpRoute :: HttpRoute[
+    method: HttpRequestMethod.PUT,
+    pattern: #.pattern,
+    requestBody: JsonRequestBody[#.bodyArgName],
+    handler: #.handler,
+    response: NoResponseBody[204]
+];
+
 httpPatchJson = ^[pattern: RoutePattern, handler: Type<^Nothing => Any>, bodyArgName: String<1..>] => HttpRoute :: HttpRoute[
     method: HttpRequestMethod.PATCH,
     pattern: #.pattern,
