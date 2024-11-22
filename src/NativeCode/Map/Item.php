@@ -96,7 +96,7 @@ final readonly class Item implements NativeMethod {
 			if ($result) {
 				$targetType = $this->toBaseType($target->type);
 				$type = $targetType instanceof RecordType ?
-					($targetType->types()[$parameterValue->literalValue()] ?? null) :
+					($targetType->types()[$parameterValue->literalValue()] ?? $targetType->restType()) :
 					$targetType->itemType();
 				return new TypedValue($type, $result);
 			}

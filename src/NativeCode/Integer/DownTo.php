@@ -40,11 +40,11 @@ final readonly class DownTo implements NativeMethod {
 						$parameterType->range()->minValue(),
 						$targetType->range()->maxValue()
 					) : $this->context->typeRegistry()->nothing(),
-					max(0,
+					min($maxLength, max(0,
 						$parameterType->range()->maxValue() === PlusInfinity::value ||
 						$targetType->range()->minValue() === MinusInfinity::value ? 0 :
 							1 + $targetType->range()->minValue() - $parameterType->range()->maxValue()
-					),
+					)),
 					$maxLength
 				);
 			}

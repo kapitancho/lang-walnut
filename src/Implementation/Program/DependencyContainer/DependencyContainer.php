@@ -77,10 +77,18 @@ final class DependencyContainer implements DependencyContainerInterface {
 			return $found;
 		}
 		try {
-			$result = $this->containerCastExpression()->execute(
+			$sType = TypedValue::forValue($this->valueRegistry->type($type));
+			$containerCastExpression = $this->containerCastExpression();
+			$containerCastExpression->analyse(
+				$this->globalContext->withAddedVariableType(
+					new VariableNameIdentifier('#'),
+					$sType->type
+				)
+			);
+			$result = $containerCastExpression->execute(
 				$this->globalContext->withAddedVariableValue(
 					new VariableNameIdentifier('#'),
-					TypedValue::forValue($this->valueRegistry->type($type))
+					$sType
 				)
 			)->value();
 			if ($result instanceof ErrorValue && $result->errorValue() instanceof SealedValue &&

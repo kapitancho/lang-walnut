@@ -77,7 +77,9 @@ final class CustomMethodRegistryBuilder implements MethodRegistry, CustomMethodR
 		};
 	}
 
-	public function analyse(): void {
+	/** @return string[] - the errors found during analyse */
+	public function analyse(): array {
+		$analyseErrors = [];
 		foreach($this->methods as $methods) {
 			foreach($methods as $method) {
 				try {
@@ -86,33 +88,29 @@ final class CustomMethodRegistryBuilder implements MethodRegistry, CustomMethodR
 						$method->parameterType(),
 					);
 				} catch (AnalyserException $e) {
-					throw new AnalyserException(
-						sprintf("%s : %s",$this->getErrorMessageFor($method), $e->getMessage()),
-						previous: $e
-					);
+					$analyseErrors[] = sprintf("%s : %s",$this->getErrorMessageFor($method), $e->getMessage());
 				}
 				$d = $method->dependencyType();
 				if ($d && !($d instanceof NothingType)) {
 					$value = $this->dependencyContainer->valueByType($method->dependencyType());
 					if ($value instanceof DependencyError) {
-						throw new AnalyserException(
-							sprintf("%s : the dependency %s cannot be resolved: %s (type: %s)",
-								$this->getErrorMessageFor($method),
-								$method->dependencyType(),
-								match($value->unresolvableDependency) {
-									UnresolvableDependency::notFound => "no appropriate value found",
-									UnresolvableDependency::ambiguous => "ambiguity - multiple values found",
-									UnresolvableDependency::circularDependency => "circular dependency detected",
-									UnresolvableDependency::unsupportedType => "unsupported type found",
-                                    UnresolvableDependency::errorWhileCreatingValue => 'error returned while creating value',
-								},
-								$value->type
-							)
+						$analyseErrors[] = sprintf("%s : the dependency %s cannot be resolved: %s (type: %s)",
+							$this->getErrorMessageFor($method),
+							$method->dependencyType(),
+							match($value->unresolvableDependency) {
+								UnresolvableDependency::notFound => "no appropriate value found",
+								UnresolvableDependency::ambiguous => "ambiguity - multiple values found",
+								UnresolvableDependency::circularDependency => "circular dependency detected",
+								UnresolvableDependency::unsupportedType => "unsupported type found",
+                                UnresolvableDependency::errorWhileCreatingValue => 'error returned while creating value',
+							},
+							$value->type
 						);
 					}
 				}
 			}
 		}
+		return $analyseErrors;
 	}
 
 	public function jsonSerialize(): array {

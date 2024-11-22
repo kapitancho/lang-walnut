@@ -40,11 +40,11 @@ final readonly class UpTo implements NativeMethod {
 						$targetType->range()->minValue(),
 						$parameterType->range()->maxValue()
 					) : $this->context->typeRegistry()->nothing(),
-					max(0,
+					min($maxLength, max(0,
 						$targetType->range()->maxValue() === PlusInfinity::value ||
 						$parameterType->range()->minValue() === MinusInfinity::value ? 0 :
 							1 + $parameterType->range()->minValue() - $targetType->range()->maxValue()
-					),
+					)),
 					$maxLength
 				);
 			}

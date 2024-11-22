@@ -39,25 +39,30 @@ final readonly class ProgramBuilder implements ProgramBuilderInterface {
 		private AnalyserContext&ExecutionContext $globalContext,
 	) {}
 
-	private function analyseGlobalFunctions(): void {
+	/** @return string[] - the errors found during analyse */
+	private function analyseGlobalFunctions(): array {
+		$analyseErrors = [];
+
 		//Part 1 - check all global functions
 		foreach($this->globalScopeBuilder->build()->allTypedValues() as $name => $typedValue) {
 			if ($typedValue->value instanceof FunctionValue) {
 				try {
 					$typedValue->value->analyse($this->globalContext);
 				} catch (AnalyserException $ex) {
-					throw new AnalyserException(
-						"Error in function $name: {$ex->getMessage()}",
-						previous: $ex
-					);
+					$analyseErrors[] = "Error in function $name: {$ex->getMessage()}";
 				}
 			}
 		}
+		return $analyseErrors;
 	}
 
 	public function analyseAndBuildProgram(): Program {
-		$this->analyseGlobalFunctions();
-		$this->customMethodRegistryBuilder->analyse();
+		$globalFunctionAnalyseErrors = $this->analyseGlobalFunctions();
+		$customMethodAnalyseErrors = $this->customMethodRegistryBuilder->analyse();
+		$analyseErrors = [... $globalFunctionAnalyseErrors, ... $customMethodAnalyseErrors];
+		if (count($analyseErrors) > 0) {
+			throw new AnalyserException(implode("\n", $analyseErrors));
+		}
 		return new Program(
 			$this->globalScopeBuilder->build(),
 		);
