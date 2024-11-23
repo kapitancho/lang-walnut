@@ -32,8 +32,9 @@ $result = $c->call('start', ['arg1', 'arg2']); //Call the main function of the `
 echo "Result: $result", PHP_EOL;
 ```
 
-## Old Demos (a new repository will be created soon)
-- [Walnut Lang demos](https://github.com/kapitancho/walnut-lang-demos)
+## Demos
+- [Downloadable Walnut Lang demos](https://github.com/kapitancho/lang-walnut-demos)
+- [Online demos](https://demo.walnutphp.com/)
 
 ## Documentation
 0. [Index](docs/00-language-reference.md)
