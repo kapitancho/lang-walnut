@@ -89,6 +89,7 @@ final class CustomMethodRegistryBuilder implements MethodRegistry, CustomMethodR
 					);
 				} catch (AnalyserException $e) {
 					$analyseErrors[] = sprintf("%s : %s",$this->getErrorMessageFor($method), $e->getMessage());
+					continue;
 				}
 				$d = $method->dependencyType();
 				if ($d && !($d instanceof NothingType)) {
