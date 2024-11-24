@@ -110,7 +110,8 @@ final readonly class ProgramFactory implements DependencyContainerInterface, Pro
 			$this->typeRegistryBuilder,
 			$this->valueRegistry,
 			$this->expressionRegistry,
-			$this->globalScopeBuilder
+			$this->globalScopeBuilder,
+			$this->customMethodRegistryBuilder
 		);
 	}
 

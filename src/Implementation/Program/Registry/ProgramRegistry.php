@@ -4,6 +4,7 @@ namespace Walnut\Lang\Implementation\Program\Registry;
 
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope;
+use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry as ProgramRegistryInterface;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
@@ -15,7 +16,8 @@ final readonly class ProgramRegistry implements ProgramRegistryInterface, JsonSe
 		private TypeRegistry $typeRegistry,
 		private ValueRegistry $valueRegistry,
 		private ExpressionRegistry $expressionRegistry,
-		private ScopeBuilder $globalScopeBuilder
+		private ScopeBuilder $globalScopeBuilder,
+		private CustomMethodRegistryBuilder $customMethodRegistryBuilder
 	) {}
 
 	public function typeRegistry(): TypeRegistry {
@@ -33,8 +35,9 @@ final readonly class ProgramRegistry implements ProgramRegistryInterface, JsonSe
 
 	public function jsonSerialize(): array {
 		return [
-			'typeRegistry' => $this->typeRegistry,
-			'variables' => $this->globalScope()
+			'types' => $this->typeRegistry,
+			'variables' => $this->globalScope(),
+			'customMethods' => $this->customMethodRegistryBuilder
 		];
 	}
 
