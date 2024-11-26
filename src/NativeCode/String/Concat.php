@@ -35,6 +35,10 @@ final readonly class Concat implements NativeMethod {
 					$parameterType->range()->maxLength() === PlusInfinity::value ? PlusInfinity::value :
 					$targetType->range()->maxLength() + $parameterType->range()->maxLength()
 				);
+			} elseif ($parameterType->isSubtypeOf(
+				$this->context->typeRegistry()->string()
+			)) {
+				return $this->context->typeRegistry()->string();
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));

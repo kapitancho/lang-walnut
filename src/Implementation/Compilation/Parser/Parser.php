@@ -8,7 +8,11 @@ use Walnut\Lang\Blueprint\Compilation\CodeBuilder;
 use Walnut\Lang\Blueprint\Compilation\ModuleImporter;
 use Walnut\Lang\Blueprint\Compilation\Parser as ParserInterface;
 use Walnut\Lang\Blueprint\Function\FunctionBodyException;
+use Walnut\Lang\Blueprint\Program\UnknownEnumerationValue;
 use Walnut\Lang\Blueprint\Program\UnknownType;
+use Walnut\Lang\Blueprint\Range\InvalidIntegerRange;
+use Walnut\Lang\Blueprint\Range\InvalidLengthRange;
+use Walnut\Lang\Blueprint\Range\InvalidRealRange;
 use Walnut\Lib\Walex\Token;
 
 final readonly class Parser implements ParserInterface {
@@ -65,6 +69,10 @@ final readonly class Parser implements ParserInterface {
 				$lastState = $s->state;
 				try {
 					$transition($token, $s, $codeBuilder);
+				} catch (InvalidIntegerRange|InvalidRealRange|InvalidLengthRange $e) {
+					throw new ParserException($s, "Range Issue: " . $e->getMessage(), $token, $moduleName);
+				} catch (UnknownEnumerationValue $e) {
+					throw new ParserException($s, "Enumeration Issue: " . $e->getMessage(), $token, $moduleName);
 				} catch (UnknownType $e) {
 					throw new ParserException($s, "Unknown type: " . $e->getMessage(), $token, $moduleName);
                 } catch (FunctionBodyException|UnknownContextVariable $e) {
