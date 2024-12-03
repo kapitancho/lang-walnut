@@ -71,19 +71,19 @@ interface TypeRegistry {
 	public function stringSubset(array $values): StringSubsetType;
 
 	public function array(
-		Type             $itemType = null,
+		Type|null        $itemType = null,
 		int              $minLength = 0,
 		int|PlusInfinity $maxLength = PlusInfinity::value
 	): ArrayType;
 	public function map(
-		Type             $itemType = null,
+		Type|null        $itemType = null,
 		int              $minLength = 0,
 		int|PlusInfinity $maxLength = PlusInfinity::value
 	): MapType;
 	/** @param list<Type> $itemTypes */
-	public function tuple(array $itemTypes, Type $restType = null): TupleType;
+	public function tuple(array $itemTypes, Type|null $restType = null): TupleType;
 	/** @param array<string, Type> $itemTypes */
-	public function record(array $itemTypes, Type $restType = null): RecordType;
+	public function record(array $itemTypes, Type|null $restType = null): RecordType;
 
 	/** @param list<Type> $types */
 	public function union(array $types, bool $normalize = true): Type;

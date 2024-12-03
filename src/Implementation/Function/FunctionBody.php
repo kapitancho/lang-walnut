@@ -11,8 +11,10 @@ use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownContextVariable;
 use Walnut\Lang\Blueprint\Function\FunctionBody as FunctionBodyInterface;
 use Walnut\Lang\Blueprint\Identifier\IdentifierException;
+use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\SealedType;
@@ -24,6 +26,7 @@ use Walnut\Lang\Blueprint\Value\SealedValue;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
+use Walnut\Lang\Implementation\Type\OptionalKeyType;
 
 final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializable {
 
@@ -31,6 +34,7 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 
 	public function __construct(
 		private TypeRegistry $typeRegistry,
+		private ValueRegistry $valueRegistry,
 		private Expression $expression
 	) {}
 
@@ -44,6 +48,11 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 		Type $parameterType,
 		Type $dependencyType
 	): Type {
+		$mapItemNotFound = $this->typeRegistry->sealed(new TypeNameIdentifier("MapItemNotFound"));
+		$tConv = fn(Type $type): Type => $type instanceof OptionalKeyType ?
+			$this->typeRegistry->result($type->valueType(), $mapItemNotFound) :
+			$type;
+
 		foreach(['$' => $targetType, '#' => $parameterType, '%' => $dependencyType] as $variableName => $type) {
 			if (!($type instanceof NothingType)) {
 				$analyserContext = $analyserContext->withAddedVariableType(
@@ -66,7 +75,7 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 					foreach($type->types() as $fieldName => $fieldType) {
 						$analyserContext = $analyserContext->withAddedVariableType(
 							new VariableNameIdentifier($variableName . $fieldName),
-							$fieldType
+							$tConv($fieldType)
 						);
 					}
 				}
@@ -76,7 +85,7 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 			foreach($targetType->valueType()->types() as $fieldName => $fieldType) {
 				$analyserContext = $analyserContext->withAddedVariableType(
 					new VariableNameIdentifier('$' . $fieldName),
-					$fieldType
+					$tConv($fieldType)
 				);
 			}
 		}
@@ -99,6 +108,11 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 		TypedValue $parameterValue,
 		TypedValue|null $dependencyValue
 	): Value {
+		$mapItemNotFound = $this->typeRegistry->sealed(new TypeNameIdentifier("MapItemNotFound"));
+		$tConv = fn(Type $type): Type => $type instanceof OptionalKeyType ?
+			$this->typeRegistry->result($type->valueType(), $mapItemNotFound) :
+			$type;
+
 		foreach(['$' => $targetValue, '#' => $parameterValue, '%' => $dependencyValue] as $variableName => $value) {
 			if ($value) {
 				$executionContext = $executionContext->withAddedVariableValue(
@@ -116,11 +130,19 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 					}
 				}
 				if ($t instanceof RecordType && $v instanceof RecordValue) {
+					$values = $v->values();
 					foreach($t->types() as $fieldName => $fieldType) {
 						try {
+							$value = $values[$fieldName] ??
+								$this->valueRegistry->error(
+									$this->valueRegistry->sealedValue(
+										new TypeNameIdentifier('MapItemNotFound'),
+										$this->valueRegistry->record(['key' => $this->valueRegistry->string($fieldName)])
+									)
+								);
 							$executionContext = $executionContext->withAddedVariableValue(
 								new VariableNameIdentifier($variableName . $fieldName),
-								new TypedValue($fieldType, $v->valueOf($fieldName)) // TODO: not found
+								new TypedValue($tConv($fieldType), $value)
 							);
 						} catch(IdentifierException) {}
 					}
@@ -128,12 +150,21 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 			}
 		}
 		if ($targetValue && $targetValue->type instanceof SealedType && $targetValue->value instanceof SealedValue) {
+			$values = $targetValue->value->value()->values();
 			foreach($targetValue->type->valueType()->types() as $fieldName => $fieldType) {
+				$value = $values[$fieldName] ??
+					$this->valueRegistry->error(
+						$this->valueRegistry->sealedValue(
+							new TypeNameIdentifier('MapItemNotFound'),
+							$this->valueRegistry->record(['key' => $this->valueRegistry->string($fieldName)])
+						)
+					)
+				;
 				$executionContext = $executionContext->withAddedVariableValue(
 					new VariableNameIdentifier('$' . $fieldName),
 					new TypedValue(
-						$fieldType,
-						$targetValue->value->value()->valueOf($fieldName) // TODO: not found
+						$tConv($fieldType),
+						$value
 					)
 				);
 			}

@@ -272,21 +272,21 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
         return $this->enumerationTypes[$typeName->identifier] ?? UnknownType::withName($typeName);
     }
 
-	public function array(Type $itemType = null, int $minLength = 0, int|PlusInfinity $maxLength = PlusInfinity::value): ArrayType {
+	public function array(Type|null $itemType = null, int $minLength = 0, int|PlusInfinity $maxLength = PlusInfinity::value): ArrayType {
 		return new ArrayType($itemType ?? $this->anyType, new LengthRange($minLength, $maxLength));
 	}
 
-	public function map(Type $itemType = null, int $minLength = 0, int|PlusInfinity $maxLength = PlusInfinity::value): MapType {
+	public function map(Type|null $itemType = null, int $minLength = 0, int|PlusInfinity $maxLength = PlusInfinity::value): MapType {
 		return new MapType($itemType ?? $this->anyType, new LengthRange($minLength, $maxLength));
 	}
 
 	/** @param list<Type> $itemTypes */
-	public function tuple(array $itemTypes, Type $restType = null): TupleType {
+	public function tuple(array $itemTypes, Type|null $restType = null): TupleType {
 		return new TupleType($this, $itemTypes, $restType ?? $this->nothingType);
 	}
 
 	/** @param array<string, Type> $itemTypes */
-	public function record(array $itemTypes, Type $restType = null): RecordType {
+	public function record(array $itemTypes, Type|null $restType = null): RecordType {
 		return new RecordType($this, $itemTypes, $restType ?? $this->nothingType);
 	}
 
