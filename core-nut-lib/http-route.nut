@@ -14,13 +14,13 @@ JsonRequestBody->toParameter(^HttpRequest => Result<Map<JsonValue>, InvalidJsonS
     value = body=>jsonDecode;
     ?whenTypeOf(value) is {
         type{Result<Nothing, InvalidJsonString>}: value,
-        type{JsonValue}: [:]->withKeyValue[key: $.valueKey, value: value]
+        type{JsonValue}: [:]->withKeyValue[key: $valueKey, value: value]
     }
 };
 
 NoResponseBody = $[statusCode: HttpStatusCode];
 NoResponseBody->fromParameter(^Any => HttpResponse) :: [
-     statusCode: $.statusCode,
+     statusCode: $statusCode,
      protocolVersion: HttpProtocolVersion.HTTP11,
      headers: [:],
      body: null
@@ -30,7 +30,7 @@ RedirectResponseBody = $[statusCode: HttpStatusCode];
 RedirectResponseBody->fromParameter(^Any => Result<HttpResponse, Any>) :: {
     redirectValue = #=>as(type{String});
     [
-         statusCode: $.statusCode,
+         statusCode: $statusCode,
          protocolVersion: HttpProtocolVersion.HTTP11,
          headers: [:]->withKeyValue[key: 'Location', value: [redirectValue]],
          body: null
@@ -44,7 +44,7 @@ JsonResponseBody->fromParameter(^Any => Result<HttpResponse, Any>) :: {
     ?whenTypeOf(jsonValue) is {
         type{Result<Nothing, InvalidJsonValue>}: jsonValue,
         type{JsonValue}: [
-             statusCode: $.statusCode,
+             statusCode: $statusCode,
              protocolVersion: HttpProtocolVersion.HTTP11,
              headers: [:]->withKeyValue[key: 'Content-Type', value: ['application/json']],
              body: jsonValue->stringify
@@ -81,20 +81,20 @@ HttpRoute->handleRequest(^HttpRequest => Result<HttpResponse, HttpRouteDoesNotMa
     };
     runner = ^Null => Result<HttpResponse, Any> :: {
         ?whenValueOf(request.method) is {
-            $.method: {
-                matchResult = $.pattern->matchAgainst(request.requestTarget);
+            $method: {
+                matchResult = $pattern->matchAgainst(request.requestTarget);
                 ?whenTypeOf(matchResult) is {
                     type{Map<String|Integer<0..>>}: {
-                        bodyArg = $.requestBody=>toParameter(request);
+                        bodyArg = $requestBody=>toParameter(request);
                         callParams = matchResult->mergeWith(bodyArg);
                         callParams = callParams->asJsonValue;
-                        handlerType = $.handler;
+                        handlerType = $handler;
                         handlerParameterType = handlerType->parameterType;
                         handlerReturnType = handlerType->returnType;
                         handlerParams = callParams=>hydrateAs(handlerParameterType);
                         handlerInstance = %=>valueOf(handlerType);
                         handlerResult = ?noError(handlerInstance(handlerParams));
-                        $.response=>fromParameter(handlerResult)
+                        $response=>fromParameter(handlerResult)
                     },
                     ~: Error(HttpRouteDoesNotMatch[])
                 }
@@ -113,7 +113,7 @@ HttpRoute->handleRequest(^HttpRequest => Result<HttpResponse, HttpRouteDoesNotMa
 HttpRouteChain = $[routes: Array<HttpRoute, 1..>];
 HttpRouteChain->handleRequest(^HttpRequest => Result<HttpResponse, HttpRouteDoesNotMatch>) :: {
     request = #;
-    routes = $.routes;
+    routes = $routes;
 
     h = ^Array<HttpRoute, 1..> => Result<HttpResponse, HttpRouteDoesNotMatch> :: {
         routes = #;

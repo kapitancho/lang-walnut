@@ -33,9 +33,9 @@ Time <: [hour: Integer<0..23>, minute: Integer<0..59>, second: Integer<0..59>];
 DateAndTime <: [date: Date, time: Time];
 
 Date ==> String :: [
-    $.year->asString,
-    $.month->asString->padLeft[length: 2, padString: '0'],
-    $.day->asString->padLeft[length: 2, padString: '0']
+    $year->asString,
+    $month->asString->padLeft[length: 2, padString: '0'],
+    $day->asString->padLeft[length: 2, padString: '0']
 ]->combineAsString('-');
 
 JsonValue ==> Date @ InvalidDate :: {
@@ -66,9 +66,9 @@ String ==> Date @ InvalidDate :: {
 };
 
 Time ==> String :: [
-    $.hour->asString->padLeft[length: 2, padString: '0'],
-    $.minute->asString->padLeft[length: 2, padString: '0'],
-    $.second->asString->padLeft[length: 2, padString: '0']
+    $hour->asString->padLeft[length: 2, padString: '0'],
+    $minute->asString->padLeft[length: 2, padString: '0'],
+    $second->asString->padLeft[length: 2, padString: '0']
 ]->combineAsString(':');
 
 JsonValue ==> Time @ InvalidTime :: {
@@ -98,7 +98,7 @@ String ==> Time @ InvalidTime :: {
      }
 };
 
-DateAndTime ==> String :: [$.date->asString, $.time->asString]->combineAsString(' ');
+DateAndTime ==> String :: [$date->asString, $time->asString]->combineAsString(' ');
 
 JsonValue ==> DateAndTime @ InvalidDate|InvalidTime|InvalidDateAndTime :: {
     ?whenTypeOf($) is {

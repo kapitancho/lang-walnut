@@ -5,9 +5,9 @@ SqlString = String;
 SqlQuoter = [quoteIdentifier: ^String => String, quoteValue: ^String|Integer|Real|Boolean|Null => String];
 
 SqlValue = $[value: String|Integer|Real|Boolean|Null];
-SqlValue ==> SqlString %% [~SqlQuoter] :: %sqlQuoter.quoteValue($.value);
+SqlValue ==> SqlString %% [~SqlQuoter] :: %sqlQuoter.quoteValue($value);
 PreparedValue = $[parameterName: String];
-PreparedValue ==> SqlString :: ':'->concat($.parameterName);
+PreparedValue ==> SqlString :: ':'->concat($parameterName);
 QueryValue = SqlValue|PreparedValue;
 
 DatabaseTableName = String<1..>;
@@ -26,7 +26,7 @@ InsertQuery ==> DatabaseSqlQuery %% [~SqlQuoter] :: 'INSERT INTO '
 
 TableField = $[tableAlias: DatabaseTableName, fieldName: DatabaseFieldName];
 TableField ==> SqlString %% [~SqlQuoter] :: [
-    %sqlQuoter.quoteIdentifier($.tableAlias), %sqlQuoter.quoteIdentifier($.fieldName)
+    %sqlQuoter.quoteIdentifier($tableAlias), %sqlQuoter.quoteIdentifier($fieldName)
 ]->combineAsString('.');
 
 SqlFieldExpressionOperation = :[Equals, NullSafeEquals, NotEquals, LessThan, LessOrEquals, GreaterThan, GreaterOrEquals, Like, NotLike, Regexp];
@@ -59,7 +59,7 @@ SqlFieldExpression ==> SqlString :: [
     $operation->as(type{SqlString}),
     $value->as(type{SqlString})
 ]->combineAsString(' ');
-SqlRawExpression ==> SqlString :: $.expression;
+SqlRawExpression ==> SqlString :: $expression;
 SqlAndExpression ==> SqlString :: ?whenTypeOf($expressions) is {
     type{Array<SqlExpression, 1..>}: [
         '(',
@@ -102,7 +102,7 @@ DeleteQuery ==> DatabaseSqlQuery %% [~SqlQuoter] :: 'DELETE FROM '
     ];
 
 SqlSelectLimit = $[limit: Integer<1..>, offset: Integer<0..>];
-SqlSelectLimit ==> SqlString :: ['LIMIT', $.limit->asString, 'OFFSET', $.offset->asString]->combineAsString(' ');
+SqlSelectLimit ==> SqlString :: ['LIMIT', $limit->asString, 'OFFSET', $offset->asString]->combineAsString(' ');
 
 SqlOrderByDirection = :[Asc, Desc];
 SqlOrderByDirection ==> SqlString :: ?whenValueOf($) is {
@@ -111,8 +111,8 @@ SqlOrderByDirection ==> SqlString :: ?whenValueOf($) is {
 };
 SqlOrderByField = $[field: DatabaseFieldName, direction: SqlOrderByDirection];
 SqlOrderByField ==> SqlString %% [~SqlQuoter] :: [
-    %sqlQuoter.quoteIdentifier($.field),
-    $.direction->asSqlString
+    %sqlQuoter.quoteIdentifier($field),
+    $direction->asSqlString
 ]->combineAsString(' ');
 SqlOrderByFields = $[fields: Array<SqlOrderByField>];
 SqlOrderByFields ==> SqlString :: 'ORDER BY '->concat(
@@ -134,8 +134,8 @@ SqlTableJoin = $[
 ];
 SqlTableJoin ==> SqlString %% [~SqlQuoter] :: [
     $joinType->asSqlString, ' ',
-    %sqlQuoter.quoteIdentifier($.tableName), ' AS ', %sqlQuoter.quoteIdentifier($.tableAlias),
-    ' ON ', $.queryFilter->asSqlString
+    %sqlQuoter.quoteIdentifier($tableName), ' AS ', %sqlQuoter.quoteIdentifier($tableAlias),
+    ' ON ', $queryFilter->asSqlString
 ]->combineAsString(' ');
 
 SqlSelectFieldList = $[fields: Map<DatabaseFieldName|TableField|QueryValue>];

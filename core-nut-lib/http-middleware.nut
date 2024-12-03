@@ -4,12 +4,12 @@ CompositeHandler <: [defaultHandler: HttpRequestHandler, middlewares: Array<Http
 
 CompositeHandler ==> HttpRequestHandler :: {
     ^[request: HttpRequest] => Result<HttpResponse, Any> :: {
-        ?whenTypeOf($.middlewares) is {
-            type{Array<1..>}: {
-                m = $.middlewares=>withoutFirst;
-                m.element[#.request, {CompositeHandler[$.defaultHandler, m.array]}=>as(type{HttpRequestHandler})]
+        ?whenTypeOf($middlewares) is {
+            type{Array<HttpMiddleware, 1..>}: {
+                m = $middlewares => withoutFirst;
+                {m.element} [#.request, {CompositeHandler[$defaultHandler, m.array]}=>as(type{HttpRequestHandler})]
             },
-            ~: $.defaultHandler[#.request]
+            ~: $defaultHandler[#.request]
         }
     }
 };
@@ -90,7 +90,7 @@ LookupRouter ==> HttpMiddleware %% DependencyContainer :: {
             method: request.method
         ]}->as(type{HttpRequest});
 
-        kv = $.routerMapping->findFirst(
+        kv = $routerMapping->findFirst(
             ^[path: String, type: Type] => Boolean :: {
                 request.requestTarget->startsWith(#.path)
             }

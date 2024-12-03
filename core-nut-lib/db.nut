@@ -10,12 +10,12 @@ DatabaseQueryCommand = [query: DatabaseSqlQuery, boundParameters: DatabaseQueryB
 DatabaseQueryResultRow = Map<DatabaseValue>;
 DatabaseQueryResult = Array<DatabaseQueryResultRow>;
 DatabaseQueryFailure = $[query: DatabaseSqlQuery, boundParameters: DatabaseQueryBoundParameters, error: String];
-DatabaseQueryFailure->error(^Null => String) :: $.error;
+DatabaseQueryFailure->error(^Null => String) :: $error;
 
 DatabaseQueryFailure ==> ExternalError :: ExternalError[
     errorType: $->type->typeName,
     originalError: $,
-    errorMessage: $.error
+    errorMessage: $error
 ];
 
 ==> DatabaseConnector %% DatabaseConnection :: DatabaseConnector[connection: %];

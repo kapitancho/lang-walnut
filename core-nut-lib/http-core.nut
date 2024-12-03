@@ -45,17 +45,17 @@ HttpResponse = [
 ];
 HttpResponse->withHeader(^[headerName: String, values: Array<String, 1..>] => HttpResponse) :: {
     [
-        protocolVersion: $.protocolVersion,
-        body: $.body,
-        headers: $.headers->withKeyValue[key: #.headerName, value: #.values],
-        statusCode: $.statusCode
+        protocolVersion: $protocolVersion,
+        body: $body,
+        headers: $headers->withKeyValue[key: #.headerName, value: #.values],
+        statusCode: $statusCode
     ]
 };
 HttpResponse->withBody(^HttpMessageBody|Null => HttpResponse) :: [
-    protocolVersion: $.protocolVersion,
+    protocolVersion: $protocolVersion,
     body: #,
-    headers: $.headers,
-    statusCode: $.statusCode
+    headers: $headers,
+    statusCode: $statusCode
 ];
 
 HttpRequestHandler = ^[request: HttpRequest] => Result<HttpResponse, Any>;

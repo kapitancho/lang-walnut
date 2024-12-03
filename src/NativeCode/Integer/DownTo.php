@@ -30,21 +30,22 @@ final readonly class DownTo implements NativeMethod {
 		if ($targetType instanceof IntegerType || $targetType instanceof IntegerSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) {
-				$maxLength = max(0,
-					$targetType->range()->maxValue() === PlusInfinity::value ||
-					$parameterType->range()->minValue() === MinusInfinity::value ? PlusInfinity::value :
-					1 + $targetType->range()->maxValue() - $parameterType->range()->minValue(),
+				$tMin = $targetType->range()->minValue();
+				$tMax = $targetType->range()->maxValue();
+				$pMin = $parameterType->range()->minValue();
+				$pMax = $parameterType->range()->maxValue();
+
+				$minLength = max(0, $pMax === PlusInfinity::value || $tMin === MinusInfinity::value ?
+					0 : 1 + $tMin - $pMax
 				);
+				$maxLength = $tMax === PlusInfinity::value || $pMin === MinusInfinity::value ? PlusInfinity::value :
+					max(0, 1 + $tMax - $pMin);
+
 				return $this->context->typeRegistry()->array(
-					$maxLength > 0 ? $this->context->typeRegistry()->integer(
-						$parameterType->range()->minValue(),
-						$targetType->range()->maxValue()
-					) : $this->context->typeRegistry()->nothing(),
-					min($maxLength, max(0,
-						$parameterType->range()->maxValue() === PlusInfinity::value ||
-						$targetType->range()->minValue() === MinusInfinity::value ? 0 :
-							1 + $targetType->range()->minValue() - $parameterType->range()->maxValue()
-					)),
+					$maxLength === PlusInfinity::value || $maxLength > 0 ?
+						$this->context->typeRegistry()->integer($pMin, $tMax) :
+						$this->context->typeRegistry()->nothing(),
+					$maxLength === PlusInfinity::value ? $minLength : min($maxLength, $minLength),
 					$maxLength
 				);
 			}

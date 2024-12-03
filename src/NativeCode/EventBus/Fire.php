@@ -57,6 +57,14 @@ final readonly class Fire implements NativeMethod {
 					if ($listener instanceof FunctionValue) {
 						if ($parameterValue->type()->isSubtypeOf($listener->parameterType())) {
 							$listener->execute($this->context->globalContext(), $parameterValue);
+							if ($result->type()->isSubtypeOf(
+								$this->context->typeRegistry()->result(
+									$this->context->typeRegistry()->nothing(),
+									$this->context->typeRegistry()->withName(new TypeNameIdentifier('ExternalError'))
+								)
+							)) {
+								return TypedValue::forValue($result);
+							}
 						}
 					} else {
 						throw new ExecutionException("Invalid listener");
