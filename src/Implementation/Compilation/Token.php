@@ -19,6 +19,7 @@ enum Token: string {
 	case atom_type = '\:\[]';
 	case enum_type_start = '\:\[';
 	case colon = '\:';
+	case boolean_op = '(!|&&|\|\||\^\^)';
 	case lambda_param = '\^';
 	case lambda_return = '\=\>';
 	case error_as_external = '\*\>';
@@ -34,7 +35,6 @@ enum Token: string {
 	case empty_record = '\[\:\]';
 	case tuple_start = '\[';
 	case tuple_end = '\]';
-	case boolean_op = '(!|&&|\|\|)';
 	case union = '\|';
 	case intersection = '\&';
 	case assign = '\=';
@@ -60,6 +60,7 @@ enum Token: string {
 	case real_number = '(0|(\-?[1-9][0-9]*))\.[0-9]+';
 	case positive_integer_number = '0|([1-9][0-9]*)';
 	case integer_number = '0|(\-?[1-9][0-9]*)';
+	case arithmetic_op2 = '(\*\*|\/\/)';
 	case arithmetic_op_multiply = '\*';
 	case arithmetic_op = '[\+\-\/]';
 	case default_match = '\~';

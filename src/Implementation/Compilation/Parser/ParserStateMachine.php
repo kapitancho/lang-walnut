@@ -791,6 +791,10 @@ final readonly class ParserStateMachine {
 				T::no_error->name => 250,
 				T::no_external_error->name => 252,
 
+				T::boolean_op->name => $u = function(LT $token) { $this->s->stay(361); },
+				T::arithmetic_op->name => $u,
+				T::default_match->name => $u,
+
 				T::var_keyword->name => function(LT $token) {
 					$this->s->result = ['var_name' => $token->patternMatch->text];
 					$this->s->move(260);
@@ -903,8 +907,12 @@ final readonly class ParserStateMachine {
 						'-' => 'binaryMinus',
 						'*' => 'binaryMultiply',
 						'/' => 'binaryDivide',
+						'//' => 'binaryIntegerDivide',
 						'%' => 'binaryModulo',
-						'^' => 'binaryPower',
+						'**' => 'binaryPower',
+						'&' => 'binaryBitwiseAnd',
+						'|' => 'binaryBitwiseOr',
+						'^' => 'binaryBitwiseXor',
 						'<' => 'binaryLessThan',
 						'<=' => 'binaryLessThanEqual',
 						'>' => 'binaryGreaterThan',
@@ -913,9 +921,13 @@ final readonly class ParserStateMachine {
 						'==' => 'binaryEqual',
 						'||' => 'binaryOr',
 						'&&' => 'binaryAnd',
+						'^^' => 'binaryXor',
 					};
 					$this->s->move(316);
 				},
+				T::union->name => $c,
+				T::intersection->name => $c,
+				T::arithmetic_op2->name => $c,
 				T::arithmetic_op_multiply->name => $c,
 				T::lambda_param->name => $c,
 				T::boolean_op->name => $c,
@@ -966,6 +978,9 @@ final readonly class ParserStateMachine {
 				T::less_than_equal->name => $c,
 				T::greater_than_equal->name => $c,
 				T::arithmetic_op->name => $c,
+				T::intersection->name => $c,
+				T::union->name => $c,
+				T::arithmetic_op2->name => $c,
 				T::arithmetic_op_multiply->name => $c,
 				T::equals->name => $c,
 				T::not_equals->name => $c,
@@ -1272,6 +1287,39 @@ final readonly class ParserStateMachine {
 						])
 					);
 					$this->s->moveAndPop();
+				},
+			]],
+			361 => ['name' => 'unary op start', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->result = [];
+					$this->s->result['method_name'] = match($token->patternMatch->text) {
+						'+' => 'unaryPlus',
+						'-' => 'unaryMinus',
+						'~' => 'unaryBitwiseNot',
+						'!' => 'unaryNot',
+						default => 'unaryUnknown',
+					};
+					$this->s->push(362);
+					$this->s->move(301);
+				},
+			]],
+			362 => ['name' => 'unary op return', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->stay(363);
+				}
+			]],
+			363 => ['name' => 'unary op return end', 'transitions' => [
+				'' => function(LT $token) {
+					$g = $this->s->generated;
+					$m = $this->s->result['method_name'];
+					$this->s->pop();
+					$this->s->generated = $this->codeBuilder->methodCall(
+						$g,
+						new MethodNameIdentifier($m),
+						$this->codeBuilder->constant(
+							$this->codeBuilder->valueRegistry()->null()
+						)
+					);
 				},
 			]],
 
