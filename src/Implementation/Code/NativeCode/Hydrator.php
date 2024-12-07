@@ -153,6 +153,28 @@ final readonly class Hydrator {
 	}
 
 	private function hydrateAtom(Value $value, AtomType $targetType, string $hydrationPath): AtomValue {
+		$method = $this->methodRegistry->method(
+			$this->context->typeRegistry()->withName(new TypeNameIdentifier('JsonValue')),
+			new MethodNameIdentifier(
+				sprintf('as%s', $targetType->name())
+			)
+		);
+		if ($method instanceof Method) {
+			$result = $method->execute(
+				TypedValue::forValue($value),
+				TypedValue::forValue($this->context->valueRegistry()->null())
+			);
+			$resultValue = $result->value;
+			if ($resultValue instanceof ErrorValue) {
+				throw new HydrationException(
+					$value,
+					$hydrationPath,
+					sprintf("Atom hydration failed. Error: %s", $resultValue->errorValue())
+				//TODO - consider a better error message
+				);
+			}
+			return $resultValue;
+		}
 		return $targetType->value();
 	}
 
@@ -168,7 +190,16 @@ final readonly class Hydrator {
 				TypedValue::forValue($value),
 				TypedValue::forValue($this->context->valueRegistry()->null())
 			);
-			return $result instanceof TypedValue ? $result->value : $result;
+			$resultValue = $result->value;
+			if ($resultValue instanceof ErrorValue) {
+				throw new HydrationException(
+					$value,
+					$hydrationPath,
+					sprintf("Enumeration hydration failed. Error: %s", $resultValue->errorValue())
+					//TODO - consider a better error message
+				);
+			}
+			return $resultValue;
 		}
 		if ($value instanceof StringValue) {
 			foreach($targetType->values() as $enumValue) {
@@ -189,7 +220,19 @@ final readonly class Hydrator {
 		);
 	}
 	private function hydrateEnumerationSubset(Value $value, EnumerationSubsetType $targetType, string $hydrationPath): EnumerationValue {
-		if ($value instanceof StringValue) {
+		$resultValue = $this->hydrateEnumeration($value, $targetType->enumeration(), $hydrationPath);
+		if (!in_array($resultValue, $targetType->subsetValues())) {
+			throw new HydrationException(
+				$value,
+				$hydrationPath,
+				sprintf("The enumeration value %s is not among %s",
+					$resultValue,
+					implode(', ', $targetType->subsetValues())
+				)
+			);
+		}
+		return $resultValue;
+		/*if ($value instanceof StringValue) {
 			foreach($targetType->subsetValues() as $enumValue) {
 				if ($enumValue->name()->identifier === $value->literalValue()) {
 					return $this->context->valueRegistry()->enumerationValue(
@@ -205,7 +248,7 @@ final readonly class Hydrator {
 			sprintf("The value should be a string with a value among %s",
 				implode(', ', $targetType->subsetValues())
 			)
-		);
+		);*/
 	}
 
 	/*private function hydrateIntersection(Value $value, IntersectionType $targetType, string $hydrationPath): Value {
@@ -268,7 +311,16 @@ final readonly class Hydrator {
 				TypedValue::forValue($value),
 				TypedValue::forValue($this->context->valueRegistry()->null())
 			);
-			return $result instanceof TypedValue ? $result->value : $result;
+			$resultValue = $result->value;
+			if ($resultValue instanceof ErrorValue) {
+				throw new HydrationException(
+					$value,
+					$hydrationPath,
+					sprintf("Subtype hydration failed. Error: %s", $resultValue->errorValue())
+				//TODO - consider a better error message
+				);
+			}
+			return $resultValue;
 		}
 
 		$baseValue = $this->hydrateValue($value, $targetType->baseType(), $hydrationPath);
@@ -286,9 +338,9 @@ final readonly class Hydrator {
 			$resultValue = $result->value;
 			if ($resultValue instanceof ErrorValue) {
 				throw new HydrationException(
-					$resultValue,
+					$baseValue,
 					$hydrationPath,
-					'Subtype hydration failed'
+					sprintf('Value construction failed. Error: %s', $resultValue->errorValue())
 				);
 			}
 		}
@@ -310,7 +362,16 @@ final readonly class Hydrator {
 				TypedValue::forValue($value),
 				TypedValue::forValue($this->context->valueRegistry()->null())
 			);
-			return $result instanceof TypedValue ? $result->value : $result;
+			$resultValue = $result->value;
+			if ($resultValue instanceof ErrorValue) {
+				throw new HydrationException(
+					$value,
+					$hydrationPath,
+					sprintf("Sealed type hydration failed. Error: %s", $resultValue->errorValue())
+				//TODO - consider a better error message
+				);
+			}
+			return $resultValue;
 		}
 		$baseValue = $this->hydrateValue($value, $targetType->valueType(), $hydrationPath);
 		if ($baseValue instanceof RecordValue) {
@@ -327,9 +388,9 @@ final readonly class Hydrator {
 				$resultValue = $result->value;
 				if ($resultValue instanceof ErrorValue) {
 					throw new HydrationException(
-						$resultValue,
+						$baseValue,
 						$hydrationPath,
-						'Value construction failed'
+						sprintf('Value construction failed. Error: %s', $resultValue->errorValue())
 					);
 				}
 			}
