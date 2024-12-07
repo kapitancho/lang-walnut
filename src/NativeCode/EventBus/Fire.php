@@ -56,7 +56,7 @@ final readonly class Fire implements NativeMethod {
 				foreach($listeners->values() as $listener) {
 					if ($listener instanceof FunctionValue) {
 						if ($parameterValue->type()->isSubtypeOf($listener->parameterType())) {
-							$listener->execute($this->context->globalContext(), $parameterValue);
+							$result = $listener->execute($this->context->globalContext(), $parameterValue);
 							if ($result->type()->isSubtypeOf(
 								$this->context->typeRegistry()->result(
 									$this->context->typeRegistry()->nothing(),
