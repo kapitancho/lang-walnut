@@ -50,7 +50,7 @@ final readonly class SHIFT implements NativeMethod {
 				if (count($values) > 0) {
 					$value = array_shift($values);
 					$v->changeValueTo($this->context->valueRegistry()->tuple($values));
-					return $value;
+					return new TypedValue($v->targetType()->itemType(), $value);
 				}
 				return TypedValue::forValue($this->context->valueRegistry()->error(
 					$this->context->valueRegistry()->atom(new TypeNameIdentifier("ItemNotFound"))
