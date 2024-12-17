@@ -124,12 +124,31 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 		// @codeCoverageIgnoreEnd
 	}
 
+	private function isJsonType(Type $type): bool {
+		return match(true) {
+			$type instanceof IntegerType, $type instanceof IntegerSubsetType,
+			$type instanceof RealType, $type instanceof RealSubsetType,
+			$type instanceof StringType, $type instanceof StringSubsetType,
+			$type instanceof BooleanType, $type instanceof TrueType,
+			$type instanceof FalseType, $type instanceof NullType => true,
+			$type instanceof ArrayType => $this->isJsonType($type->itemType()),
+			$type instanceof MapType => $this->isJsonType($type->itemType()),
+			$type instanceof TupleType => $this->isJsonType($type->asArrayType()),
+			$type instanceof RecordType => $this->isJsonType($type->asMapType()),
+			$type instanceof MutableType => $this->isJsonType($type->valueType()),
+			default => false
+		};
+	}
+
 	/**
 	 * @param Type $type
 	 * @return array<string>
 	 */
 	public function getTypesFor(Type $type): array {
 		$result = $this->findTypesFor($type);
+		if ($this->isJsonType($type)) {
+			$result[] = 'JsonValue';
+		}
 		$result[] = 'Any';
 		if ($type instanceof NamedType) {
 			array_unshift($result, $type->name()->identifier);

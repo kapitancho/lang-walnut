@@ -13,6 +13,7 @@ use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
+use Walnut\Lang\Blueprint\Value\MutableValue;
 use Walnut\Lang\Blueprint\Value\NullValue;
 use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\RecordValue;
@@ -88,6 +89,9 @@ final readonly class AsJsonValue implements NativeMethod {
 				TypedValue::forValue($this->context->valueRegistry()->null())
 			);
 		}
+		if ($value instanceof MutableValue) {
+			return $this->getJsonValue($value->value());
+		}
 		if ($value instanceof SubtypeValue) {
 			return $this->getJsonValue($value->baseValue());
 		}
@@ -111,7 +115,11 @@ final readonly class AsJsonValue implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-        $result = $this->asJsonValue($targetValue);
+		try {
+			$result = $this->asJsonValue($targetValue);
+		} catch (FunctionReturn $return) {
+			return TypedValue::forValue($return->value);
+		}
 		return $result instanceof Value ? new TypedValue(
 			$this->context->typeRegistry()->withName(new TypeNameIdentifier('JsonValue')),
 			$result,
