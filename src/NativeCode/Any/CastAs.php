@@ -33,7 +33,15 @@ final readonly class CastAs implements NativeMethod {
 		TypeInterface $targetType,
 		TypeInterface $parameterType
 	): array|UnknownMethod {
+		$isParameterJson = $parameterType instanceof AliasType && $parameterType->name()->equals(
+			new TypeNameIdentifier('JsonValue')
+		);
 		foreach($this->typeMapper->getTypesFor($parameterType) as $candidate) {
+			if (!$isParameterJson && $candidate === 'JsonValue') {
+				//The JsonValue type should be ignored because there is a
+				//generic method asJsonValue which returns a different value (and type)
+				continue;
+			}
 			$method = $this->methodRegistry->method($targetType,
 				$methodName = new MethodNameIdentifier(sprintf('as%s',
 					$candidate
