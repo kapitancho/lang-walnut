@@ -136,6 +136,10 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 			$type instanceof TupleType => $this->isJsonType($type->asArrayType()),
 			$type instanceof RecordType => $this->isJsonType($type->asMapType()),
 			$type instanceof MutableType => $this->isJsonType($type->valueType()),
+			$type instanceof AliasType && $type->name()->identifier === 'JsonValue' => true,
+			$type instanceof AliasType => $this->isJsonType($type->aliasedType()),
+			$type instanceof UnionType => array_reduce($type->types(),
+				fn($carry, $type) => $carry && $this->isJsonType($type), true),
 			default => false
 		};
 	}

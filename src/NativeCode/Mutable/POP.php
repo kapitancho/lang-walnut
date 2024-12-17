@@ -54,7 +54,7 @@ final readonly class POP implements NativeMethod {
 				if (count($values) > 0) {
 					$value = array_pop($values);
 					$v->changeValueTo($this->context->valueRegistry()->tuple($values));
-					return new TypedValue($v->targetType()->itemType(), $value);
+					return new TypedValue($targetType->itemType(), $value);
 				}
 				return TypedValue::forValue($this->context->valueRegistry()->error(
 					$this->context->valueRegistry()->atom(new TypeNameIdentifier("ItemNotFound"))
