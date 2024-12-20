@@ -4,6 +4,7 @@ namespace Walnut\Lang\NativeCode\Any;
 
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Function\UnknownMethod;
 use Walnut\Lang\Blueprint\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
@@ -39,6 +40,13 @@ final readonly class JsonStringify implements NativeMethod {
 		TypedValue $parameter
 	): TypedValue {
 		$targetValue = $target->value;
+
+		$method0 = $this->methodRegistry->method(
+			$targetValue->type(), new MethodNameIdentifier('stringify')
+		);
+		if ($method0 !== UnknownMethod::value) {
+			return $method0->execute($target, $parameter);
+		}
 
 		$method1 = $this->methodRegistry->method(
 			$targetValue->type(), new MethodNameIdentifier('asJsonValue')
