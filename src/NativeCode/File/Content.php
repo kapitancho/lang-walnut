@@ -55,7 +55,7 @@ final readonly class Content implements NativeMethod {
 				return TypedValue::forValue($this->context->valueRegistry()->error(
 					$this->context->valueRegistry()->sealedValue(
 						new TypeNameIdentifier('CannotReadFile'),
-						$targetValue
+						$targetValue->value()
 					)
 				));
 			}

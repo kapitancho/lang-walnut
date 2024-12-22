@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\Boolean;
+namespace Walnut\Lang\NativeCode\Null;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
@@ -12,6 +12,7 @@ use Walnut\Lang\Blueprint\Type\FalseType;
 use Walnut\Lang\Blueprint\Type\TrueType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
+use Walnut\Lang\Blueprint\Value\NullValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class AsInteger implements NativeMethod {
@@ -25,26 +26,9 @@ final readonly class AsInteger implements NativeMethod {
 		Type $targetType,
 		Type $parameterType,
 	): Type {
-		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof BooleanType) {
-			return $this->context->typeRegistry()->integerSubset([
-				$this->context->valueRegistry()->integer(0),
-				$this->context->valueRegistry()->integer(1)
-			]);
-		}
-		if ($targetType instanceof TrueType) {
-			return $this->context->typeRegistry()->integerSubset([
-				$this->context->valueRegistry()->integer(1)
-			]);
-		}
-		if ($targetType instanceof FalseType) {
-			return $this->context->typeRegistry()->integerSubset([
-				$this->context->valueRegistry()->integer(0)
-			]);
-		}
-		// @codeCoverageIgnoreStart
-		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
-		// @codeCoverageIgnoreEnd
+		return $this->context->typeRegistry()->integerSubset([
+			$this->context->valueRegistry()->integer(0)
+		]);
 	}
 
 	public function execute(
@@ -54,9 +38,8 @@ final readonly class AsInteger implements NativeMethod {
 		$targetValue = $target->value;
 
 		$targetValue = $this->toBaseValue($targetValue);
-		if ($targetValue instanceof BooleanValue) {
-			$target = $targetValue->literalValue();
-			return TypedValue::forValue($this->context->valueRegistry()->integer($target ? 1 : 0));
+		if ($targetValue instanceof NullValue) {
+			return TypedValue::forValue($this->context->valueRegistry()->integer(0));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

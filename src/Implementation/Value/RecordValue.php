@@ -26,7 +26,7 @@ final readonly class RecordValue implements RecordValueInterface, JsonSerializab
 	    foreach($this->values as $value) {
             if (!$value instanceof Value) {
                 throw new InvalidArgumentException(
-                    'TupleValue must be constructed with a list of Value instances'
+                    'RecordValue must be constructed with a list of Value instances'
                 );
             }
         }

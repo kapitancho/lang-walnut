@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\Real;
+namespace Walnut\Lang\NativeCode\Integer;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
@@ -30,20 +30,8 @@ final readonly class AsInteger implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof IntegerSubsetType || $targetType instanceof RealSubsetType) {
-			return $this->context->typeRegistry()->integerSubset(
-				array_map(fn(RealValue|IntegerValue $v) =>
-					$this->context->valueRegistry()->integer((int)$v->literalValue()),
-					$targetType->subsetValues())
-			);
-		}
-		if ($targetType instanceof IntegerType || $targetType instanceof RealType) {
-			return $this->context->typeRegistry()->integer(
-				$targetType->range()->minValue() === MinusInfinity::value ? MinusInfinity::value :
-					(int)$targetType->range()->minValue(),
-				$targetType->range()->maxValue() === PlusInfinity::value ? PlusInfinity::value :
-					(int)$targetType->range()->maxValue()
-			);
+		if ($targetType instanceof IntegerSubsetType || $targetType instanceof IntegerType) {
+			return $targetType;
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -57,9 +45,8 @@ final readonly class AsInteger implements NativeMethod {
 		$targetValue = $target->value;
 
 		$targetValue = $this->toBaseValue($targetValue);
-		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
-			$target = $targetValue->literalValue();
-			return TypedValue::forValue($this->context->valueRegistry()->integer((int)$target));
+		if ($targetValue instanceof IntegerValue) {
+			return TypedValue::forValue($this->context->valueRegistry()->integer($targetValue->literalValue()));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

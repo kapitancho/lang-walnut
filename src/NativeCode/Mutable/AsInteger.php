@@ -1,28 +1,37 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\Real;
+namespace Walnut\Lang\NativeCode\Mutable;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
+use Walnut\Lang\Blueprint\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
+use Walnut\Lang\Blueprint\Function\Method;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Function\UnknownMethod;
+use Walnut\Lang\Blueprint\Identifier\MethodNameIdentifier;
+use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
 use Walnut\Lang\Blueprint\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
+use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
+use Walnut\Lang\Blueprint\Value\MutableValue;
 use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
+use Walnut\Lang\NativeCode\Any\CastAs;
 
 final readonly class AsInteger implements NativeMethod {
 	use BaseType;
 
 	public function __construct(
-		private MethodExecutionContext $context
+		private MethodExecutionContext $context,
+		private MethodRegistry $methodRegistry,
 	) {}
 
 	public function analyse(
@@ -30,20 +39,15 @@ final readonly class AsInteger implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof IntegerSubsetType || $targetType instanceof RealSubsetType) {
-			return $this->context->typeRegistry()->integerSubset(
-				array_map(fn(RealValue|IntegerValue $v) =>
-					$this->context->valueRegistry()->integer((int)$v->literalValue()),
-					$targetType->subsetValues())
+		if ($targetType instanceof MutableType) {
+			$valueType = $targetType->valueType();
+			$method = $this->methodRegistry->method(
+				$valueType,
+				new MethodNameIdentifier('asInteger')
 			);
-		}
-		if ($targetType instanceof IntegerType || $targetType instanceof RealType) {
-			return $this->context->typeRegistry()->integer(
-				$targetType->range()->minValue() === MinusInfinity::value ? MinusInfinity::value :
-					(int)$targetType->range()->minValue(),
-				$targetType->range()->maxValue() === PlusInfinity::value ? PlusInfinity::value :
-					(int)$targetType->range()->maxValue()
-			);
+			if ($method instanceof Method) {
+				return $method->analyse($valueType, $parameterType);
+			}
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -57,9 +61,17 @@ final readonly class AsInteger implements NativeMethod {
 		$targetValue = $target->value;
 
 		$targetValue = $this->toBaseValue($targetValue);
-		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
-			$target = $targetValue->literalValue();
-			return TypedValue::forValue($this->context->valueRegistry()->integer((int)$target));
+		if ($targetValue instanceof MutableValue) {
+			$value = $targetValue->value();
+			$method = $this->methodRegistry->method(
+				$targetValue->targetType(),
+				new MethodNameIdentifier('asInteger')
+			);
+			if ($method instanceof Method) {
+				return $method->execute(
+					new TypedValue($targetValue->targetType(), $value),
+					$parameter);
+			}
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

@@ -30,13 +30,19 @@ final readonly class AsReal implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof IntegerType || $targetType instanceof IntegerSubsetType ||
-			$targetType instanceof RealType || $targetType instanceof RealSubsetType) {
+		if ($targetType instanceof IntegerSubsetType || $targetType instanceof RealSubsetType) {
+			return $this->context->typeRegistry()->realSubset(
+				array_map(fn(RealValue|IntegerValue $v) =>
+				$this->context->valueRegistry()->real((float)$v->literalValue()),
+					$targetType->subsetValues())
+			);
+		}
+		if ($targetType instanceof IntegerType || $targetType instanceof RealType) {
 			return $this->context->typeRegistry()->real(
 				$targetType->range()->minValue() === MinusInfinity::value ? MinusInfinity::value :
-					(int)$targetType->range()->minValue(),
+					(float)$targetType->range()->minValue(),
 				$targetType->range()->maxValue() === PlusInfinity::value ? PlusInfinity::value :
-					(int)$targetType->range()->maxValue()
+					(float)$targetType->range()->maxValue()
 			);
 		}
 		// @codeCoverageIgnoreStart

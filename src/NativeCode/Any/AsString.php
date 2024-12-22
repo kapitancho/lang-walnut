@@ -7,18 +7,27 @@ use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
 use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Range\PlusInfinity;
+use Walnut\Lang\Blueprint\Type\AliasType;
+use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Type\BooleanType;
+use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\FalseType;
+use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
+use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\NullType;
+use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
+use Walnut\Lang\Blueprint\Type\SubtypeType;
 use Walnut\Lang\Blueprint\Type\TrueType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\TypeType;
+use Walnut\Lang\Blueprint\Value\AtomValue;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
+use Walnut\Lang\Blueprint\Value\EnumerationValue;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
 use Walnut\Lang\Blueprint\Value\MutableValue;
 use Walnut\Lang\Blueprint\Value\NullValue;
@@ -27,27 +36,43 @@ use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Blueprint\Value\SubtypeValue;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Blueprint\Value\Value;
-use Walnut\Lang\Implementation\Type\AliasType;
-use Walnut\Lang\Implementation\Type\EnumerationType;
-use Walnut\Lang\Implementation\Type\IntegerSubsetType;
-use Walnut\Lang\Implementation\Type\RealSubsetType;
-use Walnut\Lang\Implementation\Value\EnumerationValue;
 
 final readonly class AsString implements NativeMethod {
 	public function __construct(
 		private MethodExecutionContext $context
 	) {}
 
-	public function analyse(
-		Type $targetType,
-		Type $parameterType
-	): StringType|ResultType {
-		while ($targetType instanceof AliasType) {
-			$targetType = $targetType->aliasedType();
-		}
-		[$minLength, $maxLength] = match (true) {
-			$targetType instanceof IntegerType,
-			$targetType instanceof IntegerSubsetType => [
+	/** @return list<string>|null */
+	public function detectSubsetType(Type $targetType): array|null {
+		return match(true) {
+			$targetType instanceof AliasType => $this->detectSubsetType($targetType->aliasedType()),
+			$targetType instanceof SubtypeType => $this->detectSubsetType($targetType->baseType()),
+			$targetType instanceof MutableType => $this->detectSubsetType($targetType->valueType()),
+			$targetType instanceof NullType => ['null'],
+			$targetType instanceof AtomType => [$targetType->name()->identifier],
+			$targetType instanceof TrueType => ['true'],
+			$targetType instanceof FalseType => ['false'],
+			$targetType instanceof BooleanType => ['true', 'false'],
+			$targetType instanceof EnumerationSubsetType =>
+				array_map(fn(EnumerationValue $enumerationValue): string =>
+					$enumerationValue->name()->identifier, $targetType->subsetValues()),
+			$targetType instanceof IntegerSubsetType =>
+				array_map(fn(IntegerValue $integerValue): string =>
+					(string)$integerValue->literalValue(), $targetType->subsetValues()),
+			$targetType instanceof RealSubsetType =>
+				array_map(fn(RealValue $realValue): string =>
+					(string)$realValue->literalValue(), $targetType->subsetValues()),
+			default => null
+		};
+	}
+
+	/** @return array{int, int}|null */
+	public function detectRangedType(Type $targetType): array|null {
+		return match(true) {
+			$targetType instanceof AliasType => $this->detectRangedType($targetType->aliasedType()),
+			$targetType instanceof SubtypeType => $this->detectRangedType($targetType->baseType()),
+			$targetType instanceof MutableType => $this->detectRangedType($targetType->valueType()),
+			$targetType instanceof IntegerType => [
 				1,
 				$targetType->range()->maxValue() === PlusInfinity::value ? 1000 :
 					max(1,
@@ -57,31 +82,38 @@ final readonly class AsString implements NativeMethod {
 					)
 
 			],
-			$targetType instanceof RealType,
-			$targetType instanceof RealSubsetType => [1, 1000],
-			$targetType instanceof BooleanType => [4, 5],
-			$targetType instanceof NullType, $targetType instanceof TrueType => [4, 4],
-			$targetType instanceof FalseType => [5, 5],
-			$targetType instanceof StringType,
-			$targetType instanceof StringSubsetType => [
-				$targetType->range()->minLength(),
-				$targetType->range()->maxLength(),
-			],
+			$targetType instanceof RealSubsetType, $targetType instanceof RealType => [1, 1000],
 			$targetType instanceof TypeType => [1, PlusInfinity::value],
-			$targetType instanceof EnumerationType => [
-				min(array_map(static fn(EnumerationValue $value): int => mb_strlen($value->name()), $targetType->values())),
-				max(array_map(static fn(EnumerationValue $value): int => mb_strlen($value->name()), $targetType->values()))
-			],
-			default => ($c = $this->context->typeRegistry()->result(
-				$this->context->typeRegistry()->string(),
-				$this->context->typeRegistry()->sealed(new TypeNameIdentifier("CastNotAvailable"))
-			)) ? [0, PlusInfinity::value] : null
-			//throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType))
+			default => null
 		};
-		if ($c ??= null) {
-			return $c;
+	}
+
+	public function analyse(
+		Type $targetType,
+		Type $parameterType
+	): StringType|StringSubsetType|ResultType {
+		if ($targetType instanceof StringSubsetType || $targetType instanceof StringType) {
+			return $targetType;
 		}
-		return $this->context->typeRegistry()->string($minLength, $maxLength);
+		$subsetValues = $this->detectSubsetType($targetType);
+		if (is_array($subsetValues)) {
+			return $this->context->typeRegistry()->stringSubset(
+				array_map(
+					fn(string $val) => $this->context->valueRegistry()->string($val),
+					$subsetValues
+				)
+			);
+		}
+		$range = $this->detectRangedType($targetType);
+		if (is_array($range)) {
+			[$minLength, $maxLength] = $range;
+			return $this->context->typeRegistry()->string($minLength, $maxLength);
+		}
+		/** @var ResultType */
+		return $this->context->typeRegistry()->result(
+			$this->context->typeRegistry()->string(),
+			$this->context->typeRegistry()->sealed(new TypeNameIdentifier("CastNotAvailable"))
+		);
 	}
 
 	public function execute(
@@ -117,6 +149,7 @@ final readonly class AsString implements NativeMethod {
             $value instanceof TypeValue => (string)$value->typeValue(),
             $value instanceof SubtypeValue => $this->evaluate($value->baseValue()),
             $value instanceof MutableValue => $this->evaluate($value->value()),
+	        $value instanceof AtomValue => $value->type()->name(),
 	        $value instanceof EnumerationValue => $value->name(),
             //TODO: check for cast to jsonValue (+subtype as well)
             //TODO: error values
