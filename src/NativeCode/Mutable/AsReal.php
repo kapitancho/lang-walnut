@@ -4,27 +4,16 @@ namespace Walnut\Lang\NativeCode\Mutable;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\Method;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
-use Walnut\Lang\Blueprint\Function\UnknownMethod;
 use Walnut\Lang\Blueprint\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
-use Walnut\Lang\Blueprint\Range\MinusInfinity;
-use Walnut\Lang\Blueprint\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
-use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\MutableType;
-use Walnut\Lang\Blueprint\Type\RealSubsetType;
-use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Value\IntegerValue;
 use Walnut\Lang\Blueprint\Value\MutableValue;
-use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
-use Walnut\Lang\NativeCode\Any\CastAs;
 
 final readonly class AsReal implements NativeMethod {
 	use BaseType;

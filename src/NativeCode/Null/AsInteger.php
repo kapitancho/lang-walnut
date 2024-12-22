@@ -2,16 +2,11 @@
 
 namespace Walnut\Lang\NativeCode\Null;
 
-use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
-use Walnut\Lang\Blueprint\Type\BooleanType;
-use Walnut\Lang\Blueprint\Type\FalseType;
-use Walnut\Lang\Blueprint\Type\TrueType;
 use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Value\BooleanValue;
 use Walnut\Lang\Blueprint\Value\NullValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 

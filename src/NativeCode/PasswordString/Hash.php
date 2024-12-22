@@ -8,15 +8,11 @@ use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
-use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Type\SealedType;
-use Walnut\Lang\Blueprint\Type\StringSubsetType;
-use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\SealedValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
-use Walnut\Lang\Implementation\Value\AtomValue;
 
 final readonly class Hash implements NativeMethod {
 	use BaseType;

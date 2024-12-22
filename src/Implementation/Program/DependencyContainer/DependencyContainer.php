@@ -185,7 +185,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 		if ($found instanceof DependencyError) {
 			$constructor = $this->valueRegistry->atom(new TypeNameIdentifier('Constructor'));
 			$method = $this->methodRegistry->method($constructor->type(),
-				$methodName = new MethodNameIdentifier($type->name()->identifier));
+				new MethodNameIdentifier($type->name()->identifier));
 			if ($method instanceof CustomMethod) {
                 $baseValue = $this->findValueByType($method->parameterType());
 			} else {

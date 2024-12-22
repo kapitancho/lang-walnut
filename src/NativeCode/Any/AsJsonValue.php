@@ -43,9 +43,6 @@ final readonly class AsJsonValue implements NativeMethod {
 	}
 
 	private function isSafeConversion(Type $fromType): bool {
-		$isSafe = $fromType->isSubtypeOf(
-			$this->context->typeRegistry()->withName(new TypeNameIdentifier('JsonValue'))
-		);
 		return $fromType->isSubtypeOf(
 			$this->context->typeRegistry()->withName(new TypeNameIdentifier('JsonValue'))
 		);

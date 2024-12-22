@@ -6,7 +6,6 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
 use Walnut\Lang\Blueprint\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Range\PlusInfinity;
@@ -16,7 +15,6 @@ use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
-use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class Square implements NativeMethod {

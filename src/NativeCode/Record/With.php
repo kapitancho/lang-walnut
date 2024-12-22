@@ -9,7 +9,6 @@ use Walnut\Lang\Blueprint\Function\Method;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
 use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
 use Walnut\Lang\Blueprint\Type\MapType;
