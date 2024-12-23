@@ -5,6 +5,7 @@ namespace Walnut\Lang\Implementation\Compilation\Parser;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownContextVariable;
 use Walnut\Lang\Blueprint\Compilation\CodeBuilder;
+use Walnut\Lang\Blueprint\Compilation\CompilationException;
 use Walnut\Lang\Blueprint\Compilation\ModuleImporter;
 use Walnut\Lang\Blueprint\Compilation\Parser as ParserInterface;
 use Walnut\Lang\Blueprint\Function\FunctionBodyException;
@@ -77,6 +78,8 @@ final readonly class Parser implements ParserInterface {
 					throw new ParserException($s, "Unknown type: " . $e->getMessage(), $token, $moduleName);
                 } catch (FunctionBodyException|UnknownContextVariable $e) {
                     throw new ParserException($s, $e->getMessage(), $token, $moduleName);
+				} catch (CompilationException $e) {
+					throw new ParserException($s, "Compilation exception: " . $e->getMessage(), $token, $moduleName);
 				} catch (AnalyserException $e) {
 					throw new ParserException($s, "Analyser exception: " . $e->getMessage(), $token, $moduleName);
 				}

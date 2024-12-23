@@ -787,6 +787,7 @@ final readonly class ParserStateMachine {
 				T::mutable->name => function(LT $token) { $this->s->move(344); },
 
 				T::sequence_start->name => 230,
+				T::sequence_end->name => function(LT $token) { $this->s->stay(318); },
 				T::lambda_return->name => 240,
 				T::no_error->name => 250,
 				T::no_external_error->name => 252,
@@ -1146,6 +1147,16 @@ final readonly class ParserStateMachine {
 						$this->s->generated
 					);*/
 					$this->s->stay(315);
+				}
+			]],
+
+			318 => ['name' => 'sequence early end', 'transitions' => [
+				'' => function(LT $token) {
+					//TODO - get rid of the null expression.
+					$this->s->generated = $this->codeBuilder->constant(
+						$this->codeBuilder->valueRegistry()->null()
+					);
+					$this->s->pop();
 				}
 			]],
 
