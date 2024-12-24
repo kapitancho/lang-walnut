@@ -6,6 +6,7 @@ namespace Walnut\Lang\Implementation\Compilation\Parser;
 
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MethodCallExpression;
+use Walnut\Lang\Blueprint\Code\Expression\SequenceExpression;
 use Walnut\Lang\Blueprint\Compilation\CodeBuilder;
 use Walnut\Lang\Blueprint\Compilation\ModuleImporter;
 use Walnut\Lang\Blueprint\Identifier\EnumValueIdentifier;
@@ -547,7 +548,16 @@ final readonly class ParserStateMachine {
 					$this->s->move(201);
 				},
 				T::sequence_end->name => function(LT $token) {
-					$this->s->result['sequence_expressions'][] = $this->s->generated;
+					$g = $this->s->generated;
+					if (
+						$g instanceof SequenceExpression &&
+						count($g->expressions()) === 0 &&
+						count($this->s->result['sequence_expressions']) > 0
+					) {
+						//skip
+					} else {
+						$this->s->result['sequence_expressions'][] = $this->s->generated;
+					}
 					$this->s->generated = $this->codeBuilder->sequence($this->s->result['sequence_expressions']);
 					$this->s->moveAndPop();
 				},
@@ -1153,9 +1163,7 @@ final readonly class ParserStateMachine {
 			318 => ['name' => 'sequence early end', 'transitions' => [
 				'' => function(LT $token) {
 					//TODO - get rid of the null expression.
-					$this->s->generated = $this->codeBuilder->constant(
-						$this->codeBuilder->valueRegistry()->null()
-					);
+					$this->s->generated = $this->codeBuilder->sequence([]);
 					$this->s->pop();
 				}
 			]],
@@ -1580,6 +1588,12 @@ final readonly class ParserStateMachine {
 				T::empty_record->name => $c,
 			]],
 			503 => ['name' => 'function value parameter return', 'transitions' => [
+				T::function_body_marker->name => function(LT $token) {
+					$this->s->result['parameter'] = $this->s->generated;
+					$this->s->result['return'] = $this->codeBuilder->typeRegistry()->any();
+					$this->s->result['dependency'] = $this->codeBuilder->typeRegistry()->nothing();
+					$this->s->move(506);
+				},
 				T::lambda_return->name => function(LT $token) {
 					$this->s->result['parameter'] = $this->s->generated;
 					$this->s->move(504);
@@ -2594,7 +2608,12 @@ final readonly class ParserStateMachine {
 				T::lambda_return->name => function(LT $token) {
 					$this->s->result['parameter'] = $this->s->generated;
 					$this->s->move(903);
-				}
+				},
+				'' => function(LT $token) {
+					$this->s->result['parameter'] = $this->s->generated;
+					$this->s->generated = $this->codeBuilder->typeRegistry()->any();
+					$this->s->stay(904);
+				},
 			]],
 			903 => ['name' => 'function type return type', 'transitions' => [
 				T::type_proxy_keyword->name => $c = function(LT $token) {
