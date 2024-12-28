@@ -111,6 +111,7 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 				$this->getTypeMapping()[
 					[
 						'Function' => FunctionType::class,
+						'MutableType' => MutableType::class,
 						'Tuple' => TupleType::class,
 						'Record' => RecordType::class,
 						'Union' => UnionType::class,

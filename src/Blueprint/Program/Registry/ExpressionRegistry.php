@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionDefault;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionOperation;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionPair;
 use Walnut\Lang\Blueprint\Code\Expression\MethodCallExpression;
+use Walnut\Lang\Blueprint\Code\Expression\MutableExpression;
 use Walnut\Lang\Blueprint\Code\Expression\NoErrorExpression;
 use Walnut\Lang\Blueprint\Code\Expression\NoExternalErrorExpression;
 use Walnut\Lang\Blueprint\Code\Expression\RecordExpression;
@@ -20,6 +21,7 @@ use Walnut\Lang\Blueprint\Code\Expression\VariableNameExpression;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Identifier\VariableNameIdentifier;
+use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 
 interface ExpressionRegistry {
@@ -60,4 +62,5 @@ interface ExpressionRegistry {
 	): MethodCallExpression;
 
 	public function functionBody(Expression $expression): FunctionBody;
+	public function mutable(Type $type, Expression $value): MutableExpression;
 }

@@ -37,6 +37,9 @@ final readonly class ValueType implements NativeMethod {
 				if ($refType->value() === MetaTypeValue::Sealed) {
 					return $this->context->typeRegistry()->type($this->context->typeRegistry()->any());
 				}
+				if ($refType->value() === MetaTypeValue::MutableType) {
+					return $this->context->typeRegistry()->type($this->context->typeRegistry()->any());
+				}
 			}
 			if ($refType instanceof MutableType) {
 				return $this->context->typeRegistry()->type($refType->valueType());

@@ -12,6 +12,7 @@ use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\IntersectionType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
+use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\NamedType;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\TupleType;
@@ -51,6 +52,7 @@ final readonly class MetaType implements MetaTypeInterface, SupertypeChecker, Js
 			MetaTypeValue::Enumeration => $ofType instanceof EnumerationType,
 			MetaTypeValue::EnumerationSubset => $ofType instanceof EnumerationSubsetType,
 			MetaTypeValue::IntegerSubset => $ofType instanceof IntegerSubsetType,
+			MetaTypeValue::MutableType => $ofType instanceof MutableType,
 			MetaTypeValue::RealSubset => $ofType instanceof RealSubsetType,
 			MetaTypeValue::StringSubset => $ofType instanceof StringSubsetType,
 			MetaTypeValue::Named => $ofType instanceof NamedType,

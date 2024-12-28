@@ -236,6 +236,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 			'Integer' => $this->integer(),
 			'Real' => $this->real(),
 			'String' => $this->string(),
+		    'MutableType' => 1,
 			default => $this->withName($typeName)
 	    };
 	}

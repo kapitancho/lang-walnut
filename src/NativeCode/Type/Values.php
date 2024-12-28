@@ -42,7 +42,7 @@ final readonly class Values implements NativeMethod {
 						default => null
 					};
 					if ($t) {
-						return $this->context->typeRegistry()->array($t);
+						return $this->context->typeRegistry()->array($t, 1);
 					}
 				}
 				if ($refType instanceof IntegerSubsetType ||
@@ -86,7 +86,13 @@ final readonly class Values implements NativeMethod {
 					$refType instanceof StringSubsetType ||
 					$refType instanceof EnumerationSubsetType
 				) {
-					return TypedValue::forValue($this->context->valueRegistry()->tuple($refType->subsetValues()));
+					return TypedValue::forValue($this->context->valueRegistry()->tuple(
+						array_values(
+							array_unique(
+								$refType->subsetValues()
+							)
+						)
+					));
 				}
 			}
 			// @codeCoverageIgnoreStart

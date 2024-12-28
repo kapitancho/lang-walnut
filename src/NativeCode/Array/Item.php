@@ -86,7 +86,7 @@ final readonly class Item implements NativeMethod {
 		if ($targetValue instanceof TupleValue && $parameterValue instanceof IntegerValue) {
 			$values = $targetValue->values();
 			$result = $values[$parameterValue->literalValue()] ?? null;
-			if ($result) {
+			if ($result !== null) {
 				$targetType = $this->toBaseType($target->type);
 				$type = match(true) {
 					$targetType instanceof TupleType => ($targetType->types()[$parameterValue->literalValue()] ?? $targetType->restType()),

@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Implementation\Type;
 
 use JsonSerializable;
+use Walnut\Lang\Blueprint\Type\AnyType;
 use Walnut\Lang\Blueprint\Type\MutableType as MutableTypeInterface;
 use Walnut\Lang\Blueprint\Type\TypeType as TypeTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -33,6 +34,9 @@ final readonly class TypeType implements TypeTypeInterface, JsonSerializable {
     }
 
 	public function __toString(): string {
+		if ($this->refType instanceof AnyType) {
+			return "Type";
+		}
 		return sprintf(
 			"Type<%s>",
 			$this->refType

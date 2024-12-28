@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionDefault as MatchExpress
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionOperation;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionPair as MatchExpressionPairInterface;
 use Walnut\Lang\Blueprint\Code\Expression\MethodCallExpression;
+use Walnut\Lang\Blueprint\Code\Expression\MutableExpression;
 use Walnut\Lang\Blueprint\Code\Expression\NoErrorExpression;
 use Walnut\Lang\Blueprint\Code\Expression\NoExternalErrorExpression;
 use Walnut\Lang\Blueprint\Code\Expression\RecordExpression;
@@ -207,6 +208,10 @@ final readonly class CodeBuilder implements CodeBuilderInterface {
 
 	public function functionBody(Expression $expression): FunctionBody {
 		return $this->expressionRegistry->functionBody($expression);
+	}
+	
+	public function mutable(Type $type, Expression $value): MutableExpression {
+		return $this->expressionRegistry->mutable($type, $value);	
 	}
 
 	public function addAtom(TypeNameIdentifier $name): AtomType {

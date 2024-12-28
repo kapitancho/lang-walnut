@@ -1746,7 +1746,7 @@ final readonly class ParserStateMachine {
 						'Mutable' => 770,
 						'Error' => 775,
 						'Result' => 780,
-						'Any', 'Nothing', 'Boolean', 'True', 'False', 'Null' => 702,
+						'Any', 'Nothing', 'Boolean', 'True', 'False', 'Null', 'MutableType' => 702,
 						default => 790
 					};
 					$this->s->i++;
@@ -1791,7 +1791,8 @@ final readonly class ParserStateMachine {
 						'Integer' => $tr->integer(),
 						'Real' => $tr->real(),
 						'Array' => $tr->array(),
-						'Map' => $tr->map()
+						'Map' => $tr->map(),
+						'MutableType' => $tr->metaType(MetaTypeValue::MutableType),
 					};
 					$this->s->pop();
 				},
