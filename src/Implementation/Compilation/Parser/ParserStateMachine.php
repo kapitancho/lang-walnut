@@ -1294,16 +1294,9 @@ final readonly class ParserStateMachine {
 			]],
 			348 => ['name' => 'mutable value type return', 'transitions' => [
 				T::sequence_end->name => function(LT $token) {
-					$this->s->generated = $this->codeBuilder->constructorCall(
-						new TypeNameIdentifier('Mutable'),
-						$this->codeBuilder->tuple([
-							$this->codeBuilder->constant(
-								$this->codeBuilder->valueRegistry()->type(
-									$this->s->result['mutable_type']
-								)
-							),
-							$this->s->generated
-						])
+					$this->s->generated = $this->codeBuilder->mutable(
+						$this->s->result['mutable_type'],
+						$this->s->generated
 					);
 					$this->s->moveAndPop();
 				},
@@ -1529,7 +1522,7 @@ final readonly class ParserStateMachine {
 				T::type_keyword->name => $c = function(LT $token) {
 					if (in_array($token->patternMatch->text, [
 						'Function', 'Tuple', 'Record', 'Union', 'Intersection', 'Atom', 'Enumeration',
-						'EnumerationSubset', 'IntegerSubset', 'RealSubset', 'StringSubset',
+						'EnumerationSubset', 'IntegerSubset', 'MutableType', 'RealSubset', 'StringSubset',
 						'State', 'Subtype', 'Alias', 'Named'
 					], true)) {
 						$this->s->generated = $this->codeBuilder->typeRegistry()->metaType(
@@ -2125,7 +2118,7 @@ final readonly class ParserStateMachine {
 					if (in_array($token->patternMatch->text, [
 						'Function', 'Tuple', 'Record', 'Union', 'Intersection', 'Atom', 'Enumeration',
 						'EnumerationSubset', 'IntegerSubset', 'RealSubset', 'StringSubset',
-						'Sealed', 'Subtype', 'Alias', 'Named'
+						'Sealed', 'Subtype', 'Alias', 'Named', 'MutableType'
 					], true)) {
 						$this->s->result['type'] = $this->codeBuilder->typeRegistry()->metaType(
 							MetaTypeValue::from($token->patternMatch->text)

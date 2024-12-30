@@ -12,12 +12,14 @@ use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry as ExpressionRegis
 use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
+use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Code\Expression\ConstantExpression;
 use Walnut\Lang\Implementation\Code\Expression\MatchExpression;
 use Walnut\Lang\Implementation\Code\Expression\MatchExpressionDefault;
 use Walnut\Lang\Implementation\Code\Expression\MatchExpressionPair;
 use Walnut\Lang\Implementation\Code\Expression\MethodCallExpression;
+use Walnut\Lang\Implementation\Code\Expression\MutableExpression;
 use Walnut\Lang\Implementation\Code\Expression\NoErrorExpression;
 use Walnut\Lang\Implementation\Code\Expression\NoExternalErrorExpression;
 use Walnut\Lang\Implementation\Code\Expression\RecordExpression;
@@ -118,4 +120,12 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 		return new FunctionBody($this->typeRegistry, $this->valueRegistry,  $expression);
 	}
 
+	public function mutable(Type $type, Expression $value): MutableExpression {
+		return new MutableExpression(
+			$this->typeRegistry,
+			$this->valueRegistry,
+			$type,
+			$value
+		);
+	}
 }
