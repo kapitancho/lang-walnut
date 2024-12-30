@@ -98,29 +98,6 @@ final readonly class Construct implements NativeMethod {
 					$this->context->typeRegistry()->union($errorTypes)
 				): $t;
 			}
-			/*if ($t instanceof MutableType) {
-				if ($targetType instanceof TupleType && count($targetType->types()) === 2) {
-					[$mutableType, $mutableValue] = $targetType->types();
-					if ($mutableType instanceof TypeType) {
-						$mutableRefType = $mutableType->refType();
-						if ($mutableValue->isSubtypeOf($mutableRefType)) {
-							return $this->context->typeRegistry()->mutable($mutableRefType);
-						}
-						// @codeCoverageIgnoreStart
-						throw new AnalyserException(
-							sprintf(
-								"The initial value of a Mutable type should be a subtype of %s. %s provided",
-								$mutableRefType,
-								$mutableValue,
-							)
-						);
-						// @codeCoverageIgnoreEnd
-					}
-				}
-				// @codeCoverageIgnoreStart
-				throw new AnalyserException("A Mutable type constructor requires a tuple parameter containing the type and the initial value");
-				// @codeCoverageIgnoreEnd
-			}*/
 			if ($t instanceof ResultType && $t->returnType() instanceof NothingType) {
 				return $this->context->typeRegistry()->result(
 					$this->context->typeRegistry()->nothing(),
@@ -229,32 +206,12 @@ final readonly class Construct implements NativeMethod {
 				));
 				// @codeCoverageIgnoreEnd
 			}
-			/*if ($t instanceof MutableType) {
-				if ($targetValue instanceof TupleValue && count($targetValue->values()) === 2) {
-					[$mutableType, $mutableValue] = $targetValue->values();
-					if ($mutableType instanceof TypeValue) {
-						$mutableRefType = $mutableType->typeValue();
-						if ($mutableValue->type()->isSubtypeOf($mutableRefType)) {
-							return new TypedValue(
-								$this->context->typeRegistry()->mutable($mutableRefType),
-								$this->context->valueRegistry()->mutable($mutableRefType, $mutableValue)
-							);
-						}
-					}
-				}
-				// @codeCoverageIgnoreStart
-				throw new ExecutionException("A Mutable type constructor requires a tuple parameter containing the type and the initial value");
-				// @codeCoverageIgnoreEnd
-			}*/
 			if ($t instanceof ResultType && $t->returnType() instanceof NothingType) {
 				return new TypedValue(
 					$t,
 					$this->context->valueRegistry()->error($targetValue)
 				);
 			}
-			/*if ($targetValue->type()->isSubtypeOf($parameterValue->typeValue())) {
-				return $target;
-			}*/
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target/parameter value");

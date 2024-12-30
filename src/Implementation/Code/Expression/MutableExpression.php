@@ -18,7 +18,6 @@ use Walnut\Lang\Blueprint\Type\Type;
 
 final readonly class MutableExpression implements MutableExpressionInterface, JsonSerializable {
 
-	/** @param list<Expression> $values */
 	public function __construct(
 		private TypeRegistry $typeRegistry,
 		private ValueRegistry $valueRegistry,

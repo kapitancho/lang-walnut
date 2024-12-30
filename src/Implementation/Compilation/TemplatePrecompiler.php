@@ -9,8 +9,8 @@ final readonly class TemplatePrecompiler {
 			
 		$1 ==> Template @ UnableToRenderTemplate %% [~TemplateRenderer] :: {
 			output = Template(mutable{String, ''});
-			e = ^String => Any :: output->APPEND(#);
-			h = ^String => Any :: output->APPEND(#->htmlEscape);
+			e = ^String :: output->APPEND(#);
+			h = ^String :: output->APPEND(#->htmlEscape);
 			-->
 								
 		CODE, $sourceCode);

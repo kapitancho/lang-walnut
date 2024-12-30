@@ -1728,7 +1728,7 @@ final readonly class ParserStateMachine {
 						'Mutable' => 770,
 						'Result' => 780,
 						'Error' => 775,
-						'Any', 'Nothing', 'Boolean', 'True', 'False', 'Null' => 702,
+						'Any', 'Nothing', 'Boolean', 'True', 'False', 'Null', 'MutableType' => 702,
 						default => 789
 					};
 					$this->s->i++;
