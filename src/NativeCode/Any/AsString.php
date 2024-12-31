@@ -76,8 +76,8 @@ final readonly class AsString implements NativeMethod {
 				1,
 				$targetType->range->maxValue === PlusInfinity::value ? 1000 :
 					max(1,
-						(int)ceil(log10(abs($targetType->range->maxValue))),
-						(int)ceil(log10(abs($targetType->range->minValue))) +
+						(int)ceil(log10(abs((string)$targetType->range->maxValue))),
+						(int)ceil(log10(abs((string)$targetType->range->minValue))) +
 							($targetType->range->minValue < 0 ? 1 : 0)
 					)
 

@@ -45,7 +45,7 @@ final readonly class IntegerType implements IntegerTypeInterface, JsonSerializab
 		$max = $this->range->maxValue;
 		return $min !== MinusInfinity::value && $max !== PlusInfinity::value &&
 			$ofType->range->minValue <= $min && $ofType->range->maxValue >= $max &&
-			1 + $this->range->maxValue - $this->range->minValue === count(
+			1 + (int)(string)$this->range->maxValue - (int)(string)$this->range->minValue === count(
 				array_filter($ofType->subsetValues, static fn(IntegerValue $value): bool =>
 					$value->literalValue >= $min && $value->literalValue <= $max
 			));

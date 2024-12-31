@@ -43,7 +43,7 @@ final readonly class Item implements NativeMethod {
 							$returnType = $this->context->typeRegistry->union(
 								array_map(
 									static fn(IntegerValue $value) =>
-										$targetType->types[$value->literalValue] ?? $targetType->restType,
+										$targetType->types[(string)$value->literalValue] ?? $targetType->restType,
 									$parameterType->subsetValues
 								)
 							);
@@ -51,8 +51,8 @@ final readonly class Item implements NativeMethod {
 							$isWithinLimit = $max !== PlusInfinity::value && $max < count($targetType->types);
 							$returnType = $this->context->typeRegistry->union(
 								$isWithinLimit ?
-								array_slice($targetType->types, $min, $max - $min + 1) :
-								[... array_slice($targetType->types, $min), $targetType->restType]
+								array_slice($targetType->types, (int)(string)$min, (int)(string)$max - (int)(string)$min + 1) :
+								[... array_slice($targetType->types, (int)(string)$min), $targetType->restType]
 							);
 						}
 					}
@@ -85,11 +85,11 @@ final readonly class Item implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue && $parameterValue instanceof IntegerValue) {
 			$values = $targetValue->values;
-			$result = $values[$parameterValue->literalValue] ?? null;
+			$result = $values[(string)$parameterValue->literalValue] ?? null;
 			if ($result !== null) {
 				$targetType = $this->toBaseType($target->type);
 				$type = match(true) {
-					$targetType instanceof TupleType => ($targetType->types[$parameterValue->literalValue] ?? $targetType->restType),
+					$targetType instanceof TupleType => ($targetType->types[(string)$parameterValue->literalValue] ?? $targetType->restType),
 					$targetType instanceof ArrayType => $targetType->itemType,
 					default => $result->type
 				};

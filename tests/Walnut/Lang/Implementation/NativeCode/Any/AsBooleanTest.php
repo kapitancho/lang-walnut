@@ -20,7 +20,7 @@ final class AsBooleanTest extends BaseProgramTestHelper {
 		$this->callAsBoolean($this->valueRegistry->integer(123), true);
 		$this->callAsBoolean($this->valueRegistry->integer(0), false);
 		$this->callAsBoolean($this->valueRegistry->real(3.14), true);
-		$this->callAsBoolean($this->valueRegistry->real(0), false);
+		$this->callAsBoolean($this->valueRegistry->real(0.0), false);
 		$this->callAsBoolean($this->valueRegistry->string("Hello"), true);
 		$this->callAsBoolean($this->valueRegistry->string(""), false);
 		$this->callAsBoolean($this->valueRegistry->true, true);

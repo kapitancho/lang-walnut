@@ -52,12 +52,14 @@ final class ValueRegistry implements ValueRegistryInterface {
 		get => $this->typeRegistry->false->value;
 	}
 
-    public function integer(Number $value): IntegerValue {
-		return new IntegerValue($this->typeRegistry,$value);
+    public function integer(Number|int $value): IntegerValue {
+		return new IntegerValue($this->typeRegistry,
+			is_int($value) ? new Number($value) : $value);
 	}
 
-    public function real(Number $value): RealValue {
-	    return new RealValue($this->typeRegistry, $value);
+    public function real(Number|float $value): RealValue {
+	    return new RealValue($this->typeRegistry,
+		    is_float($value) ? new Number((string)$value) : $value);
 	}
 
     public function string(string $value): StringValue {

@@ -25,8 +25,8 @@ final class IntegerValue implements IntegerValueInterface, JsonSerializable {
 	}
 
 	public function equals(Value $other): bool {
-		return ($other instanceof IntegerValueInterface && $this->literalValue === $other->literalValue) ||
-			($other instanceof RealValue && $this->asRealValue()->literalValue === $other->literalValue);
+		return ($other instanceof IntegerValueInterface && (string)$this->literalValue === (string)$other->literalValue) ||
+			($other instanceof RealValue && (string)$this->asRealValue()->literalValue === (string)$other->literalValue);
 	}
 
 	public function __toString(): string {

@@ -53,7 +53,7 @@ final readonly class BinaryModulo implements NativeMethod {
 		if ($targetValue instanceof IntegerValue) {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue) {
-				if ($parameterValue->literalValue === 0) {
+				if ((int)(string)$parameterValue->literalValue === 0) {
 					return TypedValue::forValue($this->context->valueRegistry->error(
 						$this->context->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
 					));
@@ -63,7 +63,7 @@ final readonly class BinaryModulo implements NativeMethod {
                 ));
 			}
 			if ($parameterValue instanceof RealValue) {
-				if ((float)$parameterValue->literalValue === 0.0) {
+				if ((float)(string)$parameterValue->literalValue === 0.0) {
 					return TypedValue::forValue($this->context->valueRegistry->error(
 						$this->context->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
 					));

@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Range;
 
+use BcMath\Number;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Range\InvalidLengthRange;
 use Walnut\Lang\Blueprint\Range\LengthRange as LengthRangeInterface;
@@ -9,12 +10,12 @@ use Walnut\Lang\Blueprint\Range\PlusInfinity;
 
 final readonly class LengthRange implements LengthRangeInterface, JsonSerializable {
 	public function __construct(
-		public int              $minLength,
-		public int|PlusInfinity $maxLength
+		public Number              $minLength,
+		public Number|PlusInfinity $maxLength
 	) {
 		if (
 			$this->minLength < 0 || (
-				is_int($maxLength) && $maxLength < $minLength
+				$maxLength instanceof Number && $maxLength < $minLength
 			)
 		) {
 			throw new InvalidLengthRange($minLength, $maxLength);
@@ -27,14 +28,14 @@ final readonly class LengthRange implements LengthRangeInterface, JsonSerializab
 			$this->compare($this->maxLength, $range->maxLength) < 1;
 	}
 
-	public function lengthInRange(int $length): bool {
+	public function lengthInRange(Number $length): bool {
 		return
 			$this->compare($this->minLength, $length) < 1 &&
 			$this->compare($this->maxLength, $length) > -1;
 	}
 
 	/** @return int<-1>|int<0>|int<1> */
-	private function compare(int|PlusInfinity $a, int|PlusInfinity $b): int {
+	private function compare(Number|PlusInfinity $a, Number|PlusInfinity $b): int {
 		if ($a === $b) { return 0; }
 		if ($a instanceof PlusInfinity) { return 1; }
 		if ($b instanceof PlusInfinity) { return -1; }
@@ -42,7 +43,7 @@ final readonly class LengthRange implements LengthRangeInterface, JsonSerializab
 	}
 
 	public function __toString(): string {
-		return ($this->minLength === 0 ? '' : $this->minLength) . '..' .
+		return ((int)(string)$this->minLength === 0 ? '' : $this->minLength) . '..' .
 			($this->maxLength === PlusInfinity::value ? '' : $this->maxLength);
 	}
 

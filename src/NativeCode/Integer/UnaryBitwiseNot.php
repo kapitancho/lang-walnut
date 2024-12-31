@@ -42,7 +42,7 @@ final readonly class UnaryBitwiseNot implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof IntegerValue) {
 			$target = $targetValue->literalValue;
-			return TypedValue::forValue($this->context->valueRegistry->integer(~$target));
+			return TypedValue::forValue($this->context->valueRegistry->integer(~(int)(string)$target));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

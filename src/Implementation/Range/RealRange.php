@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Range;
 
+use BcMath\Number;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Range\InvalidRealRange;
 use Walnut\Lang\Blueprint\Range\MinusInfinity;
@@ -12,10 +13,10 @@ use Walnut\Lang\Blueprint\Value\RealValue;
 
 final readonly class RealRange implements RealRangeInterface, JsonSerializable {
 	public function __construct(
-		public float|MinusInfinity $minValue,
-		public float|PlusInfinity  $maxValue
+		public Number|MinusInfinity $minValue,
+		public Number|PlusInfinity  $maxValue
 	) {
-		if (is_float($maxValue) && $maxValue < $minValue) {
+		if ($minValue instanceof Number && $maxValue instanceof Number && $maxValue < $minValue) {
 			throw new InvalidRealRange($minValue, $maxValue);
 		}
 	}
@@ -32,7 +33,7 @@ final readonly class RealRange implements RealRangeInterface, JsonSerializable {
 	}
 
 	/** @return int<-1>|int<0>|int<1> */
-	private function compare(float|MinusInfinity|PlusInfinity $a, float|MinusInfinity|PlusInfinity $b): int {
+	private function compare(Number|MinusInfinity|PlusInfinity $a, Number|MinusInfinity|PlusInfinity $b): int {
 		if ($a === $b) { return 0; }
 		if ($a instanceof MinusInfinity || $b instanceof PlusInfinity) { return -1; }
 		if ($a instanceof PlusInfinity || $b instanceof MinusInfinity) { return 1; }

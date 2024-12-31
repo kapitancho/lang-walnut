@@ -22,8 +22,8 @@ final class RealValue implements RealValueInterface, JsonSerializable {
     }
 
 	public function equals(Value $other): bool {
-		return ($other instanceof RealValueInterface && $this->literalValue === $other->literalValue) ||
-			($other instanceof IntegerValueInterface && $this->literalValue === $other->asRealValue()->literalValue);
+		return ($other instanceof RealValueInterface && (string)$this->literalValue === (string)$other->literalValue) ||
+			($other instanceof IntegerValueInterface && (string)$this->literalValue === (string)$other->asRealValue()->literalValue);
 	}
 
 	public function __toString(): string {

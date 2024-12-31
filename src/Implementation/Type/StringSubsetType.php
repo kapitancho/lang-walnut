@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Type;
 
+use BcMath\Number;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Type\StringSubsetType as StringSubsetTypeInterface;
 use Walnut\Lang\Blueprint\Type\StringType as StringTypeInterface;
@@ -31,7 +32,9 @@ final class StringSubsetType implements StringSubsetTypeInterface, JsonSerializa
 
 	/** @param list<StringValue> $subsetValues */
     private static function isInRange(array $subsetValues, LengthRange $range): bool {
-	    return array_all($subsetValues, fn($value) => $range->lengthInRange(mb_strlen($value->literalValue)));
+	    return array_all($subsetValues, fn($value) => $range->lengthInRange(
+			new Number(mb_strlen($value->literalValue))
+	    ));
     }
 
     private static function isSubset(array $subset, array $superset): bool {
@@ -46,18 +49,18 @@ final class StringSubsetType implements StringSubsetTypeInterface, JsonSerializa
 		return sprintf("String[%s]", implode(', ', $this->subsetValues));
 	}
 
-	private function minLength(): int {
-		return min(array_map(
+	private function minLength(): Number {
+		return new Number(min(array_map(
 			static fn(StringValue $value): int =>
 				mb_strlen($value->literalValue), $this->subsetValues
-		));
+		)));
 	}
 
-	private function maxLength(): int {
-		return max(array_map(
+	private function maxLength(): Number {
+		return new Number(max(array_map(
 			static fn(StringValue $value): int =>
 				mb_strlen($value->literalValue), $this->subsetValues
-		));
+		)));
 	}
 
 	public LengthRange $range {

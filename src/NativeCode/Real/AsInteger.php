@@ -33,16 +33,16 @@ final readonly class AsInteger implements NativeMethod {
 		if ($targetType instanceof IntegerSubsetType || $targetType instanceof RealSubsetType) {
 			return $this->context->typeRegistry->integerSubset(
 				array_map(fn(RealValue|IntegerValue $v) =>
-					$this->context->valueRegistry->integer((int)$v->literalValue),
+					$this->context->valueRegistry->integer((int)(string)$v->literalValue),
 					$targetType->subsetValues)
 			);
 		}
 		if ($targetType instanceof IntegerType || $targetType instanceof RealType) {
 			return $this->context->typeRegistry->integer(
 				$targetType->range->minValue === MinusInfinity::value ? MinusInfinity::value :
-					(int)$targetType->range->minValue,
+					(int)(string)$targetType->range->minValue,
 				$targetType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
-					(int)$targetType->range->maxValue
+					(int)(string)$targetType->range->maxValue
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -59,7 +59,7 @@ final readonly class AsInteger implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			$target = $targetValue->literalValue;
-			return TypedValue::forValue($this->context->valueRegistry->integer((int)$target));
+			return TypedValue::forValue($this->context->valueRegistry->integer((int)(string)$target));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

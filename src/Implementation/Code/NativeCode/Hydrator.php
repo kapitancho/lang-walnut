@@ -779,7 +779,7 @@ final readonly class Hydrator {
 					$targetType->range->maxValue === PlusInfinity::value ||
 					$targetType->range->maxValue >= $value->literalValue
 			)) {
-				return $this->context->valueRegistry->real((float)$value->literalValue);
+				return $this->context->valueRegistry->real((float)(string)$value->literalValue);
 			}
 			throw new HydrationException(
 				$value,

@@ -58,7 +58,7 @@ final readonly class BinaryBitwiseOr implements NativeMethod {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue) {
 	            return TypedValue::forValue($this->context->valueRegistry->integer(
-					$targetValue->literalValue | $parameterValue->literalValue
+		            (int)(string)$targetValue->literalValue | (int)(string)$parameterValue->literalValue
 	            ));
 			}
 			// @codeCoverageIgnoreStart

@@ -44,7 +44,7 @@ final class VariableAssignmentExpressionTest extends TestCase {
 		self::assertInstanceOf(ConstantExpression::class,
 			$this->variableAssignmentExpression->assignedExpression);
 		self::assertEquals(123,
-			$this->variableAssignmentExpression->assignedExpression->value->literalValue);
+			(int)(string)$this->variableAssignmentExpression->assignedExpression->value->literalValue);
 	}
 
 	public function testAnalyse(): void {

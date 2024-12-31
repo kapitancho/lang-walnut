@@ -31,9 +31,9 @@ final readonly class RoundAsInteger implements NativeMethod {
 		if ($targetType instanceof RealType || $targetType instanceof RealSubsetType) {
 			return $this->context->typeRegistry->integer(
 				$targetType->range->minValue === MinusInfinity::value ? MinusInfinity::value :
-					round($targetType->range->minValue),
+					$targetType->range->minValue->round(),
 				$targetType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
-					round($targetType->range->maxValue)
+					$targetType->range->maxValue->round()
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -50,7 +50,7 @@ final readonly class RoundAsInteger implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			$target = $targetValue->literalValue;
-			return TypedValue::forValue($this->context->valueRegistry->integer(round($target)));
+			return TypedValue::forValue($this->context->valueRegistry->integer($target->round()));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

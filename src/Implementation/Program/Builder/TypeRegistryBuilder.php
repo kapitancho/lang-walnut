@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Program\Builder;
 
+use BcMath\Number;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
@@ -132,12 +133,15 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
     }
 
     public function integer(
-	    int|MinusInfinity $min = MinusInfinity::value,
-        int|PlusInfinity $max = PlusInfinity::value
+	    int|Number|MinusInfinity $min = MinusInfinity::value,
+        int|Number|PlusInfinity $max = PlusInfinity::value
     ): IntegerType {
         return new IntegerType(
 			$this,
-			new IntegerRange($min, $max)
+			new IntegerRange(
+				is_int($min) ? new Number($min) : $min,
+				is_int($max) ? new Number($max) : $max
+			)
         );
     }
 	/** @param list<IntegerValue> $values */
@@ -146,10 +150,15 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 	}
 
     public function real(
-	    float|MinusInfinity $min = MinusInfinity::value,
-	    float|PlusInfinity $max = PlusInfinity::value
+	    float|Number|MinusInfinity $min = MinusInfinity::value,
+	    float|Number|PlusInfinity $max = PlusInfinity::value
     ): RealType {
-        return new RealType(new RealRange($min, $max));
+        return new RealType(
+			new RealRange(
+				is_float($min) ? new Number((string)$min) : $min,
+				is_float($max) ? new Number((string)$max) : $max
+			)
+        );
     }
 	/** @param list<RealValue> $values */
 	public function realSubset(array $values): RealSubsetType {
@@ -157,10 +166,13 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 	}
 
     public function string(
-	    int $minLength = 0,
-	    int|PlusInfinity $maxLength = PlusInfinity::value
+	    int|Number $minLength = 0,
+	    int|Number|PlusInfinity $maxLength = PlusInfinity::value
     ): StringType {
-        return new StringType(new LengthRange($minLength, $maxLength));
+        return new StringType(new LengthRange(
+	        is_int($minLength) ? new Number($minLength) : $minLength,
+            is_int($maxLength) ? new Number($maxLength) : $maxLength
+        ));
     }
 	/** @param list<StringValue> $values */
 	public function stringSubset(array $values): StringSubsetType {
@@ -250,12 +262,23 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
         return $this->enumerationTypes[$typeName->identifier] ?? UnknownType::withName($typeName);
     }
 
-	public function array(Type|null $itemType = null, int $minLength = 0, int|PlusInfinity $maxLength = PlusInfinity::value): ArrayType {
-		return new ArrayType($itemType ?? $this->any, new LengthRange($minLength, $maxLength));
+	public function array(Type|null $itemType = null, int|Number $minLength = 0, int|Number|PlusInfinity $maxLength = PlusInfinity::value): ArrayType {
+		return new ArrayType(
+			$itemType ?? $this->any,
+			new LengthRange(
+				is_int($minLength) ? new Number($minLength) : $minLength,
+		       is_int($maxLength) ? new Number($maxLength) : $maxLength
+			)
+		);
 	}
 
-	public function map(Type|null $itemType = null, int $minLength = 0, int|PlusInfinity $maxLength = PlusInfinity::value): MapType {
-		return new MapType($itemType ?? $this->any, new LengthRange($minLength, $maxLength));
+	public function map(Type|null $itemType = null, int|Number $minLength = 0, int|Number|PlusInfinity $maxLength = PlusInfinity::value): MapType {
+		return new MapType($itemType ?? $this->any,
+			new LengthRange(
+				is_int($minLength) ? new Number($minLength) : $minLength,
+		       is_int($maxLength) ? new Number($maxLength) : $maxLength
+			)
+		);
 	}
 
 	/** @param list<Type> $itemTypes */

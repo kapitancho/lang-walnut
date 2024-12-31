@@ -34,7 +34,7 @@ final readonly class Abs implements NativeMethod {
 				$targetType->range->minValue < 0 ? 0 : $targetType->range->minValue,
 				$targetType->range->minValue === MinusInfinity::value ||
 				$targetType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
-				max(abs($targetType->range->minValue), abs($targetType->range->maxValue))
+				max(abs((string)$targetType->range->minValue), abs((string)$targetType->range->maxValue))
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -51,7 +51,7 @@ final readonly class Abs implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			$target = $targetValue->literalValue;
-			return TypedValue::forValue($this->context->valueRegistry->real(abs($target)));
+			return TypedValue::forValue($this->context->valueRegistry->real(abs((string)$target)));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

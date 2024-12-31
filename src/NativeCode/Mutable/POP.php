@@ -28,7 +28,7 @@ final readonly class POP implements NativeMethod {
 		$t = $this->toBaseType($targetType);
 		if ($t instanceof MutableType) {
             $valueType = $this->toBaseType($t->valueType);
-		    if ($valueType instanceof ArrayType && $valueType->range->minLength === 0) {
+		    if ($valueType instanceof ArrayType && (int)(string)$valueType->range->minLength === 0) {
                 return $this->context->typeRegistry->result(
                     $valueType->itemType,
                     $this->context->typeRegistry->atom(new TypeNameIdentifier("ItemNotFound"))

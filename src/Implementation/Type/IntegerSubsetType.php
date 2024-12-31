@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Type;
 
+use BcMath\Number;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Range\IntegerRange as IntegerRangeInterface;
 use Walnut\Lang\Blueprint\Range\RealRange;
@@ -62,14 +63,14 @@ final class IntegerSubsetType implements IntegerSubsetTypeInterface, JsonSeriali
 		return sprintf("Integer[%s]", implode(', ', $this->subsetValues));
 	}
 
-	private function minValue(): int {
+	private function minValue(): Number {
 		return min(array_map(
 			static fn(IntegerValue $value) =>
 				$value->literalValue, $this->subsetValues
 		));
 	}
 
-	private function maxValue(): int {
+	private function maxValue(): Number {
 		return max(array_map(
 			static fn(IntegerValue $value) =>
 				$value->literalValue, $this->subsetValues

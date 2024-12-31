@@ -31,9 +31,9 @@ final readonly class RoundAsDecimal implements NativeMethod {
 		if ($targetType instanceof RealType || $targetType instanceof RealSubsetType) {
 			return $this->context->typeRegistry->real(
 				$targetType->range->minValue === MinusInfinity::value ? MinusInfinity::value :
-					(int)floor($targetType->range->minValue),
+					$targetType->range->minValue->floor(),
 				$targetType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
-					(int)ceil($targetType->range->maxValue)
+					$targetType->range->maxValue->ceil()
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -54,7 +54,7 @@ final readonly class RoundAsDecimal implements NativeMethod {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue && $parameterValue->literalValue >= 0) {
 				return TypedValue::forValue(
-					$this->context->valueRegistry->real(round($target, $parameterValue->literalValue))
+					$this->context->valueRegistry->real($target->round((string)$parameterValue->literalValue))
 				);
 			}
 			// @codeCoverageIgnoreStart

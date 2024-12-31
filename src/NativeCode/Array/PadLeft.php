@@ -44,10 +44,10 @@ final readonly class PadLeft implements NativeMethod {
 							$type->itemType,
 							$valueType
 						]),
-						max($type->range->minLength, $lengthType->range->minValue),
+						max((int)(string)$type->range->minLength, (int)(string)$lengthType->range->minValue),
 						$type->range->maxLength === PlusInfinity::value ||
 							$lengthType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
-							max($type->range->maxLength, $lengthType->range->maxValue),
+							max((int)(string)$type->range->maxLength, (int)(string)$lengthType->range->maxValue),
 					);
 				}
 			}
@@ -78,7 +78,7 @@ final readonly class PadLeft implements NativeMethod {
 				if ($length instanceof IntegerValue && $padValue !== null) {
 					$result = array_pad(
 						$values,
-						-$length->literalValue,
+						-(int)(string)$length->literalValue,
 						$padValue
 					);
 					return TypedValue::forValue($this->context->valueRegistry->tuple($result));

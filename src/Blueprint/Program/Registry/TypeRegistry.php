@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Blueprint\Program\Registry;
 
+use BcMath\Number;
 use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Range\PlusInfinity;
@@ -51,35 +52,35 @@ interface TypeRegistry {
 	public FalseType $false { get; }
 
 	public function integer(
-		int|MinusInfinity $min = MinusInfinity::value,
-		int|PlusInfinity $max = PlusInfinity::value
+		int|Number|MinusInfinity $min = MinusInfinity::value,
+		int|Number|PlusInfinity $max = PlusInfinity::value
 	): IntegerType;
 	/** @param list<IntegerValue> $values */
 	public function integerSubset(array $values): IntegerSubsetType;
 
 	public function real(
-		float|MinusInfinity $min = MinusInfinity::value,
-		float|PlusInfinity $max = PlusInfinity::value
+		float|Number|MinusInfinity $min = MinusInfinity::value,
+		float|Number|PlusInfinity $max = PlusInfinity::value
 	): RealType;
 	/** @param list<RealValue> $values */
 	public function realSubset(array $values): RealSubsetType;
 
 	public function string(
-		int $minLength = 0,
-		int|PlusInfinity $maxLength = PlusInfinity::value
+		int|Number $minLength = 0,
+		int|Number|PlusInfinity $maxLength = PlusInfinity::value
 	): StringType;
 	/** @param list<StringValue> $values */
 	public function stringSubset(array $values): StringSubsetType;
 
 	public function array(
 		Type|null        $itemType = null,
-		int              $minLength = 0,
-		int|PlusInfinity $maxLength = PlusInfinity::value
+		int|Number              $minLength = 0,
+		int|Number|PlusInfinity $maxLength = PlusInfinity::value
 	): ArrayType;
 	public function map(
 		Type|null        $itemType = null,
-		int              $minLength = 0,
-		int|PlusInfinity $maxLength = PlusInfinity::value
+		int|Number              $minLength = 0,
+		int|Number|PlusInfinity $maxLength = PlusInfinity::value
 	): MapType;
 	/** @param list<Type> $itemTypes */
 	public function tuple(array $itemTypes, Type|null $restType = null): TupleType;

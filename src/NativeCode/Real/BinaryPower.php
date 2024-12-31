@@ -61,7 +61,9 @@ final readonly class BinaryPower implements NativeMethod {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue || $parameterValue instanceof RealValue) {
                 return TypedValue::forValue($this->context->valueRegistry->real(
-	                $targetValue->literalValue ** $parameterValue->literalValue
+					str_contains($parameterValue->literalValue, '.') ?
+						(float)(string)$targetValue->literalValue ** (float)(string)$parameterValue->literalValue :
+	                    $targetValue->literalValue->pow($parameterValue->literalValue)
                 ));
 			}
 			// @codeCoverageIgnoreStart

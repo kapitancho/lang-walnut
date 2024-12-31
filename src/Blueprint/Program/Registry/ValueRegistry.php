@@ -32,8 +32,8 @@ interface ValueRegistry {
 	public BooleanValue $false { get; }
 
 	public function boolean(bool $value): BooleanValue;
-	public function integer(Number $value): IntegerValue;
-	public function real(Number $value): RealValue;
+	public function integer(Number|int $value): IntegerValue;
+	public function real(Number|float $value): RealValue;
 	public function string(string $value): StringValue;
 
 	/** @param list<Value> $values */

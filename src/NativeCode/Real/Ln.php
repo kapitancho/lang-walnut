@@ -54,7 +54,7 @@ final readonly class Ln implements NativeMethod {
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
             $val = $targetValue->literalValue;
 			return TypedValue::forValue($val > 0 ? $this->context->valueRegistry->real(
-				log($val)
+				log((string)$val)
 			) : $this->context->valueRegistry->error(
                 $this->context->valueRegistry->atom(
                     new TypeNameIdentifier("NotANumber")

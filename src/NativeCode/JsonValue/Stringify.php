@@ -48,11 +48,15 @@ final readonly class Stringify implements NativeMethod {
 		}
 		if ($value instanceof NullValue ||
 			$value instanceof BooleanValue ||
-			$value instanceof IntegerValue ||
-			$value instanceof RealValue ||
 			$value instanceof StringValue
 		) {
 			return $value->literalValue;
+		}
+		if ($value instanceof IntegerValue) {
+			return (int)(string)$value->literalValue;
+		}
+		if ($value instanceof RealValue) {
+			return (float)(string)$value->literalValue;
 		}
 		if ($value instanceof SubtypeValue) {
 			return $this->doStringify($value->baseValue);

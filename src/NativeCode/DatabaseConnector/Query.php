@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\NativeCode\DatabaseConnector;
 
+use BcMath\Number;
 use PDO;
 use PDOException;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
@@ -75,7 +76,8 @@ final readonly class Query implements NativeMethod {
 					$pdo = new PDO($dsn);
 					$stmt = $pdo->prepare($parameterValue->values['query']->literalValue);
 					$stmt->execute(array_map(static fn(Value $value): string|int|null =>
-						$value->literalValue, $parameterValue->values['boundParameters']->values()
+						$value->literalValue instanceof Number ? (string)$value->literalValue : $value->literalValue,
+						 $parameterValue->values['boundParameters']->values()
 					));
 					$result = [];
 					foreach($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {

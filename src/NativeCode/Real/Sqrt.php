@@ -59,7 +59,7 @@ final readonly class Sqrt implements NativeMethod {
 
 		if ($targetValue instanceof IntegerValue || $targetValue instanceof RealValue) {
 			return TypedValue::forValue($this->context->valueRegistry->real(
-                sqrt($targetValue->literalValue)
+                $targetValue->literalValue->sqrt()
 			));
 		}
 		// @codeCoverageIgnoreStart

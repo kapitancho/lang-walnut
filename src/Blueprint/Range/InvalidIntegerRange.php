@@ -2,12 +2,13 @@
 
 namespace Walnut\Lang\Blueprint\Range;
 
+use BcMath\Number;
 use RuntimeException;
 
 final class InvalidIntegerRange extends RuntimeException {
 	public function __construct(
-		public readonly int|MinusInfinity $minValue,
-		public readonly int|PlusInfinity $maxValue
+		public readonly Number|MinusInfinity $minValue,
+		public readonly Number|PlusInfinity $maxValue
 	) {
 		parent::__construct();
 	}

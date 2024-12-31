@@ -2,12 +2,13 @@
 
 namespace Walnut\Lang\Blueprint\Range;
 
+use BcMath\Number;
 use Stringable;
 use Walnut\Lang\Blueprint\Value\RealValue;
 
 interface RealRange extends Stringable {
-	public float|MinusInfinity $minValue { get; }
-	public float|PlusInfinity $maxValue { get; }
+	public Number|MinusInfinity $minValue { get; }
+	public Number|PlusInfinity $maxValue { get; }
 
 	public function isSubRangeOf(RealRange $range): bool;
 

@@ -26,7 +26,7 @@ final readonly class SHIFT implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$t = $this->toBaseType($targetType);
-		if ($t instanceof MutableType && $t->valueType instanceof ArrayType && $t->valueType->range->minLength === 0) {
+		if ($t instanceof MutableType && $t->valueType instanceof ArrayType && (int)(string)$t->valueType->range->minLength === 0) {
 			return $this->context->typeRegistry->result(
 				$t->valueType->itemType,
 				$this->context->typeRegistry->atom(new TypeNameIdentifier("ItemNotFound"))

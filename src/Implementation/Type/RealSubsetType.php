@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Type;
 
+use BcMath\Number;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Type\RealSubsetType as RealSubsetTypeInterface;
 use Walnut\Lang\Blueprint\Type\RealType as RealTypeInterface;
@@ -47,18 +48,18 @@ final class RealSubsetType implements RealSubsetTypeInterface, JsonSerializable 
 	}
 
 
-	private function minValue(): float {
-		return min(array_map(
+	private function minValue(): Number {
+		return new Number(min(array_map(
 			static fn(RealValue $value) =>
 				$value->literalValue, $this->subsetValues
-		));
+		)));
 	}
 
-	private function maxValue(): float {
-		return max(array_map(
+	private function maxValue(): Number {
+		return new Number(max(array_map(
 			static fn(RealValue $value) =>
 				$value->literalValue, $this->subsetValues
-		));
+		)));
 	}
 
 	public RealRange $range {

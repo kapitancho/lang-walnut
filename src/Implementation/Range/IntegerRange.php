@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Range;
 
+use BcMath\Number;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Range\IntegerRange as IntegerRangeInterface;
 use Walnut\Lang\Blueprint\Range\InvalidIntegerRange;
@@ -11,10 +12,10 @@ use Walnut\Lang\Blueprint\Value\IntegerValue;
 
 final readonly class IntegerRange implements IntegerRangeInterface, JsonSerializable {
 	public function __construct(
-		public int|MinusInfinity $minValue,
-		public int|PlusInfinity  $maxValue
+		public Number|MinusInfinity $minValue,
+		public Number|PlusInfinity  $maxValue
 	) {
-		if (is_int($maxValue) && $maxValue < $minValue) {
+		if ($this->minValue instanceof Number && $this->maxValue instanceof Number && $maxValue < $minValue) {
 			throw new InvalidIntegerRange($minValue, $maxValue);
 		}
 	}
@@ -26,9 +27,9 @@ final readonly class IntegerRange implements IntegerRangeInterface, JsonSerializ
 	}
 
 	private function min(
-		MinusInfinity|PlusInfinity|int $value1,
-		MinusInfinity|PlusInfinity|int $value2
-	): MinusInfinity|PlusInfinity|int {
+		MinusInfinity|PlusInfinity|Number $value1,
+		MinusInfinity|PlusInfinity|Number $value2
+	): MinusInfinity|PlusInfinity|Number {
 		return match(true) {
 			$value1 === MinusInfinity::value || $value2 === MinusInfinity::value => MinusInfinity::value,
 			$value1 === PlusInfinity::value => $value2,
@@ -38,9 +39,9 @@ final readonly class IntegerRange implements IntegerRangeInterface, JsonSerializ
 	}
 
 	private function max(
-		MinusInfinity|PlusInfinity|int $value1,
-		MinusInfinity|PlusInfinity|int $value2
-	): MinusInfinity|PlusInfinity|int {
+		MinusInfinity|PlusInfinity|Number $value1,
+		MinusInfinity|PlusInfinity|Number $value2
+	): MinusInfinity|PlusInfinity|Number {
 		return match(true) {
 			$value1 === PlusInfinity::value || $value2 === PlusInfinity::value => PlusInfinity::value,
 			$value1 === MinusInfinity::value => $value2,
@@ -50,10 +51,10 @@ final readonly class IntegerRange implements IntegerRangeInterface, JsonSerializ
 	}
 
 	public function intersectsWith(IntegerRangeInterface $range): bool {
-		if (is_int($this->maxValue) && is_int($range->minValue) && $this->maxValue < $range->minValue) {
+		if ($this->maxValue instanceof Number && $range->minValue instanceof Number && $this->maxValue < $range->minValue) {
 			return false;
 		}
-		if (is_int($this->minValue) && is_int($range->maxValue) && $this->minValue > $range->maxValue) {
+		if ($this->minValue instanceof Number && $range->maxValue instanceof Number && $this->minValue > $range->maxValue) {
 			return false;
 		}
 		return true;
@@ -74,7 +75,7 @@ final readonly class IntegerRange implements IntegerRangeInterface, JsonSerializ
 	}
 
 	/** @return int<-1>|int<0>|int<1> */
-	private function compare(int|MinusInfinity|PlusInfinity $a, int|MinusInfinity|PlusInfinity $b): int {
+	private function compare(Number|MinusInfinity|PlusInfinity $a, Number|MinusInfinity|PlusInfinity $b): int {
 		if ($a === $b) { return 0; }
 		if ($a instanceof MinusInfinity || $b instanceof PlusInfinity) { return -1; }
 		if ($a instanceof PlusInfinity || $b instanceof MinusInfinity) { return 1; }

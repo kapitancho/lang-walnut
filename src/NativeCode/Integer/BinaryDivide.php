@@ -78,13 +78,13 @@ final readonly class BinaryDivide implements NativeMethod {
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue || $parameterValue instanceof RealValue) {
-				if ((float)$parameterValue->literalValue === 0.0) {
+				if ((float)(string)$parameterValue->literalValue === 0.0) {
 					return TypedValue::forValue($this->context->valueRegistry->error(
 						$this->context->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
 					));
 				}
                 return TypedValue::forValue($this->context->valueRegistry->real(
-	                fdiv($targetValue->literalValue, $parameterValue->literalValue)
+	                fdiv((string)$targetValue->literalValue, (string)$parameterValue->literalValue)
 	                //$targetValue->literalValue / $parameter->literalValue
                 ));
 			}

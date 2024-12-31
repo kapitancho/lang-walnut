@@ -31,9 +31,9 @@ final readonly class Floor implements NativeMethod {
 		if ($targetType instanceof RealType || $targetType instanceof RealSubsetType) {
 			return $this->context->typeRegistry->integer(
 				$targetType->range->minValue === MinusInfinity::value ? MinusInfinity::value :
-					(int)floor($targetType->range->minValue),
+					$targetType->range->minValue->floor(),
 				$targetType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
-					(int)floor($targetType->range->maxValue)
+					$targetType->range->maxValue->floor()
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -50,7 +50,7 @@ final readonly class Floor implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			$target = $targetValue->literalValue;
-			return TypedValue::forValue($this->context->valueRegistry->integer((int)floor($target)));
+			return TypedValue::forValue($this->context->valueRegistry->integer($target->floor()));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");
