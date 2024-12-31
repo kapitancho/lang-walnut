@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Blueprint\Program\Registry;
 
+use bcmath\Number;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
@@ -31,8 +32,8 @@ interface ValueRegistry {
 	public BooleanValue $false { get; }
 
 	public function boolean(bool $value): BooleanValue;
-	public function integer(int $value): IntegerValue;
-	public function real(float $value): RealValue;
+	public function integer(Number $value): IntegerValue;
+	public function real(Number $value): RealValue;
 	public function string(string $value): StringValue;
 
 	/** @param list<Value> $values */

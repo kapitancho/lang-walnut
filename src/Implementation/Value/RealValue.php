@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Value;
 
+use BcMath\Number;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Value\IntegerValue as IntegerValueInterface;
@@ -13,7 +14,7 @@ final class RealValue implements RealValueInterface, JsonSerializable {
 
     public function __construct(
 		private readonly TypeRegistry $typeRegistry,
-		public readonly float $literalValue
+		public readonly Number $literalValue
     ) {}
 
 	public RealSubsetType $type {

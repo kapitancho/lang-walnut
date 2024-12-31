@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Value;
 
+use BcMath\Number;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Value\IntegerValue as IntegerValueInterface;
@@ -12,7 +13,7 @@ final class IntegerValue implements IntegerValueInterface, JsonSerializable {
 
     public function __construct(
 		private readonly TypeRegistry $typeRegistry,
-		public readonly int $literalValue
+		public readonly Number $literalValue
     ) {}
 
 	public IntegerSubsetType $type {
@@ -20,7 +21,7 @@ final class IntegerValue implements IntegerValueInterface, JsonSerializable {
     }
 
 	public function asRealValue(): RealValue {
-		return new RealValue($this->typeRegistry, (float)$this->literalValue);
+		return new RealValue($this->typeRegistry, $this->literalValue);
 	}
 
 	public function equals(Value $other): bool {

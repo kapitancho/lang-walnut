@@ -2,6 +2,8 @@
 
 namespace Walnut\Lang\Blueprint\Value;
 
+use BcMath\Number;
+
 interface LiteralValue extends Value {
-	public int|float|string|bool|null $literalValue { get; }
+	public Number|string|bool|null $literalValue { get; }
 }

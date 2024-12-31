@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Program\Registry;
 
+use BcMath\Number;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
@@ -51,14 +52,11 @@ final class ValueRegistry implements ValueRegistryInterface {
 		get => $this->typeRegistry->false->value;
 	}
 
-    public function integer(int $value): IntegerValue {
-		return new IntegerValue(
-			$this->typeRegistry,
-			$value
-		);
+    public function integer(Number $value): IntegerValue {
+		return new IntegerValue($this->typeRegistry,$value);
 	}
 
-    public function real(float $value): RealValue {
+    public function real(Number $value): RealValue {
 	    return new RealValue($this->typeRegistry, $value);
 	}
 
