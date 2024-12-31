@@ -7,7 +7,6 @@ use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Identifier\IdentifierException;
 use Walnut\Lang\Blueprint\Identifier\MethodNameIdentifier;
-use Walnut\Lang\Blueprint\Identifier\PropertyNameIdentifier;
 use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Identifier\VariableNameIdentifier;
 
@@ -24,7 +23,7 @@ final class IdentifierTest extends TestCase {
 	public function testEnumValueIdentifier(): void {
 		self::assertEquals('X', (string)(new EnumValueIdentifier("X")));
 		self::assertEquals('"X"', $this->jsonEncode(new EnumValueIdentifier("X")));
-		self::assertTrue((new EnumValueIdentifier("X"))->equals(new EnumValueIdentifier("X")));
+		self::assertTrue(new EnumValueIdentifier("X")->equals(new EnumValueIdentifier("X")));
 		self::assertNotNull(new EnumValueIdentifier("ItShouldStartWithUppercaseAndContainAToZAnd0To9"));
 		$this->expectException(IdentifierException::class);
 		new EnumValueIdentifier("itShouldNotStartWithLowercase");
@@ -33,7 +32,7 @@ final class IdentifierTest extends TestCase {
 	public function testMethodNameIdentifier(): void {
 		self::assertEquals('x', (string)(new MethodNameIdentifier("x")));
 		self::assertEquals('"x"', $this->jsonEncode(new MethodNameIdentifier("x")));
-		self::assertTrue((new MethodNameIdentifier("x"))->equals(new MethodNameIdentifier("x")));
+		self::assertTrue(new MethodNameIdentifier("x")->equals(new MethodNameIdentifier("x")));
 		self::assertNotNull(new MethodNameIdentifier("222"));
 		self::assertNotNull(new MethodNameIdentifier("ItShouldContainsAToZ0To9And_Underscore"));
 		$this->expectException(IdentifierException::class);
@@ -43,7 +42,7 @@ final class IdentifierTest extends TestCase {
 	public function testTypeNameIdentifier(): void {
 		self::assertEquals('X', (string)(new TypeNameIdentifier("X")));
 		self::assertEquals('"X"', $this->jsonEncode(new TypeNameIdentifier("X")));
-		self::assertTrue((new TypeNameIdentifier("X"))->equals(new TypeNameIdentifier("X")));
+		self::assertTrue(new TypeNameIdentifier("X")->equals(new TypeNameIdentifier("X")));
 		self::assertNotNull(new TypeNameIdentifier("ItShouldStartWithUppercaseAndContainAToZAnd0To9"));
 		$this->expectException(IdentifierException::class);
 		new TypeNameIdentifier("itShouldNotStartWithLowercase");

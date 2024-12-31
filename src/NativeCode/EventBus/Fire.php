@@ -26,12 +26,12 @@ final readonly class Fire implements NativeMethod {
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
-		if ($targetType instanceof SealedType && $targetType->name()->equals(
+		if ($targetType instanceof SealedType && $targetType->name->equals(
 			new TypeNameIdentifier('EventBus')
 		)) {
-			return $this->context->typeRegistry()->result(
+			return $this->context->typeRegistry->result(
 				$parameterType,
-				$this->context->typeRegistry()->withName(new TypeNameIdentifier('ExternalError'))
+				$this->context->typeRegistry->withName(new TypeNameIdentifier('ExternalError'))
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -48,19 +48,19 @@ final readonly class Fire implements NativeMethod {
 		$parameterValue = $parameter->value;
 		
 		$targetValue = $this->toBaseValue($targetValue);
-		if ($targetValue instanceof SealedValue && $targetValue->type()->name()->equals(
+		if ($targetValue instanceof SealedValue && $targetValue->type->name->equals(
 			new TypeNameIdentifier('EventBus')
 		)) {
-			$listeners = $targetValue->value()->values()['listeners'] ?? null;
+			$listeners = $targetValue->value->values['listeners'] ?? null;
 			if ($listeners instanceof TupleValue) {
-				foreach($listeners->values() as $listener) {
+				foreach($listeners->values as $listener) {
 					if ($listener instanceof FunctionValue) {
-						if ($parameterValue->type()->isSubtypeOf($listener->parameterType())) {
-							$result = $listener->execute($this->context->globalContext(), $parameterValue);
-							if ($result->type()->isSubtypeOf(
-								$this->context->typeRegistry()->result(
-									$this->context->typeRegistry()->nothing(),
-									$this->context->typeRegistry()->withName(new TypeNameIdentifier('ExternalError'))
+						if ($parameterValue->type->isSubtypeOf($listener->parameterType)) {
+							$result = $listener->execute($this->context->globalContext, $parameterValue);
+							if ($result->type->isSubtypeOf(
+								$this->context->typeRegistry->result(
+									$this->context->typeRegistry->nothing,
+									$this->context->typeRegistry->withName(new TypeNameIdentifier('ExternalError'))
 								)
 							)) {
 								return TypedValue::forValue($result);

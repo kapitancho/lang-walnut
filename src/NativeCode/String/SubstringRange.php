@@ -29,18 +29,18 @@ final readonly class SubstringRange implements NativeMethod {
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
-			$pInt = $this->context->typeRegistry()->integer(0);
-			$pType = $this->context->typeRegistry()->record([
+			$pInt = $this->context->typeRegistry->integer(0);
+			$pType = $this->context->typeRegistry->record([
 				"start" => $pInt,
 				"end" => $pInt
 			]);
 			if ($parameterType->isSubtypeOf($pType)) {
 				$parameterType = $this->toBaseType($parameterType);
-				$endType = $parameterType->types()['end'];
-				return $this->context->typeRegistry()->string(0,
-					$endType->range()->maxValue() === PlusInfinity::value ? PlusInfinity::value :
-					min($targetType->range()->maxLength,
-					$endType->range()->maxValue - $parameterType->types()['start']->range()->minValue()
+				$endType = $parameterType->types['end'];
+				return $this->context->typeRegistry->string(0,
+					$endType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
+					min($targetType->range->maxLength,
+					$endType->range->maxValue - $parameterType->types['start']->range->minValue
 				));
 			}
 			// @codeCoverageIgnoreStart
@@ -71,11 +71,11 @@ final readonly class SubstringRange implements NativeMethod {
 				$start instanceof IntegerValue &&
 				$end instanceof IntegerValue
 			) {
-				$length = $end->literalValue() - $start->literalValue();
-				return TypedValue::forValue($this->context->valueRegistry()->string(
+				$length = $end->literalValue - $start->literalValue;
+				return TypedValue::forValue($this->context->valueRegistry->string(
 					mb_substr(
-						$targetValue->literalValue(),
-						$start->literalValue(),
+						$targetValue->literalValue,
+						$start->literalValue,
 						$length
 					)
 				));

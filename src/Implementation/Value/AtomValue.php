@@ -9,19 +9,19 @@ use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Value\AtomValue as AtomValueInterface;
 use Walnut\Lang\Blueprint\Value\Value;
 
-final readonly class AtomValue implements AtomValueInterface, JsonSerializable {
+final class AtomValue implements AtomValueInterface, JsonSerializable {
 
     public function __construct(
-        private TypeRegistry $typeRegistry,
-        private TypeNameIdentifier $typeName
+        private readonly TypeRegistry $typeRegistry,
+        private readonly TypeNameIdentifier $typeName
     ) {}
 
-    public function type(): AtomType {
-        return $this->typeRegistry->atom($this->typeName);
+	public AtomType $type {
+        get => $this->typeRegistry->atom($this->typeName);
     }
 
 	public function equals(Value $other): bool {
-		return $other instanceof AtomValueInterface && $this->typeName->equals($other->type()->name());
+		return $other instanceof AtomValueInterface && $this->typeName->equals($other->type->name);
 	}
 
 	public function __toString(): string {

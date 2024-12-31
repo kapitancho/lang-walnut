@@ -6,8 +6,9 @@ use Stringable;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
 
 interface IntegerRange extends Stringable {
-    public function minValue(): int|MinusInfinity;
-    public function maxValue(): int|PlusInfinity;
+	public int|MinusInfinity $minValue { get; }
+	public int|PlusInfinity $maxValue { get; }
+
 	public function isSubRangeOf(IntegerRange $range): bool;
 	public function intersectsWith(IntegerRange $range): bool;
 	public function tryRangeUnionWith(IntegerRange $range): IntegerRange|null;

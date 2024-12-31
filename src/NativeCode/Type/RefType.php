@@ -25,9 +25,9 @@ final readonly class RefType implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $this->toBaseType($targetType->refType());
+			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof TypeType) {
-				return $this->context->typeRegistry()->type($refType->refType());
+				return $this->context->typeRegistry->type($refType->refType);
 			}
 		}
 		// @codeCoverageIgnoreStart
@@ -42,9 +42,9 @@ final readonly class RefType implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof TypeValue) {
-			$typeValue = $this->toBaseType($targetValue->typeValue());
+			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof TypeType) {
-				return TypedValue::forValue($this->context->valueRegistry()->type($typeValue->refType()));
+				return TypedValue::forValue($this->context->valueRegistry->type($typeValue->refType));
 			}
 		}
 		// @codeCoverageIgnoreStart

@@ -9,24 +9,20 @@ use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Value\TypeValue as TypeValueInterface;
 use Walnut\Lang\Blueprint\Value\Value;
 
-final readonly class TypeValue implements TypeValueInterface, JsonSerializable {
+final class TypeValue implements TypeValueInterface, JsonSerializable {
 
     public function __construct(
-		private TypeRegistry $typeRegistry,
-		private Type $typeValue
+		private readonly TypeRegistry $typeRegistry,
+		public readonly Type $typeValue
     ) {}
 
-    public function type(): TypeType {
-        return $this->typeRegistry->type($this->typeValue);
-    }
-
-    public function typeValue(): Type {
-        return $this->typeValue;
+	public TypeType $type {
+		get => $this->typeRegistry->type($this->typeValue);
     }
 
 	public function equals(Value $other): bool {
 		return $other instanceof TypeValueInterface &&
-			$this->typeValue->isSubtypeOf($other->typeValue()) &&
+			$this->typeValue->isSubtypeOf($other->typeValue) &&
 			$other->typeValue->isSubtypeOf($this->typeValue);
 	}
 

@@ -16,9 +16,9 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class MatchAgainstPattern implements NativeMethod {
 	use BaseType;
 
-	private const ROUTE_PATTERN_MATCH = '#\{([\w\_]+)\}#';
-	private const ROUTE_PATTERN_REPLACE = '#\{[\w\_]+\}#';
-	private const REPLACE_PATTERN = '(.+?)';
+	private const string ROUTE_PATTERN_MATCH = '#\{([\w\_]+)\}#';
+	private const string ROUTE_PATTERN_REPLACE = '#\{[\w\_]+\}#';
+	private const string REPLACE_PATTERN = '(.+?)';
 
 	public function __construct(
 		private MethodExecutionContext $context
@@ -32,11 +32,11 @@ final readonly class MatchAgainstPattern implements NativeMethod {
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $this->context->typeRegistry()->union([
-					$this->context->typeRegistry()->map(
-						$this->context->typeRegistry()->string(),
+				return $this->context->typeRegistry->union([
+					$this->context->typeRegistry->map(
+						$this->context->typeRegistry->string(),
 					),
-					$this->context->typeRegistry()->false()
+					$this->context->typeRegistry->false
 				]);
 			}
 			// @codeCoverageIgnoreStart
@@ -59,8 +59,8 @@ final readonly class MatchAgainstPattern implements NativeMethod {
 		$parameterValue = $this->toBaseValue($parameterValue);
 		if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof StringValue) {
-				$target = $targetValue->literalValue();
-				$path = $parameterValue->literalValue();
+				$target = $targetValue->literalValue;
+				$path = $parameterValue->literalValue;
 
 				if (preg_match_all(self::ROUTE_PATTERN_MATCH, $path, $matches)) {
 					$pathArgs = $matches[1] ?? [];
@@ -71,19 +71,19 @@ final readonly class MatchAgainstPattern implements NativeMethod {
 				}
 				$path = strtolower($path);
 				if (!preg_match('#' . $path . '#', $target, $matches)) {
-					return TypedValue::forValue($this->context->valueRegistry()->false());
+					return TypedValue::forValue($this->context->valueRegistry->false);
 				}
 				return TypedValue::forValue(is_array($pathArgs) ?
-					$this->context->valueRegistry()->record(
+					$this->context->valueRegistry->record(
 						array_map(fn($value) =>
-							$this->context->valueRegistry()->string($value),
+							$this->context->valueRegistry->string($value),
 							array_combine(
 								$pathArgs,
 								array_slice($matches, 1)
 							)
 						)
 					) :
-					$this->context->valueRegistry()->record([])
+					$this->context->valueRegistry->record([])
 				);
 			}
 			// @codeCoverageIgnoreStart

@@ -6,6 +6,6 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\TypeType;
 
 interface TypeValue extends Value {
-    public function type(): TypeType;
-    public function typeValue(): Type;
+	public TypeType $type { get; }
+	public Type $typeValue { get; }
 }

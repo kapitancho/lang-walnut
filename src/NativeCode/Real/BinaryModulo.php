@@ -39,12 +39,12 @@ final readonly class BinaryModulo implements NativeMethod {
 				$parameterType instanceof RealType ||
 				$parameterType instanceof RealSubsetType
 			) {
-				return ($parameterType->range()->minValue() === MinusInfinity::value || $parameterType->range()->minValue() < 0) &&
-					($parameterType->range()->maxValue() === PlusInfinity::value || $parameterType->range()->maxValue() > 0) ?
-						$this->context->typeRegistry()->result(
-							$this->context->typeRegistry()->real(),
-							$this->context->typeRegistry()->atom(new TypeNameIdentifier('NotANumber'))
-						) : $this->context->typeRegistry()->real();
+				return ($parameterType->range->minValue === MinusInfinity::value || $parameterType->range->minValue < 0) &&
+					($parameterType->range->maxValue === PlusInfinity::value || $parameterType->range->maxValue > 0) ?
+						$this->context->typeRegistry->result(
+							$this->context->typeRegistry->real(),
+							$this->context->typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
+						) : $this->context->typeRegistry->real();
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -67,13 +67,13 @@ final readonly class BinaryModulo implements NativeMethod {
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue || $parameterValue instanceof RealValue) {
-				if ((float)$parameterValue->literalValue() === 0.0) {
-					return TypedValue::forValue($this->context->valueRegistry()->error(
-						$this->context->valueRegistry()->atom(new TypeNameIdentifier('NotANumber'))
+				if ((float)$parameterValue->literalValue === 0.0) {
+					return TypedValue::forValue($this->context->valueRegistry->error(
+						$this->context->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
 					));
 				}
-                return TypedValue::forValue($this->context->valueRegistry()->real(
-	                fmod($targetValue->literalValue(), $parameterValue->literalValue())
+                return TypedValue::forValue($this->context->valueRegistry->real(
+	                fmod($targetValue->literalValue, $parameterValue->literalValue)
                 ));
 			}
 			// @codeCoverageIgnoreStart

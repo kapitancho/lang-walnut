@@ -11,31 +11,23 @@ use Walnut\Lang\Blueprint\Type\Type;
 final readonly class SealedType implements SealedTypeInterface, JsonSerializable {
 
     public function __construct(
-	    private TypeNameIdentifier $typeName,
-        private RecordType $valueType
+	    public TypeNameIdentifier $name,
+        public RecordType         $valueType
     ) {}
-
-	public function name(): TypeNameIdentifier {
-		return $this->typeName;
-    }
-
-	public function valueType(): RecordType {
-        return $this->valueType;
-    }
 
     public function isSubtypeOf(Type $ofType): bool {
 		return match(true) {
-			$ofType instanceof SealedTypeInterface => $this->name()->equals($ofType->name()),
+			$ofType instanceof SealedTypeInterface => $this->name->equals($ofType->name),
 			$ofType instanceof SupertypeChecker => $ofType->isSupertypeOf($this),
 			default => false
 		};
     }
 
 	public function __toString(): string {
-		return (string)$this->typeName;
+		return (string)$this->name;
 	}
 
 	public function jsonSerialize(): array {
-		return ['type' => 'Sealed', 'name' => $this->typeName, 'valueType' => $this->valueType];
+		return ['type' => 'Sealed', 'name' => $this->name, 'valueType' => $this->valueType];
 	}
 }

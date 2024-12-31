@@ -12,34 +12,25 @@ use Walnut\Lang\Blueprint\Type\EnumerationType as EnumerationTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\EnumerationValue;
 
-final readonly class EnumerationType implements EnumerationTypeInterface, JsonSerializable {
+final class EnumerationType implements EnumerationTypeInterface, JsonSerializable {
 
     /**
-     * @param array<string, EnumerationValue> $enumerationValues
+     * @param array<string, EnumerationValue> $values
      */
     public function __construct(
-        private TypeNameIdentifier $typeName,
-        private array $enumerationValues
+        public readonly TypeNameIdentifier $name,
+        public readonly array               $values
     ) {}
-
-    /** @return array<string, EnumerationValue> */
-    public function values(): array {
-        return $this->enumerationValues;
-    }
 
 	/** @throws UnknownEnumerationValue **/
 	public function value(EnumValueIdentifier $valueIdentifier): EnumerationValue {
-		return $this->enumerationValues[$valueIdentifier->identifier] ??
-			UnknownEnumerationValue::of($this->typeName, $valueIdentifier);
+		return $this->values[$valueIdentifier->identifier] ??
+			UnknownEnumerationValue::of($this->name, $valueIdentifier);
 	}
-
-    public function name(): TypeNameIdentifier {
-        return $this->typeName;
-    }
 
     public function isSubtypeOf(Type $ofType): bool {
 		return match (true) {
-			$ofType instanceof EnumerationTypeInterface => $this->typeName->equals($ofType->name()),
+			$ofType instanceof EnumerationTypeInterface => $this->name->equals($ofType->name),
 			$ofType instanceof SupertypeChecker => $ofType->isSupertypeOf($this),
 			default => false
 		};
@@ -55,30 +46,34 @@ final readonly class EnumerationType implements EnumerationTypeInterface, JsonSe
         }
         $selected = [];
         foreach($values as $value) {
-            $v = $this->enumerationValues[$value->identifier] ?? null;
+            $v = $this->values[$value->identifier] ?? null;
             if ($v === null) {
-				UnknownEnumerationValue::of($this->typeName, $value);
+				UnknownEnumerationValue::of($this->name, $value);
             }
             $selected[$value->identifier] = $v;
         }
-        return count($selected) === count($this->enumerationValues) ?
+        return count($selected) === count($this->values) ?
             $this : new EnumerationSubsetType($this, $selected);
     }
 
-    public function enumeration(): EnumerationType {
-        return $this;
-    }
+	public EnumerationType $enumeration {
+		get {
+			return $this;
+		}
+	}
 
-    /** @return list<EnumerationValue> */
-    public function subsetValues(): array {
-        return $this->enumerationValues;
-    }
+	/** @param array<string, EnumerationValue> $subsetValues */
+	public array $subsetValues {
+		get {
+			return $this->values;
+		}
+	}
 
 	public function __toString(): string {
-		return (string)$this->typeName;
+		return (string)$this->name;
 	}
 
 	public function jsonSerialize(): array {
-		return ['type' => 'Enumeration', 'name' => (string)$this->typeName, 'values' => $this->enumerationValues];
+		return ['type' => 'Enumeration', 'name' => (string)$this->name, 'values' => $this->values];
 	}
 }

@@ -11,7 +11,7 @@ final class AsBooleanTest extends BaseProgramTestHelper {
 		$this->testMethodCall(
 			$this->expressionRegistry->constant($value),
 			'asBoolean',
-			$this->expressionRegistry->constant($this->valueRegistry->null()),
+			$this->expressionRegistry->constant($this->valueRegistry->null),
 			$this->valueRegistry->boolean($expected)
 		);
 	}
@@ -23,9 +23,9 @@ final class AsBooleanTest extends BaseProgramTestHelper {
 		$this->callAsBoolean($this->valueRegistry->real(0), false);
 		$this->callAsBoolean($this->valueRegistry->string("Hello"), true);
 		$this->callAsBoolean($this->valueRegistry->string(""), false);
-		$this->callAsBoolean($this->valueRegistry->true(), true);
-		$this->callAsBoolean($this->valueRegistry->false(), false);
-		$this->callAsBoolean($this->valueRegistry->null(), false);
+		$this->callAsBoolean($this->valueRegistry->true, true);
+		$this->callAsBoolean($this->valueRegistry->false, false);
+		$this->callAsBoolean($this->valueRegistry->null, false);
 		$this->callAsBoolean($this->valueRegistry->tuple([
 			$this->valueRegistry->integer(123)
 		]), true);

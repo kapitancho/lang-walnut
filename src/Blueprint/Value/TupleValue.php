@@ -6,9 +6,9 @@ use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\UnknownProperty;
 
 interface TupleValue extends Value {
-    /** @return list<Value> */
-    public function values(): array;
-    public function type(): TupleType;
+	public array $values { get; }
+	public TupleType $type { get; }
+
 	/** @throws UnknownProperty */
 	public function valueOf(int $index): Value;
 }

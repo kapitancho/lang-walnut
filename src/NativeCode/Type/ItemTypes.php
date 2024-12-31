@@ -31,37 +31,37 @@ final readonly class ItemTypes implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $this->toBaseType($targetType->refType());
+			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof TupleType) {
-				return $this->context->typeRegistry()->tuple(
+				return $this->context->typeRegistry->tuple(
 					array_map(
-						fn(TypeInterface $type) => $this->context->typeRegistry()->type($type),
-						$refType->types(),
+						fn(TypeInterface $type) => $this->context->typeRegistry->type($type),
+						$refType->types,
 					)
 				);
 			}
 			if ($refType instanceof RecordType) {
-				return $this->context->typeRegistry()->record(
+				return $this->context->typeRegistry->record(
 					array_map(
-						fn(TypeInterface $type) => $this->context->typeRegistry()->type($type),
-						$refType->types(),
+						fn(TypeInterface $type) => $this->context->typeRegistry->type($type),
+						$refType->types,
 					)
 				);
 			}
 			if ($refType instanceof MetaType) {
-				if (in_array($refType->value(), [
+				if (in_array($refType->value, [
 					MetaTypeValue::Tuple, MetaTypeValue::Union, MetaTypeValue::Intersection
 				], true)) {
-					return $this->context->typeRegistry()->array(
-						$this->context->typeRegistry()->type(
-							$this->context->typeRegistry()->any()
+					return $this->context->typeRegistry->array(
+						$this->context->typeRegistry->type(
+							$this->context->typeRegistry->any
 						)
 					);
 				}
-				if ($refType->value() === MetaTypeValue::Record) {
-					return $this->context->typeRegistry()->map(
-						$this->context->typeRegistry()->type(
-							$this->context->typeRegistry()->any()
+				if ($refType->value === MetaTypeValue::Record) {
+					return $this->context->typeRegistry->map(
+						$this->context->typeRegistry->type(
+							$this->context->typeRegistry->any
 						)
 					);
 				}
@@ -79,20 +79,20 @@ final readonly class ItemTypes implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof TypeValue) {
-			$typeValue = $this->toBaseType($targetValue->typeValue());
+			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof TupleType || $typeValue instanceof UnionType || $typeValue instanceof IntersectionType) {
-				return TypedValue::forValue($this->context->valueRegistry()->tuple(
+				return TypedValue::forValue($this->context->valueRegistry->tuple(
 					array_map(
-						fn(TypeInterface $type) => $this->context->valueRegistry()->type($type),
-						$typeValue->types()
+						fn(TypeInterface $type) => $this->context->valueRegistry->type($type),
+						$typeValue->types
 					)
 				));
 			}
 			if ($typeValue instanceof RecordType) {
-				return TypedValue::forValue($this->context->valueRegistry()->record(
+				return TypedValue::forValue($this->context->valueRegistry->record(
 					array_map(
-						fn(TypeInterface $type) => $this->context->valueRegistry()->type($type),
-						$typeValue->types()
+						fn(TypeInterface $type) => $this->context->valueRegistry->type($type),
+						$typeValue->types
 					)
 				));
 			}

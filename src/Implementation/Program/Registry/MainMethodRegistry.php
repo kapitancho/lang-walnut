@@ -45,7 +45,7 @@ final readonly class MainMethodRegistry implements MethodRegistry {
 		$baseType = $this->toBaseType($targetType);
 		if ($baseType instanceof IntersectionType) {
 			$methods = [];
-			foreach($baseType->types() as $type) {
+			foreach($baseType->types as $type) {
 				$method = $this->method($type, $methodName);
 				if ($method instanceof Method) {
 					$methods[] = [$type, $method];
@@ -71,7 +71,7 @@ final readonly class MainMethodRegistry implements MethodRegistry {
 		}
 		if ($baseType instanceof UnionType) {
 			$methods = [];
-			foreach($baseType->types() as $type) {
+			foreach($baseType->types as $type) {
 				$method = $this->method($type, $methodName);
 				if ($method instanceof Method) {
 					$methods[] = [$type, $method];

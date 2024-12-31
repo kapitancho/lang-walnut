@@ -32,9 +32,9 @@ final readonly class ValueOf implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($parameterType instanceof TypeType) {
-			return $this->context->typeRegistry()->result(
-				$parameterType->refType(),
-				$this->context->typeRegistry()->withName(
+			return $this->context->typeRegistry->result(
+				$parameterType->refType,
+				$this->context->typeRegistry->withName(
 					new TypeNameIdentifier('DependencyContainerError')
 				)
 			);
@@ -51,19 +51,19 @@ final readonly class ValueOf implements NativeMethod {
 		$parameterValue = $parameter->value;
 		
 		if ($parameterValue instanceof TypeValue) {
-			$type = $parameterValue->typeValue();
+			$type = $parameterValue->typeValue;
 			$result = $this->dependencyContainer->valueByType($type);
 			if ($result instanceof Value) {
 				return new TypedValue($type, $result);
 			}
 			return TypedValue::forValue(
-				$this->context->valueRegistry()->error(
-					$this->context->valueRegistry()->sealedValue(
+				$this->context->valueRegistry->error(
+					$this->context->valueRegistry->sealedValue(
 						new TypeNameIdentifier('DependencyContainerError'),
-						$this->context->valueRegistry()->record([
-							'targetType' => $this->context->valueRegistry()->type($type),
-							'errorOnType' => $this->context->valueRegistry()->type($result->type),
-							'errorMessage' => $this->context->valueRegistry()->string(
+						$this->context->valueRegistry->record([
+							'targetType' => $this->context->valueRegistry->type($type),
+							'errorOnType' => $this->context->valueRegistry->type($result->type),
+							'errorMessage' => $this->context->valueRegistry->string(
 								match($result->unresolvableDependency) {
 									UnresolvableDependency::circularDependency => 'Circular dependency',
 									UnresolvableDependency::ambiguous => 'Ambiguous dependency',

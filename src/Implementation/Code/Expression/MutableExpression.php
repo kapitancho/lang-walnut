@@ -21,20 +21,13 @@ final readonly class MutableExpression implements MutableExpressionInterface, Js
 	public function __construct(
 		private TypeRegistry $typeRegistry,
 		private ValueRegistry $valueRegistry,
-		private Type $type,
-		private Expression $value
+		public Type $type,
+		public Expression $value
 	) {}
-
-	public function type(): Type {
-		return $this->type;
-	}
-	public function value(): Expression {
-		return $this->value;
-	}
 
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
 		$analyserResult = $this->value->analyse($analyserContext);
-		if ($analyserResult->expressionType()->isSubtypeOf($this->type)) {
+		if ($analyserResult->expressionType->isSubtypeOf($this->type)) {
 			return $analyserResult->withExpressionType(
 				$this->typeRegistry->mutable($this->type)
 			);
@@ -43,7 +36,7 @@ final readonly class MutableExpression implements MutableExpressionInterface, Js
 			sprintf(
 				"%s Value type %s is not a subtype of %s",
 				__CLASS__,
-				$analyserResult->expressionType(),
+				$analyserResult->expressionType,
 				$this->type
 			)
 		);
@@ -51,13 +44,13 @@ final readonly class MutableExpression implements MutableExpressionInterface, Js
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
 		$executionContext = $this->value->execute($executionContext);
-		if ($executionContext->valueType()->isSubtypeOf($this->type)) {
+		if ($executionContext->valueType->isSubtypeOf($this->type)) {
 			return $executionContext->withTypedValue(
 				new TypedValue(
 					$this->typeRegistry->mutable($this->type),
 					$this->valueRegistry->mutable(
 						$this->type,
-						$executionContext->value()
+						$executionContext->value
 					)
 				)
 			);
@@ -66,7 +59,7 @@ final readonly class MutableExpression implements MutableExpressionInterface, Js
 			sprintf(
 				"%s Value type %s is not a subtype of %s",
 				__CLASS__,
-				$executionContext->valueType(),
+				$executionContext->valueType,
 				$this->type
 			)
 		);

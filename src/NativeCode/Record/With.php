@@ -37,24 +37,24 @@ final readonly class With implements NativeMethod {
 		$originalTargetType = $targetType;
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof RecordType && $parameterType instanceof RecordType) {
-			$recTypes = [...$targetType->types(), ...$parameterType->types()];
-			$result = $this->context->typeRegistry()->record($recTypes);
+			$recTypes = [...$targetType->types, ...$parameterType->types];
+			$result = $this->context->typeRegistry->record($recTypes);
 			if ($originalTargetType instanceof SubtypeType) {
-				$constructorType = $this->context->typeRegistry()->typeByName(new TypeNameIdentifier('Constructor'));
+				$constructorType = $this->context->typeRegistry->typeByName(new TypeNameIdentifier('Constructor'));
 				$validatorMethod = $this->methodRegistry->method(
 					$constructorType,
-					new MethodNameIdentifier('as' . $originalTargetType->name()->identifier)
+					new MethodNameIdentifier('as' . $originalTargetType->name->identifier)
 				);
-				$b = $originalTargetType->baseType();
+				$b = $originalTargetType->baseType;
 				$errorType = null;
 				if ($validatorMethod instanceof Method) {
 					$validatorResult = $validatorMethod->analyse($constructorType, $b);
 					if ($validatorResult instanceof ResultType) {
-						$errorType = $validatorResult->errorType() instanceof NothingType ? null : $validatorResult->errorType();
+						$errorType = $validatorResult->errorType instanceof NothingType ? null : $validatorResult->errorType;
 					}
 				}
 				if ($result->isSubtypeOf($b)) {
-					return $errorType ? $this->context->typeRegistry()->result(
+					return $errorType ? $this->context->typeRegistry->result(
 						$originalTargetType, $errorType
 					) : $originalTargetType;
 				}
@@ -69,13 +69,13 @@ final readonly class With implements NativeMethod {
 		}
 		if ($targetType instanceof MapType) {
 			if ($parameterType instanceof MapType) {
-				return $this->context->typeRegistry()->map(
-					$this->context->typeRegistry()->union([
-						$targetType->itemType(),
-						$parameterType->itemType()
+				return $this->context->typeRegistry->map(
+					$this->context->typeRegistry->union([
+						$targetType->itemType,
+						$parameterType->itemType
 					]),
-					max($targetType->range()->minLength(), $parameterType->range()->minLength()),
-					$targetType->range()->maxLength() + $parameterType->range()->maxLength()
+					max($targetType->range->minLength, $parameterType->range->minLength),
+					$targetType->range->maxLength + $parameterType->range->maxLength
 				);
 			}
 			// @codeCoverageIgnoreStart
@@ -98,27 +98,27 @@ final readonly class With implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue) {
 			if ($parameterValue instanceof RecordValue) {
-				$result = $this->context->valueRegistry()->record([
-					... $targetValue->values(), ... $parameterValue->values()
+				$result = $this->context->valueRegistry->record([
+					... $targetValue->values, ... $parameterValue->values
 				]);
 				$r = TypedValue::forValue($result);
 				if ($originalValue instanceof SubtypeValue) {
-					$constructorType = $this->context->typeRegistry()->typeByName(new TypeNameIdentifier('Constructor'));
+					$constructorType = $this->context->typeRegistry->typeByName(new TypeNameIdentifier('Constructor'));
 					$validatorMethod = $this->methodRegistry->method(
 						$constructorType,
-						new MethodNameIdentifier('as' . $originalValue->type()->name()->identifier)
+						new MethodNameIdentifier('as' . $originalValue->type->name->identifier)
 					);
 					if ($validatorMethod instanceof Method) {
 						$validatorResult = $validatorMethod->execute(
-							TypedValue::forValue($constructorType->value()),
+							TypedValue::forValue($constructorType->value),
 							$r,
 						);
 						$resultValue = $validatorResult->value;
 						if ($resultValue instanceof ErrorValue) {
 							return $validatorResult;
 						}
-						$r = TypedValue::forValue($this->context->valueRegistry()->subtypeValue(
-							$originalValue->type()->name(),
+						$r = TypedValue::forValue($this->context->valueRegistry->subtypeValue(
+							$originalValue->type->name,
 							$result
 						));
 					}

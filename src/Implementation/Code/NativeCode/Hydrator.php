@@ -110,31 +110,31 @@ final readonly class Hydrator {
 	private function hydrateType(Value $value, TypeType $targetType, string $hydrationPath): TypeValue {
 		if ($value instanceof StringValue) {
 			try {
-				$typeName = $value->literalValue();
+				$typeName = $value->literalValue;
 				$type = match($typeName) {
-					'Any' => $this->context->typeRegistry()->any(),
-					'Nothing' => $this->context->typeRegistry()->nothing(),
-					'Array' => $this->context->typeRegistry()->array(),
-					'Map' => $this->context->typeRegistry()->map(),
-					'Mutable' => $this->context->typeRegistry()->mutable($this->context->typeRegistry()->any()),
-					'Type' => $this->context->typeRegistry()->type($this->context->typeRegistry()->any()),
-					'Null' => $this->context->typeRegistry()->null(),
-					'True' => $this->context->typeRegistry()->true(),
-					'False' => $this->context->typeRegistry()->false(),
-					'Boolean' => $this->context->typeRegistry()->boolean(),
-					'Integer' => $this->context->typeRegistry()->integer(),
-					'Real' => $this->context->typeRegistry()->real(),
-					'String' => $this->context->typeRegistry()->string(),
-					default => $this->context->typeRegistry()->withName(new TypeNameIdentifier($typeName)),
+					'Any' => $this->context->typeRegistry->any,
+					'Nothing' => $this->context->typeRegistry->nothing,
+					'Array' => $this->context->typeRegistry->array(),
+					'Map' => $this->context->typeRegistry->map(),
+					'Mutable' => $this->context->typeRegistry->mutable($this->context->typeRegistry->any),
+					'Type' => $this->context->typeRegistry->type($this->context->typeRegistry->any),
+					'Null' => $this->context->typeRegistry->null,
+					'True' => $this->context->typeRegistry->true,
+					'False' => $this->context->typeRegistry->false,
+					'Boolean' => $this->context->typeRegistry->boolean,
+					'Integer' => $this->context->typeRegistry->integer(),
+					'Real' => $this->context->typeRegistry->real(),
+					'String' => $this->context->typeRegistry->string(),
+					default => $this->context->typeRegistry->withName(new TypeNameIdentifier($typeName)),
 				}				;
-				//$type = $this->context->typeRegistry()->withName(new TypeNameIdentifier());
-				if ($type->isSubtypeOf($targetType->refType())) {
-					return $this->context->valueRegistry()->type($type);
+				//$type = $this->context->typeRegistry->withName(new TypeNameIdentifier());
+				if ($type->isSubtypeOf($targetType->refType)) {
+					return $this->context->valueRegistry->type($type);
 				}
 				throw new HydrationException(
 					$value,
 					$hydrationPath,
-					sprintf("The type should be a subtype of %s", $targetType->refType())
+					sprintf("The type should be a subtype of %s", $targetType->refType)
 				);
 			} catch (UnknownType) {
 				throw new HydrationException(
@@ -153,59 +153,117 @@ final readonly class Hydrator {
 
 	private function hydrateAtom(Value $value, AtomType $targetType, string $hydrationPath): AtomValue {
 		$method = $this->methodRegistry->method(
-			$this->context->typeRegistry()->withName(new TypeNameIdentifier('JsonValue')),
+			$this->context->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
 			new MethodNameIdentifier(
-				sprintf('as%s', $targetType->name())
+				sprintf('as%s', $targetType->name)
 			)
 		);
 		if ($method instanceof Method) {
 			$result = $method->execute(
 				TypedValue::forValue($value),
-				TypedValue::forValue($this->context->valueRegistry()->null())
+				TypedValue::forValue($this->context->valueRegistry->null)
 			);
 			$resultValue = $result->value;
 			if ($resultValue instanceof ErrorValue) {
 				throw new HydrationException(
 					$value,
 					$hydrationPath,
-					sprintf("Atom hydration failed. Error: %s", $resultValue->errorValue())
+					sprintf("Atom hydration failed. Error: %s", $resultValue->errorValue)
 				//TODO - consider a better error message
 				);
 			}
 			return $resultValue;
 		}
-		return $targetType->value();
+		return $targetType->value;
 	}
 
 	private function hydrateEnumeration(Value $value, EnumerationType $targetType, string $hydrationPath): Value {
+		return $this->hydrateEnumerationSubset($value, $targetType, $hydrationPath);
+	}
+
+	private function hydrateEnumerationSubset(Value $value, EnumerationSubsetType $targetType, string $hydrationPath): EnumerationValue {
 		$method = $this->methodRegistry->method(
-			$this->context->typeRegistry()->withName(new TypeNameIdentifier('JsonValue')),
+			$this->context->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
 			new MethodNameIdentifier(
-				sprintf('as%s', $targetType->name())
+				sprintf('as%s', $targetType->enumeration->name)
 			)
 		);
 		if ($method instanceof Method) {
 			$result = $method->execute(
 				TypedValue::forValue($value),
-				TypedValue::forValue($this->context->valueRegistry()->null())
+				TypedValue::forValue($this->context->valueRegistry->null)
 			);
 			$resultValue = $result->value;
 			if ($resultValue instanceof ErrorValue) {
 				throw new HydrationException(
 					$value,
 					$hydrationPath,
-					sprintf("Enumeration hydration failed. Error: %s", $resultValue->errorValue())
+					sprintf("Enumeration hydration failed. Error: %s", $resultValue->errorValue)
+					//TODO - consider a better error message
+				);
+			}
+			foreach($targetType->subsetValues as $enumValue) {
+				if ($enumValue === $resultValue) {
+					return $resultValue;
+				}
+			}
+			throw new HydrationException(
+				$value,
+				$hydrationPath,
+				sprintf("The enumeration value %s is not among %s",
+					$resultValue,
+					implode(', ', $targetType->subsetValues)
+				)
+			);
+		}
+		if ($value instanceof StringValue) {
+			foreach($targetType->subsetValues as $enumValue) {
+				if ($enumValue->name->identifier === $value->literalValue) {
+					return $this->context->valueRegistry->enumerationValue(
+						$targetType->enumeration->name,
+						$enumValue->name
+					);
+				}
+			}
+		}
+		throw new HydrationException(
+			$value,
+			$hydrationPath,
+			sprintf("The value should be a string with a value among %s",
+				implode(', ', $targetType->subsetValues)
+			)
+		);
+	}
+
+	/*private function hydrateEnumerationOld(Value $value, EnumerationType $targetType, string $hydrationPath): Value {
+		$method = $this->methodRegistry->method(
+			$this->context->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
+			new MethodNameIdentifier(
+				sprintf('as%s', $targetType->name)
+			)
+		);
+		if ($method instanceof Method) {
+			$result = $method->execute(
+				TypedValue::forValue($value),
+				TypedValue::forValue($this->context->valueRegistry->null)
+			);
+			$resultValue = $result->value;
+			if ($resultValue instanceof ErrorValue) {
+				throw new HydrationException(
+					$value,
+					$hydrationPath,
+					sprintf("Enumeration hydration failed. Error: %s", $resultValue->errorValue)
 					//TODO - consider a better error message
 				);
 			}
 			return $resultValue;
 		}
 		if ($value instanceof StringValue) {
-			foreach($targetType->values() as $enumValue) {
-				if ($enumValue->name()->identifier === $value->literalValue()) {
-					return $this->context->valueRegistry()->enumerationValue(
-						$targetType->name(),
-						$enumValue->name()
+			foreach($targetType->values as $enumValue) {
+				if ($enumValue->name->identifier === $value->literalValue) {
+					return $this->context->valueRegistry->enumerationValue(
+						$targetType->name,
+						$enumValue->name
 					);
 				}
 			}
@@ -214,41 +272,24 @@ final readonly class Hydrator {
 			$value,
 			$hydrationPath,
 			sprintf("The value should be a string with a value among %s",
-				implode(', ', $targetType->values())
+				implode(', ', $targetType->values)
 			)
 		);
 	}
-	private function hydrateEnumerationSubset(Value $value, EnumerationSubsetType $targetType, string $hydrationPath): EnumerationValue {
-		$resultValue = $this->hydrateEnumeration($value, $targetType->enumeration(), $hydrationPath);
-		if (!in_array($resultValue, $targetType->subsetValues())) {
+	private function hydrateEnumerationSubsetOld(Value $value, EnumerationSubsetType $targetType, string $hydrationPath): EnumerationValue {
+		$resultValue = $this->hydrateEnumeration($value, $targetType->enumeration, $hydrationPath);
+		if (!in_array($resultValue, $targetType->subsetValues)) {
 			throw new HydrationException(
 				$value,
 				$hydrationPath,
 				sprintf("The enumeration value %s is not among %s",
 					$resultValue,
-					implode(', ', $targetType->subsetValues())
+					implode(', ', $targetType->subsetValues)
 				)
 			);
 		}
 		return $resultValue;
-		/*if ($value instanceof StringValue) {
-			foreach($targetType->subsetValues() as $enumValue) {
-				if ($enumValue->name()->identifier === $value->literalValue()) {
-					return $this->context->valueRegistry()->enumerationValue(
-						$targetType->enumeration()->name(),
-						$enumValue->name()
-					);
-				}
-			}
-		}
-		throw new HydrationException(
-			$value,
-			$hydrationPath,
-			sprintf("The value should be a string with a value among %s",
-				implode(', ', $targetType->subsetValues())
-			)
-		);*/
-	}
+	}*/
 
 	/*private function hydrateIntersection(Value $value, IntersectionType $targetType, string $hydrationPath): Value {
 		$values = [];
@@ -264,12 +305,12 @@ final readonly class Hydrator {
 			/** @noinspection SlowArrayOperationsInLoopInspection * /
 			$values = array_merge($values, $result->values());
 		}
-		return $this->context->valueRegistry()->dict($values);
+		return $this->context->valueRegistry->dict($values);
 	}*/
 
 	private function hydrateUnion(Value $value, UnionType $targetType, string $hydrationPath): Value {
 		$exceptions = [];
-		foreach($targetType->types() as $type) {
+		foreach($targetType->types as $type) {
 			try {
 				return $this->hydrateValue($value, $type, $hydrationPath);
 			} catch (HydrationException $ex) {
@@ -281,16 +322,16 @@ final readonly class Hydrator {
 	}
 
 	private function hydrateAlias(Value $value, AliasType $targetType, string $hydrationPath): Value {
-		return $this->hydrateValue($value, $targetType->aliasedType(), $hydrationPath);
+		return $this->hydrateValue($value, $targetType->aliasedType, $hydrationPath);
 	}
 
 	private function hydrateResult(Value $value, ResultType $targetType, string $hydrationPath): Value {
 		try {
-			return $this->hydrateValue($value, $targetType->returnType(), $hydrationPath);
+			return $this->hydrateValue($value, $targetType->returnType, $hydrationPath);
 		} catch (HydrationException $ex) {
 			try {
-				return $this->context->valueRegistry()->error(
-					$this->hydrateValue($value, $targetType->errorType(), $hydrationPath)
+				return $this->context->valueRegistry->error(
+					$this->hydrateValue($value, $targetType->errorType, $hydrationPath)
 				);
 			} catch (HydrationException) {
 				throw $ex;
@@ -300,38 +341,38 @@ final readonly class Hydrator {
 
 	private function hydrateSubtype(Value $value, SubtypeType $targetType, string $hydrationPath): Value {
 		$method = $this->methodRegistry->method(
-			$this->context->typeRegistry()->withName(new TypeNameIdentifier('JsonValue')),
+			$this->context->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
 			new MethodNameIdentifier(
-				sprintf('as%s', $targetType->name())
+				sprintf('as%s', $targetType->name)
 			)
 		);
 		if ($method instanceof Method) {
 			$result = $method->execute(
 				TypedValue::forValue($value),
-				TypedValue::forValue($this->context->valueRegistry()->null())
+				TypedValue::forValue($this->context->valueRegistry->null)
 			);
 			$resultValue = $result->value;
 			if ($resultValue instanceof ErrorValue) {
 				throw new HydrationException(
 					$value,
 					$hydrationPath,
-					sprintf("Subtype hydration failed. Error: %s", $resultValue->errorValue())
+					sprintf("Subtype hydration failed. Error: %s", $resultValue->errorValue)
 				//TODO - consider a better error message
 				);
 			}
 			return $resultValue;
 		}
 
-		$baseValue = $this->hydrateValue($value, $targetType->baseType(), $hydrationPath);
+		$baseValue = $this->hydrateValue($value, $targetType->baseType, $hydrationPath);
 
-		$constructorType = $this->context->typeRegistry()->atom(new TypeNameIdentifier('Constructor'));
+		$constructorType = $this->context->typeRegistry->atom(new TypeNameIdentifier('Constructor'));
 		$validatorMethod = $this->methodRegistry->method(
 			$constructorType,
-			new MethodNameIdentifier('as' . $targetType->name()->identifier)
+			new MethodNameIdentifier('as' . $targetType->name->identifier)
 		);
 		if ($validatorMethod instanceof Method) {
 			$result = $validatorMethod->execute(
-				TypedValue::forValue($constructorType->value()),
+				TypedValue::forValue($constructorType->value),
 				TypedValue::forValue($baseValue),
 			);
 			$resultValue = $result->value;
@@ -339,49 +380,49 @@ final readonly class Hydrator {
 				throw new HydrationException(
 					$baseValue,
 					$hydrationPath,
-					sprintf('Value construction failed. Error: %s', $resultValue->errorValue())
+					sprintf('Value construction failed. Error: %s', $resultValue->errorValue)
 				);
 			}
 		}
-		return $this->context->valueRegistry()->subtypeValue(
-			$targetType->name(),
+		return $this->context->valueRegistry->subtypeValue(
+			$targetType->name,
 			$baseValue
 		);
 	}
 
 	private function hydrateSealed(Value $value, SealedType $targetType, string $hydrationPath): Value {
 		$method = $this->methodRegistry->method(
-			$this->context->typeRegistry()->withName(new TypeNameIdentifier('JsonValue')),
+			$this->context->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
 			new MethodNameIdentifier(
-				sprintf('as%s', $targetType->name())
+				sprintf('as%s', $targetType->name)
 			)
 		);
 		if ($method instanceof Method) {
 			$result = $method->execute(
 				TypedValue::forValue($value),
-				TypedValue::forValue($this->context->valueRegistry()->null())
+				TypedValue::forValue($this->context->valueRegistry->null)
 			);
 			$resultValue = $result->value;
 			if ($resultValue instanceof ErrorValue) {
 				throw new HydrationException(
 					$value,
 					$hydrationPath,
-					sprintf("Sealed type hydration failed. Error: %s", $resultValue->errorValue())
+					sprintf("Sealed type hydration failed. Error: %s", $resultValue->errorValue)
 				//TODO - consider a better error message
 				);
 			}
 			return $resultValue;
 		}
-		$baseValue = $this->hydrateValue($value, $targetType->valueType(), $hydrationPath);
+		$baseValue = $this->hydrateValue($value, $targetType->valueType, $hydrationPath);
 		if ($baseValue instanceof RecordValue) {
-			$constructorType = $this->context->typeRegistry()->atom(new TypeNameIdentifier('Constructor'));
+			$constructorType = $this->context->typeRegistry->atom(new TypeNameIdentifier('Constructor'));
 			$validatorMethod = $this->methodRegistry->method(
 				$constructorType,
-				new MethodNameIdentifier('as' . $targetType->name()->identifier)
+				new MethodNameIdentifier('as' . $targetType->name->identifier)
 			);
 			if ($validatorMethod instanceof Method) {
 				$result = $validatorMethod->execute(
-					TypedValue::forValue($constructorType->value()),
+					TypedValue::forValue($constructorType->value),
 					TypedValue::forValue($baseValue),
 				);
 				$resultValue = $result->value;
@@ -389,12 +430,12 @@ final readonly class Hydrator {
 					throw new HydrationException(
 						$baseValue,
 						$hydrationPath,
-						sprintf('Value construction failed. Error: %s', $resultValue->errorValue())
+						sprintf('Value construction failed. Error: %s', $resultValue->errorValue)
 					);
 				}
 			}
-			return $this->context->valueRegistry()->sealedValue(
-				$targetType->name(),
+			return $this->context->valueRegistry->sealedValue(
+				$targetType->name,
 				$baseValue
 			);
 		}
@@ -406,20 +447,20 @@ final readonly class Hydrator {
 	}
 
 	private function hydrateMutable(Value $value, MutableType $targetType, string $hydrationPath): MutableValue {
-		return $this->context->valueRegistry()->mutable(
-			$targetType->valueType(),
-			$this->hydrateValue($value, $targetType->valueType(), $hydrationPath)
+		return $this->context->valueRegistry->mutable(
+			$targetType->valueType,
+			$this->hydrateValue($value, $targetType->valueType, $hydrationPath)
 		);
 	}
 
 	private function hydrateInteger(Value $value, IntegerType $targetType, string $hydrationPath): IntegerValue {
 		if ($value instanceof IntegerValue) {
 			if ((
-				$targetType->range()->minValue() === MinusInfinity::value ||
-				$targetType->range()->minValue() <= $value->literalValue()
+				$targetType->range->minValue === MinusInfinity::value ||
+				$targetType->range->minValue <= $value->literalValue
 			) && (
-					$targetType->range()->maxValue() === PlusInfinity::value ||
-					$targetType->range()->maxValue() >= $value->literalValue()
+					$targetType->range->maxValue === PlusInfinity::value ||
+					$targetType->range->maxValue >= $value->literalValue
 			)) {
 				return $value;
 			}
@@ -427,8 +468,8 @@ final readonly class Hydrator {
 				$value,
 				$hydrationPath,
 				sprintf("The integer value should be in the range %s..%s",
-					$targetType->range()->minValue() === MinusInfinity::value ? "-Infinity" : $targetType->range()->minValue(),
-					$targetType->range()->maxValue() === PlusInfinity::value ? "+Infinity" : $targetType->range()->maxValue(),
+					$targetType->range->minValue === MinusInfinity::value ? "-Infinity" : $targetType->range->minValue,
+					$targetType->range->maxValue === PlusInfinity::value ? "+Infinity" : $targetType->range->maxValue,
 				)
 			);
 		}
@@ -436,8 +477,8 @@ final readonly class Hydrator {
 			$value,
 			$hydrationPath,
 			sprintf("The value should be an integer in the range %s..%s",
-				$targetType->range()->minValue() === MinusInfinity::value ? "-Infinity" : $targetType->range()->minValue(),
-				$targetType->range()->maxValue() === PlusInfinity::value ? "+Infinity" : $targetType->range()->maxValue(),
+				$targetType->range->minValue === MinusInfinity::value ? "-Infinity" : $targetType->range->minValue,
+				$targetType->range->maxValue === PlusInfinity::value ? "+Infinity" : $targetType->range->maxValue,
 			)
 		);
 	}
@@ -451,7 +492,7 @@ final readonly class Hydrator {
 				$value,
 				$hydrationPath,
 				sprintf("The integer value should be among %s",
-					implode(', ', $targetType->subsetValues())
+					implode(', ', $targetType->subsetValues)
 				)
 			);
 		}
@@ -459,7 +500,7 @@ final readonly class Hydrator {
 			$value,
 			$hydrationPath,
 			sprintf("The value should be an integer among %s",
-				implode(', ', $targetType->subsetValues())
+				implode(', ', $targetType->subsetValues)
 			)
 		);
 	}
@@ -488,7 +529,7 @@ final readonly class Hydrator {
 
 	private function hydrateTrue(Value $value, TrueType $targetType, string $hydrationPath): BooleanValue {
 		if ($value instanceof BooleanValue) {
-			if ($value->literalValue() === true) {
+			if ($value->literalValue === true) {
 				return $value;
 			}
 			throw new HydrationException(
@@ -506,7 +547,7 @@ final readonly class Hydrator {
 
 	private function hydrateFalse(Value $value, FalseType $targetType, string $hydrationPath): BooleanValue {
 		if ($value instanceof BooleanValue) {
-			if ($value->literalValue() === false) {
+			if ($value->literalValue === false) {
 				return $value;
 			}
 			throw new HydrationException(
@@ -524,13 +565,13 @@ final readonly class Hydrator {
 
 	private function hydrateString(Value $value, StringType $targetType, string $hydrationPath): StringValue {
 		while($value instanceof SubtypeValue) {
-			$value = $value->baseValue();
+			$value = $value->baseValue;
 		}
 		if ($value instanceof StringValue) {
-			$l = mb_strlen($value->literalValue());
-			if ($targetType->range()->minLength() <= $l && (
-					$targetType->range()->maxLength() === PlusInfinity::value ||
-					$targetType->range()->maxLength() >= $l
+			$l = mb_strlen($value->literalValue);
+			if ($targetType->range->minLength <= $l && (
+					$targetType->range->maxLength === PlusInfinity::value ||
+					$targetType->range->maxLength >= $l
 			)) {
 				return $value;
 			}
@@ -538,8 +579,8 @@ final readonly class Hydrator {
 				$value,
 				$hydrationPath,
 				sprintf("The string value should be with a length between %s and %s",
-					$targetType->range()->minLength(),
-					$targetType->range()->maxLength() === PlusInfinity::value ? "+Infinity" : $targetType->range()->maxLength(),
+					$targetType->range->minLength,
+					$targetType->range->maxLength === PlusInfinity::value ? "+Infinity" : $targetType->range->maxLength,
 				)
 			);
 		}
@@ -547,8 +588,8 @@ final readonly class Hydrator {
 			$value,
 			$hydrationPath,
 			sprintf("The value should be a string with a length between %s and %s",
-				$targetType->range()->minLength(),
-				$targetType->range()->maxLength() === PlusInfinity::value ? "+Infinity" : $targetType->range()->maxLength(),
+				$targetType->range->minLength,
+				$targetType->range->maxLength === PlusInfinity::value ? "+Infinity" : $targetType->range->maxLength,
 			)
 		);
 	}
@@ -562,7 +603,7 @@ final readonly class Hydrator {
 				$value,
 				$hydrationPath,
 				sprintf("The string value should be among %s",
-					implode(', ', $targetType->subsetValues())
+					implode(', ', $targetType->subsetValues)
 				)
 			);
 		}
@@ -570,31 +611,31 @@ final readonly class Hydrator {
 			$value,
 			$hydrationPath,
 			sprintf("The value should be a string among %s",
-				implode(', ', $targetType->subsetValues())
+				implode(', ', $targetType->subsetValues)
 			)
 		);
 	}
 
 	private function hydrateArray(Value $value, ArrayType $targetType, string $hydrationPath): TupleValue {
 		if ($value instanceof TupleValue) {
-			$l = count($value->values());
-			if ($targetType->range()->minLength() <= $l && (
-					$targetType->range()->maxLength() === PlusInfinity::value ||
-					$targetType->range()->maxLength() >= $l
+			$l = count($value->values);
+			if ($targetType->range->minLength <= $l && (
+					$targetType->range->maxLength === PlusInfinity::value ||
+					$targetType->range->maxLength >= $l
 			)) {
-				$refType = $targetType->itemType();
+				$refType = $targetType->itemType;
 				$result = [];
-				foreach($value->values() as $seq => $item) {
+				foreach($value->values as $seq => $item) {
 					$result[] = $this->hydrateValue($item, $refType, "{$hydrationPath}[$seq]");
 				}
-				return $this->context->valueRegistry()->tuple($result);
+				return $this->context->valueRegistry->tuple($result);
 			}
 			throw new HydrationException(
 				$value,
 				$hydrationPath,
 				sprintf("The array value should be with a length between %s and %s",
-					$targetType->range()->minLength(),
-					$targetType->range()->maxLength() === PlusInfinity::value ? "+Infinity" : $targetType->range()->maxLength(),
+					$targetType->range->minLength,
+					$targetType->range->maxLength === PlusInfinity::value ? "+Infinity" : $targetType->range->maxLength,
 				)
 			);
 		}
@@ -602,16 +643,16 @@ final readonly class Hydrator {
 			$value,
 			$hydrationPath,
 			sprintf("The value should be an array with a length between %s and %s",
-				$targetType->range()->minLength(),
-				$targetType->range()->maxLength() === PlusInfinity::value ? "+Infinity" : $targetType->range()->maxLength(),
+				$targetType->range->minLength,
+				$targetType->range->maxLength === PlusInfinity::value ? "+Infinity" : $targetType->range->maxLength,
 			)
 		);
 	}
 
 	private function hydrateTuple(Value $value, TupleType $targetType, string $hydrationPath): TupleValue {
 		if ($value instanceof TupleValue) {
-			$l = count($targetType->types());
-			if ($targetType->restType() instanceof NothingType && count($value->values()) > $l) {
+			$l = count($targetType->types);
+			if ($targetType->restType instanceof NothingType && count($value->values) > $l) {
 				throw new HydrationException(
 					$value,
 					$hydrationPath,
@@ -619,7 +660,7 @@ final readonly class Hydrator {
 				);
 			}
 			$result = [];
-			foreach($targetType->types() as $seq => $refType) {
+			foreach($targetType->types as $seq => $refType) {
 				try {
 					$item = $value->valueOf($seq);
 					$result[] = $this->hydrateValue($item, $refType, "{$hydrationPath}[$seq]");
@@ -631,44 +672,44 @@ final readonly class Hydrator {
 					);
 				}
 			}
-			foreach($value->values() as $seq => $val) {
+			foreach($value->values as $seq => $val) {
 				if (!isset($result[$seq])) {
 					$result[] = $this->hydrateValue($val,
-						$targetType->types()[$seq] ?? $targetType->restType(), "{$hydrationPath}[$seq]");
+						$targetType->types[$seq] ?? $targetType->restType, "{$hydrationPath}[$seq]");
 				}
 			}
-			return $this->context->valueRegistry()->tuple($result);
+			return $this->context->valueRegistry->tuple($result);
 
 		}
 		throw new HydrationException(
 			$value,
 			$hydrationPath,
 			sprintf("The value should be a tuple with %d items",
-				count($targetType->types()),
+				count($targetType->types),
 			)
 		);
 	}
 
 	private function hydrateMap(Value $value, MapType $targetType, string $hydrationPath): RecordValue {
 		if ($value instanceof RecordValue) {
-			$l = count($value->values());
-			if ($targetType->range()->minLength() <= $l && (
-					$targetType->range()->maxLength() === PlusInfinity::value ||
-					$targetType->range()->maxLength() >= $l
+			$l = count($value->values);
+			if ($targetType->range->minLength <= $l && (
+					$targetType->range->maxLength === PlusInfinity::value ||
+					$targetType->range->maxLength >= $l
 			)) {
-				$refType = $targetType->itemType();
+				$refType = $targetType->itemType;
 				$result = [];
-				foreach($value->values() as $key => $item) {
+				foreach($value->values as $key => $item) {
 					$result[$key] = $this->hydrateValue($item, $refType, "$hydrationPath.$key");
 				}
-				return $this->context->valueRegistry()->record($result);
+				return $this->context->valueRegistry->record($result);
 			}
 			throw new HydrationException(
 				$value,
 				$hydrationPath,
 				sprintf("The map value should be with a length between %s and %s",
-					$targetType->range()->minLength(),
-					$targetType->range()->maxLength() === PlusInfinity::value ? "+Infinity" : $targetType->range()->maxLength(),
+					$targetType->range->minLength,
+					$targetType->range->maxLength === PlusInfinity::value ? "+Infinity" : $targetType->range->maxLength,
 				)
 			);
 		}
@@ -676,8 +717,8 @@ final readonly class Hydrator {
 			$value,
 			$hydrationPath,
 			sprintf("The value should be a map with a length between %s and %s",
-				$targetType->range()->minLength(),
-				$targetType->range()->maxLength() === PlusInfinity::value ? "+Infinity" : $targetType->range()->maxLength(),
+				$targetType->range->minLength,
+				$targetType->range->maxLength === PlusInfinity::value ? "+Infinity" : $targetType->range->maxLength,
 			)
 		);
 	}
@@ -686,11 +727,11 @@ final readonly class Hydrator {
 		if ($value instanceof RecordValue) {
 			$usedKeys = [];
 			$result = [];
-			foreach($targetType->types() as $key => $refType) {
+			foreach($targetType->types as $key => $refType) {
 				$isOptional = false;
 				if ($refType instanceof OptionalKeyType) {
 					$isOptional = true;
-					$refType = $refType->valueType();
+					$refType = $refType->valueType;
 				}
 				try {
 					$item = $value->valueOf($key);
@@ -706,25 +747,25 @@ final readonly class Hydrator {
 					}
 				}
 			}
-			foreach($value->values() as $key => $val) {
+			foreach($value->values as $key => $val) {
 				if (!($usedKeys[$key] ?? null)) {
-					if ($targetType->restType() instanceof NothingType) {
+					if ($targetType->restType instanceof NothingType) {
 						throw new HydrationException(
 							$value,
 							$hydrationPath,
 							sprintf("The record value may not contain the key %s", $key)
 						);
 					}
-					$result[$key] = $this->hydrateValue($val, $targetType->restType(), "$hydrationPath.$key");
+					$result[$key] = $this->hydrateValue($val, $targetType->restType, "$hydrationPath.$key");
 				}
 			}
-			return $this->context->valueRegistry()->record( $result);
+			return $this->context->valueRegistry->record( $result);
 		}
 		throw new HydrationException(
 			$value,
 			$hydrationPath,
 			sprintf("The value should be a record with %d items",
-				count($targetType->types()),
+				count($targetType->types),
 			)
 		);
 	}
@@ -732,20 +773,20 @@ final readonly class Hydrator {
 	private function hydrateReal(Value $value, RealType $targetType, string $hydrationPath): RealValue {
 		if ($value instanceof IntegerValue || $value instanceof RealValue) {
 			if ((
-				$targetType->range()->minValue() === MinusInfinity::value ||
-				$targetType->range()->minValue() <= $value->literalValue()
+				$targetType->range->minValue === MinusInfinity::value ||
+				$targetType->range->minValue <= $value->literalValue
 			) && (
-					$targetType->range()->maxValue() === PlusInfinity::value ||
-					$targetType->range()->maxValue() >= $value->literalValue()
+					$targetType->range->maxValue === PlusInfinity::value ||
+					$targetType->range->maxValue >= $value->literalValue
 			)) {
-				return $this->context->valueRegistry()->real((float)$value->literalValue());
+				return $this->context->valueRegistry->real((float)$value->literalValue);
 			}
 			throw new HydrationException(
 				$value,
 				$hydrationPath,
 				sprintf("The real value should be in the range %s..%s",
-					$targetType->range()->minValue() === MinusInfinity::value ? "-Infinity" : $targetType->range()->minValue(),
-					$targetType->range()->maxValue() === PlusInfinity::value ? "+Infinity" : $targetType->range()->maxValue(),
+					$targetType->range->minValue === MinusInfinity::value ? "-Infinity" : $targetType->range->minValue,
+					$targetType->range->maxValue === PlusInfinity::value ? "+Infinity" : $targetType->range->maxValue,
 				)
 			);
 		}
@@ -753,8 +794,8 @@ final readonly class Hydrator {
 			$value,
 			$hydrationPath,
 			sprintf("The value should be a real number in the range %s..%s",
-				$targetType->range()->minValue() === MinusInfinity::value ? "-Infinity" : $targetType->range()->minValue(),
-				$targetType->range()->maxValue() === PlusInfinity::value ? "+Infinity" : $targetType->range()->maxValue(),
+				$targetType->range->minValue === MinusInfinity::value ? "-Infinity" : $targetType->range->minValue,
+				$targetType->range->maxValue === PlusInfinity::value ? "+Infinity" : $targetType->range->maxValue,
 			)
 		);
 	}
@@ -771,7 +812,7 @@ final readonly class Hydrator {
 				$value,
 				$hydrationPath,
 				sprintf("The real value should be among %s",
-					implode(', ', $targetType->subsetValues())
+					implode(', ', $targetType->subsetValues)
 				)
 			);
 		}
@@ -779,7 +820,7 @@ final readonly class Hydrator {
 			$value,
 			$hydrationPath,
 			sprintf("The value should be a real number among %s",
-				implode(', ', $targetType->subsetValues())
+				implode(', ', $targetType->subsetValues)
 			)
 		);
 	}

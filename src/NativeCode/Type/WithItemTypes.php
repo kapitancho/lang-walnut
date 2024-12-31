@@ -28,17 +28,17 @@ final readonly class WithItemTypes implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $this->toBaseType($targetType->refType());
+			$refType = $this->toBaseType($targetType->refType);
 			if ($parameterType->isSubtypeOf(
-				$this->context->typeRegistry()->array(
-					$this->context->typeRegistry()->type(
-						$this->context->typeRegistry()->any()
+				$this->context->typeRegistry->array(
+					$this->context->typeRegistry->type(
+						$this->context->typeRegistry->any
 					)
 				)
 			)) {
 				if ($refType instanceof TupleType) {
-					return $this->context->typeRegistry()->type(
-						$this->context->typeRegistry()->metaType(
+					return $this->context->typeRegistry->type(
+						$this->context->typeRegistry->metaType(
 							MetaTypeValue::Tuple
 						)
 					);
@@ -48,15 +48,15 @@ final readonly class WithItemTypes implements NativeMethod {
 				// @codeCoverageIgnoreEnd
 			}
 			if ($parameterType->isSubtypeOf(
-				$this->context->typeRegistry()->map(
-					$this->context->typeRegistry()->type(
-						$this->context->typeRegistry()->any()
+				$this->context->typeRegistry->map(
+					$this->context->typeRegistry->type(
+						$this->context->typeRegistry->any
 					)
 				)
 			)) {
 				if ($refType instanceof RecordType) {
-					return $this->context->typeRegistry()->type(
-						$this->context->typeRegistry()->metaType(
+					return $this->context->typeRegistry->type(
+						$this->context->typeRegistry->metaType(
 							MetaTypeValue::Record
 						)
 					);
@@ -81,35 +81,35 @@ final readonly class WithItemTypes implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof TypeValue) {
-			$typeValue = $this->toBaseType($targetValue->typeValue());
+			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($parameter->type->isSubtypeOf(
-				$this->context->typeRegistry()->array(
-					$this->context->typeRegistry()->type(
-						$this->context->typeRegistry()->any()
+				$this->context->typeRegistry->array(
+					$this->context->typeRegistry->type(
+						$this->context->typeRegistry->any
 					)
 				)
 			)) {
 				if ($typeValue instanceof TupleType) {
-					$result = $this->context->typeRegistry()->tuple(
-						array_map(fn(TypeValue $tv): TypeInterface => $tv->typeValue(), $parameter->value->values()),
-						$typeValue->restType(),
+					$result = $this->context->typeRegistry->tuple(
+						array_map(fn(TypeValue $tv): TypeInterface => $tv->typeValue, $parameter->value->values),
+						$typeValue->restType,
 					);
-					return TypedValue::forValue($this->context->valueRegistry()->type($result));
+					return TypedValue::forValue($this->context->valueRegistry->type($result));
 				}
 			}
 			if ($parameter->type->isSubtypeOf(
-				$this->context->typeRegistry()->map(
-					$this->context->typeRegistry()->type(
-						$this->context->typeRegistry()->any()
+				$this->context->typeRegistry->map(
+					$this->context->typeRegistry->type(
+						$this->context->typeRegistry->any
 					)
 				)
 			)) {
 				if ($typeValue instanceof RecordType) {
-					$result = $this->context->typeRegistry()->record(
-						array_map(fn(TypeValue $tv): TypeInterface => $tv->typeValue(), $parameter->value->values()),
-						$typeValue->restType(),
+					$result = $this->context->typeRegistry->record(
+						array_map(fn(TypeValue $tv): TypeInterface => $tv->typeValue, $parameter->value->values),
+						$typeValue->restType,
 					);
-					return TypedValue::forValue($this->context->valueRegistry()->type($result));
+					return TypedValue::forValue($this->context->valueRegistry->type($result));
 				}
 			}
 		}

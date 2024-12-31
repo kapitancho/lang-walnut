@@ -39,7 +39,7 @@ final class RecordExpressionTest extends TestCase {
 	}
 
 	public function testValues(): void {
-		self::assertCount(2, $this->recordExpression->values());
+		self::assertCount(2, $this->recordExpression->values);
 	}
 
 	public function testAnalyse(): void {
@@ -48,7 +48,7 @@ final class RecordExpressionTest extends TestCase {
 				new VariableScope([])
 			)
 		);
-		self::assertTrue($result->expressionType()->isSubtypeOf(
+		self::assertTrue($result->expressionType->isSubtypeOf(
 			$this->typeRegistry->record([
 				'a' => $this->typeRegistry->integer(),
 				'b' => $this->typeRegistry->string()
@@ -67,7 +67,7 @@ final class RecordExpressionTest extends TestCase {
 				'a' => $this->valueRegistry->integer(123),
 				'b' => $this->valueRegistry->string("456")
 			]),
-			$result->value()
+			$result->value
 		);
 	}
 

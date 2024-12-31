@@ -24,43 +24,39 @@ use Walnut\Lang\Blueprint\Value\SealedValue;
 final readonly class NoExternalErrorExpression implements NoExternalErrorExpressionInterface, JsonSerializable {
 	public function __construct(
 		private TypeRegistry $typeRegistry,
-		private Expression $targetExpression
+		public Expression $targetExpression
 	) {}
 
-	public function targetExpression(): Expression {
-		return $this->targetExpression;
-	}
-
 	private function withoutExternalError(ResultType $resultType): Type {
-		$errorType = $resultType->errorType();
+		$errorType = $resultType->errorType;
 		$errorType = match(true) {
-			$errorType instanceof SealedType && $errorType->name()->equals(
-				new TypeNameIdentifier('ExternalError')) => $this->typeRegistry->nothing(),
+			$errorType instanceof SealedType && $errorType->name->equals(
+				new TypeNameIdentifier('ExternalError')) => $this->typeRegistry->nothing,
 			$errorType instanceof UnionType => $this->typeRegistry->union(
-				array_filter($errorType->types(), static fn(Type $t): bool => !(
-					$t instanceof SealedType && $t->name()->equals(
+				array_filter($errorType->types, static fn(Type $t): bool => !(
+					$t instanceof SealedType && $t->name->equals(
 						new TypeNameIdentifier('ExternalError')
 					)
 				))
 			),
 			default => $errorType
 		};
-		return $errorType instanceof NothingType ? $resultType->returnType() :
+		return $errorType instanceof NothingType ? $resultType->returnType :
 			$this->typeRegistry->result(
-				$resultType->returnType(),
+				$resultType->returnType,
 				$errorType
 			);
 	}
 
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
 		$ret = $this->targetExpression->analyse($analyserContext);
-		$expressionType = $ret->expressionType();
+		$expressionType = $ret->expressionType;
 		if ($expressionType instanceof ResultType) {
 			return $ret->withExpressionType(
 				$this->withoutExternalError($expressionType)
 			)->withReturnType(
 				$this->typeRegistry->result(
-					$ret->returnType(),
+					$ret->returnType,
 					$this->typeRegistry->withName(
 						new TypeNameIdentifier('ExternalError')
 					)
@@ -72,19 +68,19 @@ final readonly class NoExternalErrorExpression implements NoExternalErrorExpress
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
 		$result = $this->targetExpression->execute($executionContext);
-		$value = $result->value();
+		$value = $result->value;
 		if ($value instanceof ErrorValue) {
-			$errorValue = $value->errorValue();
-			if ($errorValue instanceof SealedValue && $errorValue->type()->name()->equals(
+			$errorValue = $value->errorValue;
+			if ($errorValue instanceof SealedValue && $errorValue->type->name->equals(
 				new TypeNameIdentifier('ExternalError'))
 			) {
-				throw new FunctionReturn($errorValue);
+				throw new FunctionReturn($value);
 			}
 		}
-		$vt = $result->valueType();
+		$vt = $result->valueType;
 		if ($vt instanceof ResultType) {
 			$result = $result->withTypedValue(new TypedValue(
-				$this->withoutExternalError($vt), $result->value()));
+				$this->withoutExternalError($vt), $result->value));
 		}
 		return $result;
 	}

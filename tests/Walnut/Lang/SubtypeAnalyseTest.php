@@ -24,13 +24,13 @@ final class SubtypeAnalyseTest extends BaseProgramTestHelper {
 		);
 	}
 
-	private function getEntryPointFor(Type $r, Type $p = null): ProgramEntryPoint {
+	private function getEntryPointFor(Type $r, Type|null $p = null): ProgramEntryPoint {
 		$fn = new VariableNameIdentifier('fn');
 		$this->programBuilder->addVariable(
 			$fn,
 			$this->valueRegistry->function(
 				$p ?? $this->typeRegistry->integer(),
-				$this->typeRegistry->nothing(),
+				$this->typeRegistry->nothing,
 				$r,
 				$this->expressionRegistry->functionBody(
 					$this->expressionRegistry->methodCall(
@@ -38,7 +38,7 @@ final class SubtypeAnalyseTest extends BaseProgramTestHelper {
 						new MethodNameIdentifier('construct'),
 						$this->expressionRegistry->constant(
 							$this->valueRegistry->type(
-								$r instanceof ResultType ? $r->returnType() : $r
+								$r instanceof ResultType ? $r->returnType : $r
 							)
 						)
 					)
@@ -54,8 +54,8 @@ final class SubtypeAnalyseTest extends BaseProgramTestHelper {
 
 	public function testBasicValidSubtype(): void {
 		$this->getSubtype(
-			$this->expressionRegistry->constant($this->valueRegistry->null()),
-			$this->typeRegistry->nothing()
+			$this->expressionRegistry->constant($this->valueRegistry->null),
+			$this->typeRegistry->nothing
 		);
 		$result = $this->getEntryPointFor(
 			$this->typeRegistry->subtype(new TypeNameIdentifier('MySubtype')),
@@ -65,7 +65,7 @@ final class SubtypeAnalyseTest extends BaseProgramTestHelper {
 
 	public function testBasicValidSubtypeWithDeclaredErrorType(): void {
 		$this->getSubtype(
-			$this->expressionRegistry->constant($this->valueRegistry->null()),
+			$this->expressionRegistry->constant($this->valueRegistry->null),
 			$this->typeRegistry->string()
 		);
 		$result = $this->getEntryPointFor(
@@ -107,7 +107,7 @@ final class SubtypeAnalyseTest extends BaseProgramTestHelper {
 					)
 				)
 			),
-			$this->typeRegistry->nothing()
+			$this->typeRegistry->nothing
 		);
 		$this->expectException(AnalyserException::class);
 		$this->getEntryPointFor(
@@ -127,7 +127,7 @@ final class SubtypeAnalyseTest extends BaseProgramTestHelper {
 					)
 				)
 			),
-			$this->typeRegistry->boolean()
+			$this->typeRegistry->boolean
 		);
 		$this->expectException(AnalyserException::class);
 		$this->getEntryPointFor(
@@ -140,8 +140,8 @@ final class SubtypeAnalyseTest extends BaseProgramTestHelper {
 
 	public function testInvalidBaseValue(): void {
 		$this->getSubtype(
-			$this->expressionRegistry->constant($this->valueRegistry->null()),
-			$this->typeRegistry->nothing()
+			$this->expressionRegistry->constant($this->valueRegistry->null),
+			$this->typeRegistry->nothing
 		);
 		$this->expectException(AnalyserException::class);
 		$this->getEntryPointFor(

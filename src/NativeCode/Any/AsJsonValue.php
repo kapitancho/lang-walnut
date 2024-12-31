@@ -35,16 +35,16 @@ final readonly class AsJsonValue implements NativeMethod {
 		Type $targetType,
 		Type $parameterType
 	): Type {
-		$resultType = $this->context->typeRegistry()->alias(new TypeNameIdentifier('JsonValue'));
-		return $this->isSafeConversion($targetType) ? $resultType : $this->context->typeRegistry()->result(
+		$resultType = $this->context->typeRegistry->alias(new TypeNameIdentifier('JsonValue'));
+		return $this->isSafeConversion($targetType) ? $resultType : $this->context->typeRegistry->result(
 			$resultType,
-			$this->context->typeRegistry()->withName(new TypeNameIdentifier('InvalidJsonValue'))
+			$this->context->typeRegistry->withName(new TypeNameIdentifier('InvalidJsonValue'))
 		);
 	}
 
 	private function isSafeConversion(Type $fromType): bool {
 		return $fromType->isSubtypeOf(
-			$this->context->typeRegistry()->withName(new TypeNameIdentifier('JsonValue'))
+			$this->context->typeRegistry->withName(new TypeNameIdentifier('JsonValue'))
 		);
 	}
 
@@ -56,17 +56,17 @@ final readonly class AsJsonValue implements NativeMethod {
 	private function asJsonValue(Value $value): Value|TypedValue {
 		if ($value instanceof TupleValue) {
 			$items = [];
-			foreach($value->values() as $item) {
+			foreach($value->values as $item) {
 				$items[] = $this->getJsonValue($item);
 			}
-			return $this->context->valueRegistry()->tuple($items);
+			return $this->context->valueRegistry->tuple($items);
 		}
 		if ($value instanceof RecordValue) {
 			$items = [];
-			foreach($value->values() as $key => $item) {
+			foreach($value->values as $key => $item) {
 				$items[$key] = $this->getJsonValue($item);
 			}
-			return $this->context->valueRegistry()->record($items);
+			return $this->context->valueRegistry->record($items);
 		}
 		if ($value instanceof NullValue ||
 			$value instanceof BooleanValue ||
@@ -77,31 +77,31 @@ final readonly class AsJsonValue implements NativeMethod {
 			return $value;
 		}
 		$method = $this->methodRegistry->method(
-			$value->type(),
+			$value->type,
 			new MethodNameIdentifier('asJsonValue')
 		);
 		if ($method instanceof Method && !($method instanceof self)) {
 			return $method->execute(
 				TypedValue::forValue($value), 
-				TypedValue::forValue($this->context->valueRegistry()->null())
+				TypedValue::forValue($this->context->valueRegistry->null)
 			);
 		}
 		if ($value instanceof MutableValue) {
-			return $this->getJsonValue($value->value());
+			return $this->getJsonValue($value->value);
 		}
 		if ($value instanceof SubtypeValue) {
-			return $this->getJsonValue($value->baseValue());
+			return $this->getJsonValue($value->baseValue);
 		}
 		if ($value instanceof SealedValue) {
-			return $this->getJsonValue($value->value());
+			return $this->getJsonValue($value->value);
 		}
 		if ($value instanceof EnumerationValue) {
-			return $this->context->valueRegistry()->string($value->name()->identifier);
+			return $this->context->valueRegistry->string($value->name->identifier);
 		}
-		throw new FunctionReturn($this->context->valueRegistry()->error(
-			$this->context->valueRegistry()->sealedValue(
+		throw new FunctionReturn($this->context->valueRegistry->error(
+			$this->context->valueRegistry->sealedValue(
 				new TypeNameIdentifier('InvalidJsonValue'),
-				$this->context->valueRegistry()->record(['value' => $value])
+				$this->context->valueRegistry->record(['value' => $value])
 			)
 		));
 	}
@@ -118,7 +118,7 @@ final readonly class AsJsonValue implements NativeMethod {
 			return TypedValue::forValue($return->value);
 		}
 		return $result instanceof Value ? new TypedValue(
-			$this->context->typeRegistry()->withName(new TypeNameIdentifier('JsonValue')),
+			$this->context->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
 			$result,
 		) : $result;
 	}

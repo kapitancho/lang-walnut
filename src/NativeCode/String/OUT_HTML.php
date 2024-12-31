@@ -39,7 +39,7 @@ final readonly class OUT_HTML implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 		if ($targetValue instanceof StringValue) {
-			echo nl2br(htmlspecialchars($targetValue->literalValue()));
+			echo nl2br(htmlspecialchars($targetValue->literalValue));
 			return $target;
 		}
 		// @codeCoverageIgnoreStart

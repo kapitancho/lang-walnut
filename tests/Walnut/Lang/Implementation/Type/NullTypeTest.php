@@ -14,10 +14,10 @@ final class NullTypeTest extends TestCase {
 		$this->typeRegistry = new TypeRegistryBuilder();
 	}
 	public function testNullType(): void {
-		$nullType = $this->typeRegistry->null();
-		self::assertEquals('Null', $nullType->name()->identifier);
-		self::assertNull($nullType->value()->literalValue());
-		self::assertTrue($nullType->isSubtypeOf($this->typeRegistry->null()));
-		self::assertFalse($nullType->isSubtypeOf($this->typeRegistry->boolean()));
+		$nullType = $this->typeRegistry->null;
+		self::assertEquals('Null', $nullType->name->identifier);
+		self::assertNull($nullType->value->literalValue);
+		self::assertTrue($nullType->isSubtypeOf($this->typeRegistry->null));
+		self::assertFalse($nullType->isSubtypeOf($this->typeRegistry->boolean));
 	}
 }

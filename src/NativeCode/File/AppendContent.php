@@ -27,14 +27,14 @@ final readonly class AppendContent implements NativeMethod {
 		Type $targetType,
 		Type $parameterType,
 	): Type {
-		if ($targetType instanceof SealedType && $targetType->name()->equals(
+		if ($targetType instanceof SealedType && $targetType->name->equals(
 			new TypeNameIdentifier('File')
 		)) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $this->context->typeRegistry()->result(
-					$this->context->typeRegistry()->string(),
-					$this->context->typeRegistry()->withName(
+				return $this->context->typeRegistry->result(
+					$this->context->typeRegistry->string(),
+					$this->context->typeRegistry->withName(
 						new TypeNameIdentifier('CannotWriteFile')
 					)
 				);
@@ -53,22 +53,22 @@ final readonly class AppendContent implements NativeMethod {
 		$parameterValue = $parameter->value;
 		
 		$targetValue = $this->toBaseValue($targetValue);
-		if ($targetValue instanceof SealedValue && $targetValue->type()->name()->equals(
+		if ($targetValue instanceof SealedValue && $targetValue->type->name->equals(
 			new TypeNameIdentifier('File')
 		)) {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof StringValue) {
-				$path = $targetValue->value()->valueOf('path')->literalValue();
-				$result = @file_put_contents($path, $parameterValue->literalValue(), FILE_APPEND);
+				$path = $targetValue->value->valueOf('path')->literalValue;
+				$result = @file_put_contents($path, $parameterValue->literalValue, FILE_APPEND);
 				if ($result === false) {
-					return TypedValue::forValue($this->context->valueRegistry()->error(
-						$this->context->valueRegistry()->sealedValue(
+					return TypedValue::forValue($this->context->valueRegistry->error(
+						$this->context->valueRegistry->sealedValue(
 							new TypeNameIdentifier('CannotWriteFile'),
 							$targetValue
 						)
 					));
 				}
-				return TypedValue::forValue($this->context->valueRegistry()->string($parameterValue));
+				return TypedValue::forValue($this->context->valueRegistry->string($parameterValue));
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

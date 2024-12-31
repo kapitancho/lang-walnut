@@ -26,17 +26,17 @@ final readonly class WithErrorType implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $this->toBaseType($targetType->refType());
+			$refType = $this->toBaseType($targetType->refType);
 			if ($parameterType->isSubtypeOf(
-				$this->context->typeRegistry()->type(
-					$this->context->typeRegistry()->any()
+				$this->context->typeRegistry->type(
+					$this->context->typeRegistry->any
 				)
 			)) {
 				if ($refType instanceof ResultType) {
-					return $this->context->typeRegistry()->type(
-						$this->context->typeRegistry()->result(
-							$refType->returnType(),
-							$parameterType->refType()
+					return $this->context->typeRegistry->type(
+						$this->context->typeRegistry->result(
+							$refType->returnType,
+							$parameterType->refType
 						)
 					);
 				}
@@ -60,18 +60,18 @@ final readonly class WithErrorType implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof TypeValue) {
-			$typeValue = $this->toBaseType($targetValue->typeValue());
+			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($parameter->type->isSubtypeOf(
-				$this->context->typeRegistry()->type(
-					$this->context->typeRegistry()->any()
+				$this->context->typeRegistry->type(
+					$this->context->typeRegistry->any
 				)
 			)) {
 				if ($typeValue instanceof ResultType) {
-					$result = $this->context->typeRegistry()->result(
-						$typeValue->returnType(),
-						$parameter->value->typeValue(),
+					$result = $this->context->typeRegistry->result(
+						$typeValue->returnType,
+						$parameter->value->typeValue,
 					);
-					return TypedValue::forValue($this->context->valueRegistry()->type($result));
+					return TypedValue::forValue($this->context->valueRegistry->type($result));
 				}
 			}
 		}

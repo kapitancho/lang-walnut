@@ -12,6 +12,6 @@ final readonly class TypedValue {
 	) {}
 
 	public static function forValue(Value $value): self {
-		return new self($value->type(), $value);
+		return new self($value->type, $value);
 	}
 }

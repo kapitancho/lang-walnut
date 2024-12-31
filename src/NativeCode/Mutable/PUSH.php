@@ -10,10 +10,8 @@ use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
 use Walnut\Lang\Blueprint\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\MutableType;
-use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\MutableValue;
-use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
@@ -30,10 +28,10 @@ final readonly class PUSH implements NativeMethod {
 	): Type {
 		$t = $this->toBaseType($targetType);
 		if ($t instanceof MutableType) {
-            $valueType = $this->toBaseType($t->valueType());
-		    if ($valueType instanceof ArrayType && $valueType->range()->maxLength() === PlusInfinity::value) {
+            $valueType = $this->toBaseType($t->valueType);
+		    if ($valueType instanceof ArrayType && $valueType->range->maxLength === PlusInfinity::value) {
 			    $p = $this->toBaseType($parameterType);
-				if ($p->isSubtypeOf($valueType->itemType())) {
+				if ($p->isSubtypeOf($valueType->itemType)) {
 					return $t;
 				}
 			    // @codeCoverageIgnoreStart
@@ -54,15 +52,13 @@ final readonly class PUSH implements NativeMethod {
 
 		$v = $this->toBaseValue($targetValue);
 		if ($v instanceof MutableValue) {
-            $targetType = $this->toBaseType($v->targetType());
-			$mv = $v->value();
+            $targetType = $this->toBaseType($v->targetType);
+			$mv = $v->value;
 			if ($targetType instanceof ArrayType && $mv instanceof TupleValue) {
-				if ($parameter->type->isSubtypeOf($targetType->itemType())) {
-					$arr = $mv->values();
+				if ($parameter->type->isSubtypeOf($targetType->itemType)) {
+					$arr = $mv->values;
 					$arr[] = $parameter->value;
-					$v->changeValueTo(
-						$this->context->valueRegistry()->tuple($arr)
-					);
+					$v->value = $this->context->valueRegistry->tuple($arr);
 					return $target;
 				}
 				// @codeCoverageIgnoreStart

@@ -6,31 +6,35 @@ use JsonSerializable;
 use Walnut\Lang\Blueprint\Type\FunctionType as FunctionTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
 
-final readonly class FunctionType implements FunctionTypeInterface, JsonSerializable {
+final class FunctionType implements FunctionTypeInterface, JsonSerializable {
 
-	private Type $realParameterType;
-	private Type $realReturnType;
+	private readonly Type $realParameterType;
+	private readonly Type $realReturnType;
 
     public function __construct(
-        private Type $parameterType,
-        private Type $returnType
+        private readonly Type $declaredParameterType,
+        private readonly Type $declaredReturnType
     ) {}
 
-    public function parameterType(): Type {
-		return $this->realParameterType ??= $this->parameterType instanceof ProxyNamedType ?
-			$this->parameterType->getActualType() : $this->parameterType;
+	public Type $parameterType {
+		get {
+			return $this->realParameterType ??= $this->declaredParameterType instanceof ProxyNamedType ?
+				$this->declaredParameterType->actualType : $this->declaredParameterType;
+		}
 	}
 
-	public function returnType(): Type {
-		return $this->realReturnType ??= $this->returnType instanceof ProxyNamedType ?
-			$this->returnType->getActualType() : $this->returnType;
+	public Type $returnType {
+		get {
+			return $this->realReturnType ??= $this->declaredReturnType instanceof ProxyNamedType ?
+				$this->declaredReturnType->actualType : $this->declaredReturnType;
+		}
 	}
 
     public function isSubtypeOf(Type $ofType): bool {
 		return match(true) {
 			$ofType instanceof FunctionTypeInterface =>
-				$ofType->parameterType()->isSubtypeOf($this->parameterType()) &&
-				$this->returnType()->isSubtypeOf($ofType->returnType()),
+				$ofType->parameterType->isSubtypeOf($this->parameterType) &&
+				$this->returnType->isSubtypeOf($ofType->returnType),
 			$ofType instanceof SupertypeChecker => $ofType->isSupertypeOf($this),
 			default => false
 		};
@@ -39,16 +43,16 @@ final readonly class FunctionType implements FunctionTypeInterface, JsonSerializ
 	public function __toString(): string {
 		return sprintf(
 			'^%s => %s',
-			$this->parameterType(),
-			$this->returnType(),
+			$this->parameterType,
+			$this->returnType,
 		);
 	}
 
 	public function jsonSerialize(): array {
 		return [
 			'type' => 'Function',
-			'parameter' => $this->parameterType(),
-			'return' => $this->returnType()
+			'parameter' => $this->parameterType,
+			'return' => $this->returnType
 		];
 	}
 }

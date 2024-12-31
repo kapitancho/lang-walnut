@@ -44,9 +44,9 @@ final readonly class Reverse implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
-			$values = $targetValue->values();
+			$values = $targetValue->values;
 			$values = array_reverse($values);
-			return TypedValue::forValue($this->context->valueRegistry()->tuple($values));
+			return TypedValue::forValue($this->context->valueRegistry->tuple($values));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

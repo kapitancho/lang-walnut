@@ -23,7 +23,7 @@ final readonly class UnionMethodCall implements Method {
 		Type $targetType,
 		Type $parameterType
 	): Type {
-		return $this->context->typeRegistry()->union(
+		return $this->context->typeRegistry->union(
 			array_map(
 				static fn(array $method): Type => $method[1]->analyse(
 					$method[0], $parameterType
@@ -42,6 +42,8 @@ final readonly class UnionMethodCall implements Method {
 				 return $method->execute($target, $parameter);
 			 }
 		}
+		echo $target->type, '/', $target->value, '|', $parameter->type, '/', $parameter->value, PHP_EOL;
+		var_dump(array_map(fn(array $a) => (string)$a[0], $this->methods));die;
 		throw new ExecutionException("Union method call is not executable");
 	}
 

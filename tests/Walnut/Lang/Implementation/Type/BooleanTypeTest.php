@@ -10,21 +10,21 @@ use Walnut\Lang\Test\Implementation\BaseProgramTestHelper;
 final class BooleanTypeTest extends BaseProgramTestHelper {
 
 	public function testProperties(): void {
-		$boolean = $this->typeRegistry->boolean();
+		$boolean = $this->typeRegistry->boolean;
 		$this->assertTrue(
-			$boolean->enumeration()->name()->equals(new TypeNameIdentifier('Boolean'))
+			$boolean->enumeration->name->equals(new TypeNameIdentifier('Boolean'))
 		);
-		$this->assertCount(2, $boolean->subsetValues());
-		$this->assertCount(2, $boolean->values());
+		$this->assertCount(2, $boolean->subsetValues);
+		$this->assertCount(2, $boolean->values);
 	}
 
 	public function testEmptySubset(): void {
 		$this->expectException(InvalidArgumentException::class);
-		$this->typeRegistry->boolean()->subsetType([]);
+		$this->typeRegistry->boolean->subsetType([]);
 	}
 
 	public function testInvalidSubsetValue(): void {
 		$this->expectException(InvalidArgumentException::class);
-		$this->typeRegistry->boolean()->subsetType([new EnumValueIdentifier('Wrong')]);
+		$this->typeRegistry->boolean->subsetType([new EnumValueIdentifier('Wrong')]);
 	}
 }

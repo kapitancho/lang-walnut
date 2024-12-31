@@ -17,8 +17,8 @@ use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Value\Value;
 
 interface CodeBuilder extends ExpressionRegistry, ProgramTypeBuilder, CustomMethodRegistryBuilder {
-	public function typeRegistry(): TypeRegistry;
-	public function valueRegistry(): ValueRegistry;
+	public TypeRegistry $typeRegistry { get; }
+	public ValueRegistry $valueRegistry { get; }
 
 	/** @param list<MatchExpressionPair|MatchExpressionDefault> $pairs */
 	public function matchTrue(array $pairs): MatchExpression;

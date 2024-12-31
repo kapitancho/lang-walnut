@@ -36,7 +36,7 @@ final readonly class BinaryPower implements NativeMethod {
 				$parameterType instanceof RealType ||
 				$parameterType instanceof RealSubsetType
 			) {
-				return $this->context->typeRegistry()->real();
+				return $this->context->typeRegistry->real();
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -60,8 +60,8 @@ final readonly class BinaryPower implements NativeMethod {
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue || $parameterValue instanceof RealValue) {
-                return TypedValue::forValue($this->context->valueRegistry()->real(
-	                $targetValue->literalValue() ** $parameterValue->literalValue()
+                return TypedValue::forValue($this->context->valueRegistry->real(
+	                $targetValue->literalValue ** $parameterValue->literalValue
                 ));
 			}
 			// @codeCoverageIgnoreStart

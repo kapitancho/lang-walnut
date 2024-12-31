@@ -33,12 +33,12 @@ final readonly class Sqrt implements NativeMethod {
 		if ($targetType instanceof IntegerType || $targetType instanceof IntegerSubsetType ||
 			$targetType instanceof RealType || $targetType instanceof RealSubsetType
 		) {
-			$real = $this->context->typeRegistry()->real(0);
-			$minValue = $targetType->range()->minValue();
+			$real = $this->context->typeRegistry->real(0);
+			$minValue = $targetType->range->minValue;
 			return $minValue === MinusInfinity::value || $minValue < 0 ?
-				$this->context->typeRegistry()->result(
+				$this->context->typeRegistry->result(
 					$real,
-					$this->context->typeRegistry()->atom(
+					$this->context->typeRegistry->atom(
 						new TypeNameIdentifier('NotANumber')
 					)
 				) :
@@ -58,8 +58,8 @@ final readonly class Sqrt implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 
 		if ($targetValue instanceof IntegerValue || $targetValue instanceof RealValue) {
-			return TypedValue::forValue($this->context->valueRegistry()->real(
-                sqrt($targetValue->literalValue())
+			return TypedValue::forValue($this->context->valueRegistry->real(
+                sqrt($targetValue->literalValue)
 			));
 		}
 		// @codeCoverageIgnoreStart

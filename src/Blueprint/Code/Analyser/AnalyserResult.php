@@ -6,8 +6,8 @@ use Walnut\Lang\Blueprint\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Type\Type;
 
 interface AnalyserResult extends AnalyserContext {
-	public function expressionType(): Type;
-	public function returnType(): Type;
+	public Type $expressionType { get; }
+	public Type $returnType { get; }
 	public function withAddedVariableType(
 		VariableNameIdentifier $variableName,
 		Type                   $variableType,

@@ -33,8 +33,8 @@ final class UnionTypeNormalizerTest extends BaseProgramTestHelper {
     public function testSubsetTypes(): void {
         $this->assertEquals(
             'Integer[3, 5]', (string)$this->union(
-            $this->valueRegistry->integer(3)->type(),
-            $this->valueRegistry->integer(5)->type(),
+            $this->valueRegistry->integer(3)->type,
+            $this->valueRegistry->integer(5)->type,
             )
         );
     }
@@ -45,36 +45,36 @@ final class UnionTypeNormalizerTest extends BaseProgramTestHelper {
 
     public function testSingleType(): void {
         self::assertEquals("Boolean", (string)$this->union(
-            $this->typeRegistry->boolean()
+            $this->typeRegistry->boolean
         ));
     }
 
     public function testSimpleUnionType(): void {
         self::assertEquals("(Boolean|Integer)", (string)$this->union(
-            $this->typeRegistry->boolean(),
+            $this->typeRegistry->boolean,
             $this->typeRegistry->integer()
         ));
     }
 
     public function testWithNothingType(): void {
         self::assertEquals("(Boolean|Integer)", (string)$this->union(
-            $this->typeRegistry->boolean(),
+            $this->typeRegistry->boolean,
             $this->typeRegistry->integer(),
-            $this->typeRegistry->nothing()
+            $this->typeRegistry->nothing
         ));
     }
 
     public function testWithAnyType(): void {
         self::assertEquals("Any", (string)$this->union(
-            $this->typeRegistry->boolean(),
+            $this->typeRegistry->boolean,
             $this->typeRegistry->integer(),
-            $this->typeRegistry->any()
+            $this->typeRegistry->any
         ));
     }
 
     public function testWithNestedType(): void {
         self::assertEquals("(Boolean|Integer|String)", (string)$this->union(
-            $this->typeRegistry->boolean(),
+            $this->typeRegistry->boolean,
             $this->union(
                 $this->typeRegistry->integer(),
                 $this->typeRegistry->string(),
@@ -84,19 +84,19 @@ final class UnionTypeNormalizerTest extends BaseProgramTestHelper {
 
     public function testSubtypes(): void {
         self::assertEquals("(Boolean|Real)", (string)$this->union(
-            $this->typeRegistry->boolean(),
+            $this->typeRegistry->boolean,
             $this->typeRegistry->integer(),
-            $this->typeRegistry->false(),
+            $this->typeRegistry->false,
             $this->typeRegistry->real()
         ));
     }
 
     public function testAliasTypes(): void {
-	    $this->programBuilder->addAlias(new TypeNameIdentifier('M'), $this->typeRegistry->boolean());
+	    $this->programBuilder->addAlias(new TypeNameIdentifier('M'), $this->typeRegistry->boolean);
         self::assertEquals("(Boolean|Real)", (string)$this->union(
 	        $this->typeRegistry->alias(new TypeNameIdentifier('M')),
             $this->typeRegistry->integer(),
-            $this->typeRegistry->false(),
+            $this->typeRegistry->false,
             $this->typeRegistry->real()
         ));
     }
@@ -143,7 +143,7 @@ final class UnionTypeNormalizerTest extends BaseProgramTestHelper {
 		));
 		self::assertEquals("Result<Integer<1..15>, Integer<5..10>>", (string)$this->union(
 			$this->typeRegistry->result(
-                $this->typeRegistry->nothing(),
+                $this->typeRegistry->nothing,
 				$this->typeRegistry->integer(5, 10)
 			),
 			$this->typeRegistry->integer(1, 15),
@@ -151,7 +151,7 @@ final class UnionTypeNormalizerTest extends BaseProgramTestHelper {
 		self::assertEquals("Result<(String|Integer), (Boolean|Array)>", (string)$this->union(
 			$this->typeRegistry->result(
                 $this->typeRegistry->string(),
-				$this->typeRegistry->boolean()
+				$this->typeRegistry->boolean
 			),
 			$this->typeRegistry->result(
                 $this->typeRegistry->integer(),

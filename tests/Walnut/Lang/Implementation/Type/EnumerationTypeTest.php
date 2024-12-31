@@ -18,10 +18,10 @@ final class EnumerationTypeTest extends BaseProgramTestHelper {
 		]);
 		$type = $this->typeRegistry->enumeration(new TypeNameIdentifier('Suit'));
 		$this->assertTrue(
-			$type->name()->equals(new TypeNameIdentifier('Suit'))
+			$type->name->equals(new TypeNameIdentifier('Suit'))
 		);
-		$this->assertCount(4, $type->values());
-		$this->assertCount(4, $type->enumeration()->subsetValues());
+		$this->assertCount(4, $type->values);
+		$this->assertCount(4, $type->enumeration->subsetValues);
 	}
 
 	public function testEmptySubset(): void {

@@ -12,7 +12,7 @@ final class AsStringTest extends BaseProgramTestHelper {
 		$this->testMethodCall(
 			$this->expressionRegistry->constant($value),
 			'asString',
-			$this->expressionRegistry->constant($this->valueRegistry->null()),
+			$this->expressionRegistry->constant($this->valueRegistry->null),
 			$this->valueRegistry->string($expected)
 		);
 	}
@@ -21,7 +21,7 @@ final class AsStringTest extends BaseProgramTestHelper {
         $this->testMethodCallAnalyse(
             $type,
             'asString',
-            $this->typeRegistry->null(),
+            $this->typeRegistry->null,
             $expected
         );
     }
@@ -33,9 +33,9 @@ final class AsStringTest extends BaseProgramTestHelper {
 		$this->callAsString($this->valueRegistry->real(0), "0");
 		$this->callAsString($this->valueRegistry->string("Hello"), "Hello");
 		$this->callAsString($this->valueRegistry->string(""), "");
-		$this->callAsString($this->valueRegistry->true(), "true");
-		$this->callAsString($this->valueRegistry->false(), "false");
-		$this->callAsString($this->valueRegistry->null(), "null");
+		$this->callAsString($this->valueRegistry->true, "true");
+		$this->callAsString($this->valueRegistry->false, "false");
+		$this->callAsString($this->valueRegistry->null, "null");
 
         $this->analyseCallAsString(
             $this->typeRegistry->integer(-5, 42),

@@ -28,15 +28,15 @@ final readonly class Flatten implements NativeMethod {
 		$targetType = $this->toBaseType($targetType);
 		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($type instanceof ArrayType) {
-            $itemType = $type->itemType();
+            $itemType = $type->itemType;
             if ($itemType instanceof ArrayType) {
-                return $this->context->typeRegistry()->array(
-                    $itemType->itemType(),
-                    $type->range()->minLength() * $itemType->range()->minLength(),
-                    $type->range()->maxLength() === PlusInfinity::value ||
-                        $itemType->range()->maxLength() === PlusInfinity::value ?
+                return $this->context->typeRegistry->array(
+                    $itemType->itemType,
+                    $type->range->minLength * $itemType->range->minLength,
+                    $type->range->maxLength === PlusInfinity::value ||
+                        $itemType->range->maxLength === PlusInfinity::value ?
                         PlusInfinity::value :
-                        $type->range()->maxLength() * $itemType->range()->maxLength(),
+                        $type->range->maxLength * $itemType->range->maxLength,
                 );
             }
 		}
@@ -53,18 +53,18 @@ final readonly class Flatten implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
-			$values = $targetValue->values();
+			$values = $targetValue->values;
             $result = [];
             foreach($values as $value) {
                 if ($value instanceof TupleValue) {
-                    $result = array_merge($result, $value->values());
+                    $result = array_merge($result, $value->values);
                 } else {
                     // @codeCoverageIgnoreStart
                     throw new ExecutionException("Invalid target value");
                     // @codeCoverageIgnoreEnd
                 }
             }
-			return TypedValue::forValue($this->context->valueRegistry()->tuple($result));
+			return TypedValue::forValue($this->context->valueRegistry->tuple($result));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

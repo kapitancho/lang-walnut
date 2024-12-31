@@ -8,33 +8,29 @@ use Walnut\Lang\Blueprint\Value\StringValue as StringValueInterface;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\StringSubsetType;
 
-final readonly class StringValue implements StringValueInterface, JsonSerializable {
+final class StringValue implements StringValueInterface, JsonSerializable {
 
     public function __construct(
-		private TypeRegistry $typeRegistry,
-		private string $stringValue
+		private readonly TypeRegistry $typeRegistry,
+		public readonly string $literalValue
     ) {}
 
-    public function type(): StringSubsetType {
-        return $this->typeRegistry->stringSubset([$this]);
-    }
-
-    public function literalValue(): string {
-        return $this->stringValue;
+	public StringSubsetType $type {
+		get => $this->typeRegistry->stringSubset([$this]);
     }
 
 	public function equals(Value $other): bool {
-		return $other instanceof StringValueInterface && $this->literalValue() === $other->literalValue();
+		return $other instanceof StringValueInterface && $this->literalValue === $other->literalValue;
 	}
 
 	public function __toString(): string {
-		return "'" . str_replace(['\\', "\n", "'"], ['\\\\', '\n', '\`'], $this->literalValue()) . "'";
+		return "'" . str_replace(['\\', "\n", "'"], ['\\\\', '\n', '\`'], $this->literalValue) . "'";
 	}
 
 	public function jsonSerialize(): array {
 		return [
 			'valueType' => 'String',
-			'value' => $this->stringValue
+			'value' => $this->literalValue
 		];
 	}
 }

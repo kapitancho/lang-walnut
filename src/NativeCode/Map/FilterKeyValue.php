@@ -22,12 +22,12 @@ final readonly class FilterKeyValue implements NativeMethod {
 	) {}
 
 	private function getExpectedType(Type $targetType): Type {
-		return $this->context->typeRegistry()->function(
-			$this->context->typeRegistry()->record([
-				'key' => $this->context->typeRegistry()->string(),
+		return $this->context->typeRegistry->function(
+			$this->context->typeRegistry->record([
+				'key' => $this->context->typeRegistry->string(),
 				'value' => $targetType
 			]),
-			$this->context->typeRegistry()->boolean()
+			$this->context->typeRegistry->boolean
 		);
 	}
 
@@ -40,13 +40,13 @@ final readonly class FilterKeyValue implements NativeMethod {
 			$targetType = $targetType->asMapType();
 		}
 		if ($targetType instanceof MapType) {
-			$expectedType = $this->getExpectedType($targetType->itemType());
+			$expectedType = $this->getExpectedType($targetType->itemType);
 			if ($parameterType->isSubtypeOf($expectedType)) {
 				//if ($targetType->itemType()->isSubtypeOf($parameterType->parameterType())) {
-					return $this->context->typeRegistry()->map(
-						$targetType->itemType(),
+					return $this->context->typeRegistry->map(
+						$targetType->itemType,
 						0,
-						$targetType->range()->maxLength()
+						$targetType->range->maxLength
 					);
 				//}
 				/*throw new AnalyserException(
@@ -76,14 +76,14 @@ final readonly class FilterKeyValue implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue) {
 			if ($parameterValue instanceof FunctionValue) {
-				$values = $targetValue->values();
+				$values = $targetValue->values;
 				$result = [];
-				$true = $this->context->valueRegistry()->true();
+				$true = $this->context->valueRegistry->true;
 				foreach($values as $key => $value) {
 					$filterResult = $parameterValue->execute(
-						$this->context->globalContext(),
-						$this->context->valueRegistry()->record([
-							'key' => $this->context->valueRegistry()->string($key),
+						$this->context->globalContext,
+						$this->context->valueRegistry->record([
+							'key' => $this->context->valueRegistry->string($key),
 							'value' => $value
 						])
 					);
@@ -91,7 +91,7 @@ final readonly class FilterKeyValue implements NativeMethod {
 						$result[$key] = $value;
 					}
 				}
-				return TypedValue::forValue($this->context->valueRegistry()->record($result));
+				return TypedValue::forValue($this->context->valueRegistry->record($result));
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

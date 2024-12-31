@@ -27,19 +27,19 @@ final readonly class AsReal implements NativeMethod {
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof BooleanType) {
-			return $this->context->typeRegistry()->realSubset([
-				$this->context->valueRegistry()->real(0.0),
-				$this->context->valueRegistry()->real(1.0)
+			return $this->context->typeRegistry->realSubset([
+				$this->context->valueRegistry->real(0.0),
+				$this->context->valueRegistry->real(1.0)
 			]);
 		}
 		if ($targetType instanceof TrueType) {
-			return $this->context->typeRegistry()->realSubset([
-				$this->context->valueRegistry()->real(1.0)
+			return $this->context->typeRegistry->realSubset([
+				$this->context->valueRegistry->real(1.0)
 			]);
 		}
 		if ($targetType instanceof FalseType) {
-			return $this->context->typeRegistry()->realSubset([
-				$this->context->valueRegistry()->real(0.0)
+			return $this->context->typeRegistry->realSubset([
+				$this->context->valueRegistry->real(0.0)
 			]);
 		}
 		// @codeCoverageIgnoreStart
@@ -55,8 +55,8 @@ final readonly class AsReal implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof BooleanValue) {
-			$target = $targetValue->literalValue();
-			return TypedValue::forValue($this->context->valueRegistry()->real($target ? 1.0 : 0.0));
+			$target = $targetValue->literalValue;
+			return TypedValue::forValue($this->context->valueRegistry->real($target ? 1.0 : 0.0));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

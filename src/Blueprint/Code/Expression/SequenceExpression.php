@@ -3,6 +3,6 @@
 namespace Walnut\Lang\Blueprint\Code\Expression;
 
 interface SequenceExpression extends Expression {
-	/** @return list<Expression> */
-	public function expressions(): array;
+	/** @param list<Expression> $expressions */
+	public array $expressions { get; }
 }

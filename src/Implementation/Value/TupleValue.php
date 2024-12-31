@@ -11,17 +11,17 @@ use Walnut\Lang\Blueprint\Type\UnknownProperty;
 use Walnut\Lang\Blueprint\Value\TupleValue as TupleValueInterface;
 use Walnut\Lang\Blueprint\Value\Value;
 
-final readonly class TupleValue implements TupleValueInterface, JsonSerializable {
+final class TupleValue implements TupleValueInterface, JsonSerializable {
 
-	private TupleType $type;
+	private readonly TupleType $actualType;
 
 	/**
 	 * @param TypeRegistry $typeRegistry
 	 * @param list<Value> $values
 	 */
     public function __construct(
-        private TypeRegistry $typeRegistry,
-	    private array $values
+        private readonly TypeRegistry $typeRegistry,
+	    public readonly array $values
     ) {
 		foreach($this->values as $value) {
 			if (!$value instanceof Value) {
@@ -32,20 +32,15 @@ final readonly class TupleValue implements TupleValueInterface, JsonSerializable
 		}
     }
 
-    public function type(): TupleType {
-        return $this->type ??= $this->typeRegistry->tuple(
+	public TupleType $type {
+		get => $this->actualType ??= $this->typeRegistry->tuple(
 			array_map(
 				static fn(Value $value): Type =>
-					$value->type(), $this->values
+					$value->type, $this->values
 			),
-	        $this->typeRegistry->nothing()
+	        $this->typeRegistry->nothing
         );
     }
-
-	/** @return list<Value> */
-	public function values(): array {
-		return $this->values;
-	}
 
 	/** @throws UnknownProperty */
 	public function valueOf(int $index): Value {
@@ -56,14 +51,9 @@ final readonly class TupleValue implements TupleValueInterface, JsonSerializable
 	public function equals(Value $other): bool {
 		if ($other instanceof TupleValueInterface) {
 			$thisValues = $this->values;
-			$otherValues = $other->values();
+			$otherValues = $other->values;
 			if (count($thisValues) === count($otherValues)) {
-				foreach($thisValues as $index => $value) {
-					if (!$value->equals($otherValues[$index])) {
-						return false;
-					}
-				}
-				return true;
+				return array_all($thisValues, fn($value, $index) => $value->equals($otherValues[$index]));
 			}
 		}
 		return false;

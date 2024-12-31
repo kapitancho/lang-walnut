@@ -13,7 +13,7 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4",
         "kapitancho/walex": "^0.0.1",
         "ext-mbstring": "*"
     },

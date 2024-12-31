@@ -31,18 +31,18 @@ final readonly class Values implements NativeMethod {
 	): TypeInterface {
 		if ($parameterType instanceof NullType) {
 			if ($targetType instanceof TypeType) {
-				$refType = $targetType->refType();
+				$refType = $targetType->refType;
 				if ($refType instanceof MetaType) {
-					$t = match($refType->value()) {
+					$t = match($refType->value) {
 						MetaTypeValue::Enumeration, MetaTypeValue::EnumerationSubset
-							=> $this->context->typeRegistry()->any(),
-						MetaTypeValue::IntegerSubset => $this->context->typeRegistry()->integer(),
-						MetaTypeValue::RealSubset => $this->context->typeRegistry()->real(),
-						MetaTypeValue::StringSubset => $this->context->typeRegistry()->string(),
+							=> $this->context->typeRegistry->any,
+						MetaTypeValue::IntegerSubset => $this->context->typeRegistry->integer(),
+						MetaTypeValue::RealSubset => $this->context->typeRegistry->real(),
+						MetaTypeValue::StringSubset => $this->context->typeRegistry->string(),
 						default => null
 					};
 					if ($t) {
-						return $this->context->typeRegistry()->array($t, 1);
+						return $this->context->typeRegistry->array($t, 1);
 					}
 				}
 				if ($refType instanceof IntegerSubsetType ||
@@ -51,15 +51,15 @@ final readonly class Values implements NativeMethod {
 					$refType instanceof EnumerationSubsetType
 				) {
 					$t = match(true) {
-						$refType instanceof IntegerSubsetType => $this->context->typeRegistry()->integer(),
-						$refType instanceof RealSubsetType => $this->context->typeRegistry()->real(),
-						$refType instanceof StringSubsetType => $this->context->typeRegistry()->string(),
-						$refType instanceof EnumerationSubsetType => $this->context->typeRegistry()->enumeration(
-							$refType->enumeration()->name(),
+						$refType instanceof IntegerSubsetType => $this->context->typeRegistry->integer(),
+						$refType instanceof RealSubsetType => $this->context->typeRegistry->real(),
+						$refType instanceof StringSubsetType => $this->context->typeRegistry->string(),
+						$refType instanceof EnumerationSubsetType => $this->context->typeRegistry->enumeration(
+							$refType->enumeration->name,
 						),
 					};
-					$l = count($refType->subsetValues());
-					return $this->context->typeRegistry()->array($t, $l, $l);
+					$l = count($refType->subsetValues);
+					return $this->context->typeRegistry->array($t, $l, $l);
 				}
 			}
 			// @codeCoverageIgnoreStart
@@ -80,16 +80,16 @@ final readonly class Values implements NativeMethod {
 		
 		if ($parameterValue instanceof NullValue) {
 			if ($targetValue instanceof TypeValue) {
-				$refType = $targetValue->typeValue();
+				$refType = $targetValue->typeValue;
 				if ($refType instanceof IntegerSubsetType ||
 					$refType instanceof RealSubsetType ||
 					$refType instanceof StringSubsetType ||
 					$refType instanceof EnumerationSubsetType
 				) {
-					return TypedValue::forValue($this->context->valueRegistry()->tuple(
+					return TypedValue::forValue($this->context->valueRegistry->tuple(
 						array_values(
 							array_unique(
-								$refType->subsetValues()
+								$refType->subsetValues
 							)
 						)
 					));

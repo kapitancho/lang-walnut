@@ -52,7 +52,7 @@ final class MatchExpressionTest extends TestCase {
 					),
 					new ConstantExpression(
 						$this->typeRegistry,
-						$this->valueRegistry->true()
+						$this->valueRegistry->true
 					)
 				),
 			]
@@ -62,27 +62,27 @@ final class MatchExpressionTest extends TestCase {
 	public function testTarget(): void {
 		self::assertInstanceOf(
 			ConstantExpression::class,
-			$this->matchExpression->target()
+			$this->matchExpression->target
 		);
 	}
 
 	public function testPairs(): void {
-		self::assertCount(2, $this->matchExpression->pairs());
+		self::assertCount(2, $this->matchExpression->pairs);
 	}
 
 	public function testOperation(): void {
 		self::assertInstanceOf(
 			MatchExpressionEquals::class,
-			$this->matchExpression->operation()
+			$this->matchExpression->operation
 		);
 	}
 
 	public function testAnalyse(): void {
 		$result = $this->matchExpression->analyse(new AnalyserContext(new VariableScope([])));
-		self::assertTrue($result->expressionType()->isSubtypeOf(
+		self::assertTrue($result->expressionType->isSubtypeOf(
 			$this->typeRegistry->union([
 				$this->typeRegistry->string(),
-				$this->typeRegistry->true()
+				$this->typeRegistry->true
 			]),
 		));
 	}
@@ -90,12 +90,12 @@ final class MatchExpressionTest extends TestCase {
 	public function testExecute(): void {
 		$result = $this->matchExpression->execute(new ExecutionContext(new VariableValueScope([])));
 		self::assertTrue(
-			$this->valueRegistry->true()->equals($result->value())
+			$this->valueRegistry->true->equals($result->value)
 		);
 	}
 
 	public function testIsSubtypeOf(): void {
-		$result = (new MatchExpression(
+		$result = new MatchExpression(
 			$this->typeRegistry,
 			$this->valueRegistry,
 			new ConstantExpression(
@@ -125,18 +125,18 @@ final class MatchExpressionTest extends TestCase {
 					),
 					new ConstantExpression(
 						$this->typeRegistry,
-						$this->valueRegistry->true()
+						$this->valueRegistry->true
 					)
 				),
 			]
-		))->execute(new ExecutionContext(new VariableValueScope([])));
-		self::assertTrue($result->value()->equals(
-			$this->valueRegistry->true()
+		)->execute(new ExecutionContext(new VariableValueScope([])));
+		self::assertTrue($result->value->equals(
+			$this->valueRegistry->true
 		));
 	}
 
 	public function testDefaultMatch(): void {
-		$result = (new MatchExpression(
+		$result = new MatchExpression(
 			$this->typeRegistry,
 			$this->valueRegistry,
 			new ConstantExpression(
@@ -158,18 +158,18 @@ final class MatchExpressionTest extends TestCase {
 				new MatchExpressionDefault(
 					new ConstantExpression(
 						$this->typeRegistry,
-						$this->valueRegistry->true()
+						$this->valueRegistry->true
 					)
 				),
 			],
-		))->execute(new ExecutionContext(new VariableValueScope([])));
-		self::assertTrue($result->value()->equals(
-			$this->valueRegistry->true()
+		)->execute(new ExecutionContext(new VariableValueScope([])));
+		self::assertTrue($result->value->equals(
+			$this->valueRegistry->true
 		));
 	}
 
 	public function testNoMatch(): void {
-		$result = (new MatchExpression(
+		$result = new MatchExpression(
 			$this->typeRegistry,
 			$this->valueRegistry,
 			new ConstantExpression(
@@ -195,13 +195,13 @@ final class MatchExpressionTest extends TestCase {
 					),
 					new ConstantExpression(
 						$this->typeRegistry,
-						$this->valueRegistry->true()
+						$this->valueRegistry->true
 					)
 				),
 			],
-		))->execute(new ExecutionContext(new VariableValueScope([])));
-		self::assertTrue($result->value()->equals(
-			$this->valueRegistry->null()
+		)->execute(new ExecutionContext(new VariableValueScope([])));
+		self::assertTrue($result->value->equals(
+			$this->valueRegistry->null
 		));
 	}
 

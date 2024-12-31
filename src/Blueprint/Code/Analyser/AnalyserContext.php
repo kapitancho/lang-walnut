@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Type\Type;
 
 interface AnalyserContext {
-	public function variableScope(): VariableScope;
+	public VariableScope $variableScope { get; }
 
 	public function withAddedVariableType(
 		VariableNameIdentifier $variableName,

@@ -5,8 +5,8 @@ namespace Walnut\Lang\Blueprint\Program\Registry;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope;
 
 interface ProgramRegistry {
-	public function typeRegistry(): TypeRegistry;
-	public function valueRegistry(): ValueRegistry;
-	public function expressionRegistry(): ExpressionRegistry;
-	public function globalScope(): VariableValueScope;
+	public TypeRegistry $typeRegistry { get; }
+	public ValueRegistry $valueRegistry { get; }
+	public ExpressionRegistry $expressionRegistry { get; }
+	public VariableValueScope $globalScope { get; }
 }

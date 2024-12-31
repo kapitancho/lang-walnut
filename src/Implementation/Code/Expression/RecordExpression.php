@@ -19,21 +19,16 @@ final readonly class RecordExpression implements RecordExpressionInterface, Json
 	public function __construct(
 		private TypeRegistry $typeRegistry,
 		private ValueRegistry $valueRegistry,
-		private array $values
+		public array $values
 	) {}
-
-	/** @return array<string, Expression> */
-	public function values(): array {
-		return $this->values;
-	}
 
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
 		$subtypes = [];
 		$returnTypes = [];
 		foreach($this->values as $key => $value) {
 			$analyserContext = $value->analyse($analyserContext);
-			$subtypes[$key] = $analyserContext->expressionType();
-			$returnTypes[] = $analyserContext->returnType();
+			$subtypes[$key] = $analyserContext->expressionType;
+			$returnTypes[] = $analyserContext->returnType;
 		}
 		return $analyserContext->asAnalyserResult(
 			$this->typeRegistry->record($subtypes),
@@ -46,8 +41,8 @@ final readonly class RecordExpression implements RecordExpressionInterface, Json
 		$types = [];
 		foreach($this->values as $key => $value) {
 			$executionContext = $value->execute($executionContext);
-			$values[$key] = $executionContext->value();
-			$types[$key] = $executionContext->valueType();
+			$values[$key] = $executionContext->value;
+			$types[$key] = $executionContext->valueType;
 		}
 		return $executionContext->asExecutionResult(new TypedValue(
 			$this->typeRegistry->record($types),

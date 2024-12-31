@@ -28,9 +28,9 @@ final readonly class UnaryNot implements NativeMethod {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof BooleanType || $targetType instanceof TrueType || $targetType instanceof FalseType) {
 			return match(true) {
-				$targetType instanceof FalseType => $this->context->typeRegistry()->true(),
-				$targetType instanceof TrueType => $this->context->typeRegistry()->false(),
-				default => $this->context->typeRegistry()->boolean()
+				$targetType instanceof FalseType => $this->context->typeRegistry->true,
+				$targetType instanceof TrueType => $this->context->typeRegistry->false,
+				default => $this->context->typeRegistry->boolean
 			};
 		}
 		// @codeCoverageIgnoreStart
@@ -46,7 +46,7 @@ final readonly class UnaryNot implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof BooleanValue) {
-            return TypedValue::forValue($this->context->valueRegistry()->boolean(!$targetValue->literalValue()));
+            return TypedValue::forValue($this->context->valueRegistry->boolean(!$targetValue->literalValue));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

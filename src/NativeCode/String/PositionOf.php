@@ -30,12 +30,12 @@ final readonly class PositionOf implements NativeMethod {
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $this->context->typeRegistry()->result(
-					$this->context->typeRegistry()->integer(0,
-						$targetType->range()->maxLength() === PlusInfinity::value ? PlusInfinity::value :
-						$targetType->range()->maxLength() - $parameterType->range()->minLength()
+				return $this->context->typeRegistry->result(
+					$this->context->typeRegistry->integer(0,
+						$targetType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
+						$targetType->range->maxLength - $parameterType->range->minLength
 					),
-					$this->context->typeRegistry()->withName(
+					$this->context->typeRegistry->withName(
 						new TypeNameIdentifier("SubstringNotInString")
 					)
 				);
@@ -60,13 +60,13 @@ final readonly class PositionOf implements NativeMethod {
 		$parameterValue = $this->toBaseValue($parameterValue);
 		if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof StringValue) {
-				$result = strpos($targetValue->literalValue(), $parameterValue->literalValue());
+				$result = strpos($targetValue->literalValue, $parameterValue->literalValue);
 				return TypedValue::forValue($result === false ?
-					$this->context->valueRegistry()->error(
-						$this->context->valueRegistry()->atom(
+					$this->context->valueRegistry->error(
+						$this->context->valueRegistry->atom(
 							new TypeNameIdentifier('SubstringNotInString')
 						)
-					) : $this->context->valueRegistry()->integer($result)
+					) : $this->context->valueRegistry->integer($result)
 				);
 			}
 			// @codeCoverageIgnoreStart

@@ -11,7 +11,6 @@ use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
 use Walnut\Lang\Blueprint\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
-use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\ResultType;
@@ -36,28 +35,28 @@ final readonly class Construct implements NativeMethod {
 
 	public function analyse(Type $targetType, Type $parameterType): Type {
 		if ($parameterType instanceof TypeType) {
-			$t = $parameterType->refType();
+			$t = $parameterType->refType;
 			if ($t instanceof SealedType || $t instanceof SubtypeType) {
-				$b = $t instanceof SealedType ? $t->valueType() : $t->baseType();
+				$b = $t instanceof SealedType ? $t->valueType : $t->baseType;
 
-				$constructorType = $this->context->typeRegistry()->typeByName(new TypeNameIdentifier('Constructor'));
+				$constructorType = $this->context->typeRegistry->typeByName(new TypeNameIdentifier('Constructor'));
 
 				$constructorMethod = $this->methodRegistry->method(
 					$constructorType,
-					new MethodNameIdentifier($t->name()->identifier)
+					new MethodNameIdentifier($t->name->identifier)
 				);
 				$errorTypes = [];
 				if ($constructorMethod instanceof Method) {
 					$constructorResult = $constructorMethod->analyse($constructorType, $targetType);
-					$constructorMethodReturnType = $constructorResult instanceof ResultType ? $constructorResult->returnType() : $constructorResult;
+					$constructorMethodReturnType = $constructorResult instanceof ResultType ? $constructorResult->returnType : $constructorResult;
 					if ($constructorResult instanceof ResultType) {
-						$errorTypes[] = $constructorResult->errorType();
+						$errorTypes[] = $constructorResult->errorType;
 					}
 					if (!$constructorMethodReturnType->isSubtypeOf($b)) {
 						throw new AnalyserException(
 							sprintf(
 								"The constructor of %s cannot return a value of type %s , a value of type %s is required",
-								$t->name(),
+								$t->name,
 								$constructorMethodReturnType,
 								$b,
 							)
@@ -68,7 +67,7 @@ final readonly class Construct implements NativeMethod {
 						$b instanceof RecordType &&
 						$targetType instanceof TupleType &&
 						$this->isTupleCompatibleToRecord(
-							$this->context->typeRegistry(),
+							$this->context->typeRegistry,
 							$targetType,
 							$b
 						)
@@ -78,36 +77,36 @@ final readonly class Construct implements NativeMethod {
 								"Invalid constructor value: %s is expected but %s is passed when initializing %s",
 								$b,
 								$targetType,
-								$t->name()->identifier
+								$t->name->identifier
 							)
 						);
 					}
 				}
 				$validatorMethod = $this->methodRegistry->method(
 					$constructorType,
-					new MethodNameIdentifier('as' . $t->name()->identifier)
+					new MethodNameIdentifier('as' . $t->name->identifier)
 				);
 				if ($validatorMethod instanceof Method) {
 					$validatorResult = $validatorMethod->analyse($constructorType, $b);
 					if ($validatorResult instanceof ResultType) {
-						$errorTypes[] = $validatorResult->errorType();
+						$errorTypes[] = $validatorResult->errorType;
 					}
 				}
-				return count($errorTypes) > 0 ? $this->context->typeRegistry()->result(
+				return count($errorTypes) > 0 ? $this->context->typeRegistry->result(
 					$t,
-					$this->context->typeRegistry()->union($errorTypes)
+					$this->context->typeRegistry->union($errorTypes)
 				): $t;
 			}
-			if ($t instanceof ResultType && $t->returnType() instanceof NothingType) {
-				return $this->context->typeRegistry()->result(
-					$this->context->typeRegistry()->nothing(),
+			if ($t instanceof ResultType && $t->returnType instanceof NothingType) {
+				return $this->context->typeRegistry->result(
+					$this->context->typeRegistry->nothing,
 					$targetType
 				);
 			}
-			if ($targetType->isSubtypeOf($parameterType->refType())) {
+			if ($targetType->isSubtypeOf($parameterType->refType)) {
 				// @codeCoverageIgnoreStart
 				throw new AnalyserException(
-					sprintf("The type %s has no constructor. The constructor parameter can be used directly.", $parameterType->refType())
+					sprintf("The type %s has no constructor. The constructor parameter can be used directly.", $parameterType->refType)
 				);
 			}
 		}
@@ -126,17 +125,17 @@ final readonly class Construct implements NativeMethod {
 		$parameterValue = $parameter->value;
 
 		if ($parameterValue instanceof TypeValue) {
-			$t = $parameterValue->typeValue();
+			$t = $parameterValue->typeValue;
 
 			if ($t instanceof SealedType || $t instanceof SubtypeType) {
-				$constructorType = $this->context->typeRegistry()->atom(new TypeNameIdentifier('Constructor'));
+				$constructorType = $this->context->typeRegistry->atom(new TypeNameIdentifier('Constructor'));
 				$constructorMethod = $this->methodRegistry->method(
 					$constructorType,
-					new MethodNameIdentifier($t->name()->identifier)
+					new MethodNameIdentifier($t->name->identifier)
 				);
 				if ($constructorMethod instanceof Method) {
 					$target = $constructorMethod->execute(
-						TypedValue::forValue($constructorType->value()),
+						TypedValue::forValue($constructorType->value),
 						$target,
 					);
 					$resultValue = $target->value;
@@ -147,11 +146,11 @@ final readonly class Construct implements NativeMethod {
 				}
 				$validatorMethod = $this->methodRegistry->method(
 					$constructorType,
-					new MethodNameIdentifier('as' . $t->name()->identifier)
+					new MethodNameIdentifier('as' . $t->name->identifier)
 				);
 				if ($validatorMethod instanceof Method) {
 					$result = $validatorMethod->execute(
-						TypedValue::forValue($constructorType->value()),
+						TypedValue::forValue($constructorType->value),
 						$target,
 					);
 					$resultValue = $result->value;
@@ -163,53 +162,53 @@ final readonly class Construct implements NativeMethod {
 			if ($t instanceof SealedType) {
 				if ($targetValue instanceof TupleValue) {
 					$targetValue = $this->getTupleAsRecord(
-						$this->context->valueRegistry(),
+						$this->context->valueRegistry,
 						$targetValue,
-						$t->valueType(),
+						$t->valueType,
 					);
 				}
-				if ($targetValue instanceof RecordValue && $targetValue->type()->isSubtypeOf($t->valueType())) {
+				if ($targetValue instanceof RecordValue && $targetValue->type->isSubtypeOf($t->valueType)) {
 					return new TypedValue(
 						$t,
-						$this->context->valueRegistry()->sealedValue(
-							$t->name(), $targetValue
+						$this->context->valueRegistry->sealedValue(
+							$t->name, $targetValue
 						)
 					);
 				}
 				// @codeCoverageIgnoreStart
 				throw new ExecutionException(sprintf("Invalid target value: %s, %s expected",
-					$targetValue->type(),
-					$t->valueType()
+					$targetValue->type,
+					$t->valueType
 				));
 				// @codeCoverageIgnoreEnd
 			}
 			if ($t instanceof SubtypeType) {
-				if ($targetValue instanceof TupleValue && $t->baseType() instanceof RecordType) {
+				if ($targetValue instanceof TupleValue && $t->baseType instanceof RecordType) {
 					$targetValue = $this->getTupleAsRecord(
-						$this->context->valueRegistry(),
+						$this->context->valueRegistry,
 						$targetValue,
-						$t->baseType(),
+						$t->baseType,
 					);
 				}
-				if ($targetValue->type()->isSubtypeOf($t->baseType())) {
+				if ($targetValue->type->isSubtypeOf($t->baseType)) {
 					return new TypedValue(
 						$t,
-						$this->context->valueRegistry()->subtypeValue(
-							$t->name(), $targetValue
+						$this->context->valueRegistry->subtypeValue(
+							$t->name, $targetValue
 						)
 					);
 				}
 				// @codeCoverageIgnoreStart
 				throw new ExecutionException(sprintf("Invalid target value: %s, %s expected",
-					$targetValue->type(),
-					$t->baseType()
+					$targetValue->type,
+					$t->baseType
 				));
 				// @codeCoverageIgnoreEnd
 			}
-			if ($t instanceof ResultType && $t->returnType() instanceof NothingType) {
+			if ($t instanceof ResultType && $t->returnType instanceof NothingType) {
 				return new TypedValue(
 					$t,
-					$this->context->valueRegistry()->error($targetValue)
+					$this->context->valueRegistry->error($targetValue)
 				);
 			}
 		}

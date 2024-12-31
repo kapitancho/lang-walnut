@@ -16,7 +16,7 @@ trait TupleAsRecord {
 		TupleType $tupleType,
 		RecordType $recordType
 	): bool {
-		return $tupleType->isSubtypeOf($typeRegistry->tuple(array_values($recordType->types())));
+		return $tupleType->isSubtypeOf($typeRegistry->tuple(array_values($recordType->types)));
 	}
 
 	private function getTupleAsRecord(
@@ -26,7 +26,7 @@ trait TupleAsRecord {
 	): RecordValue {
 		$result = [];
 		$index = 0;
-		foreach($recordType->types() as $key => $value) {
+		foreach($recordType->types as $key => $value) {
 			$result[$key] = $tupleValue->valueOf($index++);
 		}
 		return $valueRegistry->record($result);

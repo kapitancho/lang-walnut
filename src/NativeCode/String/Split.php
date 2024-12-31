@@ -28,10 +28,10 @@ final readonly class Split implements NativeMethod {
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $this->context->typeRegistry()->array(
+				return $this->context->typeRegistry->array(
 					$targetType,
-					$targetType->range()->minLength() > 0 ? 1 : 0,
-					$targetType->range()->maxLength()
+					$targetType->range->minLength > 0 ? 1 : 0,
+					$targetType->range->maxLength
 				);
 			}
 			// @codeCoverageIgnoreStart
@@ -54,10 +54,10 @@ final readonly class Split implements NativeMethod {
 		$parameterValue = $this->toBaseValue($parameterValue);
 		if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof StringValue) {
-				$result = explode($parameterValue->literalValue(), $targetValue->literalValue());
-				return TypedValue::forValue($this->context->valueRegistry()->tuple(
+				$result = explode($parameterValue->literalValue, $targetValue->literalValue);
+				return TypedValue::forValue($this->context->valueRegistry->tuple(
 					array_map(fn(string $piece): StringValue =>
-						$this->context->valueRegistry()->string($piece), $result)
+						$this->context->valueRegistry->string($piece), $result)
 				));
 			}
 			// @codeCoverageIgnoreStart

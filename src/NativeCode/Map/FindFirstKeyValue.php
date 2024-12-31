@@ -23,12 +23,12 @@ final readonly class FindFirstKeyValue implements NativeMethod {
 	) {}
 
 	private function getExpectedType(Type $targetType): Type {
-		return $this->context->typeRegistry()->function(
-			$this->context->typeRegistry()->record([
-				'key' => $this->context->typeRegistry()->string(),
+		return $this->context->typeRegistry->function(
+			$this->context->typeRegistry->record([
+				'key' => $this->context->typeRegistry->string(),
 				'value' => $targetType
 			]),
-			$this->context->typeRegistry()->boolean()
+			$this->context->typeRegistry->boolean
 		);
 	}
 
@@ -41,14 +41,14 @@ final readonly class FindFirstKeyValue implements NativeMethod {
 			$targetType = $targetType->asMapType();
 		}
 		if ($targetType instanceof MapType) {
-			$expectedType = $this->getExpectedType($targetType->itemType());
+			$expectedType = $this->getExpectedType($targetType->itemType);
 			if ($parameterType->isSubtypeOf($expectedType)) {
-				return $this->context->typeRegistry()->result(
-					$this->context->typeRegistry()->record([
-						'key' => $this->context->typeRegistry()->string(),
-						'value' => $targetType->itemType()
+				return $this->context->typeRegistry->result(
+					$this->context->typeRegistry->record([
+						'key' => $this->context->typeRegistry->string(),
+						'value' => $targetType->itemType
 					]),
-					$this->context->typeRegistry()->atom(
+					$this->context->typeRegistry->atom(
 						new TypeNameIdentifier('ItemNotFound')
 					)
 				);
@@ -72,13 +72,13 @@ final readonly class FindFirstKeyValue implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue) {
 			if ($parameterValue instanceof FunctionValue) {
-				$values = $targetValue->values();
-				$true = $this->context->valueRegistry()->true();
+				$values = $targetValue->values;
+				$true = $this->context->valueRegistry->true;
 				foreach($values as $key => $value) {
 					$filterResult = $parameterValue->execute(
-						$this->context->globalContext(),
-						$val = $this->context->valueRegistry()->record([
-							'key' => $this->context->valueRegistry()->string($key),
+						$this->context->globalContext,
+						$val = $this->context->valueRegistry->record([
+							'key' => $this->context->valueRegistry->string($key),
 							'value' => $value
 						])
 					);
@@ -86,8 +86,8 @@ final readonly class FindFirstKeyValue implements NativeMethod {
 						return TypedValue::forValue($val);
 					}
 				}
-				return TypedValue::forValue($this->context->valueRegistry()->error(
-					$this->context->valueRegistry()->atom(
+				return TypedValue::forValue($this->context->valueRegistry->error(
+					$this->context->valueRegistry->atom(
 						new TypeNameIdentifier('ItemNotFound'),
 					)
 				));

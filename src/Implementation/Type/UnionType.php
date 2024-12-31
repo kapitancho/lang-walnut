@@ -9,7 +9,7 @@ use Walnut\Lang\Implementation\Program\Type\UnionTypeNormalizer;
 
 final readonly class UnionType implements UnionTypeInterface, SupertypeChecker, JsonSerializable {
 	/** @var non-empty-list<Type> $types */
-	private array $types;
+	public array $types;
 
 	public function __construct(
 		private UnionTypeNormalizer $normalizer,
@@ -18,30 +18,15 @@ final readonly class UnionType implements UnionTypeInterface, SupertypeChecker, 
 		$this->types = $types;
 	}
 
-    /**
-     * @return list<Type>
-     */
-    public function types(): array {
-        return $this->types;
-    }
-
     public function isSubtypeOf(Type $ofType): bool {
-        foreach($this->types as $type) {
-            if (!$type->isSubtypeOf($ofType)) {
-                return ($ofType instanceof SupertypeChecker && $ofType->isSupertypeOf($this)) ||
-	                $this->isRecordUnion($ofType);
-            }
-        }
+	    if (array_any($this->types, fn($type) => !$type->isSubtypeOf($ofType))) {
+		    return ($ofType instanceof SupertypeChecker && $ofType->isSupertypeOf($this)) || $this->isRecordUnion($ofType);
+	    }
         return true;
     }
 
     public function isSupertypeOf(Type $ofType): bool {
-        foreach($this->types as $type) {
-            if ($ofType->isSubtypeOf($type)) {
-                return true;
-            }
-        }
-        return false;
+	    return array_any($this->types, fn($type) => $ofType->isSubtypeOf($type));
     }
 
 	public function __toString(): string {
@@ -57,34 +42,32 @@ final readonly class UnionType implements UnionTypeInterface, SupertypeChecker, 
 			return false;
 		}
 		$types = $this->types;
-		foreach($types as $type) {
-			if (!$type instanceof RecordType) {
-				return false;
-			}
+		if (array_any($types, fn($type) => !$type instanceof RecordType)) {
+			return false;
 		}
 		/** @var RecordType[] $types */
 		$allKeys = array_values(
 			array_unique(
 				array_merge(...
 					array_map(static fn(RecordType $recordType): array =>
-						array_keys($recordType->types()), $types))));
+						array_keys($recordType->types), $types))));
 
 		foreach ($allKeys as $key) {
 			$propertyTypes = [];
 			foreach($types as $type) {
-				$propertyTypes[] = $type->types()[$key] ?? $type->restType();
+				$propertyTypes[] = $type->types[$key] ?? $type->restType;
 			}
 			$propertyType = $this->normalizer->normalize(... $propertyTypes);
-			if (!$propertyType->isSubtypeOf($ofType->types()[$key] ?? $ofType->restType())) {
+			if (!$propertyType->isSubtypeOf($ofType->types[$key] ?? $ofType->restType)) {
 				return false;
 			}
 		}
 		$restTypes = [];
 		foreach($types as $type) {
-			$restTypes[] = $type->restType();
+			$restTypes[] = $type->restType;
 		}
 		$restType = $this->normalizer->normalize(... $restTypes);
-		if (!$restType->isSubtypeOf($ofType->restType())) {
+		if (!$restType->isSubtypeOf($ofType->restType)) {
 			return false;
 		}
 		return true;

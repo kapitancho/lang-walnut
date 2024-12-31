@@ -24,7 +24,7 @@ final readonly class ErrorAsExternal implements NativeMethod {
 	) {}
 
 	private function externalErrorType(): Type {
-		return $this->externalErrorType ??= $this->context->typeRegistry()
+		return $this->externalErrorType ??= $this->context->typeRegistry
 			->withName(new TypeNameIdentifier("ExternalError"));
 	}
 
@@ -34,13 +34,13 @@ final readonly class ErrorAsExternal implements NativeMethod {
 	): Type {
 		$target = $this->toBaseType($targetType);
 		if ($parameterType->isSubtypeOf(
-			$this->context->typeRegistry()->union([
-				$this->context->typeRegistry()->null(),
-				$this->context->typeRegistry()->string(),
+			$this->context->typeRegistry->union([
+				$this->context->typeRegistry->null,
+				$this->context->typeRegistry->string(),
 			])
 		)) {
 			return $target instanceof ResultType ?
-				$this->context->typeRegistry()->result($target->returnType(), $this->externalErrorType()) :
+				$this->context->typeRegistry->result($target->returnType, $this->externalErrorType()) :
 				$target;
 		}
 		// @codeCoverageIgnoreStart
@@ -53,25 +53,24 @@ final readonly class ErrorAsExternal implements NativeMethod {
 		TypedValue $parameter
 	): TypedValue {
 		$targetValue = $target->value;
-
 		if ($targetValue instanceof ErrorValue) {
-			$errorValue = $targetValue->errorValue();
-			if (!($errorValue instanceof SealedValue && $errorValue->type()->name()->equals(
+			$errorValue = $targetValue->errorValue;
+			if (!($errorValue instanceof SealedValue && $errorValue->type->name->equals(
 				new TypeNameIdentifier("ExternalError")
 			))) {
 				$parameterValue = $parameter->value;
 				$errorMessage = $parameterValue instanceof StringValue ? $parameterValue :
-					$this->context->valueRegistry()->string('Error');
+					$this->context->valueRegistry->string('Error');
 				return new TypedValue(
-					$this->context->typeRegistry()->result(
-						$this->context->typeRegistry()->nothing(),
+					$this->context->typeRegistry->result(
+						$this->context->typeRegistry->nothing,
 						$this->externalErrorType()
 					),
-					$this->context->valueRegistry()->error(
-						$this->context->valueRegistry()->sealedValue(
+					$this->context->valueRegistry->error(
+						$this->context->valueRegistry->sealedValue(
 							new TypeNameIdentifier("ExternalError"),
-							$this->context->valueRegistry()->record([
-								'errorType' => $this->context->valueRegistry()->string((string)$errorValue->type()),
+							$this->context->valueRegistry->record([
+								'errorType' => $this->context->valueRegistry->string((string)$errorValue->type),
 								'originalError' => $targetValue,
 								'errorMessage' => $errorMessage
 							])

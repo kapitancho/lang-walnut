@@ -30,10 +30,10 @@ final readonly class KeyOf implements NativeMethod {
 			$targetType = $targetType->asMapType();
 		}
 		if ($targetType instanceof MapType) {
-			$returnType = $this->context->typeRegistry()->string();
-			return $this->context->typeRegistry()->result(
+			$returnType = $this->context->typeRegistry->string();
+			return $this->context->typeRegistry->result(
 				$returnType,
-				$this->context->typeRegistry()->atom(
+				$this->context->typeRegistry->atom(
 					new TypeNameIdentifier("ItemNotFound")
 				)
 			);
@@ -52,14 +52,14 @@ final readonly class KeyOf implements NativeMethod {
 		
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue) {
-			$values = $targetValue->values();
+			$values = $targetValue->values;
 			foreach ($values as $key => $value) {
 				if ($value->equals($parameterValue)) {
-					return TypedValue::forValue($this->context->valueRegistry()->string($key));
+					return TypedValue::forValue($this->context->valueRegistry->string($key));
 				}
 			}
-			return TypedValue::forValue($this->context->valueRegistry()->error(
-				$this->context->valueRegistry()->atom(
+			return TypedValue::forValue($this->context->valueRegistry->error(
+				$this->context->valueRegistry->atom(
 					new TypeNameIdentifier('ItemNotFound'),
 				)
 			));

@@ -8,10 +8,10 @@ use Walnut\Lang\Test\Implementation\BaseProgramTestHelper;
 final class FalseTypeTest extends BaseProgramTestHelper {
 
 	public function testProperties(): void {
-		$false = $this->typeRegistry->false();
+		$false = $this->typeRegistry->false;
 		$this->assertTrue(
-			$false->enumeration()->name()->equals(new TypeNameIdentifier('Boolean'))
+			$false->enumeration->name->equals(new TypeNameIdentifier('Boolean'))
 		);
-		$this->assertCount(1, $false->subsetValues());
+		$this->assertCount(1, $false->subsetValues);
 	}
 }

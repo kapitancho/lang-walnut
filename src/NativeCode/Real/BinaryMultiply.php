@@ -37,14 +37,14 @@ final readonly class BinaryMultiply implements NativeMethod {
 				$parameterType instanceof RealType ||
 				$parameterType instanceof RealSubsetType
 			) {
-				if ($targetType->range()->minValue() >= 0 && $parameterType->range()->minValue() >= 0) {
-				    $min = $targetType->range()->minValue() * $parameterType->range()->minValue();
-				    $max = $targetType->range()->maxValue() === PlusInfinity::value ||
-				    $parameterType->range()->maxValue() === PlusInfinity::value   ? PlusInfinity::value :
-				        $targetType->range()->maxValue() * $parameterType->range()->maxValue();
-				    return $this->context->typeRegistry()->real($min, $max);
+				if ($targetType->range->minValue >= 0 && $parameterType->range->minValue >= 0) {
+				    $min = $targetType->range->minValue * $parameterType->range->minValue;
+				    $max = $targetType->range->maxValue === PlusInfinity::value ||
+				    $parameterType->range->maxValue === PlusInfinity::value   ? PlusInfinity::value :
+				        $targetType->range->maxValue * $parameterType->range->maxValue;
+				    return $this->context->typeRegistry->real($min, $max);
 				}
-				return $this->context->typeRegistry()->real();
+				return $this->context->typeRegistry->real();
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -68,8 +68,8 @@ final readonly class BinaryMultiply implements NativeMethod {
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue || $parameterValue instanceof RealValue) {
-                return TypedValue::forValue($this->context->valueRegistry()->real(
-	                $targetValue->literalValue() * $parameterValue->literalValue()
+                return TypedValue::forValue($this->context->valueRegistry->real(
+	                $targetValue->literalValue * $parameterValue->literalValue
                 ));
 			}
 			// @codeCoverageIgnoreStart

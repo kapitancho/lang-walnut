@@ -10,14 +10,10 @@ use Walnut\Lang\Blueprint\Type\Type;
 final readonly class AnalyserResult implements AnalyserResultInterface {
 
 	public function __construct(
-		private VariableScope $variableScope,
-		private Type          $expressionType,
-		private Type          $returnType
+		public VariableScope $variableScope,
+		public Type           $expressionType,
+		public Type          $returnType
 	) {}
-
-	public function variableScope(): VariableScope {
-		return $this->variableScope;
-	}
 
 	public function withAddedVariableType(VariableNameIdentifier $variableName, Type $variableType): self {
 		return new self(
@@ -33,10 +29,6 @@ final readonly class AnalyserResult implements AnalyserResultInterface {
 			$expressionType,
 			$returnType
 		);
-	}
-
-	public function expressionType(): Type {
-		return $this->expressionType;
 	}
 
 	public function returnType(): Type {

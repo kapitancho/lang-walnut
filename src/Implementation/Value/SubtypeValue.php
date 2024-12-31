@@ -9,26 +9,22 @@ use Walnut\Lang\Blueprint\Type\SubtypeType;
 use Walnut\Lang\Blueprint\Value\SubtypeValue as SubtypeValueInterface;
 use Walnut\Lang\Blueprint\Value\Value;
 
-final readonly class SubtypeValue implements SubtypeValueInterface, JsonSerializable {
+final class SubtypeValue implements SubtypeValueInterface, JsonSerializable {
 
     public function __construct(
-		private TypeRegistry $typeRegistry,
-		private TypeNameIdentifier $typeName,
-	    private Value $baseValue
+		private readonly TypeRegistry $typeRegistry,
+		private readonly TypeNameIdentifier $typeName,
+	    public readonly Value $baseValue
     ) {}
 
-    public function type(): SubtypeType {
-        return $this->typeRegistry->subtype($this->typeName);
-    }
-
-    public function baseValue(): Value {
-		return $this->baseValue;
+	public SubtypeType $type {
+        get => $this->typeRegistry->subtype($this->typeName);
     }
 
 	public function equals(Value $other): bool {
 		return $other instanceof SubtypeValueInterface &&
-			$this->typeName->equals($other->type()->name()) &&
-			$this->baseValue->equals($other->baseValue());
+			$this->typeName->equals($other->type->name) &&
+			$this->baseValue->equals($other->baseValue);
 	}
 
 	public function __toString(): string {

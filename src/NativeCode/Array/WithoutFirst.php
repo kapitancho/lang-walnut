@@ -29,18 +29,18 @@ final readonly class WithoutFirst implements NativeMethod {
 		$targetType = $this->toBaseType($targetType);
 		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($type instanceof ArrayType) {
-			$returnType = $this->context->typeRegistry()->record([
-				'element' => $type->itemType(),
-				'array' => $this->context->typeRegistry()->array(
-					$type->itemType(),
-					max(0, $type->range()->minLength() - 1),
-					$type->range()->maxLength() === PlusInfinity::value ?
-						PlusInfinity::value : $type->range()->maxLength() - 1
+			$returnType = $this->context->typeRegistry->record([
+				'element' => $type->itemType,
+				'array' => $this->context->typeRegistry->array(
+					$type->itemType,
+					max(0, $type->range->minLength - 1),
+					$type->range->maxLength === PlusInfinity::value ?
+						PlusInfinity::value : $type->range->maxLength - 1
 				)
 			]);
-			return $type->range()->minLength() > 0 ? $returnType :
-				$this->context->typeRegistry()->result($returnType,
-					$this->context->typeRegistry()->atom(
+			return $type->range->minLength > 0 ? $returnType :
+				$this->context->typeRegistry->result($returnType,
+					$this->context->typeRegistry->atom(
 						new TypeNameIdentifier("ItemNotFound")
 					)
 				);
@@ -58,16 +58,16 @@ final readonly class WithoutFirst implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
-			$values = $targetValue->values();
+			$values = $targetValue->values;
 			if (count($values) === 0) {
-				return TypedValue::forValue($this->context->valueRegistry()->atom(
+				return TypedValue::forValue($this->context->valueRegistry->atom(
 					new TypeNameIdentifier("ItemNotFound")
 				));
 			}
 			$element = array_shift($values);
-			return TypedValue::forValue($this->context->valueRegistry()->record([
+			return TypedValue::forValue($this->context->valueRegistry->record([
 				'element' => $element,
-				'array' => $this->context->valueRegistry()->tuple($values)
+				'array' => $this->context->valueRegistry->tuple($values)
 			]));
 		}
 		// @codeCoverageIgnoreStart

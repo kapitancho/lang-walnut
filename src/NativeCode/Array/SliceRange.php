@@ -32,20 +32,20 @@ final readonly class SliceRange implements NativeMethod {
 			$targetType = $targetType->asArrayType();
 		}
 		if ($targetType instanceof ArrayType) {
-			$pInt = $this->context->typeRegistry()->integer(0);
-			$pType = $this->context->typeRegistry()->record([
+			$pInt = $this->context->typeRegistry->integer(0);
+			$pType = $this->context->typeRegistry->record([
 				"start" => $pInt,
 				"end" => $pInt
 			]);
 			if ($parameterType->isSubtypeOf($pType)) {
 				$parameterType = $this->toBaseType($parameterType);
-				$endType = $parameterType->types()['end'];
-				return $this->context->typeRegistry()->array(
-					$targetType->itemType(),
+				$endType = $parameterType->types['end'];
+				return $this->context->typeRegistry->array(
+					$targetType->itemType,
 					0,
-					$endType->range()->maxValue() === PlusInfinity::value ? PlusInfinity::value :
-					min($targetType->range()->maxLength,
-					$endType->range()->maxValue - $parameterType->types()['start']->range()->minValue()
+					$endType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
+					min($targetType->range->maxLength,
+					$endType->range->maxValue - $parameterType->types['start']->range->minValue
 				));
 			}
 			// @codeCoverageIgnoreStart
@@ -73,14 +73,14 @@ final readonly class SliceRange implements NativeMethod {
 					$start instanceof IntegerValue &&
 					$end instanceof IntegerValue
 				) {
-					$length = $end->literalValue() - $start->literalValue();
-					$values = $targetValue->values();
+					$length = $end->literalValue - $start->literalValue;
+					$values = $targetValue->values;
 					$values = array_slice(
 						$values,
-						$start->literalValue(),
+						$start->literalValue,
 						$length
 					);
-					return TypedValue::forValue($this->context->valueRegistry()->tuple($values));
+					return TypedValue::forValue($this->context->valueRegistry->tuple($values));
 				}
 				// @codeCoverageIgnoreStart
 				throw new ExecutionException("Invalid parameter value");

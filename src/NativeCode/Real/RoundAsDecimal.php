@@ -29,11 +29,11 @@ final readonly class RoundAsDecimal implements NativeMethod {
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof RealType || $targetType instanceof RealSubsetType) {
-			return $this->context->typeRegistry()->real(
-				$targetType->range()->minValue() === MinusInfinity::value ? MinusInfinity::value :
-					(int)floor($targetType->range()->minValue()),
-				$targetType->range()->maxValue() === PlusInfinity::value ? PlusInfinity::value :
-					(int)ceil($targetType->range()->maxValue())
+			return $this->context->typeRegistry->real(
+				$targetType->range->minValue === MinusInfinity::value ? MinusInfinity::value :
+					(int)floor($targetType->range->minValue),
+				$targetType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
+					(int)ceil($targetType->range->maxValue)
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -50,11 +50,11 @@ final readonly class RoundAsDecimal implements NativeMethod {
 		
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
-			$target = $targetValue->literalValue();
+			$target = $targetValue->literalValue;
 			$parameterValue = $this->toBaseValue($parameterValue);
-			if ($parameterValue instanceof IntegerValue && $parameterValue->literalValue() >= 0) {
+			if ($parameterValue instanceof IntegerValue && $parameterValue->literalValue >= 0) {
 				return TypedValue::forValue(
-					$this->context->valueRegistry()->real(round($target, $parameterValue->literalValue()))
+					$this->context->valueRegistry->real(round($target, $parameterValue->literalValue))
 				);
 			}
 			// @codeCoverageIgnoreStart

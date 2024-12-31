@@ -25,19 +25,19 @@ use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\FunctionType;
 use Walnut\Lang\Implementation\Type\Helper\TupleAsRecord;
 
-final readonly class FunctionValue implements FunctionValueInterface, JsonSerializable {
+final class FunctionValue implements FunctionValueInterface, JsonSerializable {
 	use TupleAsRecord;
 
     public function __construct(
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-		private DependencyContainer $dependencyContainer,
-		private Type $parameterType,
-		private Type $dependencyType,
-		private Type $returnType,
-	    private FunctionBody $body,
-	    private VariableValueScopeInterface|null $variableValueScope,
-	    private VariableNameIdentifier|null $selfReferAs
+		private readonly TypeRegistry $typeRegistry,
+		private readonly ValueRegistry $valueRegistry,
+		private readonly DependencyContainer $dependencyContainer,
+		public readonly Type $parameterType,
+		public readonly Type $dependencyType,
+		public readonly Type $returnType,
+		public readonly FunctionBody $body,
+	    private readonly VariableValueScopeInterface|null $variableValueScope,
+	    private readonly VariableNameIdentifier|null $selfReferAs
     ) {}
 
 	public function withVariableValueScope(VariableValueScopeInterface $variableValueScope): self {
@@ -68,27 +68,11 @@ final readonly class FunctionValue implements FunctionValueInterface, JsonSerial
 		);
 	}
 
-    public function type(): FunctionType {
-        return $this->typeRegistry->function(
+	public FunctionType $type {
+		get => $this->typeRegistry->function(
 			$this->parameterType,
 			$this->returnType
         );
-    }
-
-	public function parameterType(): Type {
-		return $this->parameterType;
-	}
-
-	public function dependencyType(): Type {
-		return $this->dependencyType;
-	}
-
-	public function returnType(): Type {
-		return $this->returnType;
-	}
-
-    public function body(): FunctionBody {
-		return $this->body;
     }
 
 	/** @throws FunctionBodyException */
@@ -109,7 +93,7 @@ final readonly class FunctionValue implements FunctionValueInterface, JsonSerial
 		//try {
 			$returnType = $this->body->analyse(
 				$analyserContext,
-				$this->typeRegistry->nothing(),
+				$this->typeRegistry->nothing,
 				$this->parameterType,
 				$this->dependencyType,
 			);
@@ -156,7 +140,7 @@ final readonly class FunctionValue implements FunctionValueInterface, JsonSerial
 			$this->parameterType instanceof RecordType &&
 			$this->isTupleCompatibleToRecord(
 				$this->typeRegistry,
-				$value->type(),
+				$value->type,
 				$this->parameterType
 			)
 		) {

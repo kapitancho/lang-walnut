@@ -21,13 +21,6 @@ final readonly class LengthRange implements LengthRangeInterface, JsonSerializab
 		}
 	}
 
-    public function minLength(): int {
-        return $this->minLength;
-    }
-    public function maxLength(): int|PlusInfinity {
-        return $this->maxLength;
-    }
-
     public function isSubRangeOf(LengthRangeInterface $range): bool {
 		return
 			$this->compare($this->minLength, $range->minLength) > -1 &&

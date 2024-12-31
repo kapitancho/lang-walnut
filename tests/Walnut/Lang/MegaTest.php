@@ -29,18 +29,18 @@ final class MegaTest extends TestCase {
 	public function testNullType(): void {
 		self::assertEquals(
 			$this->typeRegistry->atom(new TypeNameIdentifier('Null')),
-			$this->typeRegistry->null()
+			$this->typeRegistry->null
 		);
 		self::assertEquals(
 			$this->valueRegistry->atom(new TypeNameIdentifier('Null')),
-			$this->valueRegistry->null()
+			$this->valueRegistry->null
 		);
 	}
 
 	public function testBooleanType(): void {
 		self::assertEquals(
 			$this->typeRegistry->enumeration(new TypeNameIdentifier('Boolean')),
-			$this->typeRegistry->boolean()
+			$this->typeRegistry->boolean
 		);
 		self::assertEquals(
 			$this->typeRegistry
@@ -49,7 +49,7 @@ final class MegaTest extends TestCase {
 					new EnumValueIdentifier('True'),
 					new EnumValueIdentifier('False')
 				]),
-			$this->typeRegistry->boolean()
+			$this->typeRegistry->boolean
 		);
 		self::assertEquals(
 			$this->typeRegistry
@@ -57,7 +57,7 @@ final class MegaTest extends TestCase {
 				->subsetType([
 					new EnumValueIdentifier('True'),
 				]),
-			$this->typeRegistry->true()
+			$this->typeRegistry->true
 		);
 		self::assertEquals(
 			$this->typeRegistry
@@ -65,40 +65,40 @@ final class MegaTest extends TestCase {
 				->subsetType([
 					new EnumValueIdentifier('False'),
 				]),
-			$this->typeRegistry->false()
+			$this->typeRegistry->false
 		);
 		self::assertEquals(
 			$this->valueRegistry->enumerationValue(
 				new TypeNameIdentifier('Boolean'),
 				new EnumValueIdentifier('True'),
 			),
-			$this->valueRegistry->true()
+			$this->valueRegistry->true
 		);
 		self::assertEquals(
 			$this->valueRegistry->enumerationValue(
 				new TypeNameIdentifier('Boolean'),
 				new EnumValueIdentifier('False'),
 			),
-			$this->valueRegistry->false()
+			$this->valueRegistry->false
 		);
 		$this->assertTrue(
-			$this->typeRegistry->true()->isSubtypeOf(
-				$this->typeRegistry->boolean()
+			$this->typeRegistry->true->isSubtypeOf(
+				$this->typeRegistry->boolean
 			)
 		);
 		$this->assertFalse(
-			$this->typeRegistry->boolean()->isSubtypeOf(
-				$this->typeRegistry->true()
+			$this->typeRegistry->boolean->isSubtypeOf(
+				$this->typeRegistry->true
 			)
 		);
 		$this->assertTrue(
-			$this->typeRegistry->false()->isSubtypeOf(
-				$this->typeRegistry->boolean()
+			$this->typeRegistry->false->isSubtypeOf(
+				$this->typeRegistry->boolean
 			)
 		);
 		$this->assertFalse(
-			$this->typeRegistry->boolean()->isSubtypeOf(
-				$this->typeRegistry->false()
+			$this->typeRegistry->boolean->isSubtypeOf(
+				$this->typeRegistry->false
 			)
 		);
 	}

@@ -29,11 +29,11 @@ final readonly class Ceil implements NativeMethod {
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof RealType || $targetType instanceof RealSubsetType) {
-			return $this->context->typeRegistry()->integer(
-				$targetType->range()->minValue() === MinusInfinity::value ? MinusInfinity::value :
-					(int)ceil($targetType->range()->minValue()),
-				$targetType->range()->maxValue() === PlusInfinity::value ? PlusInfinity::value :
-					(int)ceil($targetType->range()->maxValue())
+			return $this->context->typeRegistry->integer(
+				$targetType->range->minValue === MinusInfinity::value ? MinusInfinity::value :
+					(int)ceil($targetType->range->minValue),
+				$targetType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
+					(int)ceil($targetType->range->maxValue)
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -49,8 +49,8 @@ final readonly class Ceil implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
-			$target = $targetValue->literalValue();
-			return TypedValue::forValue($this->context->valueRegistry()->integer((int)ceil($target)));
+			$target = $targetValue->literalValue;
+			return TypedValue::forValue($this->context->valueRegistry->integer((int)ceil($target)));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

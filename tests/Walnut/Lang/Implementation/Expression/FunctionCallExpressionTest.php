@@ -40,7 +40,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 			new TypeNameIdentifier("MyCustomType"),
 			$this->typeRegistry->record(['x' => $this->typeRegistry->integer()]),
 			$this->expressionRegistry->constant(
-				$this->valueRegistry->null()
+				$this->valueRegistry->null
 			),
 			null
 		);
@@ -48,7 +48,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 			$this->typeRegistry->withName(new TypeNameIdentifier('MyCustomType')),
 			new MethodNameIdentifier('invoke'),
 			$this->typeRegistry->integer(),
-			$this->typeRegistry->nothing(),
+			$this->typeRegistry->nothing,
 			$this->typeRegistry->string(),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->constant(
@@ -65,7 +65,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 		);
 		$this->functionValue = $this->valueRegistry->function(
 			$this->typeRegistry->integer(),
-			$this->typeRegistry->nothing(),
+			$this->typeRegistry->nothing,
 			$this->typeRegistry->string(),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->constant(
@@ -85,7 +85,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 		])));
 		self::assertEquals(
 			$this->typeRegistry->string(),
-			$result->expressionType()
+			$result->expressionType
 		);
 	}
 
@@ -96,7 +96,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 		])));
 		self::assertEquals(
 			$this->typeRegistry->string(),
-			$result->expressionType()
+			$result->expressionType
 		);
 	}
 
@@ -105,7 +105,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 			'a' => $this->typeRegistry->withName(new TypeNameIdentifier('MyCustomType')),
 			'b' => $this->typeRegistry->integer()
 		])));
-		self::assertTrue($result->expressionType()->isSubtypeOf($this->typeRegistry->string()));
+		self::assertTrue($result->expressionType->isSubtypeOf($this->typeRegistry->string()));
 	}
 
 	public function testAnalyseFailWrongParameter(): void {
@@ -115,7 +115,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 				$this->typeRegistry->integer(),
 				$this->typeRegistry->string(),
 			),
-			'b' => $this->typeRegistry->boolean()
+			'b' => $this->typeRegistry->boolean
 		])));
 	}
 
@@ -133,7 +133,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 				$this->valueRegistry->integer(1)
 			)
 		])));
-		self::assertTrue($result->value()->equals($this->valueRegistry->string("hi")));
+		self::assertTrue($result->value->equals($this->valueRegistry->string("hi")));
 	}
 
 	public function testExecuteOnSubtypes(): void {
@@ -148,7 +148,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 				$this->valueRegistry->integer(1)
 			)
 		])));
-		self::assertTrue($result->value()->equals($this->valueRegistry->string("hi")));
+		self::assertTrue($result->value->equals($this->valueRegistry->string("hi")));
 	}
 
 	public function testExecuteOnCustomType(): void {
@@ -163,7 +163,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 				$this->valueRegistry->integer(1)
 			)
 		])));
-		self::assertTrue($result->value()->equals($this->valueRegistry->string("hi")));
+		self::assertTrue($result->value->equals($this->valueRegistry->string("hi")));
 	}
 
 	public function testExecuteFailWrongType(): void {

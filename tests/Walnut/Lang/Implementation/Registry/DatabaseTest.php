@@ -14,49 +14,49 @@ final class DatabaseTest extends BaseProgramTestHelper {
 			'[dsn: String]',
 	        (string)$this->typeRegistry->subtype(
 				new TypeNameIdentifier('DatabaseConnection')
-	        )->baseType()
+	        )->baseType
         );
         $this->assertEquals(
 			'(String|Integer|Boolean|Null)',
 	        (string)$this->typeRegistry->alias(
 				new TypeNameIdentifier('DatabaseValue')
-	        )->aliasedType()
+	        )->aliasedType
         );
         $this->assertEquals(
 			'Map<DatabaseValue>',
 	        (string)$this->typeRegistry->alias(
 				new TypeNameIdentifier('DatabaseQueryResultRow')
-	        )->aliasedType()
+	        )->aliasedType
         );
         $this->assertEquals(
 			'Array<DatabaseQueryResultRow>',
 	        (string)$this->typeRegistry->alias(
 				new TypeNameIdentifier('DatabaseQueryResult')
-	        )->aliasedType()
+	        )->aliasedType
         );
         $this->assertEquals(
 			'(Array<DatabaseValue>|Map<DatabaseValue>)',
 	        (string)$this->typeRegistry->alias(
 				new TypeNameIdentifier('DatabaseQueryBoundParameters')
-	        )->aliasedType()
+	        )->aliasedType
         );
         $this->assertEquals(
 			"[\n\tquery: String<1..>,\n\tboundParameters: DatabaseQueryBoundParameters\n]",
 	        (string)$this->typeRegistry->alias(
 				new TypeNameIdentifier('DatabaseQueryCommand')
-	        )->aliasedType()
+	        )->aliasedType
         );
         $this->assertEquals(
 			"[\n\tquery: String<1..>,\n\tboundParameters: DatabaseQueryBoundParameters,\n\terror: String\n]",
 	        (string)$this->typeRegistry->sealed(
 				new TypeNameIdentifier('DatabaseQueryFailure')
-	        )->valueType()
+	        )->valueType
         );
         $this->assertEquals(
 			'[connection: DatabaseConnection]',
 	        (string)$this->typeRegistry->sealed(
 				new TypeNameIdentifier('DatabaseConnector')
-	        )->valueType()
+	        )->valueType
         );
     }
 

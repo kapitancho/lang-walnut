@@ -34,8 +34,8 @@ final class CompilerTest extends TestCase {
 			$isExecutable = preg_match('/^(cast\d+|demo-\w+|nwk-\w+|lang-[\w\-]+)$/', $source);
 			if ($isExecutable) {
 				$program = $compilationResult->program;
-				$tr = $compilationResult->programRegistry->typeRegistry();
-				$vr = $compilationResult->programRegistry->valueRegistry();
+				$tr = $compilationResult->programRegistry->typeRegistry;
+				$vr = $compilationResult->programRegistry->valueRegistry;
 				$ep = $program->getEntryPoint(
 					new VariableNameIdentifier('main'),
 					$tr->array($tr->string()),

@@ -26,15 +26,15 @@ final readonly class MergeWith implements NativeMethod {
 	): Type {
 		if ($targetType instanceof MapType) {
 			if ($parameterType instanceof MapType) {
-				return $this->context->typeRegistry()->map(
-					$this->context->typeRegistry()->union([
-						$targetType->itemType(),
-						$parameterType->itemType()
+				return $this->context->typeRegistry->map(
+					$this->context->typeRegistry->union([
+						$targetType->itemType,
+						$parameterType->itemType
 					]),
-					max($targetType->range()->minLength(), $parameterType->range()->minLength()),
-					$targetType->range()->maxLength() === PlusInfinity::value ||
-						$parameterType->range()->maxLength() === PlusInfinity::value ?
-						PlusInfinity::value : $targetType->range()->maxLength() + $parameterType->range()->maxLength()
+					max($targetType->range->minLength, $parameterType->range->minLength),
+					$targetType->range->maxLength === PlusInfinity::value ||
+						$parameterType->range->maxLength === PlusInfinity::value ?
+						PlusInfinity::value : $targetType->range->maxLength + $parameterType->range->maxLength
 				);
 			}
 			// @codeCoverageIgnoreStart
@@ -56,8 +56,8 @@ final readonly class MergeWith implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue) {
 			if ($parameterValue instanceof RecordValue) {
-				$values = [... $targetValue->values(), ... $parameterValue->values()];
-				return TypedValue::forValue($this->context->valueRegistry()->record($values));
+				$values = [... $targetValue->values, ... $parameterValue->values];
+				return TypedValue::forValue($this->context->valueRegistry->record($values));
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

@@ -23,11 +23,11 @@ final readonly class AsMutableOfType implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		if ($parameterType instanceof TypeType) {
-			return $this->context->typeRegistry()->result(
-				//$this->context->typeRegistry()->type(
-					$this->context->typeRegistry()->metaType(MetaTypeValue::MutableType)
+			return $this->context->typeRegistry->result(
+				//$this->context->typeRegistry->type(
+					$this->context->typeRegistry->metaType(MetaTypeValue::MutableType)
 				/*)*/,
-				$this->context->typeRegistry()->sealed(new TypeNameIdentifier("CastNotAvailable"))
+				$this->context->typeRegistry->sealed(new TypeNameIdentifier("CastNotAvailable"))
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -43,18 +43,18 @@ final readonly class AsMutableOfType implements NativeMethod {
 		$parameterValue = $parameter->value;
 
 		if ($parameterValue instanceof TypeValue) {
-			if ($targetValue->type()->isSubtypeOf($parameterValue->typeValue())) {
-				return TypedValue::forValue($this->context->valueRegistry()->mutable(
-					$parameterValue->typeValue(),
+			if ($targetValue->type->isSubtypeOf($parameterValue->typeValue)) {
+				return TypedValue::forValue($this->context->valueRegistry->mutable(
+					$parameterValue->typeValue,
 					$targetValue
 				));
 			}
-			return TypedValue::forValue($this->context->valueRegistry()->error(
-				$this->context->valueRegistry()->sealedValue(
+			return TypedValue::forValue($this->context->valueRegistry->error(
+				$this->context->valueRegistry->sealedValue(
 					new TypeNameIdentifier("CastNotAvailable"),
-					$this->context->valueRegistry()->record([
-						'from' => $this->context->valueRegistry()->type($targetValue->type()),
-						'to' => $this->context->valueRegistry()->type($parameterValue->typeValue())
+					$this->context->valueRegistry->record([
+						'from' => $this->context->valueRegistry->type($targetValue->type),
+						'to' => $this->context->valueRegistry->type($parameterValue->typeValue)
 					])
 				)
 			));

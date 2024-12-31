@@ -9,20 +9,21 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Implementation\Range\LengthRange;
 
-final readonly class StringSubsetType implements StringSubsetTypeInterface, JsonSerializable {
-	private LengthRange $range;
+final class StringSubsetType implements StringSubsetTypeInterface, JsonSerializable {
+
+	private readonly LengthRange $actualRange;
 
 	/** @param list<StringValue> $subsetValues */
     public function __construct(
-        private array $subsetValues
+        public readonly array $subsetValues
     ) {}
 
     public function isSubtypeOf(Type $ofType): bool {
         return match(true) {
             $ofType instanceof StringTypeInterface =>
-                self::isInRange($this->subsetValues, $ofType->range()),
+                self::isInRange($this->subsetValues, $ofType->range),
             $ofType instanceof StringSubsetTypeInterface =>
-                self::isSubset($this->subsetValues, $ofType->subsetValues()),
+                self::isSubset($this->subsetValues, $ofType->subsetValues),
             $ofType instanceof SupertypeChecker => $ofType->isSupertypeOf($this),
             default => false
         };
@@ -30,26 +31,11 @@ final readonly class StringSubsetType implements StringSubsetTypeInterface, Json
 
 	/** @param list<StringValue> $subsetValues */
     private static function isInRange(array $subsetValues, LengthRange $range): bool {
-        foreach($subsetValues as $value) {
-            if (!$range->lengthInRange(mb_strlen($value->literalValue()))) {
-                return false;
-            }
-        }
-        return true;
+	    return array_all($subsetValues, fn($value) => $range->lengthInRange(mb_strlen($value->literalValue)));
     }
 
     private static function isSubset(array $subset, array $superset): bool {
-        foreach($subset as $value) {
-            if (!in_array($value, $superset)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /** @return list<StringValue> */
-    public function subsetValues(): array {
-        return $this->subsetValues;
+	    return array_all($subset, fn($value) => in_array($value, $superset));
     }
 
 	public function contains(StringValue $value): bool {
@@ -63,19 +49,19 @@ final readonly class StringSubsetType implements StringSubsetTypeInterface, Json
 	private function minLength(): int {
 		return min(array_map(
 			static fn(StringValue $value): int =>
-				mb_strlen($value->literalValue()), $this->subsetValues
+				mb_strlen($value->literalValue), $this->subsetValues
 		));
 	}
 
 	private function maxLength(): int {
 		return max(array_map(
 			static fn(StringValue $value): int =>
-				mb_strlen($value->literalValue()), $this->subsetValues
+				mb_strlen($value->literalValue), $this->subsetValues
 		));
 	}
 
-	public function range(): LengthRange {
-		return $this->range ??= new LengthRange(
+	public LengthRange $range {
+		get => $this->actualRange ??= new LengthRange(
 			$this->minLength(), $this->maxLength()
 		);
 	}

@@ -26,17 +26,17 @@ final readonly class WithParameterType implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $this->toBaseType($targetType->refType());
+			$refType = $this->toBaseType($targetType->refType);
 			if ($parameterType->isSubtypeOf(
-				$this->context->typeRegistry()->type(
-					$this->context->typeRegistry()->any()
+				$this->context->typeRegistry->type(
+					$this->context->typeRegistry->any
 				)
 			)) {
 				if ($refType instanceof FunctionType) {
-					return $this->context->typeRegistry()->type(
-						$this->context->typeRegistry()->function(
-							$this->context->typeRegistry()->nothing(),
-							$refType->returnType(),
+					return $this->context->typeRegistry->type(
+						$this->context->typeRegistry->function(
+							$this->context->typeRegistry->nothing,
+							$refType->returnType,
 						)
 					);
 				}
@@ -57,18 +57,18 @@ final readonly class WithParameterType implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof TypeValue) {
-			$typeValue = $this->toBaseType($targetValue->typeValue());
+			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($parameter->type->isSubtypeOf(
-				$this->context->typeRegistry()->type(
-					$this->context->typeRegistry()->any()
+				$this->context->typeRegistry->type(
+					$this->context->typeRegistry->any
 				)
 			)) {
 				if ($typeValue instanceof FunctionType) {
-					$result = $this->context->typeRegistry()->function(
-						$parameter->value->typeValue(),
-						$typeValue->returnType(),
+					$result = $this->context->typeRegistry->function(
+						$parameter->value->typeValue,
+						$typeValue->returnType,
 					);
-					return TypedValue::forValue($this->context->valueRegistry()->type($result));
+					return TypedValue::forValue($this->context->valueRegistry->type($result));
 				}
 			}
 		}

@@ -26,9 +26,9 @@ final readonly class Length implements NativeMethod {
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
-			return $this->context->typeRegistry()->integer(
-				$targetType->range()->minLength(),
-				$targetType->range()->maxLength(),
+			return $this->context->typeRegistry->integer(
+				$targetType->range->minLength,
+				$targetType->range->maxLength,
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -44,8 +44,8 @@ final readonly class Length implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof StringValue) {
-			return TypedValue::forValue($this->context->valueRegistry()->integer(
-				mb_strlen($targetValue->literalValue())
+			return TypedValue::forValue($this->context->valueRegistry->integer(
+				mb_strlen($targetValue->literalValue)
 			));
 		}
 		// @codeCoverageIgnoreStart

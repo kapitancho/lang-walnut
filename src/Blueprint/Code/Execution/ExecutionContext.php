@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope;
 use Walnut\Lang\Blueprint\Identifier\VariableNameIdentifier;
 
 interface ExecutionContext {
-	public function variableValueScope(): VariableValueScope;
+	public VariableValueScope $variableValueScope { get; }
 
 	public function withAddedVariableValue(
 		VariableNameIdentifier $variableName,

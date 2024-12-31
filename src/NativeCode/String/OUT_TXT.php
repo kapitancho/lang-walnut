@@ -39,7 +39,7 @@ final readonly class OUT_TXT implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 		if ($targetValue instanceof StringValue) {
-			echo $targetValue->literalValue();
+			echo $targetValue->literalValue;
 			return $target;
 		}
 		// @codeCoverageIgnoreStart

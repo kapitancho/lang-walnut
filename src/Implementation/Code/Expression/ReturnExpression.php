@@ -15,25 +15,21 @@ use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 final readonly class ReturnExpression implements ReturnExpressionInterface, JsonSerializable {
 	public function __construct(
 		private TypeRegistry $typeRegistry,
-		private Expression $returnedExpression
+		public Expression $returnedExpression
 	) {}
-
-	public function returnedExpression(): Expression {
-		return $this->returnedExpression;
-	}
 
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
 		$ret = $this->returnedExpression->analyse($analyserContext);
 		return $ret->withExpressionType(
-			$this->typeRegistry->nothing()
+			$this->typeRegistry->nothing
 		)->withReturnType($this->typeRegistry->union(
-			[$ret->returnType(), $ret->expressionType()]
+			[$ret->returnType, $ret->expressionType]
 		));
 	}
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
 		throw new FunctionReturn(
-			$this->returnedExpression->execute($executionContext)->value()
+			$this->returnedExpression->execute($executionContext)->value
 		);
 	}
 

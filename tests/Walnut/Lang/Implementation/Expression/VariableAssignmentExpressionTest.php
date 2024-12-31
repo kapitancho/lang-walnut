@@ -37,14 +37,14 @@ final class VariableAssignmentExpressionTest extends TestCase {
 
 	public function testVariableName(): void {
 		self::assertEquals('x',
-			$this->variableAssignmentExpression->variableName()->identifier);
+			$this->variableAssignmentExpression->variableName->identifier);
 	}
 
 	public function testAssignedExpression(): void {
 		self::assertInstanceOf(ConstantExpression::class,
-			$this->variableAssignmentExpression->assignedExpression());
+			$this->variableAssignmentExpression->assignedExpression);
 		self::assertEquals(123,
-			$this->variableAssignmentExpression->assignedExpression()->value()->literalValue());
+			$this->variableAssignmentExpression->assignedExpression->value->literalValue);
 	}
 
 	public function testAnalyse(): void {
@@ -55,9 +55,9 @@ final class VariableAssignmentExpressionTest extends TestCase {
 				])
 			)
 		);
-		self::assertTrue($result->expressionType()->isSubtypeOf($this->typeRegistry->integer()));
+		self::assertTrue($result->expressionType->isSubtypeOf($this->typeRegistry->integer()));
 		self::assertTrue(
-			$result->variableScope()->typeOf(
+			$result->variableScope->typeOf(
 				new VariableNameIdentifier('x')
 			)->isSubtypeOf($this->typeRegistry->integer())
 		);
@@ -74,7 +74,7 @@ final class VariableAssignmentExpressionTest extends TestCase {
 				])
 			)
 		);
-		self::assertEquals($this->valueRegistry->integer(123), $result->value());
+		self::assertEquals($this->valueRegistry->integer(123), $result->value);
 	}
 
 }

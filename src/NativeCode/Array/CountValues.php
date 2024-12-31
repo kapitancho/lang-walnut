@@ -26,16 +26,16 @@ final readonly class CountValues implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		if ($targetType instanceof ArrayType) {
-			$itemType = $targetType->itemType();
-			if ($itemType->isSubtypeOf($this->context->typeRegistry()->string()) ||
-				$itemType->isSubtypeOf($this->context->typeRegistry()->integer())
+			$itemType = $targetType->itemType;
+			if ($itemType->isSubtypeOf($this->context->typeRegistry->string()) ||
+				$itemType->isSubtypeOf($this->context->typeRegistry->integer())
 			) {
-				return $this->context->typeRegistry()->map(
-					$this->context->typeRegistry()->integer(
-						1, $targetType->range()->maxLength()
+				return $this->context->typeRegistry->map(
+					$this->context->typeRegistry->integer(
+						1, $targetType->range->maxLength
 					),
-					min(1, $targetType->range()->minLength()),
-					$targetType->range()->maxLength()
+					min(1, $targetType->range->minLength),
+					$targetType->range->maxLength
 				);
 			}
 			// @codeCoverageIgnoreStart
@@ -55,7 +55,7 @@ final readonly class CountValues implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
-			$values = $targetValue->values();
+			$values = $targetValue->values;
 
 			$rawValues = [];
 			$hasStrings = false;
@@ -70,7 +70,7 @@ final readonly class CountValues implements NativeMethod {
 					throw new ExecutionException("Invalid target value");
 					// @codeCoverageIgnoreEnd
 				}
-				$rawValues[] = $value->literalValue();
+				$rawValues[] = $value->literalValue;
 			}
 			if ($hasStrings) {
 				if ($hasIntegers) {
@@ -79,16 +79,16 @@ final readonly class CountValues implements NativeMethod {
 					// @codeCoverageIgnoreEnd
 				}
 				$rawValues = array_count_values($rawValues);
-				return TypedValue::forValue($this->context->valueRegistry()->record(array_map(
-					fn($value) => $this->context->valueRegistry()->string($value),
+				return TypedValue::forValue($this->context->valueRegistry->record(array_map(
+					fn($value) => $this->context->valueRegistry->string($value),
 					$rawValues
 				)));
 			}
 			$rawValues = array_count_values($rawValues);
-			return TypedValue::forValue($this->context->valueRegistry()->record(array_map(
+			return TypedValue::forValue($this->context->valueRegistry->record(array_map(
 				fn($value) => is_float($value) ?
-					$this->context->valueRegistry()->real($value) :
-					$this->context->valueRegistry()->integer($value),
+					$this->context->valueRegistry->real($value) :
+					$this->context->valueRegistry->integer($value),
 				$rawValues
 			)));
 		}

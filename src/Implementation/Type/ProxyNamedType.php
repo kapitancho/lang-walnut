@@ -8,37 +8,33 @@ use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ProxyNamedType as ProxyNamedTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
 
-final readonly class ProxyNamedType implements ProxyNamedTypeInterface, SupertypeChecker, JsonSerializable {
+final class ProxyNamedType implements ProxyNamedTypeInterface, SupertypeChecker, JsonSerializable {
 
     public function __construct(
-	    private TypeNameIdentifier $typeName,
-        private TypeRegistry $typeRegistry
+	    public readonly TypeNameIdentifier $name,
+        private readonly TypeRegistry $typeRegistry
     ) {}
 
-	public function name(): TypeNameIdentifier {
-		return $this->typeName;
-    }
-
 	// @codeCoverageIgnoreStart
-	public function getActualType(): Type {
-		return $this->typeRegistry->withName($this->typeName);
+	public Type $actualType {
+		get => $this->typeRegistry->withName($this->name);
 	}
 
 	public function isSubtypeOf(Type $ofType): bool {
-		if ($ofType instanceof ProxyNamedTypeInterface && $this->typeName->equals($ofType->name())) {
+		if ($ofType instanceof ProxyNamedTypeInterface && $this->name->equals($ofType->name)) {
 			return true;
 		}
-        return $this->getActualType()->isSubtypeOf($ofType);
+        return $this->actualType->isSubtypeOf($ofType);
     }
 
 	public function __toString(): string {
-		return (string)$this->getActualType();
+		return (string)$this->actualType;
 	}
 
 	public function jsonSerialize(): array {
 		return [
 			'type' => 'Proxy',
-			'proxy' => (string)$this->getActualType()
+			'proxy' => (string)$this->actualType
 		];
 	}
 
@@ -50,7 +46,7 @@ final readonly class ProxyNamedType implements ProxyNamedTypeInterface, Supertyp
 			return false;
 		}
 		//if (!($t instanceof SupertypeChecker)) {
-			return $ofType->isSubtypeOf($this->getActualType());
+			return $ofType->isSubtypeOf($this->actualType);
 		//}
 		//return false;
 	}

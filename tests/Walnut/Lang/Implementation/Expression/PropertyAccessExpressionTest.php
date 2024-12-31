@@ -72,7 +72,7 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 		);
 		self::assertEquals(
 			$this->typeRegistry->string(),
-			$result->expressionType()
+			$result->expressionType
 		);
 
 		$result = $this->tuplePropertyAccessExpression->analyse(
@@ -87,7 +87,7 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 		);
 		self::assertEquals(
 			$this->typeRegistry->string(),
-			$result->expressionType()
+			$result->expressionType
 		);
 	}
 
@@ -101,7 +101,7 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 		));
 		self::assertEquals(
 			$this->typeRegistry->string(),
-			$result->expressionType()
+			$result->expressionType
 		);
 
 		$result = $this->tuplePropertyAccessExpression->analyse(
@@ -113,7 +113,7 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 		));
 		self::assertEquals(
 			$this->typeRegistry->string(),
-			$result->expressionType()
+			$result->expressionType
 		);
 	}
 
@@ -184,7 +184,7 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 				])
 			)
 		);
-		self::assertTrue($result->value()->equals($this->valueRegistry->string("hi")));
+		self::assertTrue($result->value->equals($this->valueRegistry->string("hi")));
 
 		$result = $this->tuplePropertyAccessExpression->execute(
 			new ExecutionContext(
@@ -198,7 +198,7 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 				])
 			)
 		);
-		self::assertTrue($result->value()->equals($this->valueRegistry->string("hi")));
+		self::assertTrue($result->value->equals($this->valueRegistry->string("hi")));
 	}
 
 	public function testExecuteOnSubtypes(): void {
@@ -217,7 +217,7 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 				])
 			)
 		);
-		self::assertTrue($result->value()->equals($this->valueRegistry->string("hi")));
+		self::assertTrue($result->value->equals($this->valueRegistry->string("hi")));
 
 		$result = $this->tuplePropertyAccessExpression->execute(
 			new ExecutionContext(
@@ -234,7 +234,7 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 				])
 			)
 		);
-		self::assertTrue($result->value()->equals($this->valueRegistry->string("hi")));
+		self::assertTrue($result->value->equals($this->valueRegistry->string("hi")));
 	}
 
 	public function testExecuteFailWrongType(): void {

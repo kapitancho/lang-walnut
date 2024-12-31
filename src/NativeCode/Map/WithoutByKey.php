@@ -36,23 +36,23 @@ final readonly class WithoutByKey implements NativeMethod {
 		if ($targetType instanceof MapType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				$returnType = $this->context->typeRegistry()->record([
-					'element' => $targetType->itemType(),
-					'map' => $this->context->typeRegistry()->map(
-						$targetType->itemType(),
-						$targetType->range()->maxLength() === PlusInfinity::value ?
-							$targetType->range()->minLength() : max(0,
+				$returnType = $this->context->typeRegistry->record([
+					'element' => $targetType->itemType,
+					'map' => $this->context->typeRegistry->map(
+						$targetType->itemType,
+						$targetType->range->maxLength === PlusInfinity::value ?
+							$targetType->range->minLength : max(0,
 							min(
-								$targetType->range()->minLength() - 1,
-								$targetType->range()->maxLength() - 1
+								$targetType->range->minLength - 1,
+								$targetType->range->maxLength - 1
 							)),
-						$targetType->range()->maxLength() === PlusInfinity::value ?
-							PlusInfinity::value : $targetType->range()->maxLength() - 1
+						$targetType->range->maxLength === PlusInfinity::value ?
+							PlusInfinity::value : $targetType->range->maxLength - 1
 					)
 				]);
-				return $this->context->typeRegistry()->result(
+				return $this->context->typeRegistry->result(
 					$returnType,
-					$this->context->typeRegistry()->sealed(
+					$this->context->typeRegistry->sealed(
 						new TypeNameIdentifier("MapItemNotFound")
 					)
 				);
@@ -76,20 +76,20 @@ final readonly class WithoutByKey implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue) {
 			if ($parameterValue instanceof StringValue) {
-				$values = $targetValue->values();
-				if (!isset($values[$parameterValue->literalValue()])) {
-					return TypedValue::forValue($this->context->valueRegistry()->error(
-						$this->context->valueRegistry()->sealedValue(
+				$values = $targetValue->values;
+				if (!isset($values[$parameterValue->literalValue])) {
+					return TypedValue::forValue($this->context->valueRegistry->error(
+						$this->context->valueRegistry->sealedValue(
 							new TypeNameIdentifier('MapItemNotFound'),
-							$this->context->valueRegistry()->record(['key' => $parameterValue])
+							$this->context->valueRegistry->record(['key' => $parameterValue])
 						)
 					));
 				}
-				$val = $values[$parameterValue->literalValue()];
-				unset($values[$parameterValue->literalValue()]);
-				return TypedValue::forValue($this->context->valueRegistry()->record([
+				$val = $values[$parameterValue->literalValue];
+				unset($values[$parameterValue->literalValue]);
+				return TypedValue::forValue($this->context->valueRegistry->record([
 					'element' => $val,
-					'map' => $this->context->valueRegistry()->record($values)
+					'map' => $this->context->valueRegistry->record($values)
 				]));
 			}
 			// @codeCoverageIgnoreStart

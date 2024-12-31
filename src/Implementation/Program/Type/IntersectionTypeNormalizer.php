@@ -18,7 +18,7 @@ final readonly class IntersectionTypeNormalizer {
 	/** @return list<Type> */
     public function flatten(Type ... $types): array {
 		return array_merge(... array_map(
-			static fn(Type $type): array => $type instanceof IntersectionType ? $type->types() : [$type],
+			static fn(Type $type): array => $type instanceof IntersectionType ? $type->types : [$type],
 			$types
 		));
     }
@@ -26,7 +26,7 @@ final readonly class IntersectionTypeNormalizer {
     public function normalize(Type ... $types): Type {
         $parsedTypes = $this->parseTypes($types);
         if (count($parsedTypes) === 0) {
-            return $this->typeRegistry->any();
+            return $this->typeRegistry->any;
         }
         if (count($parsedTypes) === 1) {
             return $parsedTypes[0];
@@ -39,10 +39,10 @@ final readonly class IntersectionTypeNormalizer {
         foreach ($types as $type) {
             $xType = $type;
             while ($xType instanceof AliasType) {
-                $xType = $xType->aliasedType();
+                $xType = $xType->aliasedType;
             }
             $pTypes = $xType instanceof IntersectionTypeInterface ?
-                $this->parseTypes($xType->types()) : [$xType];
+                $this->parseTypes($xType->types) : [$xType];
             foreach ($pTypes as $tx) {
                 foreach ($queue as $qt) {
                     if ($qt->isSubtypeOf($tx)) {
@@ -57,33 +57,33 @@ final readonly class IntersectionTypeNormalizer {
 	                    array_splice($queue, $ql, 1);
 
 						$returnTypes = [
-							$q instanceof ResultType ? $q->returnType() : $q,
-							$tx instanceof ResultType ? $tx->returnType() : $tx,
+							$q instanceof ResultType ? $q->returnType : $q,
+							$tx instanceof ResultType ? $tx->returnType : $tx,
 						];
 						$errorTypes = [
-							$q instanceof ResultType ? $q->errorType() : $this->typeRegistry->nothing(),
-							$tx instanceof ResultType ? $tx->errorType() : $this->typeRegistry->nothing(),
+							$q instanceof ResultType ? $q->errorType : $this->typeRegistry->nothing,
+							$tx instanceof ResultType ? $tx->errorType : $this->typeRegistry->nothing,
 						];
 						$returnType = $this->normalize(... $returnTypes);
 						$errorType = $this->normalize(... $errorTypes);
 						$tx = $errorType instanceof NothingType ? $returnType :
 							$this->typeRegistry->result($returnType, $errorType);
                     } else if ($q instanceof IntegerType && $tx instanceof IntegerType) {
-                        $newRange = $q->range()->tryRangeIntersectionWith($tx->range());
+                        $newRange = $q->range->tryRangeIntersectionWith($tx->range);
                         if ($newRange) {
                             array_splice($queue, $ql, 1);
                             $tx = $this->typeRegistry->integer(
-                                $newRange->minValue(), $newRange->maxValue()
+                                $newRange->minValue, $newRange->maxValue
                             );
                         }
                     } else if ($q instanceof IntegerSubsetType && $tx instanceof IntegerSubsetType) {
                         array_splice($queue, $ql, 1);
                         $intersectedValues = array_values(
-                            array_intersect($q->subsetValues(), $tx->subsetValues())
+                            array_intersect($q->subsetValues, $tx->subsetValues)
                         );
                         $tx = $intersectedValues ? $this->typeRegistry->integerSubset(
                             $intersectedValues
-                        ) : $this->typeRegistry->nothing();
+                        ) : $this->typeRegistry->nothing;
                     }
                 }
                 $queue[] = $tx;

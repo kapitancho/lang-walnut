@@ -7,10 +7,10 @@ use Walnut\Lang\Blueprint\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Type\Type;
 
 interface CustomMethod extends Method, Stringable {
-	public function targetType(): Type;
-	public function methodName(): MethodNameIdentifier;
-	public function parameterType(): Type;
-	public function dependencyType(): Type|null;
-	public function returnType(): Type;
-	public function functionBody(): FunctionBody;
+	public Type $targetType { get; }
+	public MethodNameIdentifier $methodName { get; }
+	public Type $parameterType { get; }
+	public Type $dependencyType { get; }
+	public Type $returnType { get; }
+	public FunctionBody $functionBody { get; }
 }

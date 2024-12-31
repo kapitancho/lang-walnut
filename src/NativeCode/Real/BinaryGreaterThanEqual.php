@@ -36,7 +36,7 @@ final readonly class BinaryGreaterThanEqual implements NativeMethod {
 				$parameterType instanceof RealType ||
 				$parameterType instanceof RealSubsetType
 			) {
-				return $this->context->typeRegistry()->boolean();
+				return $this->context->typeRegistry->boolean;
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -58,8 +58,8 @@ final readonly class BinaryGreaterThanEqual implements NativeMethod {
 		if ($targetValue instanceof IntegerValue || $targetValue instanceof RealValue) {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue || $targetValue instanceof RealValue) {
-				return TypedValue::forValue($this->context->valueRegistry()->boolean(
-					$targetValue->literalValue() >= $parameterValue->literalValue()
+				return TypedValue::forValue($this->context->valueRegistry->boolean(
+					$targetValue->literalValue >= $parameterValue->literalValue
 				));
 			}
 			// @codeCoverageIgnoreStart

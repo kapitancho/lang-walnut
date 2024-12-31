@@ -28,12 +28,12 @@ final readonly class ParameterType implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $this->toBaseType($targetType->refType());
+			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof FunctionType) {
-				return $this->context->typeRegistry()->type($refType->parameterType());
+				return $this->context->typeRegistry->type($refType->parameterType);
 			}
-			if ($refType instanceof MetaType && $refType->value() === MetaTypeValue::Function) {
-				return $this->context->typeRegistry()->type($this->context->typeRegistry()->any());
+			if ($refType instanceof MetaType && $refType->value === MetaTypeValue::Function) {
+				return $this->context->typeRegistry->type($this->context->typeRegistry->any);
 			}
 		}
 		// @codeCoverageIgnoreStart
@@ -48,9 +48,9 @@ final readonly class ParameterType implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof TypeValue) {
-			$typeValue = $this->toBaseType($targetValue->typeValue());
+			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof FunctionType) {
-				return TypedValue::forValue($this->context->valueRegistry()->type($typeValue->parameterType()));
+				return TypedValue::forValue($this->context->valueRegistry->type($typeValue->parameterType));
 			}
 		}
 		// @codeCoverageIgnoreStart

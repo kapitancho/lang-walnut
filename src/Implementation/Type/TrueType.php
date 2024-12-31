@@ -7,17 +7,16 @@ use Walnut\Lang\Blueprint\Type\TrueType as TrueTypeInterface;
 use Walnut\Lang\Blueprint\Type\BooleanType as BooleanTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
-use Walnut\Lang\Blueprint\Value\EnumerationValue;
 
 final readonly class TrueType implements TrueTypeInterface, JsonSerializable {
 	/** @var list<BooleanValue> $subsetValues */
-	private array $subsetValues;
+	public array $subsetValues;
 
     public function __construct(
-        private BooleanTypeInterface $enumeration,
-        private BooleanValue $trueValue
+        public BooleanTypeInterface $enumeration,
+        public BooleanValue $value
     ) {
-		$this->subsetValues = [$this->trueValue->name()->identifier => $this->trueValue];
+		$this->subsetValues = [$this->value->name->identifier => $this->value];
     }
 
     public function isSubtypeOf(Type $ofType): bool {
@@ -27,19 +26,6 @@ final readonly class TrueType implements TrueTypeInterface, JsonSerializable {
             default => false
         };
     }
-
-    public function enumeration(): BooleanType {
-        return $this->enumeration;
-    }
-
-    /** @return array<string, EnumerationValue> */
-    public function subsetValues(): array {
-        return $this->subsetValues;
-    }
-
-	public function value(): BooleanValue {
-		return $this->trueValue;
-	}
 
 	public function __toString(): string {
 		return 'True';

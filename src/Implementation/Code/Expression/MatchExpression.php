@@ -25,27 +25,16 @@ final readonly class MatchExpression implements MatchExpressionInterface, JsonSe
 	public function __construct(
 		private TypeRegistry $typeRegistry,
 		private ValueRegistry $valueRegistry,
-		private Expression $target,
-		private MatchExpressionOperation $operation,
-		private array $pairs
+		public Expression $target,
+		public MatchExpressionOperation $operation,
+		public array $pairs
 	) {}
-
-	public function target(): Expression {
-		return $this->target;
-	}
-	public function operation(): MatchExpressionOperation {
-		return $this->operation;
-	}
-	/** @return list<MatchExpressionPair|MatchExpressionDefault> */
-	public function pairs(): array {
-		return $this->pairs;
-	}
 
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
 		$retTarget = $this->target->analyse($analyserContext);
 
 		$expressionTypes = [];
-		$returnTypes = [$retTarget->returnType()];
+		$returnTypes = [$retTarget->returnType];
 		$hasDefaultMatch = false;
 		$hasDynamicTypes = false;
 
@@ -55,51 +44,51 @@ final readonly class MatchExpression implements MatchExpressionInterface, JsonSe
 			$innerContext = $retTarget;
 
 			if ($pair instanceof MatchExpressionPair) {
-				$matchExpression = $pair->matchExpression();
+				$matchExpression = $pair->matchExpression;
 				$matchResult = $matchExpression->analyse($innerContext);
 
-				if ($this->operation instanceof MatchExpressionIsSubtypeOf && $matchResult->expressionType() instanceof TypeType) {
-					if ($matchExpression instanceof ConstantExpression && $matchExpression->value() instanceof TypeValue) {
-						$refTypes[] = $matchExpression->value()->typeValue();
+				if ($this->operation instanceof MatchExpressionIsSubtypeOf && $matchResult->expressionType instanceof TypeType) {
+					if ($matchExpression instanceof ConstantExpression && $matchExpression->value instanceof TypeValue) {
+						$refTypes[] = $matchExpression->value->typeValue;
 					} else {
 						$hasDynamicTypes = true;
 					}
 				}
 				if ($this->operation instanceof MatchExpressionEquals) {
 					if ($matchExpression instanceof ConstantExpression) {
-						$refTypes[] = $matchExpression->value()->type();
+						$refTypes[] = $matchExpression->value->type;
 					} else {
 						$hasDynamicTypes = true;
 					}
 				}
 
 				if ($this->target instanceof VariableNameExpression) {
-					if ($this->operation instanceof MatchExpressionIsSubtypeOf && $matchResult->expressionType() instanceof TypeType) {
+					if ($this->operation instanceof MatchExpressionIsSubtypeOf && $matchResult->expressionType instanceof TypeType) {
 						$innerContext = $innerContext->withAddedVariableType(
-							$this->target->variableName(),
-							$matchResult->expressionType()->refType(),
+							$this->target->variableName,
+							$matchResult->expressionType->refType,
 						);
 					}
 					if ($this->operation instanceof MatchExpressionEquals) {
 						$innerContext = $innerContext->withAddedVariableType(
-							$this->target->variableName(),
-							$matchResult->expressionType(),
+							$this->target->variableName,
+							$matchResult->expressionType,
 						);
 					}
 				}
 			} else {
 				$hasDefaultMatch = true;
 			}
-			$retValue = $pair->valueExpression()->analyse($innerContext);
+			$retValue = $pair->valueExpression->analyse($innerContext);
 
-			$expressionTypes[] = $retValue->expressionType();
-			$returnTypes[] = $retValue->returnType();
+			$expressionTypes[] = $retValue->expressionType;
+			$returnTypes[] = $retValue->returnType;
 		}
 		if (!$hasDefaultMatch) {
-			if ($hasDynamicTypes || !$retTarget->expressionType()->isSubtypeOf(
+			if ($hasDynamicTypes || !$retTarget->expressionType->isSubtypeOf(
 				$this->typeRegistry->union($refTypes)
 			)) {
-				$expressionTypes[] = $this->typeRegistry->null();
+				$expressionTypes[] = $this->typeRegistry->null;
 			}
 		}
 		return $retTarget->asAnalyserResult(
@@ -113,38 +102,38 @@ final readonly class MatchExpression implements MatchExpressionInterface, JsonSe
 
 		foreach($this->pairs as $pair) {
 			if ($pair instanceof MatchExpressionDefault) {
-				return $pair->valueExpression()->execute($executionContext);
+				return $pair->valueExpression->execute($executionContext);
 			}
-			$innerContext = $pair->matchExpression()->execute($executionContext);
-			if ($this->operation->match($executionContext->value(), $innerContext->value())) {
+			$innerContext = $pair->matchExpression->execute($executionContext);
+			if ($this->operation->match($executionContext->value, $innerContext->value)) {
 				if ($this->target instanceof VariableNameExpression) {
-					if ($this->operation instanceof MatchExpressionIsSubtypeOf && ($type = $innerContext->value()) instanceof TypeValue) {
+					if ($this->operation instanceof MatchExpressionIsSubtypeOf && ($type = $innerContext->value) instanceof TypeValue) {
 						$innerContext = $innerContext->withAddedVariableValue(
-							$this->target->variableName(),
+							$this->target->variableName,
 							new TypedValue(
-								$type->typeValue(),
-								$innerContext->variableValueScope()->valueOf($this->target->variableName())
+								$type->typeValue,
+								$innerContext->variableValueScope->valueOf($this->target->variableName)
 							)
 						);
 					}
 					if ($this->operation instanceof MatchExpressionEquals) {
 						$innerContext = $innerContext->withAddedVariableValue(
-							$this->target->variableName(),
-							$innerContext->typedValue(),
+							$this->target->variableName,
+							$innerContext->typedValue,
 						);
 					}
 				}
-				return $pair->valueExpression()->execute($innerContext);
+				return $pair->valueExpression->execute($innerContext);
 			}
 		}
 		return $executionContext->asExecutionResult(
-			TypedValue::forValue($this->valueRegistry->null())
+			TypedValue::forValue($this->valueRegistry->null)
 		);
 	}
 
 	public function __toString(): string {
 		$isMatchTrue = $this->target instanceof ConstantExpression &&
-			$this->target->value()->equals($this->valueRegistry->true());
+			$this->target->value->equals($this->valueRegistry->true);
 
 		$pairs = implode(", ", $this->pairs);
 

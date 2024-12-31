@@ -20,29 +20,21 @@ use Walnut\Lang\Blueprint\Value\FunctionValue;
 final readonly class VariableAssignmentExpression implements VariableAssignmentExpressionInterface, JsonSerializable {
 	public function __construct(
 		private TypeRegistry $typeRegistry,
-		private VariableNameIdentifier $variableName,
-		private Expression $assignedExpression
+		public VariableNameIdentifier $variableName,
+		public Expression $assignedExpression
 	) {}
-
-	public function variableName(): VariableNameIdentifier {
-		return $this->variableName;
-	}
-
-	public function assignedExpression(): Expression {
-		return $this->assignedExpression;
-	}
 
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
 		$innerFn = null;
 		if ($this->assignedExpression instanceof ConstantExpression &&
-			($v = $this->assignedExpression->value()) instanceof FunctionValue
+			($v = $this->assignedExpression->value) instanceof FunctionValue
 		) {
 			$innerFn = $this->variableName;
 			$analyserContext = $analyserContext->withAddedVariableType(
 				$this->variableName,
 				$this->typeRegistry->function(
-					$v->parameterType(),
-					$v->returnType(),
+					$v->parameterType,
+					$v->returnType,
 				)
 			);
 		}
@@ -50,7 +42,7 @@ final readonly class VariableAssignmentExpression implements VariableAssignmentE
 			$ret = $this->assignedExpression->analyse($analyserContext);
 			return $ret->withAddedVariableType(
 				$this->variableName,
-				$ret->expressionType()
+				$ret->expressionType
 			);
 		} catch (AnalyserException|FunctionBodyException $e) {
 			/** @noinspection PhpUnhandledExceptionInspection */
@@ -66,7 +58,7 @@ final readonly class VariableAssignmentExpression implements VariableAssignmentE
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
 		$ret = $this->assignedExpression->execute($executionContext);
-		$val = $ret->typedValue();
+		$val = $ret->typedValue;
 		if ($val->value instanceof FunctionValue && $this->assignedExpression instanceof ConstantExpression) {
 			$val = new TypedValue($val->type, $val->value->withSelfReferenceAs($this->variableName));
 		}

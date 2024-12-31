@@ -32,20 +32,20 @@ final readonly class Slice implements NativeMethod {
 			$targetType = $targetType->asArrayType();
 		}
 		if ($targetType instanceof ArrayType) {
-			$pInt = $this->context->typeRegistry()->integer(0);
-			$pType = $this->context->typeRegistry()->record([
+			$pInt = $this->context->typeRegistry->integer(0);
+			$pType = $this->context->typeRegistry->record([
 				"start" => $pInt,
-				"length" => $this->context->typeRegistry()->optionalKey($pInt)
+				"length" => $this->context->typeRegistry->optionalKey($pInt)
 			]);
 			if ($parameterType->isSubtypeOf($pType)) {
 				$parameterType = $this->toBaseType($parameterType);
-				return $this->context->typeRegistry()->array(
-					$targetType->itemType(),
+				return $this->context->typeRegistry->array(
+					$targetType->itemType,
 					0,
 					min(
-						$targetType->range()->maxLength,
-						($l = $parameterType->types()['length'] ?? null) ? $l->range()->maxValue :
-							$targetType->range()->maxLength
+						$targetType->range->maxLength,
+						($l = $parameterType->types['length'] ?? null) ? $l->range->maxValue :
+							$targetType->range->maxLength
 					)
 				);
 			}
@@ -68,12 +68,12 @@ final readonly class Slice implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
 			if ($parameterValue instanceof RecordValue) {
-				$values = $targetValue->values();
+				$values = $targetValue->values;
 				$start = $parameterValue->valueOf('start');
 				try {
 					$length = $parameterValue->valueOf('length');
 				} catch (UnknownProperty) {
-					$length = $this->context->valueRegistry()->integer(count($values));
+					$length = $this->context->valueRegistry->integer(count($values));
 				}
 				if (
 					$start instanceof IntegerValue &&
@@ -81,10 +81,10 @@ final readonly class Slice implements NativeMethod {
 				) {
 					$values = array_slice(
 						$values,
-						$start->literalValue(),
-						$length->literalValue()
+						$start->literalValue,
+						$length->literalValue
 					);
-					return TypedValue::forValue($this->context->valueRegistry()->tuple($values));
+					return TypedValue::forValue($this->context->valueRegistry->tuple($values));
 				}
 				// @codeCoverageIgnoreStart
 				throw new ExecutionException("Invalid parameter value");

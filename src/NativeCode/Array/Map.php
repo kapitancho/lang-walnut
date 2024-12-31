@@ -33,21 +33,21 @@ final readonly class Map implements NativeMethod {
 		if ($type instanceof ArrayType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof FunctionType) {
-				if ($type->itemType()->isSubtypeOf($parameterType->parameterType())) {
-					$r = $parameterType->returnType();
-					$errorType = $r instanceof ResultType ? $r->errorType() : null;
-					$returnType = $r instanceof ResultType ? $r->returnType() : $r;
-					$t = $this->context->typeRegistry()->array(
+				if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
+					$r = $parameterType->returnType;
+					$errorType = $r instanceof ResultType ? $r->errorType : null;
+					$returnType = $r instanceof ResultType ? $r->returnType : $r;
+					$t = $this->context->typeRegistry->array(
 						$returnType,
-						$type->range()->minLength(),
-						$type->range()->maxLength(),
+						$type->range->minLength,
+						$type->range->maxLength,
 					);
-					return $errorType ? $this->context->typeRegistry()->result($t, $errorType) : $t;
+					return $errorType ? $this->context->typeRegistry->result($t, $errorType) : $t;
 				}
 				throw new AnalyserException(
 					"The parameter type %s of the callback function is not a subtype of %s",
-					$type->itemType(),
-					$parameterType->parameterType()
+					$type->itemType,
+					$parameterType->parameterType
 				);
 			}
 			// @codeCoverageIgnoreStart
@@ -68,16 +68,16 @@ final readonly class Map implements NativeMethod {
 		
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue && $parameterValue instanceof FunctionValue) {
-			$values = $targetValue->values();
+			$values = $targetValue->values;
 			$result = [];
 			foreach($values as $value) {
-				$r = $parameterValue->execute($this->context->globalContext(), $value);
+				$r = $parameterValue->execute($this->context->globalContext, $value);
 				if ($r instanceof ErrorValue) {
 					return TypedValue::forValue($r);
 				}
 				$result[] = $r;
 			}
-			return TypedValue::forValue($this->context->valueRegistry()->tuple($result));
+			return TypedValue::forValue($this->context->valueRegistry->tuple($result));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

@@ -11,7 +11,7 @@ final class PrintedTest extends BaseProgramTestHelper {
 		$this->testMethodCall(
 			$this->expressionRegistry->constant($value),
 			'printed',
-			$this->expressionRegistry->constant($this->valueRegistry->null()),
+			$this->expressionRegistry->constant($this->valueRegistry->null),
 			$this->valueRegistry->string($expected)
 		);
 	}

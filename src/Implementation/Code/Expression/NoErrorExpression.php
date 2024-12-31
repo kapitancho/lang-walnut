@@ -18,23 +18,19 @@ use Walnut\Lang\Blueprint\Value\ErrorValue;
 final readonly class NoErrorExpression implements NoErrorExpressionInterface, JsonSerializable {
 	public function __construct(
 		private TypeRegistry $typeRegistry,
-		private Expression $targetExpression
+		public Expression $targetExpression
 	) {}
-
-	public function targetExpression(): Expression {
-		return $this->targetExpression;
-	}
 
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
 		$ret = $this->targetExpression->analyse($analyserContext);
-		$expressionType = $ret->expressionType();
+		$expressionType = $ret->expressionType;
 		if ($expressionType instanceof ResultType) {
 			return $ret->withExpressionType(
-				$expressionType->returnType()
+				$expressionType->returnType
 			)->withReturnType(
 				$this->typeRegistry->result(
-					$ret->returnType(),
-					$expressionType->errorType()
+					$ret->returnType,
+					$expressionType->errorType
 				)
 			);
 		}
@@ -43,13 +39,13 @@ final readonly class NoErrorExpression implements NoErrorExpressionInterface, Js
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
 		$result = $this->targetExpression->execute($executionContext);
-		$value = $result->value();
+		$value = $result->value;
 		if ($value instanceof ErrorValue) {
 			throw new FunctionReturn($value);
 		}
-		$vt = $result->valueType();
+		$vt = $result->valueType;
 		if ($vt instanceof ResultType) {
-			$result = $result->withTypedValue(new TypedValue($vt->returnType(), $result->value()));
+			$result = $result->withTypedValue(new TypedValue($vt->returnType, $result->value));
 		}
 		return $result;
 	}

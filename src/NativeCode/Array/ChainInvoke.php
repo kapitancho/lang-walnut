@@ -28,17 +28,17 @@ final readonly class ChainInvoke implements NativeMethod {
         $targetType = $this->toBaseType($targetType);
         $type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
         if ($type instanceof ArrayType) {
-            $itemType = $this->toBaseType($type->itemType());
+            $itemType = $this->toBaseType($type->itemType);
             if ($itemType instanceof FunctionType) {
-                if ($itemType->returnType()->isSubtypeOf($itemType->parameterType())) {
-                    if ($parameterType->isSubtypeOf($itemType->parameterType())) {
-                        return $itemType->returnType();
+                if ($itemType->returnType->isSubtypeOf($itemType->parameterType)) {
+                    if ($parameterType->isSubtypeOf($itemType->parameterType)) {
+                        return $itemType->returnType;
                     }
                     throw new AnalyserException(
 						sprintf(
                             "The parameter type %s is not a subtype of %s",
                             $parameterType,
-                            $itemType->parameterType()
+                            $itemType->parameterType
 						)
                     );
                 }
@@ -57,10 +57,10 @@ final readonly class ChainInvoke implements NativeMethod {
 		
         $targetValue = $this->toBaseValue($targetValue);
         if ($targetValue instanceof TupleValue) {
-            foreach($targetValue->values() as $fnValue) {
+            foreach($targetValue->values as $fnValue) {
 				if ($fnValue instanceof FunctionValue) {
-					$type = $fnValue->returnType();
-                    $parameterValue = $fnValue->execute($this->context->globalContext(), $parameterValue);
+					$type = $fnValue->returnType;
+                    $parameterValue = $fnValue->execute($this->context->globalContext, $parameterValue);
 	            }
             }
         }

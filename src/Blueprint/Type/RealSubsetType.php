@@ -6,8 +6,9 @@ use Walnut\Lang\Blueprint\Range\RealRange;
 use Walnut\Lang\Blueprint\Value\RealValue;
 
 interface RealSubsetType extends Type {
-    /** @return array<string, RealValue> */
-    public function subsetValues(): array;
+	/** @param array<string, RealRange> $subsetValues */
+	public array $subsetValues { get; }
+	public RealRange $range { get; }
+
     public function contains(RealValue $value): bool;
-	public function range(): RealRange;
 }

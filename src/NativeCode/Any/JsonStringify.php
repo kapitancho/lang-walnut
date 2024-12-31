@@ -22,16 +22,16 @@ final readonly class JsonStringify implements NativeMethod {
 		Type $targetType,
 		Type $parameterType,
 	): Type {
-		$resultType = $this->context->typeRegistry()->string();
-		return $this->isSafeConversion($targetType) ? $resultType : $this->context->typeRegistry()->result(
+		$resultType = $this->context->typeRegistry->string();
+		return $this->isSafeConversion($targetType) ? $resultType : $this->context->typeRegistry->result(
 			$resultType,
-			$this->context->typeRegistry()->withName(new TypeNameIdentifier('InvalidJsonValue'))
+			$this->context->typeRegistry->withName(new TypeNameIdentifier('InvalidJsonValue'))
 		);
 	}
 
 	private function isSafeConversion(Type $fromType): bool {
 		return $fromType->isSubtypeOf(
-			$this->context->typeRegistry()->withName(new TypeNameIdentifier('JsonValue'))
+			$this->context->typeRegistry->withName(new TypeNameIdentifier('JsonValue'))
 		);
 	}
 
@@ -42,18 +42,18 @@ final readonly class JsonStringify implements NativeMethod {
 		$targetValue = $target->value;
 
 		$method0 = $this->methodRegistry->method(
-			$targetValue->type(), new MethodNameIdentifier('stringify')
+			$targetValue->type, new MethodNameIdentifier('stringify')
 		);
 		if ($method0 !== UnknownMethod::value) {
 			return $method0->execute($target, $parameter);
 		}
 
 		$method1 = $this->methodRegistry->method(
-			$targetValue->type(), new MethodNameIdentifier('asJsonValue')
+			$targetValue->type, new MethodNameIdentifier('asJsonValue')
 		);
 		$step1 = $method1->execute($target, $parameter);
 		$method2 = $this->methodRegistry->method(
-			$this->context->typeRegistry()->alias(new TypeNameIdentifier('JsonValue')),
+			$this->context->typeRegistry->alias(new TypeNameIdentifier('JsonValue')),
 			new MethodNameIdentifier('stringify')
 		);
 		return $method2->execute($step1, $parameter);

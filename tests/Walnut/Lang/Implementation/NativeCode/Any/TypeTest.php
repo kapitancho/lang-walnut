@@ -13,7 +13,7 @@ final class TypeTest extends BaseProgramTestHelper {
 		$this->testMethodCall(
 			$this->expressionRegistry->constant($value),
 			'type',
-			$this->expressionRegistry->constant($this->valueRegistry->null()),
+			$this->expressionRegistry->constant($this->valueRegistry->null),
 			$expected
 		);
 	}
@@ -22,7 +22,7 @@ final class TypeTest extends BaseProgramTestHelper {
         $this->testMethodCallAnalyse(
             $type,
             'type',
-            $this->typeRegistry->null(),
+            $this->typeRegistry->null,
             $expected
         );
     }

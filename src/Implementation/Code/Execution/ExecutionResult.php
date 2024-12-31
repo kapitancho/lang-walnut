@@ -9,16 +9,12 @@ use Walnut\Lang\Blueprint\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 
-final readonly class ExecutionResult implements ExecutionResultInterface {
+final class ExecutionResult implements ExecutionResultInterface {
 
 	public function __construct(
-		private VariableValueScope $variableValueScope,
-		private TypedValue         $typedValue
+		public readonly VariableValueScope $variableValueScope,
+		public readonly TypedValue         $typedValue
 	) {}
-
-	public function variableValueScope(): VariableValueScope {
-		return $this->variableValueScope;
-	}
 
 	public function withAddedVariableValue(VariableNameIdentifier $variableName, TypedValue $typedValue): self {
 		return new self(
@@ -34,17 +30,8 @@ final readonly class ExecutionResult implements ExecutionResultInterface {
 		);
 	}
 
-	public function typedValue(): TypedValue {
-		return $this->typedValue;
-	}
-
-	public function value(): Value {
-		return $this->typedValue->value;
-	}
-
-	public function valueType(): Type {
-		return $this->typedValue->type;
-	}
+	public Value $value { get => $this->typedValue->value; }
+	public Type $valueType { get => $this->typedValue->type; }
 
 	public function withTypedValue(TypedValue $typedValue): ExecutionResultInterface {
 		return $this->asExecutionResult($typedValue);

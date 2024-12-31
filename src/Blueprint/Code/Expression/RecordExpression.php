@@ -3,6 +3,6 @@
 namespace Walnut\Lang\Blueprint\Code\Expression;
 
 interface RecordExpression extends Expression {
-	/** @return array<string, Expression> */
-	public function values(): array;
+	/** @param array<string, Expression> $values */
+	public array $values { get; }
 }

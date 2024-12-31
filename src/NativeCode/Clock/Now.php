@@ -25,10 +25,10 @@ final readonly class Now implements NativeMethod {
 		Type $targetType,
 		Type $parameterType
 	): Type {
-		if ($targetType instanceof AtomType && $targetType->name()->equals(
+		if ($targetType instanceof AtomType && $targetType->name->equals(
 			new TypeNameIdentifier('Clock')
 		)) {
-			return $this->context->typeRegistry()->withName(new TypeNameIdentifier('DateAndTime'));
+			return $this->context->typeRegistry->withName(new TypeNameIdentifier('DateAndTime'));
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -42,27 +42,27 @@ final readonly class Now implements NativeMethod {
 		$targetValue = $target->value;
 
 		$targetValue = $this->toBaseValue($targetValue);
-		if ($targetValue instanceof AtomValue && $targetValue->type()->name()->equals(
+		if ($targetValue instanceof AtomValue && $targetValue->type->name->equals(
 			new TypeNameIdentifier('Clock')
 		)) {
 			$now = new DateTimeImmutable;
-			return TypedValue::forValue($this->context->valueRegistry()->subtypeValue(
+			return TypedValue::forValue($this->context->valueRegistry->subtypeValue(
 				new TypeNameIdentifier('DateAndTime'),
-				$this->context->valueRegistry()->record([
-					'date' => $this->context->valueRegistry()->subtypeValue(
+				$this->context->valueRegistry->record([
+					'date' => $this->context->valueRegistry->subtypeValue(
 						new TypeNameIdentifier('Date'),
-						$this->context->valueRegistry()->record([
-							'year' => $this->context->valueRegistry()->integer((int)$now->format('Y')),
-							'month' => $this->context->valueRegistry()->integer((int)$now->format('m')),
-							'day' => $this->context->valueRegistry()->integer((int)$now->format('d')),
+						$this->context->valueRegistry->record([
+							'year' => $this->context->valueRegistry->integer((int)$now->format('Y')),
+							'month' => $this->context->valueRegistry->integer((int)$now->format('m')),
+							'day' => $this->context->valueRegistry->integer((int)$now->format('d')),
 						])
 					),
-					'time' => $this->context->valueRegistry()->subtypeValue(
+					'time' => $this->context->valueRegistry->subtypeValue(
 						new TypeNameIdentifier('Time'),
-						$this->context->valueRegistry()->record([
-							'hour' => $this->context->valueRegistry()->integer((int)$now->format('H')),
-							'minute' => $this->context->valueRegistry()->integer((int)$now->format('i')),
-							'second' => $this->context->valueRegistry()->integer((int)$now->format('s')),
+						$this->context->valueRegistry->record([
+							'hour' => $this->context->valueRegistry->integer((int)$now->format('H')),
+							'minute' => $this->context->valueRegistry->integer((int)$now->format('i')),
+							'second' => $this->context->valueRegistry->integer((int)$now->format('s')),
 						]
 						)
 					),

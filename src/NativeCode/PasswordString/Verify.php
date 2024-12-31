@@ -28,10 +28,10 @@ final readonly class Verify implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof SealedType && $targetType->name()->equals(new TypeNameIdentifier('PasswordString'))) {
+		if ($targetType instanceof SealedType && $targetType->name->equals(new TypeNameIdentifier('PasswordString'))) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $this->context->typeRegistry()->boolean();
+				return $this->context->typeRegistry->boolean;
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -51,15 +51,15 @@ final readonly class Verify implements NativeMethod {
 		
 		$targetValue = $this->toBaseValue($targetValue);
 		$parameterValue = $this->toBaseValue($parameterValue);
-		if ($targetValue instanceof SealedValue && $targetValue->type()->name()->equals(
+		if ($targetValue instanceof SealedValue && $targetValue->type->name->equals(
 			new TypeNameIdentifier('PasswordString')
 		)) {
-			$passwordString = $targetValue->value()->valueOf('value');
+			$passwordString = $targetValue->value->valueOf('value');
 			if ($passwordString instanceof StringValue && $parameterValue instanceof StringValue) {
-				return TypedValue::forValue($this->context->valueRegistry()->boolean(
+				return TypedValue::forValue($this->context->valueRegistry->boolean(
 					password_verify(
-						$passwordString->literalValue(),
-						$parameterValue->literalValue(),
+						$passwordString->literalValue,
+						$parameterValue->literalValue,
 					)
 				));
 			}

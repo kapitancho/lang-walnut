@@ -21,8 +21,8 @@ final readonly class AsInteger implements NativeMethod {
 		Type $targetType,
 		Type $parameterType,
 	): Type {
-		return $this->context->typeRegistry()->integerSubset([
-			$this->context->valueRegistry()->integer(0)
+		return $this->context->typeRegistry->integerSubset([
+			$this->context->valueRegistry->integer(0)
 		]);
 	}
 
@@ -34,7 +34,7 @@ final readonly class AsInteger implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof NullValue) {
-			return TypedValue::forValue($this->context->valueRegistry()->integer(0));
+			return TypedValue::forValue($this->context->valueRegistry->integer(0));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

@@ -28,13 +28,13 @@ final readonly class AliasedType implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $targetType->refType();
+			$refType = $targetType->refType;
 			if ($refType instanceof AliasType) {
-				return $this->context->typeRegistry()->type($refType->aliasedType());
+				return $this->context->typeRegistry->type($refType->aliasedType);
 			}
 			if ($refType instanceof MetaType) {
-				if ($refType->value() === MetaTypeValue::Alias) {
-					return $this->context->typeRegistry()->type($this->context->typeRegistry()->any());
+				if ($refType->value === MetaTypeValue::Alias) {
+					return $this->context->typeRegistry->type($this->context->typeRegistry->any);
 				}
 			}
 		}
@@ -50,9 +50,9 @@ final readonly class AliasedType implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof TypeValue) {
-			$typeValue = $targetValue->typeValue();
+			$typeValue = $targetValue->typeValue;
 			if ($typeValue instanceof AliasType) {
-				return TypedValue::forValue($this->context->valueRegistry()->type($typeValue->aliasedType()));
+				return TypedValue::forValue($this->context->valueRegistry->type($typeValue->aliasedType));
 			}
 		}
 		// @codeCoverageIgnoreStart

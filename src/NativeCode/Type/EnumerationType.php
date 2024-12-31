@@ -28,13 +28,13 @@ final readonly class EnumerationType implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $targetType->refType();
+			$refType = $targetType->refType;
 			if ($refType instanceof EnumerationSubsetType) {
-				return $this->context->typeRegistry()->type($refType->enumeration());
+				return $this->context->typeRegistry->type($refType->enumeration);
 			}
 			if ($refType instanceof MetaType) {
-				if ($refType->value() === MetaTypeValue::EnumerationSubset) {
-					return $this->context->typeRegistry()->type($this->context->typeRegistry()->any());
+				if ($refType->value === MetaTypeValue::EnumerationSubset) {
+					return $this->context->typeRegistry->type($this->context->typeRegistry->any);
 				}
 			}
 		}
@@ -50,9 +50,9 @@ final readonly class EnumerationType implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof TypeValue) {
-			$typeValue = $targetValue->typeValue();
+			$typeValue = $targetValue->typeValue;
 			if ($typeValue instanceof EnumerationSubsetType) {
-				return TypedValue::forValue($this->context->valueRegistry()->type($typeValue->enumeration()));
+				return TypedValue::forValue($this->context->valueRegistry->type($typeValue->enumeration));
 			}
 		}
 		// @codeCoverageIgnoreStart

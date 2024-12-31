@@ -59,7 +59,7 @@ final readonly class ProgramBuilder implements ProgramBuilderInterface {
 	public function analyseAndBuildProgram(): Program {
 		$globalFunctionAnalyseErrors = $this->analyseGlobalFunctions();
 		$customMethodAnalyseErrors = $this->customMethodRegistryBuilder->analyse();
-		$analyseErrors = [... $globalFunctionAnalyseErrors, ... $customMethodAnalyseErrors];
+		$analyseErrors = [... $customMethodAnalyseErrors, ... $globalFunctionAnalyseErrors];
 		if (count($analyseErrors) > 0) {
 			throw new AnalyserException(implode("\n", $analyseErrors));
 		}
@@ -117,7 +117,7 @@ final readonly class ProgramBuilder implements ProgramBuilderInterface {
 			$this->typeRegistry->atom(new TypeNameIdentifier('Constructor')),
 			new MethodNameIdentifier($name->identifier),
 			$baseType,
-			$this->typeRegistry->nothing(),
+			$this->typeRegistry->nothing,
 			$errorType && !($errorType instanceof NothingType) ?
 				$this->typeRegistry->result($baseType /*$subtype*/, $errorType) : $baseType/*$subtype*/,
 			$this->expressionRegistry->functionBody(
@@ -155,7 +155,7 @@ final readonly class ProgramBuilder implements ProgramBuilderInterface {
 			$this->typeRegistry->atom(new TypeNameIdentifier('Constructor')),
 			new MethodNameIdentifier($name->identifier),
 			$valueType,
-			$this->typeRegistry->nothing(),
+			$this->typeRegistry->nothing,
 			$errorType && !($errorType instanceof NothingType) ?
 				$this->typeRegistry->result($valueType /*$subtype*/, $errorType) : $valueType/*$subtype*/,
 			$this->expressionRegistry->functionBody(
@@ -172,7 +172,7 @@ final readonly class ProgramBuilder implements ProgramBuilderInterface {
 			$this->typeRegistry->atom(new TypeNameIdentifier('Constructor')),
 			new MethodNameIdentifier($name->identifier),
 			$valueType,
-			$this->typeRegistry->nothing(),
+			$this->typeRegistry->nothing,
 			$valueType, //$sealedType,
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->variableName(
@@ -202,7 +202,7 @@ final readonly class ProgramBuilder implements ProgramBuilderInterface {
 			$this->typeRegistry->atom(new TypeNameIdentifier('Constructor')),
 			new MethodNameIdentifier('as' . $name->identifier),
 			$fromType,
-			$this->typeRegistry->nothing(),
+			$this->typeRegistry->nothing,
 			$errorType && !($errorType instanceof NothingType) ?
 				$this->typeRegistry->result($fromType, $errorType) :
 				$fromType,

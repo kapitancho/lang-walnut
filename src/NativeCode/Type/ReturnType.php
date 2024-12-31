@@ -29,12 +29,12 @@ final readonly class ReturnType implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $this->toBaseType($targetType->refType());
+			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof FunctionType || $refType instanceof ResultType) {
-				return $this->context->typeRegistry()->type($refType->returnType());
+				return $this->context->typeRegistry->type($refType->returnType);
 			}
-			if ($refType instanceof MetaType && $refType->value() === MetaTypeValue::Function) {
-				return $this->context->typeRegistry()->type($this->context->typeRegistry()->any());
+			if ($refType instanceof MetaType && $refType->value === MetaTypeValue::Function) {
+				return $this->context->typeRegistry->type($this->context->typeRegistry->any);
 			}
 		}
 		// @codeCoverageIgnoreStart
@@ -49,9 +49,9 @@ final readonly class ReturnType implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof TypeValue) {
-			$typeValue = $this->toBaseType($targetValue->typeValue());
+			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof FunctionType || $typeValue instanceof ResultType) {
-				return TypedValue::forValue($this->context->valueRegistry()->type($typeValue->returnType()));
+				return TypedValue::forValue($this->context->valueRegistry->type($typeValue->returnType));
 			}
 		}
 		// @codeCoverageIgnoreStart

@@ -32,18 +32,18 @@ final readonly class Filter implements NativeMethod {
 		}
 		if ($targetType instanceof MapType) {
 			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof FunctionType && $parameterType->returnType()->isSubtypeOf($this->context->typeRegistry()->boolean())) {
-				if ($targetType->itemType()->isSubtypeOf($parameterType->parameterType())) {
-					return $this->context->typeRegistry()->map(
-						$targetType->itemType(),
+			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf($this->context->typeRegistry->boolean)) {
+				if ($targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
+					return $this->context->typeRegistry->map(
+						$targetType->itemType,
 						0,
-						$targetType->range()->maxLength()
+						$targetType->range->maxLength
 					);
 				}
 				throw new AnalyserException(
 					"The parameter type %s of the callback function is not a subtype of %s",
-					$targetType->itemType(),
-					$parameterType->parameterType()
+					$targetType->itemType,
+					$parameterType->parameterType
 				);
 			}
 			// @codeCoverageIgnoreStart
@@ -64,16 +64,16 @@ final readonly class Filter implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue && $parameterValue instanceof FunctionValue) {
-			$values = $targetValue->values();
+			$values = $targetValue->values;
 			$result = [];
-			$true = $this->context->valueRegistry()->true();
+			$true = $this->context->valueRegistry->true;
 			foreach($values as $key => $value) {
-				$r = $parameterValue->execute($this->context->globalContext(), $value);
+				$r = $parameterValue->execute($this->context->globalContext, $value);
 				if ($true->equals($r)) {
 					$result[$key] = $value;
 				}
 			}
-			return TypedValue::forValue($this->context->valueRegistry()->record($result));
+			return TypedValue::forValue($this->context->valueRegistry->record($result));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

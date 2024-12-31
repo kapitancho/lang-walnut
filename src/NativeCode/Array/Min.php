@@ -32,27 +32,27 @@ final readonly class Min implements NativeMethod {
 		if ($targetType instanceof TupleType) {
 			$targetType = $targetType->asArrayType();
 		}
-		if ($targetType instanceof ArrayType && $targetType->range()->minLength() > 0) {
-			$itemType = $targetType->itemType();
+		if ($targetType instanceof ArrayType && $targetType->range->minLength > 0) {
+			$itemType = $targetType->itemType;
 			if ($itemType->isSubtypeOf(
-				$this->context->typeRegistry()->union([
-					$this->context->typeRegistry()->integer(),
-					$this->context->typeRegistry()->real()
+				$this->context->typeRegistry->union([
+					$this->context->typeRegistry->integer(),
+					$this->context->typeRegistry->real()
 				])
 			)) {
 				if ($itemType instanceof RealType || $itemType instanceof RealSubsetType) {
-					return $this->context->typeRegistry()->real(
-						$itemType->range()->minValue(),
-						$itemType->range()->maxValue()
+					return $this->context->typeRegistry->real(
+						$itemType->range->minValue,
+						$itemType->range->maxValue
 					);
 				}
 				if ($itemType instanceof IntegerType || $itemType instanceof IntegerSubsetType) {
-					return $this->context->typeRegistry()->integer(
-						$itemType->range()->minValue(),
-						$itemType->range()->maxValue()
+					return $this->context->typeRegistry->integer(
+						$itemType->range->minValue,
+						$itemType->range->maxValue
 					);
 				}
-				return $this->context->typeRegistry()->real();
+				return $this->context->typeRegistry->real();
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -70,11 +70,11 @@ final readonly class Min implements NativeMethod {
 		$targetValue = $target->value;
 
 		$targetValue = $this->toBaseValue($targetValue);
-		if ($targetValue instanceof TupleValue && count($targetValue->values()) > 0) {
-			$minV = $targetValue->values()[0];
-			$min = $minV->literalValue();
-			foreach($targetValue->values() as $item) {
-				$value = $item->literalValue();
+		if ($targetValue instanceof TupleValue && count($targetValue->values) > 0) {
+			$minV = $targetValue->values[0];
+			$min = $minV->literalValue;
+			foreach($targetValue->values as $item) {
+				$value = $item->literalValue;
 				if ($value < $min) {
 					$minV = $item;
 					$min = $value;

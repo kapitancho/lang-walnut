@@ -30,7 +30,7 @@ final readonly class BinaryModulo implements NativeMethod {
 		if ($targetType instanceof IntegerType || $targetType instanceof IntegerSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) {
-				return $this->context->typeRegistry()->integer();
+				return $this->context->typeRegistry->integer();
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -53,23 +53,23 @@ final readonly class BinaryModulo implements NativeMethod {
 		if ($targetValue instanceof IntegerValue) {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue) {
-				if ($parameterValue->literalValue() === 0) {
-					return TypedValue::forValue($this->context->valueRegistry()->error(
-						$this->context->valueRegistry()->atom(new TypeNameIdentifier('NotANumber'))
+				if ($parameterValue->literalValue === 0) {
+					return TypedValue::forValue($this->context->valueRegistry->error(
+						$this->context->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
 					));
 				}
-                return TypedValue::forValue($this->context->valueRegistry()->integer(
-	                $targetValue->literalValue() % $parameterValue->literalValue()
+                return TypedValue::forValue($this->context->valueRegistry->integer(
+	                $targetValue->literalValue % $parameterValue->literalValue
                 ));
 			}
 			if ($parameterValue instanceof RealValue) {
-				if ((float)$parameterValue->literalValue() === 0.0) {
-					return TypedValue::forValue($this->context->valueRegistry()->error(
-						$this->context->valueRegistry()->atom(new TypeNameIdentifier('NotANumber'))
+				if ((float)$parameterValue->literalValue === 0.0) {
+					return TypedValue::forValue($this->context->valueRegistry->error(
+						$this->context->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
 					));
 				}
-                return TypedValue::forValue($this->context->valueRegistry()->real(
-	                fmod($targetValue->literalValue(), $parameterValue->literalValue())
+                return TypedValue::forValue($this->context->valueRegistry->real(
+	                fmod($targetValue->literalValue, $parameterValue->literalValue)
                 ));
 			}
 			// @codeCoverageIgnoreStart

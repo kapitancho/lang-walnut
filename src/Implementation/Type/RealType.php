@@ -9,15 +9,11 @@ use Walnut\Lang\Blueprint\Type\Type;
 
 final readonly class RealType implements RealTypeInterface, JsonSerializable {
 
-    public function __construct(private RealRange $range) {}
-
-    public function range(): RealRange {
-        return $this->range;
-    }
+    public function __construct(public RealRange $range) {}
 
     public function isSubtypeOf(Type $ofType): bool {
         return match(true) {
-            $ofType instanceof RealTypeInterface => $this->range->isSubRangeOf($ofType->range()),
+            $ofType instanceof RealTypeInterface => $this->range->isSubRangeOf($ofType->range),
             $ofType instanceof SupertypeChecker => $ofType->isSupertypeOf($this),
             default => false
         };

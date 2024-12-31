@@ -44,7 +44,7 @@ final class NoErrorExpressionTest extends TestCase {
 
 	public function testReturnedExpression(): void {
 		self::assertInstanceOf(ConstantExpression::class,
-			$this->noErrorExpression->targetExpression());
+			$this->noErrorExpression->targetExpression);
 	}
 
 	public function testAnalyse(): void {

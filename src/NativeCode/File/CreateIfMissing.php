@@ -27,16 +27,16 @@ final readonly class CreateIfMissing implements NativeMethod {
 		Type $targetType,
 		Type $parameterType,
 	): Type {
-		if ($targetType instanceof SealedType && $targetType->name()->equals(
+		if ($targetType instanceof SealedType && $targetType->name->equals(
 			new TypeNameIdentifier('File')
 		)) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $this->context->typeRegistry()->result(
-					$this->context->typeRegistry()->withName(
+				return $this->context->typeRegistry->result(
+					$this->context->typeRegistry->withName(
 						new TypeNameIdentifier('File')
 					),
-					$this->context->typeRegistry()->withName(
+					$this->context->typeRegistry->withName(
 						new TypeNameIdentifier('CannotWriteFile')
 					)
 				);
@@ -55,17 +55,17 @@ final readonly class CreateIfMissing implements NativeMethod {
 		$parameterValue = $parameter->value;
 		
 		$targetValue = $this->toBaseValue($targetValue);
-		if ($targetValue instanceof SealedValue && $targetValue->type()->name()->equals(
+		if ($targetValue instanceof SealedValue && $targetValue->type->name->equals(
 			new TypeNameIdentifier('File')
 		)) {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof StringValue) {
-				$path = $targetValue->value()->valueOf('path')->literalValue();
+				$path = $targetValue->value->valueOf('path')->literalValue;
 				if (!file_exists($path)) {
-					$result = @file_put_contents($path, $parameterValue->literalValue());
+					$result = @file_put_contents($path, $parameterValue->literalValue);
 					if ($result === false) {
-						return TypedValue::forValue($this->context->valueRegistry()->error(
-							$this->context->valueRegistry()->sealedValue(
+						return TypedValue::forValue($this->context->valueRegistry->error(
+							$this->context->valueRegistry->sealedValue(
 								new TypeNameIdentifier('CannotWriteFile'),
 								$targetValue
 							)

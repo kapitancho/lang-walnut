@@ -10,20 +10,12 @@ use Walnut\Lang\Blueprint\Type\Type;
 final readonly class AliasType implements AliasTypeInterface, SupertypeChecker, JsonSerializable {
 
     public function __construct(
-	    private TypeNameIdentifier $typeName,
-        private Type $aliasedType
+	    public TypeNameIdentifier $name,
+        public Type               $aliasedType
     ) {}
 
-	public function name(): TypeNameIdentifier {
-		return $this->typeName;
-    }
-
-	public function aliasedType(): Type {
-        return $this->aliasedType;
-    }
-
     public function isSubtypeOf(Type $ofType): bool {
-	    if ($ofType instanceof AliasTypeInterface && $this->typeName->equals($ofType->typeName)) {
+	    if ($ofType instanceof AliasTypeInterface && $this->name->equals($ofType->name)) {
             return true;
         }
 	    return (
@@ -35,7 +27,7 @@ final readonly class AliasType implements AliasTypeInterface, SupertypeChecker, 
     }
 
 	public function __toString(): string {
-		return (string)$this->typeName;
+		return (string)$this->name;
 	}
 
 	public function isSupertypeOf(Type $ofType): bool {
@@ -45,7 +37,7 @@ final readonly class AliasType implements AliasTypeInterface, SupertypeChecker, 
 	public function jsonSerialize(): array {
 		return [
 			'type' => 'Alias',
-			'name' => $this->typeName,
+			'name' => $this->name,
 			'aliasedType' => $this->aliasedType
 		];
 	}

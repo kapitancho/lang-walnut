@@ -6,6 +6,6 @@ use Stringable;
 use Walnut\Lang\Blueprint\Type\Type;
 
 interface Value extends Stringable {
-    public function type(): Type;
+	public Type $type { get; }
 	public function equals(Value $other): bool;
 }

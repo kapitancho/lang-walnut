@@ -40,12 +40,12 @@ final class SequenceExpressionTest extends TestCase {
 	}
 
 	public function testValues(): void {
-		self::assertCount(2, $this->sequenceExpression->expressions());
+		self::assertCount(2, $this->sequenceExpression->expressions);
 	}
 
 	public function testAnalyse(): void {
 		$result = $this->sequenceExpression->analyse(new AnalyserContext(new VariableScope([])));
-		self::assertTrue($result->expressionType()->isSubtypeOf(
+		self::assertTrue($result->expressionType->isSubtypeOf(
 			$this->typeRegistry->string()
 		));
 	}
@@ -56,12 +56,12 @@ final class SequenceExpressionTest extends TestCase {
 		);
 		self::assertEquals(
 			$this->valueRegistry->string("456"),
-			$result->value()
+			$result->value
 		);
 	}
 
 	public function testAnalyseWithReturn(): void {
-		$result = (new SequenceExpression(
+		$result = new SequenceExpression(
 			$this->typeRegistry,
 			$this->valueRegistry,
 			[
@@ -77,8 +77,8 @@ final class SequenceExpressionTest extends TestCase {
 					$this->valueRegistry->string("456")
 				)
 			]
-		))->analyse(new AnalyserContext(new VariableScope([])));
-		self::assertTrue($result->expressionType()->isSubtypeOf(
+		)->analyse(new AnalyserContext(new VariableScope([])));
+		self::assertTrue($result->expressionType->isSubtypeOf(
 			$this->typeRegistry->integer()
 		));
 	}

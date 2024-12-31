@@ -28,27 +28,27 @@ final readonly class InsertAt implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		if ($targetType instanceof ArrayType) {
-			$pInt = $this->context->typeRegistry()->integer(0);
-			$pType = $this->context->typeRegistry()->record([
-				"value" => $this->context->typeRegistry()->any(),
+			$pInt = $this->context->typeRegistry->integer(0);
+			$pType = $this->context->typeRegistry->record([
+				"value" => $this->context->typeRegistry->any,
 				"index" => $pInt
 			]);
 			if ($parameterType->isSubtypeOf($pType)) {
 				$parameterType = $this->toBaseType($parameterType);
-				$returnType = $this->context->typeRegistry()->array(
-					$this->context->typeRegistry()->union([
-						$targetType->itemType(),
-						$parameterType->types()['value']
+				$returnType = $this->context->typeRegistry->array(
+					$this->context->typeRegistry->union([
+						$targetType->itemType,
+						$parameterType->types['value']
 					]),
-					$targetType->range()->minLength() + 1,
-					$targetType->range()->maxLength() === PlusInfinity::value ?
-						PlusInfinity::value : $targetType->range()->maxLength() + 1
+					$targetType->range->minLength + 1,
+					$targetType->range->maxLength === PlusInfinity::value ?
+						PlusInfinity::value : $targetType->range->maxLength + 1
 				);
 				return
-					$parameterType->types()['index']->range()->maxValue() >= 0 &&
-					$parameterType->types()['index']->range()->maxValue() <= $targetType->range()->minLength() ?
-					$returnType : $this->context->typeRegistry()->result($returnType,
-						$this->context->typeRegistry()->sealed(new TypeNameIdentifier('IndexOutOfRange'))
+					$parameterType->types['index']->range->maxValue >= 0 &&
+					$parameterType->types['index']->range->maxValue <= $targetType->range->minLength ?
+					$returnType : $this->context->typeRegistry->result($returnType,
+						$this->context->typeRegistry->sealed(new TypeNameIdentifier('IndexOutOfRange'))
 					);
 			}
 			// @codeCoverageIgnoreStart
@@ -73,8 +73,8 @@ final readonly class InsertAt implements NativeMethod {
 				$value = $parameterValue->valueOf('value');
 				$index = $parameterValue->valueOf('index');
 				if ($index instanceof IntegerValue) {
-					$idx = $index->literalValue();
-					$values = $targetValue->values();
+					$idx = $index->literalValue;
+					$values = $targetValue->values;
 					if ($idx >= 0 && $idx <= count($values)) {
 						array_splice(
 							$values,
@@ -82,16 +82,16 @@ final readonly class InsertAt implements NativeMethod {
 							0,
 							[$value]
 						);
-						return TypedValue::forValue($this->context->valueRegistry()->tuple($values));
+						return TypedValue::forValue($this->context->valueRegistry->tuple($values));
 					}
 				}
 				// @codeCoverageIgnoreStart
 				throw new ExecutionException("Invalid parameter value");
 				// @codeCoverageIgnoreEnd
 			}
-			$values = $targetValue->values();
+			$values = $targetValue->values;
 			$values[] = $parameterValue;
-			return TypedValue::forValue($this->context->valueRegistry()->tuple($values));
+			return TypedValue::forValue($this->context->valueRegistry->tuple($values));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

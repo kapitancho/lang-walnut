@@ -33,7 +33,7 @@ final readonly class CastAs implements NativeMethod {
 		TypeInterface $targetType,
 		TypeInterface $parameterType
 	): array|UnknownMethod {
-		$isParameterJson = $parameterType instanceof AliasType && $parameterType->name()->equals(
+		$isParameterJson = $parameterType instanceof AliasType && $parameterType->name->equals(
 			new TypeNameIdentifier('JsonValue')
 		);
 		foreach($this->typeMapper->getTypesFor($parameterType) as $candidate) {
@@ -59,15 +59,15 @@ final readonly class CastAs implements NativeMethod {
 		TypeInterface $parameterType
 	): TypeInterface {
 		if ($parameterType instanceof TypeType) {
-			$refType = $parameterType->refType();
+			$refType = $parameterType->refType;
 			if ($targetType->isSubtypeOf($refType)) {
 				return $refType;
 			}
 			$method = $this->getMethod($targetType, $refType);
 			if ($method instanceof UnknownMethod) {
-				return $this->context->typeRegistry()->result(
+				return $this->context->typeRegistry->result(
 					$refType,
-					$this->context->typeRegistry()->withName(new TypeNameIdentifier('CastNotAvailable'))
+					$this->context->typeRegistry->withName(new TypeNameIdentifier('CastNotAvailable'))
 				);
 				/*throw new AnalyserException(
 					sprintf(
@@ -79,9 +79,9 @@ final readonly class CastAs implements NativeMethod {
 			}
 			$returnType = $method[1]->analyse(
 				$targetType,
-				$this->context->typeRegistry()->nothing()
+				$this->context->typeRegistry->nothing
 			);
-			$resultType = $returnType instanceof ResultType ? $returnType->returnType() : $returnType;
+			$resultType = $returnType instanceof ResultType ? $returnType->returnType : $returnType;
 
 			if (!$resultType->isSubtypeOf($refType)) {
 				throw new AnalyserException(sprintf(
@@ -106,27 +106,27 @@ final readonly class CastAs implements NativeMethod {
 		$parameterValue = $parameter->value;
 		
 		if ($parameterValue instanceof TypeValue) {
-			if ($targetValue->type()->isSubtypeOf($parameterValue->typeValue())) {
-				return new TypedValue($parameterValue->typeValue(), $targetValue);
+			if ($targetValue->type->isSubtypeOf($parameterValue->typeValue)) {
+				return new TypedValue($parameterValue->typeValue, $targetValue);
 			}
 			$runtimeMethod = $this->getMethod(
 				$targetValue instanceof TypeValue ?
-					$targetValue->typeValue() :
-					$targetValue->type(),
-				$parameterValue->typeValue()
+					$targetValue->typeValue :
+					$targetValue->type,
+				$parameterValue->typeValue
 			);
 			if ($runtimeMethod instanceof UnknownMethod) {
 				$method = $this->getMethod(
 					$targetType = $target->type,
-					$parameterType = $parameterValue->typeValue()
+					$parameterType = $parameterValue->typeValue
 				);
 				if ($method instanceof UnknownMethod) {
-					$val = $this->context->valueRegistry()->error(
-						$this->context->valueRegistry()->sealedValue(
+					$val = $this->context->valueRegistry->error(
+						$this->context->valueRegistry->sealedValue(
 							new TypeNameIdentifier('CastNotAvailable'),
-							$this->context->valueRegistry()->record([
-								'from' => $this->context->valueRegistry()->type($targetType),
-								'to' => $this->context->valueRegistry()->type($parameterType)
+							$this->context->valueRegistry->record([
+								'from' => $this->context->valueRegistry->type($targetType),
+								'to' => $this->context->valueRegistry->type($parameterType)
 							])
 						)
 					);

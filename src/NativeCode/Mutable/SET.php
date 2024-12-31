@@ -25,7 +25,7 @@ final readonly class SET implements NativeMethod {
 	): Type {
 		$t = $this->toBaseType($targetType);
 		if ($t instanceof MutableType) {
-			if ($parameterType->isSubtypeOf($t->valueType())) {
+			if ($parameterType->isSubtypeOf($t->valueType)) {
 				return $targetType;
 			}
 			// @codeCoverageIgnoreStart
@@ -46,7 +46,7 @@ final readonly class SET implements NativeMethod {
 		
 		$v = $this->toBaseValue($targetValue);
 		if ($v instanceof MutableValue) {
-			$v->changeValueTo($parameterValue);
+			$v->value = $parameterValue;
 			return TypedValue::forValue($targetValue);
 		}
 		// @codeCoverageIgnoreStart

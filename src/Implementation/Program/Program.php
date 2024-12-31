@@ -36,15 +36,15 @@ final readonly class Program implements ProgramInterface {
 				$functionName, $expectedParameterType, $expectedReturnType
 			);
 		}
-		if (!$expectedParameterType->isSubtypeOf($type->parameterType())) {
+		if (!$expectedParameterType->isSubtypeOf($type->parameterType)) {
 			InvalidEntryPoint::becauseWrongParameterType(
 				$functionName,
 				$expectedParameterType,
 				$expectedReturnType,
-				$type->parameterType()
+				$type->parameterType
 			);
 		}
-		if (!$type->returnType()->isSubtypeOf($expectedReturnType)) {
+		if (!$type->returnType->isSubtypeOf($expectedReturnType)) {
 			InvalidEntryPoint::becauseWrongReturnType(
 				$functionName, $expectedParameterType, $expectedReturnType
 			);

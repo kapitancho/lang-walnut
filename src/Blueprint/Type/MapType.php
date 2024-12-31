@@ -5,6 +5,6 @@ namespace Walnut\Lang\Blueprint\Type;
 use Walnut\Lang\Blueprint\Range\LengthRange;
 
 interface MapType extends Type {
-    public function itemType(): Type;
-    public function range(): LengthRange;
+	public Type $itemType { get; }
+	public LengthRange $range { get; }
 }

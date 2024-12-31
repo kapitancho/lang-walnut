@@ -38,14 +38,14 @@ final readonly class BinaryPlus implements NativeMethod {
 				$parameterType instanceof RealType ||
 				$parameterType instanceof RealSubsetType
 			) {
-				$min = $targetType->range()->minValue() === MinusInfinity::value ||
-					$parameterType->range()->minValue() === MinusInfinity::value ? MinusInfinity::value :
-					$targetType->range()->minValue() + $parameterType->range()->minValue();
-				$max = $targetType->range()->maxValue() === PlusInfinity::value ||
-					$parameterType->range()->maxValue() === PlusInfinity::value ? PlusInfinity::value :
-					$targetType->range()->maxValue() + $parameterType->range()->maxValue();
+				$min = $targetType->range->minValue === MinusInfinity::value ||
+					$parameterType->range->minValue === MinusInfinity::value ? MinusInfinity::value :
+					$targetType->range->minValue + $parameterType->range->minValue;
+				$max = $targetType->range->maxValue === PlusInfinity::value ||
+					$parameterType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
+					$targetType->range->maxValue + $parameterType->range->maxValue;
 
-				return $this->context->typeRegistry()->real($min, $max);
+				return $this->context->typeRegistry->real($min, $max);
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -68,8 +68,8 @@ final readonly class BinaryPlus implements NativeMethod {
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue || $parameterValue instanceof RealValue) {
-                return TypedValue::forValue($this->context->valueRegistry()->real(
-					$targetValue->literalValue() + $parameterValue->literalValue()
+                return TypedValue::forValue($this->context->valueRegistry->real(
+					$targetValue->literalValue + $parameterValue->literalValue
                 ));
 			}
 			// @codeCoverageIgnoreStart

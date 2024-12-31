@@ -27,25 +27,26 @@ final readonly class WithItemType implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $this->toBaseType($targetType->refType());
+			$refType = $this->toBaseType($targetType->refType);
 			if ($parameterType->isSubtypeOf(
-				$this->context->typeRegistry()->type(
-					$this->context->typeRegistry()->any()
+				$this->context->typeRegistry->type(
+					$this->context->typeRegistry->any
 				)
 			)) {
 				if ($refType instanceof ArrayType) {
-					return $this->context->typeRegistry()->type(
-						$this->context->typeRegistry()->array(
-							$parameterType->refType(),
-							$refType->range()->minLength(),
-							$refType->range()->maxLength())
+					return $this->context->typeRegistry->type(
+						$this->context->typeRegistry->array(
+							$parameterType->refType,
+							$refType->range->minLength,
+							$refType->range->maxLength)
 					);
-				} elseif ($refType instanceof MapType) {
-					return $this->context->typeRegistry()->type(
-						$this->context->typeRegistry()->map(
-							$parameterType->refType(),
-							$refType->range()->minLength(),
-							$refType->range()->maxLength()
+				}
+				if ($refType instanceof MapType) {
+					return $this->context->typeRegistry->type(
+						$this->context->typeRegistry->map(
+							$parameterType->refType,
+							$refType->range->minLength,
+							$refType->range->maxLength
 						)
 					);
 				}
@@ -69,26 +70,27 @@ final readonly class WithItemType implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof TypeValue) {
-			$typeValue = $this->toBaseType($targetValue->typeValue());
+			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($parameter->type->isSubtypeOf(
-				$this->context->typeRegistry()->type(
-					$this->context->typeRegistry()->any()
+				$this->context->typeRegistry->type(
+					$this->context->typeRegistry->any
 				)
 			)) {
 				if ($typeValue instanceof ArrayType) {
-					$result = $this->context->typeRegistry()->array(
-						$parameter->value->typeValue(),
-						$typeValue->range()->minLength(),
-						$typeValue->range()->maxLength(),
+					$result = $this->context->typeRegistry->array(
+						$parameter->value->typeValue,
+						$typeValue->range->minLength,
+						$typeValue->range->maxLength,
 					);
-					return TypedValue::forValue($this->context->valueRegistry()->type($result));
-				} elseif ($typeValue instanceof MapType) {
-					$result = $this->context->typeRegistry()->map(
-						$parameter->value->typeValue(),
-						$typeValue->range()->minLength(),
-						$typeValue->range()->maxLength(),
+					return TypedValue::forValue($this->context->valueRegistry->type($result));
+				}
+				if ($typeValue instanceof MapType) {
+					$result = $this->context->typeRegistry->map(
+						$parameter->value->typeValue,
+						$typeValue->range->minLength,
+						$typeValue->range->maxLength,
 					);
-					return TypedValue::forValue($this->context->valueRegistry()->type($result));
+					return TypedValue::forValue($this->context->valueRegistry->type($result));
 				}
 			}
 		}

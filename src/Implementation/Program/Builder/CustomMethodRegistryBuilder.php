@@ -57,7 +57,7 @@ final class CustomMethodRegistryBuilder implements MethodRegistry, CustomMethodR
 
 	public function method(Type $targetType, MethodNameIdentifier $methodName): Method|UnknownMethod {
 		foreach(array_reverse($this->methods[$methodName->identifier] ?? []) as $method) {
-			if ($targetType->isSubtypeOf($method->targetType())) {
+			if ($targetType->isSubtypeOf($method->targetType)) {
 				return $method;
 			}
 		}
@@ -66,14 +66,16 @@ final class CustomMethodRegistryBuilder implements MethodRegistry, CustomMethodR
 
 	private function getErrorMessageFor(CustomMethodInterface $method): string {
 		return match(true) {
-			(string)$method->targetType() === 'Constructor'
-				=> sprintf("Error in the constructor of %s", $method->methodName()),
-			(string)$method->targetType() === 'DependencyContainer'
-				=> sprintf("Error in the dependency builder of %s", substr($method->methodName(), 2)),
-			str_starts_with($method->methodName()->identifier, 'as')
-				=> sprintf("Error in the cast %s ==> %s", $method->targetType(),
-					substr($method->methodName(), 2)),
-			default => sprintf("Error in method %s->%s", $method->targetType(), $method->methodName())
+			(string)$method->targetType === 'Constructor' && str_starts_with($method->methodName->identifier, 'as')
+				=> sprintf("Error in the validator of %s", substr($method->methodName, 2)),
+			(string)$method->targetType === 'Constructor'
+				=> sprintf("Error in the constructor of %s", $method->methodName),
+			(string)$method->targetType === 'DependencyContainer'
+				=> sprintf("Error in the dependency builder of %s", substr($method->methodName, 2)),
+			str_starts_with($method->methodName->identifier, 'as')
+				=> sprintf("Error in the cast %s ==> %s", $method->targetType,
+					substr($method->methodName, 2)),
+			default => sprintf("Error in method %s->%s", $method->targetType, $method->methodName)
 		};
 	}
 
@@ -84,29 +86,43 @@ final class CustomMethodRegistryBuilder implements MethodRegistry, CustomMethodR
 			foreach($methods as $method) {
 				try {
 					$method->analyse(
-						$method->targetType(),
-						$method->parameterType(),
+						$method->targetType,
+						$method->parameterType,
 					);
 				} catch (AnalyserException $e) {
 					$analyseErrors[] = sprintf("%s : %s",$this->getErrorMessageFor($method), $e->getMessage());
 					continue;
 				}
-				$d = $method->dependencyType();
+				$d = $method->dependencyType;
 				if ($d && !($d instanceof NothingType)) {
-					$value = $this->dependencyContainer->valueByType($method->dependencyType());
+					$value = $this->dependencyContainer->valueByType($method->dependencyType);
 					if ($value instanceof DependencyError) {
 						$analyseErrors[] = sprintf("%s : the dependency %s cannot be resolved: %s (type: %s)",
 							$this->getErrorMessageFor($method),
-							$method->dependencyType(),
+							$method->dependencyType,
 							match($value->unresolvableDependency) {
 								UnresolvableDependency::notFound => "no appropriate value found",
 								UnresolvableDependency::ambiguous => "ambiguity - multiple values found",
 								UnresolvableDependency::circularDependency => "circular dependency detected",
 								UnresolvableDependency::unsupportedType => "unsupported type found",
-                                UnresolvableDependency::errorWhileCreatingValue => 'error returned while creating value',
+								UnresolvableDependency::errorWhileCreatingValue => 'error returned while creating value',
 							},
 							$value->type
 						);
+						/*throw new AnalyserException(
+							sprintf("%s : the dependency %s cannot be resolved: %s (type: %s)",
+								$this->getErrorMessageFor($method),
+								$method->dependencyType,
+								match($value->unresolvableDependency) {
+									UnresolvableDependency::notFound => "no appropriate value found",
+									UnresolvableDependency::ambiguous => "ambiguity - multiple values found",
+									UnresolvableDependency::circularDependency => "circular dependency detected",
+									UnresolvableDependency::unsupportedType => "unsupported type found",
+                                    UnresolvableDependency::errorWhileCreatingValue => 'error returned while creating value',
+								},
+								$value->type
+							)
+						);*/
 					}
 				}
 			}

@@ -27,19 +27,19 @@ final readonly class AsInteger implements NativeMethod {
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof BooleanType) {
-			return $this->context->typeRegistry()->integerSubset([
-				$this->context->valueRegistry()->integer(0),
-				$this->context->valueRegistry()->integer(1)
+			return $this->context->typeRegistry->integerSubset([
+				$this->context->valueRegistry->integer(0),
+				$this->context->valueRegistry->integer(1)
 			]);
 		}
 		if ($targetType instanceof TrueType) {
-			return $this->context->typeRegistry()->integerSubset([
-				$this->context->valueRegistry()->integer(1)
+			return $this->context->typeRegistry->integerSubset([
+				$this->context->valueRegistry->integer(1)
 			]);
 		}
 		if ($targetType instanceof FalseType) {
-			return $this->context->typeRegistry()->integerSubset([
-				$this->context->valueRegistry()->integer(0)
+			return $this->context->typeRegistry->integerSubset([
+				$this->context->valueRegistry->integer(0)
 			]);
 		}
 		// @codeCoverageIgnoreStart
@@ -55,8 +55,8 @@ final readonly class AsInteger implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof BooleanValue) {
-			$target = $targetValue->literalValue();
-			return TypedValue::forValue($this->context->valueRegistry()->integer($target ? 1 : 0));
+			$target = $targetValue->literalValue;
+			return TypedValue::forValue($this->context->valueRegistry->integer($target ? 1 : 0));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

@@ -26,10 +26,11 @@ use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Blueprint\Value\Value;
 
 interface ValueRegistry {
-	public function null(): NullValue;
+	public NullValue $null { get; }
+	public BooleanValue $true { get; }
+	public BooleanValue $false { get; }
+
 	public function boolean(bool $value): BooleanValue;
-	public function true(): BooleanValue;
-	public function false(): BooleanValue;
 	public function integer(int $value): IntegerValue;
 	public function real(float $value): RealValue;
 	public function string(string $value): StringValue;

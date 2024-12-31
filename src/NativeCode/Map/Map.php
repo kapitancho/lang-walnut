@@ -35,22 +35,22 @@ final readonly class Map implements NativeMethod {
 		if ($targetType instanceof MapType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof FunctionType) {
-				if ($targetType->itemType()->isSubtypeOf($parameterType->parameterType())) {
-					$r = $parameterType->returnType();
-					$errorType = $r instanceof ResultType ? $r->errorType() : null;
-					$returnType = $r instanceof ResultType ? $r->returnType() : $r;
-					$t = $this->context->typeRegistry()->map(
+				if ($targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
+					$r = $parameterType->returnType;
+					$errorType = $r instanceof ResultType ? $r->errorType : null;
+					$returnType = $r instanceof ResultType ? $r->returnType : $r;
+					$t = $this->context->typeRegistry->map(
 						$returnType,
-						$targetType->range()->minLength(),
-						$targetType->range()->maxLength(),
+						$targetType->range->minLength,
+						$targetType->range->maxLength,
 					);
-					return $errorType ? $this->context->typeRegistry()->result($t, $errorType) : $t;
+					return $errorType ? $this->context->typeRegistry->result($t, $errorType) : $t;
 				}
 				throw new AnalyserException(
                     sprintf(
     					"The parameter type %s of the callback function is not a subtype of %s",
-	    				$targetType->itemType(),
-		    			$parameterType->parameterType()
+	    				$targetType->itemType,
+		    			$parameterType->parameterType
                     )
 				);
 			}
@@ -72,16 +72,16 @@ final readonly class Map implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue && $parameterValue instanceof FunctionValue) {
-			$values = $targetValue->values();
+			$values = $targetValue->values;
 			$result = [];
 			foreach($values as $key => $value) {
-				$r = $parameterValue->execute($this->context->globalContext(), $value);
+				$r = $parameterValue->execute($this->context->globalContext, $value);
 				if ($r instanceof ErrorValue) {
 					return TypedValue::forValue($r);
 				}
 				$result[$key] = $r;
 			}
-			return TypedValue::forValue($this->context->valueRegistry()->record($result));
+			return TypedValue::forValue($this->context->valueRegistry->record($result));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

@@ -10,12 +10,8 @@ use Walnut\Lang\Blueprint\Identifier\VariableNameIdentifier;
 final readonly class ExecutionContext implements ExecutionContextInterface {
 
 	public function __construct(
-		private VariableValueScope $variableValueScope
+		public VariableValueScope $variableValueScope
 	) {}
-
-	public function variableValueScope(): VariableValueScope {
-		return $this->variableValueScope;
-	}
 
 	public function withAddedVariableValue(VariableNameIdentifier $variableName, TypedValue $typedValue): self {
 		return new self(

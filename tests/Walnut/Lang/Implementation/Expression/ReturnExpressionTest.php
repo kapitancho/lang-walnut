@@ -34,7 +34,7 @@ final class ReturnExpressionTest extends TestCase {
 
 	public function testReturnedExpression(): void {
 		self::assertInstanceOf(ConstantExpression::class,
-			$this->returnExpression->returnedExpression());
+			$this->returnExpression->returnedExpression);
 	}
 
 	public function testAnalyse(): void {

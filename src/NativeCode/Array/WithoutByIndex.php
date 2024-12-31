@@ -33,19 +33,19 @@ final readonly class WithoutByIndex implements NativeMethod {
 		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($type instanceof ArrayType) {
 			if ($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) {
-				$returnType = $this->context->typeRegistry()->record([
-					'element' => $type->itemType(),
-					'array' => $this->context->typeRegistry()->array(
-						$type->itemType(),
-						max(0, $type->range()->minLength() - 1),
-						$type->range()->maxLength() === PlusInfinity::value ?
-							PlusInfinity::value : $type->range()->maxLength() - 1
+				$returnType = $this->context->typeRegistry->record([
+					'element' => $type->itemType,
+					'array' => $this->context->typeRegistry->array(
+						$type->itemType,
+						max(0, $type->range->minLength - 1),
+						$type->range->maxLength === PlusInfinity::value ?
+							PlusInfinity::value : $type->range->maxLength - 1
 					)
 				]);
-				return $parameterType->range()->minValue() < $type->range()->maxLength() ? $returnType :
-					$this->context->typeRegistry()->result(
+				return $parameterType->range->minValue < $type->range->maxLength ? $returnType :
+					$this->context->typeRegistry->result(
 						$returnType,
-						$this->context->typeRegistry()->sealed(
+						$this->context->typeRegistry->sealed(
 							new TypeNameIdentifier("IndexOutOfRange")
 						)
 					);
@@ -69,18 +69,18 @@ final readonly class WithoutByIndex implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
 			if ($parameterValue instanceof IntegerValue) {
-				$values = $targetValue->values();
-				$p = $parameterValue->literalValue();
+				$values = $targetValue->values;
+				$p = $parameterValue->literalValue;
 				if (!array_key_exists($p, $values)) {
-					return TypedValue::forValue($this->context->valueRegistry()->sealedValue(
+					return TypedValue::forValue($this->context->valueRegistry->sealedValue(
 						new TypeNameIdentifier('IndexOutOfRange'),
-						$this->context->valueRegistry()->record(['index' => $parameterValue])
+						$this->context->valueRegistry->record(['index' => $parameterValue])
 					));
 				}
 				$removed = array_splice($values, $p, 1);
-				return TypedValue::forValue($this->context->valueRegistry()->record([
+				return TypedValue::forValue($this->context->valueRegistry->record([
 					'element' => $removed[0],
-					'array' => $this->context->valueRegistry()->tuple($values)
+					'array' => $this->context->valueRegistry->tuple($values)
 				]));
 			}
 			// @codeCoverageIgnoreStart

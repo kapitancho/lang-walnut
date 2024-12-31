@@ -31,15 +31,15 @@ final readonly class Without implements NativeMethod {
 			$targetType = $targetType->asMapType();
 		}
 		if ($targetType instanceof MapType) {
-			$returnType = $this->context->typeRegistry()->map(
-				$targetType->itemType(),
-				max(0, $targetType->range()->minLength() - 1),
-				$targetType->range()->maxLength() === PlusInfinity::value ?
-					PlusInfinity::value : $targetType->range()->maxLength() - 1
+			$returnType = $this->context->typeRegistry->map(
+				$targetType->itemType,
+				max(0, $targetType->range->minLength - 1),
+				$targetType->range->maxLength === PlusInfinity::value ?
+					PlusInfinity::value : $targetType->range->maxLength - 1
 			);
-			return $this->context->typeRegistry()->result(
+			return $this->context->typeRegistry->result(
 				$returnType,
-				$this->context->typeRegistry()->atom(
+				$this->context->typeRegistry->atom(
 					new TypeNameIdentifier("ItemNotFound")
 				)
 			);
@@ -58,15 +58,15 @@ final readonly class Without implements NativeMethod {
 		
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue) {
-			$values = $targetValue->values();
+			$values = $targetValue->values;
 			foreach($values as $key => $value) {
 				if ($value->equals($parameterValue)) {
 					unset($values[$key]);
-					return TypedValue::forValue($this->context->valueRegistry()->record($values));
+					return TypedValue::forValue($this->context->valueRegistry->record($values));
 				}
 			}
-			return TypedValue::forValue($this->context->valueRegistry()->error(
-				$this->context->valueRegistry()->atom(new TypeNameIdentifier("ItemNotFound"))
+			return TypedValue::forValue($this->context->valueRegistry->error(
+				$this->context->valueRegistry->atom(new TypeNameIdentifier("ItemNotFound"))
 			));
 		}
 		// @codeCoverageIgnoreStart

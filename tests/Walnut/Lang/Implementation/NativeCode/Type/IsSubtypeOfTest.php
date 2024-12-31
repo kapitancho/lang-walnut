@@ -24,8 +24,8 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 	}
 
 	public function testIsSubtypeOfInteger(): void {
-		$n = $this->typeRegistry->nothing();
-		$a = $this->typeRegistry->any();
+		$n = $this->typeRegistry->nothing;
+		$a = $this->typeRegistry->any;
 
 		$t1 = $this->typeRegistry->integerSubset([
 			$this->valueRegistry->integer(1),
@@ -71,8 +71,8 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 	}
 
 	public function testIsSubtypeOfReal(): void {
-		$n = $this->typeRegistry->nothing();
-		$a = $this->typeRegistry->any();
+		$n = $this->typeRegistry->nothing;
+		$a = $this->typeRegistry->any;
 
 		$t1 = $this->typeRegistry->realSubset([
 			$this->valueRegistry->real(1),
@@ -112,8 +112,8 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 	}
 
 	public function testIsSubtypeOfString(): void {
-		$n = $this->typeRegistry->nothing();
-		$a = $this->typeRegistry->any();
+		$n = $this->typeRegistry->nothing;
+		$a = $this->typeRegistry->any;
 
 		$t1 = $this->typeRegistry->stringSubset([
 			$this->valueRegistry->string("Hello"),
@@ -150,12 +150,12 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 	}
 
 	public function testIsSubtypeOfBoolean(): void {
-		$n = $this->typeRegistry->nothing();
-		$a = $this->typeRegistry->any();
+		$n = $this->typeRegistry->nothing;
+		$a = $this->typeRegistry->any;
 
-		$t1 = $this->typeRegistry->true();
-		$t2 = $this->typeRegistry->false();
-		$t3 = $this->typeRegistry->boolean();
+		$t1 = $this->typeRegistry->true;
+		$t2 = $this->typeRegistry->false;
+		$t3 = $this->typeRegistry->boolean;
 
 		$matrix = [
 			1 => [1 =>  true, false, true],
@@ -172,10 +172,10 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 	}
 
 	public function testIsSubtypeOfNull(): void {
-		$n = $this->typeRegistry->nothing();
-		$a = $this->typeRegistry->any();
+		$n = $this->typeRegistry->nothing;
+		$a = $this->typeRegistry->any;
 
-		$t1 = $this->typeRegistry->null();
+		$t1 = $this->typeRegistry->null;
 
 		$this->callIsOfType($t1, $t1, true);
 		$this->callIsOfType($t1, $a, true);
@@ -183,8 +183,8 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 	}
 
 	public function testIsSubtypeOfTuple(): void {
-		$n = $this->typeRegistry->nothing();
-		$a = $this->typeRegistry->any();
+		$n = $this->typeRegistry->nothing;
+		$a = $this->typeRegistry->any;
 
 		$t1 = $this->typeRegistry->tuple([]);
 		$t2 = $this->typeRegistry->tuple([$this->typeRegistry->integer(-10, 10)]);
@@ -201,17 +201,17 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 				$this->typeRegistry->string(),
 			])
 		);
-		$t8 = $this->typeRegistry->array($this->typeRegistry->any(), 2);
-		$t9 = $this->typeRegistry->array($this->typeRegistry->any(), 0, 1);
+		$t8 = $this->typeRegistry->array($this->typeRegistry->any, 2);
+		$t9 = $this->typeRegistry->array($this->typeRegistry->any, 0, 1);
 		$t10 = $this->typeRegistry->array();
-		$t11 = $this->typeRegistry->tuple([], $this->typeRegistry->any());
-		$t12 = $this->typeRegistry->tuple([$this->typeRegistry->integer(-10, 10)], $this->typeRegistry->any());
-		$t13 = $this->typeRegistry->tuple([$this->typeRegistry->integer()], $this->typeRegistry->any());
-		$t14 = $this->typeRegistry->tuple([$this->typeRegistry->string()], $this->typeRegistry->any());
+		$t11 = $this->typeRegistry->tuple([], $this->typeRegistry->any);
+		$t12 = $this->typeRegistry->tuple([$this->typeRegistry->integer(-10, 10)], $this->typeRegistry->any);
+		$t13 = $this->typeRegistry->tuple([$this->typeRegistry->integer()], $this->typeRegistry->any);
+		$t14 = $this->typeRegistry->tuple([$this->typeRegistry->string()], $this->typeRegistry->any);
 		$t15 = $this->typeRegistry->tuple([
 			$this->typeRegistry->integer(),
 			$this->typeRegistry->string()
-		], $this->typeRegistry->any());
+		], $this->typeRegistry->any);
 
 		$matrix = [
 			1 => [1 =>  true, false, false, false, false,  true,  true, false,  true, true,  true, false, false, false, false],
@@ -242,8 +242,8 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 	}
 
 	public function testIsSubtypeOfArray(): void {
-		$n = $this->typeRegistry->nothing();
-		$a = $this->typeRegistry->any();
+		$n = $this->typeRegistry->nothing;
+		$a = $this->typeRegistry->any;
 
 		$t1 = $this->typeRegistry->array($this->typeRegistry->integer());
 		$t2 = $this->typeRegistry->array($this->typeRegistry->integer(10, 20));
@@ -255,9 +255,9 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 				$this->typeRegistry->string(),
 			])
 		);
-		$t6 = $this->typeRegistry->array($this->typeRegistry->nothing());
-		$t7 = $this->typeRegistry->array($this->typeRegistry->any(), 5, 15);
-		$t8 = $this->typeRegistry->array($this->typeRegistry->any(), 10, 20);
+		$t6 = $this->typeRegistry->array($this->typeRegistry->nothing);
+		$t7 = $this->typeRegistry->array($this->typeRegistry->any, 5, 15);
+		$t8 = $this->typeRegistry->array($this->typeRegistry->any, 10, 20);
 		$t9 = $this->typeRegistry->array();
 
 		$matrix = [
@@ -281,8 +281,8 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 	}
 
 	public function testIsSubtypeOfMap(): void {
-		$n = $this->typeRegistry->nothing();
-		$a = $this->typeRegistry->any();
+		$n = $this->typeRegistry->nothing;
+		$a = $this->typeRegistry->any;
 
 		$t1 = $this->typeRegistry->map($this->typeRegistry->integer());
 		$t2 = $this->typeRegistry->map($this->typeRegistry->integer(10, 20));
@@ -294,9 +294,9 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 				$this->typeRegistry->string(),
 			])
 		);
-		$t6 = $this->typeRegistry->map($this->typeRegistry->nothing());
-		$t7 = $this->typeRegistry->map($this->typeRegistry->any(), 5, 15);
-		$t8 = $this->typeRegistry->map($this->typeRegistry->any(), 10, 20);
+		$t6 = $this->typeRegistry->map($this->typeRegistry->nothing);
+		$t7 = $this->typeRegistry->map($this->typeRegistry->any, 5, 15);
+		$t8 = $this->typeRegistry->map($this->typeRegistry->any, 10, 20);
 		$t9 = $this->typeRegistry->map();
 
 		$matrix = [
@@ -320,8 +320,8 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 	}
 
 	public function testIsSubtypeOfRecord(): void {
-		$n = $this->typeRegistry->nothing();
-		$a = $this->typeRegistry->any();
+		$n = $this->typeRegistry->nothing;
+		$a = $this->typeRegistry->any;
 
 		$t1 = $this->typeRegistry->record([]);
 		$t2 = $this->typeRegistry->record(['a' => $this->typeRegistry->integer(-10, 10)]);
@@ -338,17 +338,17 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 				$this->typeRegistry->string(),
 			])
 		);
-		$t8 = $this->typeRegistry->map($this->typeRegistry->any(), 2);
-		$t9 = $this->typeRegistry->map($this->typeRegistry->any(), 0, 1);
+		$t8 = $this->typeRegistry->map($this->typeRegistry->any, 2);
+		$t9 = $this->typeRegistry->map($this->typeRegistry->any, 0, 1);
 		$t10 = $this->typeRegistry->map();
-		$t11 = $this->typeRegistry->record([], $this->typeRegistry->any());
-		$t12 = $this->typeRegistry->record(['a' => $this->typeRegistry->integer(-10, 10)], $this->typeRegistry->any());
-		$t13 = $this->typeRegistry->record(['a' => $this->typeRegistry->integer()], $this->typeRegistry->any());
-		$t14 = $this->typeRegistry->record(['a' => $this->typeRegistry->string()], $this->typeRegistry->any());
+		$t11 = $this->typeRegistry->record([], $this->typeRegistry->any);
+		$t12 = $this->typeRegistry->record(['a' => $this->typeRegistry->integer(-10, 10)], $this->typeRegistry->any);
+		$t13 = $this->typeRegistry->record(['a' => $this->typeRegistry->integer()], $this->typeRegistry->any);
+		$t14 = $this->typeRegistry->record(['a' => $this->typeRegistry->string()], $this->typeRegistry->any);
 		$t15 = $this->typeRegistry->record([
 			'a' => $this->typeRegistry->integer(),
 			'b' => $this->typeRegistry->string()
-		], $this->typeRegistry->any());
+		], $this->typeRegistry->any);
 
 		$matrix = [
 			1 => [1 =>  true, false, false, false, false,  true,  true, false,  true, true,  true, false, false, false, false],
@@ -379,8 +379,8 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 	}
 
 	public function testIsSubtypeOfAliasType(): void {
-		$n = $this->typeRegistry->nothing();
-		$a = $this->typeRegistry->any();
+		$n = $this->typeRegistry->nothing;
+		$a = $this->typeRegistry->any;
 
 		$this->programBuilder->addAlias(new TypeNameIdentifier('Integer1050'), $this->typeRegistry->integer(10, 50));
 		$this->programBuilder->addAlias(new TypeNameIdentifier('Integer2040'), $this->typeRegistry->integer(20, 40));
@@ -406,10 +406,10 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 	}
 
 	public function testIsSubtypeOfSubtype(): void {
-		$n = $this->typeRegistry->nothing();
-		$a = $this->typeRegistry->any();
+		$n = $this->typeRegistry->nothing;
+		$a = $this->typeRegistry->any;
 
-		$fnBody = $this->expressionRegistry->constant($this->valueRegistry->null());
+		$fnBody = $this->expressionRegistry->constant($this->valueRegistry->null);
 
 		$this->programBuilder->addSubtype(new TypeNameIdentifier('Integer1050'), $this->typeRegistry->integer(10, 50), $fnBody, null);
 		$this->programBuilder->addSubtype(new TypeNameIdentifier('Integer2040'), $this->typeRegistry->integer(20, 40), $fnBody, null);
@@ -435,8 +435,8 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 	}
 
 	/*public function testIsSubtypeOfSealedType(): void {
-		$n = $this->typeRegistry->nothing();
-		$a = $this->typeRegistry->any();
+		$n = $this->typeRegistry->nothing;
+		$a = $this->typeRegistry->any;
 
 		$this->builder->addSealed(new TypeNameIdentifier('Integer1060'), $this->typeRegistry->integer(10, 60));
 		$this->builder->addSealed(new TypeNameIdentifier('Integer2050'), $this->typeRegistry->integer(20, 50));
@@ -462,16 +462,16 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 	}*/
 
 	public function testIsSubtypeOfFunctionType(): void {
-		$n = $this->typeRegistry->nothing();
-		$a = $this->typeRegistry->any();
+		$n = $this->typeRegistry->nothing;
+		$a = $this->typeRegistry->any;
 
 		$t1 = $this->typeRegistry->function($this->typeRegistry->integer(),$this->typeRegistry->string());
 		$t2 = $this->typeRegistry->function($this->typeRegistry->integer(),$this->typeRegistry->string(10, 20));
 		$t3 = $this->typeRegistry->function($this->typeRegistry->integer(10, 20),$this->typeRegistry->string());
 		$t4 = $this->typeRegistry->function($this->typeRegistry->integer(10, 20),$this->typeRegistry->string(10, 20));
 		$t5 = $this->typeRegistry->function($this->typeRegistry->string(),$this->typeRegistry->integer());
-		$t6 = $this->typeRegistry->function($this->typeRegistry->any(),$this->typeRegistry->nothing());
-		$t7 = $this->typeRegistry->function($this->typeRegistry->nothing(),$this->typeRegistry->any());
+		$t6 = $this->typeRegistry->function($this->typeRegistry->any,$this->typeRegistry->nothing);
+		$t7 = $this->typeRegistry->function($this->typeRegistry->nothing,$this->typeRegistry->any);
 
 		$matrix = [
 			1 => [1 =>  true, false,  true, false, false, false, true],
@@ -492,13 +492,13 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 	}
 
 	public function testIsSubtypeOfMutableType(): void {
-		$n = $this->typeRegistry->nothing();
-		$a = $this->typeRegistry->any();
+		$n = $this->typeRegistry->nothing;
+		$a = $this->typeRegistry->any;
 
 		$t1 = $this->typeRegistry->mutable($this->typeRegistry->integer());
 		$t2 = $this->typeRegistry->mutable($this->typeRegistry->integer(10, 20));
-		$t3 = $this->typeRegistry->mutable($this->typeRegistry->any());
-		$t4 = $this->typeRegistry->mutable($this->typeRegistry->nothing());
+		$t3 = $this->typeRegistry->mutable($this->typeRegistry->any);
+		$t4 = $this->typeRegistry->mutable($this->typeRegistry->nothing);
 
 		$matrix = [
 			1 => [1 =>  true, false, false, false],
@@ -516,13 +516,13 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 	}
 
 	public function testIsSubtypeOfTypeType(): void {
-		$n = $this->typeRegistry->nothing();
-		$a = $this->typeRegistry->any();
+		$n = $this->typeRegistry->nothing;
+		$a = $this->typeRegistry->any;
 
 		$t1 = $this->typeRegistry->type($this->typeRegistry->integer());
 		$t2 = $this->typeRegistry->type($this->typeRegistry->integer(10, 20));
-		$t3 = $this->typeRegistry->type($this->typeRegistry->any());
-		$t4 = $this->typeRegistry->type($this->typeRegistry->nothing());
+		$t3 = $this->typeRegistry->type($this->typeRegistry->any);
+		$t4 = $this->typeRegistry->type($this->typeRegistry->nothing);
 
 		$matrix = [
 			1 => [1 =>  true, false,  true, false],
@@ -540,8 +540,8 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 	}
 
 	public function testIsSubtypeOfAtomType(): void {
-		$n = $this->typeRegistry->nothing();
-		$a = $this->typeRegistry->any();
+		$n = $this->typeRegistry->nothing;
+		$a = $this->typeRegistry->any;
 
 		$this->programBuilder->addAtom(new TypeNameIdentifier('Atom1'));
 		$this->programBuilder->addAtom(new TypeNameIdentifier('Atom2'));
@@ -563,8 +563,8 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 	}
 
 	public function testIsSubtypeOfEnumerationType(): void {
-		$n = $this->typeRegistry->nothing();
-		$a = $this->typeRegistry->any();
+		$n = $this->typeRegistry->nothing;
+		$a = $this->typeRegistry->any;
 
 		$this->programBuilder->addEnumeration(new TypeNameIdentifier('Enumeration1'), [
 			new EnumValueIdentifier('A'),
@@ -609,14 +609,14 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 	}
 
 	public function testIsSubtypeOfIntersectionType(): void {
-		$n = $this->typeRegistry->nothing();
-		$a = $this->typeRegistry->any();
+		$n = $this->typeRegistry->nothing;
+		$a = $this->typeRegistry->any;
 
 		$t1 = $this->typeRegistry->record([
-			'a' => $this->typeRegistry->integer(), 'b' => $this->typeRegistry->string(), 'c' => $this->typeRegistry->boolean()
+			'a' => $this->typeRegistry->integer(), 'b' => $this->typeRegistry->string(), 'c' => $this->typeRegistry->boolean
 		]);
 		$t2 = $this->typeRegistry->record([
-			'a' => $this->typeRegistry->any(), 'b' => $this->typeRegistry->string(), 'd' => $this->typeRegistry->array()
+			'a' => $this->typeRegistry->any, 'b' => $this->typeRegistry->string(), 'd' => $this->typeRegistry->array()
 		]);
 		$t3 = $this->typeRegistry->intersection([$t1, $t2]);
 		$t4 = $this->typeRegistry->intersection([$t1, $this->typeRegistry->integer()]);
@@ -637,14 +637,14 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 	}
 
 	public function testIsSubtypeOfUnionType(): void {
-		$n = $this->typeRegistry->nothing();
-		$a = $this->typeRegistry->any();
+		$n = $this->typeRegistry->nothing;
+		$a = $this->typeRegistry->any;
 
 		$t1 = $this->typeRegistry->record([
-			'a' => $this->typeRegistry->integer(), 'b' => $this->typeRegistry->string(), 'c' => $this->typeRegistry->boolean()
+			'a' => $this->typeRegistry->integer(), 'b' => $this->typeRegistry->string(), 'c' => $this->typeRegistry->boolean
 		]);
 		$t2 = $this->typeRegistry->record([
-			'a' => $this->typeRegistry->any(), 'b' => $this->typeRegistry->string(), 'd' => $this->typeRegistry->array()
+			'a' => $this->typeRegistry->any, 'b' => $this->typeRegistry->string(), 'd' => $this->typeRegistry->array()
 		]);
 		$t3 = $this->typeRegistry->union([$t1, $t2]);
 		$t4 = $this->typeRegistry->union([$t1, $this->typeRegistry->integer()]);
@@ -665,17 +665,17 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 	}
 
 	public function testIsSubtypeOfResultType(): void {
-		$n = $this->typeRegistry->nothing();
-		$a = $this->typeRegistry->any();
+		$n = $this->typeRegistry->nothing;
+		$a = $this->typeRegistry->any;
 
 		$t1 = $this->typeRegistry->result($this->typeRegistry->integer(), $this->typeRegistry->string());
 		$t2 = $this->typeRegistry->result($this->typeRegistry->integer(10, 20), $this->typeRegistry->string());
-		$t3 = $this->typeRegistry->result($this->typeRegistry->any(), $this->typeRegistry->string());
-		$t4 = $this->typeRegistry->result($this->typeRegistry->nothing(), $this->typeRegistry->string());
+		$t3 = $this->typeRegistry->result($this->typeRegistry->any, $this->typeRegistry->string());
+		$t4 = $this->typeRegistry->result($this->typeRegistry->nothing, $this->typeRegistry->string());
 		$t5 = $this->typeRegistry->result($this->typeRegistry->integer(), $this->typeRegistry->string(10, 20));
 		$t6 = $this->typeRegistry->result($this->typeRegistry->integer(10, 20), $this->typeRegistry->string(10, 20));
-		$t7 = $this->typeRegistry->result($this->typeRegistry->any(), $this->typeRegistry->string(10, 20));
-		$t8 = $this->typeRegistry->result($this->typeRegistry->nothing(), $this->typeRegistry->string(10, 20));
+		$t7 = $this->typeRegistry->result($this->typeRegistry->any, $this->typeRegistry->string(10, 20));
+		$t8 = $this->typeRegistry->result($this->typeRegistry->nothing, $this->typeRegistry->string(10, 20));
 		$t9 = $this->typeRegistry->integer();
 		$t10 = $this->typeRegistry->string();
 

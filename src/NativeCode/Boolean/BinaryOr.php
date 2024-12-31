@@ -30,8 +30,8 @@ final readonly class BinaryOr implements NativeMethod {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof BooleanType || $parameterType instanceof TrueType || $parameterType instanceof FalseType) {
 				return $targetType instanceof TrueType || $parameterType instanceof TrueType ?
-					$this->context->typeRegistry()->true() :
-					$this->context->typeRegistry()->boolean();
+					$this->context->typeRegistry->true :
+					$this->context->typeRegistry->boolean;
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -53,8 +53,8 @@ final readonly class BinaryOr implements NativeMethod {
 		if ($targetValue instanceof BooleanValue) {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof BooleanValue) {
-	            return TypedValue::forValue($this->context->valueRegistry()->boolean(
-					$targetValue->literalValue() || $parameterValue->literalValue()
+	            return TypedValue::forValue($this->context->valueRegistry->boolean(
+					$targetValue->literalValue || $parameterValue->literalValue
 	            ));
 			}
 		}

@@ -7,10 +7,10 @@ use Walnut\Lang\Blueprint\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Type\Type;
 
 final class InvalidEntryPoint extends InvalidArgumentException {
-	private const FunctionIsNotDefined = "function is not defined";
-	private const ValueIsNotAFunction = "value is not a function";
-	private const WrongParameterType = "wrong parameter type: %s expected, %s given";
-	private const WrongReturnType = "wrong return type";
+	private const string FunctionIsNotDefined = "function is not defined";
+	private const string ValueIsNotAFunction = "value is not a function";
+	private const string WrongParameterType = "wrong parameter type: %s expected, %s given";
+	private const string WrongReturnType = "wrong return type";
 
     private function __construct(
 	    public readonly VariableNameIdentifier $functionName,

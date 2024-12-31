@@ -26,8 +26,8 @@ final readonly class Hash implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof SealedType && $targetType->name()->equals(new TypeNameIdentifier('PasswordString'))) {
-			return $this->context->typeRegistry()->string(24, 255);
+		if ($targetType instanceof SealedType && $targetType->name->equals(new TypeNameIdentifier('PasswordString'))) {
+			return $this->context->typeRegistry->string(24, 255);
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -41,13 +41,13 @@ final readonly class Hash implements NativeMethod {
 		$targetValue = $target->value;
 
 		$targetValue = $this->toBaseValue($targetValue);
-		if ($targetValue instanceof SealedValue && $targetValue->type()->name()->equals(
+		if ($targetValue instanceof SealedValue && $targetValue->type->name->equals(
 			new TypeNameIdentifier('PasswordString')
 		)) {
-			$passwordString = $targetValue->value()->valueOf('value');
+			$passwordString = $targetValue->value->valueOf('value');
 			if ($passwordString instanceof StringValue) {
-				return TypedValue::forValue($this->context->valueRegistry()->string(
-					password_hash($passwordString->literalValue(), PASSWORD_DEFAULT)
+				return TypedValue::forValue($this->context->valueRegistry->string(
+					password_hash($passwordString->literalValue, PASSWORD_DEFAULT)
 				));
 			}
 			// @codeCoverageIgnoreStart

@@ -45,35 +45,27 @@ use Walnut\Lang\Implementation\Code\Expression\MatchExpressionPair;
 final readonly class CodeBuilder implements CodeBuilderInterface {
 
 	public function __construct(
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
+		public TypeRegistry $typeRegistry,
+		public ValueRegistry $valueRegistry,
 		private ProgramBuilder $programBuilder,
 		private ExpressionRegistry $expressionRegistry
 	) {}
 
-	public function typeRegistry(): TypeRegistry {
-		return $this->typeRegistry;
-	}
-
-	public function valueRegistry(): ValueRegistry {
-		return $this->valueRegistry;
-	}
-
 	/** @param list<MatchExpressionPairInterface|MatchExpressionDefaultInterface> $pairs */
 	public function matchTrue(array $pairs): MatchExpression {
 		return $this->expressionRegistry->match(
-			$this->expressionRegistry->constant($this->valueRegistry->true()),
+			$this->expressionRegistry->constant($this->valueRegistry->true),
 			new MatchExpressionEquals, array_map(
 				fn(MatchExpressionPairInterface|MatchExpressionDefaultInterface $pair): MatchExpressionPairInterface|MatchExpressionDefaultInterface => match(true) {
 					$pair instanceof MatchExpressionPairInterface => new MatchExpressionPair(
 						$this->expressionRegistry->methodCall(
-							$pair->matchExpression(),
+							$pair->matchExpression,
 							new MethodNameIdentifier('asBoolean'),
 							$this->expressionRegistry->constant(
-								$this->valueRegistry->null()
+								$this->valueRegistry->null
 							)
 						),
-						$pair->valueExpression()
+						$pair->valueExpression
 					),
 					$pair instanceof MatchExpressionDefaultInterface => $pair
 				},
@@ -95,7 +87,7 @@ final readonly class CodeBuilder implements CodeBuilderInterface {
 	public function matchIf(Expression $condition, Expression $then, Expression $else): MatchExpression {
 		return $this->expressionRegistry->match($condition, new MatchExpressionEquals, [
 			new MatchExpressionPair(
-				$this->expressionRegistry->constant($this->valueRegistry->true()), $then),
+				$this->expressionRegistry->constant($this->valueRegistry->true), $then),
 			new MatchExpressionDefault($else)
 		]);
 	}
@@ -209,9 +201,9 @@ final readonly class CodeBuilder implements CodeBuilderInterface {
 	public function functionBody(Expression $expression): FunctionBody {
 		return $this->expressionRegistry->functionBody($expression);
 	}
-	
+
 	public function mutable(Type $type, Expression $value): MutableExpression {
-		return $this->expressionRegistry->mutable($type, $value);	
+		return $this->expressionRegistry->mutable($type, $value);
 	}
 
 	public function addAtom(TypeNameIdentifier $name): AtomType {

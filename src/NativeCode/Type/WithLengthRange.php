@@ -31,16 +31,18 @@ final readonly class WithLengthRange implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $this->toBaseType($targetType->refType());
+			$refType = $this->toBaseType($targetType->refType);
 			if ($parameterType->isSubtypeOf(
-				$this->context->typeRegistry()->withName(new TypeNameIdentifier('LengthRange'))
+				$this->context->typeRegistry->withName(new TypeNameIdentifier('LengthRange'))
 			)) {
 				if ($refType instanceof StringType) {
-					return $this->context->typeRegistry()->type($this->context->typeRegistry()->string());
-				} elseif ($refType instanceof ArrayType) {
-					return $this->context->typeRegistry()->type($this->context->typeRegistry()->array($refType->itemType()));
-				} elseif ($refType instanceof MapType) {
-					return $this->context->typeRegistry()->type($this->context->typeRegistry()->map($refType->itemType()));
+					return $this->context->typeRegistry->type($this->context->typeRegistry->string());
+				}
+				if ($refType instanceof ArrayType) {
+					return $this->context->typeRegistry->type($this->context->typeRegistry->array($refType->itemType));
+				}
+				if ($refType instanceof MapType) {
+					return $this->context->typeRegistry->type($this->context->typeRegistry->map($refType->itemType));
 				}
 				// @codeCoverageIgnoreStart
 				throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -62,39 +64,41 @@ final readonly class WithLengthRange implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof TypeValue) {
-			$typeValue = $this->toBaseType($targetValue->typeValue());
+			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($parameter->type->isSubtypeOf(
-				$this->context->typeRegistry()->withName(new TypeNameIdentifier('LengthRange'))
+				$this->context->typeRegistry->withName(new TypeNameIdentifier('LengthRange'))
 			)) {
 				if ($typeValue instanceof StringType) {
-					$range = $this->toBaseValue($parameter->value)->values();
+					$range = $this->toBaseValue($parameter->value)->values;
 					$minValue = $range['minLength'];
 					$maxValue = $range['maxLength'];
-					$result = $this->context->typeRegistry()->string(
-						$minValue->literalValue(),
-						$maxValue instanceof IntegerValue ? $maxValue->literalValue() : PlusInfinity::value,
+					$result = $this->context->typeRegistry->string(
+						$minValue->literalValue,
+						$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
 					);
-					return TypedValue::forValue($this->context->valueRegistry()->type($result));
-				} elseif ($typeValue instanceof ArrayType) {
-					$range = $this->toBaseValue($parameter->value)->values();
+					return TypedValue::forValue($this->context->valueRegistry->type($result));
+				}
+				if ($typeValue instanceof ArrayType) {
+					$range = $this->toBaseValue($parameter->value)->values;
 					$minValue = $range['minLength'];
 					$maxValue = $range['maxLength'];
-					$result = $this->context->typeRegistry()->array(
-						$typeValue->itemType(),
-						$minValue->literalValue(),
-						$maxValue instanceof IntegerValue ? $maxValue->literalValue() : PlusInfinity::value,
+					$result = $this->context->typeRegistry->array(
+						$typeValue->itemType,
+						$minValue->literalValue,
+						$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
 					);
-					return TypedValue::forValue($this->context->valueRegistry()->type($result));
-				} elseif ($typeValue instanceof MapType) {
-					$range = $this->toBaseValue($parameter->value)->values();
+					return TypedValue::forValue($this->context->valueRegistry->type($result));
+				}
+				if ($typeValue instanceof MapType) {
+					$range = $this->toBaseValue($parameter->value)->values;
 					$minValue = $range['minLength'];
 					$maxValue = $range['maxLength'];
-					$result = $this->context->typeRegistry()->map(
-						$typeValue->itemType(),
-						$minValue->literalValue(),
-						$maxValue instanceof IntegerValue ? $maxValue->literalValue() : PlusInfinity::value,
+					$result = $this->context->typeRegistry->map(
+						$typeValue->itemType,
+						$minValue->literalValue,
+						$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
 					);
-					return TypedValue::forValue($this->context->valueRegistry()->type($result));
+					return TypedValue::forValue($this->context->valueRegistry->type($result));
 				}
 			}
 		}

@@ -45,23 +45,23 @@ final readonly class AsString implements NativeMethod {
 	/** @return list<string>|null */
 	public function detectSubsetType(Type $targetType): array|null {
 		return match(true) {
-			$targetType instanceof AliasType => $this->detectSubsetType($targetType->aliasedType()),
-			$targetType instanceof SubtypeType => $this->detectSubsetType($targetType->baseType()),
-			$targetType instanceof MutableType => $this->detectSubsetType($targetType->valueType()),
+			$targetType instanceof AliasType => $this->detectSubsetType($targetType->aliasedType),
+			$targetType instanceof SubtypeType => $this->detectSubsetType($targetType->baseType),
+			$targetType instanceof MutableType => $this->detectSubsetType($targetType->valueType),
 			$targetType instanceof NullType => ['null'],
-			$targetType instanceof AtomType => [$targetType->name()->identifier],
+			$targetType instanceof AtomType => [$targetType->name->identifier],
 			$targetType instanceof TrueType => ['true'],
 			$targetType instanceof FalseType => ['false'],
 			$targetType instanceof BooleanType => ['true', 'false'],
 			$targetType instanceof EnumerationSubsetType =>
 				array_map(fn(EnumerationValue $enumerationValue): string =>
-					$enumerationValue->name()->identifier, $targetType->subsetValues()),
+					$enumerationValue->name->identifier, $targetType->subsetValues),
 			$targetType instanceof IntegerSubsetType =>
 				array_map(fn(IntegerValue $integerValue): string =>
-					(string)$integerValue->literalValue(), $targetType->subsetValues()),
+					(string)$integerValue->literalValue, $targetType->subsetValues),
 			$targetType instanceof RealSubsetType =>
 				array_map(fn(RealValue $realValue): string =>
-					(string)$realValue->literalValue(), $targetType->subsetValues()),
+					(string)$realValue->literalValue, $targetType->subsetValues),
 			default => null
 		};
 	}
@@ -69,16 +69,16 @@ final readonly class AsString implements NativeMethod {
 	/** @return array{int, int}|null */
 	public function detectRangedType(Type $targetType): array|null {
 		return match(true) {
-			$targetType instanceof AliasType => $this->detectRangedType($targetType->aliasedType()),
-			$targetType instanceof SubtypeType => $this->detectRangedType($targetType->baseType()),
-			$targetType instanceof MutableType => $this->detectRangedType($targetType->valueType()),
+			$targetType instanceof AliasType => $this->detectRangedType($targetType->aliasedType),
+			$targetType instanceof SubtypeType => $this->detectRangedType($targetType->baseType),
+			$targetType instanceof MutableType => $this->detectRangedType($targetType->valueType),
 			$targetType instanceof IntegerType => [
 				1,
-				$targetType->range()->maxValue() === PlusInfinity::value ? 1000 :
+				$targetType->range->maxValue === PlusInfinity::value ? 1000 :
 					max(1,
-						(int)ceil(log10(abs($targetType->range()->maxValue))),
-						(int)ceil(log10(abs($targetType->range()->minValue))) +
-							($targetType->range()->minValue() < 0 ? 1 : 0)
+						(int)ceil(log10(abs($targetType->range->maxValue))),
+						(int)ceil(log10(abs($targetType->range->minValue))) +
+							($targetType->range->minValue < 0 ? 1 : 0)
 					)
 
 			],
@@ -97,9 +97,9 @@ final readonly class AsString implements NativeMethod {
 		}
 		$subsetValues = $this->detectSubsetType($targetType);
 		if (is_array($subsetValues)) {
-			return $this->context->typeRegistry()->stringSubset(
+			return $this->context->typeRegistry->stringSubset(
 				array_map(
-					fn(string $val) => $this->context->valueRegistry()->string($val),
+					fn(string $val) => $this->context->valueRegistry->string($val),
 					$subsetValues
 				)
 			);
@@ -107,12 +107,12 @@ final readonly class AsString implements NativeMethod {
 		$range = $this->detectRangedType($targetType);
 		if (is_array($range)) {
 			[$minLength, $maxLength] = $range;
-			return $this->context->typeRegistry()->string($minLength, $maxLength);
+			return $this->context->typeRegistry->string($minLength, $maxLength);
 		}
 		/** @var ResultType */
-		return $this->context->typeRegistry()->result(
-			$this->context->typeRegistry()->string(),
-			$this->context->typeRegistry()->sealed(new TypeNameIdentifier("CastNotAvailable"))
+		return $this->context->typeRegistry->result(
+			$this->context->typeRegistry->string(),
+			$this->context->typeRegistry->sealed(new TypeNameIdentifier("CastNotAvailable"))
 		);
 	}
 
@@ -124,16 +124,16 @@ final readonly class AsString implements NativeMethod {
 
 		$result = $this->evaluate($targetValue);
         return TypedValue::forValue($result === null ?
-	        $this->context->valueRegistry()->error(
-				$this->context->valueRegistry()->sealedValue(
+	        $this->context->valueRegistry->error(
+				$this->context->valueRegistry->sealedValue(
 					new TypeNameIdentifier("CastNotAvailable"),
-					$this->context->valueRegistry()->record([
-						'from' => $this->context->valueRegistry()->type($targetValue->type()),
-						'to' => $this->context->valueRegistry()->type($this->context->typeRegistry()->string())
+					$this->context->valueRegistry->record([
+						'from' => $this->context->valueRegistry->type($targetValue->type),
+						'to' => $this->context->valueRegistry->type($this->context->typeRegistry->string())
 					])
 				)
 			) :
-	        $this->context->valueRegistry()->string(
+	        $this->context->valueRegistry->string(
                 $this->evaluate($targetValue)
             )
         );
@@ -141,16 +141,16 @@ final readonly class AsString implements NativeMethod {
 
     private function evaluate(Value $value): string|null {
         return match (true) {
-            $value instanceof IntegerValue => (string)$value->literalValue(),
-            $value instanceof RealValue => (string) $value->literalValue(),
-            $value instanceof StringValue => $value->literalValue(),
-            $value instanceof BooleanValue => $value->literalValue() ? 'true' : 'false',
+            $value instanceof IntegerValue => (string)$value->literalValue,
+            $value instanceof RealValue => (string) $value->literalValue,
+            $value instanceof StringValue => $value->literalValue,
+            $value instanceof BooleanValue => $value->literalValue ? 'true' : 'false',
             $value instanceof NullValue => 'null',
-            $value instanceof TypeValue => (string)$value->typeValue(),
-            $value instanceof SubtypeValue => $this->evaluate($value->baseValue()),
-            $value instanceof MutableValue => $this->evaluate($value->value()),
-	        $value instanceof AtomValue => $value->type()->name(),
-	        $value instanceof EnumerationValue => $value->name(),
+            $value instanceof TypeValue => (string)$value->typeValue,
+            $value instanceof SubtypeValue => $this->evaluate($value->baseValue),
+            $value instanceof MutableValue => $this->evaluate($value->value),
+	        $value instanceof AtomValue => $value->type->name,
+	        $value instanceof EnumerationValue => $value->name,
             //TODO: check for cast to jsonValue (+subtype as well)
             //TODO: error values
             //default => throw new ExecutionException("Invalid target value")

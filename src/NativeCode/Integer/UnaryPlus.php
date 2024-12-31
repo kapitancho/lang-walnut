@@ -41,8 +41,8 @@ final readonly class UnaryPlus implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof IntegerValue) {
-			$target = $targetValue->literalValue();
-			return TypedValue::forValue($this->context->valueRegistry()->integer($target));
+			$target = $targetValue->literalValue;
+			return TypedValue::forValue($this->context->valueRegistry->integer($target));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

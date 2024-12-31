@@ -10,20 +10,8 @@ use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 
 final readonly class MethodExecutionContext implements MethodExecutionContextInterface {
 	public function __construct(
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-		private AnalyserContext&ExecutionContext $globalExecutionContext
+		public TypeRegistry $typeRegistry,
+		public ValueRegistry $valueRegistry,
+		public AnalyserContext&ExecutionContext $globalContext
 	) {}
-
-	public function typeRegistry(): TypeRegistry {
-		return $this->typeRegistry;
-	}
-
-	public function valueRegistry(): ValueRegistry {
-		return $this->valueRegistry;
-	}
-
-	public function globalContext(): AnalyserContext&ExecutionContext {
-		return $this->globalExecutionContext;
-	}
 }

@@ -9,15 +9,11 @@ use Walnut\Lang\Blueprint\Type\Type;
 
 final readonly class StringType implements StringTypeInterface, JsonSerializable {
 
-    public function __construct(private LengthRange $range) {}
-
-    public function range(): LengthRange {
-        return $this->range;
-    }
+    public function __construct(public LengthRange $range) {}
 
     public function isSubtypeOf(Type $ofType): bool {
         return match(true) {
-            $ofType instanceof StringTypeInterface => $this->range->isSubRangeOf($ofType->range()),
+            $ofType instanceof StringTypeInterface => $this->range->isSubRangeOf($ofType->range),
             $ofType instanceof SupertypeChecker => $ofType->isSupertypeOf($this),
             default => false
         };

@@ -80,14 +80,14 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 		$subtype = null;
 		while ($type instanceof AliasType || $type instanceof SubtypeType) {
 			$k++;
-			$baseIds[] = $type->name()->identifier;
+			$baseIds[] = $type->name->identifier;
 			if ($type instanceof AliasType) {
 				$alias ??= $k;
-				$type = $type->aliasedType();
+				$type = $type->aliasedType;
 				continue;
 			}
             $subtype ??= $k;
-            $type = $type->baseType();
+            $type = $type->baseType;
 		}
 		if ($alias !== null) {
 			if ($subtype !== null && $subtype < $alias) {
@@ -116,7 +116,7 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 						'Record' => RecordType::class,
 						'Union' => UnionType::class,
 						'Intersection' => IntersectionType::class
-					][$type->value()->value]
+					][$type->value->value]
 				]
 			);
 		}
@@ -132,14 +132,14 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 			$type instanceof StringType, $type instanceof StringSubsetType,
 			$type instanceof BooleanType, $type instanceof TrueType,
 			$type instanceof FalseType, $type instanceof NullType => true,
-			$type instanceof ArrayType => $this->isJsonType($type->itemType()),
-			$type instanceof MapType => $this->isJsonType($type->itemType()),
+			$type instanceof ArrayType => $this->isJsonType($type->itemType),
+			$type instanceof MapType => $this->isJsonType($type->itemType),
 			$type instanceof TupleType => $this->isJsonType($type->asArrayType()),
 			$type instanceof RecordType => $this->isJsonType($type->asMapType()),
-			$type instanceof MutableType => $this->isJsonType($type->valueType()),
-			$type instanceof AliasType && $type->name()->identifier === 'JsonValue' => true,
-			$type instanceof AliasType => $this->isJsonType($type->aliasedType()),
-			$type instanceof UnionType => array_reduce($type->types(),
+			$type instanceof MutableType => $this->isJsonType($type->valueType),
+			$type instanceof AliasType && $type->name->identifier === 'JsonValue' => true,
+			$type instanceof AliasType => $this->isJsonType($type->aliasedType),
+			$type instanceof UnionType => array_reduce($type->types,
 				fn($carry, $type) => $carry && $this->isJsonType($type), true),
 			default => false
 		};
@@ -156,7 +156,7 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 		}
 		$result[] = 'Any';
 		if ($type instanceof NamedType) {
-			array_unshift($result, $type->name()->identifier);
+			array_unshift($result, $type->name->identifier);
 		}
 		return $result;
 	}

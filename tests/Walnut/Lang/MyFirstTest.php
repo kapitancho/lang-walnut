@@ -27,7 +27,7 @@ final class MyFirstTest extends BaseProgramTestHelper {
 			$fn,
 			$this->valueRegistry->function(
 				$this->typeRegistry->string(),
-				$this->typeRegistry->nothing(),
+				$this->typeRegistry->nothing,
 				$this->typeRegistry->alias($myFirstType),
 				$this->expressionRegistry->functionBody(
 					$this->expressionRegistry->tuple([
@@ -55,10 +55,10 @@ final class MyFirstTest extends BaseProgramTestHelper {
 		$this->programBuilder->addVariable(
 			$fn,
 			$this->valueRegistry->function(
-				$this->typeRegistry->boolean(),
+				$this->typeRegistry->boolean,
 				$atomType,
 				$this->typeRegistry->tuple([
-					$this->typeRegistry->boolean(),
+					$this->typeRegistry->boolean,
 					$atomType
 				]),
 				$this->expressionRegistry->functionBody(
@@ -72,11 +72,11 @@ final class MyFirstTest extends BaseProgramTestHelper {
 		$program = $this->programBuilder->analyseAndBuildProgram();
 		$entryPoint = $program->getEntryPoint(
 			$fn,
-			$this->typeRegistry->boolean(),
+			$this->typeRegistry->boolean,
 			$this->typeRegistry->array()
 		);
 		$this->assertEquals("[true, MyFirstAtom[]]", (string)$entryPoint->call(
-			$this->valueRegistry->true()
+			$this->valueRegistry->true
 		));
 	}
 
@@ -86,7 +86,7 @@ final class MyFirstTest extends BaseProgramTestHelper {
 			$f,
 			$this->valueRegistry->function(
 				$this->typeRegistry->string(),
-				$this->typeRegistry->nothing(),
+				$this->typeRegistry->nothing,
 				$this->typeRegistry->tuple([
 					$this->typeRegistry->string()
 				]),
@@ -102,7 +102,7 @@ final class MyFirstTest extends BaseProgramTestHelper {
 			$fn,
 			$this->valueRegistry->function(
 				$this->typeRegistry->string(),
-				$this->typeRegistry->nothing(),
+				$this->typeRegistry->nothing,
 				$this->typeRegistry->tuple([
 					$this->typeRegistry->string()
 				]),

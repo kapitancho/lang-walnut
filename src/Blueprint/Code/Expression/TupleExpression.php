@@ -3,6 +3,6 @@
 namespace Walnut\Lang\Blueprint\Code\Expression;
 
 interface TupleExpression extends Expression {
-	/** @return list<Expression> */
-	public function values(): array;
+	/** @param list<Expression> $values */
+	public array $values { get; }
 }

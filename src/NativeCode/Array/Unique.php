@@ -27,17 +27,17 @@ final readonly class Unique implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		if ($targetType instanceof ArrayType) {
-			$itemType = $targetType->itemType();
-			if ($itemType->isSubtypeOf($this->context->typeRegistry()->string()) || $itemType->isSubtypeOf(
-				$this->context->typeRegistry()->union([
-					$this->context->typeRegistry()->integer(),
-					$this->context->typeRegistry()->real()
+			$itemType = $targetType->itemType;
+			if ($itemType->isSubtypeOf($this->context->typeRegistry->string()) || $itemType->isSubtypeOf(
+				$this->context->typeRegistry->union([
+					$this->context->typeRegistry->integer(),
+					$this->context->typeRegistry->real()
 				])
 			)) {
-				return $this->context->typeRegistry()->array(
-					$targetType->itemType(),
-					min(1, $targetType->range()->minLength()),
-					$targetType->range()->maxLength()
+				return $this->context->typeRegistry->array(
+					$targetType->itemType,
+					min(1, $targetType->range->minLength),
+					$targetType->range->maxLength
 				);
 			}
 			// @codeCoverageIgnoreStart
@@ -57,7 +57,7 @@ final readonly class Unique implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
-			$values = $targetValue->values();
+			$values = $targetValue->values;
 
 			$rawValues = [];
 			$hasStrings = false;
@@ -72,7 +72,7 @@ final readonly class Unique implements NativeMethod {
 					throw new ExecutionException("Invalid target value");
 					// @codeCoverageIgnoreEnd
 				}
-				$rawValues[] = $value->literalValue();
+				$rawValues[] = $value->literalValue;
 			}
 			if ($hasStrings) {
 				if ($hasNumbers) {
@@ -81,16 +81,16 @@ final readonly class Unique implements NativeMethod {
 					// @codeCoverageIgnoreEnd
 				}
 				$rawValues = array_unique($rawValues);
-				return TypedValue::forValue($this->context->valueRegistry()->tuple(array_map(
-					fn($value) => $this->context->valueRegistry()->string($value),
+				return TypedValue::forValue($this->context->valueRegistry->tuple(array_map(
+					fn($value) => $this->context->valueRegistry->string($value),
 					$rawValues
 				)));
 			}
 			$rawValues = array_unique($rawValues, SORT_NUMERIC);
-			return TypedValue::forValue($this->context->valueRegistry()->tuple(array_map(
+			return TypedValue::forValue($this->context->valueRegistry->tuple(array_map(
 				fn($value) => is_float($value) ?
-					$this->context->valueRegistry()->real($value) :
-					$this->context->valueRegistry()->integer($value),
+					$this->context->valueRegistry->real($value) :
+					$this->context->valueRegistry->integer($value),
 				$rawValues
 			)));
 		}

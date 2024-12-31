@@ -31,12 +31,12 @@ final readonly class MaxLength implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $this->toBaseType($targetType->refType());
+			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof StringType || $refType instanceof StringSubsetType ||
 				$refType instanceof ArrayType || $refType instanceof MapType) {
-				return $this->context->typeRegistry()->union([
-					$this->context->typeRegistry()->integer(0),
-					$this->context->typeRegistry()->withName(new TypeNameIdentifier('PlusInfinity'))
+				return $this->context->typeRegistry->union([
+					$this->context->typeRegistry->integer(0),
+					$this->context->typeRegistry->withName(new TypeNameIdentifier('PlusInfinity'))
 				]);
 			}
 		}
@@ -52,12 +52,12 @@ final readonly class MaxLength implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof TypeValue) {
-			$typeValue = $this->toBaseType($targetValue->typeValue());
+			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof StringType || $typeValue instanceof StringSubsetType ||
 				$typeValue instanceof ArrayType || $typeValue instanceof MapType) {
-				return TypedValue::forValue($typeValue->range()->maxLength() === PlusInfinity::value ?
-					$this->context->valueRegistry()->atom(new TypeNameIdentifier('PlusInfinity')) :
-					$this->context->valueRegistry()->integer($typeValue->range()->maxLength())
+				return TypedValue::forValue($typeValue->range->maxLength === PlusInfinity::value ?
+					$this->context->valueRegistry->atom(new TypeNameIdentifier('PlusInfinity')) :
+					$this->context->valueRegistry->integer($typeValue->range->maxLength)
 				);
 			}
 		}

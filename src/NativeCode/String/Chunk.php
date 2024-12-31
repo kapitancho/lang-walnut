@@ -31,13 +31,13 @@ final readonly class Chunk implements NativeMethod {
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) {
-				return $this->context->typeRegistry()->array(
-					$this->context->typeRegistry()->string(
-						min(1, $targetType->range()->minLength()),
-						$parameterType->range()->maxValue()
+				return $this->context->typeRegistry->array(
+					$this->context->typeRegistry->string(
+						min(1, $targetType->range->minLength),
+						$parameterType->range->maxValue
 					),
-					$targetType->range()->minLength() > 0 ? 1 : 0,
-					$targetType->range()->maxLength()
+					$targetType->range->minLength > 0 ? 1 : 0,
+					$targetType->range->maxLength
 				);
 			}
 			// @codeCoverageIgnoreStart
@@ -60,10 +60,10 @@ final readonly class Chunk implements NativeMethod {
 		$parameterValue = $this->toBaseValue($parameterValue);
 		if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof IntegerValue) {
-				$result = str_split($targetValue->literalValue(), $parameterValue->literalValue());
-				return TypedValue::forValue($this->context->valueRegistry()->tuple(
+				$result = str_split($targetValue->literalValue, $parameterValue->literalValue);
+				return TypedValue::forValue($this->context->valueRegistry->tuple(
 					array_map(fn(string $piece): StringValue =>
-						$this->context->valueRegistry()->string($piece), $result)
+						$this->context->valueRegistry->string($piece), $result)
 				));
 			}
 			// @codeCoverageIgnoreStart

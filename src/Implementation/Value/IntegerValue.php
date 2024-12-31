@@ -8,38 +8,34 @@ use Walnut\Lang\Blueprint\Value\IntegerValue as IntegerValueInterface;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\IntegerSubsetType;
 
-final readonly class IntegerValue implements IntegerValueInterface, JsonSerializable {
+final class IntegerValue implements IntegerValueInterface, JsonSerializable {
 
     public function __construct(
-		private TypeRegistry $typeRegistry,
-		private int $integerValue
+		private readonly TypeRegistry $typeRegistry,
+		public readonly int $literalValue
     ) {}
 
-    public function type(): IntegerSubsetType {
-        return $this->typeRegistry->integerSubset([$this]);
-    }
-
-    public function literalValue(): int {
-        return $this->integerValue;
+	public IntegerSubsetType $type {
+		get => $this->typeRegistry->integerSubset([$this]);
     }
 
 	public function asRealValue(): RealValue {
-		return new RealValue($this->typeRegistry, (float)$this->integerValue);
+		return new RealValue($this->typeRegistry, (float)$this->literalValue);
 	}
 
 	public function equals(Value $other): bool {
-		return ($other instanceof IntegerValueInterface && $this->literalValue() === $other->literalValue()) ||
-			($other instanceof RealValue && $this->asRealValue()->literalValue() === $other->literalValue());
+		return ($other instanceof IntegerValueInterface && $this->literalValue === $other->literalValue) ||
+			($other instanceof RealValue && $this->asRealValue()->literalValue === $other->literalValue);
 	}
 
 	public function __toString(): string {
-		return (string)$this->literalValue();
+		return (string)$this->literalValue;
 	}
 
 	public function jsonSerialize(): array {
 		return [
 			'valueType' => 'Integer',
-			'value' => $this->integerValue
+			'value' => $this->literalValue
 		];
 	}
 }

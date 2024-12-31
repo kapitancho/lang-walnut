@@ -3,6 +3,6 @@
 namespace Walnut\Lang\Blueprint\Type;
 
 interface ResultType extends Type {
-    public function returnType(): Type;
-    public function errorType(): Type;
+	public Type $returnType { get; }
+	public Type $errorType { get; }
 }

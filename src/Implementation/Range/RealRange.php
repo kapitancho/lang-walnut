@@ -20,22 +20,15 @@ final readonly class RealRange implements RealRangeInterface, JsonSerializable {
 		}
 	}
 
-    public function minValue(): float|MinusInfinity {
-        return $this->minValue;
-    }
-    public function maxValue(): float|PlusInfinity {
-        return $this->maxValue;
-    }
-
     public function isSubRangeOf(RealRangeInterface $range): bool {
 		return
-			$this->compare($this->minValue, $range->minValue()) > -1 &&
-			$this->compare($this->maxValue, $range->maxValue()) < 1;
+			$this->compare($this->minValue, $range->minValue) > -1 &&
+			$this->compare($this->maxValue, $range->maxValue) < 1;
 	}
 
 	public function contains(RealValue|IntegerValue $value): bool {
-		return $this->compare($this->minValue, $value->literalValue()) < 1 &&
-			$this->compare($this->maxValue, $value->literalValue()) > -1;
+		return $this->compare($this->minValue, $value->literalValue) < 1 &&
+			$this->compare($this->maxValue, $value->literalValue) > -1;
 	}
 
 	/** @return int<-1>|int<0>|int<1> */

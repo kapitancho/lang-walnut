@@ -17,7 +17,7 @@ final readonly class Printed implements NativeMethod {
 		Type $targetType,
 		Type $parameterType
 	): StringType {
-		return $this->context->typeRegistry()->string();
+		return $this->context->typeRegistry->string();
 	}
 
 	public function execute(
@@ -26,7 +26,7 @@ final readonly class Printed implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-        return TypedValue::forValue($this->context->valueRegistry()->string(
+        return TypedValue::forValue($this->context->valueRegistry->string(
             (string)$targetValue
         ));
 	}

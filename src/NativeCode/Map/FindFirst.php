@@ -31,17 +31,17 @@ final readonly class FindFirst implements NativeMethod {
 		$type = $targetType instanceof RecordType ? $targetType->asMapType() : $targetType;
 		if ($type instanceof MapType) {
 			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof FunctionType && $parameterType->returnType()->isSubtypeOf($this->context->typeRegistry()->boolean())) {
-				if ($type->itemType()->isSubtypeOf($parameterType->parameterType())) {
-					return $this->context->typeRegistry()->result(
-						$type->itemType(),
-						$this->context->typeRegistry()->atom(new TypeNameIdentifier('ItemNotFound'))
+			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf($this->context->typeRegistry->boolean)) {
+				if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
+					return $this->context->typeRegistry->result(
+						$type->itemType,
+						$this->context->typeRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
 					);
 				}
 				throw new AnalyserException(
 					"The parameter type %s of the callback function is not a subtype of %s",
-					$type->itemType(),
-					$parameterType->parameterType()
+					$type->itemType,
+					$parameterType->parameterType
 				);
 			}
 			// @codeCoverageIgnoreStart
@@ -62,17 +62,17 @@ final readonly class FindFirst implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue && $parameterValue instanceof FunctionValue) {
-			$values = $targetValue->values();
-			$true = $this->context->valueRegistry()->true();
+			$values = $targetValue->values;
+			$true = $this->context->valueRegistry->true;
 			foreach($values as $value) {
-				$r = $parameterValue->execute($this->context->globalContext(), $value);
+				$r = $parameterValue->execute($this->context->globalContext, $value);
 				if ($true->equals($r)) {
 					return TypedValue::forValue($value);
 				}
 			}
 			return TypedValue::forValue(
-				$this->context->valueRegistry()->error(
-					$this->context->valueRegistry()->atom(new TypeNameIdentifier('ItemNotFound'))
+				$this->context->valueRegistry->error(
+					$this->context->valueRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
 				)
 			);
 		}

@@ -28,6 +28,7 @@ use Walnut\Lang\Blueprint\Type\ProxyNamedType;
 use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\RecordType;
+use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
@@ -41,13 +42,13 @@ use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
 
 interface TypeRegistry {
-	public function any(): AnyType;
-	public function nothing(): NothingType;
+	public AnyType $any { get; }
+	public NothingType $nothing { get; }
 
-	public function null(): NullType;
-	public function boolean(): BooleanType;
-	public function true(): TrueType;
-	public function false(): FalseType;
+	public NullType $null { get; }
+	public BooleanType $boolean { get; }
+	public TrueType $true { get; }
+	public FalseType $false { get; }
 
 	public function integer(
 		int|MinusInfinity $min = MinusInfinity::value,
@@ -95,7 +96,7 @@ interface TypeRegistry {
 	public function mutable(Type $valueType): MutableType;
 	public function optionalKey(Type $valueType): OptionalKeyType;
 	public function impure(Type $valueType): Type;
-	public function result(Type $returnType, Type $errorType): Type;
+	public function result(Type $returnType, Type $errorType): ResultType;
 	public function type(Type $refType): TypeType;
 
 	public function proxyType(TypeNameIdentifier $typeName): ProxyNamedType;

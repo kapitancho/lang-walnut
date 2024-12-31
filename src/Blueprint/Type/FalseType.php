@@ -5,8 +5,9 @@ namespace Walnut\Lang\Blueprint\Type;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
 
 interface FalseType extends EnumerationSubsetType {
-    public function enumeration(): BooleanType;
+	public BooleanType $enumeration { get; }
+	/** @param array<string, BooleanType> $subsetValues */
+	public array $subsetValues { get; }
 
-    /** @return array<string, BooleanValue> */
-    public function subsetValues(): array;
+	public BooleanValue $value { get; }
 }

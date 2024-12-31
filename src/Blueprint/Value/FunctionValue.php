@@ -12,14 +12,14 @@ use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\Type;
 
 interface FunctionValue extends Value {
+	public FunctionType $type { get; }
+	public Type $parameterType { get; }
+	public Type $dependencyType { get; }
+	public Type $returnType { get; }
+	public FunctionBody $body { get; }
+
 	public function withVariableValueScope(VariableValueScope $variableValueScope): self;
 	public function withSelfReferenceAs(VariableNameIdentifier $variableName): self;
-
-    public function type(): FunctionType;
-    public function parameterType(): Type;
-    public function dependencyType(): Type;
-    public function returnType(): Type;
-    public function body(): FunctionBody;
 
 	/** @throws FunctionBodyException */
 	public function analyse(AnalyserContext $analyserContext): void;

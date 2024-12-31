@@ -13,13 +13,13 @@ trait BaseType {
 	public function toBaseType(Type $targetType): Type {
 		while ($targetType instanceof AliasType || $targetType instanceof SubtypeType || $targetType instanceof ProxyNamedType) {
 			if ($targetType instanceof AliasType) {
-				$targetType = $targetType->aliasedType();
+				$targetType = $targetType->aliasedType;
 			}
 			if ($targetType instanceof SubtypeType) {
-				$targetType = $targetType->baseType();
+				$targetType = $targetType->baseType;
 			}
 			if ($targetType instanceof ProxyNamedType) {
-				$targetType = $targetType->getActualType();
+				$targetType = $targetType->actualType;
 			}
 		}
 		return $targetType;
@@ -27,7 +27,7 @@ trait BaseType {
 
 	public function toBaseValue(Value $targetValue): Value {
 		while ($targetValue instanceof SubtypeValue) {
-			$targetValue = $targetValue->baseValue();
+			$targetValue = $targetValue->baseValue;
 		}
 		return $targetValue;
 	}

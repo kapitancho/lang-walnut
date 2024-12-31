@@ -28,19 +28,20 @@ use Walnut\Lang\Implementation\Program\Registry\MainMethodRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
 
-final readonly class ProgramFactory implements DependencyContainerInterface, ProgramFactoryInterface {
+final class ProgramFactory implements DependencyContainerInterface, ProgramFactoryInterface {
 
-	private TypeRegistryBuilder $typeRegistryBuilder;
-	private ValueRegistry $valueRegistry;
-	private ExpressionRegistry $expressionRegistry;
-	private MethodRegistry $methodRegistry;
-	private DependencyContainer $dependencyContainer;
-	private CustomMethodRegistryBuilder $customMethodRegistryBuilder;
-	private ScopeBuilder $globalScopeBuilder;
-	private AnalyserContext&ExecutionContext $globalContext;
+	private readonly TypeRegistryBuilder $typeRegistryBuilder;
+	private readonly ValueRegistry $valueRegistry;
+	private readonly ExpressionRegistry $expressionRegistry;
+	private readonly MethodRegistry $methodRegistry;
+	private readonly DependencyContainer $dependencyContainer;
+	private readonly CustomMethodRegistryBuilder $customMethodRegistryBuilder;
+	private readonly ScopeBuilder $globalScopeBuilder;
+	private readonly AnalyserContext&ExecutionContext $globalContext;
 
-	private ProgramBuilder $programBuilder;
-	private ProgramRegistry $programRegistry;
+	private readonly CodeBuilder $programCodeBuilder;
+	private readonly ProgramBuilder $programBuilder;
+	private readonly ProgramRegistry $programRegistry;
 
 	public function __construct() {
 		$this->typeRegistryBuilder = new TypeRegistryBuilder;
@@ -85,34 +86,40 @@ final readonly class ProgramFactory implements DependencyContainerInterface, Pro
 		return $this->dependencyContainer->valueByType($type);
 	}
 
-	public function codeBuilder(): CodeBuilder {
-		return new CodeBuilder(
-			$this->typeRegistryBuilder,
-			$this->valueRegistry,
-			$this->builder(),
-			$this->expressionRegistry,
-		);
+	public CodeBuilder $codeBuilder {
+		get {
+			return $this->programCodeBuilder ??= new CodeBuilder(
+				$this->typeRegistryBuilder,
+				$this->valueRegistry,
+				$this->builder,
+				$this->expressionRegistry,
+			);
+		}
 	}
 
-	public function builder(): ProgramBuilder {
-		return $this->programBuilder ??= new ProgramBuilder(
-			$this->typeRegistryBuilder,
-			$this->expressionRegistry,
-			$this->typeRegistryBuilder,
-			$this->customMethodRegistryBuilder,
-			$this->globalScopeBuilder,
-			$this->globalContext
-		);
+	public ProgramBuilder $builder {
+		get {
+			return $this->programBuilder ??= new ProgramBuilder(
+				$this->typeRegistryBuilder,
+				$this->expressionRegistry,
+				$this->typeRegistryBuilder,
+				$this->customMethodRegistryBuilder,
+				$this->globalScopeBuilder,
+				$this->globalContext
+			);
+		}
 	}
 
-	public function registry(): ProgramRegistry {
-		return $this->programRegistry ??= new ProgramRegistry(
-			$this->typeRegistryBuilder,
-			$this->valueRegistry,
-			$this->expressionRegistry,
-			$this->globalScopeBuilder,
-			$this->customMethodRegistryBuilder
-		);
+	public ProgramRegistry $registry {
+		get {
+			return $this->programRegistry ??= new ProgramRegistry(
+				$this->typeRegistryBuilder,
+				$this->valueRegistry,
+				$this->expressionRegistry,
+				$this->globalScopeBuilder,
+				$this->customMethodRegistryBuilder
+			);
+		}
 	}
 
 	public function addMethod(

@@ -27,9 +27,9 @@ final readonly class HydrateAs implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		if ($parameterType instanceof TypeType) {
-			return $this->context->typeRegistry()->result(
-				$parameterType->refType(),
-				$this->context->typeRegistry()->withName(new TypeNameIdentifier("HydrationError"))
+			return $this->context->typeRegistry->result(
+				$parameterType->refType,
+				$this->context->typeRegistry->withName(new TypeNameIdentifier("HydrationError"))
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -46,18 +46,18 @@ final readonly class HydrateAs implements NativeMethod {
 		
 		if ($parameterValue instanceof TypeValue) {
 			try {
-				return (new Hydrator(
+				return new Hydrator(
 					$this->context,
 					$this->methodRegistry,
-				))->hydrate($targetValue, $parameterValue->typeValue(), 'value');
+				)->hydrate($targetValue, $parameterValue->typeValue, 'value');
 			} catch (HydrationException $e) {
-				return TypedValue::forValue($this->context->valueRegistry()->error(
-					$this->context->valueRegistry()->sealedValue(
+				return TypedValue::forValue($this->context->valueRegistry->error(
+					$this->context->valueRegistry->sealedValue(
 						new TypeNameIdentifier("HydrationError"),
-						$this->context->valueRegistry()->record([
+						$this->context->valueRegistry->record([
 							'value' => $e->value,
-							'hydrationPath' => $this->context->valueRegistry()->string($e->hydrationPath),
-							'errorMessage' => $this->context->valueRegistry()->string($e->errorMessage),
+							'hydrationPath' => $this->context->valueRegistry->string($e->hydrationPath),
+							'errorMessage' => $this->context->valueRegistry->string($e->errorMessage),
 						])
 					)
 				));

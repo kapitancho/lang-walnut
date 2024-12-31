@@ -28,9 +28,9 @@ final readonly class TypeName implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $targetType->refType();
+			$refType = $targetType->refType;
 			if ($refType instanceof MetaType) {
-				if (in_array($refType->value(), [
+				if (in_array($refType->value, [
 					MetaTypeValue::Named,
 					MetaTypeValue::Atom,
 					MetaTypeValue::Enumeration,
@@ -38,12 +38,12 @@ final readonly class TypeName implements NativeMethod {
 					MetaTypeValue::Subtype,
 					MetaTypeValue::Sealed,
 				], true)) {
-					return $this->context->typeRegistry()->string(1);
+					return $this->context->typeRegistry->string(1);
 				}
 			}
 			if ($refType instanceof NamedType) {
-				return $this->context->typeRegistry()->stringSubset([
-					$this->context->valueRegistry()->string($refType->name()->identifier)
+				return $this->context->typeRegistry->stringSubset([
+					$this->context->valueRegistry->string($refType->name->identifier)
 				]);
 			}
 		}
@@ -59,9 +59,9 @@ final readonly class TypeName implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof TypeValue) {
-			$typeValue = $targetValue->typeValue();
+			$typeValue = $targetValue->typeValue;
 			if ($typeValue instanceof NamedType) {
-				return TypedValue::forValue($this->context->valueRegistry()->string($typeValue->name()->identifier));
+				return TypedValue::forValue($this->context->valueRegistry->string($typeValue->name->identifier));
 			}
 		}
 		// @codeCoverageIgnoreStart

@@ -26,7 +26,7 @@ final readonly class HtmlEscape implements NativeMethod {
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
-			return $this->context->typeRegistry()->string();
+			return $this->context->typeRegistry->string();
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -41,7 +41,7 @@ final readonly class HtmlEscape implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof StringValue) {
-			return TypedValue::forValue($this->context->valueRegistry()->string(htmlspecialchars($targetValue->literalValue())));
+			return TypedValue::forValue($this->context->valueRegistry->string(htmlspecialchars($targetValue->literalValue)));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

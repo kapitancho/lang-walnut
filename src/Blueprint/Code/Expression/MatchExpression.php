@@ -3,8 +3,8 @@
 namespace Walnut\Lang\Blueprint\Code\Expression;
 
 interface MatchExpression extends Expression {
-	public function target(): Expression;
-	public function operation(): MatchExpressionOperation;
-	/** @return list<MatchExpressionPair> */
-	public function pairs(): array;
+	public Expression $target { get; }
+	public MatchExpressionOperation $operation { get; }
+	/** @var list<MatchExpressionPair|MatchExpressionDefault> */
+	public array $pairs { get; }
 }

@@ -28,12 +28,12 @@ final readonly class TextValue implements NativeMethod {
 			if ($parameterType instanceof NullType) {
 				$min = 0;
 				$max = 999999;
-				foreach($targetType->subsetValues() as $value) {
-					$l = mb_strlen($value->name());
+				foreach($targetType->subsetValues as $value) {
+					$l = mb_strlen($value->name);
 					$min = min($min, $l);
 					$max = max($max, $l);
 				}
-				return $this->context->typeRegistry()->string($min, $max);
+				return $this->context->typeRegistry->string($min, $max);
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -53,7 +53,7 @@ final readonly class TextValue implements NativeMethod {
 		
 		if ($targetValue instanceof EnumerationValue) {
 			if ($parameterValue instanceof NullValue) {
-				return TypedValue::forValue($this->context->valueRegistry()->string($targetValue->name()->identifier));
+				return TypedValue::forValue($this->context->valueRegistry->string($targetValue->name->identifier));
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

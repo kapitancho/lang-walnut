@@ -3,12 +3,11 @@
 namespace Walnut\Lang\Blueprint\Type;
 
 interface TupleType extends Type {
-    /**
-     * @return non-empty-list<Type>
-     */
-    public function types(): array;
-
-	public function restType(): Type;
+	/**
+      * @param non-empty-list<Type> $types
+      */
+	public array $types { get; }
+	public Type $restType { get; }
 
 	public function asArrayType(): ArrayType;
 

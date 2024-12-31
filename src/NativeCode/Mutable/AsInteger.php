@@ -29,7 +29,7 @@ final readonly class AsInteger implements NativeMethod {
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof MutableType) {
-			$valueType = $targetType->valueType();
+			$valueType = $targetType->valueType;
 			$method = $this->methodRegistry->method(
 				$valueType,
 				new MethodNameIdentifier('asInteger')
@@ -51,14 +51,14 @@ final readonly class AsInteger implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof MutableValue) {
-			$value = $targetValue->value();
+			$value = $targetValue->value;
 			$method = $this->methodRegistry->method(
-				$targetValue->targetType(),
+				$targetValue->targetType,
 				new MethodNameIdentifier('asInteger')
 			);
 			if ($method instanceof Method) {
 				return $method->execute(
-					new TypedValue($targetValue->targetType(), $value),
+					new TypedValue($targetValue->targetType, $value),
 					$parameter);
 			}
 		}

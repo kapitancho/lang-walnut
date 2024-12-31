@@ -117,7 +117,7 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 	}
 
 	public function functionBody(Expression $expression): FunctionBody {
-		return new FunctionBody($this->typeRegistry, $this->valueRegistry,  $expression);
+		return new FunctionBody($this->typeRegistry, $this->valueRegistry, $expression);
 	}
 
 	public function mutable(Type $type, Expression $value): MutableExpression {

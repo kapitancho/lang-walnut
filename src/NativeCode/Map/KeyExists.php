@@ -34,7 +34,7 @@ final readonly class KeyExists implements NativeMethod {
 		if ($targetType instanceof MapType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $this->context->typeRegistry()->boolean();
+				return $this->context->typeRegistry->boolean;
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -54,9 +54,9 @@ final readonly class KeyExists implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue && $parameterValue instanceof StringValue) {
-			$values = $targetValue->values();
-			return TypedValue::forValue($this->context->valueRegistry()->boolean(
-				array_key_exists($parameterValue->literalValue(), $values)
+			$values = $targetValue->values;
+			return TypedValue::forValue($this->context->valueRegistry->boolean(
+				array_key_exists($parameterValue->literalValue, $values)
 			));
 		}
 		// @codeCoverageIgnoreStart

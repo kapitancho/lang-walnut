@@ -26,7 +26,7 @@ final readonly class UnaryBitwiseNot implements NativeMethod {
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof IntegerType || $targetType instanceof IntegerSubsetType) {
-			return $this->context->typeRegistry()->integer(0);
+			return $this->context->typeRegistry->integer(0);
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -41,8 +41,8 @@ final readonly class UnaryBitwiseNot implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof IntegerValue) {
-			$target = $targetValue->literalValue();
-			return TypedValue::forValue($this->context->valueRegistry()->integer(~$target));
+			$target = $targetValue->literalValue;
+			return TypedValue::forValue($this->context->valueRegistry->integer(~$target));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

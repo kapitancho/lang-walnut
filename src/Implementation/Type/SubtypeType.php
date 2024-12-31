@@ -10,21 +10,13 @@ use Walnut\Lang\Blueprint\Type\Type;
 final readonly class SubtypeType implements SubtypeTypeInterface, JsonSerializable {
 
     public function __construct(
-	    private TypeNameIdentifier $typeName,
-        private Type $baseType
+	    public TypeNameIdentifier $name,
+        public Type               $baseType
     ) {}
-
-	public function name(): TypeNameIdentifier {
-		return $this->typeName;
-    }
-
-	public function baseType(): Type {
-        return $this->baseType;
-    }
 
 	public function isSubtypeOf(Type $ofType): bool {
 		return match(true) {
-			$ofType instanceof SubtypeTypeInterface => $this->typeName->equals($ofType->name()),
+			$ofType instanceof SubtypeTypeInterface => $this->name->equals($ofType->name),
 			$ofType instanceof SupertypeChecker => $ofType->isSupertypeOf($this) ||
 				$this->baseType->isSubtypeOf($ofType),
 			default => $this->baseType->isSubtypeOf($ofType)
@@ -32,11 +24,11 @@ final readonly class SubtypeType implements SubtypeTypeInterface, JsonSerializab
     }
 
 	public function __toString(): string {
-		return (string)$this->typeName;
+		return (string)$this->name;
 	}
 
 	public function jsonSerialize(): array {
-		return ['type' => 'Subtype', 'name' => $this->typeName, 'baseType' => $this->baseType];
+		return ['type' => 'Subtype', 'name' => $this->name, 'baseType' => $this->baseType];
 	}
 
 }

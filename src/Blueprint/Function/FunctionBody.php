@@ -11,7 +11,7 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 
 interface FunctionBody extends Stringable {
-	public function expression(): Expression;
+	public Expression $expression { get; }
 
 	public function analyse(
 		AnalyserContext $analyserContext,

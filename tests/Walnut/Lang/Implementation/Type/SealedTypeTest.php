@@ -10,12 +10,12 @@ final class SealedTypeTest extends BaseProgramTestHelper {
 	public function testProperties(): void {
 		$this->programBuilder->addSealed(
 			new TypeNameIdentifier('M'),
-			$valueType = $this->typeRegistry->record(['a' => $this->typeRegistry->boolean()]),
-			$this->expressionRegistry->constant($this->valueRegistry->null()),
+			$valueType = $this->typeRegistry->record(['a' => $this->typeRegistry->boolean]),
+			$this->expressionRegistry->constant($this->valueRegistry->null),
 			null
 		);
 		$type = $this->typeRegistry->sealed(new TypeNameIdentifier('M'));
-		$this->assertEquals($valueType, $type->valueType());
+		$this->assertEquals($valueType, $type->valueType);
 	}
 
 }

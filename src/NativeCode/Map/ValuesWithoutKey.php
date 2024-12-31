@@ -35,19 +35,19 @@ final readonly class ValuesWithoutKey implements NativeMethod {
 		}
 		if ($targetType instanceof MapType) {
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $this->context->typeRegistry()->result(
-					$this->context->typeRegistry()->map(
-						$targetType->itemType(),
-						$targetType->range()->maxLength() === PlusInfinity::value ?
-							$targetType->range()->minLength() : max(0,
+				return $this->context->typeRegistry->result(
+					$this->context->typeRegistry->map(
+						$targetType->itemType,
+						$targetType->range->maxLength === PlusInfinity::value ?
+							$targetType->range->minLength : max(0,
 							min(
-								$targetType->range()->minLength() - 1,
-								$targetType->range()->maxLength() - 1
+								$targetType->range->minLength - 1,
+								$targetType->range->maxLength - 1
 							)),
-						$targetType->range()->maxLength() === PlusInfinity::value ?
-							PlusInfinity::value : $targetType->range()->maxLength() - 1
+						$targetType->range->maxLength === PlusInfinity::value ?
+							PlusInfinity::value : $targetType->range->maxLength - 1
 					),
-					$this->context->typeRegistry()->sealed(
+					$this->context->typeRegistry->sealed(
 						new TypeNameIdentifier("MapItemNotFound")
 					)
 				);
@@ -71,17 +71,17 @@ final readonly class ValuesWithoutKey implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue) {
 			if ($parameterValue instanceof StringValue) {
-				$values = $targetValue->values();
-				if (!isset($values[$parameterValue->literalValue()])) {
-					return TypedValue::forValue($this->context->valueRegistry()->error(
-						$this->context->valueRegistry()->sealedValue(
+				$values = $targetValue->values;
+				if (!isset($values[$parameterValue->literalValue])) {
+					return TypedValue::forValue($this->context->valueRegistry->error(
+						$this->context->valueRegistry->sealedValue(
 							new TypeNameIdentifier('MapItemNotFound'),
-							$this->context->valueRegistry()->record(['key' => $parameterValue])
+							$this->context->valueRegistry->record(['key' => $parameterValue])
 						)
 					));
 				}
-				unset($values[$parameterValue->literalValue()]);
-				return TypedValue::forValue($this->context->valueRegistry()->record($values));
+				unset($values[$parameterValue->literalValue]);
+				return TypedValue::forValue($this->context->valueRegistry->record($values));
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

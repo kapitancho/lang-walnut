@@ -34,17 +34,17 @@ final readonly class PadRight implements NativeMethod {
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof RecordType) {
-				$types = $parameterType->types();
+				$types = $parameterType->types;
 				$lengthType = $types['length'] ?? null;
 				$padStringType = $types['padString'] ?? null;
 				if (($lengthType instanceof IntegerType || $lengthType instanceof IntegerSubsetType) &&
 					($padStringType instanceof StringType || $padStringType instanceof StringSubsetType)
 				) {
-					return $this->context->typeRegistry()->string(
-						max($targetType->range()->minLength(), $lengthType->range()->minValue()),
-						$targetType->range()->maxLength() === PlusInfinity::value ||
-							$lengthType->range()->maxValue() === PlusInfinity::value ? PlusInfinity::value :
-							max($targetType->range()->maxLength(), $lengthType->range()->maxValue()),
+					return $this->context->typeRegistry->string(
+						max($targetType->range->minLength, $lengthType->range->minValue),
+						$targetType->range->maxLength === PlusInfinity::value ||
+							$lengthType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
+							max($targetType->range->maxLength, $lengthType->range->maxValue),
 					);
 				}
 			}
@@ -68,16 +68,16 @@ final readonly class PadRight implements NativeMethod {
 		$parameterValue = $this->toBaseValue($parameterValue);
 		if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof RecordValue) {
-				$values = $parameterValue->values();
+				$values = $parameterValue->values;
 				$length = $values['length'] ?? null;
 				$padString = $values['padString'] ?? null;
 				if ($length instanceof IntegerValue && $padString instanceof StringValue) {
 					$result = str_pad(
-						$targetValue->literalValue(),
-						$length->literalValue(),
-						$padString->literalValue()
+						$targetValue->literalValue,
+						$length->literalValue,
+						$padString->literalValue
                     );
-					return TypedValue::forValue($this->context->valueRegistry()->string($result));
+					return TypedValue::forValue($this->context->valueRegistry->string($result));
 				}
 			}
 			// @codeCoverageIgnoreStart

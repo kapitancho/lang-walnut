@@ -8,8 +8,8 @@ use Walnut\Lang\Blueprint\Program\UnknownEnumerationValue;
 use Walnut\Lang\Blueprint\Value\EnumerationValue;
 
 interface EnumerationType extends EnumerationSubsetType, NamedType {
-    /** @return array<string, EnumerationValue> */
-    public function values(): array;
+	/** @param array<string, EnumerationValue> $values */
+	public array $values { get; }
 
     /**
      * @param non-empty-list<EnumValueIdentifier> $values

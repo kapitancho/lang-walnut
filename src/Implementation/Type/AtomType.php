@@ -11,34 +11,26 @@ use Walnut\Lang\Blueprint\Value\AtomValue;
 final readonly class AtomType implements AtomTypeInterface, JsonSerializable {
 
     public function __construct(
-        private TypeNameIdentifier $typeName,
-        private AtomValue          $atomValue
+        public TypeNameIdentifier $name,
+        public AtomValue           $value
     ) {}
-
-    public function value(): AtomValue {
-        return $this->atomValue;
-    }
-
-    public function name(): TypeNameIdentifier {
-        return $this->typeName;
-    }
 
     public function isSubtypeOf(Type $ofType): bool {
 		return match(true) {
-			$ofType instanceof AtomTypeInterface => $this->typeName->equals($ofType->name()),
+			$ofType instanceof AtomTypeInterface => $this->name->equals($ofType->name),
 			$ofType instanceof SupertypeChecker => $ofType->isSupertypeOf($this),
 			default => false
 		};
     }
 
 	public function __toString(): string {
-		return (string)$this->typeName;
+		return (string)$this->name;
 	}
 
 	public function jsonSerialize(): array {
 		return [
 			'type' => 'Atom',
-			'name' => $this->typeName
+			'name' => $this->name
 		];
 	}
 }

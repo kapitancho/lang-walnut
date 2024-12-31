@@ -28,14 +28,14 @@ final readonly class InsertLast implements NativeMethod {
         $targetType = $this->toBaseType($targetType);
         $type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($type instanceof ArrayType) {
-			return $this->context->typeRegistry()->array(
-				$this->context->typeRegistry()->union([
-					$type->itemType(),
+			return $this->context->typeRegistry->array(
+				$this->context->typeRegistry->union([
+					$type->itemType,
 					$parameterType
 				]),
-				$type->range()->minLength() + 1,
-				$type->range()->maxLength() === PlusInfinity::value ?
-					PlusInfinity::value : $type->range()->maxLength() + 1
+				$type->range->minLength + 1,
+				$type->range->maxLength === PlusInfinity::value ?
+					PlusInfinity::value : $type->range->maxLength + 1
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -52,9 +52,9 @@ final readonly class InsertLast implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
-			$values = $targetValue->values();
+			$values = $targetValue->values;
 			$values[] = $parameterValue;
-			return TypedValue::forValue($this->context->valueRegistry()->tuple($values));
+			return TypedValue::forValue($this->context->valueRegistry->tuple($values));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

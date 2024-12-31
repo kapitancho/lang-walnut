@@ -32,13 +32,13 @@ final class CastAsTest extends BaseProgramTestHelper {
 	public function testCastAs(): void {
 		$this->callCastAs(
 			$this->valueRegistry->integer(1),
-			$this->typeRegistry->boolean(),
-			$this->valueRegistry->true()
+			$this->typeRegistry->boolean,
+			$this->valueRegistry->true
 		);
 		$this->callCastAs(
 			$this->valueRegistry->integer(0),
-			$this->typeRegistry->boolean(),
-			$this->valueRegistry->false()
+			$this->typeRegistry->boolean,
+			$this->valueRegistry->false
 		);
 
 		$this->programBuilder->addEnumeration(
@@ -51,9 +51,9 @@ final class CastAsTest extends BaseProgramTestHelper {
 		$this->programBuilder->addMethod(
 			$this->typeRegistry->enumeration(new TypeNameIdentifier('OrderStatus')),
 			new MethodNameIdentifier('asBoolean'),
-			$this->typeRegistry->null(),
-			$this->typeRegistry->nothing(),
-			$this->typeRegistry->boolean(),
+			$this->typeRegistry->null,
+			$this->typeRegistry->nothing,
+			$this->typeRegistry->boolean,
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->match(
 					$this->expressionRegistry->variableName(
@@ -69,12 +69,12 @@ final class CastAsTest extends BaseProgramTestHelper {
 								)
 							),
 							$this->expressionRegistry->constant(
-								$this->valueRegistry->false()
+								$this->valueRegistry->false
 							)
 						),
 						$this->expressionRegistry->matchDefault(
 							$this->expressionRegistry->constant(
-								$this->valueRegistry->true()
+								$this->valueRegistry->true
 							)
 						),
 					]
@@ -86,23 +86,23 @@ final class CastAsTest extends BaseProgramTestHelper {
 				new TypeNameIdentifier('OrderStatus'),
 				new EnumValueIdentifier('Draft')
 			),
-			$this->typeRegistry->boolean(),
-			$this->valueRegistry->true()
+			$this->typeRegistry->boolean,
+			$this->valueRegistry->true
 		);
 		$this->callCastAs(
 			$this->valueRegistry->enumerationValue(
 				new TypeNameIdentifier('OrderStatus'),
 				new EnumValueIdentifier('Invalid')
 			),
-			$this->typeRegistry->boolean(),
-			$this->valueRegistry->false()
+			$this->typeRegistry->boolean,
+			$this->valueRegistry->false
 		);
 
 		$this->programBuilder->addMethod(
 			$enumType = $this->typeRegistry->enumeration(new TypeNameIdentifier('OrderStatus')),
 			new MethodNameIdentifier('asInteger'),
-			$this->typeRegistry->null(),
-			$this->typeRegistry->nothing(),
+			$this->typeRegistry->null,
+			$this->typeRegistry->nothing,
 			$this->typeRegistry->integer(0, 2),
 			$toInt = $this->expressionRegistry->functionBody(
 				$this->expressionRegistry->match(
@@ -176,9 +176,9 @@ final class CastAsTest extends BaseProgramTestHelper {
 
 		$this->programBuilder->addMethod(
 			$this->typeRegistry->integer(),
-			new MethodNameIdentifier('as' . $enumType->name()),
-			$this->typeRegistry->null(),
-			$this->typeRegistry->nothing(),
+			new MethodNameIdentifier('as' . $enumType->name),
+			$this->typeRegistry->null,
+			$this->typeRegistry->nothing,
 			$enumType,
 			$fromInt = $this->expressionRegistry->functionBody(
 				$this->expressionRegistry->match(
@@ -252,14 +252,14 @@ final class CastAsTest extends BaseProgramTestHelper {
 	    //$jsonValueType =
 		$this->typeRegistry->addAlias($j,
 		    $this->typeRegistry->union([
-				$this->typeRegistry->null(),
-			    $this->typeRegistry->boolean(),
+				$this->typeRegistry->null,
+			    $this->typeRegistry->boolean,
 			    $this->typeRegistry->integer(),
 			    $this->typeRegistry->real(),
 			    $this->typeRegistry->string(),
 			    $this->typeRegistry->array($aliasType),
 			    $this->typeRegistry->map($aliasType),
-			    $this->typeRegistry->result($this->typeRegistry->nothing(), $aliasType),
+			    $this->typeRegistry->result($this->typeRegistry->nothing, $aliasType),
 			    $this->typeRegistry->mutable($aliasType)
 		    ], false),
 	    );
@@ -274,8 +274,8 @@ final class CastAsTest extends BaseProgramTestHelper {
 		$this->programBuilder->addMethod(
 			$enumType,
 			new MethodNameIdentifier('asJsonValue'),
-			$this->typeRegistry->null(),
-			$this->typeRegistry->nothing(),
+			$this->typeRegistry->null,
+			$this->typeRegistry->nothing,
 			$this->typeRegistry->integer(0, 2),
 			$toInt
 		);
@@ -291,9 +291,9 @@ final class CastAsTest extends BaseProgramTestHelper {
 
 		$this->programBuilder->addMethod(
 			$jv,
-			new MethodNameIdentifier('as' . $enumType->name()),
-			$this->typeRegistry->null(),
-			$this->typeRegistry->nothing(),
+			new MethodNameIdentifier('as' . $enumType->name),
+			$this->typeRegistry->null,
+			$this->typeRegistry->nothing,
 			$enumType,
 			$fromInt
 		);
@@ -314,7 +314,7 @@ final class CastAsTest extends BaseProgramTestHelper {
 						$this->valueRegistry->integer(1)
 					)
 				])))
-				->value()->equals(
+				->value->equals(
 					$this->valueRegistry->enumerationValue(
 						new TypeNameIdentifier('OrderStatus'),
 						new EnumValueIdentifier('Draft')

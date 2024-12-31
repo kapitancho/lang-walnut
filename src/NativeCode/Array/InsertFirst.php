@@ -25,14 +25,14 @@ final readonly class InsertFirst implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		if ($targetType instanceof ArrayType) {
-			return $this->context->typeRegistry()->array(
-				$this->context->typeRegistry()->union([
-					$targetType->itemType(),
+			return $this->context->typeRegistry->array(
+				$this->context->typeRegistry->union([
+					$targetType->itemType,
 					$parameterType
 				]),
-				$targetType->range()->minLength() + 1,
-				$targetType->range()->maxLength() === PlusInfinity::value ?
-					PlusInfinity::value : $targetType->range()->maxLength() + 1
+				$targetType->range->minLength + 1,
+				$targetType->range->maxLength === PlusInfinity::value ?
+					PlusInfinity::value : $targetType->range->maxLength + 1
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -49,9 +49,9 @@ final readonly class InsertFirst implements NativeMethod {
 		
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
-			$values = $targetValue->values();
+			$values = $targetValue->values;
 			array_unshift($values, $parameterValue);
-			return TypedValue::forValue($this->context->valueRegistry()->tuple($values));
+			return TypedValue::forValue($this->context->valueRegistry->tuple($values));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

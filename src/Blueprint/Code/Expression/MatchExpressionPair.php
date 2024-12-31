@@ -5,6 +5,6 @@ namespace Walnut\Lang\Blueprint\Code\Expression;
 use Stringable;
 
 interface MatchExpressionPair extends Stringable {
-	public function matchExpression(): Expression;
-	public function valueExpression(): Expression;
+	public Expression $matchExpression { get; }
+	public Expression $valueExpression { get; }
 }

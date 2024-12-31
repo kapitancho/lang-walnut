@@ -63,14 +63,14 @@ use Walnut\Lang\Implementation\Value\NullValue;
 
 final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInterface, JsonSerializable {
 
-    private AnyType $anyType;
-    private NothingType $nothingType;
+    public AnyType $any;
+    public NothingType $nothing;
 
-    private BooleanType $booleanType;
-    private TrueType $trueType;
-    private FalseType $falseType;
+    public BooleanType $boolean;
+    public TrueType $true;
+    public FalseType $false;
 
-    private NullType $nullType;
+    public NullType $null;
 
 	/** @var array<string, AtomType> */
     private array $atomTypes;
@@ -86,18 +86,18 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
     private UnionTypeNormalizer $unionTypeNormalizer;
     private IntersectionTypeNormalizer $intersectionTypeNormalizer;
 
-    private const booleanTypeName = 'Boolean';
-    private const nullTypeName = 'Null';
-    private const constructorTypeName = 'Constructor';
+    private const string booleanTypeName = 'Boolean';
+    private const string nullTypeName = 'Null';
+    private const string constructorTypeName = 'Constructor';
 
     public function __construct() {
         $this->unionTypeNormalizer = new UnionTypeNormalizer($this);
         $this->intersectionTypeNormalizer = new IntersectionTypeNormalizer($this);
 
-        $this->anyType = new AnyType;
-        $this->nothingType = new NothingType;
+        $this->any = new AnyType;
+        $this->nothing = new NothingType;
         $atomTypes = [
-			self::nullTypeName => $this->nullType = new NullType(
+			self::nullTypeName => $this->null = new NullType(
 				new TypeNameIdentifier(self::nullTypeName),
 	            new NullValue($this)
 	        ),
@@ -109,7 +109,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 
         $this->atomTypes = $atomTypes;
         $enumerationTypes = [
-			self::booleanTypeName => $this->booleanType = new BooleanType(
+			self::booleanTypeName => $this->boolean = new BooleanType(
 	            new TypeNameIdentifier(self::booleanTypeName),
 	            new BooleanValue(
 					$this,
@@ -123,34 +123,12 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 	            )
 	        )
         ];
-        $this->trueType = $this->booleanType->subsetType([$trueValue]);
-        $this->falseType = $this->booleanType->subsetType([$falseValue]);
+        $this->true = $this->boolean->subsetType([$trueValue]);
+        $this->false = $this->boolean->subsetType([$falseValue]);
         $this->enumerationTypes = $enumerationTypes;
 		$this->aliasTypes = [];
 		$this->subtypeTypes = [];
 		$this->sealedTypes = [];
-    }
-
-    public function any(): AnyType {
-        return $this->anyType;
-    }
-
-    public function nothing(): NothingType {
-        return $this->nothingType;
-    }
-
-    public function null(): NullType {
-        return $this->nullType;
-    }
-
-    public function boolean(): BooleanType {
-        return $this->booleanType;
-    }
-    public function true(): TrueType {
-        return $this->trueType;
-    }
-    public function false(): FalseType {
-        return $this->falseType;
     }
 
     public function integer(
@@ -199,10 +177,10 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		);
     }
 
-    public function result(Type $returnType, Type $errorType): Type {
+    public function result(Type $returnType, Type $errorType): ResultType {
 		if ($returnType instanceof ResultTypeInterface) {
-			$errorType = $this->union([$errorType, $returnType->errorType()]);
-			$returnType = $returnType->returnType();
+			$errorType = $this->union([$errorType, $returnType->errorType]);
+			$returnType = $returnType->returnType;
 		}
         return new ResultType($returnType, $errorType);
     }
@@ -221,18 +199,18 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 
     public function typeByName(TypeNameIdentifier $typeName): Type {
 	    return match($typeName->identifier) {
-			'Any' => $this->anyType,
-			'Nothing' => $this->nothingType,
+			'Any' => $this->any,
+			'Nothing' => $this->nothing,
 			'Array' => $this->array(),
 			'Map' => $this->map(),
-		    'Error' => $this->result($this->nothingType, $this->anyType),
-			'Impure' => $this->impure($this->anyType),
-			'Mutable' => $this->mutable($this->anyType),
-			'Type' => $this->type($this->anyType),
-			'Null' => $this->nullType,
-			'True' => $this->trueType,
-			'False' => $this->falseType,
-			'Boolean' => $this->booleanType,
+		    'Error' => $this->result($this->nothing, $this->any),
+			'Impure' => $this->impure($this->any),
+			'Mutable' => $this->mutable($this->any),
+			'Type' => $this->type($this->any),
+			'Null' => $this->null,
+			'True' => $this->true,
+			'False' => $this->false,
+			'Boolean' => $this->boolean,
 			'Integer' => $this->integer(),
 			'Real' => $this->real(),
 			'String' => $this->string(),
@@ -273,21 +251,21 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
     }
 
 	public function array(Type|null $itemType = null, int $minLength = 0, int|PlusInfinity $maxLength = PlusInfinity::value): ArrayType {
-		return new ArrayType($itemType ?? $this->anyType, new LengthRange($minLength, $maxLength));
+		return new ArrayType($itemType ?? $this->any, new LengthRange($minLength, $maxLength));
 	}
 
 	public function map(Type|null $itemType = null, int $minLength = 0, int|PlusInfinity $maxLength = PlusInfinity::value): MapType {
-		return new MapType($itemType ?? $this->anyType, new LengthRange($minLength, $maxLength));
+		return new MapType($itemType ?? $this->any, new LengthRange($minLength, $maxLength));
 	}
 
 	/** @param list<Type> $itemTypes */
 	public function tuple(array $itemTypes, Type|null $restType = null): TupleType {
-		return new TupleType($this, $itemTypes, $restType ?? $this->nothingType);
+		return new TupleType($this, $itemTypes, $restType ?? $this->nothing);
 	}
 
 	/** @param array<string, Type> $itemTypes */
 	public function record(array $itemTypes, Type|null $restType = null): RecordType {
-		return new RecordType($this, $itemTypes, $restType ?? $this->nothingType);
+		return new RecordType($this, $itemTypes, $restType ?? $this->nothing);
 	}
 
 	/** @param list<Type> $types */
@@ -368,23 +346,23 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 	public function jsonSerialize(): array {
 		return [
 			'coreTypes' => [
-				'Any' => $this->anyType,
-				'Nothing' => $this->nothingType,
-				'Boolean' => $this->booleanType,
-				'True' => $this->trueType,
-				'False' => $this->falseType,
-				'Null' => $this->nullType,
+				'Any' => $this->any,
+				'Nothing' => $this->nothing,
+				'Boolean' => $this->boolean,
+				'True' => $this->true,
+				'False' => $this->false,
+				'Null' => $this->null,
 				'Integer' => $this->integer(),
 				'Real' => $this->real(),
 				'String' => $this->string(),
 				'Array' => $this->array(),
 				'Map' => $this->map(),
-				'Tuple' => $this->tuple([], $this->nothingType),
-				'Record' => $this->record([], $this->nothingType),
-				'Mutable' => $this->mutable($this->anyType),
-				'Result' => $this->result($this->anyType, $this->anyType),
-				'Type' => $this->type($this->anyType),
-				'Function' => $this->function($this->anyType, $this->anyType),
+				'Tuple' => $this->tuple([], $this->nothing),
+				'Record' => $this->record([], $this->nothing),
+				'Mutable' => $this->mutable($this->any),
+				'Result' => $this->result($this->any, $this->any),
+				'Type' => $this->type($this->any),
+				'Function' => $this->function($this->any, $this->any),
 				'Intersection' => $this->intersection([$this->integer(), $this->string()]),
 				'Union' => $this->union([$this->integer(), $this->string()]),
 			],

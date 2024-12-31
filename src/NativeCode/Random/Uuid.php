@@ -25,8 +25,8 @@ final readonly class Uuid implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof AtomType && $targetType->name()->equals(new TypeNameIdentifier('Random'))) {
-			return $this->context->typeRegistry()->string(36, 36);
+		if ($targetType instanceof AtomType && $targetType->name->equals(new TypeNameIdentifier('Random'))) {
+			return $this->context->typeRegistry->string(36, 36);
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -40,7 +40,7 @@ final readonly class Uuid implements NativeMethod {
 		$targetValue = $target->value;
 
 		$targetValue = $this->toBaseValue($targetValue);
-		if ($targetValue instanceof AtomValue && $targetValue->type()->name()->equals(
+		if ($targetValue instanceof AtomValue && $targetValue->type->name->equals(
 			new TypeNameIdentifier('Random')
 		)) {
 			/** @noinspection PhpUnhandledExceptionInspection */
@@ -51,7 +51,7 @@ final readonly class Uuid implements NativeMethod {
 			$arr[2] = ($arr[2] & 0x0fff) | 0x4000;
 			$arr[3] = ($arr[3] & 0x3fff) | 0x8000;
 			$uuid = vsprintf('%08x-%04x-%04x-%04x-%04x%08x', $arr);
-			return TypedValue::forValue($this->context->valueRegistry()->string($uuid));
+			return TypedValue::forValue($this->context->valueRegistry->string($uuid));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

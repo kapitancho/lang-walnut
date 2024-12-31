@@ -28,7 +28,7 @@ final readonly class Contains implements NativeMethod {
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $this->context->typeRegistry()->boolean();
+				return $this->context->typeRegistry->boolean;
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -50,10 +50,10 @@ final readonly class Contains implements NativeMethod {
 		$parameterValue = $this->toBaseValue($parameterValue);
 		if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof StringValue) {
-				return TypedValue::forValue($this->context->valueRegistry()->boolean(
+				return TypedValue::forValue($this->context->valueRegistry->boolean(
 					str_contains(
-						$targetValue->literalValue(),
-						$parameterValue->literalValue()
+						$targetValue->literalValue,
+						$parameterValue->literalValue
 					)
 				));
 			}

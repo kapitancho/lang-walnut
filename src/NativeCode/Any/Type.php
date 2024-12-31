@@ -22,7 +22,7 @@ final readonly class Type implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($parameterType instanceof NullType) {
-			return $this->context->typeRegistry()->type($targetType);
+			return $this->context->typeRegistry->type($targetType);
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -37,7 +37,7 @@ final readonly class Type implements NativeMethod {
 		$parameterValue = $parameter->value;
 		
 		if ($parameterValue instanceof NullValue) {
-			return TypedValue::forValue($this->context->valueRegistry()->type($targetValue->type()));
+			return TypedValue::forValue($this->context->valueRegistry->type($targetValue->type));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid parameter value");

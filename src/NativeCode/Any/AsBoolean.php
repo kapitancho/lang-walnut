@@ -53,41 +53,41 @@ final readonly class AsBoolean implements NativeMethod {
 	private function analyseType(Type $type): BooleanType|TrueType|FalseType {
 		return match(true) {
 			$type instanceof AliasType
-				=> $this->analyseType($type->aliasedType()),
+				=> $this->analyseType($type->aliasedType),
 			$type instanceof SubtypeType
-				=> $this->analyseType($type->baseType()),
+				=> $this->analyseType($type->baseType),
 			$type instanceof MutableType
-				=> $this->analyseType($type->valueType()),
+				=> $this->analyseType($type->valueType),
 
 			$type instanceof NullType,
 			$type instanceof FalseType,
-			($type instanceof IntegerSubsetType && count($type->subsetValues()) === 1 && $type->subsetValues()[0]->literalValue() === 0),
-			($type instanceof IntegerType && $type->range()->minValue() === 0 && $type->range()->maxValue() === 0),
-			($type instanceof RealSubsetType && count($type->subsetValues()) === 1 && (float)$type->subsetValues()[0]->literalValue() === 0.0),
-			($type instanceof RealType && $type->range()->minValue() === 0.0 && $type->range()->maxValue() === 0.0),
-			($type instanceof StringSubsetType && count($type->subsetValues()) === 1 && $type->subsetValues()[0]->literalValue() === ''),
-			($type instanceof StringType && $type->range()->maxLength() === 0),
-			($type instanceof RecordType && count($type->types()) === 0),
-			($type instanceof TupleType && count($type->types()) === 0),
-			($type instanceof ArrayType && $type->range()->maxLength() === 0),
-			($type instanceof MapType && $type->range()->maxLength() === 0)
-				=> $this->context->typeRegistry()->false(),
+			($type instanceof IntegerSubsetType && count($type->subsetValues) === 1 && $type->subsetValues[0]->literalValue === 0),
+			($type instanceof IntegerType && $type->range->minValue === 0 && $type->range->maxValue === 0),
+			($type instanceof RealSubsetType && count($type->subsetValues) === 1 && (float)$type->subsetValues[0]->literalValue === 0.0),
+			($type instanceof RealType && $type->range->minValue === 0.0 && $type->range->maxValue === 0.0),
+			($type instanceof StringSubsetType && count($type->subsetValues) === 1 && $type->subsetValues[0]->literalValue === ''),
+			($type instanceof StringType && $type->range->maxLength === 0),
+			($type instanceof RecordType && count($type->types) === 0),
+			($type instanceof TupleType && count($type->types) === 0),
+			($type instanceof ArrayType && $type->range->maxLength === 0),
+			($type instanceof MapType && $type->range->maxLength === 0)
+				=> $this->context->typeRegistry->false,
 			$type instanceof SealedType,
 			$type instanceof TrueType,
-			($type instanceof IntegerSubsetType && !in_array(0, array_map(fn(IntegerValue $v) => $v->literalValue(), $type->subsetValues()))),
-			($type instanceof IntegerType && $type->range()->minValue() !== MinusInfinity::value && $type->range()->minValue() > 0),
-			($type instanceof IntegerType && $type->range()->maxValue() !== PlusInfinity::value && $type->range()->maxValue() < 0),
-			($type instanceof RealSubsetType && !in_array(0.0, array_map(fn(IntegerValue|RealValue $v) => $v->literalValue(), $type->subsetValues()))),
-			($type instanceof RealType && $type->range()->minValue() !== MinusInfinity::value && $type->range()->minValue() > 0),
-			($type instanceof RealType && $type->range()->maxValue() !== PlusInfinity::value && $type->range()->maxValue() < 0),
-			($type instanceof StringSubsetType && !in_array('', array_map(fn(StringValue $v) => $v->literalValue(), $type->subsetValues()))),
-			($type instanceof StringType && $type->range()->minLength() > 0),
-			($type instanceof RecordType && count($type->types()) > 0),
-			($type instanceof TupleType && count($type->types()) > 0),
-			($type instanceof ArrayType && $type->range()->minLength() > 0),
-			($type instanceof MapType && $type->range()->minLength() > 0)
-				=> $this->context->typeRegistry()->true(),
-			default => $this->context->typeRegistry()->boolean(),
+			($type instanceof IntegerSubsetType && !in_array(0, array_map(fn(IntegerValue $v) => $v->literalValue, $type->subsetValues))),
+			($type instanceof IntegerType && $type->range->minValue !== MinusInfinity::value && $type->range->minValue > 0),
+			($type instanceof IntegerType && $type->range->maxValue !== PlusInfinity::value && $type->range->maxValue < 0),
+			($type instanceof RealSubsetType && !in_array(0.0, array_map(fn(IntegerValue|RealValue $v) => $v->literalValue, $type->subsetValues))),
+			($type instanceof RealType && $type->range->minValue !== MinusInfinity::value && $type->range->minValue > 0),
+			($type instanceof RealType && $type->range->maxValue !== PlusInfinity::value && $type->range->maxValue < 0),
+			($type instanceof StringSubsetType && !in_array('', array_map(fn(StringValue $v) => $v->literalValue, $type->subsetValues))),
+			($type instanceof StringType && $type->range->minLength > 0),
+			($type instanceof RecordType && count($type->types) > 0),
+			($type instanceof TupleType && count($type->types) > 0),
+			($type instanceof ArrayType && $type->range->minLength > 0),
+			($type instanceof MapType && $type->range->minLength > 0)
+				=> $this->context->typeRegistry->true,
+			default => $this->context->typeRegistry->boolean,
 			/*$type instanceof IntegerType,
 			$type instanceof IntegerSubsetType,
 			$type instanceof RealType,
@@ -107,22 +107,22 @@ final readonly class AsBoolean implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 		
-        return TypedValue::forValue($this->context->valueRegistry()->boolean(
+        return TypedValue::forValue($this->context->valueRegistry->boolean(
             $this->evaluate($targetValue)
         ));
 	}
 
     private function evaluate(Value $value): bool {
         return match(true) {
-            $value instanceof IntegerValue => $value->literalValue() !== 0,
-            $value instanceof RealValue => $value->literalValue() !== 0.0,
-            $value instanceof StringValue => $value->literalValue() !== '',
-            $value instanceof BooleanValue => $value->literalValue(),
+            $value instanceof IntegerValue => $value->literalValue !== 0,
+            $value instanceof RealValue => $value->literalValue !== 0.0,
+            $value instanceof StringValue => $value->literalValue !== '',
+            $value instanceof BooleanValue => $value->literalValue,
             $value instanceof NullValue => false,
-            $value instanceof TupleValue => $value->values() !== [],
-            $value instanceof RecordValue => $value->values() !== [],
-            $value instanceof SubtypeValue => $this->evaluate($value->baseValue()),
-            $value instanceof MutableValue => $this->evaluate($value->value()),
+            $value instanceof TupleValue => $value->values !== [],
+            $value instanceof RecordValue => $value->values !== [],
+            $value instanceof SubtypeValue => $this->evaluate($value->baseValue),
+            $value instanceof MutableValue => $this->evaluate($value->value),
             //TODO: check for cast to boolean
             default => true
         };

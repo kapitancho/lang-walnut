@@ -21,8 +21,8 @@ final readonly class AsReal implements NativeMethod {
 		Type $targetType,
 		Type $parameterType,
 	): Type {
-		return $this->context->typeRegistry()->realSubset([
-			$this->context->valueRegistry()->real(0.0)
+		return $this->context->typeRegistry->realSubset([
+			$this->context->valueRegistry->real(0.0)
 		]);
 	}
 
@@ -34,7 +34,7 @@ final readonly class AsReal implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof NullValue) {
-			return TypedValue::forValue($this->context->valueRegistry()->real(0));
+			return TypedValue::forValue($this->context->valueRegistry->real(0));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

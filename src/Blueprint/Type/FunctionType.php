@@ -3,6 +3,6 @@
 namespace Walnut\Lang\Blueprint\Type;
 
 interface FunctionType extends Type {
-    public function parameterType(): Type;
-    public function returnType(): Type;
+	public Type $parameterType { get; }
+	public Type $returnType { get; }
 }

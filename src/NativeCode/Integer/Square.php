@@ -32,15 +32,15 @@ final readonly class Square implements NativeMethod {
 		if ($targetType instanceof IntegerType || $targetType instanceof IntegerSubsetType ||
 			$targetType instanceof RealType || $targetType instanceof RealSubsetType
 		) {
-			$minValue = $targetType->range()->minValue();
-			$maxValue = $targetType->range()->maxValue();
+			$minValue = $targetType->range->minValue;
+			$maxValue = $targetType->range->maxValue;
 			$min = $minValue === MinusInfinity::value || $minValue < 0 ? 0 : $minValue * $minValue;
 			if ($maxValue !== PlusInfinity::value && $maxValue < 0) {
 				$min = $maxValue * $maxValue;
 			}
 			$max = $maxValue === PlusInfinity::value || $minValue === MinusInfinity::value ?
 				PlusInfinity::value : max($minValue * $minValue, $maxValue * $maxValue);
-			return $this->context->typeRegistry()->integer($min, $max);
+			return $this->context->typeRegistry->integer($min, $max);
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -56,8 +56,8 @@ final readonly class Square implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 
 		if ($targetValue instanceof IntegerValue) {
-			return TypedValue::forValue($this->context->valueRegistry()->integer(
-                $targetValue->literalValue() * $targetValue->literalValue()
+			return TypedValue::forValue($this->context->valueRegistry->integer(
+                $targetValue->literalValue * $targetValue->literalValue
 			));
 		}
 		// @codeCoverageIgnoreStart

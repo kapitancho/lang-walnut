@@ -12,8 +12,8 @@ use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\IntersectionType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
-use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\NamedType;
+use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\RecordType;
@@ -29,10 +29,6 @@ final readonly class MetaType implements MetaTypeInterface, SupertypeChecker, Js
 
 	public function __toString(): string {
 		return $this->value->value;
-	}
-
-	public function value(): MetaTypeValue {
-		return $this->value;
 	}
 
 	public function isSupertypeOf(Type $ofType): bool {
@@ -57,7 +53,7 @@ final readonly class MetaType implements MetaTypeInterface, SupertypeChecker, Js
 			MetaTypeValue::StringSubset => $ofType instanceof StringSubsetType,
 			MetaTypeValue::Named => $ofType instanceof NamedType,
 		};
-		return $result || ($ofType instanceof AliasType && $this->isSupertypeOf($ofType->aliasedType()));
+		return $result || ($ofType instanceof AliasType && $this->isSupertypeOf($ofType->aliasedType));
     }
 
 	public function isSubtypeOf(Type $ofType): bool {

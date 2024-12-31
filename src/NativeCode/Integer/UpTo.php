@@ -30,10 +30,10 @@ final readonly class UpTo implements NativeMethod {
 		if ($targetType instanceof IntegerType || $targetType instanceof IntegerSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) {
-				$tMin = $targetType->range()->minValue();
-				$tMax = $targetType->range()->maxValue();
-				$pMin = $parameterType->range()->minValue();
-				$pMax = $parameterType->range()->maxValue();
+				$tMin = $targetType->range->minValue;
+				$tMax = $targetType->range->maxValue;
+				$pMin = $parameterType->range->minValue;
+				$pMax = $parameterType->range->maxValue;
 
 				$minLength = max(0, $tMax === PlusInfinity::value || $pMin === MinusInfinity::value ?
 					0 : 1 + $pMin - $tMax
@@ -41,10 +41,10 @@ final readonly class UpTo implements NativeMethod {
 				$maxLength = $pMax === PlusInfinity::value || $tMin === MinusInfinity::value ? PlusInfinity::value :
 					max(0, 1 + $pMax - $tMin);
 
-				return $this->context->typeRegistry()->array(
+				return $this->context->typeRegistry->array(
 					$maxLength === PlusInfinity::value || $maxLength > 0 ?
-						$this->context->typeRegistry()->integer($tMin, $pMax) :
-						$this->context->typeRegistry()->nothing(),
+						$this->context->typeRegistry->integer($tMin, $pMax) :
+						$this->context->typeRegistry->nothing,
 					$maxLength === PlusInfinity::value ? $minLength : min($maxLength, $minLength),
 					$maxLength
 				);
@@ -69,11 +69,11 @@ final readonly class UpTo implements NativeMethod {
 		if ($targetValue instanceof IntegerValue) {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue) {
-	            return TypedValue::forValue($this->context->valueRegistry()->tuple(
-					$targetValue->literalValue() < $parameterValue->literalValue()  ?
+	            return TypedValue::forValue($this->context->valueRegistry->tuple(
+					$targetValue->literalValue < $parameterValue->literalValue  ?
 						array_map(fn(int $i): IntegerValue =>
-							$this->context->valueRegistry()->integer($i),
-							range($targetValue->literalValue(), $parameterValue->literalValue())
+							$this->context->valueRegistry->integer($i),
+							range($targetValue->literalValue, $parameterValue->literalValue)
 						) : []
 	            ));
 			}

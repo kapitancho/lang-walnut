@@ -28,13 +28,13 @@ final readonly class Ln implements NativeMethod {
 	): Type {
 		$targetType = $this->toBaseType($targetType);
         if ($targetType instanceof RealType || $targetType instanceof RealSubsetType) {
-			$min = $targetType->range()->minValue();
-			$max = $targetType->range()->maxValue();
-            $real = $this->context->typeRegistry()->real(max: $max);
+			$min = $targetType->range->minValue;
+			$max = $targetType->range->maxValue;
+            $real = $this->context->typeRegistry->real(max: $max);
             return $min > 0 ? $real :
-                $this->context->typeRegistry()->result(
+                $this->context->typeRegistry->result(
                     $real,
-                    $this->context->typeRegistry()->atom(
+                    $this->context->typeRegistry->atom(
                         new TypeNameIdentifier('NotANumber')
                     )
                 );
@@ -52,11 +52,11 @@ final readonly class Ln implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
-            $val = $targetValue->literalValue();
-			return TypedValue::forValue($val > 0 ? $this->context->valueRegistry()->real(
+            $val = $targetValue->literalValue;
+			return TypedValue::forValue($val > 0 ? $this->context->valueRegistry->real(
 				log($val)
-			) : $this->context->valueRegistry()->error(
-                $this->context->valueRegistry()->atom(
+			) : $this->context->valueRegistry->error(
+                $this->context->valueRegistry->atom(
                     new TypeNameIdentifier("NotANumber")
                 )
             ));

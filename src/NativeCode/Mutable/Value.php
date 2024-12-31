@@ -27,10 +27,10 @@ final readonly class Value implements NativeMethod {
 	): Type {
 		$t = $this->toBaseType($targetType);
 		if ($t instanceof MutableType) {
-			return $t->valueType();
+			return $t->valueType;
 		}
-		if ($t instanceof MetaType && $t->value() === MetaTypeValue::MutableType) {
-			return $this->context->typeRegistry()->any();
+		if ($t instanceof MetaType && $t->value === MetaTypeValue::MutableType) {
+			return $this->context->typeRegistry->any;
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -45,7 +45,7 @@ final readonly class Value implements NativeMethod {
 
 		$v = $this->toBaseValue($targetValue);
 		if ($v instanceof MutableValue) {
-			return new TypedValue($v->targetType(), $v->value());
+			return new TypedValue($v->targetType, $v->value);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

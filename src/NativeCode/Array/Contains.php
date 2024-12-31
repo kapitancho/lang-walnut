@@ -29,7 +29,7 @@ final readonly class Contains implements NativeMethod {
 			$targetType = $targetType->asArrayType();
 		}
 		if ($targetType instanceof ArrayType) {
-			return $this->context->typeRegistry()->boolean();
+			return $this->context->typeRegistry->boolean;
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -45,13 +45,13 @@ final readonly class Contains implements NativeMethod {
 		
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
-			$values = $targetValue->values();
+			$values = $targetValue->values;
 			foreach ($values as $value) {
 				if ($value->equals($parameterValue)) {
-					return TypedValue::forValue($this->context->valueRegistry()->true());
+					return TypedValue::forValue($this->context->valueRegistry->true);
 				}
 			}
-			return TypedValue::forValue($this->context->valueRegistry()->false());
+			return TypedValue::forValue($this->context->valueRegistry->false);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

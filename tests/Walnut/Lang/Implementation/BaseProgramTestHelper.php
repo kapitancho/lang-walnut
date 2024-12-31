@@ -39,7 +39,7 @@ abstract class BaseProgramTestHelper extends \Walnut\Lang\Test\BaseProgramTestHe
             'y' => $parameterType
         ])));
         $this->assertTrue(
-            $result->expressionType()->isSubtypeOf($expectedType)
+            $result->expressionType->isSubtypeOf($expectedType)
         );
     }
 
@@ -55,7 +55,7 @@ abstract class BaseProgramTestHelper extends \Walnut\Lang\Test\BaseProgramTestHe
 		$this->assertTrue(
 			($r = $call
 				->execute(new ExecutionContext(VariableValueScope::empty()))
-				->value())->equals($expectedValue),
+				->value)->equals($expectedValue),
 			sprintf("'%s' is not equal to '%s'", $r, $expectedValue)
 		);
 	}

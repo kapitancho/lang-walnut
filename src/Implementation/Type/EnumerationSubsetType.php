@@ -14,45 +14,36 @@ final readonly class EnumerationSubsetType implements EnumerationSubsetTypeInter
      * @param array<string, EnumerationValue> $subsetValues
      */
     public function __construct(
-        private EnumerationTypeInterface $enumeration,
-        private array $subsetValues
+        public EnumerationTypeInterface $enumeration,
+        public array $subsetValues
     ) {}
 
     public function isSubtypeOf(Type $ofType): bool {
         return match(true) {
             $ofType instanceof EnumerationTypeInterface =>
-                $this->enumeration->name()->identifier === $ofType->name()->identifier,
+                $this->enumeration->name->identifier === $ofType->name->identifier,
             $ofType instanceof EnumerationSubsetTypeInterface =>
-            	$this->enumeration->name()->equals($ofType->enumeration()->name()) &&
-                self::isSubset($this->subsetValues, $ofType->subsetValues()),
+            	$this->enumeration->name->equals($ofType->enumeration->name) &&
+                self::isSubset($this->subsetValues, $ofType->subsetValues),
             $ofType instanceof SupertypeChecker => $ofType->isSupertypeOf($this),
             default => false
         };
     }
 
     private static function isSubset(array $subset, array $superset): bool {
-        foreach($subset as $key => $value) {
-            if (!isset($superset[$key])) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public function enumeration(): EnumerationTypeInterface {
-        return $this->enumeration;
-    }
-
-    /** @return array<string, EnumerationValue> */
-    public function subsetValues(): array {
-        return $this->subsetValues;
+		foreach($subset as $key => $value) {
+			if (!isset($superset[$key])) {
+				return false;
+			}
+		}
+		return true;
     }
 
 	public function __toString(): string {
 		return sprintf("%s[%s]",
 			$this->enumeration,
 			implode(', ', array_map(
-				static fn(EnumerationValue $value) => $value->name(),
+				static fn(EnumerationValue $value) => $value->name,
 				$this->subsetValues
 			))
 		);
@@ -61,7 +52,7 @@ final readonly class EnumerationSubsetType implements EnumerationSubsetTypeInter
 	public function jsonSerialize(): array {
 		return [
 			'type' => 'EnumerationSubsetType',
-			'enumerationName' => $this->enumeration->name(),
+			'enumerationName' => $this->enumeration->name,
 			'subsetValues' => $this->subsetValues
 		];
 	}

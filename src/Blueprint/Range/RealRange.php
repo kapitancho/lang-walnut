@@ -6,8 +6,9 @@ use Stringable;
 use Walnut\Lang\Blueprint\Value\RealValue;
 
 interface RealRange extends Stringable {
-    public function minValue(): float|MinusInfinity;
-    public function maxValue(): float|PlusInfinity;
+	public float|MinusInfinity $minValue { get; }
+	public float|PlusInfinity $maxValue { get; }
+
 	public function isSubRangeOf(RealRange $range): bool;
 
 	public function contains(RealValue $value): bool;

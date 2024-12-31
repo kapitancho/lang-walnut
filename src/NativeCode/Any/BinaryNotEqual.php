@@ -18,7 +18,7 @@ final readonly class BinaryNotEqual implements NativeMethod {
 		Type $targetType,
 		Type $parameterType,
 	): BooleanType {
-		return $this->context->typeRegistry()->boolean();
+		return $this->context->typeRegistry->boolean;
 	}
 
 	public function execute(
@@ -28,7 +28,7 @@ final readonly class BinaryNotEqual implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		return TypedValue::forValue($this->context->valueRegistry()->boolean(
+		return TypedValue::forValue($this->context->valueRegistry->boolean(
             !$targetValue->equals($parameterValue)
         ));
 	}

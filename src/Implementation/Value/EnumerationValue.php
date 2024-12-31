@@ -11,38 +11,33 @@ use Walnut\Lang\Blueprint\Type\EnumerationType;
 use Walnut\Lang\Blueprint\Value\EnumerationValue as EnumerationValueInterface;
 use Walnut\Lang\Blueprint\Value\Value;
 
-final readonly class EnumerationValue implements EnumerationValueInterface, JsonSerializable {
+final class EnumerationValue implements EnumerationValueInterface, JsonSerializable {
 
     public function __construct(
-        private TypeRegistry $typeRegistry,
-        private TypeNameIdentifier $typeName,
-        private EnumValueIdentifier $valueIdentifier
+        private readonly TypeRegistry $typeRegistry,
+        private readonly TypeNameIdentifier $typeName,
+        public readonly EnumValueIdentifier $name
     ) {}
 
-    public function type(): EnumerationSubsetType {
-        return $this->enumeration()->subsetType([$this->valueIdentifier]);
+	public EnumerationSubsetType $type {
+        get => $this->enumeration->subsetType([$this->name]);
     }
 
-    public function enumeration(): EnumerationType {
-        return $this->typeRegistry
-            ->enumeration($this->typeName);
-    }
-
-    public function name(): EnumValueIdentifier {
-        return $this->valueIdentifier;
+	public EnumerationType $enumeration {
+        get => $this->typeRegistry->enumeration($this->typeName);
     }
 
 	public function equals(Value $other): bool {
 		return $other instanceof EnumerationValueInterface &&
-			$this->typeName->equals($other->enumeration()->name()) &&
-			$this->valueIdentifier->equals($other->name());
+			$this->typeName->equals($other->enumeration->name) &&
+			$this->name->equals($other->name);
 	}
 
 	public function __toString(): string {
 		return sprintf(
 			"%s.%s",
 			$this->typeName,
-			$this->valueIdentifier
+			$this->name
 		);
 	}
 
@@ -50,7 +45,7 @@ final readonly class EnumerationValue implements EnumerationValueInterface, Json
 		return [
 			'valueType' => 'EnumerationValue',
 			'typeName' => $this->typeName,
-			'valueIdentifier' => $this->valueIdentifier
+			'valueIdentifier' => $this->name
 		];
 	}
 }

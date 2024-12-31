@@ -27,11 +27,11 @@ final readonly class Sort implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		if ($targetType instanceof ArrayType) {
-			$itemType = $targetType->itemType();
-			if ($itemType->isSubtypeOf($this->context->typeRegistry()->string()) || $itemType->isSubtypeOf(
-				$this->context->typeRegistry()->union([
-					$this->context->typeRegistry()->integer(),
-					$this->context->typeRegistry()->real()
+			$itemType = $targetType->itemType;
+			if ($itemType->isSubtypeOf($this->context->typeRegistry->string()) || $itemType->isSubtypeOf(
+				$this->context->typeRegistry->union([
+					$this->context->typeRegistry->integer(),
+					$this->context->typeRegistry->real()
 				])
 			)) {
 				return $targetType;
@@ -53,7 +53,7 @@ final readonly class Sort implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
-			$values = $targetValue->values();
+			$values = $targetValue->values;
 
 			$rawValues = [];
 			$hasStrings = false;
@@ -68,7 +68,7 @@ final readonly class Sort implements NativeMethod {
 					throw new ExecutionException("Invalid target value");
 					// @codeCoverageIgnoreEnd
 				}
-				$rawValues[] = $value->literalValue();
+				$rawValues[] = $value->literalValue;
 			}
 			if ($hasStrings) {
 				if ($hasNumbers) {
@@ -77,16 +77,16 @@ final readonly class Sort implements NativeMethod {
 					// @codeCoverageIgnoreEnd
 				}
 				sort($rawValues, SORT_STRING);
-				return TypedValue::forValue($this->context->valueRegistry()->tuple(array_map(
-					fn($value) => $this->context->valueRegistry()->string($value),
+				return TypedValue::forValue($this->context->valueRegistry->tuple(array_map(
+					fn($value) => $this->context->valueRegistry->string($value),
 					$rawValues
 				)));
 			}
 			sort($rawValues, SORT_NUMERIC);
-			return TypedValue::forValue($this->context->valueRegistry()->tuple(array_map(
+			return TypedValue::forValue($this->context->valueRegistry->tuple(array_map(
 				fn($value) => is_float($value) ?
-					$this->context->valueRegistry()->real($value) :
-					$this->context->valueRegistry()->integer($value),
+					$this->context->valueRegistry->real($value) :
+					$this->context->valueRegistry->integer($value),
 				$rawValues
 			)));
 		}

@@ -1,21 +1,17 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\Type;
+namespace Walnut\Lang\NativeCode\Any;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Implementation\Type\Helper\BaseType;
 use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Type\NullType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
-use Walnut\Lang\Blueprint\Type\TypeType;
-use Walnut\Lang\Blueprint\Value\TypeValue;
-use Walnut\Lang\Implementation\Type\ResultType;
+use Walnut\Lang\Blueprint\Value\NullValue;
 
-final readonly class ErrorType implements NativeMethod {
-
-	use BaseType;
+final readonly class CompileTimeType implements NativeMethod {
 
 	public function __construct(
 		private MethodExecutionContext $context
@@ -25,11 +21,8 @@ final readonly class ErrorType implements NativeMethod {
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
-		if ($targetType instanceof TypeType) {
-			$refType = $this->toBaseType($targetType->refType);
-			if ($refType instanceof ResultType) {
-				return $this->context->typeRegistry->type($refType->errorType);
-			}
+		if ($parameterType instanceof NullType) {
+			return $this->context->typeRegistry->type($targetType);
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -40,13 +33,14 @@ final readonly class ErrorType implements NativeMethod {
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
-		$targetValue = $target->value;
+		$parameterValue = $parameter->value;
 
-		if ($targetValue instanceof TypeValue) {
-			$typeValue = $this->toBaseType($targetValue->typeValue);
-			if ($typeValue instanceof ResultType) {
-				return TypedValue::forValue($this->context->valueRegistry->type($typeValue->errorType));
-			}
+		if ($parameterValue instanceof NullValue) {
+			return TypedValue::forValue(
+				$this->context->valueRegistry->type(
+					$this->analyse($target->type, $parameter->type)
+				)
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid parameter value");

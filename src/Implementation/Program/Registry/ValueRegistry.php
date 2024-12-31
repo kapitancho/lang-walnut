@@ -29,26 +29,26 @@ use Walnut\Lang\Implementation\Value\SubtypeValue;
 use Walnut\Lang\Implementation\Value\TupleValue;
 use Walnut\Lang\Implementation\Value\TypeValue;
 
-final readonly class ValueRegistry implements ValueRegistryInterface {
+final class ValueRegistry implements ValueRegistryInterface {
 	public function __construct(
-		private TypeRegistry $typeRegistry,
-		private DependencyContainer $dependencyContainer
+		private readonly TypeRegistry $typeRegistry,
+		private readonly DependencyContainer $dependencyContainer
 	) {}
 
-	public function null(): NullValue {
-		return $this->typeRegistry->null()->value();
+	public NullValue $null {
+		get => $this->typeRegistry->null->value;
 	}
 
     public function boolean(bool $value): BooleanValue {
-		return $value ? $this->true() : $this->false();
+		return $value ? $this->true : $this->false;
 	}
 
-    public function true(): BooleanValue {
-	    return $this->typeRegistry->true()->value();
+	public BooleanValue $true {
+		get => $this->typeRegistry->true->value;
 	}
 
-    public function false(): BooleanValue {
-	    return $this->typeRegistry->false()->value();
+	public BooleanValue $false {
+		get => $this->typeRegistry->false->value;
 	}
 
     public function integer(int $value): IntegerValue {
@@ -119,7 +119,7 @@ final readonly class ValueRegistry implements ValueRegistryInterface {
 
     /** @throws UnknownType */
     public function atom(TypeNameIdentifier $typeName): AtomValueInterface {
-		return $this->typeRegistry->atom($typeName)->value();
+		return $this->typeRegistry->atom($typeName)->value;
 	}
 
     /** @throws UnknownType */

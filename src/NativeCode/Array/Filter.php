@@ -30,19 +30,19 @@ final readonly class Filter implements NativeMethod {
 		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($type instanceof ArrayType) {
 			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof FunctionType && $parameterType->returnType()->isSubtypeOf($this->context->typeRegistry()->boolean())) {
-				if ($type->itemType()->isSubtypeOf($parameterType->parameterType())) {
-					return $this->context->typeRegistry()->array(
-						$type->itemType(),
+			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf($this->context->typeRegistry->boolean)) {
+				if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
+					return $this->context->typeRegistry->array(
+						$type->itemType,
 						0,
-						$type->range()->maxLength()
+						$type->range->maxLength
 					);
 				}
 				throw new AnalyserException(
 					sprintf(
 						"The parameter type %s of the callback function is not a subtype of %s",
-						$type->itemType(),
-						$parameterType->parameterType()
+						$type->itemType,
+						$parameterType->parameterType
 					)
 				);
 			}
@@ -64,16 +64,16 @@ final readonly class Filter implements NativeMethod {
 		
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue && $parameterValue instanceof FunctionValue) {
-			$values = $targetValue->values();
+			$values = $targetValue->values;
 			$result = [];
-			$true = $this->context->valueRegistry()->true();
+			$true = $this->context->valueRegistry->true;
 			foreach($values as $value) {
-				$r = $parameterValue->execute($this->context->globalContext(), $value);
+				$r = $parameterValue->execute($this->context->globalContext, $value);
 				if ($true->equals($r)) {
 					$result[] = $value;
 				}
 			}
-			return TypedValue::forValue($this->context->valueRegistry()->tuple($result));
+			return TypedValue::forValue($this->context->valueRegistry->tuple($result));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

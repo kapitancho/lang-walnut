@@ -22,7 +22,7 @@ final readonly class IsSubtypeOf implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType && $parameterType instanceof TypeType) {
-			return $this->context->typeRegistry()->boolean();
+			return $this->context->typeRegistry->boolean;
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -37,8 +37,8 @@ final readonly class IsSubtypeOf implements NativeMethod {
 		$parameterValue = $parameter->value;
 		
 		if ($targetValue instanceof TypeValue && $parameterValue instanceof TypeValue) {
-			return TypedValue::forValue($this->context->valueRegistry()->boolean(
-				$targetValue->typeValue()->isSubtypeOf($parameterValue->typeValue())
+			return TypedValue::forValue($this->context->valueRegistry->boolean(
+				$targetValue->typeValue->isSubtypeOf($parameterValue->typeValue)
 			));
 		}
 		// @codeCoverageIgnoreStart

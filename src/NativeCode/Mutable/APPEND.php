@@ -29,8 +29,8 @@ final readonly class APPEND implements NativeMethod {
 	): Type {
 		$t = $this->toBaseType($targetType);
 		if ($t instanceof MutableType) {
-            $valueType = $this->toBaseType($t->valueType());
-		    if ($valueType instanceof StringType && $valueType->range()->maxLength() === PlusInfinity::value) {
+            $valueType = $this->toBaseType($t->valueType);
+		    if ($valueType instanceof StringType && $valueType->range->maxLength === PlusInfinity::value) {
 			    $p = $this->toBaseType($parameterType);
 				if ($p instanceof StringType || $p instanceof StringSubsetType) {
 					return $t;
@@ -53,12 +53,12 @@ final readonly class APPEND implements NativeMethod {
 
 		$v = $this->toBaseValue($targetValue);
 		if ($v instanceof MutableValue) {
-            $targetType = $this->toBaseType($v->targetType());
-			$mv = $v->value();
+            $targetType = $this->toBaseType($v->targetType);
+			$mv = $v->value;
 			if ($targetType instanceof StringType && $mv instanceof StringValue) {
 				$p = $this->toBaseValue($parameter->value);
 				if ($p instanceof StringValue) {
-					$v->changeValueTo($this->context->valueRegistry()->string($mv->literalValue() . $p->literalValue()));
+					$v->value = $this->context->valueRegistry->string($mv->literalValue . $p->literalValue);
 					return $target;
 				}
 				// @codeCoverageIgnoreStart

@@ -30,38 +30,14 @@ final readonly class CustomMethod implements CustomMethodInterface, JsonSerializ
 	public function __construct(
 		private MethodExecutionContext $methodExecutionContext,
 		private DependencyContainer $dependencyContainer,
-		private Type $targetType,
-		private MethodNameIdentifier $methodName,
-		private Type $parameterType,
-		private Type $dependencyType,
-		private Type $returnType,
-		private FunctionBody $functionBody,
+		public Type $targetType,
+		public MethodNameIdentifier $methodName,
+		public Type $parameterType,
+		public Type $dependencyType,
+		public Type $returnType,
+		public FunctionBody $functionBody,
 	) {
 		$this->isAnalysed = new ArrayObject();
-	}
-
-	public function targetType(): Type {
-		return $this->targetType;
-	}
-
-	public function methodName(): MethodNameIdentifier {
-		return $this->methodName;
-	}
-
-	public function parameterType(): Type {
-		return $this->parameterType;
-	}
-
-	public function dependencyType(): Type {
-		return $this->dependencyType;
-	}
-
-	public function returnType(): Type {
-		return $this->returnType;
-	}
-
-	public function functionBody(): FunctionBody {
-		return $this->functionBody;
 	}
 
 	/** @throws AnalyserException */
@@ -78,7 +54,7 @@ final readonly class CustomMethod implements CustomMethodInterface, JsonSerializ
 			$this->parameterType instanceof RecordType &&
 			$parameterType instanceof TupleType &&
 			$this->isTupleCompatibleToRecord(
-				$this->methodExecutionContext->typeRegistry(),
+				$this->methodExecutionContext->typeRegistry,
 				$parameterType,
 				$this->parameterType
 			)
@@ -93,7 +69,7 @@ final readonly class CustomMethod implements CustomMethodInterface, JsonSerializ
 			);
 		}
 		$returnType = $this->functionBody->analyse(
-			$this->methodExecutionContext->globalContext(),
+			$this->methodExecutionContext->globalContext,
 			$this->targetType,
 			$this->parameterType,
 			$this->dependencyType
@@ -122,13 +98,13 @@ final readonly class CustomMethod implements CustomMethodInterface, JsonSerializ
 		if ($parameterValue instanceof TupleValue &&
 			$this->parameterType instanceof RecordType &&
 			$this->isTupleCompatibleToRecord(
-				$this->methodExecutionContext->typeRegistry(),
-				$parameterValue->type(),
+				$this->methodExecutionContext->typeRegistry,
+				$parameterValue->type,
 				$this->parameterType
 			)
 		) {
 			$parameterValue = $this->getTupleAsRecord(
-				$this->methodExecutionContext->valueRegistry(),
+				$this->methodExecutionContext->valueRegistry,
 				$parameterValue,
 				$this->parameterType
 			);
@@ -137,13 +113,13 @@ final readonly class CustomMethod implements CustomMethodInterface, JsonSerializ
 		if (!($this->dependencyType instanceof NothingType)) {
 			$dep = $this->dependencyContainer->valueByType($this->dependencyType);
 			if ($dep instanceof DependencyError) {
-				return TypedValue::forValue($this->methodExecutionContext->valueRegistry()->error(
-					$this->methodExecutionContext->valueRegistry()->sealedValue(
+				return TypedValue::forValue($this->methodExecutionContext->valueRegistry->error(
+					$this->methodExecutionContext->valueRegistry->sealedValue(
 						new TypeNameIdentifier('DependencyContainerError'),
-						$this->methodExecutionContext->valueRegistry()->record([
-							'targetType' => $this->methodExecutionContext->valueRegistry()->type($this->dependencyType),
-							'errorOnType' => $this->methodExecutionContext->valueRegistry()->type($dep->type),
-							'errorMessage' => $this->methodExecutionContext->valueRegistry()->string(
+						$this->methodExecutionContext->valueRegistry->record([
+							'targetType' => $this->methodExecutionContext->valueRegistry->type($this->dependencyType),
+							'errorOnType' => $this->methodExecutionContext->valueRegistry->type($dep->type),
+							'errorMessage' => $this->methodExecutionContext->valueRegistry->string(
 								match($dep->unresolvableDependency) {
 									UnresolvableDependency::circularDependency => 'Circular dependency',
 									UnresolvableDependency::ambiguous => 'Ambiguous dependency',
@@ -163,7 +139,7 @@ final readonly class CustomMethod implements CustomMethodInterface, JsonSerializ
 			return new TypedValue(
 				$this->returnType,
 				$this->functionBody->execute(
-					$this->methodExecutionContext->globalContext(),
+					$this->methodExecutionContext->globalContext,
 					TypedValue::forValue($targetValue),
 					TypedValue::forValue($parameterValue),
 					$dep

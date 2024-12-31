@@ -17,27 +17,16 @@ final readonly class RecordType implements RecordTypeInterface, JsonSerializable
 	/** @param array<string, Type> $types */
 	public function __construct(
 		private TypeRegistry $typeRegistry,
-		private array $types,
-		private Type $restType
+		public array $types,
+		public Type $restType
 	) {}
 
-    /**
-     * @return array<string, Type>
-     */
-    public function types(): array {
-        return $this->types;
-    }
-
-	public function restType(): Type {
-		return $this->restType;
-	}
-
 	public function asMapType(): MapType {
-		$l = count($this->types());
-		$min = count(array_filter($this->types(), static fn($type) => !($type instanceof OptionalKeyType)));
+		$l = count($this->types);
+		$min = count(array_filter($this->types, static fn($type) => !($type instanceof OptionalKeyType)));
 		$types = array_map(
-			static fn(Type $type): Type => $type instanceof OptionalKeyType ? $type->valueType() : $type,
-			$this->types()
+			static fn(Type $type): Type => $type instanceof OptionalKeyType ? $type->valueType : $type,
+			$this->types
 		);
 		return $this->typeRegistry->map(
 			$this->typeRegistry->union(array_values([... $types, $this->restType])),
@@ -48,7 +37,7 @@ final readonly class RecordType implements RecordTypeInterface, JsonSerializable
 
 	/** @throws UnknownProperty */
 	public function typeOf(string $propertyName): Type {
-		return $this->types()[$propertyName] ??
+		return $this->types[$propertyName] ??
 			throw new UnknownProperty($propertyName, (string)$this);
 	}
 
@@ -62,51 +51,45 @@ final readonly class RecordType implements RecordTypeInterface, JsonSerializable
 	}
 
 	private function isSubtypeOfRecord(RecordTypeInterface $ofType): bool {
-		if (!$this->restType()->isSubtypeOf($ofType->restType())) {
+		if (!$this->restType->isSubtypeOf($ofType->restType)) {
 			return false;
 		}
-		$ofTypes = $ofType->types();
+		$ofTypes = $ofType->types;
 		$usedKeys = [];
-		foreach($this->types() as $key => $type) {
-			if (!$type->isSubtypeOf($ofTypes[$key] ?? $ofType->restType())) {
+		foreach($this->types as $key => $type) {
+			if (!$type->isSubtypeOf($ofTypes[$key] ?? $ofType->restType)) {
 				return false;
 			}
 			$usedKeys[$key] = true;
 		}
-		foreach($ofTypes as $key => $type) {
-			if (!($type instanceof OptionalKeyType) && !isset($usedKeys[$key]) &&
-				(!isset($this->types()[$key]) || $this->types()[$key]->isSubtypeOf($type))) {
-				return false;
-			}
-		}
-		return true;
+		return array_all($ofTypes, fn($type, $key) => $type instanceof OptionalKeyType || isset($usedKeys[$key]) || isset($this->types[$key]) && !$this->types[$key]->isSubtypeOf($type));
 	}
 
 	private function isSubtypeOfMap(MapType $ofType): bool {
-		$itemType = $ofType->itemType();
-		if (!$this->restType()->isSubtypeOf($itemType)) {
+		$itemType = $ofType->itemType;
+		if (!$this->restType->isSubtypeOf($itemType)) {
 			return false;
 		}
-		foreach($this->types() as $type) {
-			$t = $type instanceof OptionalKeyType ? $type->valueType() : $type;
+		foreach($this->types as $type) {
+			$t = $type instanceof OptionalKeyType ? $type->valueType : $type;
 			if (!$t->isSubtypeOf($itemType)) {
 				return false;
 			}
 		}
-		$min = count(array_filter($this->types(), static fn($type) => !($type instanceof OptionalKeyType)));
-		$cnt = count($this->types());
-		if ($min < $ofType->range()->minLength()) {
+		$min = count(array_filter($this->types, static fn($type) => !($type instanceof OptionalKeyType)));
+		$cnt = count($this->types);
+		if ($min < $ofType->range->minLength) {
 			return false;
 		}
-		$max = $ofType->range()->maxLength();
-		return $max === PlusInfinity::value || ($this->restType() instanceof NothingType && $cnt <= $max);
+		$max = $ofType->range->maxLength;
+		return $max === PlusInfinity::value || ($this->restType instanceof NothingType && $cnt <= $max);
 	}
 
 	public function asString(bool $multiline): string {
 		$types = [];
 		$typeX = '';
-		if (count($this->types())) {
-			foreach($this->types() as $key => $type) {
+		if (count($this->types)) {
+			foreach($this->types as $key => $type) {
 				$typeStr = (string)$type;
 				$typeStr = lcfirst($typeStr) === $key ? "~$typeStr" : "$key: $typeStr";
 				$typeStr = $multiline ? "\t" . str_replace("\n", "\n" . "\t", $typeStr) : $typeStr;
@@ -115,12 +98,12 @@ final readonly class RecordType implements RecordTypeInterface, JsonSerializable
 		} else {
 			$typeX = ':';
 		}
-		if ($this->restType() instanceof AnyTypeInterface) {
+		if ($this->restType instanceof AnyTypeInterface) {
 			$types[] = "...";
 			if ($typeX === ':') {
 				$typeX = ': ';
 			}
-		} elseif (!$this->restType() instanceof NothingType) {
+		} elseif (!$this->restType instanceof NothingType) {
 			$types[] = "... " . $this->restType;
 			if ($typeX === ':') {
 				$typeX = ': ';

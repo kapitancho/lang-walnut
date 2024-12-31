@@ -26,22 +26,10 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 	public function __construct(
 		private TypeRegistry $typeRegistry,
 		private MethodRegistry $methodRegistry,
-		private Expression $target,
-		private MethodNameIdentifier $methodName,
-		private Expression $parameter,
+		public Expression $target,
+		public MethodNameIdentifier $methodName,
+		public Expression $parameter,
 	) {}
-
-	public function target(): Expression {
-		return $this->target;
-	}
-
-	public function methodName(): MethodNameIdentifier {
-		return $this->methodName;
-	}
-
-	public function parameter(): Expression {
-		return $this->parameter;
-	}
 
 	private function getMethod($targetType): Method|UnknownMethod {
 		return $this->methodRegistry->method($targetType,
@@ -52,7 +40,7 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
 		$analyserContext = $this->target->analyse($analyserContext);
-		$retExpr = $analyserContext->expressionType();
+		$retExpr = $analyserContext->expressionType;
 
 		//Special case: cast as - it requires the method registry and a dependency loop should be avoided.
 		$method = $this->getMethod($retExpr);
@@ -65,28 +53,28 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 				)
 			);
 		}
-		$targetReturnType = $analyserContext->returnType();
+		$targetReturnType = $analyserContext->returnType;
 
 		$analyserContext = $this->parameter->analyse($analyserContext);
-		$retParamType = $analyserContext->expressionType();
+		$retParamType = $analyserContext->expressionType;
 
 		$retType = $method->analyse($retExpr, $retParamType);
 		return $analyserContext->asAnalyserResult(
 			$retType,
 			$this->typeRegistry->union([
 				$targetReturnType,
-				$analyserContext->returnType()
+				$analyserContext->returnType
 			])
 		);
 	}
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
 		$executionContext = $this->target->execute($executionContext);
-		$retTypedValue = $executionContext->typedValue();
-		$retValue = $executionContext->value();
-		$retType = $executionContext->valueType();
+		$retTypedValue = $executionContext->typedValue;
+		$retValue = $executionContext->value;
+		$retType = $executionContext->valueType;
 
-		$method = $this->getMethod($retValue->type());
+		$method = $this->getMethod($retValue->type);
 		if ($method instanceof UnknownMethod) {
 			$method = $this->methodRegistry->method($retType, $this->methodName);
 			if ($method instanceof UnknownMethod) {
@@ -95,7 +83,7 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 					sprintf(
 						"Cannot call method '%s' on type '%s' for value '%s' and parameter '%s'",
 						$this->methodName,
-						$retValue->type(),
+						$retValue->type,
 						$retValue,
 						$this->parameter
 					)
@@ -105,17 +93,17 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 		}
 
 		$executionContext = $this->parameter->execute($executionContext);
-		$retParamType = $executionContext->valueType();
+		$retParamType = $executionContext->valueType;
 
-		$value = $method->execute($retTypedValue, $executionContext->typedValue());
+		$value = $method->execute($retTypedValue, $executionContext->typedValue);
 		if ($value instanceof ErrorValue &&
-			$value->errorValue()->type() instanceof SealedType &&
-			$value->errorValue()->type()->name() === 'DependencyContainerError'
+			$value->errorValue->type instanceof SealedType &&
+			$value->errorValue->type->name === 'DependencyContainerError'
 		) {
 			throw new FunctionReturn($value);
 		}
 		if ($value instanceof Value) {
-			$valueType = $value->type();
+			$valueType = $value->type;
 			try {
 				$valueType = $method->analyse($retType, $retParamType);
 			} catch (AnalyserException) {}

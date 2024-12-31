@@ -22,7 +22,7 @@ final readonly class UnionTypeNormalizer {
 	/** @return list<Type> */
     public function flatten(Type ... $types): array {
 		return array_merge(... array_map(
-			static fn(Type $type): array => $type instanceof UnionType ? $type->types() : [$type],
+			static fn(Type $type): array => $type instanceof UnionType ? $type->types : [$type],
 			$types
 		));
     }
@@ -30,7 +30,7 @@ final readonly class UnionTypeNormalizer {
     public function normalize(Type ... $types): Type {
         $parsedTypes = $this->parseTypes($types);
         if (count($parsedTypes) === 0) {
-            return $this->typeRegistry->nothing();
+            return $this->typeRegistry->nothing;
         }
         if (count($parsedTypes) === 1) {
             return $parsedTypes[0];
@@ -43,10 +43,10 @@ final readonly class UnionTypeNormalizer {
         foreach ($types as $type) {
             $xType = $type;
             while ($xType instanceof AliasType) {
-                $xType = $xType->aliasedType();
+                $xType = $xType->aliasedType;
             }
             $pTypes = $xType instanceof UnionTypeInterface ?
-                $this->parseTypes($xType->types()) : [$xType];
+                $this->parseTypes($xType->types) : [$xType];
             foreach ($pTypes as $tx) {
                 foreach ($queue as $qt) {
                     if ($tx->isSubtypeOf($qt)) {
@@ -61,26 +61,26 @@ final readonly class UnionTypeNormalizer {
 	                    array_splice($queue, $ql, 1);
 
 						$returnTypes = [
-							$q instanceof ResultType ? $q->returnType() : $q,
-							$tx instanceof ResultType ? $tx->returnType() : $tx,
+							$q instanceof ResultType ? $q->returnType : $q,
+							$tx instanceof ResultType ? $tx->returnType : $tx,
 						];
 						$errorTypes = [];
 						if ($q instanceof ResultType) {
-							$errorTypes[] = $q->errorType();
+							$errorTypes[] = $q->errorType;
 						}
 						if ($tx instanceof ResultType) {
-							$errorTypes[] = $tx->errorType();
+							$errorTypes[] = $tx->errorType;
 						}
 						$tx = $this->typeRegistry->result(
 							$this->normalize(... $returnTypes),
 							$this->normalize(... $errorTypes),
 						);
                     } else if ($q instanceof IntegerType && $tx instanceof IntegerType) {
-                        $newRange = $q->range()->tryRangeUnionWith($tx->range());
+                        $newRange = $q->range->tryRangeUnionWith($tx->range);
                         if ($newRange) {
                             array_splice($queue, $ql, 1);
                             $tx = $this->typeRegistry->integer(
-                                $newRange->minValue(), $newRange->maxValue()
+                                $newRange->minValue, $newRange->maxValue
                             );
                         }
                     } else if ($q instanceof IntegerSubsetType && $tx instanceof IntegerSubsetType) {
@@ -88,7 +88,7 @@ final readonly class UnionTypeNormalizer {
                         $tx = $this->typeRegistry->integerSubset(
                             array_values(
                                 array_unique(
-                                    array_merge($q->subsetValues(), $tx->subsetValues())
+                                    array_merge($q->subsetValues, $tx->subsetValues)
                                 )
                             )
                         );
@@ -97,7 +97,7 @@ final readonly class UnionTypeNormalizer {
                         $tx = $this->typeRegistry->realSubset(
                             array_values(
                                 array_unique(
-                                    array_merge($q->subsetValues(), $tx->subsetValues())
+                                    array_merge($q->subsetValues, $tx->subsetValues)
                                 )
                             )
                         );
@@ -106,18 +106,18 @@ final readonly class UnionTypeNormalizer {
                         $tx = $this->typeRegistry->stringSubset(
                             array_values(
                                 array_unique(
-                                    array_merge($q->subsetValues(), $tx->subsetValues())
+                                    array_merge($q->subsetValues, $tx->subsetValues)
                                 )
                             )
                         );
                     } else if ($q instanceof EnumerationSubsetType && $tx instanceof EnumerationSubsetType &&
-	                    $q->enumeration()->name()->equals($tx->enumeration()->name())) {
+	                    $q->enumeration->name->equals($tx->enumeration->name)) {
                         array_splice($queue, $ql, 1);
-                        $tx = $q->enumeration()->subsetType(
+                        $tx = $q->enumeration->subsetType(
                             array_values(
                                 array_unique(
 									array_map(static fn(EnumerationValue $value): EnumValueIdentifier =>
-										$value->name(), array_merge($q->subsetValues(), $tx->subsetValues())
+										$value->name, array_merge($q->subsetValues, $tx->subsetValues)
 									)
                                 )
                             )

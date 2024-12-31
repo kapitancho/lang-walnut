@@ -41,7 +41,7 @@ final readonly class AsInteger implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof IntegerValue) {
-			return TypedValue::forValue($this->context->valueRegistry()->integer($targetValue->literalValue()));
+			return TypedValue::forValue($this->context->valueRegistry->integer($targetValue->literalValue));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

@@ -9,21 +9,21 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Implementation\Range\RealRange;
 
-final readonly class RealSubsetType implements RealSubsetTypeInterface, JsonSerializable {
+final class RealSubsetType implements RealSubsetTypeInterface, JsonSerializable {
 
-	private RealRange $range;
+	private readonly RealRange $actualRange;
 
     /** @param list<RealValue> $subsetValues */
     public function __construct(
-        private array $subsetValues
+        public readonly array $subsetValues
     ) {}
 
     public function isSubtypeOf(Type $ofType): bool {
         return match(true) {
             $ofType instanceof RealTypeInterface =>
-                self::isInRange($this->subsetValues, $ofType->range()),
+                self::isInRange($this->subsetValues, $ofType->range),
             $ofType instanceof RealSubsetTypeInterface =>
-                self::isSubset($this->subsetValues, $ofType->subsetValues()),
+                self::isSubset($this->subsetValues, $ofType->subsetValues),
             $ofType instanceof SupertypeChecker => $ofType->isSupertypeOf($this),
             default => false
         };
@@ -31,26 +31,11 @@ final readonly class RealSubsetType implements RealSubsetTypeInterface, JsonSeri
 
 	/** @param list<RealValue> $subsetValues */
     private static function isInRange(array $subsetValues, RealRange $range): bool {
-        foreach($subsetValues as $value) {
-            if (!$range->contains($value)) {
-                return false;
-            }
-        }
-        return true;
+	    return array_all($subsetValues, fn($value) => $range->contains($value));
     }
 
     private static function isSubset(array $subset, array $superset): bool {
-        foreach($subset as $value) {
-            if (!in_array($value, $superset)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /** @return list<RealValue> */
-    public function subsetValues(): array {
-        return $this->subsetValues;
+	    return array_all($subset, fn($value) => in_array($value, $superset));
     }
 
 	public function contains(RealValue $value): bool {
@@ -65,23 +50,22 @@ final readonly class RealSubsetType implements RealSubsetTypeInterface, JsonSeri
 	private function minValue(): float {
 		return min(array_map(
 			static fn(RealValue $value) =>
-				$value->literalValue(), $this->subsetValues
+				$value->literalValue, $this->subsetValues
 		));
 	}
 
 	private function maxValue(): float {
 		return max(array_map(
 			static fn(RealValue $value) =>
-				$value->literalValue(), $this->subsetValues
+				$value->literalValue, $this->subsetValues
 		));
 	}
 
-	public function range(): RealRange {
-		return $this->range ??= new RealRange(
+	public RealRange $range {
+		get => $this->actualRange ??= new RealRange(
 			$this->minValue(), $this->maxValue()
 		);
 	}
-
 
 	public function jsonSerialize(): array {
 		return ['type' => 'RealSubset', 'values' => $this->subsetValues];

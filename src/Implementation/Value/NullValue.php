@@ -8,18 +8,18 @@ use Walnut\Lang\Blueprint\Type\NullType;
 use Walnut\Lang\Blueprint\Value\NullValue as NullValueInterface;
 use Walnut\Lang\Blueprint\Value\Value;
 
-final readonly class NullValue implements NullValueInterface, JsonSerializable {
+final class NullValue implements NullValueInterface, JsonSerializable {
 
     public function __construct(
-        private TypeRegistry $typeRegistry
+        private readonly TypeRegistry $typeRegistry
     ) {}
 
-    public function type(): NullType {
-        return $this->typeRegistry->null();
+	public NullType $type {
+        get => $this->typeRegistry->null;
     }
 
-	public function literalValue(): null {
-		return null;
+	public null $literalValue {
+		get => null;
 	}
 
 	public function equals(Value $other): bool {

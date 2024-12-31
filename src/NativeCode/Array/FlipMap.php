@@ -31,25 +31,25 @@ final readonly class FlipMap implements NativeMethod {
         $targetType = $this->toBaseType($targetType);
         $type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($type instanceof ArrayType) {
-			$itemType = $type->itemType();
-			if ($itemType->isSubtypeOf($this->context->typeRegistry()->string())) {
+			$itemType = $type->itemType;
+			if ($itemType->isSubtypeOf($this->context->typeRegistry->string())) {
                 $parameterType = $this->toBaseType($parameterType);
                 if ($parameterType instanceof FunctionType) {
-                    if ($type->itemType()->isSubtypeOf($parameterType->parameterType())) {
-                        $r = $parameterType->returnType();
-                        $errorType = $r instanceof ResultType ? $r->errorType() : null;
-                        $returnType = $r instanceof ResultType ? $r->returnType() : $r;
-                        $t = $this->context->typeRegistry()->map(
+                    if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
+                        $r = $parameterType->returnType;
+                        $errorType = $r instanceof ResultType ? $r->errorType : null;
+                        $returnType = $r instanceof ResultType ? $r->returnType : $r;
+                        $t = $this->context->typeRegistry->map(
                             $returnType,
-                            min(1, $type->range()->minLength()),
-                            $type->range()->maxLength(),
+                            min(1, $type->range->minLength),
+                            $type->range->maxLength,
                         );
-                        return $errorType ? $this->context->typeRegistry()->result($t, $errorType) : $t;
+                        return $errorType ? $this->context->typeRegistry->result($t, $errorType) : $t;
                     }
                     throw new AnalyserException(
                         "The parameter type %s of the callback function is not a subtype of %s",
-                        $type->itemType(),
-                        $parameterType->parameterType()
+                        $type->itemType,
+                        $parameterType->parameterType
                     );
                 }
 			}
@@ -71,7 +71,7 @@ final readonly class FlipMap implements NativeMethod {
 		
         $targetValue = $this->toBaseValue($targetValue);
         if ($targetValue instanceof TupleValue && $parameterValue instanceof FunctionValue) {
-            $values = $targetValue->values();
+            $values = $targetValue->values;
             $result = [];
             foreach($values as $value) {
                 if (!($value instanceof StringValue)) {
@@ -79,10 +79,10 @@ final readonly class FlipMap implements NativeMethod {
                     throw new ExecutionException("Invalid target value");
                     // @codeCoverageIgnoreEnd
                 }
-                $r = $parameterValue->execute($this->context->globalContext(), $value);
-                $result[$value->literalValue()] = $r;
+                $r = $parameterValue->execute($this->context->globalContext, $value);
+                $result[$value->literalValue] = $r;
             }
-            return TypedValue::forValue($this->context->valueRegistry()->record($result));
+            return TypedValue::forValue($this->context->valueRegistry->record($result));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

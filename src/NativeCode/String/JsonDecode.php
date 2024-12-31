@@ -29,9 +29,9 @@ final readonly class JsonDecode implements NativeMethod {
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
-			return $this->context->typeRegistry()->result(
-				$this->context->typeRegistry()->withName(new TypeNameIdentifier("JsonValue")),
-				$this->context->typeRegistry()->withName(new TypeNameIdentifier("InvalidJsonString"))
+			return $this->context->typeRegistry->result(
+				$this->context->typeRegistry->withName(new TypeNameIdentifier("JsonValue")),
+				$this->context->typeRegistry->withName(new TypeNameIdentifier("InvalidJsonString"))
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -41,19 +41,19 @@ final readonly class JsonDecode implements NativeMethod {
 
 	private function phpToValue(string|int|float|bool|null|array|object $value): Value {
 		return match(true) {
-			is_array($value) => $this->context->valueRegistry()->tuple(
+			is_array($value) => $this->context->valueRegistry->tuple(
 				array_map(fn(string|int|float|bool|null|array|object $item): Value
 					=> $this->phpToValue($item), $value)
 			),
-			is_object($value) => $this->context->valueRegistry()->record(
+			is_object($value) => $this->context->valueRegistry->record(
 				array_map(fn(string|int|float|bool|null|array|object $item): Value
 					=> $this->phpToValue($item), (array)$value)
 			),
-			is_string($value) => $this->context->valueRegistry()->string($value),
-			is_int($value) => $this->context->valueRegistry()->integer($value),
-			is_float($value) => $this->context->valueRegistry()->real($value),
-			is_bool($value) => $this->context->valueRegistry()->boolean($value),
-			is_null($value) => $this->context->valueRegistry()->null(),
+			is_string($value) => $this->context->valueRegistry->string($value),
+			is_int($value) => $this->context->valueRegistry->integer($value),
+			is_float($value) => $this->context->valueRegistry->real($value),
+			is_bool($value) => $this->context->valueRegistry->boolean($value),
+			is_null($value) => $this->context->valueRegistry->null,
 		};
 	}
 
@@ -66,16 +66,16 @@ final readonly class JsonDecode implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof StringValue) {
 			try {
-				$value = json_decode($targetValue->literalValue(), false, 512, JSON_THROW_ON_ERROR);
+				$value = json_decode($targetValue->literalValue, false, 512, JSON_THROW_ON_ERROR);
 				return new TypedValue(
-					$this->context->typeRegistry()->withName(new TypeNameIdentifier("JsonValue")),
+					$this->context->typeRegistry->withName(new TypeNameIdentifier("JsonValue")),
 					$this->phpToValue($value)
 				);
 			} catch (JsonException) {
-				return TypedValue::forValue($this->context->valueRegistry()->error(
-					$this->context->valueRegistry()->sealedValue(
+				return TypedValue::forValue($this->context->valueRegistry->error(
+					$this->context->valueRegistry->sealedValue(
 						new TypeNameIdentifier("InvalidJsonString"),
-						$this->context->valueRegistry()->record(['value' => $targetValue])
+						$this->context->valueRegistry->record(['value' => $targetValue])
 					)
 				));
 			}

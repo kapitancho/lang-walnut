@@ -25,12 +25,12 @@ final class IntersectionTypeNormalizerTest extends BaseProgramTestHelper {
         $this->assertEquals(
             'Integer[3]', (string)$this->intersection(
                 $this->typeRegistry->union([
-                    $this->valueRegistry->integer(3)->type(),
-                    $this->valueRegistry->integer(5)->type()
+                    $this->valueRegistry->integer(3)->type,
+                    $this->valueRegistry->integer(5)->type
                 ]),
                 $this->typeRegistry->union([
-                    $this->valueRegistry->integer(3)->type(),
-                    $this->valueRegistry->integer(7)->type()
+                    $this->valueRegistry->integer(3)->type,
+                    $this->valueRegistry->integer(7)->type
                 ]),
             )
         );
@@ -42,7 +42,7 @@ final class IntersectionTypeNormalizerTest extends BaseProgramTestHelper {
 
     public function testSingleType(): void {
         self::assertEquals("Boolean", (string)$this->intersection(
-            $this->typeRegistry->boolean()
+            $this->typeRegistry->boolean
         ));
     }
 
@@ -55,23 +55,23 @@ final class IntersectionTypeNormalizerTest extends BaseProgramTestHelper {
 
     public function testWithAnyType(): void {
         self::assertEquals("(Boolean&Integer)", (string)$this->intersection(
-            $this->typeRegistry->boolean(),
+            $this->typeRegistry->boolean,
             $this->typeRegistry->integer(),
-            $this->typeRegistry->any()
+            $this->typeRegistry->any
         ));
     }
 
     public function testWithNothingType(): void {
         self::assertEquals("Nothing", (string)$this->intersection(
-            $this->typeRegistry->boolean(),
+            $this->typeRegistry->boolean,
             $this->typeRegistry->integer(),
-            $this->typeRegistry->nothing()
+            $this->typeRegistry->nothing
         ));
     }
 
     public function testWithNestedType(): void {
         self::assertEquals("(Boolean&Integer&String)", (string)$this->intersection(
-            $this->typeRegistry->boolean(),
+            $this->typeRegistry->boolean,
             $this->intersection(
                 $this->typeRegistry->integer(),
                 $this->typeRegistry->string(),
@@ -81,19 +81,19 @@ final class IntersectionTypeNormalizerTest extends BaseProgramTestHelper {
 
     public function testSubtypes(): void {
         self::assertEquals("(Integer&False)", (string)$this->intersection(
-            $this->typeRegistry->boolean(),
+            $this->typeRegistry->boolean,
             $this->typeRegistry->integer(),
-            $this->typeRegistry->false(),
+            $this->typeRegistry->false,
             $this->typeRegistry->real()
         ));
     }
 
     public function testAliasTypes(): void {
-	    $this->programBuilder->addAlias(new TypeNameIdentifier('M'), $this->typeRegistry->boolean());
+	    $this->programBuilder->addAlias(new TypeNameIdentifier('M'), $this->typeRegistry->boolean);
         self::assertEquals("(Integer&False)", (string)$this->intersection(
             $this->typeRegistry->alias(new TypeNameIdentifier('M')),
             $this->typeRegistry->integer(),
-            $this->typeRegistry->false(),
+            $this->typeRegistry->false,
             $this->typeRegistry->real()
         ));
     }
@@ -136,7 +136,7 @@ final class IntersectionTypeNormalizerTest extends BaseProgramTestHelper {
 		));
 		self::assertEquals("Nothing", (string)$this->intersection(
 			$this->typeRegistry->result(
-                $this->typeRegistry->nothing(),
+                $this->typeRegistry->nothing,
 				$this->typeRegistry->integer(5, 10)
 			),
 			$this->typeRegistry->integer(1, 15),
@@ -144,7 +144,7 @@ final class IntersectionTypeNormalizerTest extends BaseProgramTestHelper {
 		self::assertEquals("Result<(String&Integer), (Boolean&Array)>", (string)$this->intersection(
 			$this->typeRegistry->result(
                 $this->typeRegistry->string(),
-				$this->typeRegistry->boolean()
+				$this->typeRegistry->boolean
 			),
 			$this->typeRegistry->result(
                 $this->typeRegistry->integer(),

@@ -6,8 +6,9 @@ use Walnut\Lang\Blueprint\Range\LengthRange;
 use Walnut\Lang\Blueprint\Value\StringValue;
 
 interface StringSubsetType extends Type {
-    /** @return array<string, StringValue> */
-    public function subsetValues(): array;
+	/** @param array<string, LengthRange> $subsetValues */
+	public array $subsetValues { get; }
+	public LengthRange $range { get; }
+
 	public function contains(StringValue $value): bool;
-    public function range(): LengthRange;
 }

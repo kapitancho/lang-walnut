@@ -32,26 +32,26 @@ final readonly class Integer implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof AtomType && $targetType->name()->equals(new TypeNameIdentifier('Random'))) {
+		if ($targetType instanceof AtomType && $targetType->name->equals(new TypeNameIdentifier('Random'))) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof RecordType) {
-				$fromType = $parameterType->types()['min'] ?? null;
-				$toType = $parameterType->types()['max'] ?? null;
+				$fromType = $parameterType->types['min'] ?? null;
+				$toType = $parameterType->types['max'] ?? null;
 
 				if (
 					($fromType instanceof IntegerType || $fromType instanceof IntegerSubsetType) &&
 					($toType instanceof IntegerType || $toType instanceof IntegerSubsetType)
 				) {
-					$fromMax = $fromType->range()->maxValue();
-					$toMin = $toType->range()->minValue();
+					$fromMax = $fromType->range->maxValue;
+					$toMin = $toType->range->minValue;
 					if ($fromMax === PlusInfinity::value || $toMin === MinusInfinity::value || $fromMax > $toMin) {
 						// @codeCoverageIgnoreStart
 						throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s - range is not compatible", __CLASS__, $parameterType));
 						// @codeCoverageIgnoreEnd
 					}
-					return $this->context->typeRegistry()->integer(
-						$fromType->range()->minValue(),
-						$toType->range()->maxValue()
+					return $this->context->typeRegistry->integer(
+						$fromType->range->minValue,
+						$toType->range->maxValue
 					);
 				}
 			}
@@ -73,7 +73,7 @@ final readonly class Integer implements NativeMethod {
 		
 		$targetValue = $this->toBaseValue($targetValue);
 		$parameterValue = $this->toBaseValue($parameterValue);
-		if ($targetValue instanceof AtomValue && $targetValue->type()->name()->equals(
+		if ($targetValue instanceof AtomValue && $targetValue->type->name->equals(
 			new TypeNameIdentifier('Random')
 		)) {
 			if ($parameterValue instanceof RecordValue) {
@@ -84,7 +84,7 @@ final readonly class Integer implements NativeMethod {
 					$to instanceof IntegerValue
 				) {
 					/** @noinspection PhpUnhandledExceptionInspection */
-					return TypedValue::forValue($this->context->valueRegistry()->integer(random_int($from->literalValue(), $to->literalValue())));
+					return TypedValue::forValue($this->context->valueRegistry->integer(random_int($from->literalValue, $to->literalValue)));
 				}
 			}
 			// @codeCoverageIgnoreStart

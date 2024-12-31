@@ -20,12 +20,12 @@ final class AtomTypeTest extends TestCase {
 
 	public function testAtomType(): void {
 		$atomType = $this->typeRegistry->atom(new TypeNameIdentifier('MyAtom'));
-		self::assertEquals('MyAtom', $atomType->name()->identifier);
+		self::assertEquals('MyAtom', $atomType->name->identifier);
 	}
 
 	public function testAtomValue(): void {
 		$atomType = $this->typeRegistry->atom(new TypeNameIdentifier('MyAtom'));
-		self::assertEquals($atomType, $atomType->value()->type());
+		self::assertEquals($atomType, $atomType->value->type);
 	}
 
 	public function testIsSubtypeOf(): void {

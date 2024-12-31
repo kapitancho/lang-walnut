@@ -13,31 +13,19 @@ final class MutableValue implements MutableValueInterface, JsonSerializable {
 
     public function __construct(
 		private readonly TypeRegistry $typeRegistry,
-		private readonly Type $targetType,
-	    private Value $value
+		public readonly Type $targetType,
+	    public Value $value
     ) {}
 
-    public function type(): MutableType {
-        return $this->typeRegistry->mutable($this->targetType);
+	public MutableType $type {
+        get => $this->typeRegistry->mutable($this->targetType);
     }
-
-	public function targetType(): Type {
-		return $this->targetType;
-	}
-
-    public function value(): Value {
-		return $this->value;
-    }
-
-	public function changeValueTo(Value $value): void {
-		$this->value = $value;
-	}
 
 	public function equals(Value $other): bool {
 		return $other instanceof MutableValueInterface &&
-			$this->targetType->isSubtypeOf($other->targetType()) &&
-			$other->targetType()->isSubtypeOf($this->targetType) &&
-			$this->value->equals($other->value());
+			$this->targetType->isSubtypeOf($other->targetType) &&
+			$other->targetType->isSubtypeOf($this->targetType) &&
+			$this->value->equals($other->value);
 	}
 
 	public function __toString(): string {

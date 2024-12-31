@@ -25,14 +25,14 @@ final readonly class Flip implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		if ($targetType instanceof ArrayType) {
-			$itemType = $targetType->itemType();
-			if ($itemType->isSubtypeOf($this->context->typeRegistry()->string())) {
-				return $this->context->typeRegistry()->map(
-					$this->context->typeRegistry()->integer(
-						0, $targetType->range()->maxLength()
+			$itemType = $targetType->itemType;
+			if ($itemType->isSubtypeOf($this->context->typeRegistry->string())) {
+				return $this->context->typeRegistry->map(
+					$this->context->typeRegistry->integer(
+						0, $targetType->range->maxLength
 					),
-					min(1, $targetType->range()->minLength()),
-					$targetType->range()->maxLength(),
+					min(1, $targetType->range->minLength),
+					$targetType->range->maxLength,
 				);
 			}
 			// @codeCoverageIgnoreStart
@@ -52,12 +52,12 @@ final readonly class Flip implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
-			$values = $targetValue->values();
+			$values = $targetValue->values;
 
 			$rawValues = [];
 			foreach($values as $value) {
 				if ($value instanceof StringValue) {
-					$rawValues[] = $value->literalValue();
+					$rawValues[] = $value->literalValue;
 				} else {
 					// @codeCoverageIgnoreStart
 					throw new ExecutionException("Invalid target value");
@@ -65,8 +65,8 @@ final readonly class Flip implements NativeMethod {
 				}
 			}
 			$rawValues = array_flip($rawValues);
-			return TypedValue::forValue($this->context->valueRegistry()->record(array_map(
-				fn($value) => $this->context->valueRegistry()->integer($value),
+			return TypedValue::forValue($this->context->valueRegistry->record(array_map(
+				fn($value) => $this->context->valueRegistry->integer($value),
 				$rawValues
 			)));
 		}

@@ -28,16 +28,16 @@ final readonly class Substring implements NativeMethod {
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
-			$pInt = $this->context->typeRegistry()->integer(0);
-			$pType = $this->context->typeRegistry()->record([
+			$pInt = $this->context->typeRegistry->integer(0);
+			$pType = $this->context->typeRegistry->record([
 				"start" => $pInt,
 				"length" => $pInt
 			]);
 			if ($parameterType->isSubtypeOf($pType)) {
 				$parameterType = $this->toBaseType($parameterType);
-				return $this->context->typeRegistry()->string(0, min(
-					$targetType->range()->maxLength,
-					$parameterType->types()['length']->range()->maxValue
+				return $this->context->typeRegistry->string(0, min(
+					$targetType->range->maxLength,
+					$parameterType->types['length']->range->maxValue
 				));
 			}
 			// @codeCoverageIgnoreStart
@@ -68,11 +68,11 @@ final readonly class Substring implements NativeMethod {
 				$start instanceof IntegerValue &&
 				$length instanceof IntegerValue
 			) {
-				return TypedValue::forValue($this->context->valueRegistry()->string(
+				return TypedValue::forValue($this->context->valueRegistry->string(
 					mb_substr(
-						$targetValue->literalValue(),
-						$start->literalValue(),
-						$length->literalValue()
+						$targetValue->literalValue,
+						$start->literalValue,
+						$length->literalValue
 					)
 				));
 			}

@@ -27,15 +27,15 @@ final readonly class WithValueType implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $this->toBaseType($targetType->refType());
+			$refType = $this->toBaseType($targetType->refType);
 			if ($parameterType->isSubtypeOf(
-				$this->context->typeRegistry()->type(
-					$this->context->typeRegistry()->any()
+				$this->context->typeRegistry->type(
+					$this->context->typeRegistry->any
 				)
 			)) {
 				if ($refType instanceof MutableType) {
-					return $this->context->typeRegistry()->type(
-						$this->context->typeRegistry()->metaType(MetaTypeValue::MutableType)
+					return $this->context->typeRegistry->type(
+						$this->context->typeRegistry->metaType(MetaTypeValue::MutableType)
 					);
 				}
 				// @codeCoverageIgnoreStart
@@ -58,17 +58,17 @@ final readonly class WithValueType implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof TypeValue) {
-			$typeValue = $this->toBaseType($targetValue->typeValue());
+			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($parameter->type->isSubtypeOf(
-				$this->context->typeRegistry()->type(
-					$this->context->typeRegistry()->any()
+				$this->context->typeRegistry->type(
+					$this->context->typeRegistry->any
 				)
 			)) {
 				if ($typeValue instanceof MutableType) {
-					$result = $this->context->typeRegistry()->mutable(
-						$parameter->value->typeValue(),
+					$result = $this->context->typeRegistry->mutable(
+						$parameter->value->typeValue,
 					);
-					return TypedValue::forValue($this->context->valueRegistry()->type($result));
+					return TypedValue::forValue($this->context->valueRegistry->type($result));
 				}
 			}
 		}

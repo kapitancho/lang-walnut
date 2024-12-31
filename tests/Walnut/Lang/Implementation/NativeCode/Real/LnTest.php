@@ -13,7 +13,7 @@ final class LnTest extends BaseProgramTestHelper {
 		$this->testMethodCall(
 			$this->expressionRegistry->constant($value),
 			'ln',
-			$this->expressionRegistry->constant($this->valueRegistry->null()),
+			$this->expressionRegistry->constant($this->valueRegistry->null),
 			$this->valueRegistry->real($expected)
 		);
 	}
@@ -22,7 +22,7 @@ final class LnTest extends BaseProgramTestHelper {
         $this->testMethodCallAnalyse(
             $type,
             'ln',
-            $this->typeRegistry->null(),
+            $this->typeRegistry->null,
             $expected
         );
 	}
@@ -39,7 +39,7 @@ final class LnTest extends BaseProgramTestHelper {
 			new TypeNameIdentifier('MyReal'),
 			$this->typeRegistry->withName(new TypeNameIdentifier('PositiveReal')),
 			$this->expressionRegistry->functionBody(
-				$this->expressionRegistry->constant($this->valueRegistry->null())
+				$this->expressionRegistry->constant($this->valueRegistry->null)
 			),
 			null
 		);
@@ -55,7 +55,7 @@ final class LnTest extends BaseProgramTestHelper {
             ),
             'ln',
             $this->expressionRegistry->constant(
-                $this->valueRegistry->null()),
+                $this->valueRegistry->null),
             $this->valueRegistry->error(
                 $this->valueRegistry->atom(
                     new TypeNameIdentifier('NotANumber')

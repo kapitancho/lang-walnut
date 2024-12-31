@@ -8,8 +8,12 @@ use Walnut\Lang\Blueprint\Program\UnknownEnumerationValue;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
 
 interface BooleanType extends EnumerationType {
-    /** @return array<string, BooleanValue> */
-    public function values(): array;
+	public BooleanType $enumeration { get; }
+	/** @param array<string, BooleanType> $subsetValues */
+	public array $subsetValues { get; }
+
+	/** @param array<string, BooleanValue> $values */
+	public array $values { get; }
 
 	/**
 	* @param non-empty-list<EnumValueIdentifier> $values

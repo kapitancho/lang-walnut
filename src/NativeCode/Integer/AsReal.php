@@ -31,18 +31,18 @@ final readonly class AsReal implements NativeMethod {
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof IntegerSubsetType || $targetType instanceof RealSubsetType) {
-			return $this->context->typeRegistry()->realSubset(
+			return $this->context->typeRegistry->realSubset(
 				array_map(fn(RealValue|IntegerValue $v) =>
-				$this->context->valueRegistry()->real((float)$v->literalValue()),
-					$targetType->subsetValues())
+				$this->context->valueRegistry->real((float)$v->literalValue),
+					$targetType->subsetValues)
 			);
 		}
 		if ($targetType instanceof IntegerType || $targetType instanceof RealType) {
-			return $this->context->typeRegistry()->real(
-				$targetType->range()->minValue() === MinusInfinity::value ? MinusInfinity::value :
-					(float)$targetType->range()->minValue(),
-				$targetType->range()->maxValue() === PlusInfinity::value ? PlusInfinity::value :
-					(float)$targetType->range()->maxValue()
+			return $this->context->typeRegistry->real(
+				$targetType->range->minValue === MinusInfinity::value ? MinusInfinity::value :
+					(float)$targetType->range->minValue,
+				$targetType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
+					(float)$targetType->range->maxValue
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -58,8 +58,8 @@ final readonly class AsReal implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof IntegerValue || $targetValue instanceof RealValue) {
-			$target = $targetValue->literalValue();
-			return TypedValue::forValue($this->context->valueRegistry()->real((float)$target));
+			$target = $targetValue->literalValue;
+			return TypedValue::forValue($this->context->valueRegistry->real((float)$target));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

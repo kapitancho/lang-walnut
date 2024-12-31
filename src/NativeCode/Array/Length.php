@@ -26,14 +26,14 @@ final readonly class Length implements NativeMethod {
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof ArrayType) {
-			return $this->context->typeRegistry()->integer(
-				$targetType->range()->minLength(),
-				$targetType->range()->maxLength()
+			return $this->context->typeRegistry->integer(
+				$targetType->range->minLength,
+				$targetType->range->maxLength
 			);
 		}
 		if ($targetType instanceof TupleType) {
-			return $this->context->typeRegistry()->integer(
-				$l = count($targetType->types()),
+			return $this->context->typeRegistry->integer(
+				$l = count($targetType->types),
 				$l
 			);
 		}
@@ -50,7 +50,7 @@ final readonly class Length implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
-			return TypedValue::forValue($this->context->valueRegistry()->integer(count($targetValue->values())));
+			return TypedValue::forValue($this->context->valueRegistry->integer(count($targetValue->values)));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

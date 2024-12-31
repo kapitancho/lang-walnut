@@ -22,7 +22,7 @@ final class SealedAnalyseTest extends BaseProgramTestHelper {
 				'y' => $this->typeRegistry->string()
 			]),
 			$this->expressionRegistry->constant(
-				$this->valueRegistry->null()
+				$this->valueRegistry->null
 			),
 			null
 		);
@@ -38,7 +38,7 @@ final class SealedAnalyseTest extends BaseProgramTestHelper {
 			$fn,
 			$t=$this->valueRegistry->function(
 				$p ?? $this->typeRegistry->integer(),
-				$this->typeRegistry->nothing(),
+				$this->typeRegistry->nothing,
 				$r,
 				$this->expressionRegistry->functionBody(
 					$this->expressionRegistry->methodCall(

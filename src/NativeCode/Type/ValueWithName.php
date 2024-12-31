@@ -29,12 +29,12 @@ final readonly class ValueWithName implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $targetType->refType();
+			$refType = $targetType->refType;
 			if ($refType instanceof EnumerationSubsetType) {
 				if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-					return $this->context->typeRegistry()->result(
-						$this->context->typeRegistry()->enumeration($refType->enumeration()->name()),
-						$this->context->typeRegistry()->sealed(
+					return $this->context->typeRegistry->result(
+						$this->context->typeRegistry->enumeration($refType->enumeration->name),
+						$this->context->typeRegistry->sealed(
 							new TypeNameIdentifier('UnknownEnumerationValue'),
 						)
 					);
@@ -58,14 +58,14 @@ final readonly class ValueWithName implements NativeMethod {
 		
 		if ($parameterValue instanceof StringValue) {
 			if ($targetValue instanceof TypeValue) {
-				$refType = $targetValue->typeValue();
+				$refType = $targetValue->typeValue;
 				if ($refType instanceof EnumerationSubsetType) {
-					return TypedValue::forValue($refType->subsetValues()[$parameterValue->literalValue()] ??
-						$this->context->valueRegistry()->error(
-							$this->context->valueRegistry()->sealedValue(
+					return TypedValue::forValue($refType->subsetValues[$parameterValue->literalValue] ??
+						$this->context->valueRegistry->error(
+							$this->context->valueRegistry->sealedValue(
 								new TypeNameIdentifier('UnknownEnumerationValue'),
-								$this->context->valueRegistry()->record([
-									'enumeration' => $this->context->valueRegistry()->type($refType),
+								$this->context->valueRegistry->record([
+									'enumeration' => $this->context->valueRegistry->type($refType),
 									'value' => $parameterValue,
 								])
 							)

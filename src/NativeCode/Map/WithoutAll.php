@@ -24,10 +24,10 @@ final readonly class WithoutAll implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		if ($targetType instanceof MapType) {
-			return $this->context->typeRegistry()->map(
-				$targetType->itemType(),
+			return $this->context->typeRegistry->map(
+				$targetType->itemType,
 				0,
-				$targetType->range()->maxLength()
+				$targetType->range->maxLength
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -44,9 +44,9 @@ final readonly class WithoutAll implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue) {
-			$values = $targetValue->values();
+			$values = $targetValue->values;
 			$values = array_filter($values, static fn($value) => !$value->equals($parameterValue));
-			return TypedValue::forValue($this->context->valueRegistry()->record($values));
+			return TypedValue::forValue($this->context->valueRegistry->record($values));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

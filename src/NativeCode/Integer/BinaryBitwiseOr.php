@@ -26,16 +26,16 @@ final readonly class BinaryBitwiseOr implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if (($targetType instanceof IntegerType || $targetType instanceof IntegerSubsetType) && $targetType->range()->minValue() >= 0) {
+		if (($targetType instanceof IntegerType || $targetType instanceof IntegerSubsetType) && $targetType->range->minValue >= 0) {
 			$parameterType = $this->toBaseType($parameterType);
 
-			if (($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) && $parameterType->range()->minValue() >= 0) {
-				$min = max($targetType->range()->minValue(), $parameterType->range()->minValue());
-				$max = $targetType->range()->maxValue() === PlusInfinity::value ||
-					$parameterType->range()->maxValue() === PlusInfinity::value ? PlusInfinity::value :
-					2 * max($targetType->range()->maxValue(), $parameterType->range()->maxValue());
+			if (($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) && $parameterType->range->minValue >= 0) {
+				$min = max($targetType->range->minValue, $parameterType->range->minValue);
+				$max = $targetType->range->maxValue === PlusInfinity::value ||
+					$parameterType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
+					2 * max($targetType->range->maxValue, $parameterType->range->maxValue);
 
-				return $this->context->typeRegistry()->integer($min, $max);
+				return $this->context->typeRegistry->integer($min, $max);
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -57,8 +57,8 @@ final readonly class BinaryBitwiseOr implements NativeMethod {
 		if ($targetValue instanceof IntegerValue) {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue) {
-	            return TypedValue::forValue($this->context->valueRegistry()->integer(
-					$targetValue->literalValue() | $parameterValue->literalValue()
+	            return TypedValue::forValue($this->context->valueRegistry->integer(
+					$targetValue->literalValue | $parameterValue->literalValue
 	            ));
 			}
 			// @codeCoverageIgnoreStart

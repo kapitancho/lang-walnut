@@ -3,5 +3,5 @@
 namespace Walnut\Lang\Blueprint\Code\Expression;
 
 interface NoExternalErrorExpression extends Expression {
-	public function targetExpression(): Expression;
+	public Expression $targetExpression { get; }
 }

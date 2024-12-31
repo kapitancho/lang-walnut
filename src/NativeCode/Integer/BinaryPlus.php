@@ -38,18 +38,18 @@ final readonly class BinaryPlus implements NativeMethod {
 				$parameterType instanceof RealType ||
 				$parameterType instanceof RealSubsetType
 			) {
-				$min = $targetType->range()->minValue() === MinusInfinity::value ||
-					$parameterType->range()->minValue() === MinusInfinity::value ? MinusInfinity::value :
-					$targetType->range()->minValue() + $parameterType->range()->minValue();
-				$max = $targetType->range()->maxValue() === PlusInfinity::value ||
-					$parameterType->range()->maxValue() === PlusInfinity::value ? PlusInfinity::value :
-					$targetType->range()->maxValue() + $parameterType->range()->maxValue();
+				$min = $targetType->range->minValue === MinusInfinity::value ||
+					$parameterType->range->minValue === MinusInfinity::value ? MinusInfinity::value :
+					$targetType->range->minValue + $parameterType->range->minValue;
+				$max = $targetType->range->maxValue === PlusInfinity::value ||
+					$parameterType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
+					$targetType->range->maxValue + $parameterType->range->maxValue;
 
 				if ($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) {
-					return $this->context->typeRegistry()->integer($min, $max);
+					return $this->context->typeRegistry->integer($min, $max);
 				}
 				if ($parameterType instanceof RealType || $parameterType instanceof RealSubsetType) {
-					return $this->context->typeRegistry()->real($min, $max);
+					return $this->context->typeRegistry->real($min, $max);
 				}
 			}
 			// @codeCoverageIgnoreStart
@@ -72,13 +72,13 @@ final readonly class BinaryPlus implements NativeMethod {
 		if ($targetValue instanceof IntegerValue) {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue) {
-	            return TypedValue::forValue($this->context->valueRegistry()->integer(
-					$targetValue->literalValue() + $parameterValue->literalValue()
+	            return TypedValue::forValue($this->context->valueRegistry->integer(
+					$targetValue->literalValue + $parameterValue->literalValue
 	            ));
 			}
 			if ($parameterValue instanceof RealValue) {
-	            return TypedValue::forValue($this->context->valueRegistry()->real(
-					$targetValue->literalValue() + $parameterValue->literalValue()
+	            return TypedValue::forValue($this->context->valueRegistry->real(
+					$targetValue->literalValue + $parameterValue->literalValue
 	            ));
 			}
 			// @codeCoverageIgnoreStart

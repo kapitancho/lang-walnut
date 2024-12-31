@@ -27,9 +27,9 @@ final readonly class ItemType implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $this->toBaseType($targetType->refType());
+			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof ArrayType || $refType instanceof MapType) {
-				return $this->context->typeRegistry()->type($refType->itemType());
+				return $this->context->typeRegistry->type($refType->itemType);
 			}
 		}
 		// @codeCoverageIgnoreStart
@@ -44,9 +44,9 @@ final readonly class ItemType implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof TypeValue) {
-			$typeValue = $this->toBaseType($targetValue->typeValue());
+			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof ArrayType || $typeValue instanceof MapType) {
-				return TypedValue::forValue($this->context->valueRegistry()->type($typeValue->itemType()));
+				return TypedValue::forValue($this->context->valueRegistry->type($typeValue->itemType));
 			}
 		}
 		// @codeCoverageIgnoreStart

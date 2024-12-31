@@ -33,11 +33,11 @@ abstract class BaseProgramTestHelper extends TestCase {
 		parent::setUp();
 
 		$programFactory = $this->getProgramFactory();
-		$programBuilder = $programFactory->builder();
-		$programRegistry = $programFactory->registry();
-		$this->typeRegistry = $programRegistry->typeRegistry();
-		$this->valueRegistry = $programRegistry->valueRegistry();
-		$this->expressionRegistry = $programRegistry->expressionRegistry();
+		$programBuilder = $programFactory->builder;
+		$programRegistry = $programFactory->registry;
+		$this->typeRegistry = $programRegistry->typeRegistry;
+		$this->valueRegistry = $programRegistry->valueRegistry;
+		$this->expressionRegistry = $programRegistry->expressionRegistry;
 		$this->programBuilder = $programBuilder;
 
 		$this->addCoreToContext();
@@ -58,8 +58,8 @@ abstract class BaseProgramTestHelper extends TestCase {
 		$this->typeRegistry->addSealed(
 			new TypeNameIdentifier('CastNotAvailable'),
 			$this->typeRegistry->record([
-				'from' => $this->typeRegistry->type($this->typeRegistry->any()),
-				'to' => $this->typeRegistry->type($this->typeRegistry->any()),
+				'from' => $this->typeRegistry->type($this->typeRegistry->any),
+				'to' => $this->typeRegistry->type($this->typeRegistry->any),
 			]),
 		);
 		$this->typeRegistry->addSealed(
@@ -71,7 +71,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 		$this->typeRegistry->addSealed(
 			new TypeNameIdentifier('InvalidJsonValue'),
 			$this->typeRegistry->record([
-				'value' => $this->typeRegistry->any()
+				'value' => $this->typeRegistry->any
 			]),
 		);
 		$this->typeRegistry->addSealed(
@@ -83,21 +83,21 @@ abstract class BaseProgramTestHelper extends TestCase {
 		$this->typeRegistry->addSealed(
 			new TypeNameIdentifier('UnknownEnumerationValue'),
 			$this->typeRegistry->record([
-				'enumeration' => $this->typeRegistry->type($this->typeRegistry->any()),
+				'enumeration' => $this->typeRegistry->type($this->typeRegistry->any),
 				'value' => $this->typeRegistry->string(),
 			]),
 		);
 		$this->typeRegistry->addSealed(
 			new TypeNameIdentifier('DependencyContainerError'),
 			$this->typeRegistry->record([
-				'targetType' => $this->typeRegistry->type($this->typeRegistry->any()),
+				'targetType' => $this->typeRegistry->type($this->typeRegistry->any),
 				'errorMessage' => $this->typeRegistry->string(),
 			]),
 		);
 		$this->typeRegistry->addSealed(
 			new TypeNameIdentifier('HydrationError'),
 			$this->typeRegistry->record([
-				'value' => $this->typeRegistry->any(),
+				'value' => $this->typeRegistry->any,
 				'hydrationPath' => $this->typeRegistry->string(),
 				'errorMessage' => $this->typeRegistry->string(),
 			]),
@@ -111,8 +111,8 @@ abstract class BaseProgramTestHelper extends TestCase {
 			new TypeNameIdentifier('JsonValue'),
 			new UnionType(
 				new UnionTypeNormalizer($this->typeRegistry),
-				$this->typeRegistry->null(),
-				$this->typeRegistry->boolean(),
+				$this->typeRegistry->null,
+				$this->typeRegistry->boolean,
 				$this->typeRegistry->integer(),
 				$this->typeRegistry->real(),
 				$this->typeRegistry->string(),
@@ -129,7 +129,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 			]),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->constant(
-					$this->valueRegistry->null()
+					$this->valueRegistry->null
 				)
 			),
 			null
@@ -139,8 +139,8 @@ abstract class BaseProgramTestHelper extends TestCase {
 			$this->typeRegistry->union([
 				$this->typeRegistry->string(),
 				$this->typeRegistry->integer(),
-				$this->typeRegistry->boolean(),
-				$this->typeRegistry->null()
+				$this->typeRegistry->boolean,
+				$this->typeRegistry->null
 			])
 		);
 		$this->typeRegistry->addAlias(

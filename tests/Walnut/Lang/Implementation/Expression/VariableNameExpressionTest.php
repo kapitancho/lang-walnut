@@ -31,7 +31,7 @@ final class VariableNameExpressionTest extends TestCase {
 
 	public function testVariableName(): void {
 		self::assertEquals('x',
-			$this->variableNameExpression->variableName()->identifier);
+			$this->variableNameExpression->variableName->identifier);
 	}
 
 	public function testAnalyse(): void {
@@ -40,7 +40,7 @@ final class VariableNameExpressionTest extends TestCase {
 				'x' => $this->typeRegistry->integer()
 			]))
 		);
-		self::assertEquals($this->typeRegistry->integer(), $result->expressionType());
+		self::assertEquals($this->typeRegistry->integer(), $result->expressionType);
 	}
 
 	public function testExecute(): void {
@@ -54,7 +54,7 @@ final class VariableNameExpressionTest extends TestCase {
 				])
 			)
 		);
-		self::assertEquals($this->valueRegistry->integer(123), $result->value());
+		self::assertEquals($this->valueRegistry->integer(123), $result->value);
 	}
 
 }

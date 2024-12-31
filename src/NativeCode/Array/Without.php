@@ -29,15 +29,15 @@ final readonly class Without implements NativeMethod {
         $targetType = $this->toBaseType($targetType);
         $type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($type instanceof ArrayType) {
-			$returnType = $this->context->typeRegistry()->array(
-				$type->itemType(),
-				max(0, $type->range()->minLength() - 1),
-				$type->range()->maxLength() === PlusInfinity::value ?
-					PlusInfinity::value : $type->range()->maxLength() - 1
+			$returnType = $this->context->typeRegistry->array(
+				$type->itemType,
+				max(0, $type->range->minLength - 1),
+				$type->range->maxLength === PlusInfinity::value ?
+					PlusInfinity::value : $type->range->maxLength - 1
 			);
-			return $this->context->typeRegistry()->result(
+			return $this->context->typeRegistry->result(
 				$returnType,
-				$this->context->typeRegistry()->atom(
+				$this->context->typeRegistry->atom(
 					new TypeNameIdentifier("ItemNotFound")
 				)
 			);
@@ -56,21 +56,21 @@ final readonly class Without implements NativeMethod {
 		
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
-			$values = $targetValue->values();
+			$values = $targetValue->values;
 			foreach($values as $index => $value) {
 				if ($value->equals($parameterValue)) {
 					array_splice($values, $index, 1);
 					return new TypedValue(
-						$this->context->typeRegistry()->result(
-							$value->type(),
-							$this->context->typeRegistry()->atom(new TypeNameIdentifier('ItemNotFound'))
+						$this->context->typeRegistry->result(
+							$value->type,
+							$this->context->typeRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
 						),
-						$this->context->valueRegistry()->tuple($values)
+						$this->context->valueRegistry->tuple($values)
 					);
 				}
 			}
-			return TypedValue::forValue($this->context->valueRegistry()->error(
-				$this->context->valueRegistry()->atom(new TypeNameIdentifier("ItemNotFound"))
+			return TypedValue::forValue($this->context->valueRegistry->error(
+				$this->context->valueRegistry->atom(new TypeNameIdentifier("ItemNotFound"))
 			));
 		}
 		// @codeCoverageIgnoreStart

@@ -29,10 +29,10 @@ final readonly class Keys implements NativeMethod {
 			$targetType = $targetType->asMapType();
 		}
 		if ($targetType instanceof MapType) {
-			return $this->context->typeRegistry()->array(
-				$this->context->typeRegistry()->string(),
-				$targetType->range()->minLength(),
-				$targetType->range()->maxLength()
+			return $this->context->typeRegistry->array(
+				$this->context->typeRegistry->string(),
+				$targetType->range->minLength,
+				$targetType->range->maxLength
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -48,11 +48,11 @@ final readonly class Keys implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue) {
-			return TypedValue::forValue($this->context->valueRegistry()->tuple(
+			return TypedValue::forValue($this->context->valueRegistry->tuple(
 				array_map(
-					fn($key) => $this->context->valueRegistry()->string($key),
+					fn($key) => $this->context->valueRegistry->string($key),
 					array_keys(
-						$targetValue->values()
+						$targetValue->values
 					)
 				)
 			));

@@ -33,19 +33,19 @@ final readonly class PadRight implements NativeMethod {
 		if ($type instanceof ArrayType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof RecordType) {
-				$types = $parameterType->types();
+				$types = $parameterType->types;
 				$lengthType = $types['length'] ?? null;
 				$valueType = $types['value'] ?? null;
 				if ($lengthType instanceof IntegerType || $lengthType instanceof IntegerSubsetType) {
-					return $this->context->typeRegistry()->array(
-						$this->context->typeRegistry()->union([
-							$type->itemType(),
+					return $this->context->typeRegistry->array(
+						$this->context->typeRegistry->union([
+							$type->itemType,
 							$valueType
 						]),
-						max($type->range()->minLength(), $lengthType->range()->minValue()),
-						$type->range()->maxLength() === PlusInfinity::value ||
-							$lengthType->range()->maxValue() === PlusInfinity::value ? PlusInfinity::value :
-							max($type->range()->maxLength(), $lengthType->range()->maxValue()),
+						max($type->range->minLength, $lengthType->range->minValue),
+						$type->range->maxLength === PlusInfinity::value ||
+							$lengthType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
+							max($type->range->maxLength, $lengthType->range->maxValue),
 					);
 				}
 			}
@@ -68,18 +68,18 @@ final readonly class PadRight implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
 			if ($parameterValue instanceof RecordValue) {
-				$values = $targetValue->values();
+				$values = $targetValue->values;
 
-				$paramValues = $parameterValue->values();
+				$paramValues = $parameterValue->values;
 				$length = $paramValues['length'] ?? null;
 				$padValue = $paramValues['value'] ?? null;
 				if ($length instanceof IntegerValue && $padValue !== null) {
 					$result = array_pad(
 						$values,
-						$length->literalValue(),
+						$length->literalValue,
 						$padValue
 					);
-					return TypedValue::forValue($this->context->valueRegistry()->tuple($result));
+					return TypedValue::forValue($this->context->valueRegistry->tuple($result));
 				}
 			}
 			// @codeCoverageIgnoreStart

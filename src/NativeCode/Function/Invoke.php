@@ -28,24 +28,24 @@ final readonly class Invoke implements NativeMethod {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof FunctionType) {
 			if (!(
-				$parameterType->isSubtypeOf($targetType->parameterType()) || (
-					$targetType->parameterType() instanceof RecordType &&
+				$parameterType->isSubtypeOf($targetType->parameterType) || (
+					$targetType->parameterType instanceof RecordType &&
 					$parameterType instanceof TupleType &&
 					$this->isTupleCompatibleToRecord(
-						$this->context->typeRegistry(),
+						$this->context->typeRegistry,
 						$parameterType,
-						$targetType->parameterType()
+						$targetType->parameterType
 					)
 				)
 			)) {
 				// @codeCoverageIgnoreStart
 				throw new AnalyserException(sprintf("Invalid parameter type: %s, %s expected",
 					$parameterType,
-					$targetType->parameterType()
+					$targetType->parameterType
 				));
 				// @codeCoverageIgnoreEnd
 			}
-			return $targetType->returnType();
+			return $targetType->returnType;
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(
@@ -63,17 +63,17 @@ final readonly class Invoke implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof FunctionValue) {
-			if ($parameterValue instanceof TupleValue && $targetValue->parameterType() instanceof RecordType) {
+			if ($parameterValue instanceof TupleValue && $targetValue->parameterType instanceof RecordType) {
 				$parameterValue = $this->getTupleAsRecord(
-					$this->context->valueRegistry(),
+					$this->context->valueRegistry,
 					$parameterValue,
-					$targetValue->parameterType(),
+					$targetValue->parameterType,
 				);
 			}
 			return new TypedValue(
-				$targetValue->returnType(),
+				$targetValue->returnType,
 				$targetValue->execute(
-					$this->context->globalContext(),
+					$this->context->globalContext,
 					$parameterValue
 				)
 			);

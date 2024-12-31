@@ -30,32 +30,32 @@ final readonly class WithKeyValue implements NativeMethod {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof RecordType || $targetType instanceof MapType) {
 			if ($parameterType->isSubtypeOf(
-				$this->context->typeRegistry()->record([
-					'key' => $this->context->typeRegistry()->string(),
-					'value' => $this->context->typeRegistry()->any()
+				$this->context->typeRegistry->record([
+					'key' => $this->context->typeRegistry->string(),
+					'value' => $this->context->typeRegistry->any
 				])
 			)) {
-				$keyType = $parameterType->types()['key'] ?? null;
+				$keyType = $parameterType->types['key'] ?? null;
 				if ($targetType instanceof RecordType) {
-					if ($keyType instanceof StringSubsetType && count($keyType->subsetValues()) === 1) {
-						$keyValue = $keyType->subsetValues()[0];
-						return $this->context->typeRegistry()->record(
-							$targetType->types() + [
-								$keyValue->literalValue() => $parameterType->types()['value']
+					if ($keyType instanceof StringSubsetType && count($keyType->subsetValues) === 1) {
+						$keyValue = $keyType->subsetValues[0];
+						return $this->context->typeRegistry->record(
+							$targetType->types + [
+								$keyValue->literalValue => $parameterType->types['value']
 							]
 						);
 					}
 					$targetType = $targetType->asMapType();
 				}
-				$valueType = $parameterType->types()['value'] ?? null;
-				return $this->context->typeRegistry()->map(
-					$this->context->typeRegistry()->union([
-						$targetType->itemType(),
+				$valueType = $parameterType->types['value'] ?? null;
+				return $this->context->typeRegistry->map(
+					$this->context->typeRegistry->union([
+						$targetType->itemType,
 						$valueType
 					]),
-					$targetType->range()->minLength(),
-					$targetType->range()->maxLength() === PlusInfinity::value ?
-						PlusInfinity::value : $targetType->range()->maxLength() + 1
+					$targetType->range->minLength,
+					$targetType->range->maxLength === PlusInfinity::value ?
+						PlusInfinity::value : $targetType->range->maxLength + 1
 				);
 			}
 			// @codeCoverageIgnoreStart
@@ -77,23 +77,23 @@ final readonly class WithKeyValue implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue) {
 			if ($parameterValue instanceof RecordValue) {
-				$p = $parameterValue->values();
+				$p = $parameterValue->values;
 				$pKey = $p['key'] ?? null;
 				$pValue = $p['value'] ?? null;
 				if ($pValue && $pKey instanceof StringValue) {
-					$values = $targetValue->values();
-					$values[$pKey->literalValue()] = $pValue;
-					$resultValue = $this->context->valueRegistry()->record($values);
+					$values = $targetValue->values;
+					$values[$pKey->literalValue] = $pValue;
+					$resultValue = $this->context->valueRegistry->record($values);
 					$resultType = $target->type instanceof MapType ?
-						$this->context->typeRegistry()->map(
-							$this->context->typeRegistry()->union([
-								$target->type->itemType(),
-								$pValue->type()
+						$this->context->typeRegistry->map(
+							$this->context->typeRegistry->union([
+								$target->type->itemType,
+								$pValue->type
 							]),
-							$target->type->range()->minLength(),
-							$target->type->range()->maxLength() === PlusInfinity::value ?
-								PlusInfinity::value : $target->type->range()->maxLength() + 1
-						) : $resultValue->type();
+							$target->type->range->minLength,
+							$target->type->range->maxLength === PlusInfinity::value ?
+								PlusInfinity::value : $target->type->range->maxLength + 1
+						) : $resultValue->type;
 					return new TypedValue($resultType, $resultValue);
 				}
 			}

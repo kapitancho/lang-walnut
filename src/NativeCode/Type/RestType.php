@@ -29,13 +29,13 @@ final readonly class RestType implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $this->toBaseType($targetType->refType());
+			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof TupleType || $refType instanceof RecordType) {
-				return $this->context->typeRegistry()->type($refType->restType());
+				return $this->context->typeRegistry->type($refType->restType);
 			}
 			if ($refType instanceof MetaType) {
-				if ($refType->value() === MetaTypeValue::Tuple || $refType->value() === MetaTypeValue::Record) {
-					return $this->context->typeRegistry()->type($this->context->typeRegistry()->any());
+				if ($refType->value === MetaTypeValue::Tuple || $refType->value === MetaTypeValue::Record) {
+					return $this->context->typeRegistry->type($this->context->typeRegistry->any);
 				}
 			}
 		}
@@ -51,9 +51,9 @@ final readonly class RestType implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof TypeValue) {
-			$typeValue = $this->toBaseType($targetValue->typeValue());
+			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof TupleType || $typeValue instanceof RecordType) {
-				return TypedValue::forValue($this->context->valueRegistry()->type($typeValue->restType()));
+				return TypedValue::forValue($this->context->valueRegistry->type($typeValue->restType));
 			}
 		}
 		// @codeCoverageIgnoreStart

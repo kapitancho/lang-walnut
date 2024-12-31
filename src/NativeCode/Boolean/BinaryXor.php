@@ -31,10 +31,10 @@ final readonly class BinaryXor implements NativeMethod {
 			if ($parameterType instanceof BooleanType || $parameterType instanceof TrueType || $parameterType instanceof FalseType) {
 				return match(true) {
 					($targetType instanceof FalseType && $parameterType instanceof FalseType) ||
-					($targetType instanceof TrueType && $parameterType instanceof TrueType) => $this->context->typeRegistry()->false(),
+					($targetType instanceof TrueType && $parameterType instanceof TrueType) => $this->context->typeRegistry->false,
 					($targetType instanceof FalseType && $parameterType instanceof TrueType) ||
-					($targetType instanceof TrueType && $parameterType instanceof FalseType) => $this->context->typeRegistry()->true(),
-					default => $this->context->typeRegistry()->boolean()
+					($targetType instanceof TrueType && $parameterType instanceof FalseType) => $this->context->typeRegistry->true,
+					default => $this->context->typeRegistry->boolean
 				};
 			}
 			// @codeCoverageIgnoreStart
@@ -57,9 +57,9 @@ final readonly class BinaryXor implements NativeMethod {
 		if ($targetValue instanceof BooleanValue) {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof BooleanValue) {
-	            return TypedValue::forValue($this->context->valueRegistry()->boolean(
-		            ($targetValue->literalValue() && !$parameterValue->literalValue()) ||
-		            (!$targetValue->literalValue() && $parameterValue->literalValue())
+	            return TypedValue::forValue($this->context->valueRegistry->boolean(
+		            ($targetValue->literalValue && !$parameterValue->literalValue) ||
+		            (!$targetValue->literalValue && $parameterValue->literalValue)
 	            ));
 			}
 		}

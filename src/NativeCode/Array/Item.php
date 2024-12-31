@@ -34,34 +34,34 @@ final readonly class Item implements NativeMethod {
 		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($type instanceof ArrayType) {
 			if ($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) {
-				$returnType = $type->itemType();
+				$returnType = $type->itemType;
 				if ($targetType instanceof TupleType) {
-					$min = $parameterType->range()->minValue();
-					$max = $parameterType->range()->maxValue();
+					$min = $parameterType->range->minValue;
+					$max = $parameterType->range->maxValue;
 					if ($min !== MinusInfinity::value && $min >= 0) {
 						if ($parameterType instanceof IntegerSubsetType) {
-							$returnType = $this->context->typeRegistry()->union(
+							$returnType = $this->context->typeRegistry->union(
 								array_map(
 									static fn(IntegerValue $value) =>
-										$targetType->types()[$value->literalValue()] ?? $targetType->restType(),
-									$parameterType->subsetValues()
+										$targetType->types[$value->literalValue] ?? $targetType->restType,
+									$parameterType->subsetValues
 								)
 							);
 						} elseif ($parameterType instanceof IntegerType) {
-							$isWithinLimit = $max !== PlusInfinity::value && $max < count($targetType->types());
-							$returnType = $this->context->typeRegistry()->union(
+							$isWithinLimit = $max !== PlusInfinity::value && $max < count($targetType->types);
+							$returnType = $this->context->typeRegistry->union(
 								$isWithinLimit ?
-								array_slice($targetType->types(), $min, $max - $min + 1) :
-								[... array_slice($targetType->types(), $min), $targetType->restType()]
+								array_slice($targetType->types, $min, $max - $min + 1) :
+								[... array_slice($targetType->types, $min), $targetType->restType]
 							);
 						}
 					}
 				}
 
-				return $type->range()->minLength() > $parameterType->range()->maxValue() ? $returnType :
-					$this->context->typeRegistry()->result(
+				return $type->range->minLength > $parameterType->range->maxValue ? $returnType :
+					$this->context->typeRegistry->result(
 						$returnType,
-						$this->context->typeRegistry()->sealed(
+						$this->context->typeRegistry->sealed(
 							new TypeNameIdentifier("IndexOutOfRange")
 						)
 					);
@@ -84,21 +84,21 @@ final readonly class Item implements NativeMethod {
 		
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue && $parameterValue instanceof IntegerValue) {
-			$values = $targetValue->values();
-			$result = $values[$parameterValue->literalValue()] ?? null;
+			$values = $targetValue->values;
+			$result = $values[$parameterValue->literalValue] ?? null;
 			if ($result !== null) {
 				$targetType = $this->toBaseType($target->type);
 				$type = match(true) {
-					$targetType instanceof TupleType => ($targetType->types()[$parameterValue->literalValue()] ?? $targetType->restType()),
-					$targetType instanceof ArrayType => $targetType->itemType(),
-					default => $result->type()
+					$targetType instanceof TupleType => ($targetType->types[$parameterValue->literalValue] ?? $targetType->restType),
+					$targetType instanceof ArrayType => $targetType->itemType,
+					default => $result->type
 				};
 				return new TypedValue($type, $result);
 			}
-			return TypedValue::forValue($this->context->valueRegistry()->error(
-				$this->context->valueRegistry()->sealedValue(
+			return TypedValue::forValue($this->context->valueRegistry->error(
+				$this->context->valueRegistry->sealedValue(
 					new TypeNameIdentifier('IndexOutOfRange'),
-					$this->context->valueRegistry()->record(['index' => $parameterValue])
+					$this->context->valueRegistry->record(['index' => $parameterValue])
 				)
 			));
 		}

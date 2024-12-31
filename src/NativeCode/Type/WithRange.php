@@ -32,12 +32,12 @@ final readonly class WithRange implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $this->toBaseType($targetType->refType());
+			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof IntegerType) {
 				if ($parameterType->isSubtypeOf(
-					$this->context->typeRegistry()->withName(new TypeNameIdentifier('IntegerRange'))
+					$this->context->typeRegistry->withName(new TypeNameIdentifier('IntegerRange'))
 				)) {
-					return $this->context->typeRegistry()->type($this->context->typeRegistry()->integer());
+					return $this->context->typeRegistry->type($this->context->typeRegistry->integer());
 				}
 				// @codeCoverageIgnoreStart
 				throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -45,9 +45,9 @@ final readonly class WithRange implements NativeMethod {
 			}
 			if ($refType instanceof RealType) {
 				if ($parameterType->isSubtypeOf(
-					$this->context->typeRegistry()->withName(new TypeNameIdentifier('RealRange'))
+					$this->context->typeRegistry->withName(new TypeNameIdentifier('RealRange'))
 				)) {
-					return $this->context->typeRegistry()->type($this->context->typeRegistry()->real());
+					return $this->context->typeRegistry->type($this->context->typeRegistry->real());
 				}
 				// @codeCoverageIgnoreStart
 				throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -66,33 +66,33 @@ final readonly class WithRange implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof TypeValue) {
-			$typeValue = $this->toBaseType($targetValue->typeValue());
+			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof IntegerType) {
 				if ($parameter->type->isSubtypeOf(
-					$this->context->typeRegistry()->withName(new TypeNameIdentifier('IntegerRange'))
+					$this->context->typeRegistry->withName(new TypeNameIdentifier('IntegerRange'))
 				)) {
-					$range = $this->toBaseValue($parameter->value)->values();
+					$range = $this->toBaseValue($parameter->value)->values;
 					$minValue = $range['minValue'];
 					$maxValue = $range['maxValue'];
-					$result = $this->context->typeRegistry()->integer(
-						$minValue instanceof IntegerValue ? $minValue->literalValue() : MinusInfinity::value,
-						$maxValue instanceof IntegerValue ? $maxValue->literalValue() : PlusInfinity::value,
+					$result = $this->context->typeRegistry->integer(
+						$minValue instanceof IntegerValue ? $minValue->literalValue : MinusInfinity::value,
+						$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
 					);
-					return TypedValue::forValue($this->context->valueRegistry()->type($result));
+					return TypedValue::forValue($this->context->valueRegistry->type($result));
 				}
 			}
 			if ($typeValue instanceof RealType) {
 				if ($parameter->type->isSubtypeOf(
-					$this->context->typeRegistry()->withName(new TypeNameIdentifier('RealRange'))
+					$this->context->typeRegistry->withName(new TypeNameIdentifier('RealRange'))
 				)) {
-					$range = $this->toBaseValue($parameter->value)->values();
+					$range = $this->toBaseValue($parameter->value)->values;
 					$minValue = $range['minValue'];
 					$maxValue = $range['maxValue'];
-					$result = $this->context->typeRegistry()->real(
-						$minValue instanceof RealValue ? $minValue->literalValue() : MinusInfinity::value,
-						$maxValue instanceof RealValue ? $maxValue->literalValue() : PlusInfinity::value,
+					$result = $this->context->typeRegistry->real(
+						$minValue instanceof RealValue ? $minValue->literalValue : MinusInfinity::value,
+						$maxValue instanceof RealValue ? $maxValue->literalValue : PlusInfinity::value,
 					);
-					return TypedValue::forValue($this->context->valueRegistry()->type($result));
+					return TypedValue::forValue($this->context->valueRegistry->type($result));
 				}
 			}
 		}

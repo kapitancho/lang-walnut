@@ -35,32 +35,32 @@ final readonly class Sum implements NativeMethod {
 			$targetType = $targetType->asArrayType();
 		}
 		if ($targetType instanceof ArrayType) {
-			$itemType = $targetType->itemType();
+			$itemType = $targetType->itemType;
 			if ($itemType->isSubtypeOf(
-				$this->context->typeRegistry()->union([
-					$this->context->typeRegistry()->integer(),
-					$this->context->typeRegistry()->real()
+				$this->context->typeRegistry->union([
+					$this->context->typeRegistry->integer(),
+					$this->context->typeRegistry->real()
 				])
 			)) {
 				if ($itemType instanceof RealType || $itemType instanceof RealSubsetType) {
-					return $this->context->typeRegistry()->real(
-                        $itemType->range()->minValue() === MinusInfinity::value ? MinusInfinity::value :
-                            $itemType->range()->minValue() * $targetType->range()->minLength(),
-                        $itemType->range()->maxValue() === PlusInfinity::value ||
-                        $targetType->range()->maxLength() === PlusInfinity::value ? PlusInfinity::value :
-                            $itemType->range()->maxValue() * $targetType->range()->maxLength()
+					return $this->context->typeRegistry->real(
+                        $itemType->range->minValue === MinusInfinity::value ? MinusInfinity::value :
+                            $itemType->range->minValue * $targetType->range->minLength,
+                        $itemType->range->maxValue === PlusInfinity::value ||
+                        $targetType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
+                            $itemType->range->maxValue * $targetType->range->maxLength
 					);
 				}
 				if ($itemType instanceof IntegerType || $itemType instanceof IntegerSubsetType) {
-					return $this->context->typeRegistry()->integer(
-                        $itemType->range()->minValue() === MinusInfinity::value ? MinusInfinity::value :
-						    $itemType->range()->minValue() * $targetType->range()->minLength(),
-                        $itemType->range()->maxValue() === PlusInfinity::value ||
-                        $targetType->range()->maxLength() === PlusInfinity::value ? PlusInfinity::value :
-						    $itemType->range()->maxValue() * $targetType->range()->maxLength()
+					return $this->context->typeRegistry->integer(
+                        $itemType->range->minValue === MinusInfinity::value ? MinusInfinity::value :
+						    $itemType->range->minValue * $targetType->range->minLength,
+                        $itemType->range->maxValue === PlusInfinity::value ||
+                        $targetType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
+						    $itemType->range->maxValue * $targetType->range->maxLength
 					);
 				}
-				return $this->context->typeRegistry()->real();
+				return $this->context->typeRegistry->real();
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -78,18 +78,18 @@ final readonly class Sum implements NativeMethod {
 		$targetValue = $target->value;
 
 		$targetValue = $this->toBaseValue($targetValue);
-		if ($targetValue instanceof TupleValue && count($targetValue->values()) > 0) {
+		if ($targetValue instanceof TupleValue && count($targetValue->values) > 0) {
 			$sum = 0;
 			$hasReal = false;
-			foreach($targetValue->values() as $item) {
-				$v = $item->literalValue();
+			foreach($targetValue->values as $item) {
+				$v = $item->literalValue;
 				if (is_float($v)) {
 					$hasReal = true;
 				}
 				$sum += $v;
 			}
 			return TypedValue::forValue(
-				$hasReal ? $this->context->valueRegistry()->real($sum) : $this->context->valueRegistry()->integer($sum)
+				$hasReal ? $this->context->valueRegistry->real($sum) : $this->context->valueRegistry->integer($sum)
 			);
 		}
 		// @codeCoverageIgnoreStart

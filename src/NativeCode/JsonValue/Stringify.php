@@ -28,20 +28,20 @@ final readonly class Stringify implements NativeMethod {
 		Type $targetType,
 		Type $parameterType
 	): StringType {
-		return $this->context->typeRegistry()->string();
+		return $this->context->typeRegistry->string();
 	}
 
 	private function doStringify(Value $value): string|int|float|bool|null|array|object {
 		if ($value instanceof TupleValue) {
 			$items = [];
-			foreach($value->values() as $item) {
+			foreach($value->values as $item) {
 				$items[] = $this->doStringify($item);
 			}
 			return $items;
 		}
 		if ($value instanceof RecordValue) {
 			$items = [];
-			foreach($value->values() as $key => $item) {
+			foreach($value->values as $key => $item) {
 				$items[$key] = $this->doStringify($item);
 			}
 			return $items;
@@ -52,10 +52,10 @@ final readonly class Stringify implements NativeMethod {
 			$value instanceof RealValue ||
 			$value instanceof StringValue
 		) {
-			return $value->literalValue();
+			return $value->literalValue;
 		}
 		if ($value instanceof SubtypeValue) {
-			return $this->doStringify($value->baseValue());
+			return $this->doStringify($value->baseValue);
 		}
 		throw new ExecutionException(
 			sprintf("Cannot stringify value of type %s", $value)
@@ -68,7 +68,7 @@ final readonly class Stringify implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		return TypedValue::forValue($this->context->valueRegistry()->string(
+		return TypedValue::forValue($this->context->valueRegistry->string(
 			json_encode($this->doStringify($targetValue), JSON_PRETTY_PRINT)
 		));
 	}

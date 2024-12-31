@@ -27,13 +27,13 @@ final readonly class BaseType implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $targetType->refType();
+			$refType = $targetType->refType;
 			if ($refType instanceof SubtypeType) {
-				return $this->context->typeRegistry()->type($refType->baseType());
+				return $this->context->typeRegistry->type($refType->baseType);
 			}
 			if ($refType instanceof MetaType) {
-				if ($refType->value() === MetaTypeValue::Subtype) {
-					return $this->context->typeRegistry()->type($this->context->typeRegistry()->any());
+				if ($refType->value === MetaTypeValue::Subtype) {
+					return $this->context->typeRegistry->type($this->context->typeRegistry->any);
 				}
 			}
 		}
@@ -49,9 +49,9 @@ final readonly class BaseType implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof TypeValue) {
-			$typeValue = $targetValue->typeValue();
+			$typeValue = $targetValue->typeValue;
 			if ($typeValue instanceof SubtypeType) {
-				return TypedValue::forValue($this->context->valueRegistry()->type($typeValue->baseType()));
+				return TypedValue::forValue($this->context->valueRegistry->type($typeValue->baseType));
 			}
 		}
 		// @codeCoverageIgnoreStart

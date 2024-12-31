@@ -7,49 +7,49 @@ use Walnut\Lang\Blueprint\Type\ProxyNamedType;
 use Walnut\Lang\Blueprint\Type\ResultType as ResultTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
 
-final readonly class ResultType implements ResultTypeInterface, SupertypeChecker, JsonSerializable {
+final class ResultType implements ResultTypeInterface, SupertypeChecker, JsonSerializable {
 
-	private Type $realReturnType;
-	private Type $realErrorType;
+	private readonly Type $realReturnType;
+	private readonly Type $realErrorType;
 
     public function __construct(
-        private Type $returnType,
-        private Type $errorType
+        private readonly Type $declaredReturnType,
+        private readonly Type $declaredErrorType
     ) {}
 
-    public function returnType(): Type {
-        return $this->realReturnType ??= $this->returnType instanceof ProxyNamedType ?
-			$this->returnType->getActualType() : $this->returnType;
+	public Type $returnType {
+		get => $this->realReturnType ??= $this->declaredReturnType instanceof ProxyNamedType ?
+			$this->declaredReturnType->actualType : $this->declaredReturnType;
     }
 
-    public function errorType(): Type {
-        return $this->realErrorType ??= $this->errorType instanceof ProxyNamedType ?
-            $this->errorType->getActualType() : $this->errorType;
+	public Type $errorType {
+		get => $this->realErrorType ??= $this->declaredErrorType instanceof ProxyNamedType ?
+            $this->declaredErrorType->actualType : $this->declaredErrorType;
     }
 
     public function isSubtypeOf(Type $ofType): bool {
 	    return match(true) {
 			$ofType instanceof ResultTypeInterface =>
-				$this->returnType()->isSubtypeOf($ofType->returnType()) &&
-                $this->errorType()->isSubtypeOf($ofType->errorType()),
+				$this->returnType->isSubtypeOf($ofType->returnType) &&
+                $this->errorType->isSubtypeOf($ofType->errorType),
 			$ofType instanceof SupertypeChecker => $ofType->isSupertypeOf($this),
 			default => false
 		};
     }
 
     public function isSupertypeOf(Type $ofType): bool {
-        return $ofType->isSubtypeOf($this->returnType());
+        return $ofType->isSubtypeOf($this->returnType);
     }
 
 	public function __toString(): string {
 		return sprintf(
 			"Result<%s, %s>",
-			$this->returnType(),
-            $this->errorType()
+			$this->returnType,
+            $this->errorType
 		);
 	}
 
 	public function jsonSerialize(): array {
-		return ['type' => 'Result', 'returnType' => $this->returnType(), 'errorType' => $this->errorType()];
+		return ['type' => 'Result', 'returnType' => $this->returnType, 'errorType' => $this->errorType];
 	}
 }

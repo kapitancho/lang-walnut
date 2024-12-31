@@ -10,7 +10,7 @@ final class NamedTypeTest extends BaseProgramTestHelper {
 	public function testProperties(): void {
 		$type = $this->typeRegistry->alias(new TypeNameIdentifier('JsonValue'));
 		$this->assertEquals('JsonValue', (string)$type);
-		$this->assertTrue($type->isSupertypeOf($this->typeRegistry->nothing()));
+		$this->assertTrue($type->isSupertypeOf($this->typeRegistry->nothing));
 	}
 
 }

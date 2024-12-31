@@ -11,7 +11,7 @@ final class BinaryNotEqualTest extends BaseProgramTestHelper {
 		$c2 = $this->expressionRegistry->constant($this->valueRegistry->integer(456));
 		$c = $this->expressionRegistry->constant($this->valueRegistry->integer(123));
 
-		$this->testMethodCall($c, 'binaryNotEqual',$c1, $this->valueRegistry->false());
-		$this->testMethodCall($c, 'binaryNotEqual', $c2, $this->valueRegistry->true());
+		$this->testMethodCall($c, 'binaryNotEqual',$c1, $this->valueRegistry->false);
+		$this->testMethodCall($c, 'binaryNotEqual', $c2, $this->valueRegistry->true);
 	}
 }

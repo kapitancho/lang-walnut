@@ -26,15 +26,15 @@ final readonly class AppendWith implements NativeMethod {
 	): Type {
 		if ($targetType instanceof ArrayType) {
 			if ($parameterType instanceof ArrayType) {
-				return $this->context->typeRegistry()->array(
-					$this->context->typeRegistry()->union([
-						$targetType->itemType(),
-						$parameterType->itemType()
+				return $this->context->typeRegistry->array(
+					$this->context->typeRegistry->union([
+						$targetType->itemType,
+						$parameterType->itemType
 					]),
-					$targetType->range()->minLength() + $parameterType->range()->minLength(),
-					$targetType->range()->maxLength() === PlusInfinity::value ||
-						$parameterType->range()->maxLength() === PlusInfinity::value ?
-						PlusInfinity::value : $targetType->range()->maxLength() + $parameterType->range()->maxLength()
+					$targetType->range->minLength + $parameterType->range->minLength,
+					$targetType->range->maxLength === PlusInfinity::value ||
+						$parameterType->range->maxLength === PlusInfinity::value ?
+						PlusInfinity::value : $targetType->range->maxLength + $parameterType->range->maxLength
 				);
 			}
 		}
@@ -53,8 +53,8 @@ final readonly class AppendWith implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
 			if ($parameterValue instanceof TupleValue) {
-				$values = array_merge($targetValue->values(), $parameterValue->values());
-				return TypedValue::forValue($this->context->valueRegistry()->tuple($values));
+				$values = array_merge($targetValue->values, $parameterValue->values);
+				return TypedValue::forValue($this->context->valueRegistry->tuple($values));
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

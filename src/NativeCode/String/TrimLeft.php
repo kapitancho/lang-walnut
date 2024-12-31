@@ -29,7 +29,7 @@ final readonly class TrimLeft implements NativeMethod {
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof NullType || $parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $this->context->typeRegistry()->string(0, $targetType->range()->maxLength);
+				return $this->context->typeRegistry->string(0, $targetType->range->maxLength);
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -51,8 +51,8 @@ final readonly class TrimLeft implements NativeMethod {
 		if ($targetValue instanceof StringValue) {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			return TypedValue::forValue($parameterValue instanceof StringValue ?
-				$this->context->valueRegistry()->string(ltrim($targetValue->literalValue(), $parameterValue->literalValue())) :
-				$this->context->valueRegistry()->string(ltrim($targetValue->literalValue()))
+				$this->context->valueRegistry->string(ltrim($targetValue->literalValue, $parameterValue->literalValue)) :
+				$this->context->valueRegistry->string(ltrim($targetValue->literalValue))
 			);
 		}
 		// @codeCoverageIgnoreStart

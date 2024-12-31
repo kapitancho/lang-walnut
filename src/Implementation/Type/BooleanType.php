@@ -12,33 +12,24 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
 use Walnut\Lang\Blueprint\Value\EnumerationValue;
 
-final readonly class BooleanType implements BooleanTypeInterface, JsonSerializable {
+final class BooleanType implements BooleanTypeInterface, JsonSerializable {
 
 	/** @var list<BooleanValue> $enumerationValues */
-	private array $enumerationValues;
-	private TrueType $trueType;
-	private FalseType $falseType;
+	public readonly array $values;
+	private readonly TrueType $trueType;
+	private readonly FalseType $falseType;
 
     public function __construct(
-        private TypeNameIdentifier $typeName,
-        private BooleanValue $trueValue,
-        private BooleanValue $falseValue
+        public readonly TypeNameIdentifier $name,
+        private readonly BooleanValue       $trueValue,
+        private readonly BooleanValue       $falseValue
     ) {
-		$this->enumerationValues = [
-			$this->trueValue->name()->identifier => $this->trueValue,
-	        $this->falseValue->name()->identifier => $this->falseValue
+		$this->values = [
+			$this->trueValue->name->identifier => $this->trueValue,
+	        $this->falseValue->name->identifier => $this->falseValue
         ];
 		$this->trueType = new TrueType($this, $this->trueValue);
 		$this->falseType = new FalseType($this, $this->falseValue);
-    }
-
-    /** @return array<string, EnumerationValue> */
-    public function values(): array {
-        return $this->enumerationValues;
-    }
-
-    public function name(): TypeNameIdentifier {
-        return $this->typeName;
     }
 
     public function isSubtypeOf(Type $ofType): bool {
@@ -58,17 +49,17 @@ final readonly class BooleanType implements BooleanTypeInterface, JsonSerializab
 	    }
 	    $v = $values[0];
 		if (count($values) === 1) {
-			if ($v->identifier === $this->trueType->value()->name()->identifier) {
+			if ($v->identifier === $this->trueType->value->name->identifier) {
 				return $this->trueType;
 			}
-			if ($v->identifier === $this->falseType->value()->name()->identifier) {
+			if ($v->identifier === $this->falseType->value->name->identifier) {
 				return $this->falseType;
 			}
 		}
         foreach($values as $value) {
-            $v = $this->enumerationValues[$value->identifier] ?? null;
+            $v = $this->values[$value->identifier] ?? null;
             if ($v === null) {
-				UnknownEnumerationValue::of($this->typeName, $value);
+				UnknownEnumerationValue::of($this->name, $value);
             }
         }
 		return $this;
@@ -76,18 +67,22 @@ final readonly class BooleanType implements BooleanTypeInterface, JsonSerializab
 
 	/** @throws InvalidArgumentException **/
 	public function value(EnumValueIdentifier $valueIdentifier): BooleanValue {
-		return $this->enumerationValues[$valueIdentifier->identifier] ??
-			UnknownEnumerationValue::of($this->typeName, $valueIdentifier);
+		return $this->values[$valueIdentifier->identifier] ??
+			UnknownEnumerationValue::of($this->name, $valueIdentifier);
 	}
 
-    public function enumeration(): BooleanType {
-        return $this;
-    }
+	public BooleanTypeInterface $enumeration {
+		get {
+			return $this;
+		}
+	}
 
-    /** @return list<BooleanValue> */
-    public function subsetValues(): array {
-        return $this->enumerationValues;
-    }
+	/** @param list<BooleanValue> $subsetValues */
+	public array $subsetValues {
+		get {
+			return $this->values;
+		}
+	}
 
 	public function __toString(): string {
 		return 'Boolean';

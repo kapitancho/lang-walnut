@@ -10,12 +10,8 @@ use Walnut\Lang\Blueprint\Type\Type;
 final readonly class AnalyserContext implements AnalyserContextInterface {
 
 	public function __construct(
-		private VariableScope $variableScope
+		public VariableScope $variableScope
 	) {}
-
-	public function variableScope(): VariableScope {
-		return $this->variableScope;
-	}
 
 	public function withAddedVariableType(VariableNameIdentifier $variableName, Type $variableType): self {
 		return new self(

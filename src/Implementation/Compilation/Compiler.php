@@ -23,7 +23,7 @@ final readonly class Compiler implements CompilerInterface {
 
 	public function compile(string $source): CompilationResult {
 		$pf = new ProgramFactory();
-		$codeBuilder = $pf->codeBuilder();
+		$codeBuilder = $pf->codeBuilder;
 		$moduleImporter = new ModuleImporter(
 			$this->lexer,
 			$this->moduleLookupContext,
@@ -32,8 +32,8 @@ final readonly class Compiler implements CompilerInterface {
 		);
 		$moduleImporter->importModule($source);
 		return new CompilationResult(
-			$pf->builder()->analyseAndBuildProgram(),
-			$pf->registry()
+			$pf->builder->analyseAndBuildProgram(),
+			$pf->registry
 		);
 	}
 }

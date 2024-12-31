@@ -42,7 +42,7 @@ final readonly class ToUpperCase implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof StringValue) {
 			return TypedValue::forValue(
-				$this->context->valueRegistry()->string(mb_strtoupper($targetValue->literalValue()))
+				$this->context->valueRegistry->string(mb_strtoupper($targetValue->literalValue))
 			);
 		}
 		// @codeCoverageIgnoreStart

@@ -63,7 +63,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		);
 		$call->analyse(new AnalyserContext(new VariableScope([])));
 		$this->assertEquals($expected, (string)
-			$call->execute(new ExecutionContext(new VariableValueScope([])))->value()
+			$call->execute(new ExecutionContext(new VariableValueScope([])))->value
 		);
 	}
 
@@ -86,8 +86,8 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		$this->programBuilder->addMethod(
 			$this->typeRegistry->withName(new TypeNameIdentifier('MyAtom')),
 			new MethodNameIdentifier('asJsonValue'),
-			$this->typeRegistry->null(),
-			$this->typeRegistry->nothing(),
+			$this->typeRegistry->null,
+			$this->typeRegistry->nothing,
 			$this->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->constant(
@@ -131,8 +131,8 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		$this->programBuilder->addMethod(
 			$this->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
 			new MethodNameIdentifier('asMyCustomEnum'),
-			$this->typeRegistry->null(),
-			$this->typeRegistry->nothing(),
+			$this->typeRegistry->null,
+			$this->typeRegistry->nothing,
 			$this->typeRegistry->enumeration(new TypeNameIdentifier('MyCustomEnum')),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->match(
@@ -173,8 +173,8 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		$this->programBuilder->addMethod(
 			$this->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
 			new MethodNameIdentifier('asMyCustomState'),
-			$this->typeRegistry->null(),
-			$this->typeRegistry->nothing(),
+			$this->typeRegistry->null,
+			$this->typeRegistry->nothing,
 			$this->typeRegistry->sealed(new TypeNameIdentifier('MyCustomState')),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->match(
@@ -215,8 +215,8 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		$this->programBuilder->addMethod(
 			$this->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
 			new MethodNameIdentifier('asMyCustomSubtype'),
-			$this->typeRegistry->null(),
-			$this->typeRegistry->nothing(),
+			$this->typeRegistry->null,
+			$this->typeRegistry->nothing,
 			$this->typeRegistry->subtype(new TypeNameIdentifier('MyCustomSubtype')),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->match(
@@ -271,7 +271,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 							),
 						),
 						$this->expressionRegistry->matchDefault(
-							$this->expressionRegistry->constant($this->valueRegistry->null())
+							$this->expressionRegistry->constant($this->valueRegistry->null)
 						)
 					]
 				)
@@ -283,11 +283,11 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		$this->typeRegistry->addSubtype(
 			new TypeNameIdentifier('MyNestedSubtype'),
 			$this->typeRegistry->record([
-				'a' => $this->typeRegistry->boolean(),
+				'a' => $this->typeRegistry->boolean,
 				'b' => $this->typeRegistry->withName(new TypeNameIdentifier('MySubtype'))
 			]),
 			$this->expressionRegistry->functionBody(
-				$this->expressionRegistry->constant($this->valueRegistry->null())
+				$this->expressionRegistry->constant($this->valueRegistry->null)
 			),
 			null
 		);
@@ -313,7 +313,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			"@HydrationError[\n	value: 123,\n	hydrationPath: 'value',\n	errorMessage: 'The integer value should be in the range 1..100'\n]"
 		);
 		$this->callHydrateAsError(
-			$this->valueRegistry->true(),
+			$this->valueRegistry->true,
 			$this->typeRegistry->integer(),
 			"@HydrationError[\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be an integer in the range -Infinity..+Infinity'\n]"
 		);
@@ -335,7 +335,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			"@HydrationError[\n	value: 123,\n	hydrationPath: 'value',\n	errorMessage: 'The integer value should be among 1, 5'\n]"
 		);
 		$this->callHydrateAsError(
-			$this->valueRegistry->true(),
+			$this->valueRegistry->true,
 			$this->typeRegistry->integerSubset([
 				$this->valueRegistry->integer(1),
 				$this->valueRegistry->integer(5),
@@ -360,7 +360,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			"@HydrationError[\n	value: 12.3,\n	hydrationPath: 'value',\n	errorMessage: 'The real value should be in the range 1..9.99'\n]"
 		);
 		$this->callHydrateAsError(
-			$this->valueRegistry->true(),
+			$this->valueRegistry->true,
 			$this->typeRegistry->real(),
 			"@HydrationError[\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a real number in the range -Infinity..+Infinity'\n]"
 		);
@@ -391,7 +391,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			"@HydrationError[\n	value: 12.3,\n	hydrationPath: 'value',\n	errorMessage: 'The real value should be among 1, 3.14'\n]"
 		);
 		$this->callHydrateAsError(
-			$this->valueRegistry->true(),
+			$this->valueRegistry->true,
 			$this->typeRegistry->realSubset([
 				$this->valueRegistry->real(1),
 				$this->valueRegistry->real(3.14),
@@ -411,7 +411,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			"@HydrationError[\n	value: 'hello',\n	hydrationPath: 'value',\n	errorMessage: 'The string value should be with a length between 10 and 100'\n]"
 		);
 		$this->callHydrateAsError(
-			$this->valueRegistry->true(),
+			$this->valueRegistry->true,
 			$this->typeRegistry->string(),
 			"@HydrationError[\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a string with a length between 0 and +Infinity'\n]"
 		);
@@ -433,7 +433,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			"@HydrationError[\n	value: 'hi!',\n	hydrationPath: 'value',\n	errorMessage: 'The string value should be among \\`hello\\`, \\`world\\`'\n]"
 		);
 		$this->callHydrateAsError(
-			$this->valueRegistry->true(),
+			$this->valueRegistry->true,
 			$this->typeRegistry->stringSubset([
 				$this->valueRegistry->string('hello'),
 				$this->valueRegistry->string('world'),
@@ -443,59 +443,59 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 
 		//Boolean
 		$this->callHydrateAs(
-			$this->valueRegistry->true(),
-			$this->typeRegistry->boolean(),
-			$this->valueRegistry->true()
+			$this->valueRegistry->true,
+			$this->typeRegistry->boolean,
+			$this->valueRegistry->true
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->string('hello'),
-			$this->typeRegistry->boolean(),
+			$this->typeRegistry->boolean,
 			"@HydrationError[\n	value: 'hello',\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a boolean'\n]"
 		);
 
 		//True
 		$this->callHydrateAs(
-			$this->valueRegistry->true(),
-			$this->typeRegistry->true(),
-			$this->valueRegistry->true()
+			$this->valueRegistry->true,
+			$this->typeRegistry->true,
+			$this->valueRegistry->true
 		);
 		$this->callHydrateAsError(
-			$this->valueRegistry->false(),
-			$this->typeRegistry->true(),
+			$this->valueRegistry->false,
+			$this->typeRegistry->true,
 			"@HydrationError[\n	value: false,\n	hydrationPath: 'value',\n	errorMessage: 'The boolean value should be true'\n]"
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->string('hello'),
-			$this->typeRegistry->true(),
+			$this->typeRegistry->true,
 			"@HydrationError[\n	value: 'hello',\n	hydrationPath: 'value',\n	errorMessage: 'The value should be \\`true\\`'\n]"
 		);
 
 		//False
 		$this->callHydrateAs(
-			$this->valueRegistry->false(),
-			$this->typeRegistry->false(),
-			$this->valueRegistry->false()
+			$this->valueRegistry->false,
+			$this->typeRegistry->false,
+			$this->valueRegistry->false
 		);
 		$this->callHydrateAsError(
-			$this->valueRegistry->true(),
-			$this->typeRegistry->false(),
+			$this->valueRegistry->true,
+			$this->typeRegistry->false,
 			"@HydrationError[\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The boolean value should be false'\n]"
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->string('hello'),
-			$this->typeRegistry->false(),
+			$this->typeRegistry->false,
 			"@HydrationError[\n	value: 'hello',\n	hydrationPath: 'value',\n	errorMessage: 'The value should be \\`false\\`'\n]"
 		);
 
 		//Null
 		$this->callHydrateAs(
-			$this->valueRegistry->null(),
-			$this->typeRegistry->null(),
-			$this->valueRegistry->null()
+			$this->valueRegistry->null,
+			$this->typeRegistry->null,
+			$this->valueRegistry->null
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->string('hello'),
-			$this->typeRegistry->null(),
+			$this->typeRegistry->null,
 			"@HydrationError[\n	value: 'hello',\n	hydrationPath: 'value',\n	errorMessage: 'The value should be \\`null\\`'\n]"
 		);
 
@@ -516,11 +516,11 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				$this->valueRegistry->integer(42),
 				$this->valueRegistry->string("Hello"),
 			]),
-			$this->typeRegistry->array($this->typeRegistry->any(), 10, 100),
+			$this->typeRegistry->array($this->typeRegistry->any, 10, 100),
 			"@HydrationError[\n	value: [42, 'Hello'],\n	hydrationPath: 'value',\n	errorMessage: 'The array value should be with a length between 10 and 100'\n]"
 		);
 		$this->callHydrateAsError(
-			$this->valueRegistry->true(),
+			$this->valueRegistry->true,
 			$this->typeRegistry->array(),
 			"@HydrationError[\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be an array with a length between 0 and +Infinity'\n]"
 		);
@@ -550,11 +550,11 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				'a' => $this->valueRegistry->integer(42),
 				'b' => $this->valueRegistry->string("Hello"),
 			]),
-			$this->typeRegistry->map($this->typeRegistry->any(), 10, 100),
+			$this->typeRegistry->map($this->typeRegistry->any, 10, 100),
 			"@HydrationError[\n	value: [a: 42, b: 'Hello'],\n	hydrationPath: 'value',\n	errorMessage: 'The map value should be with a length between 10 and 100'\n]"
 		);
 		$this->callHydrateAsError(
-			$this->valueRegistry->true(),
+			$this->valueRegistry->true,
 			$this->typeRegistry->map(),
 			"@HydrationError[\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a map with a length between 0 and +Infinity'\n]"
 		);
@@ -588,14 +588,14 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				$this->valueRegistry->string("Hello"),
 			]),
 			$this->typeRegistry->tuple([
-				$this->typeRegistry->any(),
+				$this->typeRegistry->any,
 				$this->typeRegistry->string(),
-				$this->typeRegistry->boolean(),
+				$this->typeRegistry->boolean,
 			]),
 			"@HydrationError[\n	value: [42, 'Hello'],\n	hydrationPath: 'value',\n	errorMessage: 'The tuple value should be with 3 items'\n]"
 		);
 		$this->callHydrateAsError(
-			$this->valueRegistry->true(),
+			$this->valueRegistry->true,
 			$this->typeRegistry->tuple([]),
 			"@HydrationError[\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a tuple with 0 items'\n]"
 		);
@@ -632,9 +632,9 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				'b' => $this->valueRegistry->string("Hello"),
 			]),
 			$this->typeRegistry->record([
-				'a' => $this->typeRegistry->any(),
+				'a' => $this->typeRegistry->any,
 				'b' => $this->typeRegistry->string(),
-				'c' => $this->typeRegistry->boolean(),
+				'c' => $this->typeRegistry->boolean,
 			]),
 			"@HydrationError[\n	value: [a: 42, b: 'Hello'],\n	hydrationPath: 'value',\n	errorMessage: 'The record value should contain the key c'\n]"
 		);
@@ -644,13 +644,13 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				'b' => $this->valueRegistry->string("Hello"),
 			]),
 			$this->typeRegistry->record([
-				'a' => $this->typeRegistry->any(),
-				'c' => $this->typeRegistry->boolean(),
+				'a' => $this->typeRegistry->any,
+				'c' => $this->typeRegistry->boolean,
 			]),
 			"@HydrationError[\n	value: [a: 42, b: 'Hello'],\n	hydrationPath: 'value',\n	errorMessage: 'The record value should contain the key c'\n]"
 		);
 		$this->callHydrateAsError(
-			$this->valueRegistry->true(),
+			$this->valueRegistry->true,
 			$this->typeRegistry->record([]),
 			"@HydrationError[\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a record with 0 items'\n]"
 		);
@@ -742,7 +742,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			)
 		);
 		$this->callHydrateAsError(
-			$this->valueRegistry->true(),
+			$this->valueRegistry->true,
 			$this->typeRegistry->mutable($this->typeRegistry->integer()),
 			"@HydrationError[\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be an integer in the range -Infinity..+Infinity'\n]"
 		);
@@ -750,7 +750,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		//Type
 		$this->callHydrateAs(
 			$this->valueRegistry->string("MyState"),
-			$this->typeRegistry->type($this->typeRegistry->any()),
+			$this->typeRegistry->type($this->typeRegistry->any),
 			$this->valueRegistry->type($this->typeRegistry->withName(new TypeNameIdentifier('MyState')))
 		);
 		$this->callHydrateAsError(
@@ -791,7 +791,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			$this->valueRegistry->enumerationValue(new TypeNameIdentifier('MyEnum'), new EnumValueIdentifier('C')),
 		);
 		$this->callHydrateAsError(
-			$this->valueRegistry->true(),
+			$this->valueRegistry->true,
 			$this->typeRegistry->enumeration(new TypeNameIdentifier('MyEnum')),
 			"@HydrationError[\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a string with a value among MyEnum.A, MyEnum.B, MyEnum.C, MyEnum.D'\n]"
 		);
@@ -813,7 +813,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			"@HydrationError[\n	value: 'C',\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a string with a value among MyEnum.A, MyEnum.B'\n]"
 		);
 		$this->callHydrateAsError(
-			$this->valueRegistry->true(),
+			$this->valueRegistry->true,
 			$this->typeRegistry->enumeration(new TypeNameIdentifier('MyEnum'))->subsetType([
 				new EnumValueIdentifier('A'),
 				new EnumValueIdentifier('B'),
@@ -827,7 +827,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			$this->valueRegistry->enumerationValue(new TypeNameIdentifier('MyCustomEnum'), new EnumValueIdentifier('A')),
 		);
 		$this->callHydrateAs(
-			$this->valueRegistry->true(),
+			$this->valueRegistry->true,
 			$this->typeRegistry->enumeration(new TypeNameIdentifier('MyCustomEnum')),
 			$this->valueRegistry->enumerationValue(new TypeNameIdentifier('MyCustomEnum'), new EnumValueIdentifier('B')),
 		);
@@ -849,7 +849,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				$this->valueRegistry->record(['x' => $this->valueRegistry->string('A')])),
 		);
 		$this->callHydrateAs(
-			$this->valueRegistry->true(),
+			$this->valueRegistry->true,
 			$this->typeRegistry->sealed(new TypeNameIdentifier('MyCustomState')),
 			$this->valueRegistry->sealedValue(new TypeNameIdentifier('MyCustomState'),
 				$this->valueRegistry->record(['x' => $this->valueRegistry->string('B')])),
@@ -871,7 +871,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			$this->valueRegistry->subtypeValue(new TypeNameIdentifier('MyCustomSubtype'), $this->valueRegistry->string('A')),
 		);
 		$this->callHydrateAs(
-			$this->valueRegistry->true(),
+			$this->valueRegistry->true,
 			$this->typeRegistry->subtype(new TypeNameIdentifier('MyCustomSubtype')),
 			$this->valueRegistry->subtypeValue(new TypeNameIdentifier('MyCustomSubtype'), $this->valueRegistry->string('B')),
 		);
@@ -915,13 +915,13 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				$this->expressionRegistry->methodCall(
 					$this->expressionRegistry->constant($this->valueRegistry->string($value)),
 					new MethodNameIdentifier('jsonDecode'),
-					$this->expressionRegistry->constant($this->valueRegistry->null())
+					$this->expressionRegistry->constant($this->valueRegistry->null)
 				//)
 			),
 			new MethodNameIdentifier('hydrateAs'),
 			$this->expressionRegistry->constant($this->valueRegistry->type(
 				$this->typeRegistry->record([
-					'a' => $this->typeRegistry->boolean(),
+					'a' => $this->typeRegistry->boolean,
 					'b' => $this->typeRegistry->integer(),
 					'c' => $this->typeRegistry->array($this->typeRegistry->withName(
 						new TypeNameIdentifier('MyState')
@@ -935,35 +935,35 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		)->execute(new ExecutionContext(new VariableValueScope([])));
 		$this->assertEquals(
 			"[\n\ta: true,\n\tb: 123,\n\tc: [MyState[x: 15], MyState[x: 20]],\n\td: [x: MyCustomEnum.B, y: MyAtom[]]\n]",
-			(string)$result->value()
+			(string)$result->value
 		);
 		$back = $this->expressionRegistry->methodCall(
 			$this->expressionRegistry->methodCall(
-				$this->expressionRegistry->constant($result->value()),
+				$this->expressionRegistry->constant($result->value),
 				new MethodNameIdentifier('asJsonValue'),
-				$this->expressionRegistry->constant($this->valueRegistry->null())
+				$this->expressionRegistry->constant($this->valueRegistry->null)
 				/*$this->expressionRegistry->constant($this->valueRegistry->type(
 					$this->typeRegistry->withName(new TypeNameIdentifier('JsonValue'))
 				))*/
 			),
 			new MethodNameIdentifier('stringify'),
-			$this->expressionRegistry->constant($this->valueRegistry->null())
+			$this->expressionRegistry->constant($this->valueRegistry->null)
 		)->execute(new ExecutionContext(new VariableValueScope([])));
 
 		$this->assertEquals(
 			"'" . $value . "'",
-			str_replace(["\n", '\n', "\t", ' '], '', (string)$back->value())
+			str_replace(["\n", '\n', "\t", ' '], '', (string)$back->value)
 		);
 
 		$result = $this->expressionRegistry->methodCall(
 			$this->expressionRegistry->constant($this->valueRegistry->string('invalid json')),
 			new MethodNameIdentifier('jsonDecode'),
-			$this->expressionRegistry->constant($this->valueRegistry->null())
+			$this->expressionRegistry->constant($this->valueRegistry->null)
 		)->execute(new ExecutionContext(new VariableValueScope([])));
 
 		$this->assertEquals(
 			"@InvalidJsonString[value: 'invalid json']",
-			(string)$result->value()
+			(string)$result->value
 		);
 
 	}

@@ -26,10 +26,10 @@ final readonly class SHIFT implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$t = $this->toBaseType($targetType);
-		if ($t instanceof MutableType && $t->valueType() instanceof ArrayType && $t->valueType()->range()->minLength() === 0) {
-			return $this->context->typeRegistry()->result(
-				$t->valueType()->itemType(),
-				$this->context->typeRegistry()->atom(new TypeNameIdentifier("ItemNotFound"))
+		if ($t instanceof MutableType && $t->valueType instanceof ArrayType && $t->valueType->range->minLength === 0) {
+			return $this->context->typeRegistry->result(
+				$t->valueType->itemType,
+				$this->context->typeRegistry->atom(new TypeNameIdentifier("ItemNotFound"))
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -45,16 +45,16 @@ final readonly class SHIFT implements NativeMethod {
 
 		$v = $this->toBaseValue($targetValue);
 		if ($v instanceof MutableValue) {
-			$targetType = $this->toBaseType($v->targetType());
+			$targetType = $this->toBaseType($v->targetType);
 			if ($targetType instanceof ArrayType) {
-				$values = $v->value()->values();
+				$values = $v->value->values;
 				if (count($values) > 0) {
 					$value = array_shift($values);
-					$v->changeValueTo($this->context->valueRegistry()->tuple($values));
-					return new TypedValue($targetType->itemType(), $value);
+					$v->value = $this->context->valueRegistry->tuple($values);
+					return new TypedValue($targetType->itemType, $value);
 				}
-				return TypedValue::forValue($this->context->valueRegistry()->error(
-					$this->context->valueRegistry()->atom(new TypeNameIdentifier("ItemNotFound"))
+				return TypedValue::forValue($this->context->valueRegistry->error(
+					$this->context->valueRegistry->atom(new TypeNameIdentifier("ItemNotFound"))
 				));
 			}
 		}

@@ -30,12 +30,12 @@ final readonly class Flip implements NativeMethod {
 			$targetType = $targetType->asMapType();
 		}
 		if ($targetType instanceof MapType) {
-			$itemType = $targetType->itemType();
-			if ($itemType->isSubtypeOf($this->context->typeRegistry()->string())) {
-				return $this->context->typeRegistry()->map(
-					$this->context->typeRegistry()->string(),
-					min(1, $targetType->range()->minLength()),
-					$targetType->range()->maxLength(),
+			$itemType = $targetType->itemType;
+			if ($itemType->isSubtypeOf($this->context->typeRegistry->string())) {
+				return $this->context->typeRegistry->map(
+					$this->context->typeRegistry->string(),
+					min(1, $targetType->range->minLength),
+					$targetType->range->maxLength,
 				);
 			}
 			// @codeCoverageIgnoreStart
@@ -55,12 +55,12 @@ final readonly class Flip implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue) {
-			$values = $targetValue->values();
+			$values = $targetValue->values;
 
 			$rawValues = [];
 			foreach($values as $key => $value) {
 				if ($value instanceof StringValue) {
-					$rawValues[$key] = $value->literalValue();
+					$rawValues[$key] = $value->literalValue;
 				} else {
 					// @codeCoverageIgnoreStart
 					throw new ExecutionException("Invalid target value");
@@ -68,8 +68,8 @@ final readonly class Flip implements NativeMethod {
 				}
 			}
 			$rawValues = array_flip($rawValues);
-			return TypedValue::forValue($this->context->valueRegistry()->record(array_map(
-				fn($value) => $this->context->valueRegistry()->string($value),
+			return TypedValue::forValue($this->context->valueRegistry->record(array_map(
+				fn($value) => $this->context->valueRegistry->string($value),
 				$rawValues
 			)));
 		}

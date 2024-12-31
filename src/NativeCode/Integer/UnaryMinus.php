@@ -28,19 +28,19 @@ final readonly class UnaryMinus implements NativeMethod {
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof IntegerSubsetType) {
-			return $this->context->typeRegistry()->integerSubset(
+			return $this->context->typeRegistry->integerSubset(
 				array_map(fn(IntegerValue $value): IntegerValue =>
-					$this->context->valueRegistry()->integer(-$value->literalValue()),
-					$targetType->subsetValues()
+					$this->context->valueRegistry->integer(-$value->literalValue),
+					$targetType->subsetValues
 				)
 			);
 		}
 		if ($targetType instanceof IntegerType) {
-			return $this->context->typeRegistry()->integer(
-				$targetType->range()->maxValue() === PlusInfinity::value ? MinusInfinity::value :
-					-$targetType->range()->maxValue(),
-				$targetType->range()->minValue() === MinusInfinity::value ? PlusInfinity::value :
-					-$targetType->range()->minValue()
+			return $this->context->typeRegistry->integer(
+				$targetType->range->maxValue === PlusInfinity::value ? MinusInfinity::value :
+					-$targetType->range->maxValue,
+				$targetType->range->minValue === MinusInfinity::value ? PlusInfinity::value :
+					-$targetType->range->minValue
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -56,8 +56,8 @@ final readonly class UnaryMinus implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof IntegerValue) {
-			$target = $targetValue->literalValue();
-			return TypedValue::forValue($this->context->valueRegistry()->integer(-$target));
+			$target = $targetValue->literalValue;
+			return TypedValue::forValue($this->context->valueRegistry->integer(-$target));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

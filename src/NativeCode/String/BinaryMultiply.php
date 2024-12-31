@@ -33,13 +33,13 @@ final readonly class BinaryMultiply implements NativeMethod {
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) {
-				$minValue = $parameterType->range()->minValue();
+				$minValue = $parameterType->range->minValue;
 				if ($minValue !== MinusInfinity::value && $minValue >= 0) {
-					return $this->context->typeRegistry()->string(
-						$targetType->range()->minLength() * $minValue,
-						$targetType->range()->maxLength() === PlusInfinity::value ||
-							$parameterType->range()->maxValue() === PlusInfinity::value ? PlusInfinity::value :
-							$targetType->range()->maxLength() * $parameterType->range()->maxValue()
+					return $this->context->typeRegistry->string(
+						$targetType->range->minLength * $minValue,
+						$targetType->range->maxLength === PlusInfinity::value ||
+							$parameterType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
+							$targetType->range->maxLength * $parameterType->range->maxValue
 					);
 				}
 			}
@@ -62,13 +62,13 @@ final readonly class BinaryMultiply implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		$parameterValue = $this->toBaseValue($parameterValue);
 		if ($targetValue instanceof StringValue) {
-			if ($parameterValue instanceof IntegerValue && $parameterValue->literalValue() >= 0) {
+			if ($parameterValue instanceof IntegerValue && $parameterValue->literalValue >= 0) {
 				$result = str_repeat(
-					$targetValue->literalValue(),
-					$parameterValue->literalValue()
+					$targetValue->literalValue,
+					$parameterValue->literalValue
 				);
 				return TypedValue::forValue(
-					$this->context->valueRegistry()->string($result)
+					$this->context->valueRegistry->string($result)
 				);
 			}
 			// @codeCoverageIgnoreStart

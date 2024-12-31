@@ -16,25 +16,21 @@ use Walnut\Lang\Blueprint\Value\Value;
 final readonly class ConstantExpression implements ConstantExpressionInterface, JsonSerializable {
 	public function __construct(
 		private TypeRegistry $typeRegistry,
-		private Value $value
+		public Value $value
 	) {}
-
-	public function value(): Value {
-		return $this->value;
-	}
 
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
 		if ($this->value instanceof FunctionValue) {
 			$this->value->analyse($analyserContext);
 		}
 		return $analyserContext->asAnalyserResult(
-			$this->value->type(),
-			$this->typeRegistry->nothing()
+			$this->value->type,
+			$this->typeRegistry->nothing
 		);
 	}
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
-		$variableValueScope = $executionContext->variableValueScope();
+		$variableValueScope = $executionContext->variableValueScope;
 		$value = $this->value;
 		if ($value instanceof FunctionValue) {
 			$value = $value->withVariableValueScope($variableValueScope);

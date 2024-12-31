@@ -29,10 +29,10 @@ final readonly class MinLength implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $this->toBaseType($targetType->refType());
+			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof StringType || $refType instanceof StringSubsetType ||
 				$refType instanceof ArrayType || $refType instanceof MapType) {
-				return $this->context->typeRegistry()->integer(0);
+				return $this->context->typeRegistry->integer(0);
 			}
 		}
 		// @codeCoverageIgnoreStart
@@ -47,10 +47,10 @@ final readonly class MinLength implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof TypeValue) {
-			$typeValue = $this->toBaseType($targetValue->typeValue());
+			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof StringType || $typeValue instanceof StringSubsetType ||
 				$typeValue instanceof ArrayType || $typeValue instanceof MapType) {
-				return TypedValue::forValue($this->context->valueRegistry()->integer($typeValue->range()->minLength()));
+				return TypedValue::forValue($this->context->valueRegistry->integer($typeValue->range->minLength));
 			}
 		}
 		// @codeCoverageIgnoreStart

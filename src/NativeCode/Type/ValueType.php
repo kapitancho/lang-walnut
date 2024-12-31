@@ -29,20 +29,20 @@ final readonly class ValueType implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $this->toBaseType($targetType->refType());
+			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof SealedTypeInterface) {
-				return $this->context->typeRegistry()->type($refType->valueType());
+				return $this->context->typeRegistry->type($refType->valueType);
 			}
 			if ($refType instanceof MetaType) {
-				if ($refType->value() === MetaTypeValue::Sealed) {
-					return $this->context->typeRegistry()->type($this->context->typeRegistry()->any());
+				if ($refType->value === MetaTypeValue::Sealed) {
+					return $this->context->typeRegistry->type($this->context->typeRegistry->any);
 				}
-				if ($refType->value() === MetaTypeValue::MutableType) {
-					return $this->context->typeRegistry()->type($this->context->typeRegistry()->any());
+				if ($refType->value === MetaTypeValue::MutableType) {
+					return $this->context->typeRegistry->type($this->context->typeRegistry->any);
 				}
 			}
 			if ($refType instanceof MutableType) {
-				return $this->context->typeRegistry()->type($refType->valueType());
+				return $this->context->typeRegistry->type($refType->valueType);
 			}
 		}
 		// @codeCoverageIgnoreStart
@@ -57,12 +57,12 @@ final readonly class ValueType implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof TypeValue) {
-			$typeValue = $this->toBaseType($targetValue->typeValue());
+			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof SealedTypeInterface) {
-				return TypedValue::forValue($this->context->valueRegistry()->type($typeValue->valueType()));
+				return TypedValue::forValue($this->context->valueRegistry->type($typeValue->valueType));
 			}
 			if ($typeValue instanceof MutableType) {
-				return TypedValue::forValue($this->context->valueRegistry()->type($typeValue->valueType()));
+				return TypedValue::forValue($this->context->valueRegistry->type($typeValue->valueType));
 			}
 		}
 		// @codeCoverageIgnoreStart

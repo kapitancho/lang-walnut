@@ -31,12 +31,12 @@ final readonly class LastIndexOf implements NativeMethod {
 			$targetType = $targetType->asArrayType();
 		}
 		if ($targetType instanceof ArrayType) {
-			$maxLength = $targetType->range()->maxLength();
-			$returnType = $this->context->typeRegistry()->integer(0,
+			$maxLength = $targetType->range->maxLength;
+			$returnType = $this->context->typeRegistry->integer(0,
 				$maxLength === PlusInfinity::value ? $maxLength : $maxLength - 1);
-			return $this->context->typeRegistry()->result(
+			return $this->context->typeRegistry->result(
 				$returnType,
-				$this->context->typeRegistry()->atom(
+				$this->context->typeRegistry->atom(
 					new TypeNameIdentifier("ItemNotFound")
 				)
 			);
@@ -55,14 +55,14 @@ final readonly class LastIndexOf implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
-			$values = $targetValue->values();
+			$values = $targetValue->values;
 			for($index = count($values) - 1; $index >= 0; $index--) {
 				if ($values[$index]->equals($parameterValue)) {
-					return TypedValue::forValue($this->context->valueRegistry()->integer($index));
+					return TypedValue::forValue($this->context->valueRegistry->integer($index));
 				}
 			}
-			return TypedValue::forValue($this->context->valueRegistry()->error(
-				$this->context->valueRegistry()->atom(
+			return TypedValue::forValue($this->context->valueRegistry->error(
+				$this->context->valueRegistry->atom(
 					new TypeNameIdentifier('ItemNotFound'),
 				)
 			));

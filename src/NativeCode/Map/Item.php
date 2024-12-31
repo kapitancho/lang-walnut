@@ -36,42 +36,42 @@ final readonly class Item implements NativeMethod {
 		if ($targetType instanceof IntersectionType) {
 			$types = array_map(
 				fn(Type $type) => $this->analyse($type, $parameterType),
-				$targetType->types()
+				$targetType->types
 			);
-			return $this->context->typeRegistry()->intersection($types);
+			return $this->context->typeRegistry->intersection($types);
 		}
 		$type = $targetType instanceof RecordType ? $targetType->asMapType() : $targetType;
-		if ($targetType instanceof MetaType && $targetType->value() === MetaTypeValue::Record) {
-			$type = $this->context->typeRegistry()->map(
-				$this->context->typeRegistry()->any()
+		if ($targetType instanceof MetaType && $targetType->value === MetaTypeValue::Record) {
+			$type = $this->context->typeRegistry->map(
+				$this->context->typeRegistry->any
 			);
 		}
-		$mapItemNotFound = $this->context->typeRegistry()->sealed(new TypeNameIdentifier("MapItemNotFound"));
+		$mapItemNotFound = $this->context->typeRegistry->sealed(new TypeNameIdentifier("MapItemNotFound"));
 		if ($type instanceof MapType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				$returnType = $type->itemType();
+				$returnType = $type->itemType;
 				if ($targetType instanceof RecordType && $parameterType instanceof StringSubsetType) {
 					$tConv = fn(Type $type): Type => $type instanceof OptionalKeyType ?
-						$this->context->typeRegistry()->result($type->valueType(), $mapItemNotFound) :
+						$this->context->typeRegistry->result($type->valueType, $mapItemNotFound) :
 						$type;
-					$returnType = $this->context->typeRegistry()->union(
+					$returnType = $this->context->typeRegistry->union(
 						array_map(
 							static fn(StringValue $value) => $tConv(
-								$targetType->types()[$value->literalValue()] ??
-								$targetType->restType()
+								$targetType->types[$value->literalValue] ??
+								$targetType->restType
 							),
-							$parameterType->subsetValues()
+							$parameterType->subsetValues
 						)
 					);
-					$allKeys = array_filter($parameterType->subsetValues(),
-						static fn(StringValue $value) => array_key_exists($value->literalValue(), $targetType->types())
+					$allKeys = array_filter($parameterType->subsetValues,
+						static fn(StringValue $value) => array_key_exists($value->literalValue, $targetType->types)
 					);
-					if (count($allKeys) === count($parameterType->subsetValues())) {
+					if (count($allKeys) === count($parameterType->subsetValues)) {
 						return $returnType;
 					}
 				}
-				return $this->context->typeRegistry()->result($returnType, $mapItemNotFound);
+				return $this->context->typeRegistry->result($returnType, $mapItemNotFound);
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType    ));
@@ -91,21 +91,21 @@ final readonly class Item implements NativeMethod {
 		
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue && $parameterValue instanceof StringValue) {
-			$values = $targetValue->values();
-			$result = $values[$parameterValue->literalValue()] ?? null;
+			$values = $targetValue->values;
+			$result = $values[$parameterValue->literalValue] ?? null;
 			if ($result !== null) {
 				$targetType = $this->toBaseType($target->type);
 				$type = match(true) {
-					$targetType instanceof RecordType => ($targetType->types()[$parameterValue->literalValue()] ?? $targetType->restType()),
-					$targetType instanceof MapType => $targetType->itemType(),
-					default => $result->type()
+					$targetType instanceof RecordType => ($targetType->types[$parameterValue->literalValue] ?? $targetType->restType),
+					$targetType instanceof MapType => $targetType->itemType,
+					default => $result->type
 				};
 				return new TypedValue($type, $result);
 			}
-			return TypedValue::forValue($this->context->valueRegistry()->error(
-				$this->context->valueRegistry()->sealedValue(
+			return TypedValue::forValue($this->context->valueRegistry->error(
+				$this->context->valueRegistry->sealedValue(
 					new TypeNameIdentifier('MapItemNotFound'),
-					$this->context->valueRegistry()->record(['key' => $parameterValue])
+					$this->context->valueRegistry->record(['key' => $parameterValue])
 				)
 			));
 		}

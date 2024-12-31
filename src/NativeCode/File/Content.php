@@ -24,12 +24,12 @@ final readonly class Content implements NativeMethod {
 		Type $targetType,
 		Type $parameterType,
 	): Type {
-		if ($targetType instanceof SealedType && $targetType->name()->equals(
+		if ($targetType instanceof SealedType && $targetType->name->equals(
 			new TypeNameIdentifier('File')
 		)) {
-			return $this->context->typeRegistry()->result(
-				$this->context->typeRegistry()->string(),
-				$this->context->typeRegistry()->withName(
+			return $this->context->typeRegistry->result(
+				$this->context->typeRegistry->string(),
+				$this->context->typeRegistry->withName(
 					new TypeNameIdentifier('CannotReadFile')
 				)
 			);
@@ -46,20 +46,20 @@ final readonly class Content implements NativeMethod {
 		$targetValue = $target->value;
 
 		$targetValue = $this->toBaseValue($targetValue);
-		if ($targetValue instanceof SealedValue && $targetValue->type()->name()->equals(
+		if ($targetValue instanceof SealedValue && $targetValue->type->name->equals(
 			new TypeNameIdentifier('File')
 		)) {
-			$path = $targetValue->value()->valueOf('path')->literalValue();
+			$path = $targetValue->value->valueOf('path')->literalValue;
 			$contents = @file_get_contents($path);
 			if ($contents === false) {
-				return TypedValue::forValue($this->context->valueRegistry()->error(
-					$this->context->valueRegistry()->sealedValue(
+				return TypedValue::forValue($this->context->valueRegistry->error(
+					$this->context->valueRegistry->sealedValue(
 						new TypeNameIdentifier('CannotReadFile'),
-						$targetValue->value()
+						$targetValue->value
 					)
 				));
 			}
-			return TypedValue::forValue($this->context->valueRegistry()->string($contents));
+			return TypedValue::forValue($this->context->valueRegistry->string($contents));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

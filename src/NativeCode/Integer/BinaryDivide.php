@@ -39,21 +39,21 @@ final readonly class BinaryDivide implements NativeMethod {
 				$parameterType instanceof RealType ||
 				$parameterType instanceof RealSubsetType
 			) {
-                $real = $this->context->typeRegistry()->real();
+                $real = $this->context->typeRegistry->real();
                 if (
-                    $targetType->range()->minValue() >= 0 && $parameterType->range()->minValue() > 0
+                    $targetType->range->minValue >= 0 && $parameterType->range->minValue > 0
                 ) {
-                    $min = $parameterType->range()->maxValue() === PlusInfinity::value ? 0 :
-                        $targetType->range()->minValue() / $parameterType->range()->maxValue();
-                    $max = $targetType->range()->maxValue() === PlusInfinity::value ? PlusInfinity::value :
-                        $targetType->range()->maxValue() / $parameterType->range()->minValue();
-                    $real = $this->context->typeRegistry()->real($min, $max);
+                    $min = $parameterType->range->maxValue === PlusInfinity::value ? 0 :
+                        $targetType->range->minValue / $parameterType->range->maxValue;
+                    $max = $targetType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
+                        $targetType->range->maxValue / $parameterType->range->minValue;
+                    $real = $this->context->typeRegistry->real($min, $max);
                 }
-				return ($parameterType->range()->minValue() === MinusInfinity::value || $parameterType->range()->minValue() < 0) &&
-					($parameterType->range()->maxValue() === PlusInfinity::value || $parameterType->range()->maxValue() > 0) ?
-						$this->context->typeRegistry()->result(
+				return ($parameterType->range->minValue === MinusInfinity::value || $parameterType->range->minValue < 0) &&
+					($parameterType->range->maxValue === PlusInfinity::value || $parameterType->range->maxValue > 0) ?
+						$this->context->typeRegistry->result(
 							$real,
-							$this->context->typeRegistry()->atom(new TypeNameIdentifier('NotANumber'))
+							$this->context->typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
 						) : $real;
 			}
 			// @codeCoverageIgnoreStart
@@ -78,14 +78,14 @@ final readonly class BinaryDivide implements NativeMethod {
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue || $parameterValue instanceof RealValue) {
-				if ((float)$parameterValue->literalValue() === 0.0) {
-					return TypedValue::forValue($this->context->valueRegistry()->error(
-						$this->context->valueRegistry()->atom(new TypeNameIdentifier('NotANumber'))
+				if ((float)$parameterValue->literalValue === 0.0) {
+					return TypedValue::forValue($this->context->valueRegistry->error(
+						$this->context->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
 					));
 				}
-                return TypedValue::forValue($this->context->valueRegistry()->real(
-	                fdiv($targetValue->literalValue(), $parameterValue->literalValue())
-	                //$targetValue->literalValue() / $parameter->literalValue()
+                return TypedValue::forValue($this->context->valueRegistry->real(
+	                fdiv($targetValue->literalValue, $parameterValue->literalValue)
+	                //$targetValue->literalValue / $parameter->literalValue
                 ));
 			}
 			// @codeCoverageIgnoreStart

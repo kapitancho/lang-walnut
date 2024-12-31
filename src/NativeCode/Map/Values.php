@@ -29,8 +29,8 @@ final readonly class Values implements NativeMethod {
 			$targetType = $targetType->asMapType();
 		}
 		if ($targetType instanceof MapType) {
-			return $this->context->typeRegistry()->array(
-				$targetType->itemType(), $targetType->range()->minLength(), $targetType->range()->maxLength()
+			return $this->context->typeRegistry->array(
+				$targetType->itemType, $targetType->range->minLength, $targetType->range->maxLength
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -46,7 +46,7 @@ final readonly class Values implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue) {
-			return TypedValue::forValue($this->context->valueRegistry()->tuple(array_values($targetValue->values())));
+			return TypedValue::forValue($this->context->valueRegistry->tuple(array_values($targetValue->values)));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

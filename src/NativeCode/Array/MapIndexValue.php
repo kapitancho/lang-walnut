@@ -33,24 +33,24 @@ final readonly class MapIndexValue implements NativeMethod {
 		if ($type instanceof ArrayType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof FunctionType) {
-				$callbackParameterType = $parameterType->parameterType();
-				$expectedType = $this->context->typeRegistry()->record([
-					'index' => $this->context->typeRegistry()->integer(0,
-						$type->range()->maxLength() === PlusInfinity::value ? PlusInfinity::value :
-							$type->range()->maxLength() - 1
+				$callbackParameterType = $parameterType->parameterType;
+				$expectedType = $this->context->typeRegistry->record([
+					'index' => $this->context->typeRegistry->integer(0,
+						$type->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
+							$type->range->maxLength - 1
 					),
-					'value' => $type->itemType()
+					'value' => $type->itemType
 				]);
 				if ($expectedType->isSubtypeOf($callbackParameterType)) {
-					$r = $parameterType->returnType();
-					$errorType = $r instanceof ResultType ? $r->errorType() : null;
-					$returnType = $r instanceof ResultType ? $r->returnType() : $r;
-					$t = $this->context->typeRegistry()->array(
+					$r = $parameterType->returnType;
+					$errorType = $r instanceof ResultType ? $r->errorType : null;
+					$returnType = $r instanceof ResultType ? $r->returnType : $r;
+					$t = $this->context->typeRegistry->array(
 						$returnType,
-						$type->range()->minLength(),
-						$type->range()->maxLength(),
+						$type->range->minLength,
+						$type->range->maxLength,
 					);
-					return $errorType ? $this->context->typeRegistry()->result($t, $errorType) : $t;
+					return $errorType ? $this->context->typeRegistry->result($t, $errorType) : $t;
 				}
 				throw new AnalyserException(sprintf(
 					"The parameter type %s of the callback function is not a subtype of %s",
@@ -76,19 +76,19 @@ final readonly class MapIndexValue implements NativeMethod {
 		
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue && $parameterValue instanceof FunctionValue) {
-			$values = $targetValue->values();
+			$values = $targetValue->values;
 			$result = [];
 			foreach($values as $index => $value) {
 				$r = $parameterValue->execute(
-					$this->context->globalContext(),
-					$this->context->valueRegistry()->record([
-						'index' => $this->context->valueRegistry()->integer($index),
+					$this->context->globalContext,
+					$this->context->valueRegistry->record([
+						'index' => $this->context->valueRegistry->integer($index),
 						'value' => $value
 					])
 				);
 				$result[] = $r;
 			}
-			return TypedValue::forValue($this->context->valueRegistry()->tuple($result));
+			return TypedValue::forValue($this->context->valueRegistry->tuple($result));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

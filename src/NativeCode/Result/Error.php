@@ -25,8 +25,8 @@ final readonly class Error implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$target = $this->toBaseType($targetType);
-		if ($target instanceof ResultType && $target->returnType() instanceof NothingType) {
-			return $target->errorType();
+		if ($target instanceof ResultType && $target->returnType instanceof NothingType) {
+			return $target->errorType;
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -41,11 +41,11 @@ final readonly class Error implements NativeMethod {
 
 		if ($targetValue instanceof ErrorValue) {
 			return new TypedValue(
-				$this->context->typeRegistry()->result(
-					$this->context->typeRegistry()->nothing(),
-					$targetValue->type()
+				$this->context->typeRegistry->result(
+					$this->context->typeRegistry->nothing,
+					$targetValue->type
 				),
-				$targetValue->errorValue()
+				$targetValue->errorValue
 			);
 		}
 		// @codeCoverageIgnoreStart

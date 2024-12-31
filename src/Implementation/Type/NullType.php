@@ -11,17 +11,9 @@ use Walnut\Lang\Blueprint\Value\NullValue;
 final readonly class NullType implements NullTypeInterface, JsonSerializable {
 
     public function __construct(
-        private TypeNameIdentifier $typeName,
-        private NullValue $atomValue
+        public TypeNameIdentifier $name,
+        public NullValue           $value
     ) {}
-
-    public function value(): NullValue {
-        return $this->atomValue;
-    }
-
-    public function name(): TypeNameIdentifier {
-        return $this->typeName;
-    }
 
     public function isSubtypeOf(Type $ofType): bool {
         return match(true){

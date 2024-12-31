@@ -31,17 +31,17 @@ final readonly class MaxValue implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $this->toBaseType($targetType->refType());
+			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof IntegerType || $refType instanceof IntegerSubsetType) {
-				return $this->context->typeRegistry()->union([
-					$this->context->typeRegistry()->integer(),
-					$this->context->typeRegistry()->withName(new TypeNameIdentifier('PlusInfinity'))
+				return $this->context->typeRegistry->union([
+					$this->context->typeRegistry->integer(),
+					$this->context->typeRegistry->withName(new TypeNameIdentifier('PlusInfinity'))
 				]);
 			}
 			if ($refType instanceof RealType || $refType instanceof RealSubsetType) {
-				return $this->context->typeRegistry()->union([
-					$this->context->typeRegistry()->real(),
-					$this->context->typeRegistry()->withName(new TypeNameIdentifier('PlusInfinity'))
+				return $this->context->typeRegistry->union([
+					$this->context->typeRegistry->real(),
+					$this->context->typeRegistry->withName(new TypeNameIdentifier('PlusInfinity'))
 				]);
 			}
 		}
@@ -57,17 +57,17 @@ final readonly class MaxValue implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof TypeValue) {
-			$typeValue = $this->toBaseType($targetValue->typeValue());
+			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof IntegerType || $typeValue instanceof IntegerSubsetType) {
-				return TypedValue::forValue($typeValue->range()->maxValue() === PlusInfinity::value ?
-					$this->context->valueRegistry()->atom(new TypeNameIdentifier('PlusInfinity')) :
-					$this->context->valueRegistry()->integer($typeValue->range()->maxValue())
+				return TypedValue::forValue($typeValue->range->maxValue === PlusInfinity::value ?
+					$this->context->valueRegistry->atom(new TypeNameIdentifier('PlusInfinity')) :
+					$this->context->valueRegistry->integer($typeValue->range->maxValue)
 				);
 			}
 			if ($typeValue instanceof RealType || $typeValue instanceof RealSubsetType) {
-				return TypedValue::forValue($typeValue->range()->maxValue() === PlusInfinity::value ?
-					$this->context->valueRegistry()->atom(new TypeNameIdentifier('PlusInfinity')) :
-					$this->context->valueRegistry()->real($typeValue->range()->maxValue())
+				return TypedValue::forValue($typeValue->range->maxValue === PlusInfinity::value ?
+					$this->context->valueRegistry->atom(new TypeNameIdentifier('PlusInfinity')) :
+					$this->context->valueRegistry->real($typeValue->range->maxValue)
 				);
 			}
 		}

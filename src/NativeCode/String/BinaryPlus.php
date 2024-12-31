@@ -29,16 +29,15 @@ final readonly class BinaryPlus implements NativeMethod {
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $this->context->typeRegistry()->string(
-					$targetType->range()->minLength() + $parameterType->range()->minLength(),
-					$targetType->range()->maxLength() === PlusInfinity::value ||
-					$parameterType->range()->maxLength() === PlusInfinity::value ? PlusInfinity::value :
-					$targetType->range()->maxLength() + $parameterType->range()->maxLength()
+				return $this->context->typeRegistry->string(
+					$targetType->range->minLength + $parameterType->range->minLength,
+					$targetType->range->maxLength === PlusInfinity::value ||
+					$parameterType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
+					$targetType->range->maxLength + $parameterType->range->maxLength
 				);
-			} elseif ($parameterType->isSubtypeOf(
-				$this->context->typeRegistry()->string()
-			)) {
-				return $this->context->typeRegistry()->string();
+			}
+			if ($parameterType->isSubtypeOf($this->context->typeRegistry->string())) {
+				return $this->context->typeRegistry->string();
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -60,8 +59,8 @@ final readonly class BinaryPlus implements NativeMethod {
 		$parameterValue = $this->toBaseValue($parameterValue);
 		if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof StringValue) {
-				$result = $targetValue->literalValue() . $parameterValue->literalValue();
-				return TypedValue::forValue($this->context->valueRegistry()->string($result));
+				$result = $targetValue->literalValue . $parameterValue->literalValue;
+				return TypedValue::forValue($this->context->valueRegistry->string($result));
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

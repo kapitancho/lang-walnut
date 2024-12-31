@@ -13,8 +13,8 @@ final readonly class MatchExpressionIsSubtypeOf implements MatchExpressionOperat
 	public function match(Value $matchValue, Value $matchAgainst): bool {
 		return
 			($matchAgainst instanceof TypeValue) && (
-				$matchValue->type()->isSubtypeOf($matchAgainst->typeValue()) ||
-				($matchValue instanceof SubtypeValue && $this->match($matchValue->baseValue(), $matchAgainst))
+				$matchValue->type->isSubtypeOf($matchAgainst->typeValue) ||
+				($matchValue instanceof SubtypeValue && $this->match($matchValue->baseValue, $matchAgainst))
 			);
 	}
 

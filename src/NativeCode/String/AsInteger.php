@@ -27,9 +27,9 @@ final readonly class AsInteger implements NativeMethod {
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
-			return $this->context->typeRegistry()->result(
-				$this->context->typeRegistry()->integer(),
-				$this->context->typeRegistry()->atom(new TypeNameIdentifier('NotANumber'))
+			return $this->context->typeRegistry->result(
+				$this->context->typeRegistry->integer(),
+				$this->context->typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -45,11 +45,11 @@ final readonly class AsInteger implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof StringValue) {
-			$target = $targetValue->literalValue();
+			$target = $targetValue->literalValue;
 			return TypedValue::forValue((string)($result = (int)$target) === $target ?
-				$this->context->valueRegistry()->integer($result) :
-				$this->context->valueRegistry()->error(
-					$this->context->valueRegistry()->atom(new TypeNameIdentifier('NotANumber'))
+				$this->context->valueRegistry->integer($result) :
+				$this->context->valueRegistry->error(
+					$this->context->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
 				)
 			);
 		}

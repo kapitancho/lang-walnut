@@ -19,22 +19,17 @@ final readonly class SequenceExpression implements SequenceExpressionInterface, 
 	public function __construct(
 		private TypeRegistry $typeRegistry,
 		private ValueRegistry $valueRegistry,
-		private array $expressions
+		public array $expressions
 	) {}
 
-	/** @return list<Expression> */
-	public function expressions(): array {
-		return $this->expressions;
-	}
-
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
-		$expressionType = $this->typeRegistry->nothing();
+		$expressionType = $this->typeRegistry->nothing;
 		$returnTypes = [];
 		foreach($this->expressions as $expression) {
 			$analyserContext = $expression->analyse($analyserContext);
 
-			$expressionType = $analyserContext->expressionType();
-			$returnTypes[] = $analyserContext->returnType();
+			$expressionType = $analyserContext->expressionType;
+			$returnTypes[] = $analyserContext->returnType;
 			if ($expression instanceof ReturnExpression) {
 				break;
 			}
@@ -46,10 +41,10 @@ final readonly class SequenceExpression implements SequenceExpressionInterface, 
 	}
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
-		$result = TypedValue::forValue($this->valueRegistry->null());
+		$result = TypedValue::forValue($this->valueRegistry->null);
 		foreach($this->expressions as $expression) {
 			$executionContext = $expression->execute($executionContext);
-			$result = $executionContext->typedValue();
+			$result = $executionContext->typedValue;
 		}
 		return $executionContext->asExecutionResult($result);
 	}

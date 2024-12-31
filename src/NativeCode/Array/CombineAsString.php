@@ -32,17 +32,17 @@ final readonly class CombineAsString implements NativeMethod {
 			$targetType = $targetType->asArrayType();
 		}
 		if ($targetType instanceof ArrayType) {
-			$itemType = $targetType->itemType();
-			if ($itemType->isSubtypeOf($this->context->typeRegistry()->string())) {
+			$itemType = $targetType->itemType;
+			if ($itemType->isSubtypeOf($this->context->typeRegistry->string())) {
 				if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-					return $this->context->typeRegistry()->string(
-						$parameterType->range()->minLength() * max(0, $targetType->range()->minLength() - 1), /* +
-						$itemType->range()->minLength() * $targetType->range()->minLength(),
-						$parameterType->range()->maxLength() === PlusInfinity::value ||
-						$itemType->range()->maxLength() === PlusInfinity::value ||
-						$targetType->range()->maxLength() === PlusInfinity::value ? PlusInfinity::value :
-							$parameterType->range()->maxLength() * max(0, $targetType->range()->maxLength() - 1) +
-								$itemType->range()->maxLength() * $targetType->range()->maxLength()*/
+					return $this->context->typeRegistry->string(
+						$parameterType->range->minLength * max(0, $targetType->range->minLength - 1), /* +
+						$itemType->range->minLength * $targetType->range->minLength,
+						$parameterType->range->maxLength === PlusInfinity::value ||
+						$itemType->range->maxLength === PlusInfinity::value ||
+						$targetType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
+							$parameterType->range->maxLength * max(0, $targetType->range->maxLength - 1) +
+								$itemType->range->maxLength * $targetType->range->maxLength*/
 					);
 				}
 				// @codeCoverageIgnoreStart
@@ -67,9 +67,9 @@ final readonly class CombineAsString implements NativeMethod {
 		if ($targetValue instanceof TupleValue) {
 			if ($parameterValue instanceof StringValue) {
 				$result = [];
-				foreach($targetValue->values() as $value) {
+				foreach($targetValue->values as $value) {
 					if ($value instanceof StringValue) {
-						$result[] = $value->literalValue();
+						$result[] = $value->literalValue;
 					} else {
 						echo $value::class, $targetValue;
 						// @codeCoverageIgnoreStart
@@ -77,8 +77,8 @@ final readonly class CombineAsString implements NativeMethod {
 						// @codeCoverageIgnoreEnd
 					}
 				}
-				$result = implode($parameterValue->literalValue(), $result);
-				return TypedValue::forValue($this->context->valueRegistry()->string($result));
+				$result = implode($parameterValue->literalValue, $result);
+				return TypedValue::forValue($this->context->valueRegistry->string($result));
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

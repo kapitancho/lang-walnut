@@ -8,9 +8,9 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 
 interface ExecutionResult extends ExecutionContext {
-	public function typedValue(): TypedValue;
-	public function value(): Value;
-	public function valueType(): Type;
+	public TypedValue $typedValue { get; }
+	public Value $value { get; }
+	public Type $valueType { get; }
 
 	public function withAddedVariableValue(
 		VariableNameIdentifier $variableName,

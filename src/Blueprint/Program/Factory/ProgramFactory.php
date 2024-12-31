@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Program\Builder\ProgramBuilder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 
 interface ProgramFactory {
-	public function codeBuilder(): CodeBuilder;
-	public function builder(): ProgramBuilder;
-	public function registry(): ProgramRegistry;
+	public CodeBuilder $codeBuilder { get; }
+	public ProgramBuilder $builder { get; }
+	public ProgramRegistry $registry { get; }
 }

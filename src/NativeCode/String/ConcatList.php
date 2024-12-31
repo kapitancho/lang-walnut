@@ -35,14 +35,14 @@ final readonly class ConcatList implements NativeMethod {
 				$parameterType = $parameterType->asArrayType();
 			}
 			if ($parameterType instanceof ArrayType) {
-				$itemType = $parameterType->itemType();
+				$itemType = $parameterType->itemType;
 				if ($itemType instanceof StringType || $itemType instanceof StringSubsetType) {
-					return $this->context->typeRegistry()->string(
-						$targetType->range()->minLength() +  $parameterType->range()->minLength() * $itemType->range()->minLength(),
-						$targetType->range()->maxLength() === PlusInfinity::value ||
-						$parameterType->range()->maxLength() === PlusInfinity::value ||
-						$itemType->range()->maxLength() === PlusInfinity::value ? PlusInfinity::value :
-						$targetType->range()->maxLength() +  $parameterType->range()->maxLength() * $itemType->range()->maxLength(),
+					return $this->context->typeRegistry->string(
+						$targetType->range->minLength +  $parameterType->range->minLength * $itemType->range->minLength,
+						$targetType->range->maxLength === PlusInfinity::value ||
+						$parameterType->range->maxLength === PlusInfinity::value ||
+						$itemType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
+						$targetType->range->maxLength +  $parameterType->range->maxLength * $itemType->range->maxLength,
 					);
 				}
 			}
@@ -66,17 +66,17 @@ final readonly class ConcatList implements NativeMethod {
 		$parameterValue = $this->toBaseValue($parameterValue);
 		if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof TupleValue) {
-				$result = $targetValue->literalValue();
-				foreach($parameterValue->values() as $value) {
+				$result = $targetValue->literalValue;
+				foreach($parameterValue->values as $value) {
 					if ($value instanceof StringValue) {
-						$result .= $value->literalValue();
+						$result .= $value->literalValue;
 					} else {
 						// @codeCoverageIgnoreStart
 						throw new ExecutionException("Invalid parameter value");
 						// @codeCoverageIgnoreEnd
 					}
 				}
-				return TypedValue::forValue($this->context->valueRegistry()->string($result));
+				return TypedValue::forValue($this->context->valueRegistry->string($result));
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

@@ -19,17 +19,10 @@ final readonly class IntegerRange implements IntegerRangeInterface, JsonSerializ
 		}
 	}
 
-    public function minValue(): int|MinusInfinity {
-        return $this->minValue;
-    }
-    public function maxValue(): int|PlusInfinity {
-        return $this->maxValue;
-    }
-
 	public function isSubRangeOf(IntegerRangeInterface $range): bool {
 		return
-			$this->compare($this->minValue, $range->minValue()) > -1 &&
-			$this->compare($this->maxValue, $range->maxValue()) < 1;
+			$this->compare($this->minValue, $range->minValue) > -1 &&
+			$this->compare($this->maxValue, $range->maxValue) < 1;
 	}
 
 	private function min(
@@ -57,10 +50,10 @@ final readonly class IntegerRange implements IntegerRangeInterface, JsonSerializ
 	}
 
 	public function intersectsWith(IntegerRangeInterface $range): bool {
-		if (is_int($this->maxValue) && is_int($range->minValue()) && $this->maxValue < $range->minValue()) {
+		if (is_int($this->maxValue) && is_int($range->minValue) && $this->maxValue < $range->minValue) {
 			return false;
 		}
-		if (is_int($this->minValue) && is_int($range->maxValue()) && $this->minValue > $range->maxValue()) {
+		if (is_int($this->minValue) && is_int($range->maxValue) && $this->minValue > $range->maxValue) {
 			return false;
 		}
 		return true;
@@ -68,15 +61,15 @@ final readonly class IntegerRange implements IntegerRangeInterface, JsonSerializ
 
 	public function tryRangeUnionWith(IntegerRangeInterface $range): IntegerRange|null {
 		return $this->intersectsWith($range) ? new self (
-			$this->min($this->minValue, $range->minValue()),
-			$this->max($this->maxValue, $range->maxValue())
+			$this->min($this->minValue, $range->minValue),
+			$this->max($this->maxValue, $range->maxValue)
 		) : null;
 	}
 
 	public function tryRangeIntersectionWith(IntegerRangeInterface $range): IntegerRange|null {
 		return $this->intersectsWith($range) ? new self (
-			$this->max($this->minValue, $range->minValue()),
-			$this->min($this->maxValue, $range->maxValue())
+			$this->max($this->minValue, $range->minValue),
+			$this->min($this->maxValue, $range->maxValue)
 		) : null;
 	}
 
@@ -93,8 +86,8 @@ final readonly class IntegerRange implements IntegerRangeInterface, JsonSerializ
     }
 
     public function contains(IntegerValue $value): bool {
-        return $this->compare($this->minValue, $value->literalValue()) < 1 &&
-            $this->compare($this->maxValue, $value->literalValue()) > -1;
+        return $this->compare($this->minValue, $value->literalValue) < 1 &&
+            $this->compare($this->maxValue, $value->literalValue) > -1;
     }
 
 	public function __toString(): string {
