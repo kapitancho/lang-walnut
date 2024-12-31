@@ -7,6 +7,16 @@ Constructor = :[];
 NotANumber = :[];
 MinusInfinity = :[];
 PlusInfinity = :[];
+InvalidRange = :[];
+IntegerRange <: [minValue: Integer|MinusInfinity, maxValue: Integer|PlusInfinity] @ InvalidRange ::
+    ?whenTypeOf(#) is { type[minValue: Integer, maxValue: Integer]:
+        ?whenIsTrue { #.minValue > #.maxValue: => @InvalidRange[] }};
+RealRange <: [minValue: Real|MinusInfinity, maxValue: Real|PlusInfinity] @ InvalidRange ::
+    ?whenTypeOf(#) is { type[minValue: Real, maxValue: Real]:
+        ?whenIsTrue { #.minValue > #.maxValue: => @InvalidRange[] }};
+LengthRange <: [minLength: Integer<0..>, maxLength: Integer<0..>|PlusInfinity] @ InvalidRange ::
+    ?whenTypeOf(#) is { type[minLength: Integer<0..>, maxLength: Integer<0..>]:
+        ?whenIsTrue { #.minLength > #.maxLength: => @InvalidRange[] }};
 
 /* dependency container */
 DependencyContainer = :[];
