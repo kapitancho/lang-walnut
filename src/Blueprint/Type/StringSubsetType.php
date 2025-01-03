@@ -2,7 +2,7 @@
 
 namespace Walnut\Lang\Blueprint\Type;
 
-use Walnut\Lang\Blueprint\Range\LengthRange;
+use Walnut\Lang\Blueprint\Common\Range\LengthRange;
 use Walnut\Lang\Blueprint\Value\StringValue;
 
 interface StringSubsetType extends Type {

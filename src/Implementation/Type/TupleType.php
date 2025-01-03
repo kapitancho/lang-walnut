@@ -3,7 +3,7 @@
 namespace Walnut\Lang\Implementation\Type;
 
 use JsonSerializable;
-use Walnut\Lang\Blueprint\Range\PlusInfinity;
+use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\AnyType;
 use Walnut\Lang\Blueprint\Type\ArrayType as ArrayTypeInterface;
@@ -56,7 +56,7 @@ final readonly class TupleType implements TupleTypeInterface, JsonSerializable {
 			}
 			$usedIndices[$index] = true;
 		}
-		return array_all($ofTypes, fn($type, $index) => isset($usedIndices[$index]) || isset($this->types[$index]) && !$this->types[$index]->isSubtypeOf($type));
+		return array_all($ofTypes, fn($type, $index) => isset($usedIndices[$index]) || (isset($this->types[$index]) && !$this->types[$index]->isSubtypeOf($type)));
 	}
 
 	private function isSubtypeOfArray(ArrayTypeInterface $ofType): bool {

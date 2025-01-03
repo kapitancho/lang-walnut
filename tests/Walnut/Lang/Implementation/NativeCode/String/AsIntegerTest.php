@@ -2,7 +2,7 @@
 
 namespace Walnut\Lang\Implementation\NativeCode\String;
 
-use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Test\Implementation\BaseProgramTestHelper;

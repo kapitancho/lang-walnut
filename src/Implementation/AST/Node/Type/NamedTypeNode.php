@@ -4,7 +4,7 @@ namespace Walnut\Lang\Implementation\AST\Node\Type;
 
 use Walnut\Lang\Blueprint\AST\Node\SourceLocation;
 use Walnut\Lang\Blueprint\AST\Node\Type\NamedTypeNode as NamedTypeNodeInterface;
-use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 
 final readonly class NamedTypeNode implements NamedTypeNodeInterface {
 	public function __construct(

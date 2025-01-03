@@ -3,9 +3,9 @@
 namespace Walnut\Lang\Blueprint\Program\Registry;
 
 use bcmath\Number;
+use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
-use Walnut\Lang\Blueprint\Identifier\EnumValueIdentifier;
-use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\UnknownEnumerationValue;
 use Walnut\Lang\Blueprint\Program\UnknownType;
 use Walnut\Lang\Blueprint\Type\Type;

@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\AST\Node\Module\AddSealedTypeNode as AddSealedTypeNode
 use Walnut\Lang\Blueprint\AST\Node\SourceLocation;
 use Walnut\Lang\Blueprint\AST\Node\Type\RecordTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
-use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 
 final readonly class AddSealedTypeNode implements AddSealedTypeNodeInterface {
 	public function __construct(

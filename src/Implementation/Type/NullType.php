@@ -3,7 +3,7 @@
 namespace Walnut\Lang\Implementation\Type;
 
 use JsonSerializable;
-use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Type\NullType as NullTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\NullValue;

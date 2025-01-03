@@ -3,7 +3,7 @@
 namespace Walnut\Lang\Implementation\Type;
 
 use JsonSerializable;
-use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ProxyNamedType as ProxyNamedTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;

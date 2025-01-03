@@ -3,7 +3,7 @@
 namespace Walnut\Lang\Implementation\Type;
 
 use JsonSerializable;
-use Walnut\Lang\Blueprint\Range\PlusInfinity;
+use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\AnyType as AnyTypeInterface;
 use Walnut\Lang\Blueprint\Type\MapType;
@@ -62,7 +62,7 @@ final readonly class RecordType implements RecordTypeInterface, JsonSerializable
 			}
 			$usedKeys[$key] = true;
 		}
-		return array_all($ofTypes, fn($type, $key) => $type instanceof OptionalKeyType || isset($usedKeys[$key]) || isset($this->types[$key]) && !$this->types[$key]->isSubtypeOf($type));
+		return array_all($ofTypes, fn($type, $key) => $type instanceof OptionalKeyType || isset($usedKeys[$key]) || (isset($this->types[$key]) && !$this->types[$key]->isSubtypeOf($type)));
 	}
 
 	private function isSubtypeOfMap(MapType $ofType): bool {

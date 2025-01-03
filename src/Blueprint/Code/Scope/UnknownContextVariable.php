@@ -3,7 +3,7 @@
 namespace Walnut\Lang\Blueprint\Code\Scope;
 
 use LogicException;
-use Walnut\Lang\Blueprint\Identifier\VariableNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 
 final class UnknownContextVariable extends LogicException {
 

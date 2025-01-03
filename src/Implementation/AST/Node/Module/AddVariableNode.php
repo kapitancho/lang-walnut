@@ -5,7 +5,7 @@ namespace Walnut\Lang\Implementation\AST\Node\Module;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddVariableNode as AddVariableNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\SourceLocation;
 use Walnut\Lang\Blueprint\AST\Node\Value\ValueNode;
-use Walnut\Lang\Blueprint\Identifier\VariableNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 
 final readonly class AddVariableNode implements AddVariableNodeInterface {
 	public function __construct(

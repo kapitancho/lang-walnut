@@ -3,6 +3,6 @@
 namespace Walnut\Lang\Blueprint\Compilation;
 
 interface ModuleLookupContext {
-	/** @throws CompilationException */
+	/** @throws ModuleDependencyException */
 	public function sourceOf(string $moduleName): string;
 }

@@ -2,7 +2,7 @@
 
 namespace Walnut\Lang\Blueprint\Code\Expression;
 
-use Walnut\Lang\Blueprint\Identifier\MethodNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 
 interface MethodCallExpression extends Expression {
 	public Expression $target { get; }

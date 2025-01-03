@@ -2,23 +2,15 @@
 
 namespace Walnut\Lang\Test\Implementation;
 
-use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
-use Walnut\Lang\Blueprint\Identifier\MethodNameIdentifier;
-use Walnut\Lang\Blueprint\Identifier\VariableNameIdentifier;
-use Walnut\Lang\Blueprint\Program\Builder\ProgramBuilder;
-use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
-use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
+use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Implementation\Code\Execution\ExecutionContext;
 use Walnut\Lang\Implementation\Code\Scope\VariableScope;
 use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
-use Walnut\Lang\Implementation\Program\Builder\ScopeBuilder;
-use Walnut\Lang\Implementation\Program\Factory\ProgramFactory;
-use Walnut\Lang\Implementation\Program\GlobalContext;
 
 abstract class BaseProgramTestHelper extends \Walnut\Lang\Test\BaseProgramTestHelper {
 

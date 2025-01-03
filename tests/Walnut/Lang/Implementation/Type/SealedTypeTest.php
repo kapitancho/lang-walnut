@@ -2,7 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Type;
 
-use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Test\Implementation\BaseProgramTestHelper;
 
 final class SealedTypeTest extends BaseProgramTestHelper {

@@ -4,7 +4,7 @@ namespace Walnut\Lang\Blueprint\AST\Node\Module;
 
 use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
-use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 
 interface AddConstructorMethodNode extends ModuleDefinitionNode {
 	public TypeNameIdentifier $typeName { get; }

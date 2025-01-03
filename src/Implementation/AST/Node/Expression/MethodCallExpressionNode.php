@@ -5,7 +5,7 @@ namespace Walnut\Lang\Implementation\AST\Node\Expression;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MethodCallExpressionNode as MethodCallExpressionNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\SourceLocation;
-use Walnut\Lang\Blueprint\Identifier\MethodNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 
 final readonly class MethodCallExpressionNode implements MethodCallExpressionNodeInterface {
 	public function __construct(

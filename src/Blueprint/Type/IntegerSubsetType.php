@@ -2,7 +2,7 @@
 
 namespace Walnut\Lang\Blueprint\Type;
 
-use Walnut\Lang\Blueprint\Range\IntegerRange;
+use Walnut\Lang\Blueprint\Common\Range\IntegerRange;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
 
 interface IntegerSubsetType extends Type {

@@ -3,7 +3,7 @@
 namespace Walnut\Lang\Blueprint\AST\Node\Type;
 
 use BcMath\Number;
-use Walnut\Lang\Blueprint\Range\PlusInfinity;
+use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 
 interface ArrayTypeNode extends TypeNode {
 	public TypeNode $itemType { get; }

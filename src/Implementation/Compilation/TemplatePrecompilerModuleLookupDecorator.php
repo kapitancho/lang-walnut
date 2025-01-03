@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Compilation;
 
+use Walnut\Lang\Blueprint\Compilation\ModuleDependencyException;
 use Walnut\Lang\Blueprint\Compilation\ModuleLookupContext;
 
 final readonly class TemplatePrecompilerModuleLookupDecorator implements ModuleLookupContext {
@@ -15,6 +16,7 @@ final readonly class TemplatePrecompilerModuleLookupDecorator implements ModuleL
 		return $this->templateSourceRoot . '/' . str_replace('\\', '/', $moduleName) . '.nut.html';
 	}
 
+	/** @throws ModuleDependencyException */
 	public function sourceOf(string $moduleName): string {
 		$sourcePath = $this->pathOf($moduleName);
 		if (file_exists($sourcePath) && is_readable($sourcePath)) {

@@ -3,14 +3,15 @@
 namespace Walnut\Lang\Implementation\Compilation;
 
 use Walnut\Lang\Blueprint\AST\Builder\ModuleNodeBuilderFactory;
-use Walnut\Lang\Blueprint\AST\Builder\NodeBuilder;
 use Walnut\Lang\Blueprint\AST\Builder\NodeBuilderFactory;
 use Walnut\Lang\Blueprint\AST\Node\Module\ModuleNode;
-use Walnut\Lang\Blueprint\Compilation\CompilationException;
+use Walnut\Lang\Blueprint\AST\Parser\Parser;
+use Walnut\Lang\Blueprint\AST\Parser\ParserException;
+use Walnut\Lang\Blueprint\Compilation\ModuleDependencyException;
 use Walnut\Lang\Blueprint\Compilation\ModuleImporter as ModuleImporterInterface;
 use Walnut\Lang\Blueprint\Compilation\ModuleLookupContext;
-use Walnut\Lang\Blueprint\Compilation\Parser;
 use Walnut\Lang\Implementation\AST\Node\RootNode;
+use Walnut\Lang\Implementation\AST\Parser\WalexLexerAdapter;
 
 final readonly class ModuleImporter implements ModuleImporterInterface {
 
@@ -22,21 +23,26 @@ final readonly class ModuleImporter implements ModuleImporterInterface {
 		private ModuleNodeBuilderFactory $moduleNodeBuilderFactory
 	) {}
 
+	/** @throws ModuleDependencyException|ParserException */
 	public function importModules(string $startModuleName): RootNode {
 		$modules = [];
 		$cache = [];
 		$moduleImporter = function(string $moduleName) use (&$modules, &$cache, &$moduleImporter): void {
 			$c = $cache[$moduleName] ?? null;
 			if ($c === false) {
-				throw new CompilationException('Import loop: ' . $moduleName);
+				throw new ModuleDependencyException($moduleName);
 			}
 			if ($c) {
 				return;
 			}
 			$cache[$moduleName] = false;
 			$moduleNode = $this->parseModule($moduleName);
-			foreach($moduleNode->moduleDependencies as $moduleDependency) {
-				$moduleImporter($moduleDependency);
+			try {
+				foreach($moduleNode->moduleDependencies as $moduleDependency) {
+					$moduleImporter($moduleDependency);
+				}
+			} catch (ModuleDependencyException $e) {
+				throw new ModuleDependencyException($e->module, [$moduleName, ... $e->path]);
 			}
 			$modules[] = $moduleNode;
 			$cache[$moduleName] = true;
@@ -50,6 +56,7 @@ final readonly class ModuleImporter implements ModuleImporterInterface {
 		);
 	}
 
+	/** @throws ModuleDependencyException|ParserException */
 	private function parseModule(string $moduleName): ModuleNode {
 		$sourceCode = $this->moduleLookupContext->sourceOf($moduleName);
 		$tokens = $this->lexer->tokensFromSource($sourceCode);

@@ -2,7 +2,7 @@
 
 namespace Walnut\Lang\Blueprint\AST\Node\Expression;
 
-use Walnut\Lang\Blueprint\Identifier\VariableNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 
 interface VariableAssignmentExpressionNode extends ExpressionNode {
 	public VariableNameIdentifier $variableName { get; }

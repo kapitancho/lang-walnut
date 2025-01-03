@@ -3,6 +3,10 @@
 namespace Walnut\Lang\Implementation\Compilation;
 
 use Exception;
+use Walnut\Lang\Blueprint\AST\Compiler\AstCompilationException;
+use Walnut\Lang\Blueprint\AST\Compiler\AstCompiler as AstCompilerInterface;
+use Walnut\Lang\Blueprint\AST\Compiler\AstModuleCompilationException;
+use Walnut\Lang\Blueprint\AST\Compiler\AstProgramCompilationException;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ConstantExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ConstructorCallExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
@@ -81,9 +85,13 @@ use Walnut\Lang\Blueprint\AST\Node\Value\ValueNode;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionDefault;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionPair;
-use Walnut\Lang\Blueprint\Compilation\AstCompiler as AstCompilerInterface;
+use Walnut\Lang\Blueprint\Common\Range\InvalidIntegerRange;
+use Walnut\Lang\Blueprint\Common\Range\InvalidLengthRange;
+use Walnut\Lang\Blueprint\Common\Range\InvalidRealRange;
 use Walnut\Lang\Blueprint\Compilation\CodeBuilder;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
+use Walnut\Lang\Blueprint\Program\UnknownEnumerationValue;
+use Walnut\Lang\Blueprint\Program\UnknownType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 
@@ -92,17 +100,39 @@ final readonly class AstCompiler implements AstCompilerInterface {
 		private readonly CodeBuilder $codeBuilder,
 	) {}
 
-	/** @throws Exception */
+	/** @throws AstProgramCompilationException */
 	public function compile(RootNode $root): void {
-		array_map($this->compileModule(...), $root->modules);
+		$exceptions = array();
+		array_map(function(ModuleNode $module) use (&$exceptions) {
+			try {
+				$this->compileModule($module);
+			} catch (AstModuleCompilationException $e) {
+				$exceptions[] = $e;
+			}
+		}, $root->modules);
+
+		if (count($exceptions) > 0) {
+			throw new AstProgramCompilationException($exceptions);
+		}
 	}
 
-	/** @throws Exception */
+	/** @throws AstModuleCompilationException */
 	private function compileModule(ModuleNode $module): void {
-		array_map($this->compileModuleDefinition(...), $module->definitions);
+		$exceptions = array();
+		array_map(function(ModuleDefinitionNode $moduleDefinition) use (&$exceptions) {
+			try {
+				$this->compileModuleDefinition($moduleDefinition);
+			} catch (AstCompilationException $e) {
+				$exceptions[] = $e;
+			}
+		}, $module->definitions);
+
+		if (count($exceptions) > 0) {
+			throw new AstModuleCompilationException($module->moduleName, $exceptions);
+		}
 	}
 
-	/** @throws Exception */
+	/** @throws AstCompilationException */
 	private function compileModuleDefinition(ModuleDefinitionNode $moduleDefinition): void {
 		match(true) {
 			$moduleDefinition instanceof AddAliasTypeNode =>
@@ -152,7 +182,10 @@ final readonly class AstCompiler implements AstCompilerInterface {
 				$this->codeBuilder->addVariable($moduleDefinition->name,
 					$this->value($moduleDefinition->value)),
 
-			true => throw new Exception("TEMP: unknown module definition node type: " . get_class($moduleDefinition))
+			true => throw new AstCompilationException(
+				$moduleDefinition,
+				"Unknown module definition node type: " . get_class($moduleDefinition)
+			)
 		};
 	}
 
@@ -164,14 +197,14 @@ final readonly class AstCompiler implements AstCompilerInterface {
 		);
 	}
 
-	/** @throws Exception */
+	/** @throws AstCompilationException */
 	private function matchExpressionDefault(MatchExpressionDefaultNode $matchExpressionDefaultNode): MatchExpressionDefault {
 		return $this->codeBuilder->matchDefault(
 			$this->expression($matchExpressionDefaultNode->valueExpression)
 		);
 	}
 
-	/** @throws Exception */
+	/** @throws AstCompilationException */
 	private function matchExpression(MatchExpressionPairNode|MatchExpressionDefaultNode $matchExpressionNode): MatchExpressionPair|MatchExpressionDefault {
 		return match(true) {
 			$matchExpressionNode instanceof MatchExpressionPairNode =>
@@ -181,7 +214,7 @@ final readonly class AstCompiler implements AstCompilerInterface {
 		};
 	}
 
-	/** @throws Exception */
+	/** @throws AstCompilationException */
 	private function expression(ExpressionNode $expressionNode): Expression {
 		return match(true) {
 			$expressionNode instanceof ConstantExpressionNode =>
@@ -276,135 +309,155 @@ final readonly class AstCompiler implements AstCompilerInterface {
 				$this->codeBuilder->variableName(
 					$expressionNode->variableName
 				),
-
-			true => throw new Exception("TEMP: unknown expression node type: " . get_class($expressionNode))
+			true => throw new AstCompilationException(
+				$expressionNode,
+				"Unknown expression node type: " . get_class($expressionNode)
+			)
 		};
 	}
 
-	/** @throws Exception */
+	/** @throws AstCompilationException */
 	private function type(TypeNode $typeNode): Type {
-		return match(true) {
-			$typeNode instanceof AnyTypeNode => $this->codeBuilder->typeRegistry->any,
-			$typeNode instanceof NothingTypeNode => $this->codeBuilder->typeRegistry->nothing,
-			$typeNode instanceof TrueTypeNode => $this->codeBuilder->typeRegistry->true,
-			$typeNode instanceof FalseTypeNode => $this->codeBuilder->typeRegistry->false,
-			$typeNode instanceof BooleanTypeNode => $this->codeBuilder->typeRegistry->boolean,
-			$typeNode instanceof NullTypeNode => $this->codeBuilder->typeRegistry->null,
-			$typeNode instanceof UnionTypeNode => $this->codeBuilder->typeRegistry->union([
-				$this->type($typeNode->left),
-				$this->type($typeNode->right)
-			], false),
-			$typeNode instanceof IntersectionTypeNode => $this->codeBuilder->typeRegistry->intersection([
-				$this->type($typeNode->left),
-				$this->type($typeNode->right)
-			], false),
+		try {
+			return match(true) {
+				$typeNode instanceof AnyTypeNode => $this->codeBuilder->typeRegistry->any,
+				$typeNode instanceof NothingTypeNode => $this->codeBuilder->typeRegistry->nothing,
+				$typeNode instanceof TrueTypeNode => $this->codeBuilder->typeRegistry->true,
+				$typeNode instanceof FalseTypeNode => $this->codeBuilder->typeRegistry->false,
+				$typeNode instanceof BooleanTypeNode => $this->codeBuilder->typeRegistry->boolean,
+				$typeNode instanceof NullTypeNode => $this->codeBuilder->typeRegistry->null,
+				$typeNode instanceof UnionTypeNode => $this->codeBuilder->typeRegistry->union([
+					$this->type($typeNode->left),
+					$this->type($typeNode->right)
+				], false),
+				$typeNode instanceof IntersectionTypeNode => $this->codeBuilder->typeRegistry->intersection([
+					$this->type($typeNode->left),
+					$this->type($typeNode->right)
+				], false),
 
-			$typeNode instanceof ArrayTypeNode => $this->codeBuilder->typeRegistry->array(
-				$this->type($typeNode->itemType),
-				$typeNode->minLength,
-				$typeNode->maxLength
-			),
-			$typeNode instanceof MapTypeNode => $this->codeBuilder->typeRegistry->map(
-				$this->type($typeNode->itemType),
-				$typeNode->minLength,
-				$typeNode->maxLength
-			),
-			$typeNode instanceof TupleTypeNode => $this->codeBuilder->typeRegistry->tuple(
-				array_map($this->type(...), $typeNode->types),
-				$this->type($typeNode->restType)
-			),
-			$typeNode instanceof RecordTypeNode => $this->codeBuilder->typeRegistry->record(
-				array_map($this->type(...), $typeNode->types),
-				$this->type($typeNode->restType)
-			),
-			$typeNode instanceof FunctionTypeNode => $this->codeBuilder->typeRegistry->function(
-				$this->type($typeNode->parameterType),
-				$this->type($typeNode->returnType)
-			),
-			$typeNode instanceof TypeTypeNode => $this->codeBuilder->typeRegistry->type(
-				$this->type($typeNode->refType)
-			),
-			$typeNode instanceof ProxyTypeNode => $this->codeBuilder->typeRegistry->proxyType($typeNode->name),
-			$typeNode instanceof ImpureTypeNode => $this->codeBuilder->typeRegistry->impure(
-				$this->type($typeNode->valueType)
-			),
-			$typeNode instanceof OptionalKeyTypeNode => $this->codeBuilder->typeRegistry->optionalKey(
-				$this->type($typeNode->valueType)
-			),
-			$typeNode instanceof ResultTypeNode => $this->codeBuilder->typeRegistry->result(
-				$this->type($typeNode->returnType),
-				$this->type($typeNode->errorType)
-			),
-
-			$typeNode instanceof MutableTypeNode => $this->codeBuilder->typeRegistry->mutable(
-				$this->type($typeNode->valueType)
-			),
-
-			$typeNode instanceof IntegerTypeNode => $this->codeBuilder->typeRegistry->integer(
-				$typeNode->minValue, $typeNode->maxValue
-			),
-			$typeNode instanceof IntegerSubsetTypeNode => $this->codeBuilder->typeRegistry->integerSubset(
-				array_map($this->value(...), $typeNode->values)
-			),
-			$typeNode instanceof RealTypeNode => $this->codeBuilder->typeRegistry->real(
-				$typeNode->minValue, $typeNode->maxValue
-			),
-			$typeNode instanceof RealSubsetTypeNode => $this->codeBuilder->typeRegistry->realSubset(
-				array_map($this->value(...), $typeNode->values)
-			),
-			$typeNode instanceof StringTypeNode => $this->codeBuilder->typeRegistry->string(
-				$typeNode->minLength, $typeNode->maxLength
-			),
-			$typeNode instanceof StringSubsetTypeNode => $this->codeBuilder->typeRegistry->stringSubset(
-				array_map($this->value(...), $typeNode->values)
-			),
-
-			$typeNode instanceof MetaTypeTypeNode => $this->codeBuilder->typeRegistry->metaType($typeNode->value),
-			$typeNode instanceof NamedTypeNode => $this->codeBuilder->typeRegistry->typeByName($typeNode->name),
-			$typeNode instanceof EnumerationSubsetTypeNode =>
-				$this->codeBuilder->typeRegistry->enumeration($typeNode->name)->subsetType($typeNode->values),
-
-			true => throw new Exception("TEMP: unknown type node type: " . get_class($typeNode))
-		};
-	}
-
-	/** @throws Exception */
-	private function value(ValueNode $valueNode): Value {
-		return match(true) {
-			$valueNode instanceof NullValueNode => $this->codeBuilder->valueRegistry->null,
-			$valueNode instanceof TrueValueNode => $this->codeBuilder->valueRegistry->true,
-			$valueNode instanceof FalseValueNode => $this->codeBuilder->valueRegistry->false,
-			//$valueNode instanceof ErrorValueNode => $this->codeBuilder->valueRegistry->error($valueNode->value),
-			//$valueNode instanceof MutableValueNode => $this->codeBuilder->valueRegistry->mutable($valueNode->value),
-			$valueNode instanceof IntegerValueNode => $this->codeBuilder->valueRegistry->integer($valueNode->value),
-			$valueNode instanceof RealValueNode => $this->codeBuilder->valueRegistry->real($valueNode->value),
-			$valueNode instanceof StringValueNode => $this->codeBuilder->valueRegistry->string($valueNode->value),
-			$valueNode instanceof AtomValueNode => $this->codeBuilder->valueRegistry->atom($valueNode->name),
-			$valueNode instanceof EnumerationValueNode => $this->codeBuilder->valueRegistry->enumerationValue(
-				$valueNode->name,
-				$valueNode->enumValue
-			),
-			$valueNode instanceof RecordValueNode => $this->codeBuilder->valueRegistry->record(
-				array_map($this->value(...), $valueNode->values)
-			),
-			$valueNode instanceof TupleValueNode => $this->codeBuilder->valueRegistry->tuple(
-				array_map($this->value(...), $valueNode->values)
-			),
-			$valueNode instanceof TypeValueNode => $this->codeBuilder->valueRegistry->type(
-				$this->type($valueNode->type)
-			),
-			$valueNode instanceof FunctionValueNode =>
-				$this->codeBuilder->valueRegistry->function(
-					$this->type($valueNode->parameterType),
-					$this->type($valueNode->dependencyType),
-					$this->type($valueNode->returnType),
-					$this->functionBody($valueNode->functionBody)
+				$typeNode instanceof ArrayTypeNode => $this->codeBuilder->typeRegistry->array(
+					$this->type($typeNode->itemType),
+					$typeNode->minLength,
+					$typeNode->maxLength
 				),
-			true => throw new Exception("TEMP: unknown value node type: " . get_class($valueNode))
-		};
+				$typeNode instanceof MapTypeNode => $this->codeBuilder->typeRegistry->map(
+					$this->type($typeNode->itemType),
+					$typeNode->minLength,
+					$typeNode->maxLength
+				),
+				$typeNode instanceof TupleTypeNode => $this->codeBuilder->typeRegistry->tuple(
+					array_map($this->type(...), $typeNode->types),
+					$this->type($typeNode->restType)
+				),
+				$typeNode instanceof RecordTypeNode => $this->codeBuilder->typeRegistry->record(
+					array_map($this->type(...), $typeNode->types),
+					$this->type($typeNode->restType)
+				),
+				$typeNode instanceof FunctionTypeNode => $this->codeBuilder->typeRegistry->function(
+					$this->type($typeNode->parameterType),
+					$this->type($typeNode->returnType)
+				),
+				$typeNode instanceof TypeTypeNode => $this->codeBuilder->typeRegistry->type(
+					$this->type($typeNode->refType)
+				),
+				$typeNode instanceof ProxyTypeNode => $this->codeBuilder->typeRegistry->proxyType($typeNode->name),
+				$typeNode instanceof ImpureTypeNode => $this->codeBuilder->typeRegistry->impure(
+					$this->type($typeNode->valueType)
+				),
+				$typeNode instanceof OptionalKeyTypeNode => $this->codeBuilder->typeRegistry->optionalKey(
+					$this->type($typeNode->valueType)
+				),
+				$typeNode instanceof ResultTypeNode => $this->codeBuilder->typeRegistry->result(
+					$this->type($typeNode->returnType),
+					$this->type($typeNode->errorType)
+				),
+
+				$typeNode instanceof MutableTypeNode => $this->codeBuilder->typeRegistry->mutable(
+					$this->type($typeNode->valueType)
+				),
+
+				$typeNode instanceof IntegerTypeNode => $this->codeBuilder->typeRegistry->integer(
+					$typeNode->minValue, $typeNode->maxValue
+				),
+				$typeNode instanceof IntegerSubsetTypeNode => $this->codeBuilder->typeRegistry->integerSubset(
+					array_map($this->value(...), $typeNode->values)
+				),
+				$typeNode instanceof RealTypeNode => $this->codeBuilder->typeRegistry->real(
+					$typeNode->minValue, $typeNode->maxValue
+				),
+				$typeNode instanceof RealSubsetTypeNode => $this->codeBuilder->typeRegistry->realSubset(
+					array_map($this->value(...), $typeNode->values)
+				),
+				$typeNode instanceof StringTypeNode => $this->codeBuilder->typeRegistry->string(
+					$typeNode->minLength, $typeNode->maxLength
+				),
+				$typeNode instanceof StringSubsetTypeNode => $this->codeBuilder->typeRegistry->stringSubset(
+					array_map($this->value(...), $typeNode->values)
+				),
+
+				$typeNode instanceof MetaTypeTypeNode => $this->codeBuilder->typeRegistry->metaType($typeNode->value),
+				$typeNode instanceof NamedTypeNode => $this->codeBuilder->typeRegistry->typeByName($typeNode->name),
+				$typeNode instanceof EnumerationSubsetTypeNode =>
+					$this->codeBuilder->typeRegistry->enumeration($typeNode->name)->subsetType($typeNode->values),
+
+				true => throw new AstCompilationException(
+					$typeNode,
+					"Unknown type node type: " . get_class($typeNode)
+				)
+			};
+		} catch (UnknownType $e) {
+			throw new AstCompilationException($typeNode, "Type issue: " . $e->getMessage(), $e);
+		} catch (UnknownEnumerationValue $e) {
+			throw new AstCompilationException($typeNode, "Enumeration issue: " . $e->getMessage(), $e);
+		} catch (InvalidIntegerRange|InvalidRealRange|InvalidLengthRange $e) {
+			throw new AstCompilationException($typeNode, "Range issue: " . $e->getMessage(), $e);
+		}
 	}
 
-	/** @throws Exception */
+	/** @throws AstCompilationException */
+	private function value(ValueNode $valueNode): Value {
+		try {
+			return match(true) {
+				$valueNode instanceof NullValueNode => $this->codeBuilder->valueRegistry->null,
+				$valueNode instanceof TrueValueNode => $this->codeBuilder->valueRegistry->true,
+				$valueNode instanceof FalseValueNode => $this->codeBuilder->valueRegistry->false,
+				//$valueNode instanceof ErrorValueNode => $this->codeBuilder->valueRegistry->error($valueNode->value),
+				//$valueNode instanceof MutableValueNode => $this->codeBuilder->valueRegistry->mutable($valueNode->value),
+				$valueNode instanceof IntegerValueNode => $this->codeBuilder->valueRegistry->integer($valueNode->value),
+				$valueNode instanceof RealValueNode => $this->codeBuilder->valueRegistry->real($valueNode->value),
+				$valueNode instanceof StringValueNode => $this->codeBuilder->valueRegistry->string($valueNode->value),
+				$valueNode instanceof AtomValueNode => $this->codeBuilder->valueRegistry->atom($valueNode->name),
+				$valueNode instanceof EnumerationValueNode => $this->codeBuilder->valueRegistry->enumerationValue(
+					$valueNode->name,
+					$valueNode->enumValue
+				),
+				$valueNode instanceof RecordValueNode => $this->codeBuilder->valueRegistry->record(
+					array_map($this->value(...), $valueNode->values)
+				),
+				$valueNode instanceof TupleValueNode => $this->codeBuilder->valueRegistry->tuple(
+					array_map($this->value(...), $valueNode->values)
+				),
+				$valueNode instanceof TypeValueNode => $this->codeBuilder->valueRegistry->type(
+					$this->type($valueNode->type)
+				),
+				$valueNode instanceof FunctionValueNode =>
+					$this->codeBuilder->valueRegistry->function(
+						$this->type($valueNode->parameterType),
+						$this->type($valueNode->dependencyType),
+						$this->type($valueNode->returnType),
+						$this->functionBody($valueNode->functionBody)
+					),
+				true => throw new AstCompilationException(
+					$valueNode,
+					"Unknown value node type: " . get_class($valueNode)
+				)
+			};
+		} catch (UnknownEnumerationValue $e) {
+			throw new AstCompilationException($valueNode, "Enumeration Issue: " . $e->getMessage(), $e);
+		}
+	}
+
+	/** @throws AstCompilationException */
 	private function functionBody(FunctionBodyNode $functionBodyNode): FunctionBody {
 		return $this->codeBuilder->functionBody(
 			$this->expression($functionBodyNode->expression)

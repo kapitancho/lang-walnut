@@ -3,7 +3,7 @@
 namespace Walnut\Lang\Blueprint\Function;
 
 use Stringable;
-use Walnut\Lang\Blueprint\Identifier\MethodNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Type\Type;
 
 interface CustomMethod extends Method, Stringable {

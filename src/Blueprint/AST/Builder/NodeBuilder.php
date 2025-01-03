@@ -75,13 +75,13 @@ use Walnut\Lang\Blueprint\AST\Node\Value\TrueValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\TupleValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\TypeValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\ValueNode;
-use Walnut\Lang\Blueprint\Identifier\EnumValueIdentifier;
-use Walnut\Lang\Blueprint\Identifier\MethodNameIdentifier;
-use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Identifier\VariableNameIdentifier;
-use Walnut\Lang\Blueprint\Range\MinusInfinity;
-use Walnut\Lang\Blueprint\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Type\MetaTypeValue;
+use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
+use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
+use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 
 interface NodeBuilder {
 

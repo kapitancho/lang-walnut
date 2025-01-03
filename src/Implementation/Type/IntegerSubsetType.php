@@ -4,15 +4,15 @@ namespace Walnut\Lang\Implementation\Type;
 
 use BcMath\Number;
 use JsonSerializable;
-use Walnut\Lang\Blueprint\Range\IntegerRange as IntegerRangeInterface;
-use Walnut\Lang\Blueprint\Range\RealRange;
-use Walnut\Lang\Blueprint\Type\IntegerType as IntegerTypeInterface;
+use Walnut\Lang\Blueprint\Common\Range\IntegerRange as IntegerRangeInterface;
+use Walnut\Lang\Blueprint\Common\Range\RealRange;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType as IntegerSubsetTypeInterface;
-use Walnut\Lang\Blueprint\Type\RealType as RealTypeInterface;
+use Walnut\Lang\Blueprint\Type\IntegerType as IntegerTypeInterface;
 use Walnut\Lang\Blueprint\Type\RealSubsetType as RealSubsetTypeInterface;
+use Walnut\Lang\Blueprint\Type\RealType as RealTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
-use Walnut\Lang\Implementation\Range\IntegerRange;
+use Walnut\Lang\Implementation\Common\Range\IntegerRange;
 
 final class IntegerSubsetType implements IntegerSubsetTypeInterface, JsonSerializable {
 

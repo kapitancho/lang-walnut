@@ -3,7 +3,7 @@
 namespace Walnut\Lang\Blueprint\Program;
 
 use InvalidArgumentException;
-use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 
 final class UnknownType extends InvalidArgumentException {
     public function __construct(

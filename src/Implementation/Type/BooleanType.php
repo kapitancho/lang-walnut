@@ -4,8 +4,8 @@ namespace Walnut\Lang\Implementation\Type;
 
 use InvalidArgumentException;
 use JsonSerializable;
-use Walnut\Lang\Blueprint\Identifier\EnumValueIdentifier;
-use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\UnknownEnumerationValue;
 use Walnut\Lang\Blueprint\Type\BooleanType as BooleanTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;

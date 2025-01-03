@@ -3,7 +3,9 @@
 namespace Walnut\Lang\Blueprint\Compilation;
 
 use Walnut\Lang\Blueprint\AST\Node\RootNode;
+use Walnut\Lang\Blueprint\AST\Parser\ParserException;
 
 interface ModuleImporter {
+	/** @throws ModuleDependencyException|ParserException */
 	public function importModules(string $startModuleName): RootNode;
 }

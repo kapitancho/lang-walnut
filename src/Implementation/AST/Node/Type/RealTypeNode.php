@@ -5,8 +5,8 @@ namespace Walnut\Lang\Implementation\AST\Node\Type;
 use BcMath\Number;
 use Walnut\Lang\Blueprint\AST\Node\SourceLocation;
 use Walnut\Lang\Blueprint\AST\Node\Type\RealTypeNode as RealTypeNodeInterface;
-use Walnut\Lang\Blueprint\Range\MinusInfinity;
-use Walnut\Lang\Blueprint\Range\PlusInfinity;
+use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
+use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 
 final readonly class RealTypeNode implements RealTypeNodeInterface {
 	public function __construct(

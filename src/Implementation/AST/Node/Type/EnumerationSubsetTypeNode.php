@@ -4,8 +4,8 @@ namespace Walnut\Lang\Implementation\AST\Node\Type;
 
 use Walnut\Lang\Blueprint\AST\Node\SourceLocation;
 use Walnut\Lang\Blueprint\AST\Node\Type\EnumerationSubsetTypeNode as EnumerationSubsetTypeNodeInterface;
-use Walnut\Lang\Blueprint\Identifier\EnumValueIdentifier;
-use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 
 final readonly class EnumerationSubsetTypeNode implements EnumerationSubsetTypeNodeInterface {
 	/** @param list<EnumValueIdentifier> $values */

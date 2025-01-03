@@ -3,9 +3,13 @@
 namespace Walnut\Lang\Blueprint\Program\Registry;
 
 use BcMath\Number;
-use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Range\MinusInfinity;
-use Walnut\Lang\Blueprint\Range\PlusInfinity;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Range\InvalidIntegerRange;
+use Walnut\Lang\Blueprint\Common\Range\InvalidLengthRange;
+use Walnut\Lang\Blueprint\Common\Range\InvalidRealRange;
+use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
+use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
+use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Program\UnknownType;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AnyType;
@@ -19,7 +23,6 @@ use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\MetaType;
-use Walnut\Lang\Blueprint\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\NamedType;
 use Walnut\Lang\Blueprint\Type\NothingType;
@@ -51,6 +54,7 @@ interface TypeRegistry {
 	public TrueType $true { get; }
 	public FalseType $false { get; }
 
+	/** @throws InvalidIntegerRange */
 	public function integer(
 		int|Number|MinusInfinity $min = MinusInfinity::value,
 		int|Number|PlusInfinity $max = PlusInfinity::value
@@ -58,6 +62,7 @@ interface TypeRegistry {
 	/** @param list<IntegerValue> $values */
 	public function integerSubset(array $values): IntegerSubsetType;
 
+	/** @throws InvalidRealRange */
 	public function real(
 		float|Number|MinusInfinity $min = MinusInfinity::value,
 		float|Number|PlusInfinity $max = PlusInfinity::value
@@ -65,6 +70,7 @@ interface TypeRegistry {
 	/** @param list<RealValue> $values */
 	public function realSubset(array $values): RealSubsetType;
 
+	/** @throws InvalidLengthRange */
 	public function string(
 		int|Number $minLength = 0,
 		int|Number|PlusInfinity $maxLength = PlusInfinity::value
@@ -72,16 +78,20 @@ interface TypeRegistry {
 	/** @param list<StringValue> $values */
 	public function stringSubset(array $values): StringSubsetType;
 
+	/** @throws InvalidLengthRange */
 	public function array(
 		Type|null        $itemType = null,
 		int|Number              $minLength = 0,
 		int|Number|PlusInfinity $maxLength = PlusInfinity::value
 	): ArrayType;
+
+	/** @throws InvalidLengthRange */
 	public function map(
 		Type|null        $itemType = null,
 		int|Number              $minLength = 0,
 		int|Number|PlusInfinity $maxLength = PlusInfinity::value
 	): MapType;
+
 	/** @param list<Type> $itemTypes */
 	public function tuple(array $itemTypes, Type|null $restType = null): TupleType;
 	/** @param array<string, Type> $itemTypes */

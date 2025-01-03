@@ -3,7 +3,7 @@
 namespace Walnut\Lang\Blueprint\Program;
 
 use InvalidArgumentException;
-use Walnut\Lang\Blueprint\Identifier\VariableNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Type\Type;
 
 final class InvalidEntryPoint extends InvalidArgumentException {

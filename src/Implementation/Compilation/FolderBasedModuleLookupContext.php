@@ -2,7 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Compilation;
 
-use Walnut\Lang\Blueprint\Compilation\CompilationException;
+use Walnut\Lang\Blueprint\Compilation\ModuleDependencyException;
 use Walnut\Lang\Blueprint\Compilation\ModuleLookupContext;
 
 final readonly class FolderBasedModuleLookupContext implements ModuleLookupContext {
@@ -15,11 +15,11 @@ final readonly class FolderBasedModuleLookupContext implements ModuleLookupConte
 		return $this->sourceRoot . '/' . str_replace('\\', '/', $moduleName) . '.nut';
 	}
 
-	/** @throws CompilationException */
+	/** @throws ModuleDependencyException */
 	public function sourceOf(string $moduleName): string {
 		$sourcePath = $this->pathOf($moduleName);
 		if(!file_exists($sourcePath) || !is_readable($sourcePath)) {
-			throw new CompilationException("Module not found: $moduleName");
+			throw new ModuleDependencyException($moduleName);
 		}
 		return file_get_contents($sourcePath);
 	}

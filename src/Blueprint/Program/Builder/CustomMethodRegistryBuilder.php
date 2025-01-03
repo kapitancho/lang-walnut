@@ -2,9 +2,9 @@
 
 namespace Walnut\Lang\Blueprint\Program\Builder;
 
+use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethod;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
-use Walnut\Lang\Blueprint\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Type\Type;
 
 interface CustomMethodRegistryBuilder {

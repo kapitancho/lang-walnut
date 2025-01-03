@@ -2,7 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Program\Type;
 
-use Walnut\Lang\Blueprint\Identifier\EnumValueIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;

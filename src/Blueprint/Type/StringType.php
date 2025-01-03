@@ -2,7 +2,7 @@
 
 namespace Walnut\Lang\Blueprint\Type;
 
-use Walnut\Lang\Blueprint\Range\LengthRange;
+use Walnut\Lang\Blueprint\Common\Range\LengthRange;
 
 interface StringType extends Type {
 	public LengthRange $range { get; }

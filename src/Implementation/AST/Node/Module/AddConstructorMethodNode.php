@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddConstructorMethodNode as AddConstructorMethodNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\SourceLocation;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
-use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 
 final readonly class AddConstructorMethodNode implements AddConstructorMethodNodeInterface {
 	public function __construct(

@@ -6,12 +6,12 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
+use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethod;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
-use Walnut\Lang\Blueprint\Identifier\EnumValueIdentifier;
-use Walnut\Lang\Blueprint\Identifier\MethodNameIdentifier;
-use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Builder\ProgramBuilder as ProgramBuilderInterface;
 use Walnut\Lang\Blueprint\Program\Builder\TypeRegistryBuilder;
 use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry;
@@ -56,6 +56,7 @@ final readonly class ProgramBuilder implements ProgramBuilderInterface {
 		return $analyseErrors;
 	}
 
+	/** @throws AnalyserException */
 	public function analyseAndBuildProgram(): Program {
 		$globalFunctionAnalyseErrors = $this->analyseGlobalFunctions();
 		$customMethodAnalyseErrors = $this->customMethodRegistryBuilder->analyse();
@@ -113,31 +114,6 @@ final readonly class ProgramBuilder implements ProgramBuilderInterface {
 
 		$this->addConstructorMethod($name, $baseType, $errorType, $constructorBody);
 
-		if (0) $this->customMethodRegistryBuilder->addMethod(
-			$this->typeRegistry->atom(new TypeNameIdentifier('Constructor')),
-			new MethodNameIdentifier($name->identifier),
-			$baseType,
-			$this->typeRegistry->nothing,
-			$errorType && !($errorType instanceof NothingType) ?
-				$this->typeRegistry->result($baseType /*$subtype*/, $errorType) : $baseType/*$subtype*/,
-			$this->expressionRegistry->functionBody(
-				$this->expressionRegistry->sequence([
-					$constructorBody,
-					$this->expressionRegistry->variableName(
-						new VariableNameIdentifier('#')
-					),
-					/*$this->expressionRegistry->methodCall(
-						$this->expressionRegistry->variableName(
-							new VariableNameIdentifier('#')
-						),
-						new MethodNameIdentifier('construct'),
-						$this->expressionRegistry->constant(
-							$this->valueRegistry->type($subtype)
-						),
-					)*/
-				])
-			)
-		);
 		return $subtype;
 	}
 
@@ -150,45 +126,6 @@ final readonly class ProgramBuilder implements ProgramBuilderInterface {
 		$sealedType = $this->typeRegistryBuilder->addSealed($name, $valueType);
 
 		$this->addConstructorMethod($name, $valueType, $errorType, $constructorBody);
-
-		if (0) $this->customMethodRegistryBuilder->addMethod(
-			$this->typeRegistry->atom(new TypeNameIdentifier('Constructor')),
-			new MethodNameIdentifier($name->identifier),
-			$valueType,
-			$this->typeRegistry->nothing,
-			$errorType && !($errorType instanceof NothingType) ?
-				$this->typeRegistry->result($valueType /*$subtype*/, $errorType) : $valueType/*$subtype*/,
-			$this->expressionRegistry->functionBody(
-				$this->expressionRegistry->sequence([
-					$constructorBody,
-					$this->expressionRegistry->variableName(
-						new VariableNameIdentifier('#')
-					),
-				])
-			)
-		);
-
-		if (0) $this->customMethodRegistryBuilder->addMethod(
-			$this->typeRegistry->atom(new TypeNameIdentifier('Constructor')),
-			new MethodNameIdentifier($name->identifier),
-			$valueType,
-			$this->typeRegistry->nothing,
-			$valueType, //$sealedType,
-			$this->expressionRegistry->functionBody(
-				$this->expressionRegistry->variableName(
-					new VariableNameIdentifier('#')
-				),
-				/*$this->expressionRegistry->methodCall(
-					$this->expressionRegistry->variableName(
-						new VariableNameIdentifier('#')
-					),
-					new MethodNameIdentifier('construct'),
-					$this->expressionRegistry->constant(
-						$this->valueRegistry->type($sealedType)
-					),
-				)*/
-			)
-		);
 		return $sealedType;
 	}
 

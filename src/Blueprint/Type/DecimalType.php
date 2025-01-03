@@ -2,8 +2,8 @@
 
 namespace Walnut\Lang\Blueprint\Type;
 
-use Walnut\Lang\Blueprint\Range\DecimalPrecision;
-use Walnut\Lang\Blueprint\Range\RealRange;
+use Walnut\Lang\Blueprint\Common\Range\DecimalPrecision;
+use Walnut\Lang\Blueprint\Common\Range\RealRange;
 
 interface DecimalType extends Type {
     public function range(): RealRange;

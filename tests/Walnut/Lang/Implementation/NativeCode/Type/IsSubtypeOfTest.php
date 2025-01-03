@@ -2,9 +2,9 @@
 
 namespace Walnut\Lang\Implementation\NativeCode\Type;
 
-use Walnut\Lang\Blueprint\Identifier\EnumValueIdentifier;
-use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Range\MinusInfinity;
+use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Test\Implementation\BaseProgramTestHelper;
 

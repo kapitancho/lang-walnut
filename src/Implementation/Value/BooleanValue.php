@@ -3,7 +3,7 @@
 namespace Walnut\Lang\Implementation\Value;
 
 use JsonSerializable;
-use Walnut\Lang\Blueprint\Identifier\EnumValueIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\BooleanType;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;

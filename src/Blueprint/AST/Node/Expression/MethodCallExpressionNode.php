@@ -2,7 +2,7 @@
 
 namespace Walnut\Lang\Blueprint\AST\Node\Expression;
 
-use Walnut\Lang\Blueprint\Identifier\MethodNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 
 interface MethodCallExpressionNode extends ExpressionNode {
 	public ExpressionNode $target { get; }

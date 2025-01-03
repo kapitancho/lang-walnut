@@ -3,7 +3,7 @@
 namespace Walnut\Lang\Test\Implementation\Type;
 
 use PHPUnit\Framework\TestCase;
-use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\UnknownType;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
 

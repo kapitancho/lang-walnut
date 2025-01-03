@@ -3,7 +3,7 @@
 namespace Walnut\Lang\Blueprint\AST\Node\Module;
 
 use Walnut\Lang\Blueprint\AST\Node\Value\ValueNode;
-use Walnut\Lang\Blueprint\Identifier\VariableNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 
 interface AddVariableNode extends ModuleDefinitionNode {
 	public VariableNameIdentifier $name { get; }

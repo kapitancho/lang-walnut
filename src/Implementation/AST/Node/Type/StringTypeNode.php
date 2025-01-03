@@ -5,7 +5,7 @@ namespace Walnut\Lang\Implementation\AST\Node\Type;
 use BcMath\Number;
 use Walnut\Lang\Blueprint\AST\Node\SourceLocation;
 use Walnut\Lang\Blueprint\AST\Node\Type\StringTypeNode as StringTypeNodeInterface;
-use Walnut\Lang\Blueprint\Range\PlusInfinity;
+use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 
 final readonly class StringTypeNode implements StringTypeNodeInterface {
 	public function __construct(

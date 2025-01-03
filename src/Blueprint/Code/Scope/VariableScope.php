@@ -2,7 +2,7 @@
 
 namespace Walnut\Lang\Blueprint\Code\Scope;
 
-use Walnut\Lang\Blueprint\Identifier\VariableNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Type\Type;
 
 interface VariableScope {

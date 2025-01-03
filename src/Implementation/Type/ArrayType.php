@@ -3,7 +3,7 @@
 namespace Walnut\Lang\Implementation\Type;
 
 use JsonSerializable;
-use Walnut\Lang\Blueprint\Range\LengthRange;
+use Walnut\Lang\Blueprint\Common\Range\LengthRange;
 use Walnut\Lang\Blueprint\Type\ArrayType as ArrayTypeInterface;
 use Walnut\Lang\Blueprint\Type\ProxyNamedType;
 use Walnut\Lang\Blueprint\Type\Type;

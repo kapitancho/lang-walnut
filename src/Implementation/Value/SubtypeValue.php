@@ -3,7 +3,7 @@
 namespace Walnut\Lang\Implementation\Value;
 
 use JsonSerializable;
-use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\SubtypeType;
 use Walnut\Lang\Blueprint\Value\SubtypeValue as SubtypeValueInterface;

@@ -18,9 +18,9 @@ use Walnut\Lang\Blueprint\Code\Expression\SequenceExpression;
 use Walnut\Lang\Blueprint\Code\Expression\TupleExpression;
 use Walnut\Lang\Blueprint\Code\Expression\VariableAssignmentExpression;
 use Walnut\Lang\Blueprint\Code\Expression\VariableNameExpression;
+use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
-use Walnut\Lang\Blueprint\Identifier\MethodNameIdentifier;
-use Walnut\Lang\Blueprint\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 

@@ -4,7 +4,7 @@ namespace Walnut\Lang\Implementation\AST\Node\Value;
 
 use Walnut\Lang\Blueprint\AST\Node\SourceLocation;
 use Walnut\Lang\Blueprint\AST\Node\Value\AtomValueNode as AtomValueNodeInterface;
-use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 
 final readonly class AtomValueNode implements AtomValueNodeInterface {
 	public function __construct(

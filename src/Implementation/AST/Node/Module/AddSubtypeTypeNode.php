@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddSubtypeTypeNode as AddSubtypeTypeNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\SourceLocation;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
-use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 
 final readonly class AddSubtypeTypeNode implements AddSubtypeTypeNodeInterface {
 	public function __construct(

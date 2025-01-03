@@ -4,14 +4,14 @@ namespace Walnut\Lang;
 
 use BcMath\Number;
 use PHPUnit\Framework\TestCase;
-use Walnut\Lang\Blueprint\Range\InvalidIntegerRange;
-use Walnut\Lang\Blueprint\Range\InvalidLengthRange;
-use Walnut\Lang\Blueprint\Range\InvalidRealRange;
-use Walnut\Lang\Blueprint\Range\MinusInfinity;
-use Walnut\Lang\Blueprint\Range\PlusInfinity;
-use Walnut\Lang\Implementation\Range\IntegerRange;
-use Walnut\Lang\Implementation\Range\LengthRange;
-use Walnut\Lang\Implementation\Range\RealRange;
+use Walnut\Lang\Blueprint\Common\Range\InvalidIntegerRange;
+use Walnut\Lang\Blueprint\Common\Range\InvalidLengthRange;
+use Walnut\Lang\Blueprint\Common\Range\InvalidRealRange;
+use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
+use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
+use Walnut\Lang\Implementation\Common\Range\IntegerRange;
+use Walnut\Lang\Implementation\Common\Range\LengthRange;
+use Walnut\Lang\Implementation\Common\Range\RealRange;
 
 final class RangeTest extends TestCase {
 

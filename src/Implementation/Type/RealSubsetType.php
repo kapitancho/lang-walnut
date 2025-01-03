@@ -8,7 +8,7 @@ use Walnut\Lang\Blueprint\Type\RealSubsetType as RealSubsetTypeInterface;
 use Walnut\Lang\Blueprint\Type\RealType as RealTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\RealValue;
-use Walnut\Lang\Implementation\Range\RealRange;
+use Walnut\Lang\Implementation\Common\Range\RealRange;
 
 final class RealSubsetType implements RealSubsetTypeInterface, JsonSerializable {
 

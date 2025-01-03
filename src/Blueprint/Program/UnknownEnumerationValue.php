@@ -3,8 +3,8 @@
 namespace Walnut\Lang\Blueprint\Program;
 
 use InvalidArgumentException;
-use Walnut\Lang\Blueprint\Identifier\EnumValueIdentifier;
-use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 
 final class UnknownEnumerationValue extends InvalidArgumentException {
     public function __construct(

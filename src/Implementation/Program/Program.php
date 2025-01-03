@@ -4,7 +4,7 @@ namespace Walnut\Lang\Implementation\Program;
 
 use Walnut\Lang\Blueprint\Code\Scope\UnknownVariable;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope;
-use Walnut\Lang\Blueprint\Identifier\VariableNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Program\InvalidEntryPoint;
 use Walnut\Lang\Blueprint\Program\Program as ProgramInterface;
 use Walnut\Lang\Blueprint\Type\FunctionType;

@@ -6,7 +6,7 @@ use BcMath\Number;
 use Walnut\Lang\Blueprint\AST\Node\SourceLocation;
 use Walnut\Lang\Blueprint\AST\Node\Type\ArrayTypeNode as ArrayTypeNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
-use Walnut\Lang\Blueprint\Range\PlusInfinity;
+use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 
 final readonly class ArrayTypeNode implements ArrayTypeNodeInterface {
 	public function __construct(

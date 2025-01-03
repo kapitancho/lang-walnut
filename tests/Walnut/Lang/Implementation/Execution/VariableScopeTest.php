@@ -4,7 +4,7 @@ namespace Walnut\Lang\Test\Implementation\Execution;
 
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownContextVariable;
-use Walnut\Lang\Blueprint\Identifier\VariableNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Implementation\Code\Scope\VariableScope;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
 
