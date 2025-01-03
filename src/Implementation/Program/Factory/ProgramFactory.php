@@ -13,6 +13,8 @@ use Walnut\Lang\Blueprint\Program\Factory\ProgramFactory as ProgramFactoryInterf
 use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Implementation\AST\Builder\NodeBuilder;
+use Walnut\Lang\Implementation\AST\Builder\NodeBuilderFactory;
 use Walnut\Lang\Implementation\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
 use Walnut\Lang\Implementation\Compilation\CodeBuilder;
@@ -84,6 +86,12 @@ final class ProgramFactory implements DependencyContainerInterface, ProgramFacto
 
 	public function valueByType(Type $type): Value|DependencyError {
 		return $this->dependencyContainer->valueByType($type);
+	}
+
+	public NodeBuilderFactory $nodeBuilderFactory {
+		get {
+			return $this->nodeBuilderFactory ??= new NodeBuilderFactory();
+		}
 	}
 
 	public CodeBuilder $codeBuilder {

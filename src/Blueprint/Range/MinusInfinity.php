@@ -2,6 +2,12 @@
 
 namespace Walnut\Lang\Blueprint\Range;
 
-enum MinusInfinity {
+use JsonSerializable;
+
+enum MinusInfinity implements JsonSerializable {
 	case value;
+
+	public function jsonSerialize(): string {
+		return 'MinusInfinity';
+	}
 }

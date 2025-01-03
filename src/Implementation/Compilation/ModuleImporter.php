@@ -2,36 +2,63 @@
 
 namespace Walnut\Lang\Implementation\Compilation;
 
-use Walnut\Lang\Blueprint\Compilation\CodeBuilder;
+use Walnut\Lang\Blueprint\AST\Builder\ModuleNodeBuilderFactory;
+use Walnut\Lang\Blueprint\AST\Builder\NodeBuilder;
+use Walnut\Lang\Blueprint\AST\Builder\NodeBuilderFactory;
+use Walnut\Lang\Blueprint\AST\Node\Module\ModuleNode;
 use Walnut\Lang\Blueprint\Compilation\CompilationException;
 use Walnut\Lang\Blueprint\Compilation\ModuleImporter as ModuleImporterInterface;
 use Walnut\Lang\Blueprint\Compilation\ModuleLookupContext;
 use Walnut\Lang\Blueprint\Compilation\Parser;
+use Walnut\Lang\Implementation\AST\Node\RootNode;
 
-final class ModuleImporter implements ModuleImporterInterface {
-
-	/** @var array<string, bool> */
-	private array $cache = [];
+final readonly class ModuleImporter implements ModuleImporterInterface {
 
 	public function __construct(
-		private readonly WalexLexerAdapter $lexer,
-		private readonly ModuleLookupContext $moduleLookupContext,
-		private readonly Parser $parser,
-		private readonly CodeBuilder $codeBuilder,
+		private WalexLexerAdapter        $lexer,
+		private ModuleLookupContext      $moduleLookupContext,
+		private Parser                   $parser,
+		private NodeBuilderFactory       $nodeBuilderFactory,
+		private ModuleNodeBuilderFactory $moduleNodeBuilderFactory
 	) {}
 
-	public function importModule(string $moduleName): void {
-		$c = $this->cache[$moduleName] ?? null;
-		if ($c === false) {
-			throw new CompilationException('Import loop: ' . $moduleName);
-		}
-		if ($c) {
-			return;
-		}
-		$this->cache[$moduleName] = false;
+	public function importModules(string $startModuleName): RootNode {
+		$modules = [];
+		$cache = [];
+		$moduleImporter = function(string $moduleName) use (&$modules, &$cache, &$moduleImporter): void {
+			$c = $cache[$moduleName] ?? null;
+			if ($c === false) {
+				throw new CompilationException('Import loop: ' . $moduleName);
+			}
+			if ($c) {
+				return;
+			}
+			$cache[$moduleName] = false;
+			$moduleNode = $this->parseModule($moduleName);
+			foreach($moduleNode->moduleDependencies as $moduleDependency) {
+				$moduleImporter($moduleDependency);
+			}
+			$modules[] = $moduleNode;
+			$cache[$moduleName] = true;
+		};
+		$moduleImporter('core');
+		$moduleImporter($startModuleName);
+
+		return new RootNode(
+			$startModuleName,
+			$modules
+		);
+	}
+
+	private function parseModule(string $moduleName): ModuleNode {
 		$sourceCode = $this->moduleLookupContext->sourceOf($moduleName);
 		$tokens = $this->lexer->tokensFromSource($sourceCode);
-		$this->parser->parseAndBuildCodeFromTokens($this, $this->codeBuilder, $tokens, $moduleName);
-		$this->cache[$moduleName] = true;
+		$moduleNodeBuilder = $this->moduleNodeBuilderFactory->newBuilder();
+		return $this->parser->parseAndBuildCodeFromTokens(
+			$this->nodeBuilderFactory,
+			$moduleNodeBuilder,
+			$tokens,
+			$moduleName
+		);
 	}
 }

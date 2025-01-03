@@ -75,6 +75,7 @@ final readonly class PadLeft implements NativeMethod {
 				$paramValues = $parameterValue->values;
 				$length = $paramValues['length'] ?? null;
 				$padValue = $paramValues['value'] ?? null;
+
 				if ($length instanceof IntegerValue && $padValue !== null) {
 					$result = array_pad(
 						$values,

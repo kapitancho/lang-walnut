@@ -2,11 +2,14 @@
 
 namespace Walnut\Lang\Implementation\Compilation\Parser;
 
+use Walnut\Lang\Blueprint\AST\Builder\ModuleNodeBuilder;
+use Walnut\Lang\Blueprint\AST\Builder\ModuleNodeBuilderFactory;
+use Walnut\Lang\Blueprint\AST\Builder\NodeBuilder;
+use Walnut\Lang\Blueprint\AST\Builder\NodeBuilderFactory;
+use Walnut\Lang\Blueprint\AST\Node\Module\ModuleNode;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownContextVariable;
-use Walnut\Lang\Blueprint\Compilation\CodeBuilder;
 use Walnut\Lang\Blueprint\Compilation\CompilationException;
-use Walnut\Lang\Blueprint\Compilation\ModuleImporter;
 use Walnut\Lang\Blueprint\Compilation\Parser as ParserInterface;
 use Walnut\Lang\Blueprint\Function\FunctionBodyException;
 use Walnut\Lang\Blueprint\Program\UnknownEnumerationValue;
@@ -23,19 +26,24 @@ final readonly class Parser implements ParserInterface {
 
     /** @param Token[] $tokens */
 	public function parseAndBuildCodeFromTokens(
-		ModuleImporter $moduleImporter,
-		CodeBuilder $codeBuilder,
+		NodeBuilderFactory $nodeBuilderFactory,
+		ModuleNodeBuilder $moduleNodeBuilder,
 		array $tokens,
 		string $moduleName
-	): mixed {
+	): ModuleNode {
 		$s = new ParserState;
 		$s->push(-1);
 		$s->state = 101;
 
+		$nodeBuilder = $nodeBuilderFactory->newBuilder(
+			$tokens,
+			$s
+		);
+
 		$stateMachine = new ParserStateMachine(
 			$s,
-			$codeBuilder,
-			$moduleImporter
+			$nodeBuilder,
+			$moduleNodeBuilder
 		);
 		$states = $stateMachine->getAllStates();
 
@@ -69,7 +77,7 @@ final readonly class Parser implements ParserInterface {
 				$lastI = $s->i;
 				$lastState = $s->state;
 				try {
-					$transition($token, $s, $codeBuilder);
+					$transition($token, $s, $nodeBuilder);
 				} catch (InvalidIntegerRange|InvalidRealRange|InvalidLengthRange $e) {
 					throw new ParserException($s, "Range Issue: " . $e->getMessage(), $token, $moduleName);
 				} catch (UnknownEnumerationValue $e) {
@@ -87,10 +95,15 @@ final readonly class Parser implements ParserInterface {
 					throw new ParserException($s, "Transition did not change state or index ($lastI, $lastState)", $token, $moduleName);
 				}
 			} else {
-				$s->state = (int)$transition;
+				$t = (int)$transition;
+				$s->state = abs($t);
 				$s->i++;
+				$startPos = $tokens[$s->i]->sourcePosition ?? null;
+				if ($t < 0 && $startPos !== null) {
+					$s->result['startPosition'] = $startPos;
+				}
 			}
 		}
-		return $s->generated;
+		return $moduleNodeBuilder->build();
 	}
 }

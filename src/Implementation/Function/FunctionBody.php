@@ -39,15 +39,18 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 		public Expression $expression
 	) {}
 
+	private function getMapItemNotFound(): SealedType {
+		return $this->typeRegistry->sealed(new TypeNameIdentifier("MapItemNotFound"));
+	}
+
 	public function analyse(
 		AnalyserContext $analyserContext,
 		Type $targetType,
 		Type $parameterType,
 		Type $dependencyType
 	): Type {
-		$mapItemNotFound = $this->typeRegistry->sealed(new TypeNameIdentifier("MapItemNotFound"));
 		$tConv = fn(Type $type): Type => $type instanceof OptionalKeyType ?
-			$this->typeRegistry->result($type->valueType, $mapItemNotFound) :
+			$this->typeRegistry->result($type->valueType, $this->getMapItemNotFound()) :
 			$type;
 
 		foreach(['$' => $targetType, '#' => $parameterType, '%' => $dependencyType] as $variableName => $type) {
@@ -105,9 +108,8 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 		TypedValue $parameterValue,
 		TypedValue|null $dependencyValue
 	): Value {
-		$mapItemNotFound = $this->typeRegistry->sealed(new TypeNameIdentifier("MapItemNotFound"));
 		$tConv = fn(Type $type): Type => $type instanceof OptionalKeyType ?
-			$this->typeRegistry->result($type->valueType, $mapItemNotFound) :
+			$this->typeRegistry->result($type->valueType, $this->getMapItemNotFound()) :
 			$type;
 
 		foreach(['$' => $targetValue, '#' => $parameterValue, '%' => $dependencyValue] as $variableName => $value) {

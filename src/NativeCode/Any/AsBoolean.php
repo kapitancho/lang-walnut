@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\NativeCode\Any;
 
+use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
@@ -62,15 +63,15 @@ final readonly class AsBoolean implements NativeMethod {
 			$type instanceof NullType,
 			$type instanceof FalseType,
 			($type instanceof IntegerSubsetType && count($type->subsetValues) === 1 && (int)(string)$type->subsetValues[0]->literalValue === 0),
-			($type instanceof IntegerType && (int)(string)$type->range->minValue === 0 && (int)(string)$type->range->maxValue === 0),
+			($type instanceof IntegerType && $type->range->minValue instanceof Number && $type->range->maxValue instanceof Number && (int)(string)$type->range->minValue === 0 && (int)(string)$type->range->maxValue === 0),
 			($type instanceof RealSubsetType && count($type->subsetValues) === 1 && (float)(string)$type->subsetValues[0]->literalValue === 0.0),
-			($type instanceof RealType && (float)(string)$type->range->minValue === 0.0 && (float)(string)$type->range->maxValue === 0.0),
+			($type instanceof RealType && $type->range->minValue instanceof Number && $type->range->maxValue instanceof Number && (float)(string)$type->range->minValue === 0.0 && (float)(string)$type->range->maxValue === 0.0),
 			($type instanceof StringSubsetType && count($type->subsetValues) === 1 && $type->subsetValues[0]->literalValue === ''),
-			($type instanceof StringType && (int)(string)$type->range->maxLength === 0),
+			($type instanceof StringType && $type->range->maxLength instanceof Number && (int)(string)$type->range->maxLength === 0),
 			($type instanceof RecordType && count($type->types) === 0),
 			($type instanceof TupleType && count($type->types) === 0),
-			($type instanceof ArrayType && (int)(string)$type->range->maxLength === 0),
-			($type instanceof MapType && (int)(string)$type->range->maxLength === 0)
+			($type instanceof ArrayType && $type->range->maxLength instanceof Number && (int)(string)$type->range->maxLength === 0),
+			($type instanceof MapType && $type->range->maxLength instanceof Number && (int)(string)$type->range->maxLength === 0)
 				=> $this->context->typeRegistry->false,
 			$type instanceof SealedType,
 			$type instanceof TrueType,

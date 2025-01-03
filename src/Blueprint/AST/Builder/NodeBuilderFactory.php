@@ -1,0 +1,94 @@
+<?php
+
+namespace Walnut\Lang\Blueprint\AST\Builder;
+
+use BcMath\Number;
+use Walnut\Lang\Blueprint\AST\Node\Expression\ConstantExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\ConstructorCallExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\FunctionCallExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MatchExpressionDefaultNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MatchExpressionPairNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MatchIfExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MatchTrueExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MatchTypeExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MatchValueExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MethodCallExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MutableExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\NoErrorExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\NoExternalErrorExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\PropertyAccessExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\RecordExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\ReturnExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\SequenceExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\TupleExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\VariableAssignmentExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\VariableNameExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode;
+use Walnut\Lang\Blueprint\AST\Node\Module\AddAliasTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Module\AddAtomTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Module\AddConstructorMethodNode;
+use Walnut\Lang\Blueprint\AST\Node\Module\AddEnumerationTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Module\AddMethodNode;
+use Walnut\Lang\Blueprint\AST\Node\Module\AddSealedTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Module\AddSubtypeTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Module\AddVariableNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\AnyTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\ArrayTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\BooleanTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\EnumerationSubsetTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\FalseTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\FunctionTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\ImpureTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\IntegerSubsetTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\IntegerTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\IntersectionTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\MapTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\MetaTypeTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\MutableTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\NamedTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\NothingTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\NullTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\OptionalKeyTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\ProxyTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\RealSubsetTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\RealTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\RecordTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\ResultTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\StringSubsetTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\StringTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\TrueTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\TupleTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\TypeTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\UnionTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\AtomValueNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\EnumerationValueNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\FalseValueNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\FunctionValueNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\IntegerValueNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\NullValueNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\RealValueNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\RecordValueNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\StringValueNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\TrueValueNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\TupleValueNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\TypeValueNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\ValueNode;
+use Walnut\Lang\Blueprint\Identifier\EnumValueIdentifier;
+use Walnut\Lang\Blueprint\Identifier\MethodNameIdentifier;
+use Walnut\Lang\Blueprint\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Identifier\VariableNameIdentifier;
+use Walnut\Lang\Blueprint\Range\MinusInfinity;
+use Walnut\Lang\Blueprint\Range\PlusInfinity;
+use Walnut\Lang\Blueprint\Type\MetaTypeValue;
+use Walnut\Lang\Implementation\Compilation\Parser\ParserState;
+use Walnut\Lib\Walex\Token;
+
+interface NodeBuilderFactory {
+	/** @param Token[] $tokens */
+	public function newBuilder(
+		array $tokens,
+		ParserState $state
+	): NodeBuilder;
+}

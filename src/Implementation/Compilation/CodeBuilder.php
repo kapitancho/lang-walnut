@@ -19,6 +19,7 @@ use Walnut\Lang\Blueprint\Code\Expression\TupleExpression;
 use Walnut\Lang\Blueprint\Code\Expression\VariableAssignmentExpression;
 use Walnut\Lang\Blueprint\Code\Expression\VariableNameExpression;
 use Walnut\Lang\Blueprint\Compilation\CodeBuilder as CodeBuilderInterface;
+use Walnut\Lang\Blueprint\Compilation\CompilationException;
 use Walnut\Lang\Blueprint\Function\CustomMethod;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Identifier\EnumValueIdentifier;
@@ -32,6 +33,7 @@ use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
+use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\SubtypeType;
@@ -133,6 +135,34 @@ final readonly class CodeBuilder implements CodeBuilderInterface {
 					$this->valueRegistry->integer($propertyName) :
 					$this->valueRegistry->string($propertyName)
 			)
+		);
+	}
+
+	/** @throws CompilationException */
+	public function addConstructorMethod(
+		TypeNameIdentifier $typeName,
+		Type $parameterType,
+		Type $dependencyType,
+		Type $errorType,
+		FunctionBody $functionBody
+	): CustomMethod {
+		$type = $this->typeRegistry->typeByName($typeName);
+		$returnType = match(true) {
+			$type instanceof SealedType => $type->valueType,
+			$type instanceof SubtypeType => $type->baseType,
+			default => throw new CompilationException(
+				"Constructors are only allowed for subtypes and sealed types",
+			)
+		};
+		return $this->addMethod(
+			$this->typeRegistry->typeByName(new TypeNameIdentifier('Constructor')),
+			new MethodNameIdentifier($typeName),
+			$parameterType,
+			$dependencyType,
+			$errorType instanceof NothingType ? $returnType : $this->typeRegistry->result(
+				$returnType, $errorType
+			),
+			$functionBody
 		);
 	}
 
