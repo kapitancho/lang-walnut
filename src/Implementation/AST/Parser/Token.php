@@ -48,6 +48,7 @@ enum Token: string {
 	case when_type_of = '\?whenTypeOf\b';
 	case when_is_true = '\?whenIsTrue\b';
 	case when_value_of = '\?whenValueOf\b';
+	case when = '\?when\b';
 	case when_value_is = '\bis\b';
 	case optional_key = '\?\b';
 	case string_value = '\'.*?\'';

@@ -76,6 +76,21 @@ OddInteger <: Integer @ NotAnOddInteger :: ?whenValueOf(# % 2) is { 0: => Error(
 It is important to know that while the constructor can be bypassed by using the `JsonValue->hydrateAs` method, 
 the invariant validator is always executed. In case the validator returns an error, the `hydrateAs` method will return a `HydrationError`.
 
+## Default types (syntactic sugar)
+In case the return type of an extended function is Any, it can be omitted.
+```walnut
+Article->returnsAny(^String) :: ...some expression;
+```
+A similar simplification can be applied to the parameter type in case it is Null.
+```walnut
+Article->acceptsNull(=> String) :: ...some expression;
+```
+
+For a function expecting Null and returning Any, both types can be omitted.
+```walnut
+Article->acceptsNullAndReturnsAny() :: ...some expression;
+```
+
 ## Calling functions
 Simple functions can be called using the following syntax:
 ```walnut

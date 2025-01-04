@@ -53,7 +53,7 @@ x = @ExternalError[ ... ];
 ```    
 
 ## Conditionals
-There are three conditionals with a similar syntax:
+There are four conditionals with a similar syntax:
 
 ### ?whenValueOf
 ```walnut
@@ -72,6 +72,13 @@ There are three conditionals with a similar syntax:
 ### ?whenIsTrue
 ```walnut
 ?whenIsTrue { x > 0: 1, x < 0: -1, ~: 0 }; /* ~ is the default branch */
+```
+
+### ?when
+```walnut
+?when (x > 0) { 1 }; /* no else branch means 'null' */
+
+?when (x > 0) { 1 } ~ { -1 };
 ```
 
 Warning: in all three cases if the default branch (~) is omitted the expression value for the branch will be null unless the

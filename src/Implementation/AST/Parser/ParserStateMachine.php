@@ -811,8 +811,8 @@ final readonly class ParserStateMachine {
 				T::lambda_param->name => $c,
 				T::type->name => $c,
 
-				T::error_marker->name => function(LT $token) { $this->s->move(340); },
-				T::mutable->name => function(LT $token) { $this->s->move(344); },
+				T::error_marker->name => function(LT $token) { $this->s->move(354); },
+				T::mutable->name => function(LT $token) { $this->s->move(356); },
 
 				T::sequence_start->name => 230,
 				T::sequence_end->name => function(LT $token) { $this->s->stay(318); },
@@ -862,6 +862,11 @@ final readonly class ParserStateMachine {
 					$this->s->result['matchType'] = 'isTrue';
 					$this->s->result['matchPairs'] = [];
 					$this->s->move(324);
+				},
+				T::when->name => function(LT $token) {
+					$this->s->result['matchType'] = 'matchIf';
+					$this->s->result['matchPairs'] = [];
+					$this->s->move(335);
 				},
 			]],
 
@@ -1280,13 +1285,79 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				}
 			]],
-			340 => ['name' => 'error value value start', 'transitions' => [
+			335 => ['name' => 'match if start', 'transitions' => [
+				T::call_start->name => 336
+			]],
+			336 => ['name' => 'match if target', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->push(341);
+					$this->s->push(337);
+					$this->s->stay(201);
+				}
+			]],
+			337 => ['name' => 'match if target end', 'transitions' => [
+				T::call_end->name => function(LT $token) {
+					$this->s->result['matchTarget'] = $this->s->generated;
+					$this->s->move(338);
+				}
+			]],
+			338 => ['name' => 'match if then start', 'transitions' => [
+				T::sequence_start->name => 339
+			]],
+			339 => ['name' => 'match if then expression', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(340);
+					$this->s->stay(201);
+				}
+			]],
+			340 => ['name' => 'match if then end', 'transitions' => [
+				T::sequence_end->name => 341
+			]],
+			341 => ['name' => 'match if else check', 'transitions' => [
+				T::default_match->name => function(LT $token) {
+					$this->s->result['matchThen'] = $this->s->generated;
+					$this->s->move(342);
+				},
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->matchIf(
+						$this->s->result['matchTarget'],
+						$this->s->generated,
+						$this->nodeBuilder->constant(
+							$this->nodeBuilder->nullValue
+						)
+					);
+					$this->s->pop();
+				}
+			]],
+			342 => ['name' => 'match if start', 'transitions' => [
+				T::sequence_start->name => 343
+			]],
+			343 => ['name' => 'match if else expression', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(344);
+					$this->s->stay(201);
+				}
+			]],
+			344 => ['name' => 'match if else end', 'transitions' => [
+				T::sequence_end->name => 345
+			]],
+			345 => ['name' => 'match if else check', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->matchIf(
+						$this->s->result['matchTarget'],
+						$this->s->result['matchThen'],
+						$this->s->generated
+					);
+					$this->s->pop();
+				}
+			]],
+
+			354 => ['name' => 'error value value start', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(355);
 					$this->s->stay(301);
 				},
 			]],
-			341 => ['name' => 'error value type return', 'transitions' => [
+			355 => ['name' => 'error value type return', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->constructorCall(
 						new TypeNameIdentifier('Error'),
@@ -1295,28 +1366,28 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
-			344 => ['name' => 'mutable value', 'transitions' => [
-				T::sequence_start->name => 345,
+			356 => ['name' => 'mutable value', 'transitions' => [
+				T::sequence_start->name => 357,
 			]],
-			345 => ['name' => 'mutable value type', 'transitions' => [
+			357 => ['name' => 'mutable value type', 'transitions' => [
 				T::type_keyword->name => $c = function(LT $token) {
-					$this->s->push(346);
+					$this->s->push(358);
 					$this->s->stay(701);
 				},
 				T::tuple_start->name => $c,
 				T::lambda_param->name => $c,
 			]],
-			346 => ['name' => 'mutable value type separator', 'transitions' => [
-				T::value_separator->name => 347,
+			358 => ['name' => 'mutable value type separator', 'transitions' => [
+				T::value_separator->name => 359,
 			]],
-			347 => ['name' => 'mutable value value start', 'transitions' => [
+			359 => ['name' => 'mutable value value start', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->result['mutable_type'] = $this->s->generated;
-					$this->s->push(348);
+					$this->s->push(360);
 					$this->s->stay(301);
 				},
 			]],
-			348 => ['name' => 'mutable value type return', 'transitions' => [
+			360 => ['name' => 'mutable value type return', 'transitions' => [
 				T::sequence_end->name => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->mutable(
 						$this->s->result['mutable_type'],
