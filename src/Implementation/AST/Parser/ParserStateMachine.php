@@ -340,6 +340,17 @@ final readonly class ParserStateMachine {
 				T::lambda_param->name => function(LT $token) {
 					$this->s->push(125);
 					$this->s->move(901);
+				},
+				T::lambda_return->name => function(LT $token) {
+					$this->s->push(128);
+					$this->s->move(701);
+				},
+				T::call_end->name => function(LT $token) {
+					$this->s->result['parameter_type'] = $this->nodeBuilder->functionType(
+						$this->nodeBuilder->nullType,
+						$this->nodeBuilder->anyType,
+					);
+					$this->s->move(126);
 				}
 			]],
 			125 => ['name' => 'method name close param', 'transitions' => [
@@ -374,6 +385,15 @@ final readonly class ParserStateMachine {
 						)
 					);
 					$this->s->move(102);
+				}
+			]],
+			128 => ['name' => 'method name close param', 'transitions' => [
+				T::call_end->name => function(LT $token) {
+					$this->s->result['parameter_type'] = $this->nodeBuilder->functionType(
+						$this->nodeBuilder->nullType,
+						$this->s->generated,
+					);
+					$this->s->move(126);
 				}
 			]],
 			129 => ['name' => 'cast error type return', 'transitions' => [

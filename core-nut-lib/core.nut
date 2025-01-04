@@ -21,13 +21,13 @@ LengthRange <: [minLength: Integer<0..>, maxLength: Integer<0..>|PlusInfinity] @
 /* dependency container */
 DependencyContainer = :[];
 DependencyContainerError = $[targetType: Type, errorOnType: Type, errorMessage: String];
-DependencyContainerError->errorMessage(^Null => String) :: $errorMessage;
-DependencyContainerError->targetType(^Null => Type) :: $targetType;
+DependencyContainerError->errorMessage(=> String) :: $errorMessage;
+DependencyContainerError->targetType(=> Type) :: $targetType;
 
 /* json value */
 JsonValue = Null|Boolean|Integer|Real|String|Array<`JsonValue>|Map<`JsonValue>/*|Result<Nothing, `JsonValue>*/|Mutable<`JsonValue>;
 InvalidJsonString = $[value: String];
-InvalidJsonString->value(^Null => String) :: $value;
+InvalidJsonString->value(=> String) :: $value;
 InvalidJsonValue = $[value: Any];
 
 /* arrays and maps */
@@ -44,7 +44,7 @@ UnknownEnumerationValue = $[enumeration: Type, value: String];
 
 /* hydration */
 HydrationError = $[value: Any, hydrationPath: String, errorMessage: String];
-HydrationError->errorMessage(^Null => String) :: ''->concatList[
+HydrationError->errorMessage(=> String) :: ''->concatList[
     'Error in ', $hydrationPath, ': ', $errorMessage
 ];
 
