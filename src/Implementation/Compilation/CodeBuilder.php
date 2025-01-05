@@ -87,9 +87,19 @@ final readonly class CodeBuilder implements CodeBuilderInterface {
 	}
 
 	public function matchIf(Expression $condition, Expression $then, Expression $else): MatchExpression {
-		return $this->expressionRegistry->match($condition, new MatchExpressionEquals, [
+		return $this->expressionRegistry->match(
+			$this->expressionRegistry->methodCall(
+				$condition,
+				new MethodNameIdentifier('asBoolean'),
+				$this->expressionRegistry->constant(
+					$this->valueRegistry->null
+				)
+			),
+			new MatchExpressionEquals, [
 			new MatchExpressionPair(
-				$this->expressionRegistry->constant($this->valueRegistry->true), $then),
+				$this->expressionRegistry->constant($this->valueRegistry->true),
+				$then
+			),
 			new MatchExpressionDefault($else)
 		]);
 	}
