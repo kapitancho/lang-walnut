@@ -16,7 +16,9 @@ final readonly class SubtypeType implements SubtypeTypeInterface, JsonSerializab
 
 	public function isSubtypeOf(Type $ofType): bool {
 		return match(true) {
-			$ofType instanceof SubtypeTypeInterface => $this->name->equals($ofType->name),
+			$ofType instanceof SubtypeTypeInterface =>
+				$this->name->equals($ofType->name) ||
+				$this->baseType->isSubtypeOf($ofType),
 			$ofType instanceof SupertypeChecker => $ofType->isSupertypeOf($this) ||
 				$this->baseType->isSubtypeOf($ofType),
 			default => $this->baseType->isSubtypeOf($ofType)

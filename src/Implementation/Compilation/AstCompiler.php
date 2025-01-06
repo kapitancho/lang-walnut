@@ -452,6 +452,8 @@ final readonly class AstCompiler implements AstCompilerInterface {
 					"Unknown value node type: " . get_class($valueNode)
 				)
 			};
+		} catch (UnknownType $e) {
+			throw new AstCompilationException($valueNode, "Type issue: " . $e->getMessage(), $e);
 		} catch (UnknownEnumerationValue $e) {
 			throw new AstCompilationException($valueNode, "Enumeration Issue: " . $e->getMessage(), $e);
 		}

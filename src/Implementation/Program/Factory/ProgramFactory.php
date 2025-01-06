@@ -7,6 +7,8 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethod;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
+use Walnut\Lang\Blueprint\Function\Method;
+use Walnut\Lang\Blueprint\Function\UnknownMethod;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer as DependencyContainerInterface;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyError;
 use Walnut\Lang\Blueprint\Program\Factory\ProgramFactory as ProgramFactoryInterface;
@@ -29,7 +31,7 @@ use Walnut\Lang\Implementation\Program\Registry\MainMethodRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
 
-final class ProgramFactory implements DependencyContainerInterface, ProgramFactoryInterface {
+final class ProgramFactory implements DependencyContainerInterface, ProgramFactoryInterface, MethodRegistry {
 
 	private readonly TypeRegistryBuilder $typeRegistryBuilder;
 	private readonly ValueRegistry $valueRegistry;
@@ -59,7 +61,9 @@ final class ProgramFactory implements DependencyContainerInterface, ProgramFacto
 		);
 		$this->customMethodRegistryBuilder = new CustomMethodRegistryBuilder(
 			$methodExecutionContext,
-			$this
+			$this,
+			$this,
+			$this->typeRegistryBuilder
 		);
 		$this->methodRegistry = new MainMethodRegistry(
 			$methodExecutionContext,
@@ -145,5 +149,9 @@ final class ProgramFactory implements DependencyContainerInterface, ProgramFacto
 			$returnType,
 			$functionBody
 		);
+	}
+
+	public function method(Type $targetType, MethodNameIdentifier $methodName): Method|UnknownMethod {
+		return $this->methodRegistry->method($targetType, $methodName);
 	}
 }

@@ -73,7 +73,6 @@ final readonly class AsBoolean implements NativeMethod {
 			($type instanceof ArrayType && $type->range->maxLength instanceof Number && (int)(string)$type->range->maxLength === 0),
 			($type instanceof MapType && $type->range->maxLength instanceof Number && (int)(string)$type->range->maxLength === 0)
 				=> $this->context->typeRegistry->false,
-			$type instanceof SealedType,
 			$type instanceof TrueType,
 			($type instanceof IntegerSubsetType && !in_array(0, array_map(fn(IntegerValue $v) => (int)(string)$v->literalValue, $type->subsetValues))),
 			($type instanceof IntegerType && $type->range->minValue !== MinusInfinity::value && $type->range->minValue > 0),
@@ -83,10 +82,11 @@ final readonly class AsBoolean implements NativeMethod {
 			($type instanceof RealType && $type->range->maxValue !== PlusInfinity::value && $type->range->maxValue < 0),
 			($type instanceof StringSubsetType && !in_array('', array_map(fn(StringValue $v) => $v->literalValue, $type->subsetValues))),
 			($type instanceof StringType && $type->range->minLength > 0),
+			/*$type instanceof SealedType,
 			($type instanceof RecordType && count($type->types) > 0),
 			($type instanceof TupleType && count($type->types) > 0),
 			($type instanceof ArrayType && $type->range->minLength > 0),
-			($type instanceof MapType && $type->range->minLength > 0)
+			($type instanceof MapType && $type->range->minLength > 0)*/
 				=> $this->context->typeRegistry->true,
 			default => $this->context->typeRegistry->boolean,
 			/*$type instanceof IntegerType,

@@ -15,7 +15,10 @@ use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyError;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\UnresolvableDependency;
 use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\NothingType;
+use Walnut\Lang\Blueprint\Type\SubtypeType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Implementation\Function\CustomMethod;
 
@@ -28,7 +31,9 @@ final class CustomMethodRegistryBuilder implements MethodRegistry, CustomMethodR
 
 	public function __construct(
 		private readonly MethodExecutionContext $methodExecutionContext,
-		private readonly DependencyContainer $dependencyContainer
+		private readonly DependencyContainer $dependencyContainer,
+		private readonly MethodRegistry $methodRegistry,
+		private readonly TypeRegistry $typeRegistry
 	) {
 		$this->methods = [];
 	}
@@ -85,6 +90,47 @@ final class CustomMethodRegistryBuilder implements MethodRegistry, CustomMethodR
 		foreach($this->methods as $methods) {
 			foreach($methods as $method) {
 				try {
+					$sub = $method->targetType;
+					$methodFnType = $this->typeRegistry->function(
+						$method->parameterType,
+						$method->returnType
+					);
+					while ($sub instanceof SubtypeType || $sub instanceof AliasType) {
+						if ($sub instanceof AliasType) {
+							$sub = $sub->aliasedType;
+							continue;
+						}
+						$sub = $sub->baseType;
+						$existingMethod = $this->methodRegistry->method($sub, $method->methodName);
+						if ($existingMethod instanceof CustomMethod) {
+							$existingMethodFnType = $this->typeRegistry->function(
+								$existingMethod->parameterType,
+								$existingMethod->returnType
+							);
+							if (!$methodFnType->isSubtypeOf($existingMethodFnType)) {
+								$analyseErrors[] = sprintf("%s : the method %s is already defined for %s and therefore the signature %s should be a subtype of %s",
+									$this->getErrorMessageFor($method),
+									$existingMethod->methodName,
+									$sub,
+									$methodFnType,
+									$existingMethodFnType
+								);
+								break;
+							}
+						} elseif ($existingMethod instanceof Method) {
+							$analyseResult = $existingMethod->analyse($method->targetType, $method->parameterType);
+							if (!$method->returnType->isSubtypeOf($analyseResult)) {
+								$analyseErrors[] = sprintf("%s : the method %s is already defined for %s and therefore the return type %s should be a subtype of %s",
+									$this->getErrorMessageFor($method),
+									$method->methodName,
+									$sub,
+									$method->returnType,
+									$analyseResult
+								);
+								break;
+							}
+						}
+					}
 					$method->analyse(
 						$method->targetType,
 						$method->parameterType,
@@ -109,20 +155,6 @@ final class CustomMethodRegistryBuilder implements MethodRegistry, CustomMethodR
 							},
 							$value->type
 						);
-						/*throw new AnalyserException(
-							sprintf("%s : the dependency %s cannot be resolved: %s (type: %s)",
-								$this->getErrorMessageFor($method),
-								$method->dependencyType,
-								match($value->unresolvableDependency) {
-									UnresolvableDependency::notFound => "no appropriate value found",
-									UnresolvableDependency::ambiguous => "ambiguity - multiple values found",
-									UnresolvableDependency::circularDependency => "circular dependency detected",
-									UnresolvableDependency::unsupportedType => "unsupported type found",
-                                    UnresolvableDependency::errorWhileCreatingValue => 'error returned while creating value',
-								},
-								$value->type
-							)
-						);*/
 					}
 				}
 			}
