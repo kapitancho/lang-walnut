@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Common\Range\RealRange;
 use Walnut\Lang\Blueprint\Value\RealValue;
 
 interface RealSubsetType extends Type {
-	/** @param array<string, RealRange> $subsetValues */
+	/** @param array<string, RealValue> $subsetValues */
 	public array $subsetValues { get; }
 	public RealRange $range { get; }
 

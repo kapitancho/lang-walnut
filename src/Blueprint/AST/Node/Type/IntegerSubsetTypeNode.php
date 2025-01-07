@@ -2,9 +2,9 @@
 
 namespace Walnut\Lang\Blueprint\AST\Node\Type;
 
-use Walnut\Lang\Blueprint\AST\Node\Value\IntegerValueNode;
+use BcMath\Number;
 
 interface IntegerSubsetTypeNode extends TypeNode {
-	/** @var list<IntegerValueNode> */
+	/** @var list<Number> */
 	public array $values { get; }
 }

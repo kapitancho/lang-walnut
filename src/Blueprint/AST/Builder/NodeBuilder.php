@@ -201,21 +201,21 @@ interface NodeBuilder {
 		Number|MinusInfinity $minValue = MinusInfinity::value,
 		Number|PlusInfinity $maxValue = PlusInfinity::value
 	): IntegerTypeNode;
-	/** @param list<IntegerValueNode> $values */
+	/** @param list<Number> $values */
 	public function integerSubsetType(array $values): IntegerSubsetTypeNode;
 
 	public function realType(
 		Number|MinusInfinity $minValue = MinusInfinity::value,
 		Number|PlusInfinity $maxValue = PlusInfinity::value
 	): RealTypeNode;
-	/** @param list<RealValueNode> $values */
+	/** @param list<Number> $values */
 	public function realSubsetType(array $values): RealSubsetTypeNode;
 
 	public function stringType(
 		Number $minLength = new Number(0),
 		Number|PlusInfinity $maxLength = PlusInfinity::value
 	): StringTypeNode;
-	/** @param list<StringValueNode> $values */
+	/** @param list<string> $values */
 	public function stringSubsetType(array $values): StringSubsetTypeNode;
 
 	public function arrayType(

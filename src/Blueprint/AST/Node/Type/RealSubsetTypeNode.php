@@ -3,9 +3,9 @@
 namespace Walnut\Lang\Blueprint\AST\Node\Type;
 
 
-use Walnut\Lang\Blueprint\AST\Node\Value\RealValueNode;
+use BcMath\Number;
 
 interface RealSubsetTypeNode extends TypeNode {
-	/** @var list<RealValueNode> */
+	/** @var list<Number> */
 	public array $values { get; }
 }

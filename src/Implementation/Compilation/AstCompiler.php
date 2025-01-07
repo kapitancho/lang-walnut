@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Compilation;
 
+use BcMath\Number;
 use Exception;
 use Walnut\Lang\Blueprint\AST\Compiler\AstCompilationException;
 use Walnut\Lang\Blueprint\AST\Compiler\AstCompiler as AstCompilerInterface;
@@ -93,6 +94,9 @@ use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Program\UnknownType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnknownEnumerationValue;
+use Walnut\Lang\Blueprint\Value\IntegerValue;
+use Walnut\Lang\Blueprint\Value\RealValue;
+use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Blueprint\Value\Value;
 
 final readonly class AstCompiler implements AstCompilerInterface {
@@ -380,19 +384,31 @@ final readonly class AstCompiler implements AstCompilerInterface {
 					$typeNode->minValue, $typeNode->maxValue
 				),
 				$typeNode instanceof IntegerSubsetTypeNode => $this->codeBuilder->typeRegistry->integerSubset(
-					array_map($this->value(...), $typeNode->values)
+					array_map(
+						fn(Number $value): IntegerValue
+							=> $this->codeBuilder->valueRegistry->integer($value),
+						$typeNode->values
+					)
 				),
 				$typeNode instanceof RealTypeNode => $this->codeBuilder->typeRegistry->real(
 					$typeNode->minValue, $typeNode->maxValue
 				),
 				$typeNode instanceof RealSubsetTypeNode => $this->codeBuilder->typeRegistry->realSubset(
-					array_map($this->value(...), $typeNode->values)
+					array_map(
+						fn(Number $value): RealValue
+							=> $this->codeBuilder->valueRegistry->real($value),
+						$typeNode->values
+					)
 				),
 				$typeNode instanceof StringTypeNode => $this->codeBuilder->typeRegistry->string(
 					$typeNode->minLength, $typeNode->maxLength
 				),
 				$typeNode instanceof StringSubsetTypeNode => $this->codeBuilder->typeRegistry->stringSubset(
-					array_map($this->value(...), $typeNode->values)
+					array_map(
+						fn(string $value): StringValue
+							=> $this->codeBuilder->valueRegistry->string($value),
+						$typeNode->values
+					)
 				),
 
 				$typeNode instanceof MetaTypeTypeNode => $this->codeBuilder->typeRegistry->metaType($typeNode->value),

@@ -2,9 +2,7 @@
 
 namespace Walnut\Lang\Blueprint\AST\Node\Type;
 
-use Walnut\Lang\Blueprint\AST\Node\Value\StringValueNode;
-
 interface StringSubsetTypeNode extends TypeNode {
-	/** @var list<StringValueNode> */
+	/** @var list<string> */
 	public array $values { get; }
 }

@@ -2,12 +2,12 @@
 
 namespace Walnut\Lang\Implementation\AST\Node\Type;
 
+use BcMath\Number;
 use Walnut\Lang\Blueprint\AST\Node\SourceLocation;
 use Walnut\Lang\Blueprint\AST\Node\Type\IntegerSubsetTypeNode as IntegerSubsetTypeNodeInterface;
-use Walnut\Lang\Blueprint\AST\Node\Value\IntegerValueNode;
 
 final readonly class IntegerSubsetTypeNode implements IntegerSubsetTypeNodeInterface {
-	/** @param list<IntegerValueNode> $values */
+	/** @param list<Number> $values */
 	public function __construct(
 		public SourceLocation $sourceLocation,
 		public array $values

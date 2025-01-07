@@ -1921,10 +1921,7 @@ final readonly class ParserStateMachine {
 				'' => function(LT $token) {
 					if (isset($this->s->result['subsetValues'])) {
 						$this->s->generated = $this->nodeBuilder->integerSubsetType(
-							array_map(
-								fn($v) => $this->nodeBuilder->integerValue(new Number($v)),
-								$this->s->result['subsetValues']
-							)
+							$this->s->result['subsetValues']
 						);
 					} else {
 						$this->s->generated = $this->nodeBuilder->integerType(
@@ -1938,7 +1935,7 @@ final readonly class ParserStateMachine {
 			716 => ['name' => 'type integer subset value', 'transitions' => [
 				T::integer_number->name => $c = function(LT $token) {
 					$this->s->result['subsetValues'] ??= [];
-					$this->s->result['subsetValues'][] = $token->patternMatch->text;
+					$this->s->result['subsetValues'][] = new Number($token->patternMatch->text);
 					$this->s->move(717);
 				},
 				T::positive_integer_number->name => $c
@@ -1984,10 +1981,7 @@ final readonly class ParserStateMachine {
 				'' => function(LT $token) {
 					if (isset($this->s->result['subsetValues'])) {
 						$this->s->generated = $this->nodeBuilder->realSubsetType(
-							array_map(
-								fn($v) => $this->nodeBuilder->realValue(new Number($v)),
-								$this->s->result['subsetValues']
-							)
+							$this->s->result['subsetValues']
 						);
 					} else {
 						$this->s->generated = $this->nodeBuilder->realType(
@@ -2001,7 +1995,7 @@ final readonly class ParserStateMachine {
 			726 => ['name' => 'type real subset value', 'transitions' => [
 				T::real_number->name => $c = function(LT $token) {
 					$this->s->result['subsetValues'] ??= [];
-					$this->s->result['subsetValues'][] = $token->patternMatch->text;
+					$this->s->result['subsetValues'][] = new Number($token->patternMatch->text);
 					$this->s->move(727);
 				},
 				T::integer_number->name => $c,
@@ -2048,10 +2042,7 @@ final readonly class ParserStateMachine {
 				'' => function(LT $token) {
 					if (isset($this->s->result['subsetValues'])) {
 						$this->s->generated = $this->nodeBuilder->stringSubsetType(
-							array_map(
-								fn($v) => $this->nodeBuilder->stringValue($v),
-								$this->s->result['subsetValues']
-							)
+							$this->s->result['subsetValues']
 						);
 					} else {
 						$this->s->generated = $this->nodeBuilder->stringType(
@@ -2424,7 +2415,7 @@ final readonly class ParserStateMachine {
 			791 => ['name' => 'type enum subset value', 'transitions' => [
 				T::type_keyword->name => function(LT $token) {
 					$this->s->result['subsetValues'] ??= [];
-					$this->s->result['subsetValues'][] = $token->patternMatch->text;
+					$this->s->result['subsetValues'][] = new EnumValueIdentifier($token->patternMatch->text);
 					$this->s->move(792);
 				},
 			]],
@@ -2436,10 +2427,7 @@ final readonly class ParserStateMachine {
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->enumerationSubsetType(
 						new TypeNameIdentifier($this->s->result['typeName']),
-						array_map(
-							static fn(string $value): EnumValueIdentifier => new EnumValueIdentifier($value), 
-							$this->s->result['subsetValues']
-						)
+						$this->s->result['subsetValues']
 					);
 					$this->s->pop();
 				},

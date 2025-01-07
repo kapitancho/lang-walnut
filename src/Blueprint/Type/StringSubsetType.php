@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Common\Range\LengthRange;
 use Walnut\Lang\Blueprint\Value\StringValue;
 
 interface StringSubsetType extends Type {
-	/** @param array<string, LengthRange> $subsetValues */
+	/** @param array<string, StringValue> $subsetValues */
 	public array $subsetValues { get; }
 	public LengthRange $range { get; }
 
