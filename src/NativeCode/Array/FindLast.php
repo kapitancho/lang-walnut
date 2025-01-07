@@ -67,7 +67,7 @@ final readonly class FindLast implements NativeMethod {
 			for ($index = count($values) - 1; $index >= 0; $index--) {
 				$r = $parameterValue->execute($this->context->globalContext, $values[$index]);
 				if ($true->equals($r)) {
-					return $values[$index];
+					return TypedValue::forValue($values[$index]);
 				}
 			}
 			return TypedValue::forValue(

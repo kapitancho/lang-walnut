@@ -72,7 +72,7 @@ final readonly class Unique implements NativeMethod {
 					throw new ExecutionException("Invalid target value");
 					// @codeCoverageIgnoreEnd
 				}
-				$rawValues[] = $value->literalValue;
+				$rawValues[] = (string)$value->literalValue;
 			}
 			if ($hasStrings) {
 				if ($hasNumbers) {
@@ -88,7 +88,7 @@ final readonly class Unique implements NativeMethod {
 			}
 			$rawValues = array_unique($rawValues, SORT_NUMERIC);
 			return TypedValue::forValue($this->context->valueRegistry->tuple(array_map(
-				fn($value) => is_float($value) ?
+				fn($value) => str_contains($value, '.') ?
 					$this->context->valueRegistry->real($value) :
 					$this->context->valueRegistry->integer($value),
 				$rawValues

@@ -68,7 +68,7 @@ final readonly class Sort implements NativeMethod {
 					throw new ExecutionException("Invalid target value");
 					// @codeCoverageIgnoreEnd
 				}
-				$rawValues[] = $value->literalValue;
+				$rawValues[] = (string)$value->literalValue;
 			}
 			if ($hasStrings) {
 				if ($hasNumbers) {

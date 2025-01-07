@@ -90,9 +90,9 @@ use Walnut\Lang\Blueprint\Common\Range\InvalidLengthRange;
 use Walnut\Lang\Blueprint\Common\Range\InvalidRealRange;
 use Walnut\Lang\Blueprint\Compilation\CodeBuilder;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
-use Walnut\Lang\Blueprint\Program\UnknownEnumerationValue;
 use Walnut\Lang\Blueprint\Program\UnknownType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Type\UnknownEnumerationValue;
 use Walnut\Lang\Blueprint\Value\Value;
 
 final readonly class AstCompiler implements AstCompilerInterface {

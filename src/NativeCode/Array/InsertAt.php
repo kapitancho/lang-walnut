@@ -73,7 +73,7 @@ final readonly class InsertAt implements NativeMethod {
 				$value = $parameterValue->valueOf('value');
 				$index = $parameterValue->valueOf('index');
 				if ($index instanceof IntegerValue) {
-					$idx = $index->literalValue;
+					$idx = (string)$index->literalValue;
 					$values = $targetValue->values;
 					if ($idx >= 0 && $idx <= count($values)) {
 						array_splice(

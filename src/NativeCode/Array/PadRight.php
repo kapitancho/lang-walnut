@@ -76,7 +76,7 @@ final readonly class PadRight implements NativeMethod {
 				if ($length instanceof IntegerValue && $padValue !== null) {
 					$result = array_pad(
 						$values,
-						$length->literalValue,
+						(string)$length->literalValue,
 						$padValue
 					);
 					return TypedValue::forValue($this->context->valueRegistry->tuple($result));

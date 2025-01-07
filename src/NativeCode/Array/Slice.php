@@ -81,8 +81,8 @@ final readonly class Slice implements NativeMethod {
 				) {
 					$values = array_slice(
 						$values,
-						$start->literalValue,
-						$length->literalValue
+						(string)$start->literalValue,
+						(string)$length->literalValue
 					);
 					return TypedValue::forValue($this->context->valueRegistry->tuple($values));
 				}

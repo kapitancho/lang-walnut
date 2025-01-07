@@ -5,8 +5,8 @@ namespace Walnut\Lang;
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Program\UnknownEnumerationValue;
 use Walnut\Lang\Blueprint\Program\UnknownType;
+use Walnut\Lang\Blueprint\Type\UnknownEnumerationValue;
 
 final class ExceptionTest extends TestCase {
 

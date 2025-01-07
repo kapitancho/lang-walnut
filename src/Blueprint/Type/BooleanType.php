@@ -4,7 +4,6 @@ namespace Walnut\Lang\Blueprint\Type;
 
 use InvalidArgumentException;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
-use Walnut\Lang\Blueprint\Program\UnknownEnumerationValue;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
 
 interface BooleanType extends EnumerationType {

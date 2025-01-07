@@ -6,10 +6,10 @@ use InvalidArgumentException;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Program\UnknownEnumerationValue;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType as EnumerationSubsetTypeInterface;
 use Walnut\Lang\Blueprint\Type\EnumerationType as EnumerationTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Type\UnknownEnumerationValue;
 use Walnut\Lang\Blueprint\Value\EnumerationValue;
 
 final class EnumerationType implements EnumerationTypeInterface, JsonSerializable {
