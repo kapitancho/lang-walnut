@@ -1,6 +1,9 @@
 module core:
 
 /* constructor support */
+Global = :[];
+
+/* constructor support */
 Constructor = :[];
 
 /* number and range related atoms */

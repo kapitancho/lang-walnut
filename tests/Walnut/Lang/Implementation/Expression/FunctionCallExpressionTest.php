@@ -44,7 +44,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 			),
 			null
 		);
-		$this->programBuilder->addMethod(
+		$this->programBuilder->addMethodDraft(
 			$this->typeRegistry->withName(new TypeNameIdentifier('MyCustomType')),
 			new MethodNameIdentifier('invoke'),
 			$this->typeRegistry->integer(),

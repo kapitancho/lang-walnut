@@ -284,6 +284,13 @@ final class NodeBuilder implements NodeBuilderInterface {
 		return new AddAliasTypeNode($this->getSourceLocation(), $name, $aliasedType);
 	}
 
+	private function generateConstructorBody(ExpressionNode $constructorBody): ExpressionNode {
+		return $this->sequence([
+			$constructorBody,
+			$this->variableName(new VariableNameIdentifier('#'))
+		]);
+	}
+
 	public function addSealed(
 		TypeNameIdentifier $name,
 		RecordTypeNodeInterface $valueType,
@@ -294,7 +301,7 @@ final class NodeBuilder implements NodeBuilderInterface {
 			$this->getSourceLocation(),
 			$name,
 			$valueType,
-			$constructorBody,
+			$this->generateConstructorBody($constructorBody),
 			$errorType ?? $this->nothingType
 		);
 	}
@@ -304,7 +311,7 @@ final class NodeBuilder implements NodeBuilderInterface {
 			$this->getSourceLocation(),
 			$name,
 			$baseType,
-			$constructorBody,
+			$this->generateConstructorBody($constructorBody),
 			$errorType ?? $this->nothingType
 		);
 	}

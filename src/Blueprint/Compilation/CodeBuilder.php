@@ -10,7 +10,7 @@ use Walnut\Lang\Blueprint\Code\Expression\MethodCallExpression;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethod;
-use Walnut\Lang\Blueprint\Function\FunctionBody;
+use Walnut\Lang\Blueprint\Function\FunctionBodyDraft;
 use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Blueprint\Program\Builder\ProgramTypeBuilder;
 use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry;
@@ -45,6 +45,6 @@ interface CodeBuilder extends ExpressionRegistry, ProgramTypeBuilder, CustomMeth
 		Type $parameterType,
 		Type $dependencyType,
 		Type $errorType,
-		FunctionBody $functionBody
+		FunctionBodyDraft $functionBody
 	): CustomMethod;
 }

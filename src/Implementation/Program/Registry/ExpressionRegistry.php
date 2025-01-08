@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Program\Registry;
 
+use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionDefault as MatchExpressionDefaultInterface;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionOperation;
@@ -29,6 +30,7 @@ use Walnut\Lang\Implementation\Code\Expression\TupleExpression;
 use Walnut\Lang\Implementation\Code\Expression\VariableAssignmentExpression;
 use Walnut\Lang\Implementation\Code\Expression\VariableNameExpression;
 use Walnut\Lang\Implementation\Function\FunctionBody;
+use Walnut\Lang\Implementation\Function\FunctionBodyDraft;
 
 final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 	public function __construct(
@@ -114,6 +116,10 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 			$methodName,
 			$parameter
 		);
+	}
+
+	public function functionBodyDraft(ExpressionNode $expressionNode): FunctionBodyDraft {
+		return new FunctionBodyDraft($expressionNode);
 	}
 
 	public function functionBody(Expression $expression): FunctionBody {

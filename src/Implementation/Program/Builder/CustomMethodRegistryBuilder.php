@@ -6,10 +6,10 @@ use JsonSerializable;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethod as CustomMethodInterface;
-use Walnut\Lang\Blueprint\Function\FunctionBody;
+use Walnut\Lang\Blueprint\Function\CustomMethodDraft as CustomMethodDraftInterface;
+use Walnut\Lang\Blueprint\Function\FunctionBodyDraft;
 use Walnut\Lang\Blueprint\Function\Method;
 use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
-use Walnut\Lang\Blueprint\Function\UnknownMethod;
 use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder as CustomMethodRegistryBuilderInterface;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyError;
@@ -21,16 +21,16 @@ use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\SubtypeType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Implementation\Function\CustomMethod;
+use Walnut\Lang\Implementation\Function\CustomMethodDraft;
 
-final class CustomMethodRegistryBuilder implements MethodRegistry, CustomMethodRegistryBuilderInterface, JsonSerializable {
+final class CustomMethodRegistryBuilder implements CustomMethodRegistryBuilderInterface, JsonSerializable {
 
 	/**
-	 * @var array<string, list<CustomMethodInterface>> $methods
+	 * @var array<string, list<CustomMethodDraftInterface>> $methods
 	 */
 	private array $methods;
 
 	public function __construct(
-		private readonly MethodExecutionContext $methodExecutionContext,
 		private readonly DependencyContainer $dependencyContainer,
 		private readonly MethodRegistry $methodRegistry,
 		private readonly TypeRegistry $typeRegistry
@@ -38,18 +38,16 @@ final class CustomMethodRegistryBuilder implements MethodRegistry, CustomMethodR
 		$this->methods = [];
 	}
 
-	public function addMethod(
+	public function addMethodDraft(
 		Type $targetType,
 		MethodNameIdentifier $methodName,
 		Type $parameterType,
 		Type $dependencyType,
 		Type $returnType,
-		FunctionBody $functionBody,
-	): CustomMethodInterface {
+		FunctionBodyDraft $functionBody,
+	): CustomMethodDraftInterface {
 		$this->methods[$methodName->identifier] ??= [];
-		$this->methods[$methodName->identifier][] = $method = new CustomMethod(
-			$this->methodExecutionContext,
-			$this->dependencyContainer,
+		$this->methods[$methodName->identifier][] = $method = new CustomMethodDraft(
 			$targetType,
 			$methodName,
 			$parameterType,
@@ -58,15 +56,6 @@ final class CustomMethodRegistryBuilder implements MethodRegistry, CustomMethodR
 			$functionBody,
 		);
 		return $method;
-	}
-
-	public function method(Type $targetType, MethodNameIdentifier $methodName): Method|UnknownMethod {
-		foreach(array_reverse($this->methods[$methodName->identifier] ?? []) as $method) {
-			if ($targetType->isSubtypeOf($method->targetType)) {
-				return $method;
-			}
-		}
-		return UnknownMethod::value;
 	}
 
 	private function getErrorMessageFor(CustomMethodInterface $method): string {

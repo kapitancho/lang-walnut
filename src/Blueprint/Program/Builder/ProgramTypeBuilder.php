@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Blueprint\Program\Builder;
 
+use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
@@ -24,14 +25,14 @@ interface ProgramTypeBuilder {
 	public function addSubtype(
 		TypeNameIdentifier $name,
 		Type $baseType,
-		Expression $constructorBody,
+		ExpressionNode $constructorBody,
 		Type|null $errorType
 	): SubtypeType;
 
 	public function addSealed(
 		TypeNameIdentifier $name,
 		RecordType $valueType,
-		Expression $constructorBody,
+		ExpressionNode $constructorBody,
 		Type|null $errorType
 	): SealedType;
 }

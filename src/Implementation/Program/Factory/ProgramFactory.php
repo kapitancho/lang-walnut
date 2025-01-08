@@ -60,7 +60,6 @@ final class ProgramFactory implements DependencyContainerInterface, ProgramFacto
 			$this->globalContext
 		);
 		$this->customMethodRegistryBuilder = new CustomMethodRegistryBuilder(
-			$methodExecutionContext,
 			$this,
 			$this,
 			$this->typeRegistryBuilder
@@ -141,7 +140,7 @@ final class ProgramFactory implements DependencyContainerInterface, ProgramFacto
 		Type $returnType,
 		FunctionBody $functionBody
 	): CustomMethod {
-		return $this->customMethodRegistryBuilder->addMethod(
+		return $this->customMethodRegistryBuilder->addMethodDraft(
 			$targetType,
 			$methodName,
 			$parameterType,

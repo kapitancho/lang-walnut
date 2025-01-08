@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Compilation;
 
+use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
 use Walnut\Lang\Blueprint\Code\Expression\ConstantExpression;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpression;
@@ -25,7 +26,9 @@ use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Compilation\CodeBuilder as CodeBuilderInterface;
 use Walnut\Lang\Blueprint\Compilation\CompilationException;
 use Walnut\Lang\Blueprint\Function\CustomMethod;
+use Walnut\Lang\Blueprint\Function\CustomMethodDraft;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
+use Walnut\Lang\Blueprint\Function\FunctionBodyDraft;
 use Walnut\Lang\Blueprint\Program\Builder\ProgramBuilder;
 use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
@@ -154,7 +157,7 @@ final readonly class CodeBuilder implements CodeBuilderInterface {
 		Type $parameterType,
 		Type $dependencyType,
 		Type $errorType,
-		FunctionBody $functionBody
+		FunctionBodyDraft $functionBody
 	): CustomMethod {
 		$type = $this->typeRegistry->typeByName($typeName);
 		$returnType = match(true) {
@@ -164,7 +167,7 @@ final readonly class CodeBuilder implements CodeBuilderInterface {
 				"Constructors are only allowed for subtypes and sealed types",
 			)
 		};
-		return $this->addMethod(
+		return $this->addMethodDraft(
 			$this->typeRegistry->typeByName(new TypeNameIdentifier('Constructor')),
 			new MethodNameIdentifier($typeName),
 			$parameterType,
@@ -176,15 +179,15 @@ final readonly class CodeBuilder implements CodeBuilderInterface {
 		);
 	}
 
-	public function addMethod(
+	public function addMethodDraft(
 		Type $targetType,
 		MethodNameIdentifier $methodName,
 		Type $parameterType,
 		Type $dependencyType,
 		Type $returnType,
-		FunctionBody $functionBody
-	): CustomMethod {
-		return $this->programBuilder->addMethod(
+		FunctionBodyDraft $functionBody
+	): CustomMethodDraft {
+		return $this->programBuilder->addMethodDraft(
 			$targetType,
 			$methodName,
 			$parameterType,
@@ -238,6 +241,10 @@ final readonly class CodeBuilder implements CodeBuilderInterface {
 		return $this->expressionRegistry->methodCall($target, $methodName, $parameter);
 	}
 
+	public function functionBodyDraft(ExpressionNode $expressionNode): FunctionBodyDraft {
+		return $this->expressionRegistry->functionBodyDraft($expressionNode);
+	}
+
 	public function functionBody(Expression $expression): FunctionBody {
 		return $this->expressionRegistry->functionBody($expression);
 	}
@@ -259,14 +266,14 @@ final readonly class CodeBuilder implements CodeBuilderInterface {
 		return $this->programBuilder->addAlias($name, $aliasedType);
 	}
 
-	public function addSubtype(TypeNameIdentifier $name, Type $baseType, Expression $constructorBody, ?Type $errorType): SubtypeType {
+	public function addSubtype(TypeNameIdentifier $name, Type $baseType, ExpressionNode $constructorBody, ?Type $errorType): SubtypeType {
 		return $this->programBuilder->addSubtype($name, $baseType, $constructorBody, $errorType);
 	}
 
 	public function addSealed(
 		TypeNameIdentifier $name,
 		RecordType $valueType,
-		Expression $constructorBody,
+		ExpressionNode $constructorBody,
 		Type|null $errorType
 	): SealedType {
 		return $this->programBuilder->addSealed($name, $valueType, $constructorBody, $errorType);

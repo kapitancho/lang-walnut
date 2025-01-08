@@ -86,14 +86,19 @@ use Walnut\Lang\Blueprint\AST\Node\Value\ValueNode;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionDefault;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionPair;
+use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\InvalidIntegerRange;
 use Walnut\Lang\Blueprint\Common\Range\InvalidLengthRange;
 use Walnut\Lang\Blueprint\Common\Range\InvalidRealRange;
 use Walnut\Lang\Blueprint\Compilation\CodeBuilder;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
+use Walnut\Lang\Blueprint\Function\FunctionBodyDraft;
 use Walnut\Lang\Blueprint\Program\UnknownType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnknownEnumerationValue;
+use Walnut\Lang\Blueprint\Value\FunctionValue;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
 use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
@@ -101,7 +106,7 @@ use Walnut\Lang\Blueprint\Value\Value;
 
 final readonly class AstCompiler implements AstCompilerInterface {
 	public function __construct(
-		private readonly CodeBuilder $codeBuilder,
+		private CodeBuilder $codeBuilder,
 	) {}
 
 	/** @throws AstProgramCompilationException */
@@ -152,7 +157,7 @@ final readonly class AstCompiler implements AstCompilerInterface {
 					$this->type($moduleDefinition->parameterType),
 					$this->type($moduleDefinition->dependencyType),
 					$this->type($moduleDefinition->errorType),
-					$this->functionBody($moduleDefinition->functionBody)
+					$this->functionBodyDraft($moduleDefinition->functionBody)
 				),
 			$moduleDefinition instanceof AddEnumerationTypeNode =>
 				$this->codeBuilder->addEnumeration(
@@ -160,31 +165,36 @@ final readonly class AstCompiler implements AstCompilerInterface {
 					$moduleDefinition->values
 				),
 			$moduleDefinition instanceof AddMethodNode =>
-				$this->codeBuilder->addMethod(
+				$this->codeBuilder->addMethodDraft(
 					$this->type($moduleDefinition->targetType),
 					$moduleDefinition->methodName,
 					$this->type($moduleDefinition->parameterType),
 					$this->type($moduleDefinition->dependencyType),
 					$this->type($moduleDefinition->returnType),
-					$this->functionBody($moduleDefinition->functionBody)
+					$this->functionBodyDraft($moduleDefinition->functionBody)
 				),
 			$moduleDefinition instanceof AddSealedTypeNode =>
 				$this->codeBuilder->addSealed(
 					$moduleDefinition->name,
 					$this->type($moduleDefinition->valueType),
-					$this->expression($moduleDefinition->constructorBody),
+					$moduleDefinition->constructorBody,
 					$this->type($moduleDefinition->errorType)
 				),
 			$moduleDefinition instanceof AddSubtypeTypeNode =>
 				$this->codeBuilder->addSubtype(
 					$moduleDefinition->name,
 					$this->type($moduleDefinition->baseType),
-					$this->expression($moduleDefinition->constructorBody),
+					$moduleDefinition->constructorBody,
 					$this->type($moduleDefinition->errorType)
 				),
 			$moduleDefinition instanceof AddVariableNode =>
 				$this->codeBuilder->addVariable($moduleDefinition->name,
-					$this->value($moduleDefinition->value)),
+					$moduleDefinition->value instanceof FunctionValueNode ?
+						$this->globalFunction(
+							new MethodNameIdentifier($moduleDefinition->name->identifier),
+							$moduleDefinition->value
+						) :
+						$this->value($moduleDefinition->value)),
 
 			true => throw new AstCompilationException(
 				$moduleDefinition,
@@ -479,6 +489,39 @@ final readonly class AstCompiler implements AstCompilerInterface {
 	private function functionBody(FunctionBodyNode $functionBodyNode): FunctionBody {
 		return $this->codeBuilder->functionBody(
 			$this->expression($functionBodyNode->expression)
+		);
+	}
+
+	/** @throws AstCompilationException */
+	private function functionBodyDraft(FunctionBodyNode $functionBodyNode): FunctionBodyDraft {
+		return $this->codeBuilder->functionBodyDraft($functionBodyNode->expression);
+	}
+
+	private function globalFunction(MethodNameIdentifier $methodName, FunctionValueNode $functionValueNode): FunctionValue {
+		$this->codeBuilder->addMethodDraft(
+			$this->codeBuilder->typeRegistry->typeByName(
+				new TypeNameIdentifier('Global')
+			),
+			$methodName,
+			$parameterType = $this->type($functionValueNode->dependencyType),
+			$this->codeBuilder->typeRegistry->nothing,
+			$returnType = $this->type($functionValueNode->returnType),
+			$this->functionBodyDraft($functionValueNode->functionBody)
+		);
+		return $this->codeBuilder->valueRegistry->function(
+			$parameterType,
+			$this->codeBuilder->typeRegistry->typeByName(
+				new TypeNameIdentifier('Global')
+			),
+			$returnType,
+			$this->codeBuilder->functionBody(
+				$this->codeBuilder->methodCall(
+					$this->codeBuilder->variableName(new VariableNameIdentifier('%')),
+					$methodName,
+					$this->codeBuilder->variableName(new VariableNameIdentifier('#')),
+					''
+				)
+			)
 		);
 	}
 

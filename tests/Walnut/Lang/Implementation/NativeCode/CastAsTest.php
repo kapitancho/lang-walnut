@@ -48,7 +48,7 @@ final class CastAsTest extends BaseProgramTestHelper {
 				new EnumValueIdentifier('Completed')
 			]
 		);
-		$this->programBuilder->addMethod(
+		$this->programBuilder->addMethodDraft(
 			$this->typeRegistry->enumeration(new TypeNameIdentifier('OrderStatus')),
 			new MethodNameIdentifier('asBoolean'),
 			$this->typeRegistry->null,
@@ -98,7 +98,7 @@ final class CastAsTest extends BaseProgramTestHelper {
 			$this->valueRegistry->false
 		);
 
-		$this->programBuilder->addMethod(
+		$this->programBuilder->addMethodDraft(
 			$enumType = $this->typeRegistry->enumeration(new TypeNameIdentifier('OrderStatus')),
 			new MethodNameIdentifier('asInteger'),
 			$this->typeRegistry->null,
@@ -174,7 +174,7 @@ final class CastAsTest extends BaseProgramTestHelper {
 		);
 
 
-		$this->programBuilder->addMethod(
+		$this->programBuilder->addMethodDraft(
 			$this->typeRegistry->integer(),
 			new MethodNameIdentifier('as' . $enumType->name),
 			$this->typeRegistry->null,
@@ -271,7 +271,7 @@ final class CastAsTest extends BaseProgramTestHelper {
 		//	$this->valueRegistry->string("1")
 		//);
 
-		$this->programBuilder->addMethod(
+		$this->programBuilder->addMethodDraft(
 			$enumType,
 			new MethodNameIdentifier('asJsonValue'),
 			$this->typeRegistry->null,
@@ -289,7 +289,7 @@ final class CastAsTest extends BaseProgramTestHelper {
 			$this->valueRegistry->integer(1)
 		);
 
-		$this->programBuilder->addMethod(
+		$this->programBuilder->addMethodDraft(
 			$jv,
 			new MethodNameIdentifier('as' . $enumType->name),
 			$this->typeRegistry->null,

@@ -2,16 +2,16 @@
 
 namespace Walnut\Lang\Implementation\Program\Builder;
 
+use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
-use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
-use Walnut\Lang\Blueprint\Function\CustomMethod;
-use Walnut\Lang\Blueprint\Function\FunctionBody;
+use Walnut\Lang\Blueprint\Function\CustomMethodDraft;
+use Walnut\Lang\Blueprint\Function\FunctionBodyDraft;
 use Walnut\Lang\Blueprint\Program\Builder\ProgramBuilder as ProgramBuilderInterface;
 use Walnut\Lang\Blueprint\Program\Builder\TypeRegistryBuilder;
 use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry;
@@ -24,7 +24,6 @@ use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\SubtypeType;
 use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Value\FunctionValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Program\Program;
 
@@ -39,28 +38,9 @@ final readonly class ProgramBuilder implements ProgramBuilderInterface {
 		private AnalyserContext&ExecutionContext $globalContext,
 	) {}
 
-	/** @return string[] - the errors found during analyse */
-	private function analyseGlobalFunctions(): array {
-		$analyseErrors = [];
-
-		//Part 1 - check all global functions
-		foreach($this->globalScopeBuilder->build()->allTypedValues() as $name => $typedValue) {
-			if ($typedValue->value instanceof FunctionValue) {
-				try {
-					$typedValue->value->analyse($this->globalContext);
-				} catch (AnalyserException $ex) {
-					$analyseErrors[] = "Error in function $name: {$ex->getMessage()}";
-				}
-			}
-		}
-		return $analyseErrors;
-	}
-
 	/** @throws AnalyserException */
 	public function analyseAndBuildProgram(): Program {
-		$globalFunctionAnalyseErrors = $this->analyseGlobalFunctions();
-		$customMethodAnalyseErrors = $this->customMethodRegistryBuilder->analyse();
-		$analyseErrors = [... $customMethodAnalyseErrors, ... $globalFunctionAnalyseErrors];
+		$analyseErrors = $this->customMethodRegistryBuilder->analyse();
 		if (count($analyseErrors) > 0) {
 			throw new AnalyserException(implode("\n", $analyseErrors));
 		}
@@ -73,15 +53,15 @@ final readonly class ProgramBuilder implements ProgramBuilderInterface {
 		$this->globalScopeBuilder->addVariable($name, $value);
 	}
 
-	public function addMethod(
+	public function addMethodDraft(
 		Type $targetType,
 		MethodNameIdentifier $methodName,
 		Type $parameterType,
 		Type $dependencyType,
 		Type $returnType,
-		FunctionBody $functionBody,
-	): CustomMethod {
-		return $this->customMethodRegistryBuilder->addMethod(
+		FunctionBodyDraft $functionBody,
+	): CustomMethodDraft {
+		return $this->customMethodRegistryBuilder->addMethodDraft(
 			$targetType,
 			$methodName,
 			$parameterType,
@@ -107,7 +87,7 @@ final readonly class ProgramBuilder implements ProgramBuilderInterface {
 	public function addSubtype(
 		TypeNameIdentifier $name,
 		Type $baseType,
-		Expression $constructorBody,
+		ExpressionNode $constructorBody,
 		Type|null $errorType
 	): SubtypeType {
 		$subtype = $this->typeRegistryBuilder->addSubtype($name, $baseType);
@@ -120,7 +100,7 @@ final readonly class ProgramBuilder implements ProgramBuilderInterface {
 	public function addSealed(
 		TypeNameIdentifier $name,
 		RecordType $valueType,
-		Expression $constructorBody,
+		ExpressionNode $constructorBody,
 		Type|null $errorType
 	): SealedType {
 		$sealedType = $this->typeRegistryBuilder->addSealed($name, $valueType);
@@ -133,9 +113,9 @@ final readonly class ProgramBuilder implements ProgramBuilderInterface {
 		TypeNameIdentifier $name,
 		Type $fromType,
 		Type|null $errorType,
-		Expression $constructorBody
+		ExpressionNode $constructorBody
 	): void {
-		$this->customMethodRegistryBuilder->addMethod(
+		$this->customMethodRegistryBuilder->addMethodDraft(
 			$this->typeRegistry->atom(new TypeNameIdentifier('Constructor')),
 			new MethodNameIdentifier('as' . $name->identifier),
 			$fromType,
@@ -143,11 +123,8 @@ final readonly class ProgramBuilder implements ProgramBuilderInterface {
 			$errorType && !($errorType instanceof NothingType) ?
 				$this->typeRegistry->result($fromType, $errorType) :
 				$fromType,
-			$this->expressionRegistry->functionBody(
-				$this->expressionRegistry->sequence([
-					$constructorBody,
-					$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
-				])
+			$this->expressionRegistry->functionBodyDraft(
+				$constructorBody,
 			)
 		);
 	}
