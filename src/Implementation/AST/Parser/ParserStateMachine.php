@@ -186,7 +186,7 @@ final readonly class ParserStateMachine {
 					$this->s->push(168);
 					$this->s->move(201);
 				},
-				'' => function(LT $token) {
+				T::expression_separator->name => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->constant(
 						$this->nodeBuilder->nullValue
 					);
@@ -199,7 +199,7 @@ final readonly class ParserStateMachine {
 					$this->s->stay(167);
 				}
 			]],
-			167 => ['name' => 'sealed error type', 'transitions' => [
+			167 => ['name' => 'sealed error type body start', 'transitions' => [
 				T::function_body_marker->name => function(LT $token) {
 					$this->s->push(168);
 					$this->s->move(201);
@@ -247,7 +247,7 @@ final readonly class ParserStateMachine {
 					$this->s->push(118);
 					$this->s->move(201);
 				},
-				'' => function(LT $token) {
+				T::expression_separator->name => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->constant(
 						$this->nodeBuilder->nullValue
 					);
@@ -260,7 +260,7 @@ final readonly class ParserStateMachine {
 					$this->s->stay(117);
 				}
 			]],
-			117 => ['name' => 'subtype error type', 'transitions' => [
+			117 => ['name' => 'subtype error type body start', 'transitions' => [
 				T::function_body_marker->name => function(LT $token) {
 					$this->s->push(118);
 					$this->s->move(201);
