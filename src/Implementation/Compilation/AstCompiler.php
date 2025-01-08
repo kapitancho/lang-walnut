@@ -333,11 +333,11 @@ final readonly class AstCompiler implements AstCompilerInterface {
 				$typeNode instanceof UnionTypeNode => $this->codeBuilder->typeRegistry->union([
 					$this->type($typeNode->left),
 					$this->type($typeNode->right)
-				], false),
+				]),
 				$typeNode instanceof IntersectionTypeNode => $this->codeBuilder->typeRegistry->intersection([
 					$this->type($typeNode->left),
 					$this->type($typeNode->right)
-				], false),
+				]),
 
 				$typeNode instanceof ArrayTypeNode => $this->codeBuilder->typeRegistry->array(
 					$this->type($typeNode->itemType),

@@ -2,14 +2,19 @@
 
 namespace Walnut\Lang\Implementation\Program\Type;
 
+use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\AliasType;
+use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\IntersectionType as IntersectionTypeInterface;
 use Walnut\Lang\Blueprint\Type\NothingType;
+use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\ResultType;
+use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\EnumerationValue;
 use Walnut\Lang\Implementation\Type\IntersectionType;
 
 final readonly class IntersectionTypeNormalizer {
@@ -84,6 +89,30 @@ final readonly class IntersectionTypeNormalizer {
                         $tx = $intersectedValues ? $this->typeRegistry->integerSubset(
                             $intersectedValues
                         ) : $this->typeRegistry->nothing;
+                    } else if ($q instanceof RealSubsetType && $tx instanceof RealSubsetType) {
+                        array_splice($queue, $ql, 1);
+                        $intersectedValues = array_values(
+                            array_intersect($q->subsetValues, $tx->subsetValues)
+                        );
+                        $tx = $intersectedValues ? $this->typeRegistry->realSubset(
+                            $intersectedValues
+                        ) : $this->typeRegistry->nothing;
+                    } else if ($q instanceof StringSubsetType && $tx instanceof StringSubsetType) {
+                        array_splice($queue, $ql, 1);
+                        $intersectedValues = array_values(
+                            array_intersect($q->subsetValues, $tx->subsetValues)
+                        );
+                        $tx = $intersectedValues ? $this->typeRegistry->stringSubset(
+                            $intersectedValues
+                        ) : $this->typeRegistry->nothing;
+                    } elseif ($q instanceof EnumerationSubsetType && $tx instanceof EnumerationSubsetType && $q->enumeration->name->equals($tx->enumeration->name)) {
+	                    array_splice($queue, $ql, 1);
+                        $intersectedValues = array_values(
+							array_intersect($q->subsetValues, $tx->subsetValues)
+						);
+						$tx = $intersectedValues ? $q->enumeration->subsetType(
+							array_map(fn(EnumerationValue $enumerationValue): EnumValueIdentifier => $enumerationValue->name, $intersectedValues)
+						) : $this->typeRegistry->nothing;
                     }
                 }
                 $queue[] = $tx;
