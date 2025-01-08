@@ -24,11 +24,11 @@ use Walnut\Lang\Blueprint\AST\Node\Value\ValueNode;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
-use Walnut\Lang\Blueprint\Compilation\CodeBuilder;
 use Walnut\Lang\Blueprint\Function\FunctionBodyDraft;
+use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Blueprint\Program\Builder\ProgramTypeBuilder;
 use Walnut\Lang\Blueprint\Program\Builder\ScopeBuilder;
-use Walnut\Lang\Blueprint\Program\Builder\TypeRegistryBuilder;
+use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -40,7 +40,8 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 		private TypeRegistry        $typeRegistry,
 		private ValueRegistry       $valueRegistry,
 		private ProgramTypeBuilder  $programTypeBuilder,
-		private CodeBuilder         $codeBuilder,
+		private ExpressionRegistry  $expressionRegistry,
+		private CustomMethodRegistryBuilder $customMethodRegistryBuilder,
 		private AstTypeCompiler     $astTypeCompiler,
 		private AstValueCompiler    $astValueCompiler,
 		private ScopeBuilder        $globalScopeBuilder
@@ -73,7 +74,7 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 			$moduleDefinition instanceof AddAtomTypeNode =>
 				$this->programTypeBuilder->addAtom($moduleDefinition->name),
 			$moduleDefinition instanceof AddConstructorMethodNode =>
-				$this->codeBuilder->addConstructorMethod(
+				$this->customMethodRegistryBuilder->addConstructorMethodDraft(
 					$moduleDefinition->typeName,
 					$this->type($moduleDefinition->parameterType),
 					$this->type($moduleDefinition->dependencyType),
@@ -86,7 +87,7 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 					$moduleDefinition->values
 				),
 			$moduleDefinition instanceof AddMethodNode =>
-				$this->codeBuilder->addMethodDraft(
+				$this->customMethodRegistryBuilder->addMethodDraft(
 					$this->type($moduleDefinition->targetType),
 					$moduleDefinition->methodName,
 					$this->type($moduleDefinition->parameterType),
@@ -137,11 +138,11 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 
 	/** @throws AstCompilationException */
 	private function functionBodyDraft(FunctionBodyNode $functionBodyNode): FunctionBodyDraft {
-		return $this->codeBuilder->functionBodyDraft($functionBodyNode->expression);
+		return $this->expressionRegistry->functionBodyDraft($functionBodyNode->expression);
 	}
 
 	private function globalFunction(MethodNameIdentifier $methodName, FunctionValueNode $functionValueNode): FunctionValue {
-		$this->codeBuilder->addMethodDraft(
+		$this->customMethodRegistryBuilder->addMethodDraft(
 			$this->typeRegistry->typeByName(
 				new TypeNameIdentifier('Global')
 			),
@@ -157,12 +158,11 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 				new TypeNameIdentifier('Global')
 			),
 			$returnType,
-			$this->codeBuilder->functionBody(
-				$this->codeBuilder->methodCall(
-					$this->codeBuilder->variableName(new VariableNameIdentifier('%')),
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->methodCall(
+					$this->expressionRegistry->variableName(new VariableNameIdentifier('%')),
 					$methodName,
-					$this->codeBuilder->variableName(new VariableNameIdentifier('#')),
-					''
+					$this->expressionRegistry->variableName(new VariableNameIdentifier('#')),
 				)
 			)
 		);

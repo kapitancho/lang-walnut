@@ -20,7 +20,7 @@ final readonly class NestedMethodDraftRegistry implements MethodDraftRegistry {
 
 	public function methodDraft(Type $targetType, MethodNameIdentifier $methodName): MethodDraft|UnknownMethod {
 		foreach ($this->registries as $registry) {
-			$method = $registry->method($targetType, $methodName);
+			$method = $registry->methodDraft($targetType, $methodName);
 			if ($method instanceof MethodDraft) {
 				return $method;
 			}

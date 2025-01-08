@@ -6,6 +6,8 @@ use JsonSerializable;
 use Walnut\Lang\Blueprint\AST\Compiler\AstFunctionBodyCompiler;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Compilation\CompilationException;
 use Walnut\Lang\Blueprint\Function\CustomMethod as CustomMethodInterface;
 use Walnut\Lang\Blueprint\Function\CustomMethodDraft as CustomMethodDraftInterface;
 use Walnut\Lang\Blueprint\Function\FunctionBodyDraft;
@@ -21,6 +23,7 @@ use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\NothingType;
+use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\SubtypeType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Implementation\Function\CustomMethod;
@@ -60,6 +63,35 @@ final class CustomMethodRegistryBuilder implements CustomMethodRegistryBuilderIn
 			$functionBody,
 		);
 		return $method;
+	}
+
+	/** @throws CompilationException */
+	public function addConstructorMethodDraft(
+		TypeNameIdentifier $typeName,
+		Type $parameterType,
+		Type $dependencyType,
+		Type $errorType,
+		FunctionBodyDraft $functionBody
+	): CustomMethodDraftInterface {
+		$type = $this->typeRegistry->typeByName($typeName);
+		$returnType = match(true) {
+			$type instanceof SealedType => $type->valueType,
+			$type instanceof SubtypeType => $type->baseType,
+			default => throw new CompilationException(
+				"Constructors are only allowed for subtypes and sealed types",
+			)
+		};
+		return $this->addMethodDraft(
+			$this->typeRegistry->typeByName(new TypeNameIdentifier('Constructor')),
+			new MethodNameIdentifier($typeName),
+			$parameterType,
+			$dependencyType,
+			$errorType instanceof NothingType ? $returnType : $this->typeRegistry->result(
+				$returnType, $errorType
+			),
+			$functionBody
+		);
+
 	}
 
 	public function build(AstFunctionBodyCompiler $astFunctionBodyCompiler): MethodRegistry {
@@ -118,7 +150,7 @@ final class CustomMethodRegistryBuilder implements CustomMethodRegistryBuilderIn
 						continue;
 					}
 					$sub = $sub->baseType;
-					$existingMethod = $this->methodDraftRegistry->method($sub, $method->methodName);
+					$existingMethod = $this->methodDraftRegistry->methodDraft($sub, $method->methodName);
 					if ($existingMethod instanceof CustomMethodDraftInterface) {
 						$existingMethodFnType = $this->typeRegistry->function(
 							$existingMethod->parameterType,
