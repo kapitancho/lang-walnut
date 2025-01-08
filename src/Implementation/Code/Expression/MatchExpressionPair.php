@@ -13,6 +13,6 @@ final readonly class MatchExpressionPair implements MatchExpressionPairInterface
 	) {}
 
 	public function __toString(): string {
-		return sprintf("~: %s", $this->valueExpression);
+		return sprintf("%s: %s", $this->matchExpression, $this->valueExpression);
 	}
 }

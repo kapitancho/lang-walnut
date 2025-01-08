@@ -60,7 +60,7 @@ final readonly class Chunk implements NativeMethod {
 		$parameterValue = $this->toBaseValue($parameterValue);
 		if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof IntegerValue) {
-				$result = str_split($targetValue->literalValue, $parameterValue->literalValue);
+				$result = str_split($targetValue->literalValue, (string)$parameterValue->literalValue);
 				return TypedValue::forValue($this->context->valueRegistry->tuple(
 					array_map(fn(string $piece): StringValue =>
 						$this->context->valueRegistry->string($piece), $result)

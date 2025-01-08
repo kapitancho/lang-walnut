@@ -71,8 +71,8 @@ final readonly class Substring implements NativeMethod {
 				return TypedValue::forValue($this->context->valueRegistry->string(
 					mb_substr(
 						$targetValue->literalValue,
-						$start->literalValue,
-						$length->literalValue
+						(string)$start->literalValue,
+						(string)$length->literalValue
 					)
 				));
 			}
