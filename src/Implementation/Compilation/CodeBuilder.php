@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Compilation;
 
+use Walnut\Lang\Blueprint\AST\Compiler\AstFunctionBodyCompiler;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
 use Walnut\Lang\Blueprint\Code\Expression\ConstantExpression;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
@@ -25,12 +26,14 @@ use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Compilation\CodeBuilder as CodeBuilderInterface;
 use Walnut\Lang\Blueprint\Compilation\CompilationException;
-use Walnut\Lang\Blueprint\Function\CustomMethod;
 use Walnut\Lang\Blueprint\Function\CustomMethodDraft;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Function\FunctionBodyDraft;
+use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Blueprint\Program\Builder\ProgramBuilder;
+use Walnut\Lang\Blueprint\Program\Builder\ProgramTypeBuilder;
 use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\AliasType;
@@ -52,7 +55,8 @@ final readonly class CodeBuilder implements CodeBuilderInterface {
 	public function __construct(
 		public TypeRegistry $typeRegistry,
 		public ValueRegistry $valueRegistry,
-		private ProgramBuilder $programBuilder,
+		private ProgramTypeBuilder $programTypeBuilder,
+		private CustomMethodRegistryBuilder $customMethodRegistryBuilder,
 		private ExpressionRegistry $expressionRegistry
 	) {}
 
@@ -107,10 +111,6 @@ final readonly class CodeBuilder implements CodeBuilderInterface {
 		]);
 	}
 
-	public function addVariable(VariableNameIdentifier $name, Value $value): void {
-		$this->programBuilder->addVariable($name, $value);
-	}
-
 	public function noError(Expression $targetExpression): NoErrorExpression {
 		return $this->expressionRegistry->noError($targetExpression);
 	}
@@ -158,7 +158,7 @@ final readonly class CodeBuilder implements CodeBuilderInterface {
 		Type $dependencyType,
 		Type $errorType,
 		FunctionBodyDraft $functionBody
-	): CustomMethod {
+	): CustomMethodDraft {
 		$type = $this->typeRegistry->typeByName($typeName);
 		$returnType = match(true) {
 			$type instanceof SealedType => $type->valueType,
@@ -187,7 +187,7 @@ final readonly class CodeBuilder implements CodeBuilderInterface {
 		Type $returnType,
 		FunctionBodyDraft $functionBody
 	): CustomMethodDraft {
-		return $this->programBuilder->addMethodDraft(
+		return $this->customMethodRegistryBuilder->addMethodDraft(
 			$targetType,
 			$methodName,
 			$parameterType,
@@ -254,20 +254,20 @@ final readonly class CodeBuilder implements CodeBuilderInterface {
 	}
 
 	public function addAtom(TypeNameIdentifier $name): AtomType {
-		return $this->programBuilder->addAtom($name);
+		return $this->programTypeBuilder->addAtom($name);
 	}
 
 	/** @param list<EnumValueIdentifier> $values */
 	public function addEnumeration(TypeNameIdentifier $name, array $values): EnumerationType {
-		return $this->programBuilder->addEnumeration($name, $values);
+		return $this->programTypeBuilder->addEnumeration($name, $values);
 	}
 
 	public function addAlias(TypeNameIdentifier $name, Type $aliasedType): AliasType {
-		return $this->programBuilder->addAlias($name, $aliasedType);
+		return $this->programTypeBuilder->addAlias($name, $aliasedType);
 	}
 
 	public function addSubtype(TypeNameIdentifier $name, Type $baseType, ExpressionNode $constructorBody, ?Type $errorType): SubtypeType {
-		return $this->programBuilder->addSubtype($name, $baseType, $constructorBody, $errorType);
+		return $this->programTypeBuilder->addSubtype($name, $baseType, $constructorBody, $errorType);
 	}
 
 	public function addSealed(
@@ -276,6 +276,10 @@ final readonly class CodeBuilder implements CodeBuilderInterface {
 		ExpressionNode $constructorBody,
 		Type|null $errorType
 	): SealedType {
-		return $this->programBuilder->addSealed($name, $valueType, $constructorBody, $errorType);
+		return $this->programTypeBuilder->addSealed($name, $valueType, $constructorBody, $errorType);
+	}
+
+	public function build(AstFunctionBodyCompiler $astFunctionBodyCompiler): MethodRegistry {
+		return $this->customMethodRegistryBuilder->build($astFunctionBodyCompiler);
 	}
 }

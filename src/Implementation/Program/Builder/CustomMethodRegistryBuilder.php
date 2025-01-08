@@ -3,17 +3,20 @@
 namespace Walnut\Lang\Implementation\Program\Builder;
 
 use JsonSerializable;
+use Walnut\Lang\Blueprint\AST\Compiler\AstFunctionBodyCompiler;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethod as CustomMethodInterface;
 use Walnut\Lang\Blueprint\Function\CustomMethodDraft as CustomMethodDraftInterface;
 use Walnut\Lang\Blueprint\Function\FunctionBodyDraft;
-use Walnut\Lang\Blueprint\Function\Method;
+use Walnut\Lang\Blueprint\Function\MethodDraft;
 use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Function\UnknownMethod;
 use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder as CustomMethodRegistryBuilderInterface;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyError;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\UnresolvableDependency;
+use Walnut\Lang\Blueprint\Program\Registry\MethodDraftRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\AliasType;
@@ -23,7 +26,7 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Implementation\Function\CustomMethod;
 use Walnut\Lang\Implementation\Function\CustomMethodDraft;
 
-final class CustomMethodRegistryBuilder implements CustomMethodRegistryBuilderInterface, JsonSerializable {
+final class CustomMethodRegistryBuilder implements CustomMethodRegistryBuilderInterface, MethodDraftRegistry, JsonSerializable {
 
 	/**
 	 * @var array<string, list<CustomMethodDraftInterface>> $methods
@@ -31,9 +34,10 @@ final class CustomMethodRegistryBuilder implements CustomMethodRegistryBuilderIn
 	private array $methods;
 
 	public function __construct(
-		private readonly DependencyContainer $dependencyContainer,
-		private readonly MethodRegistry $methodRegistry,
-		private readonly TypeRegistry $typeRegistry
+		private readonly MethodExecutionContext $methodExecutionContext,
+		private readonly DependencyContainer    $dependencyContainer,
+		private readonly MethodDraftRegistry    $methodDraftRegistry,
+		private readonly TypeRegistry           $typeRegistry
 	) {
 		$this->methods = [];
 	}
@@ -58,6 +62,31 @@ final class CustomMethodRegistryBuilder implements CustomMethodRegistryBuilderIn
 		return $method;
 	}
 
+	public function build(AstFunctionBodyCompiler $astFunctionBodyCompiler): MethodRegistry {
+		$methods = array_map(
+			fn(array $methods) => array_map(
+				fn(CustomMethodDraftInterface $method) => new CustomMethod(
+					$this->methodExecutionContext,
+					$this->dependencyContainer,
+					$method->targetType,
+					$method->methodName,
+					$method->parameterType,
+					$method->dependencyType,
+					$method->returnType,
+					$astFunctionBodyCompiler->functionBody($method->functionBody)
+				),
+				$methods
+			),
+			$this->methods
+		);
+		$analyseErrors = $this->checkVariance($methods);
+		if (count($analyseErrors) > 0) {
+			throw new AnalyserException(implode("\n", $analyseErrors));
+		}
+		//$this->analyse($methods);
+		return new CustomMethodRegistry($methods);
+	}
+
 	private function getErrorMessageFor(CustomMethodInterface $method): string {
 		return match(true) {
 			(string)$method->targetType === 'Constructor' && str_starts_with($method->methodName->identifier, 'as')
@@ -74,9 +103,60 @@ final class CustomMethodRegistryBuilder implements CustomMethodRegistryBuilderIn
 	}
 
 	/** @return string[] - the errors found during analyse */
-	public function analyse(): array {
+	public function checkVariance(array $allMethods): array {
 		$analyseErrors = [];
-		foreach($this->methods as $methods) {
+		foreach($allMethods as $methods) {
+			foreach($methods as $method) {
+				$sub = $method->targetType;
+				$methodFnType = $this->typeRegistry->function(
+					$method->parameterType,
+					$method->returnType
+				);
+				while ($sub instanceof SubtypeType || $sub instanceof AliasType) {
+					if ($sub instanceof AliasType) {
+						$sub = $sub->aliasedType;
+						continue;
+					}
+					$sub = $sub->baseType;
+					$existingMethod = $this->methodDraftRegistry->method($sub, $method->methodName);
+					if ($existingMethod instanceof CustomMethodDraftInterface) {
+						$existingMethodFnType = $this->typeRegistry->function(
+							$existingMethod->parameterType,
+							$existingMethod->returnType
+						);
+						if (!$methodFnType->isSubtypeOf($existingMethodFnType)) {
+							$analyseErrors[] = sprintf("%s : the method %s is already defined for %s and therefore the signature %s should be a subtype of %s",
+								$this->getErrorMessageFor($method),
+								$existingMethod->methodName,
+								$sub,
+								$methodFnType,
+								$existingMethodFnType
+							);
+							break;
+						}
+					} elseif ($existingMethod instanceof MethodDraft) {
+						$analyseResult = $existingMethod->analyse($method->targetType, $method->parameterType);
+						if (!$method->returnType->isSubtypeOf($analyseResult)) {
+							$analyseErrors[] = sprintf("%s : the method %s is already defined for %s and therefore the return type %s should be a subtype of %s",
+								$this->getErrorMessageFor($method),
+								$method->methodName,
+								$sub,
+								$method->returnType,
+								$analyseResult
+							);
+							break;
+						}
+					}
+				}
+			}
+		}
+		return $analyseErrors;
+	}
+
+	/** @return string[] - the errors found during analyse */
+	public function analyse(array $allMethods): array {
+		$analyseErrors = [];
+		foreach($allMethods as $methods) {
 			foreach($methods as $method) {
 				try {
 					$sub = $method->targetType;
@@ -90,8 +170,8 @@ final class CustomMethodRegistryBuilder implements CustomMethodRegistryBuilderIn
 							continue;
 						}
 						$sub = $sub->baseType;
-						$existingMethod = $this->methodRegistry->method($sub, $method->methodName);
-						if ($existingMethod instanceof CustomMethod) {
+						$existingMethod = $this->methodDraftRegistry->method($sub, $method->methodName);
+						if ($existingMethod instanceof CustomMethodDraftInterface) {
 							$existingMethodFnType = $this->typeRegistry->function(
 								$existingMethod->parameterType,
 								$existingMethod->returnType
@@ -106,7 +186,7 @@ final class CustomMethodRegistryBuilder implements CustomMethodRegistryBuilderIn
 								);
 								break;
 							}
-						} elseif ($existingMethod instanceof Method) {
+						} elseif ($existingMethod instanceof MethodDraft) {
 							$analyseResult = $existingMethod->analyse($method->targetType, $method->parameterType);
 							if (!$method->returnType->isSubtypeOf($analyseResult)) {
 								$analyseErrors[] = sprintf("%s : the method %s is already defined for %s and therefore the return type %s should be a subtype of %s",
@@ -153,5 +233,14 @@ final class CustomMethodRegistryBuilder implements CustomMethodRegistryBuilderIn
 
 	public function jsonSerialize(): array {
 		return $this->methods;
+	}
+
+	public function methodDraft(Type $targetType, MethodNameIdentifier $methodName): MethodDraft|UnknownMethod {
+		foreach(array_reverse($this->methods[$methodName->identifier] ?? []) as $method) {
+			if ($targetType->isSubtypeOf($method->targetType)) {
+				return $method;
+			}
+		}
+		return UnknownMethod::value;
 	}
 }

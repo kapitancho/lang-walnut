@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Implementation\Function;
 
 use JsonSerializable;
+use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethodDraft as CustomMethodDraftInterface;
 use Walnut\Lang\Blueprint\Function\FunctionBodyDraft;
@@ -17,6 +18,14 @@ final readonly class CustomMethodDraft implements CustomMethodDraftInterface, Js
 		public Type $returnType,
 		public FunctionBodyDraft $functionBody,
 	) {}
+
+	/** @throws AnalyserException */
+	public function analyse(
+		Type $targetType,
+		Type $parameterType
+	): Type {
+		return $this->returnType;
+	}
 
 	public function __toString(): string {
 		$dependency = $this->dependencyType ?

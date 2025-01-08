@@ -6,7 +6,7 @@ use Stringable;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Type\Type;
 
-interface CustomMethodDraft extends Stringable {
+interface CustomMethodDraft extends MethodDraft, Stringable {
 	public Type $targetType { get; }
 	public MethodNameIdentifier $methodName { get; }
 	public Type $parameterType { get; }

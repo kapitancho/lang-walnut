@@ -49,8 +49,21 @@ final readonly class Compiler implements CompilerInterface {
 
 	/** @throws AstProgramCompilationException */
 	private function compileAst(ProgramFactory $pf, RootNode $rootNode): void {
-		$astCompiler = new AstCompiler($pf->codeBuilder);
-		$astCompiler->compile($rootNode);
+		$astTypeCompiler = new AstTypeCompiler($pf->codeBuilder->typeRegistry);
+		$astValueCompiler = new AstValueCompiler(
+			$pf->codeBuilder->valueRegistry,
+			new AstGlobalFunctionBodyCompiler,
+			$astTypeCompiler
+		);
+		$astModuleCompiler = new AstModuleCompiler(
+			$pf->codeBuilder,
+			$pf->codeBuilder,
+			$astTypeCompiler,
+			$astValueCompiler,
+		);
+		$astCompiler = new AstProgramCompiler($astModuleCompiler);
+		//$astCompiler = new AstCompiler($pf->codeBuilder);
+		$astCompiler->compileProgram($rootNode);
 	}
 
 	/** @throws ModuleDependencyException|AstProgramCompilationException|AnalyserException|ParserException */
@@ -84,6 +97,26 @@ final readonly class Compiler implements CompilerInterface {
 				$pf->registry
 			);
 		}
+
+		$astTypeCompiler = new AstTypeCompiler($pf->codeBuilder->typeRegistry);
+		$astValueCompiler = new AstValueCompiler(
+			$pf->codeBuilder->valueRegistry,
+			new AstGlobalFunctionBodyCompiler,
+			$astTypeCompiler
+		);
+		$astExpressionCompiler = new AstExpressionCompiler(
+			$astTypeCompiler,
+			$astValueCompiler,
+			$pf->codeBuilder
+		);
+		$astFunctionBodyCompiler = new AstFunctionBodyCompiler(
+			$astExpressionCompiler,
+			$pf->codeBuilder
+		);
+		$methodRegistry = $pf->customMethodRegistryBuilder->build(
+			$astFunctionBodyCompiler
+		);
+
 		try {
 			$program = $pf->builder->analyseAndBuildProgram();
 		} catch (AnalyserException $e) {

@@ -59,7 +59,7 @@ interface TypeRegistry {
 		int|Number|MinusInfinity $min = MinusInfinity::value,
 		int|Number|PlusInfinity $max = PlusInfinity::value
 	): IntegerType;
-	/** @param list<IntegerValue> $values */
+	/** @param list<Number> $values */
 	public function integerSubset(array $values): IntegerSubsetType;
 
 	/** @throws InvalidRealRange */
@@ -67,7 +67,7 @@ interface TypeRegistry {
 		float|Number|MinusInfinity $min = MinusInfinity::value,
 		float|Number|PlusInfinity $max = PlusInfinity::value
 	): RealType;
-	/** @param list<RealValue> $values */
+	/** @param list<Number> $values */
 	public function realSubset(array $values): RealSubsetType;
 
 	/** @throws InvalidLengthRange */
@@ -75,7 +75,7 @@ interface TypeRegistry {
 		int|Number $minLength = 0,
 		int|Number|PlusInfinity $maxLength = PlusInfinity::value
 	): StringType;
-	/** @param list<StringValue> $values */
+	/** @param list<string> $values */
 	public function stringSubset(array $values): StringSubsetType;
 
 	/** @throws InvalidLengthRange */

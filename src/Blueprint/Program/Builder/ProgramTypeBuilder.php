@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Blueprint\Program\Builder;
 
 use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
-use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Type\AliasType;

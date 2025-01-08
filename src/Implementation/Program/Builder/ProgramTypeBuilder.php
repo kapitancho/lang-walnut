@@ -2,21 +2,13 @@
 
 namespace Walnut\Lang\Implementation\Program\Builder;
 
-use Walnut\Lang\Blueprint\AST\Compiler\AstFunctionBodyCompiler;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
-use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
-use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
-use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
-use Walnut\Lang\Blueprint\Function\CustomMethodDraft;
-use Walnut\Lang\Blueprint\Function\FunctionBodyDraft;
-use Walnut\Lang\Blueprint\Program\Builder\ProgramBuilder as ProgramBuilderInterface;
+use Walnut\Lang\Blueprint\Program\Builder\ProgramTypeBuilder as ProgramTypeBuilderInterface;
 use Walnut\Lang\Blueprint\Program\Builder\TypeRegistryBuilder;
 use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry;
-use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AtomType;
@@ -26,10 +18,8 @@ use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\SubtypeType;
 use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Value\Value;
-use Walnut\Lang\Implementation\Program\Program;
 
-final readonly class ProgramBuilder implements ProgramBuilderInterface {
+final readonly class ProgramTypeBuilder implements ProgramTypeBuilderInterface {
 
 	public function __construct(
 		private TypeRegistry                     $typeRegistry,
@@ -37,39 +27,6 @@ final readonly class ProgramBuilder implements ProgramBuilderInterface {
 		private TypeRegistryBuilder              $typeRegistryBuilder,
 		private CustomMethodRegistryBuilder      $customMethodRegistryBuilder,
 	) {}
-
-	public function build(AstFunctionBodyCompiler $astFunctionBodyCompiler): MethodRegistry {
-		return $this->customMethodRegistryBuilder->build($astFunctionBodyCompiler);
-	}
-
-	/** @throws AnalyserException */
-	public function analyseAndBuildProgram(): Program {
-		/*$analyseErrors = $this->customMethodRegistryBuilder->analyse();
-		if (count($analyseErrors) > 0) {
-			throw new AnalyserException(implode("\n", $analyseErrors));
-		}*/
-		return new Program(
-			$this->globalScopeBuilder->build(),
-		);
-	}
-
-	public function addMethodDraft(
-		Type $targetType,
-		MethodNameIdentifier $methodName,
-		Type $parameterType,
-		Type $dependencyType,
-		Type $returnType,
-		FunctionBodyDraft $functionBody,
-	): CustomMethodDraft {
-		return $this->customMethodRegistryBuilder->addMethodDraft(
-			$targetType,
-			$methodName,
-			$parameterType,
-			$dependencyType,
-			$returnType,
-			$functionBody,
-		);
-	}
 
 	public function addAtom(TypeNameIdentifier $name): AtomType {
 		return $this->typeRegistryBuilder->addAtom($name);

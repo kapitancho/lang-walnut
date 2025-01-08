@@ -4,7 +4,7 @@ namespace Walnut\Lang\Blueprint\AST\Compiler;
 
 use Walnut\Lang\Blueprint\AST\Node\RootNode;
 
-interface AstCompiler {
+interface AstProgramCompiler {
 	/** @throws AstProgramCompilationException */
-	public function compile(RootNode $root): void;
+	public function compileProgram(RootNode $root): void;
 }

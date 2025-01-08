@@ -38,7 +38,7 @@ final class ProgramFactory implements DependencyContainerInterface, ProgramFacto
 	private readonly ExpressionRegistry $expressionRegistry;
 	private readonly MethodRegistry $methodRegistry;
 	private readonly DependencyContainer $dependencyContainer;
-	private readonly CustomMethodRegistryBuilder $customMethodRegistryBuilder;
+	public readonly CustomMethodRegistryBuilder $customMethodRegistryBuilder;
 	private readonly ScopeBuilder $globalScopeBuilder;
 	private readonly AnalyserContext&ExecutionContext $globalContext;
 
@@ -60,6 +60,7 @@ final class ProgramFactory implements DependencyContainerInterface, ProgramFacto
 			$this->globalContext
 		);
 		$this->customMethodRegistryBuilder = new CustomMethodRegistryBuilder(
+			$methodExecutionContext,
 			$this,
 			$this,
 			$this->typeRegistryBuilder
@@ -130,24 +131,6 @@ final class ProgramFactory implements DependencyContainerInterface, ProgramFacto
 				$this->customMethodRegistryBuilder
 			);
 		}
-	}
-
-	public function addMethod(
-		Type $targetType,
-		MethodNameIdentifier $methodName,
-		Type $parameterType,
-		Type $dependencyType,
-		Type $returnType,
-		FunctionBody $functionBody
-	): CustomMethod {
-		return $this->customMethodRegistryBuilder->addMethodDraft(
-			$targetType,
-			$methodName,
-			$parameterType,
-			$dependencyType,
-			$returnType,
-			$functionBody
-		);
 	}
 
 	public function method(Type $targetType, MethodNameIdentifier $methodName): Method|UnknownMethod {

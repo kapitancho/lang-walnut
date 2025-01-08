@@ -2,9 +2,11 @@
 
 namespace Walnut\Lang\Blueprint\Program\Builder;
 
+use Walnut\Lang\Blueprint\AST\Compiler\AstFunctionBodyCompiler;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethodDraft;
 use Walnut\Lang\Blueprint\Function\FunctionBodyDraft;
+use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 
 interface CustomMethodRegistryBuilder {
@@ -16,4 +18,6 @@ interface CustomMethodRegistryBuilder {
 		Type $returnType,
 		FunctionBodyDraft $functionBody,
 	): CustomMethodDraft;
+
+	public function build(AstFunctionBodyCompiler $astFunctionBodyCompiler): MethodRegistry;
 }
