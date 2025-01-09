@@ -8,7 +8,7 @@ use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 
-interface Method extends MethodDraft {
+interface Method {
 	/** @throws AnalyserException */
 	public function analyse(
 		ProgramRegistry $programRegistry,

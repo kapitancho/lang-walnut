@@ -2,9 +2,12 @@
 
 namespace Walnut\Lang\Blueprint\Program\Builder;
 
-use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
+use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
@@ -14,6 +17,12 @@ use Walnut\Lang\Blueprint\Type\SubtypeType;
 use Walnut\Lang\Blueprint\Type\Type;
 
 interface ProgramTypeBuilder {
+	public TypeRegistry                $typeRegistry { get; }
+	public TypeRegistryBuilder         $typeRegistryBuilder { get; }
+	public ValueRegistry               $valueRegistry { get; }
+	public ExpressionRegistry          $expressionRegistry { get; }
+	public CustomMethodRegistryBuilder $customMethodRegistryBuilder { get; }
+
 	public function addAtom(TypeNameIdentifier $name): AtomType;
 
 	/** @param list<EnumValueIdentifier> $values */
@@ -24,14 +33,14 @@ interface ProgramTypeBuilder {
 	public function addSubtype(
 		TypeNameIdentifier $name,
 		Type $baseType,
-		ExpressionNode $constructorBody,
+		Expression $constructorBody,
 		Type|null $errorType
 	): SubtypeType;
 
 	public function addSealed(
 		TypeNameIdentifier $name,
 		RecordType $valueType,
-		ExpressionNode $constructorBody,
+		Expression $constructorBody,
 		Type|null $errorType
 	): SealedType;
 }

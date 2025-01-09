@@ -18,7 +18,6 @@ use Walnut\Lang\Implementation\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Implementation\Compilation\AST\AstCompilerFactory;
 use Walnut\Lang\Implementation\Compilation\AST\AstProgramCompiler;
 use Walnut\Lang\Implementation\Function\CustomMethodAnalyser;
-use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Program;
 use Walnut\Lang\Implementation\Program\Registry\MainMethodRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ProgramRegistry;
@@ -39,9 +38,7 @@ final readonly class Compiler implements CompilerInterface {
 	}
 
 	private function analyseProgram(CompilationContextInterface $compilationContext): ProgramRegistryInterface {
-		$customMethodRegistryBuilder = new CustomMethodRegistryBuilder();
-		$customMethodRegistry = $customMethodRegistryBuilder->buildFromDrafts(
-			$compilationContext->customMethodDraftRegistryBuilder);
+		$customMethodRegistry = $compilationContext->customMethodRegistry;
 
 		$nativeCodeTypeMapper = new NativeCodeTypeMapper();
 		$methodRegistry = new MainMethodRegistry(

@@ -2,13 +2,15 @@
 
 namespace Walnut\Lang\Implementation\Program\Builder;
 
-use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
+use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Builder\ProgramTypeBuilder as ProgramTypeBuilderInterface;
 use Walnut\Lang\Blueprint\Program\Builder\TypeRegistryBuilder;
+use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
@@ -21,10 +23,11 @@ use Walnut\Lang\Blueprint\Type\Type;
 final readonly class ProgramTypeBuilder implements ProgramTypeBuilderInterface {
 
 	public function __construct(
-		private TypeRegistry                     $typeRegistry,
-		private FunctionBodyBuilder              $functionBodyBuilder,
-		private TypeRegistryBuilder              $typeRegistryBuilder,
-		private CustomMethodDraftRegistryBuilder $customMethodDraftRegistryBuilder,
+		public TypeRegistry                $typeRegistry,
+		public TypeRegistryBuilder         $typeRegistryBuilder,
+		public ValueRegistry               $valueRegistry,
+		public ExpressionRegistry          $expressionRegistry,
+		public CustomMethodRegistryBuilder $customMethodRegistryBuilder,
 	) {}
 
 	public function addAtom(TypeNameIdentifier $name): AtomType {
@@ -43,7 +46,7 @@ final readonly class ProgramTypeBuilder implements ProgramTypeBuilderInterface {
 	public function addSubtype(
 		TypeNameIdentifier $name,
 		Type $baseType,
-		ExpressionNode $constructorBody,
+		Expression $constructorBody,
 		Type|null $errorType
 	): SubtypeType {
 		$subtype = $this->typeRegistryBuilder->addSubtype($name, $baseType);
@@ -56,7 +59,7 @@ final readonly class ProgramTypeBuilder implements ProgramTypeBuilderInterface {
 	public function addSealed(
 		TypeNameIdentifier $name,
 		RecordType $valueType,
-		ExpressionNode $constructorBody,
+		Expression $constructorBody,
 		Type|null $errorType
 	): SealedType {
 		$sealedType = $this->typeRegistryBuilder->addSealed($name, $valueType);
@@ -69,9 +72,9 @@ final readonly class ProgramTypeBuilder implements ProgramTypeBuilderInterface {
 		TypeNameIdentifier $name,
 		Type $fromType,
 		Type|null $errorType,
-		ExpressionNode $constructorBody
+		Expression $constructorBody
 	): void {
-		$this->customMethodDraftRegistryBuilder->addMethodDraft(
+		$this->customMethodRegistryBuilder->addMethod(
 			$this->typeRegistry->atom(new TypeNameIdentifier('Constructor')),
 			new MethodNameIdentifier('as' . $name->identifier),
 			$fromType,
@@ -79,7 +82,7 @@ final readonly class ProgramTypeBuilder implements ProgramTypeBuilderInterface {
 			$errorType && !($errorType instanceof NothingType) ?
 				$this->typeRegistry->result($fromType, $errorType) :
 				$fromType,
-			$this->functionBodyBuilder->functionBodyDraft(
+			$this->expressionRegistry->functionBody(
 				$constructorBody,
 			)
 		);

@@ -2,12 +2,11 @@
 
 namespace Walnut\Lang\Implementation\Compilation\AST;
 
-use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode;
 use Walnut\Lang\Blueprint\Compilation\AST\AstCompilerFactory as AstCompilerFactoryInterface;
 use Walnut\Lang\Blueprint\Compilation\AST\AstFunctionBodyCompiler as AstFunctionBodyCompilerInterface;
 use Walnut\Lang\Blueprint\Compilation\CompilationContext;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
-use Walnut\Lang\Implementation\Program\Builder\FunctionBodyBuilder;
 use Walnut\Lang\Implementation\Program\Builder\ProgramTypeBuilder;
 
 //use Walnut\Lang\Blueprint\Program\Builder\FunctionBodyBuilder as FunctionBodyBuilderInterface;
@@ -26,7 +25,7 @@ final readonly class AstCompilerFactory implements AstCompilerFactoryInterface, 
 		$typeRegistryBuilder = $compilationContext->typeRegistryBuilder;
 		$valueRegistry       = $compilationContext->valueRegistry;
 		$expressionRegistry  = $compilationContext->expressionRegistry;
-		$customMethodDraftRegistryBuilder = $compilationContext->customMethodDraftRegistryBuilder;
+		$customMethodRegistryBuilder = $compilationContext->customMethodRegistryBuilder;
 		$globalScopeBuilder = $compilationContext->globalScopeBuilder;
 		$codeBuilder = $compilationContext->codeBuilder;
 
@@ -46,30 +45,25 @@ final readonly class AstCompilerFactory implements AstCompilerFactoryInterface, 
 			$astExpressionCompiler,
 			$expressionRegistry,
 		);
-		$functionBodyBuilder = new FunctionBodyBuilder(
-			$this->functionBodyCompiler,
-		);
 		$programTypeBuilder = new ProgramTypeBuilder(
 			$typeRegistry,
-			$functionBodyBuilder,
 			$typeRegistryBuilder,
-			$customMethodDraftRegistryBuilder
+			$valueRegistry,
+			$expressionRegistry,
+			$customMethodRegistryBuilder
 		);
 		$astModuleCompiler = new AstModuleCompiler(
-			$typeRegistry,
-			$valueRegistry,
 			$programTypeBuilder,
-			$expressionRegistry,
-			$customMethodDraftRegistryBuilder,
 			 $astTypeCompiler,
 			 $astValueCompiler,
-			 $functionBodyBuilder,
+			 $astExpressionCompiler,
+			 $this->functionBodyCompiler,
 			 $globalScopeBuilder
 		);
 		$this->programCompiler = new AstProgramCompiler($astModuleCompiler);
 	}
 
-	public function functionBody(ExpressionNode $expressionNode): FunctionBody {
-		return $this->functionBodyCompiler->functionBody($expressionNode);
+	public function functionBody(FunctionBodyNode $functionBodyNode): FunctionBody {
+		return $this->functionBodyCompiler->functionBody($functionBodyNode);
 	}
 }

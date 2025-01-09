@@ -14,7 +14,6 @@ use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\FunctionBody as FunctionBodyInterface;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
-use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\SealedType;
@@ -34,13 +33,13 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 	use BaseType;
 
 	public function __construct(
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
 		public Expression $expression
 	) {}
 
-	private function getMapItemNotFound(): SealedType {
-		return $this->typeRegistry->sealed(new TypeNameIdentifier("MapItemNotFound"));
+	private Type $returnType;
+
+	private function getMapItemNotFound(TypeRegistry $typeRegistry): SealedType {
+		return $typeRegistry->sealed(new TypeNameIdentifier("MapItemNotFound"));
 	}
 
 	public function analyse(
@@ -49,8 +48,13 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 		Type $parameterType,
 		Type $dependencyType
 	): Type {
+		if (isset($this->returnType)) {
+			return $this->returnType;
+		}
 		$tConv = fn(Type $type): Type => $type instanceof OptionalKeyType ?
-			$this->typeRegistry->result($type->valueType, $this->getMapItemNotFound()) :
+			$analyserContext->programRegistry->typeRegistry->result($type->valueType, $this->getMapItemNotFound(
+				$analyserContext->programRegistry->typeRegistry
+			)) :
 			$type;
 
 		foreach(['$' => $targetType, '#' => $parameterType, '%' => $dependencyType] as $variableName => $type) {
@@ -99,7 +103,7 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 				)
 			);
 		}
-		return $this->typeRegistry->union([$result->expressionType, $result->returnType]);
+		return $this->returnType ??= $analyserContext->programRegistry->typeRegistry->union([$result->expressionType, $result->returnType]);
 	}
 
 	public function execute(
@@ -109,7 +113,9 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 		TypedValue|null $dependencyValue
 	): Value {
 		$tConv = fn(Type $type): Type => $type instanceof OptionalKeyType ?
-			$this->typeRegistry->result($type->valueType, $this->getMapItemNotFound()) :
+			$executionContext->programRegistry->typeRegistry->result($type->valueType, $this->getMapItemNotFound(
+				$executionContext->programRegistry->typeRegistry
+			)) :
 			$type;
 
 		foreach(['$' => $targetValue, '#' => $parameterValue, '%' => $dependencyValue] as $variableName => $value) {
@@ -133,10 +139,12 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 					foreach($t->types as $fieldName => $fieldType) {
 						try {
 							$value = $values[$fieldName] ??
-								$this->valueRegistry->error(
-									$this->valueRegistry->sealedValue(
+								$executionContext->programRegistry->valueRegistry->error(
+									$executionContext->programRegistry->valueRegistry->sealedValue(
 										new TypeNameIdentifier('MapItemNotFound'),
-										$this->valueRegistry->record(['key' => $this->valueRegistry->string($fieldName)])
+										$executionContext->programRegistry->valueRegistry->record([
+											'key' => $executionContext->programRegistry->valueRegistry->string($fieldName)
+										])
 									)
 								);
 							$executionContext = $executionContext->withAddedVariableValue(
@@ -152,10 +160,12 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 			$values = $targetValue->value->value->values;
 			foreach($targetValue->type->valueType->types as $fieldName => $fieldType) {
 				$value = $values[$fieldName] ??
-					$this->valueRegistry->error(
-						$this->valueRegistry->sealedValue(
+					$executionContext->programRegistry->valueRegistry->error(
+						$executionContext->programRegistry->valueRegistry->sealedValue(
 							new TypeNameIdentifier('MapItemNotFound'),
-							$this->valueRegistry->record(['key' => $this->valueRegistry->string($fieldName)])
+							$executionContext->programRegistry->valueRegistry->record([
+								'key' => $executionContext->programRegistry->valueRegistry->string($fieldName)
+							])
 						)
 					)
 				;
