@@ -126,7 +126,9 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 	}
 
 	private function isJsonType(Type $type): bool {
+		$typeStr = (string)$type;
 		return match(true) {
+			$typeStr === '[:]', $typeStr === '[]' => true,
 			$type instanceof IntegerType, $type instanceof IntegerSubsetType,
 			$type instanceof RealType, $type instanceof RealSubsetType,
 			$type instanceof StringType, $type instanceof StringSubsetType,

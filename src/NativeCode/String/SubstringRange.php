@@ -69,11 +69,11 @@ final readonly class SubstringRange implements NativeMethod {
 				$start instanceof IntegerValue &&
 				$end instanceof IntegerValue
 			) {
-				$length = $end->literalValue - $start->literalValue;
+				$length = (string)$end->literalValue - (string)$start->literalValue;
 				return TypedValue::forValue($programRegistry->valueRegistry->string(
 					mb_substr(
 						$targetValue->literalValue,
-						$start->literalValue,
+						(string)$start->literalValue,
 						$length
 					)
 				));

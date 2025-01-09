@@ -36,15 +36,15 @@ final readonly class JsonDecode implements NativeMethod {
 		// @codeCoverageIgnoreEnd
 	}
 
-	private function phpToValue(string|int|float|bool|null|array|object $value): Value {
+	private function phpToValue(ProgramRegistry $programRegistry, string|int|float|bool|null|array|object $value): Value {
 		return match(true) {
 			is_array($value) => $programRegistry->valueRegistry->tuple(
 				array_map(fn(string|int|float|bool|null|array|object $item): Value
-					=> $this->phpToValue($item), $value)
+					=> $this->phpToValue($programRegistry, $item), $value)
 			),
 			is_object($value) => $programRegistry->valueRegistry->record(
 				array_map(fn(string|int|float|bool|null|array|object $item): Value
-					=> $this->phpToValue($item), (array)$value)
+					=> $this->phpToValue($programRegistry, $item), (array)$value)
 			),
 			is_string($value) => $programRegistry->valueRegistry->string($value),
 			is_int($value) => $programRegistry->valueRegistry->integer($value),
@@ -67,7 +67,7 @@ final readonly class JsonDecode implements NativeMethod {
 				$value = json_decode($targetValue->literalValue, false, 512, JSON_THROW_ON_ERROR);
 				return new TypedValue(
 					$programRegistry->typeRegistry->withName(new TypeNameIdentifier("JsonValue")),
-					$this->phpToValue($value)
+					$this->phpToValue($programRegistry, $value)
 				);
 			} catch (JsonException) {
 				return TypedValue::forValue($programRegistry->valueRegistry->error(

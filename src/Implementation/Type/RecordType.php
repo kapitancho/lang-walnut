@@ -95,8 +95,6 @@ final readonly class RecordType implements RecordTypeInterface, JsonSerializable
 				$typeStr = $multiline ? "\t" . str_replace("\n", "\n" . "\t", $typeStr) : $typeStr;
 				$types[] = $typeStr;
 			}
-		} else {
-			$typeX = ':';
 		}
 		if ($this->restType instanceof AnyTypeInterface) {
 			$types[] = "...";

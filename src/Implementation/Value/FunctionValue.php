@@ -167,10 +167,12 @@ final class FunctionValue implements FunctionValueInterface, JsonSerializable {
 	}
 
 	public function __toString(): string {
+		$dep = $this->dependencyType instanceof NothingType ? '' : '%% ' . sprintf("%s ", $this->dependencyType);
 		return sprintf(
-			"^%s => %s :: %s",
+			"^%s => %s %s:: %s",
 			$this->parameterType,
 			$this->returnType,
+			$dep,
 			$this->body
 		);
 	}
