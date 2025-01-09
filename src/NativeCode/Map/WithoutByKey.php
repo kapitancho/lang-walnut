@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\RecordType;
@@ -21,11 +21,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class WithoutByKey implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -36,9 +33,9 @@ final readonly class WithoutByKey implements NativeMethod {
 		if ($targetType instanceof MapType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				$returnType = $this->context->typeRegistry->record([
+				$returnType = $programRegistry->typeRegistry->record([
 					'element' => $targetType->itemType,
-					'map' => $this->context->typeRegistry->map(
+					'map' => $programRegistry->typeRegistry->map(
 						$targetType->itemType,
 						$targetType->range->maxLength === PlusInfinity::value ?
 							$targetType->range->minLength : max(0,
@@ -50,9 +47,9 @@ final readonly class WithoutByKey implements NativeMethod {
 							PlusInfinity::value : $targetType->range->maxLength - 1
 					)
 				]);
-				return $this->context->typeRegistry->result(
+				return $programRegistry->typeRegistry->result(
 					$returnType,
-					$this->context->typeRegistry->sealed(
+					$programRegistry->typeRegistry->sealed(
 						new TypeNameIdentifier("MapItemNotFound")
 					)
 				);
@@ -67,6 +64,7 @@ final readonly class WithoutByKey implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -78,18 +76,18 @@ final readonly class WithoutByKey implements NativeMethod {
 			if ($parameterValue instanceof StringValue) {
 				$values = $targetValue->values;
 				if (!isset($values[$parameterValue->literalValue])) {
-					return TypedValue::forValue($this->context->valueRegistry->error(
-						$this->context->valueRegistry->sealedValue(
+					return TypedValue::forValue($programRegistry->valueRegistry->error(
+						$programRegistry->valueRegistry->sealedValue(
 							new TypeNameIdentifier('MapItemNotFound'),
-							$this->context->valueRegistry->record(['key' => $parameterValue])
+							$programRegistry->valueRegistry->record(['key' => $parameterValue])
 						)
 					));
 				}
 				$val = $values[$parameterValue->literalValue];
 				unset($values[$parameterValue->literalValue]);
-				return TypedValue::forValue($this->context->valueRegistry->record([
+				return TypedValue::forValue($programRegistry->valueRegistry->record([
 					'element' => $val,
-					'map' => $this->context->valueRegistry->record($values)
+					'map' => $programRegistry->valueRegistry->record($values)
 				]));
 			}
 			// @codeCoverageIgnoreStart

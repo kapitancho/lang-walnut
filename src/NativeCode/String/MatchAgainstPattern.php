@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -20,11 +20,8 @@ final readonly class MatchAgainstPattern implements NativeMethod {
 	private const string ROUTE_PATTERN_REPLACE = '#\{[\w\_]+\}#';
 	private const string REPLACE_PATTERN = '(.+?)';
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -32,11 +29,11 @@ final readonly class MatchAgainstPattern implements NativeMethod {
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $this->context->typeRegistry->union([
-					$this->context->typeRegistry->map(
-						$this->context->typeRegistry->string(),
+				return $programRegistry->typeRegistry->union([
+					$programRegistry->typeRegistry->map(
+						$programRegistry->typeRegistry->string(),
 					),
-					$this->context->typeRegistry->false
+					$programRegistry->typeRegistry->false
 				]);
 			}
 			// @codeCoverageIgnoreStart
@@ -49,6 +46,7 @@ final readonly class MatchAgainstPattern implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -71,19 +69,19 @@ final readonly class MatchAgainstPattern implements NativeMethod {
 				}
 				$path = strtolower($path);
 				if (!preg_match('#' . $path . '#', $target, $matches)) {
-					return TypedValue::forValue($this->context->valueRegistry->false);
+					return TypedValue::forValue($programRegistry->valueRegistry->false);
 				}
 				return TypedValue::forValue(is_array($pathArgs) ?
-					$this->context->valueRegistry->record(
+					$programRegistry->valueRegistry->record(
 						array_map(fn($value) =>
-							$this->context->valueRegistry->string($value),
+							$programRegistry->valueRegistry->string($value),
 							array_combine(
 								$pathArgs,
 								array_slice($matches, 1)
 							)
 						)
 					) :
-					$this->context->valueRegistry->record([])
+					$programRegistry->valueRegistry->record([])
 				);
 			}
 			// @codeCoverageIgnoreStart

@@ -5,28 +5,27 @@ namespace Walnut\Lang\Implementation\Function;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\Method;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 
 final readonly class UnionMethodCall implements Method {
 
 	/**
-	 * @param MethodExecutionContext $context
 	 * @param list<array{Type, Method}> $methods
 	 */
 	public function __construct(
-		private MethodExecutionContext $context,
 		private array $methods
 	) {}
 
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType
 	): Type {
-		return $this->context->typeRegistry->union(
+		return $programRegistry->typeRegistry->union(
 			array_map(
 				static fn(array $method): Type => $method[1]->analyse(
-					$method[0], $parameterType
+					$programRegistry, $method[0], $parameterType
 				),
 				$this->methods
 			)
@@ -34,6 +33,7 @@ final readonly class UnionMethodCall implements Method {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter,
 	): TypedValue {

@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
@@ -19,11 +19,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class Chunk implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -31,8 +28,8 @@ final readonly class Chunk implements NativeMethod {
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) {
-				return $this->context->typeRegistry->array(
-					$this->context->typeRegistry->string(
+				return $programRegistry->typeRegistry->array(
+					$programRegistry->typeRegistry->string(
 						min(1, $targetType->range->minLength),
 						$parameterType->range->maxValue
 					),
@@ -50,6 +47,7 @@ final readonly class Chunk implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -61,9 +59,9 @@ final readonly class Chunk implements NativeMethod {
 		if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof IntegerValue) {
 				$result = str_split($targetValue->literalValue, (string)$parameterValue->literalValue);
-				return TypedValue::forValue($this->context->valueRegistry->tuple(
+				return TypedValue::forValue($programRegistry->valueRegistry->tuple(
 					array_map(fn(string $piece): StringValue =>
-						$this->context->valueRegistry->string($piece), $result)
+						$programRegistry->valueRegistry->string($piece), $result)
 				));
 			}
 			// @codeCoverageIgnoreStart

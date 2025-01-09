@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
@@ -18,11 +18,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class BinaryModulo implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -30,7 +27,7 @@ final readonly class BinaryModulo implements NativeMethod {
 		if ($targetType instanceof IntegerType || $targetType instanceof IntegerSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) {
-				return $this->context->typeRegistry->integer();
+				return $programRegistry->typeRegistry->integer();
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -42,6 +39,7 @@ final readonly class BinaryModulo implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -54,21 +52,21 @@ final readonly class BinaryModulo implements NativeMethod {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue) {
 				if ((int)(string)$parameterValue->literalValue === 0) {
-					return TypedValue::forValue($this->context->valueRegistry->error(
-						$this->context->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
+					return TypedValue::forValue($programRegistry->valueRegistry->error(
+						$programRegistry->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
 					));
 				}
-                return TypedValue::forValue($this->context->valueRegistry->integer(
+                return TypedValue::forValue($programRegistry->valueRegistry->integer(
 	                $targetValue->literalValue % $parameterValue->literalValue
                 ));
 			}
 			if ($parameterValue instanceof RealValue) {
 				if ((float)(string)$parameterValue->literalValue === 0.0) {
-					return TypedValue::forValue($this->context->valueRegistry->error(
-						$this->context->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
+					return TypedValue::forValue($programRegistry->valueRegistry->error(
+						$programRegistry->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
 					));
 				}
-                return TypedValue::forValue($this->context->valueRegistry->real(
+                return TypedValue::forValue($programRegistry->valueRegistry->real(
 	                fmod($targetValue->literalValue, $parameterValue->literalValue)
                 ));
 			}

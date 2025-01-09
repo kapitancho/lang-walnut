@@ -8,7 +8,6 @@ use Walnut\Lang\Blueprint\Common\Range\IntegerRange as IntegerRangeInterface;
 use Walnut\Lang\Blueprint\Common\Range\InvalidIntegerRange;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Value\IntegerValue;
 
 final readonly class IntegerRange implements IntegerRangeInterface, JsonSerializable {
 	public function __construct(
@@ -86,9 +85,9 @@ final readonly class IntegerRange implements IntegerRangeInterface, JsonSerializ
         return new RealRange($this->minValue, $this->maxValue);
     }
 
-    public function contains(IntegerValue $value): bool {
-        return $this->compare($this->minValue, $value->literalValue) < 1 &&
-            $this->compare($this->maxValue, $value->literalValue) > -1;
+    public function contains(Number $value): bool {
+        return $this->compare($this->minValue, $value) < 1 &&
+            $this->compare($this->maxValue, $value) > -1;
     }
 
 	public function __toString(): string {

@@ -16,7 +16,7 @@ final class StringValue implements StringValueInterface, JsonSerializable {
     ) {}
 
 	public StringSubsetType $type {
-		get => $this->typeRegistry->stringSubset([$this]);
+		get => $this->typeRegistry->stringSubset([$this->literalValue]);
     }
 
 	public function equals(Value $other): bool {

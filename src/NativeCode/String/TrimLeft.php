@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\NullType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
@@ -17,11 +17,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class TrimLeft implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -29,7 +26,7 @@ final readonly class TrimLeft implements NativeMethod {
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof NullType || $parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $this->context->typeRegistry->string(0, $targetType->range->maxLength);
+				return $programRegistry->typeRegistry->string(0, $targetType->range->maxLength);
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -41,6 +38,7 @@ final readonly class TrimLeft implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -51,8 +49,8 @@ final readonly class TrimLeft implements NativeMethod {
 		if ($targetValue instanceof StringValue) {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			return TypedValue::forValue($parameterValue instanceof StringValue ?
-				$this->context->valueRegistry->string(ltrim($targetValue->literalValue, $parameterValue->literalValue)) :
-				$this->context->valueRegistry->string(ltrim($targetValue->literalValue))
+				$programRegistry->valueRegistry->string(ltrim($targetValue->literalValue, $parameterValue->literalValue)) :
+				$programRegistry->valueRegistry->string(ltrim($targetValue->literalValue))
 			);
 		}
 		// @codeCoverageIgnoreStart

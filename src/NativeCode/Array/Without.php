@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\TupleType;
@@ -18,26 +18,23 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class Without implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
         $targetType = $this->toBaseType($targetType);
         $type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($type instanceof ArrayType) {
-			$returnType = $this->context->typeRegistry->array(
+			$returnType = $programRegistry->typeRegistry->array(
 				$type->itemType,
 				max(0, $type->range->minLength - 1),
 				$type->range->maxLength === PlusInfinity::value ?
 					PlusInfinity::value : $type->range->maxLength - 1
 			);
-			return $this->context->typeRegistry->result(
+			return $programRegistry->typeRegistry->result(
 				$returnType,
-				$this->context->typeRegistry->atom(
+				$programRegistry->typeRegistry->atom(
 					new TypeNameIdentifier("ItemNotFound")
 				)
 			);
@@ -48,6 +45,7 @@ final readonly class Without implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -61,16 +59,16 @@ final readonly class Without implements NativeMethod {
 				if ($value->equals($parameterValue)) {
 					array_splice($values, $index, 1);
 					return new TypedValue(
-						$this->context->typeRegistry->result(
+						$programRegistry->typeRegistry->result(
 							$value->type,
-							$this->context->typeRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
+							$programRegistry->typeRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
 						),
-						$this->context->valueRegistry->tuple($values)
+						$programRegistry->valueRegistry->tuple($values)
 					);
 				}
 			}
-			return TypedValue::forValue($this->context->valueRegistry->error(
-				$this->context->valueRegistry->atom(new TypeNameIdentifier("ItemNotFound"))
+			return TypedValue::forValue($programRegistry->valueRegistry->error(
+				$programRegistry->valueRegistry->atom(new TypeNameIdentifier("ItemNotFound"))
 			));
 		}
 		// @codeCoverageIgnoreStart

@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\Type\Type;
 final readonly class LOGDEBUG implements NativeMethod {
 
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -16,6 +17,7 @@ final readonly class LOGDEBUG implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {

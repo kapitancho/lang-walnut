@@ -8,19 +8,8 @@ use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionDefault;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionPair;
 use Walnut\Lang\Blueprint\Code\Expression\MethodCallExpression;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Function\CustomMethodDraft;
-use Walnut\Lang\Blueprint\Function\FunctionBodyDraft;
-use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder;
-use Walnut\Lang\Blueprint\Program\Builder\ProgramTypeBuilder;
-use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
-use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
-use Walnut\Lang\Blueprint\Type\Type;
 
-interface CodeBuilder extends ExpressionRegistry, ProgramTypeBuilder, CustomMethodRegistryBuilder {
-	public TypeRegistry $typeRegistry { get; }
-	public ValueRegistry $valueRegistry { get; }
-
+interface CodeBuilder {
 	/** @param list<MatchExpressionPair|MatchExpressionDefault> $pairs */
 	public function matchTrue(array $pairs): MatchExpression;
 	/** @param list<MatchExpressionPair|MatchExpressionDefault> $pairs */
@@ -35,13 +24,4 @@ interface CodeBuilder extends ExpressionRegistry, ProgramTypeBuilder, CustomMeth
 		Expression $parameter
 	): MethodCallExpression;
 	public function propertyAccess(Expression $target, int|string $propertyName): MethodCallExpression;
-
-	/** @throws CompilationException */
-	public function addConstructorMethod(
-		TypeNameIdentifier $typeName,
-		Type $parameterType,
-		Type $dependencyType,
-		Type $errorType,
-		FunctionBodyDraft $functionBody
-	): CustomMethodDraft;
 }

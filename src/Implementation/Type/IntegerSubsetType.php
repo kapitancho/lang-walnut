@@ -18,7 +18,7 @@ final class IntegerSubsetType implements IntegerSubsetTypeInterface, JsonSeriali
 
 	private readonly IntegerRangeInterface $actualRange;
 
-    /** @param list<IntegerValue> $subsetValues */
+    /** @param list<Number> $subsetValues */
     public function __construct(
         public readonly array $subsetValues
     ) {}
@@ -38,7 +38,7 @@ final class IntegerSubsetType implements IntegerSubsetTypeInterface, JsonSeriali
         };
     }
 
-	/** @param list<IntegerValue> $subsetValues */
+	/** @param list<Number> $subsetValues */
     private static function isInRange(array $subsetValues, IntegerRangeInterface|RealRange $range): bool {
 	    return array_all($subsetValues, fn($value) => $range->contains($value));
     }
@@ -48,15 +48,15 @@ final class IntegerSubsetType implements IntegerSubsetTypeInterface, JsonSeriali
     }
 
 	/**
-	 * @param list<IntegerValue> $subset
-	 * @param list<IntegerValue> $superset
+	 * @param list<Number> $subset
+	 * @param list<Number> $superset
 	 */
     private static function isSubsetReal(array $subset, array $superset): bool {
-	    return array_all($subset, fn($value) => in_array($value->asRealValue(), $superset));
+	    return array_all($subset, fn($value) => in_array($value, $superset));
     }
 
 	public function contains(IntegerValue $value): bool {
-		return in_array($value, $this->subsetValues);
+		return in_array($value->literalValue, $this->subsetValues);
 	}
 
 	public function __toString(): string {
@@ -65,15 +65,15 @@ final class IntegerSubsetType implements IntegerSubsetTypeInterface, JsonSeriali
 
 	private function minValue(): Number {
 		return min(array_map(
-			static fn(IntegerValue $value) =>
-				$value->literalValue, $this->subsetValues
+			static fn(Number $value) =>
+				$value, $this->subsetValues
 		));
 	}
 
 	private function maxValue(): Number {
 		return max(array_map(
-			static fn(IntegerValue $value) =>
-				$value->literalValue, $this->subsetValues
+			static fn(Number $value) =>
+				$value, $this->subsetValues
 		));
 	}
 

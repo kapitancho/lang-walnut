@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Blueprint\AST\Compiler;
+namespace Walnut\Lang\Blueprint\Compilation\AST;
 
 use Walnut\Lang\Blueprint\AST\Node\RootNode;
 

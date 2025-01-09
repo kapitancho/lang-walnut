@@ -4,29 +4,27 @@ namespace Walnut\Lang\NativeCode\Any;
 
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
 
 final readonly class Printed implements NativeMethod {
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType
 	): StringType {
-		return $this->context->typeRegistry->string();
+		return $programRegistry->typeRegistry->string();
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
 		$targetValue = $target->value;
 
-        return TypedValue::forValue($this->context->valueRegistry->string(
+        return TypedValue::forValue($programRegistry->valueRegistry->string(
             (string)$targetValue
         ));
 	}

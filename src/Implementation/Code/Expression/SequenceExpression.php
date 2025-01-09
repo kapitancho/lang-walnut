@@ -10,20 +10,16 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\SequenceExpression as SequenceExpressionInterface;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
-use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 
 final readonly class SequenceExpression implements SequenceExpressionInterface, JsonSerializable {
 
 	/** @param list<Expression> $expressions */
 	public function __construct(
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
 		public array $expressions
 	) {}
 
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
-		$expressionType = $this->typeRegistry->nothing;
+		$expressionType = $analyserContext->programRegistry->typeRegistry->nothing;
 		$returnTypes = [];
 		foreach($this->expressions as $expression) {
 			$analyserContext = $expression->analyse($analyserContext);
@@ -36,12 +32,12 @@ final readonly class SequenceExpression implements SequenceExpressionInterface, 
 		}
 		return $analyserContext->asAnalyserResult(
 			$expressionType,
-			$this->typeRegistry->union($returnTypes),
+			$analyserContext->programRegistry->typeRegistry->union($returnTypes),
 		);
 	}
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
-		$result = TypedValue::forValue($this->valueRegistry->null);
+		$result = TypedValue::forValue($executionContext->programRegistry->valueRegistry->null);
 		foreach($this->expressions as $expression) {
 			$executionContext = $expression->execute($executionContext);
 			$result = $executionContext->typedValue;

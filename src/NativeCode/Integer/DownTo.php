@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
@@ -18,11 +18,8 @@ use Walnut\Lang\Implementation\Value\IntegerValue;
 final readonly class DownTo implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -41,10 +38,10 @@ final readonly class DownTo implements NativeMethod {
 				$maxLength = $tMax === PlusInfinity::value || $pMin === MinusInfinity::value ? PlusInfinity::value :
 					max(0, 1 + $tMax - $pMin);
 
-				return $this->context->typeRegistry->array(
+				return $programRegistry->typeRegistry->array(
 					$maxLength === PlusInfinity::value || $maxLength > 0 ?
-						$this->context->typeRegistry->integer($pMin, $tMax) :
-						$this->context->typeRegistry->nothing,
+						$programRegistry->typeRegistry->integer($pMin, $tMax) :
+						$programRegistry->typeRegistry->nothing,
 					$maxLength === PlusInfinity::value ? $minLength : min($maxLength, $minLength),
 					$maxLength
 				);
@@ -59,6 +56,7 @@ final readonly class DownTo implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -69,10 +67,10 @@ final readonly class DownTo implements NativeMethod {
 		if ($targetValue instanceof IntegerValue) {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue) {
-	            return TypedValue::forValue($this->context->valueRegistry->tuple(
+	            return TypedValue::forValue($programRegistry->valueRegistry->tuple(
 		            $targetValue->literalValue > $parameterValue->literalValue  ?
 						array_map(fn(int $i): IntegerValue =>
-							$this->context->valueRegistry->integer($i),
+							$programRegistry->valueRegistry->integer($i),
 							range($targetValue->literalValue, $parameterValue->literalValue, -1)
 						) : []
 	            ));

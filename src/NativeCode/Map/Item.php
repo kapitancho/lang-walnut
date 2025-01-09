@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\IntersectionType;
 use Walnut\Lang\Blueprint\Type\MapType;
@@ -24,54 +24,51 @@ use Walnut\Lang\Implementation\Type\OptionalKeyType;
 final readonly class Item implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof IntersectionType) {
 			$types = array_map(
-				fn(Type $type) => $this->analyse($type, $parameterType),
+				fn(Type $type) => $this->analyse($programRegistry, $type, $parameterType),
 				$targetType->types
 			);
-			return $this->context->typeRegistry->intersection($types);
+			return $programRegistry->typeRegistry->intersection($types);
 		}
 		$type = $targetType instanceof RecordType ? $targetType->asMapType() : $targetType;
 		if ($targetType instanceof MetaType && $targetType->value === MetaTypeValue::Record) {
-			$type = $this->context->typeRegistry->map(
-				$this->context->typeRegistry->any
+			$type = $programRegistry->typeRegistry->map(
+				$programRegistry->typeRegistry->any
 			);
 		}
-		$mapItemNotFound = $this->context->typeRegistry->sealed(new TypeNameIdentifier("MapItemNotFound"));
+		$mapItemNotFound = $programRegistry->typeRegistry->sealed(new TypeNameIdentifier("MapItemNotFound"));
 		if ($type instanceof MapType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
 				$returnType = $type->itemType;
 				if ($targetType instanceof RecordType && $parameterType instanceof StringSubsetType) {
 					$tConv = fn(Type $type): Type => $type instanceof OptionalKeyType ?
-						$this->context->typeRegistry->result($type->valueType, $mapItemNotFound) :
+						$programRegistry->typeRegistry->result($type->valueType, $mapItemNotFound) :
 						$type;
-					$returnType = $this->context->typeRegistry->union(
+					$returnType = $programRegistry->typeRegistry->union(
 						array_map(
-							static fn(StringValue $value) => $tConv(
-								$targetType->types[$value->literalValue] ??
+							static fn(string $value) => $tConv(
+								$targetType->types[$value] ??
 								$targetType->restType
 							),
 							$parameterType->subsetValues
 						)
 					);
 					$allKeys = array_filter($parameterType->subsetValues,
-						static fn(StringValue $value) => array_key_exists($value->literalValue, $targetType->types)
+						static fn(string $value) => array_key_exists($value, $targetType->types)
 					);
 					if (count($allKeys) === count($parameterType->subsetValues)) {
 						return $returnType;
 					}
 				}
-				return $this->context->typeRegistry->result($returnType, $mapItemNotFound);
+				return $programRegistry->typeRegistry->result($returnType, $mapItemNotFound);
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType    ));
@@ -83,6 +80,7 @@ final readonly class Item implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -102,10 +100,10 @@ final readonly class Item implements NativeMethod {
 				};
 				return new TypedValue($type, $result);
 			}
-			return TypedValue::forValue($this->context->valueRegistry->error(
-				$this->context->valueRegistry->sealedValue(
+			return TypedValue::forValue($programRegistry->valueRegistry->error(
+				$programRegistry->valueRegistry->sealedValue(
 					new TypeNameIdentifier('MapItemNotFound'),
-					$this->context->valueRegistry->record(['key' => $parameterValue])
+					$programRegistry->valueRegistry->record(['key' => $parameterValue])
 				)
 			));
 		}

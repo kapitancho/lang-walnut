@@ -2,135 +2,139 @@
 
 namespace Walnut\Lang\Implementation\Compilation;
 
-use Walnut\Lang\Blueprint\AST\Compiler\AstProgramCompilationException;
-use Walnut\Lang\Blueprint\AST\Node\RootNode;
 use Walnut\Lang\Blueprint\AST\Parser\ParserException;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
+use Walnut\Lang\Blueprint\Compilation\AST\AstCompilationException;
+use Walnut\Lang\Blueprint\Compilation\AST\AstProgramCompilationException;
+use Walnut\Lang\Blueprint\Compilation\CompilationContext as CompilationContextInterface;
 use Walnut\Lang\Blueprint\Compilation\CompilationResult as CompilationResultInterface;
 use Walnut\Lang\Blueprint\Compilation\Compiler as CompilerInterface;
 use Walnut\Lang\Blueprint\Compilation\ModuleDependencyException;
 use Walnut\Lang\Blueprint\Compilation\ModuleLookupContext;
-use Walnut\Lang\Implementation\AST\Builder\ModuleNodeBuilderFactory;
-use Walnut\Lang\Implementation\AST\Parser\Parser;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry as ProgramRegistryInterface;
+use Walnut\Lang\Implementation\AST\Parser\NodeImporter;
 use Walnut\Lang\Implementation\AST\Parser\TransitionLogger;
-use Walnut\Lang\Implementation\AST\Parser\WalexLexerAdapter;
-use Walnut\Lang\Implementation\Program\Factory\ProgramFactory;
+use Walnut\Lang\Implementation\Code\NativeCode\NativeCodeTypeMapper;
+use Walnut\Lang\Implementation\Compilation\AST\AstCompilerFactory;
+use Walnut\Lang\Implementation\Compilation\AST\AstProgramCompiler;
+use Walnut\Lang\Implementation\Function\CustomMethodAnalyser;
+use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
+use Walnut\Lang\Implementation\Program\Program;
+use Walnut\Lang\Implementation\Program\Registry\MainMethodRegistry;
+use Walnut\Lang\Implementation\Program\Registry\ProgramRegistry;
 
 final readonly class Compiler implements CompilerInterface {
-	private WalexLexerAdapter $lexer;
-	private Parser $parser;
+	private const string lookupNamespace = 'Walnut\\Lang\\NativeCode';
+
+	private NodeImporter $nodeImporter;
 	public TransitionLogger $transitionLogger;
 	public function __construct(
-		private ModuleLookupContext $moduleLookupContext
+		private ModuleLookupContext $moduleLookupContext,
 	) {
-		$this->lexer = new WalexLexerAdapter();
-		$this->transitionLogger = new TransitionLogger();
-		$this->parser = new Parser($this->transitionLogger);
+		$this->nodeImporter = new NodeImporter($this->transitionLogger = new TransitionLogger());
 	}
 
-	private function getProgramFactory(): ProgramFactory {
-		return new ProgramFactory();
+	private function getAstCompiler(CompilationContextInterface $compilationContext): AstProgramCompiler {
+		return new AstCompilerFactory($compilationContext)->programCompiler;
 	}
 
-	private function getModuleImporter(ProgramFactory $pf): ModuleImporter {
-		return new ModuleImporter(
-			$this->lexer,
-			$this->moduleLookupContext,
-			$this->parser,
-			$pf->nodeBuilderFactory,
-			new ModuleNodeBuilderFactory
+	private function analyseProgram(CompilationContextInterface $compilationContext): ProgramRegistryInterface {
+		$customMethodRegistryBuilder = new CustomMethodRegistryBuilder();
+		$customMethodRegistry = $customMethodRegistryBuilder->buildFromDrafts(
+			$compilationContext->customMethodDraftRegistryBuilder);
+
+		$nativeCodeTypeMapper = new NativeCodeTypeMapper();
+		$methodRegistry = new MainMethodRegistry(
+			$nativeCodeTypeMapper,
+			$customMethodRegistry,
+			[
+				self::lookupNamespace
+			]
 		);
-	}
-
-	/** @throws ModuleDependencyException|ParserException */
-	private function importModules(ProgramFactory $pf, string $source): RootNode {
-		return $this->getModuleImporter($pf)->importModules($source);
-	}
-
-	/** @throws AstProgramCompilationException */
-	private function compileAst(ProgramFactory $pf, RootNode $rootNode): void {
-		$astTypeCompiler = new AstTypeCompiler($pf->codeBuilder->typeRegistry);
-		$astValueCompiler = new AstValueCompiler(
-			$pf->codeBuilder->valueRegistry,
-			new AstGlobalFunctionBodyCompiler,
-			$astTypeCompiler
+		$programRegistry = new ProgramRegistry(
+			$compilationContext->typeRegistry,
+			$compilationContext->valueRegistry,
+			$methodRegistry,
+			$compilationContext->globalScopeBuilder,
+			$compilationContext->expressionRegistry
 		);
-		$astModuleCompiler = new AstModuleCompiler(
-			$pf->codeBuilder,
-			$pf->codeBuilder,
-			$astTypeCompiler,
-			$astValueCompiler,
-		);
-		$astCompiler = new AstProgramCompiler($astModuleCompiler);
-		//$astCompiler = new AstCompiler($pf->codeBuilder);
-		$astCompiler->compileProgram($rootNode);
-	}
 
-	/** @throws ModuleDependencyException|AstProgramCompilationException|AnalyserException|ParserException */
-	public function compile(string $source): SuccessfulCompilationResult {
-		$pf = $this->getProgramFactory();
-		$this->compileAst($pf, $rootNode = $this->importModules($pf, $source));
-		return new SuccessfulCompilationResult(
-			$rootNode,
-			$pf->builder->analyseAndBuildProgram(),
-			$pf->registry
+		$customMethodAnalyser = new CustomMethodAnalyser(
+			$programRegistry,
+			$compilationContext->typeRegistry,
+			$methodRegistry,
+			$programRegistry->dependencyContainer
 		);
+		$analyseErrors = $customMethodAnalyser->analyse($customMethodRegistry);
+		if (count($analyseErrors) > 0) {
+			throw new AnalyserException(implode("\n", $analyseErrors));
+		}
+		return $programRegistry;
 	}
 
 	public function safeCompile(string $source): CompilationResultInterface {
-		$pf = $this->getProgramFactory();
+		$compilationContext = new CompilationContext();
 		try {
-			$rootNode = $this->importModules($pf, $source);
+			/// Part 1 - parser and import as AST
+			$rootNode = $this->nodeImporter->importFromSource(
+				$source,
+				$this->moduleLookupContext
+			);
 		} catch (ModuleDependencyException|ParserException $e) {
 			return new CompilationResult(
 				$e,
 				null,
-				$pf->registry
+				$compilationContext
 			);
 		}
+		$astCompiler = $this->getAstCompiler($compilationContext);
 		try {
-			$this->compileAst($pf, $rootNode);
+			$astCompiler->compileProgram($rootNode);
 		} catch (AstProgramCompilationException $e) {
 			return new CompilationResult(
 				$rootNode,
 				$e,
-				$pf->registry
+				$compilationContext
 			);
 		}
-
-		$astTypeCompiler = new AstTypeCompiler($pf->codeBuilder->typeRegistry);
-		$astValueCompiler = new AstValueCompiler(
-			$pf->codeBuilder->valueRegistry,
-			new AstGlobalFunctionBodyCompiler,
-			$astTypeCompiler
-		);
-		$astExpressionCompiler = new AstExpressionCompiler(
-			$astTypeCompiler,
-			$astValueCompiler,
-			$pf->codeBuilder
-		);
-		$astFunctionBodyCompiler = new AstFunctionBodyCompiler(
-			$astExpressionCompiler,
-			$pf->codeBuilder
-		);
-		$methodRegistry = $pf->customMethodRegistryBuilder->build(
-			$astFunctionBodyCompiler
-		);
-
 		try {
-			$program = $pf->builder->analyseAndBuildProgram();
-		} catch (AnalyserException $e) {
+			$programRegistry = $this->analyseProgram($compilationContext);
+		} catch (AnalyserException|AstCompilationException $e) {
 			return new CompilationResult(
 				$rootNode,
 				$e,
-				$pf->registry
+				$compilationContext
 			);
 		}
+		$program = new Program(
+			$programRegistry,
+			$compilationContext->globalScopeBuilder->build(),
+		);
+		return new SuccessfulCompilationResult(
+			$rootNode,
+			$program,
+			$compilationContext
+		);
+	}
+
+	public function compile(string $source): SuccessfulCompilationResult {
+		$compilationContext = new CompilationContext();
+		$astCompiler = $this->getAstCompiler($compilationContext);
+		$rootNode = $this->nodeImporter->importFromSource(
+			$source,
+			$this->moduleLookupContext
+		);
+		$astCompiler->compileProgram($rootNode);
+		$programRegistry = $this->analyseProgram($compilationContext);
+		$program = new Program(
+			$programRegistry,
+			$compilationContext->globalScopeBuilder->build(),
+		);
 
 		return new SuccessfulCompilationResult(
 			$rootNode,
 			$program,
-			$pf->registry
+			$compilationContext
 		);
 	}
 }

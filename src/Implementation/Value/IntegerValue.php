@@ -17,7 +17,7 @@ final class IntegerValue implements IntegerValueInterface, JsonSerializable {
     ) {}
 
 	public IntegerSubsetType $type {
-		get => $this->typeRegistry->integerSubset([$this]);
+		get => $this->typeRegistry->integerSubset([$this->literalValue]);
     }
 
 	public function asRealValue(): RealValue {

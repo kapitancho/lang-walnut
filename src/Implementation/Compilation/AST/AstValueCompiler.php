@@ -1,11 +1,7 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Compilation;
+namespace Walnut\Lang\Implementation\Compilation\AST;
 
-use Walnut\Lang\Blueprint\AST\Compiler\AstCompilationException;
-use Walnut\Lang\Blueprint\AST\Compiler\AstFunctionBodyCompiler;
-use Walnut\Lang\Blueprint\AST\Compiler\AstTypeCompiler;
-use Walnut\Lang\Blueprint\AST\Compiler\AstValueCompiler as AstValueCompilerInterface;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\AtomValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\EnumerationValueNode;
@@ -20,6 +16,10 @@ use Walnut\Lang\Blueprint\AST\Node\Value\TrueValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\TupleValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\TypeValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\ValueNode;
+use Walnut\Lang\Blueprint\Compilation\AST\AstCompilationException;
+use Walnut\Lang\Blueprint\Compilation\AST\AstFunctionBodyCompiler;
+use Walnut\Lang\Blueprint\Compilation\AST\AstTypeCompiler;
+use Walnut\Lang\Blueprint\Compilation\AST\AstValueCompiler as AstValueCompilerInterface;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Program\UnknownType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -69,7 +69,7 @@ final readonly class AstValueCompiler implements AstValueCompilerInterface {
 						$this->type($valueNode->parameterType),
 						$this->type($valueNode->dependencyType),
 						$this->type($valueNode->returnType),
-						$this->functionBodyCompiler->functionBody($valueNode->functionBody)
+						$this->functionBodyCompiler->functionBody($valueNode->functionBody->expression)
 					),
 				true => throw new AstCompilationException(
 					$valueNode,

@@ -7,27 +7,24 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 
 final readonly class AsMutableOfType implements NativeMethod {
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		if ($parameterType instanceof TypeType) {
-			return $this->context->typeRegistry->result(
-				//$this->context->typeRegistry->type(
-					$this->context->typeRegistry->metaType(MetaTypeValue::MutableType)
+			return $programRegistry->typeRegistry->result(
+				//$programRegistry->typeRegistry->type(
+					$programRegistry->typeRegistry->metaType(MetaTypeValue::MutableType)
 				/*)*/,
-				$this->context->typeRegistry->sealed(new TypeNameIdentifier("CastNotAvailable"))
+				$programRegistry->typeRegistry->sealed(new TypeNameIdentifier("CastNotAvailable"))
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -36,6 +33,7 @@ final readonly class AsMutableOfType implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -44,17 +42,17 @@ final readonly class AsMutableOfType implements NativeMethod {
 
 		if ($parameterValue instanceof TypeValue) {
 			if ($targetValue->type->isSubtypeOf($parameterValue->typeValue)) {
-				return TypedValue::forValue($this->context->valueRegistry->mutable(
+				return TypedValue::forValue($programRegistry->valueRegistry->mutable(
 					$parameterValue->typeValue,
 					$targetValue
 				));
 			}
-			return TypedValue::forValue($this->context->valueRegistry->error(
-				$this->context->valueRegistry->sealedValue(
+			return TypedValue::forValue($programRegistry->valueRegistry->error(
+				$programRegistry->valueRegistry->sealedValue(
 					new TypeNameIdentifier("CastNotAvailable"),
-					$this->context->valueRegistry->record([
-						'from' => $this->context->valueRegistry->type($targetValue->type),
-						'to' => $this->context->valueRegistry->type($parameterValue->typeValue)
+					$programRegistry->valueRegistry->record([
+						'from' => $programRegistry->valueRegistry->type($targetValue->type),
+						'to' => $programRegistry->valueRegistry->type($parameterValue->typeValue)
 					])
 				)
 			));

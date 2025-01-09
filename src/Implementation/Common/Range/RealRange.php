@@ -8,8 +8,6 @@ use Walnut\Lang\Blueprint\Common\Range\InvalidRealRange;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\RealRange as RealRangeInterface;
-use Walnut\Lang\Blueprint\Value\IntegerValue;
-use Walnut\Lang\Blueprint\Value\RealValue;
 
 final readonly class RealRange implements RealRangeInterface, JsonSerializable {
 	public function __construct(
@@ -27,9 +25,9 @@ final readonly class RealRange implements RealRangeInterface, JsonSerializable {
 			$this->compare($this->maxValue, $range->maxValue) < 1;
 	}
 
-	public function contains(RealValue|IntegerValue $value): bool {
-		return $this->compare($this->minValue, $value->literalValue) < 1 &&
-			$this->compare($this->maxValue, $value->literalValue) > -1;
+	public function contains(Number $value): bool {
+		return $this->compare($this->minValue, $value) < 1 &&
+			$this->compare($this->maxValue, $value) > -1;
 	}
 
 	/** @return int<-1>|int<0>|int<1> */

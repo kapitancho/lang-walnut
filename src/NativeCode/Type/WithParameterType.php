@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Type\TypeType;
@@ -17,25 +17,22 @@ final readonly class WithParameterType implements NativeMethod {
 
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($parameterType->isSubtypeOf(
-				$this->context->typeRegistry->type(
-					$this->context->typeRegistry->any
+				$programRegistry->typeRegistry->type(
+					$programRegistry->typeRegistry->any
 				)
 			)) {
 				if ($refType instanceof FunctionType) {
-					return $this->context->typeRegistry->type(
-						$this->context->typeRegistry->function(
-							$this->context->typeRegistry->nothing,
+					return $programRegistry->typeRegistry->type(
+						$programRegistry->typeRegistry->function(
+							$programRegistry->typeRegistry->nothing,
 							$refType->returnType,
 						)
 					);
@@ -51,6 +48,7 @@ final readonly class WithParameterType implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -59,16 +57,16 @@ final readonly class WithParameterType implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($parameter->type->isSubtypeOf(
-				$this->context->typeRegistry->type(
-					$this->context->typeRegistry->any
+				$programRegistry->typeRegistry->type(
+					$programRegistry->typeRegistry->any
 				)
 			)) {
 				if ($typeValue instanceof FunctionType) {
-					$result = $this->context->typeRegistry->function(
+					$result = $programRegistry->typeRegistry->function(
 						$parameter->value->typeValue,
 						$typeValue->returnType,
 					);
-					return TypedValue::forValue($this->context->valueRegistry->type($result));
+					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
 				}
 			}
 		}

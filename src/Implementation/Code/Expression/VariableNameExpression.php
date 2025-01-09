@@ -9,17 +9,15 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\VariableNameExpression as VariableNameExpressionInterface;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 
 final readonly class VariableNameExpression implements VariableNameExpressionInterface, JsonSerializable {
 	public function __construct(
-		private TypeRegistry $typeRegistry,
 		public VariableNameIdentifier $variableName
 	) {}
 
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
 		$type = $analyserContext->variableScope->typeOf($this->variableName);
-		return $analyserContext->asAnalyserResult($type, $this->typeRegistry->nothing);
+		return $analyserContext->asAnalyserResult($type, $analyserContext->programRegistry->typeRegistry->nothing);
 	}
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {

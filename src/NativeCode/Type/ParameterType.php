@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\MetaType;
@@ -19,21 +19,18 @@ final readonly class ParameterType implements NativeMethod {
 
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof FunctionType) {
-				return $this->context->typeRegistry->type($refType->parameterType);
+				return $programRegistry->typeRegistry->type($refType->parameterType);
 			}
 			if ($refType instanceof MetaType && $refType->value === MetaTypeValue::Function) {
-				return $this->context->typeRegistry->type($this->context->typeRegistry->any);
+				return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->any);
 			}
 		}
 		// @codeCoverageIgnoreStart
@@ -42,6 +39,7 @@ final readonly class ParameterType implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -50,7 +48,7 @@ final readonly class ParameterType implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof FunctionType) {
-				return TypedValue::forValue($this->context->valueRegistry->type($typeValue->parameterType));
+				return TypedValue::forValue($programRegistry->valueRegistry->type($typeValue->parameterType));
 			}
 		}
 		// @codeCoverageIgnoreStart

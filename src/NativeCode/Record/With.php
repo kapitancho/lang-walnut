@@ -8,9 +8,8 @@ use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\Method;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\RecordType;
@@ -25,12 +24,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class With implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context,
-		private MethodRegistry $methodRegistry
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -38,23 +33,23 @@ final readonly class With implements NativeMethod {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof RecordType && $parameterType instanceof RecordType) {
 			$recTypes = [...$targetType->types, ...$parameterType->types];
-			$result = $this->context->typeRegistry->record($recTypes);
+			$result = $programRegistry->typeRegistry->record($recTypes);
 			if ($originalTargetType instanceof SubtypeType) {
-				$constructorType = $this->context->typeRegistry->typeByName(new TypeNameIdentifier('Constructor'));
-				$validatorMethod = $this->methodRegistry->method(
+				$constructorType = $programRegistry->typeRegistry->typeByName(new TypeNameIdentifier('Constructor'));
+				$validatorMethod = $programRegistry->methodRegistry->method(
 					$constructorType,
 					new MethodNameIdentifier('as' . $originalTargetType->name->identifier)
 				);
 				$b = $originalTargetType->baseType;
 				$errorType = null;
 				if ($validatorMethod instanceof Method) {
-					$validatorResult = $validatorMethod->analyse($constructorType, $b);
+					$validatorResult = $validatorMethod->analyse($programRegistry, $constructorType, $b);
 					if ($validatorResult instanceof ResultType) {
 						$errorType = $validatorResult->errorType instanceof NothingType ? null : $validatorResult->errorType;
 					}
 				}
 				if ($result->isSubtypeOf($b)) {
-					return $errorType ? $this->context->typeRegistry->result(
+					return $errorType ? $programRegistry->typeRegistry->result(
 						$originalTargetType, $errorType
 					) : $originalTargetType;
 				}
@@ -69,8 +64,8 @@ final readonly class With implements NativeMethod {
 		}
 		if ($targetType instanceof MapType) {
 			if ($parameterType instanceof MapType) {
-				return $this->context->typeRegistry->map(
-					$this->context->typeRegistry->union([
+				return $programRegistry->typeRegistry->map(
+					$programRegistry->typeRegistry->union([
 						$targetType->itemType,
 						$parameterType->itemType
 					]),
@@ -88,6 +83,7 @@ final readonly class With implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -98,18 +94,19 @@ final readonly class With implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue) {
 			if ($parameterValue instanceof RecordValue) {
-				$result = $this->context->valueRegistry->record([
+				$result = $programRegistry->valueRegistry->record([
 					... $targetValue->values, ... $parameterValue->values
 				]);
 				$r = TypedValue::forValue($result);
 				if ($originalValue instanceof SubtypeValue) {
-					$constructorType = $this->context->typeRegistry->typeByName(new TypeNameIdentifier('Constructor'));
-					$validatorMethod = $this->methodRegistry->method(
+					$constructorType = $programRegistry->typeRegistry->typeByName(new TypeNameIdentifier('Constructor'));
+					$validatorMethod = $programRegistry->methodRegistry->method(
 						$constructorType,
 						new MethodNameIdentifier('as' . $originalValue->type->name->identifier)
 					);
 					if ($validatorMethod instanceof Method) {
 						$validatorResult = $validatorMethod->execute(
+							$programRegistry,
 							TypedValue::forValue($constructorType->value),
 							$r,
 						);
@@ -117,7 +114,7 @@ final readonly class With implements NativeMethod {
 						if ($resultValue instanceof ErrorValue) {
 							return $validatorResult;
 						}
-						$r = TypedValue::forValue($this->context->valueRegistry->subtypeValue(
+						$r = TypedValue::forValue($programRegistry->valueRegistry->subtypeValue(
 							$originalValue->type->name,
 							$result
 						));

@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\Code\Scope\VariableScope;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Builder\ScopeBuilder;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Implementation\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Implementation\Code\Analyser\AnalyserResult;
@@ -18,6 +19,7 @@ use Walnut\Lang\Implementation\Code\Execution\ExecutionResult;
 final class GlobalContext implements AnalyserContextInterface, ExecutionContextInterface {
 
 	public function __construct(
+		public readonly ProgramRegistry $programRegistry,
 		private readonly ScopeBuilder $scopeBuilder
 	) {}
 
@@ -29,12 +31,14 @@ final class GlobalContext implements AnalyserContextInterface, ExecutionContextI
 
 	public function withAddedVariableValue(VariableNameIdentifier $variableName, TypedValue $typedValue): ExecutionContext {
 		return new ExecutionContext(
+			$this->programRegistry,
 			$this->variableValueScope->withAddedVariableValue($variableName, $typedValue)
 		);
 	}
 
 	public function asExecutionResult(TypedValue $typedValue): ExecutionResult {
 		return new ExecutionResult(
+			$this->programRegistry,
 			$this->variableValueScope,
 			$typedValue
 		);
@@ -51,12 +55,14 @@ final class GlobalContext implements AnalyserContextInterface, ExecutionContextI
 		Type $variableType
 	): AnalyserContextInterface {
 		return new AnalyserContext(
+			$this->programRegistry,
 			$this->variableScope->withAddedVariableType($variableName, $variableType)
 		);
 	}
 
 	public function asAnalyserResult(Type $expressionType, Type $returnType): AnalyserResult {
 		return new AnalyserResult(
+			$this->programRegistry,
 			$this->variableScope,
 			$expressionType,
 			$returnType

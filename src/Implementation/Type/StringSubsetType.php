@@ -14,7 +14,7 @@ final class StringSubsetType implements StringSubsetTypeInterface, JsonSerializa
 
 	private readonly LengthRange $actualRange;
 
-	/** @param list<StringValue> $subsetValues */
+	/** @param list<string> $subsetValues */
     public function __construct(
         public readonly array $subsetValues
     ) {}
@@ -30,10 +30,10 @@ final class StringSubsetType implements StringSubsetTypeInterface, JsonSerializa
         };
     }
 
-	/** @param list<StringValue> $subsetValues */
+	/** @param list<string> $subsetValues */
     private static function isInRange(array $subsetValues, LengthRange $range): bool {
 	    return array_all($subsetValues, fn($value) => $range->lengthInRange(
-			new Number(mb_strlen($value->literalValue))
+			new Number(mb_strlen($value))
 	    ));
     }
 
@@ -42,7 +42,7 @@ final class StringSubsetType implements StringSubsetTypeInterface, JsonSerializa
     }
 
 	public function contains(StringValue $value): bool {
-		return in_array($value, $this->subsetValues);
+		return in_array($value->literalValue, $this->subsetValues);
 	}
 
 	public function __toString(): string {
@@ -51,15 +51,15 @@ final class StringSubsetType implements StringSubsetTypeInterface, JsonSerializa
 
 	private function minLength(): Number {
 		return new Number(min(array_map(
-			static fn(StringValue $value): int =>
-				mb_strlen($value->literalValue), $this->subsetValues
+			static fn(string $value): int =>
+				mb_strlen($value), $this->subsetValues
 		)));
 	}
 
 	private function maxLength(): Number {
 		return new Number(max(array_map(
-			static fn(StringValue $value): int =>
-				mb_strlen($value->literalValue), $this->subsetValues
+			static fn(string $value): int =>
+				mb_strlen($value), $this->subsetValues
 		)));
 	}
 

@@ -10,15 +10,11 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\RecordExpression as RecordExpressionInterface;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
-use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 
 final readonly class RecordExpression implements RecordExpressionInterface, JsonSerializable {
 
 	/** @param array<string, Expression> $values */
 	public function __construct(
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
 		public array $values
 	) {}
 
@@ -31,8 +27,8 @@ final readonly class RecordExpression implements RecordExpressionInterface, Json
 			$returnTypes[] = $analyserContext->returnType;
 		}
 		return $analyserContext->asAnalyserResult(
-			$this->typeRegistry->record($subtypes),
-			$this->typeRegistry->union($returnTypes),
+			$analyserContext->programRegistry->typeRegistry->record($subtypes),
+			$analyserContext->programRegistry->typeRegistry->union($returnTypes),
 		);
 	}
 
@@ -45,8 +41,8 @@ final readonly class RecordExpression implements RecordExpressionInterface, Json
 			$types[$key] = $executionContext->valueType;
 		}
 		return $executionContext->asExecutionResult(new TypedValue(
-			$this->typeRegistry->record($types),
-			$this->valueRegistry->record($values)
+			$executionContext->programRegistry->typeRegistry->record($types),
+			$executionContext->programRegistry->valueRegistry->record($values)
 		));
 	}
 

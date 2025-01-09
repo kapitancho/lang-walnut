@@ -7,6 +7,7 @@ use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Program\InvalidEntryPoint;
 use Walnut\Lang\Blueprint\Program\Program as ProgramInterface;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
@@ -14,6 +15,7 @@ use Walnut\Lang\Blueprint\Value\FunctionValue;
 final readonly class Program implements ProgramInterface {
 
 	public function __construct(
+		private ProgramRegistry $programRegistry,
 		private VariableValueScope $globalScope
 	) {}
 
@@ -50,6 +52,7 @@ final readonly class Program implements ProgramInterface {
 			);
 		}
 		return new ProgramEntryPoint(
+			$this->programRegistry,
 			$this->globalScope,
 			$value->withVariableValueScope($this->globalScope)
 		);

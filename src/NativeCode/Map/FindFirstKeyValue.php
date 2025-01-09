@@ -6,8 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -18,21 +19,18 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class FindFirstKeyValue implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
-	private function getExpectedType(Type $targetType): Type {
-		return $this->context->typeRegistry->function(
-			$this->context->typeRegistry->record([
-				'key' => $this->context->typeRegistry->string(),
+	private function getExpectedType(TypeRegistry $typeRegistry, Type $targetType): Type {
+		return $typeRegistry->function(
+			$typeRegistry->record([
+				'key' => $typeRegistry->string(),
 				'value' => $targetType
 			]),
-			$this->context->typeRegistry->boolean
+			$typeRegistry->boolean
 		);
 	}
 
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -41,14 +39,14 @@ final readonly class FindFirstKeyValue implements NativeMethod {
 			$targetType = $targetType->asMapType();
 		}
 		if ($targetType instanceof MapType) {
-			$expectedType = $this->getExpectedType($targetType->itemType);
+			$expectedType = $this->getExpectedType($programRegistry->typeRegistry, $targetType->itemType);
 			if ($parameterType->isSubtypeOf($expectedType)) {
-				return $this->context->typeRegistry->result(
-					$this->context->typeRegistry->record([
-						'key' => $this->context->typeRegistry->string(),
+				return $programRegistry->typeRegistry->result(
+					$programRegistry->typeRegistry->record([
+						'key' => $programRegistry->typeRegistry->string(),
 						'value' => $targetType->itemType
 					]),
-					$this->context->typeRegistry->atom(
+					$programRegistry->typeRegistry->atom(
 						new TypeNameIdentifier('ItemNotFound')
 					)
 				);
@@ -63,6 +61,7 @@ final readonly class FindFirstKeyValue implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -73,12 +72,12 @@ final readonly class FindFirstKeyValue implements NativeMethod {
 		if ($targetValue instanceof RecordValue) {
 			if ($parameterValue instanceof FunctionValue) {
 				$values = $targetValue->values;
-				$true = $this->context->valueRegistry->true;
+				$true = $programRegistry->valueRegistry->true;
 				foreach($values as $key => $value) {
 					$filterResult = $parameterValue->execute(
-						$this->context->globalContext,
-						$val = $this->context->valueRegistry->record([
-							'key' => $this->context->valueRegistry->string($key),
+						$programRegistry->executionContext,
+						$val = $programRegistry->valueRegistry->record([
+							'key' => $programRegistry->valueRegistry->string($key),
 							'value' => $value
 						])
 					);
@@ -86,8 +85,8 @@ final readonly class FindFirstKeyValue implements NativeMethod {
 						return TypedValue::forValue($val);
 					}
 				}
-				return TypedValue::forValue($this->context->valueRegistry->error(
-					$this->context->valueRegistry->atom(
+				return TypedValue::forValue($programRegistry->valueRegistry->error(
+					$programRegistry->valueRegistry->atom(
 						new TypeNameIdentifier('ItemNotFound'),
 					)
 				));

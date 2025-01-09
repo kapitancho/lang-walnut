@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\MetaType;
@@ -19,22 +19,19 @@ final readonly class EnumerationType implements NativeMethod {
 
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $targetType->refType;
 			if ($refType instanceof EnumerationSubsetType) {
-				return $this->context->typeRegistry->type($refType->enumeration);
+				return $programRegistry->typeRegistry->type($refType->enumeration);
 			}
 			if ($refType instanceof MetaType) {
 				if ($refType->value === MetaTypeValue::EnumerationSubset) {
-					return $this->context->typeRegistry->type($this->context->typeRegistry->any);
+					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->any);
 				}
 			}
 		}
@@ -44,6 +41,7 @@ final readonly class EnumerationType implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -52,7 +50,7 @@ final readonly class EnumerationType implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $targetValue->typeValue;
 			if ($typeValue instanceof EnumerationSubsetType) {
-				return TypedValue::forValue($this->context->valueRegistry->type($typeValue->enumeration));
+				return TypedValue::forValue($programRegistry->valueRegistry->type($typeValue->enumeration));
 			}
 		}
 		// @codeCoverageIgnoreStart

@@ -5,7 +5,7 @@ namespace Walnut\Lang\NativeCode\Array;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\TupleType;
@@ -17,11 +17,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class ChainInvoke implements NativeMethod {
 	use BaseType;
 
-    public function __construct(
-        private MethodExecutionContext $context
-    ) {}
-
     public function analyse(
+		ProgramRegistry $programRegistry,
         Type      $targetType,
         Type      $parameterType
     ): Type {
@@ -48,6 +45,7 @@ final readonly class ChainInvoke implements NativeMethod {
     }
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -60,7 +58,7 @@ final readonly class ChainInvoke implements NativeMethod {
             foreach($targetValue->values as $fnValue) {
 				if ($fnValue instanceof FunctionValue) {
 					$type = $fnValue->returnType;
-                    $parameterValue = $fnValue->execute($this->context->globalContext, $parameterValue);
+                    $parameterValue = $fnValue->execute($programRegistry->executionContext, $parameterValue);
 	            }
             }
         }

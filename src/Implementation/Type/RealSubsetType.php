@@ -14,7 +14,7 @@ final class RealSubsetType implements RealSubsetTypeInterface, JsonSerializable 
 
 	private readonly RealRange $actualRange;
 
-    /** @param list<RealValue> $subsetValues */
+    /** @param list<Number> $subsetValues */
     public function __construct(
         public readonly array $subsetValues
     ) {}
@@ -30,7 +30,7 @@ final class RealSubsetType implements RealSubsetTypeInterface, JsonSerializable 
         };
     }
 
-	/** @param list<RealValue> $subsetValues */
+	/** @param list<Number> $subsetValues */
     private static function isInRange(array $subsetValues, RealRange $range): bool {
 	    return array_all($subsetValues, fn($value) => $range->contains($value));
     }
@@ -40,7 +40,7 @@ final class RealSubsetType implements RealSubsetTypeInterface, JsonSerializable 
     }
 
 	public function contains(RealValue $value): bool {
-		return in_array($value, $this->subsetValues);
+		return in_array($value->literalValue, $this->subsetValues);
 	}
 
 	public function __toString(): string {
@@ -50,15 +50,15 @@ final class RealSubsetType implements RealSubsetTypeInterface, JsonSerializable 
 
 	private function minValue(): Number {
 		return new Number(min(array_map(
-			static fn(RealValue $value) =>
-				$value->literalValue, $this->subsetValues
+			static fn(Number $value) =>
+				$value, $this->subsetValues
 		)));
 	}
 
 	private function maxValue(): Number {
 		return new Number(max(array_map(
-			static fn(RealValue $value) =>
-				$value->literalValue, $this->subsetValues
+			static fn(Number $value) =>
+				$value, $this->subsetValues
 		)));
 	}
 

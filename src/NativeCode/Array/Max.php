@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
@@ -20,11 +20,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class Max implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -35,24 +32,24 @@ final readonly class Max implements NativeMethod {
 		if ($targetType instanceof ArrayType && $targetType->range->minLength > 0) {
 			$itemType = $targetType->itemType;
 			if ($itemType->isSubtypeOf(
-				$this->context->typeRegistry->union([
-					$this->context->typeRegistry->integer(),
-					$this->context->typeRegistry->real()
+				$programRegistry->typeRegistry->union([
+					$programRegistry->typeRegistry->integer(),
+					$programRegistry->typeRegistry->real()
 				])
 			)) {
 				if ($itemType instanceof RealType || $itemType instanceof RealSubsetType) {
-					return $this->context->typeRegistry->real(
+					return $programRegistry->typeRegistry->real(
 						$itemType->range->minValue,
 						$itemType->range->maxValue
 					);
 				}
 				if ($itemType instanceof IntegerType || $itemType instanceof IntegerSubsetType) {
-					return $this->context->typeRegistry->integer(
+					return $programRegistry->typeRegistry->integer(
 						$itemType->range->minValue,
 						$itemType->range->maxValue
 					);
 				}
-				return $this->context->typeRegistry->real();
+				return $programRegistry->typeRegistry->real();
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -64,6 +61,7 @@ final readonly class Max implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {

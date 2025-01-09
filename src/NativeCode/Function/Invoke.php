@@ -5,7 +5,7 @@ namespace Walnut\Lang\NativeCode\Function;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\RecordType;
@@ -20,11 +20,11 @@ final readonly class Invoke implements NativeMethod {
 	use BaseType;
 	use TupleAsRecord;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
-	public function analyse(Type $targetType, Type $parameterType): Type {
+	public function analyse(
+		ProgramRegistry $programRegistry,
+		Type $targetType,
+		Type $parameterType
+	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof FunctionType) {
 			if (!(
@@ -32,7 +32,7 @@ final readonly class Invoke implements NativeMethod {
 					$targetType->parameterType instanceof RecordType &&
 					$parameterType instanceof TupleType &&
 					$this->isTupleCompatibleToRecord(
-						$this->context->typeRegistry,
+						$programRegistry->typeRegistry,
 						$parameterType,
 						$targetType->parameterType
 					)
@@ -55,6 +55,7 @@ final readonly class Invoke implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -65,7 +66,7 @@ final readonly class Invoke implements NativeMethod {
 		if ($targetValue instanceof FunctionValue) {
 			if ($parameterValue instanceof TupleValue && $targetValue->parameterType instanceof RecordType) {
 				$parameterValue = $this->getTupleAsRecord(
-					$this->context->valueRegistry,
+					$programRegistry->valueRegistry,
 					$parameterValue,
 					$targetValue->parameterType,
 				);
@@ -73,7 +74,7 @@ final readonly class Invoke implements NativeMethod {
 			return new TypedValue(
 				$targetValue->returnType,
 				$targetValue->execute(
-					$this->context->globalContext,
+					$programRegistry->executionContext,
 					$parameterValue
 				)
 			);

@@ -14,12 +14,10 @@ use Walnut\Lang\Blueprint\Code\Expression\VariableAssignmentExpression as Variab
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\FunctionBodyException;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
 
 final readonly class VariableAssignmentExpression implements VariableAssignmentExpressionInterface, JsonSerializable {
 	public function __construct(
-		private TypeRegistry $typeRegistry,
 		public VariableNameIdentifier $variableName,
 		public Expression $assignedExpression
 	) {}
@@ -32,7 +30,7 @@ final readonly class VariableAssignmentExpression implements VariableAssignmentE
 			$innerFn = $this->variableName;
 			$analyserContext = $analyserContext->withAddedVariableType(
 				$this->variableName,
-				$this->typeRegistry->function(
+				$analyserContext->programRegistry->typeRegistry->function(
 					$v->parameterType,
 					$v->returnType,
 				)

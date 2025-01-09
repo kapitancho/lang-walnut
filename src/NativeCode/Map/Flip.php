@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -17,11 +17,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class Flip implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -31,9 +28,9 @@ final readonly class Flip implements NativeMethod {
 		}
 		if ($targetType instanceof MapType) {
 			$itemType = $targetType->itemType;
-			if ($itemType->isSubtypeOf($this->context->typeRegistry->string())) {
-				return $this->context->typeRegistry->map(
-					$this->context->typeRegistry->string(),
+			if ($itemType->isSubtypeOf($programRegistry->typeRegistry->string())) {
+				return $programRegistry->typeRegistry->map(
+					$programRegistry->typeRegistry->string(),
 					min(1, $targetType->range->minLength),
 					$targetType->range->maxLength,
 				);
@@ -48,6 +45,7 @@ final readonly class Flip implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -68,8 +66,8 @@ final readonly class Flip implements NativeMethod {
 				}
 			}
 			$rawValues = array_flip($rawValues);
-			return TypedValue::forValue($this->context->valueRegistry->record(array_map(
-				fn($value) => $this->context->valueRegistry->string($value),
+			return TypedValue::forValue($programRegistry->valueRegistry->record(array_map(
+				fn($value) => $programRegistry->valueRegistry->string($value),
 				$rawValues
 			)));
 		}

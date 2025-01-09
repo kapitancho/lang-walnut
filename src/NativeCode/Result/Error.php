@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -16,11 +16,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class Error implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -34,6 +31,7 @@ final readonly class Error implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -41,8 +39,8 @@ final readonly class Error implements NativeMethod {
 
 		if ($targetValue instanceof ErrorValue) {
 			return new TypedValue(
-				$this->context->typeRegistry->result(
-					$this->context->typeRegistry->nothing,
+				$programRegistry->typeRegistry->result(
+					$programRegistry->typeRegistry->nothing,
 					$targetValue->type
 				),
 				$targetValue->errorValue

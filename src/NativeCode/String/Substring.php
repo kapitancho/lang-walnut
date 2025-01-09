@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -18,24 +18,21 @@ use Walnut\Lang\Implementation\Value\IntegerValue;
 final readonly class Substring implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
-			$pInt = $this->context->typeRegistry->integer(0);
-			$pType = $this->context->typeRegistry->record([
+			$pInt = $programRegistry->typeRegistry->integer(0);
+			$pType = $programRegistry->typeRegistry->record([
 				"start" => $pInt,
 				"length" => $pInt
 			]);
 			if ($parameterType->isSubtypeOf($pType)) {
 				$parameterType = $this->toBaseType($parameterType);
-				return $this->context->typeRegistry->string(0, min(
+				return $programRegistry->typeRegistry->string(0, min(
 					$targetType->range->maxLength,
 					$parameterType->types['length']->range->maxValue
 				));
@@ -50,6 +47,7 @@ final readonly class Substring implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -68,7 +66,7 @@ final readonly class Substring implements NativeMethod {
 				$start instanceof IntegerValue &&
 				$length instanceof IntegerValue
 			) {
-				return TypedValue::forValue($this->context->valueRegistry->string(
+				return TypedValue::forValue($programRegistry->valueRegistry->string(
 					mb_substr(
 						$targetValue->literalValue,
 						(string)$start->literalValue,

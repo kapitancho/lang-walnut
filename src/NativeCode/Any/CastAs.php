@@ -9,7 +9,7 @@ use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\Method;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
@@ -21,8 +21,6 @@ use Walnut\Lang\Implementation\Type\ResultType;
 
 final readonly class CastAs implements NativeMethod {
 	public function __construct(
-		private MethodExecutionContext $context,
-		private MethodRegistry $methodRegistry,
 		private NativeCodeTypeMapper $typeMapper,
 	) {}
 
@@ -30,6 +28,7 @@ final readonly class CastAs implements NativeMethod {
 	 * @return array{0: string, 1: Method}|UnknownMethod
 	 */
 	private function getMethod(
+		MethodRegistry $methodRegistry,
 		TypeInterface $targetType,
 		TypeInterface $parameterType
 	): array|UnknownMethod {
@@ -42,7 +41,7 @@ final readonly class CastAs implements NativeMethod {
 				//generic method asJsonValue which returns a different value (and type)
 				continue;
 			}
-			$method = $this->methodRegistry->method($targetType,
+			$method = $methodRegistry->method($targetType,
 				$methodName = new MethodNameIdentifier(sprintf('as%s',
 					$candidate
 				))
@@ -55,6 +54,7 @@ final readonly class CastAs implements NativeMethod {
 	}
 
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		TypeInterface $targetType,
 		TypeInterface $parameterType
 	): TypeInterface {
@@ -63,11 +63,11 @@ final readonly class CastAs implements NativeMethod {
 			if ($targetType->isSubtypeOf($refType)) {
 				return $refType;
 			}
-			$method = $this->getMethod($targetType, $refType);
+			$method = $this->getMethod($programRegistry->methodRegistry, $targetType, $refType);
 			if ($method instanceof UnknownMethod) {
-				return $this->context->typeRegistry->result(
+				return $programRegistry->typeRegistry->result(
 					$refType,
-					$this->context->typeRegistry->withName(new TypeNameIdentifier('CastNotAvailable'))
+					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('CastNotAvailable'))
 				);
 				/*throw new AnalyserException(
 					sprintf(
@@ -78,8 +78,9 @@ final readonly class CastAs implements NativeMethod {
 				);*/
 			}
 			$returnType = $method[1]->analyse(
+				$programRegistry,
 				$targetType,
-				$this->context->typeRegistry->nothing
+				$programRegistry->typeRegistry->nothing
 			);
 			$resultType = $returnType instanceof ResultType ? $returnType->returnType : $returnType;
 
@@ -99,6 +100,7 @@ final readonly class CastAs implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -110,6 +112,7 @@ final readonly class CastAs implements NativeMethod {
 				return new TypedValue($parameterValue->typeValue, $targetValue);
 			}
 			$runtimeMethod = $this->getMethod(
+				$programRegistry->methodRegistry,
 				$targetValue instanceof TypeValue ?
 					$targetValue->typeValue :
 					$targetValue->type,
@@ -117,27 +120,30 @@ final readonly class CastAs implements NativeMethod {
 			);
 			if ($runtimeMethod instanceof UnknownMethod) {
 				$method = $this->getMethod(
+					$programRegistry->methodRegistry,
 					$targetType = $target->type,
 					$parameterType = $parameterValue->typeValue
 				);
 				if ($method instanceof UnknownMethod) {
-					$val = $this->context->valueRegistry->error(
-						$this->context->valueRegistry->sealedValue(
+					$val = $programRegistry->valueRegistry->error(
+						$programRegistry->valueRegistry->sealedValue(
 							new TypeNameIdentifier('CastNotAvailable'),
-							$this->context->valueRegistry->record([
-								'from' => $this->context->valueRegistry->type($targetType),
-								'to' => $this->context->valueRegistry->type($parameterType)
+							$programRegistry->valueRegistry->record([
+								'from' => $programRegistry->valueRegistry->type($targetType),
+								'to' => $programRegistry->valueRegistry->type($parameterType)
 							])
 						)
 					);
 					return TypedValue::forValue($val);
 				}
 				return $method[1]->execute(
+					$programRegistry,
 					$target,
 					$parameter
 				);
 			}
 			return $runtimeMethod[1]->execute(
+				$programRegistry,
 				$target,
 				$parameter
 			);

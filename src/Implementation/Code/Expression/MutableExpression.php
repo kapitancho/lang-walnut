@@ -12,15 +12,11 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MutableExpression as MutableExpressionInterface;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
-use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 
 final readonly class MutableExpression implements MutableExpressionInterface, JsonSerializable {
 
 	public function __construct(
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
 		public Type $type,
 		public Expression $value
 	) {}
@@ -29,7 +25,7 @@ final readonly class MutableExpression implements MutableExpressionInterface, Js
 		$analyserResult = $this->value->analyse($analyserContext);
 		if ($analyserResult->expressionType->isSubtypeOf($this->type)) {
 			return $analyserResult->withExpressionType(
-				$this->typeRegistry->mutable($this->type)
+				$analyserContext->programRegistry->typeRegistry->mutable($this->type)
 			);
 		}
 		throw new AnalyserException(
@@ -47,8 +43,8 @@ final readonly class MutableExpression implements MutableExpressionInterface, Js
 		if ($executionContext->valueType->isSubtypeOf($this->type)) {
 			return $executionContext->withTypedValue(
 				new TypedValue(
-					$this->typeRegistry->mutable($this->type),
-					$this->valueRegistry->mutable(
+					$executionContext->programRegistry->typeRegistry->mutable($this->type),
+					$executionContext->programRegistry->valueRegistry->mutable(
 						$this->type,
 						$executionContext->value
 					)

@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -18,17 +18,17 @@ final readonly class Now implements NativeMethod {
 	use BaseType;
 
 	public function __construct(
-		private MethodExecutionContext $context,
 	) {}
 
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType
 	): Type {
 		if ($targetType instanceof AtomType && $targetType->name->equals(
 			new TypeNameIdentifier('Clock')
 		)) {
-			return $this->context->typeRegistry->withName(new TypeNameIdentifier('DateAndTime'));
+			return $programRegistry->typeRegistry->withName(new TypeNameIdentifier('DateAndTime'));
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -36,6 +36,7 @@ final readonly class Now implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -46,23 +47,23 @@ final readonly class Now implements NativeMethod {
 			new TypeNameIdentifier('Clock')
 		)) {
 			$now = new DateTimeImmutable;
-			return TypedValue::forValue($this->context->valueRegistry->subtypeValue(
+			return TypedValue::forValue($programRegistry->valueRegistry->subtypeValue(
 				new TypeNameIdentifier('DateAndTime'),
-				$this->context->valueRegistry->record([
-					'date' => $this->context->valueRegistry->subtypeValue(
+				$programRegistry->valueRegistry->record([
+					'date' => $programRegistry->valueRegistry->subtypeValue(
 						new TypeNameIdentifier('Date'),
-						$this->context->valueRegistry->record([
-							'year' => $this->context->valueRegistry->integer((int)$now->format('Y')),
-							'month' => $this->context->valueRegistry->integer((int)$now->format('m')),
-							'day' => $this->context->valueRegistry->integer((int)$now->format('d')),
+						$programRegistry->valueRegistry->record([
+							'year' => $programRegistry->valueRegistry->integer((int)$now->format('Y')),
+							'month' => $programRegistry->valueRegistry->integer((int)$now->format('m')),
+							'day' => $programRegistry->valueRegistry->integer((int)$now->format('d')),
 						])
 					),
-					'time' => $this->context->valueRegistry->subtypeValue(
+					'time' => $programRegistry->valueRegistry->subtypeValue(
 						new TypeNameIdentifier('Time'),
-						$this->context->valueRegistry->record([
-							'hour' => $this->context->valueRegistry->integer((int)$now->format('H')),
-							'minute' => $this->context->valueRegistry->integer((int)$now->format('i')),
-							'second' => $this->context->valueRegistry->integer((int)$now->format('s')),
+						$programRegistry->valueRegistry->record([
+							'hour' => $programRegistry->valueRegistry->integer((int)$now->format('H')),
+							'minute' => $programRegistry->valueRegistry->integer((int)$now->format('i')),
+							'second' => $programRegistry->valueRegistry->integer((int)$now->format('s')),
 						]
 						)
 					),

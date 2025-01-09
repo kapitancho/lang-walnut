@@ -1,9 +1,7 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Compilation;
+namespace Walnut\Lang\Implementation\Compilation\AST;
 
-use Walnut\Lang\Blueprint\AST\Compiler\AstCompilationException;
-use Walnut\Lang\Blueprint\AST\Compiler\AstTypeCompiler as AstTypeCompilerInterface;
 use Walnut\Lang\Blueprint\AST\Node\Type\AnyTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\ArrayTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\BooleanTypeNode;
@@ -36,6 +34,8 @@ use Walnut\Lang\Blueprint\AST\Node\Type\UnionTypeNode;
 use Walnut\Lang\Blueprint\Common\Range\InvalidIntegerRange;
 use Walnut\Lang\Blueprint\Common\Range\InvalidLengthRange;
 use Walnut\Lang\Blueprint\Common\Range\InvalidRealRange;
+use Walnut\Lang\Blueprint\Compilation\AST\AstCompilationException;
+use Walnut\Lang\Blueprint\Compilation\AST\AstTypeCompiler as AstTypeCompilerInterface;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\UnknownType;
 use Walnut\Lang\Blueprint\Type\Type;

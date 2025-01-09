@@ -7,18 +7,19 @@ use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethod as CustomMethodInterface;
 use Walnut\Lang\Blueprint\Function\Method;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
+use Walnut\Lang\Blueprint\Program\Registry\CustomMethodRegistry as CustomMethodRegistryInterface;
 use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 
-final readonly class CustomMethodRegistry implements MethodRegistry, JsonSerializable {
+final readonly class CustomMethodRegistry implements MethodRegistry, CustomMethodRegistryInterface, JsonSerializable {
 
-	/** @param array<string, list<CustomMethodInterface>> $methods */
+	/** @param array<string, list<CustomMethodInterface>> $customMethods */
 	public function __construct(
-		private array $methods,
+		public array $customMethods,
 	) {}
 
 	public function method(Type $targetType, MethodNameIdentifier $methodName): Method|UnknownMethod {
-		foreach(array_reverse($this->methods[$methodName->identifier] ?? []) as $method) {
+		foreach(array_reverse($this->customMethods[$methodName->identifier] ?? []) as $method) {
 			if ($targetType->isSubtypeOf($method->targetType)) {
 				return $method;
 			}
@@ -27,6 +28,6 @@ final readonly class CustomMethodRegistry implements MethodRegistry, JsonSeriali
 	}
 
 	public function jsonSerialize(): array {
-		return $this->methods;
+		return $this->customMethods;
 	}
 }

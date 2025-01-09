@@ -1,11 +1,7 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Compilation;
+namespace Walnut\Lang\Implementation\Compilation\AST;
 
-use Walnut\Lang\Blueprint\AST\Compiler\AstCompilationException;
-use Walnut\Lang\Blueprint\AST\Compiler\AstExpressionCompiler as AstExpressionCompilerInterface;
-use Walnut\Lang\Blueprint\AST\Compiler\AstTypeCompiler;
-use Walnut\Lang\Blueprint\AST\Compiler\AstValueCompiler;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ConstantExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ConstructorCallExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
@@ -32,7 +28,11 @@ use Walnut\Lang\Blueprint\AST\Node\Value\ValueNode;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionDefault;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionPair;
-use Walnut\Lang\Blueprint\Compilation\MyCodeBuilder;
+use Walnut\Lang\Blueprint\Compilation\AST\AstCompilationException;
+use Walnut\Lang\Blueprint\Compilation\AST\AstExpressionCompiler as AstExpressionCompilerInterface;
+use Walnut\Lang\Blueprint\Compilation\AST\AstTypeCompiler;
+use Walnut\Lang\Blueprint\Compilation\AST\AstValueCompiler;
+use Walnut\Lang\Blueprint\Compilation\CodeBuilder;
 use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -41,7 +41,7 @@ final readonly class AstExpressionCompiler implements AstExpressionCompilerInter
 	public function __construct(
 		private AstTypeCompiler    $astTypeCompiler,
 		private AstValueCompiler   $astValueCompiler,
-		private MyCodeBuilder      $myCodeBuilder,
+		private CodeBuilder        $codeBuilder,
 		private ExpressionRegistry $expressionRegistry,
 	) {}
 
@@ -88,12 +88,12 @@ final readonly class AstExpressionCompiler implements AstExpressionCompilerInter
 					$this->value($expressionNode->value)
 				),
 			$expressionNode instanceof ConstructorCallExpressionNode =>
-				$this->myCodeBuilder->constructorCall(
+				$this->codeBuilder->constructorCall(
 					$expressionNode->typeName,
 					$this->expression($expressionNode->parameter)
 				),
 			$expressionNode instanceof FunctionCallExpressionNode =>
-				$this->myCodeBuilder->functionCall(
+				$this->codeBuilder->functionCall(
 					$this->expression($expressionNode->target),
 					$this->expression($expressionNode->parameter)
 				),
@@ -107,22 +107,22 @@ final readonly class AstExpressionCompiler implements AstExpressionCompilerInter
 					$this->expression($expressionNode->valueExpression)
 				),*/
 			$expressionNode instanceof MatchIfExpressionNode =>
-				$this->myCodeBuilder->matchIf(
+				$this->codeBuilder->matchIf(
 					$this->expression($expressionNode->condition),
 					$this->expression($expressionNode->then),
 					$this->expression($expressionNode->else)
 				),
 			$expressionNode instanceof MatchTrueExpressionNode =>
-				$this->myCodeBuilder->matchTrue(
+				$this->codeBuilder->matchTrue(
 					array_map($this->matchExpression(...), $expressionNode->pairs)
 				),
 			$expressionNode instanceof MatchTypeExpressionNode =>
-				$this->myCodeBuilder->matchType(
+				$this->codeBuilder->matchType(
 					$this->expression($expressionNode->target),
 					array_map($this->matchExpression(...), $expressionNode->pairs)
 				),
 			$expressionNode instanceof MatchValueExpressionNode =>
-				$this->myCodeBuilder->matchValue(
+				$this->codeBuilder->matchValue(
 					$this->expression($expressionNode->target),
 					array_map($this->matchExpression(...), $expressionNode->pairs)
 				),
@@ -146,7 +146,7 @@ final readonly class AstExpressionCompiler implements AstExpressionCompilerInter
 					$this->expression($expressionNode->targetExpression),
 				),
 			$expressionNode instanceof PropertyAccessExpressionNode =>
-				$this->myCodeBuilder->propertyAccess(
+				$this->codeBuilder->propertyAccess(
 					$this->expression($expressionNode->target),
 					$expressionNode->propertyName
 				),

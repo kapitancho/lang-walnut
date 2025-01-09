@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\RecordType;
@@ -17,11 +17,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class KeyOf implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -30,10 +27,10 @@ final readonly class KeyOf implements NativeMethod {
 			$targetType = $targetType->asMapType();
 		}
 		if ($targetType instanceof MapType) {
-			$returnType = $this->context->typeRegistry->string();
-			return $this->context->typeRegistry->result(
+			$returnType = $programRegistry->typeRegistry->string();
+			return $programRegistry->typeRegistry->result(
 				$returnType,
-				$this->context->typeRegistry->atom(
+				$programRegistry->typeRegistry->atom(
 					new TypeNameIdentifier("ItemNotFound")
 				)
 			);
@@ -44,6 +41,7 @@ final readonly class KeyOf implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -55,11 +53,11 @@ final readonly class KeyOf implements NativeMethod {
 			$values = $targetValue->values;
 			foreach ($values as $key => $value) {
 				if ($value->equals($parameterValue)) {
-					return TypedValue::forValue($this->context->valueRegistry->string($key));
+					return TypedValue::forValue($programRegistry->valueRegistry->string($key));
 				}
 			}
-			return TypedValue::forValue($this->context->valueRegistry->error(
-				$this->context->valueRegistry->atom(
+			return TypedValue::forValue($programRegistry->valueRegistry->error(
+				$programRegistry->valueRegistry->atom(
 					new TypeNameIdentifier('ItemNotFound'),
 				)
 			));

@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
@@ -19,11 +19,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class CreateIfMissing implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -32,11 +29,11 @@ final readonly class CreateIfMissing implements NativeMethod {
 		)) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $this->context->typeRegistry->result(
-					$this->context->typeRegistry->withName(
+				return $programRegistry->typeRegistry->result(
+					$programRegistry->typeRegistry->withName(
 						new TypeNameIdentifier('File')
 					),
-					$this->context->typeRegistry->withName(
+					$programRegistry->typeRegistry->withName(
 						new TypeNameIdentifier('CannotWriteFile')
 					)
 				);
@@ -48,6 +45,7 @@ final readonly class CreateIfMissing implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -64,8 +62,8 @@ final readonly class CreateIfMissing implements NativeMethod {
 				if (!file_exists($path)) {
 					$result = @file_put_contents($path, $parameterValue->literalValue);
 					if ($result === false) {
-						return TypedValue::forValue($this->context->valueRegistry->error(
-							$this->context->valueRegistry->sealedValue(
+						return TypedValue::forValue($programRegistry->valueRegistry->error(
+							$programRegistry->valueRegistry->sealedValue(
 								new TypeNameIdentifier('CannotWriteFile'),
 								$targetValue
 							)

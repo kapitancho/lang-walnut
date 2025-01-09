@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
@@ -19,11 +19,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class Verify implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -31,7 +28,7 @@ final readonly class Verify implements NativeMethod {
 		if ($targetType instanceof SealedType && $targetType->name->equals(new TypeNameIdentifier('PasswordString'))) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $this->context->typeRegistry->boolean;
+				return $programRegistry->typeRegistry->boolean;
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -43,6 +40,7 @@ final readonly class Verify implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -56,7 +54,7 @@ final readonly class Verify implements NativeMethod {
 		)) {
 			$passwordString = $targetValue->value->valueOf('value');
 			if ($passwordString instanceof StringValue && $parameterValue instanceof StringValue) {
-				return TypedValue::forValue($this->context->valueRegistry->boolean(
+				return TypedValue::forValue($programRegistry->valueRegistry->boolean(
 					password_verify(
 						$passwordString->literalValue,
 						$parameterValue->literalValue,

@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
@@ -18,11 +18,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class PositionOf implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -30,12 +27,12 @@ final readonly class PositionOf implements NativeMethod {
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $this->context->typeRegistry->result(
-					$this->context->typeRegistry->integer(0,
+				return $programRegistry->typeRegistry->result(
+					$programRegistry->typeRegistry->integer(0,
 						$targetType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
 						$targetType->range->maxLength - $parameterType->range->minLength
 					),
-					$this->context->typeRegistry->withName(
+					$programRegistry->typeRegistry->withName(
 						new TypeNameIdentifier("SubstringNotInString")
 					)
 				);
@@ -50,6 +47,7 @@ final readonly class PositionOf implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -62,11 +60,11 @@ final readonly class PositionOf implements NativeMethod {
 			if ($parameterValue instanceof StringValue) {
 				$result = strpos($targetValue->literalValue, $parameterValue->literalValue);
 				return TypedValue::forValue($result === false ?
-					$this->context->valueRegistry->error(
-						$this->context->valueRegistry->atom(
+					$programRegistry->valueRegistry->error(
+						$programRegistry->valueRegistry->atom(
 							new TypeNameIdentifier('SubstringNotInString')
 						)
-					) : $this->context->valueRegistry->integer($result)
+					) : $programRegistry->valueRegistry->integer($result)
 				);
 			}
 			// @codeCoverageIgnoreStart

@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
@@ -18,11 +18,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class Ln implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -30,11 +27,11 @@ final readonly class Ln implements NativeMethod {
         if ($targetType instanceof RealType || $targetType instanceof RealSubsetType) {
 			$min = $targetType->range->minValue;
 			$max = $targetType->range->maxValue;
-            $real = $this->context->typeRegistry->real(max: $max);
+            $real = $programRegistry->typeRegistry->real(max: $max);
             return $min > 0 ? $real :
-                $this->context->typeRegistry->result(
+                $programRegistry->typeRegistry->result(
                     $real,
-                    $this->context->typeRegistry->atom(
+                    $programRegistry->typeRegistry->atom(
                         new TypeNameIdentifier('NotANumber')
                     )
                 );
@@ -45,6 +42,7 @@ final readonly class Ln implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -53,10 +51,10 @@ final readonly class Ln implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
             $val = $targetValue->literalValue;
-			return TypedValue::forValue($val > 0 ? $this->context->valueRegistry->real(
+			return TypedValue::forValue($val > 0 ? $programRegistry->valueRegistry->real(
 				log((string)$val)
-			) : $this->context->valueRegistry->error(
-                $this->context->valueRegistry->atom(
+			) : $programRegistry->valueRegistry->error(
+                $programRegistry->valueRegistry->atom(
                     new TypeNameIdentifier("NotANumber")
                 )
             ));

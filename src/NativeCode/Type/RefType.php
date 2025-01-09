@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Value\TypeValue;
@@ -16,18 +16,15 @@ final readonly class RefType implements NativeMethod {
 
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof TypeType) {
-				return $this->context->typeRegistry->type($refType->refType);
+				return $programRegistry->typeRegistry->type($refType->refType);
 			}
 		}
 		// @codeCoverageIgnoreStart
@@ -36,6 +33,7 @@ final readonly class RefType implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -44,7 +42,7 @@ final readonly class RefType implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof TypeType) {
-				return TypedValue::forValue($this->context->valueRegistry->type($typeValue->refType));
+				return TypedValue::forValue($programRegistry->valueRegistry->type($typeValue->refType));
 			}
 		}
 		// @codeCoverageIgnoreStart

@@ -16,23 +16,21 @@ use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\Method;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
-use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\SealedType;
+use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Implementation\Program\Registry\ProgramRegistry;
 
 final readonly class MethodCallExpression implements MethodCallExpressionInterface, JsonSerializable {
 	public function __construct(
-		private TypeRegistry $typeRegistry,
-		private MethodRegistry $methodRegistry,
 		public Expression $target,
 		public MethodNameIdentifier $methodName,
 		public Expression $parameter,
 	) {}
 
-	private function getMethod($targetType): Method|UnknownMethod {
-		return $this->methodRegistry->method($targetType,
+	private function getMethod(ProgramRegistry $programRegistry, Type $targetType): Method|UnknownMethod {
+		return $programRegistry->methodRegistry->method($targetType,
 			$this->methodName->identifier === 'as' ?
 				new MethodNameIdentifier('castAs') :
 				$this->methodName);
@@ -43,7 +41,7 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 		$retExpr = $analyserContext->expressionType;
 
 		//Special case: cast as - it requires the method registry and a dependency loop should be avoided.
-		$method = $this->getMethod($retExpr);
+		$method = $this->getMethod($analyserContext->programRegistry, $retExpr);
 		if ($method instanceof UnknownMethod) {
 			throw new AnalyserException(
 				sprintf(
@@ -58,10 +56,14 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 		$analyserContext = $this->parameter->analyse($analyserContext);
 		$retParamType = $analyserContext->expressionType;
 
-		$retType = $method->analyse($retExpr, $retParamType);
+		$retType = $method->analyse(
+			$analyserContext->programRegistry,
+			$retExpr,
+			$retParamType
+		);
 		return $analyserContext->asAnalyserResult(
 			$retType,
-			$this->typeRegistry->union([
+			$analyserContext->programRegistry->typeRegistry->union([
 				$targetReturnType,
 				$analyserContext->returnType
 			])
@@ -74,9 +76,9 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 		$retValue = $executionContext->value;
 		$retType = $executionContext->valueType;
 
-		$method = $this->getMethod($retValue->type);
+		$method = $this->getMethod($executionContext->programRegistry, $retValue->type);
 		if ($method instanceof UnknownMethod) {
-			$method = $this->methodRegistry->method($retType, $this->methodName);
+			$method = $executionContext->programRegistry->methodRegistry->method($retType, $this->methodName);
 			if ($method instanceof UnknownMethod) {
 				// @codeCoverageIgnoreStart
 				throw new ExecutionException(
@@ -95,7 +97,11 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 		$executionContext = $this->parameter->execute($executionContext);
 		$retParamType = $executionContext->valueType;
 
-		$value = $method->execute($retTypedValue, $executionContext->typedValue);
+		$value = $method->execute(
+			$executionContext->programRegistry,
+			$retTypedValue,
+			$executionContext->typedValue
+		);
 		if ($value instanceof ErrorValue &&
 			$value->errorValue->type instanceof SealedType &&
 			$value->errorValue->type->name === 'DependencyContainerError'

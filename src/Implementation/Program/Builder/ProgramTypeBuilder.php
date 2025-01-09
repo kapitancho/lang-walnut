@@ -8,7 +8,6 @@ use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Builder\ProgramTypeBuilder as ProgramTypeBuilderInterface;
 use Walnut\Lang\Blueprint\Program\Builder\TypeRegistryBuilder;
-use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AtomType;
@@ -23,9 +22,9 @@ final readonly class ProgramTypeBuilder implements ProgramTypeBuilderInterface {
 
 	public function __construct(
 		private TypeRegistry                     $typeRegistry,
-		private ExpressionRegistry               $expressionRegistry,
+		private FunctionBodyBuilder              $functionBodyBuilder,
 		private TypeRegistryBuilder              $typeRegistryBuilder,
-		private CustomMethodRegistryBuilder      $customMethodRegistryBuilder,
+		private CustomMethodDraftRegistryBuilder $customMethodDraftRegistryBuilder,
 	) {}
 
 	public function addAtom(TypeNameIdentifier $name): AtomType {
@@ -72,7 +71,7 @@ final readonly class ProgramTypeBuilder implements ProgramTypeBuilderInterface {
 		Type|null $errorType,
 		ExpressionNode $constructorBody
 	): void {
-		$this->customMethodRegistryBuilder->addMethodDraft(
+		$this->customMethodDraftRegistryBuilder->addMethodDraft(
 			$this->typeRegistry->atom(new TypeNameIdentifier('Constructor')),
 			new MethodNameIdentifier('as' . $name->identifier),
 			$fromType,
@@ -80,7 +79,7 @@ final readonly class ProgramTypeBuilder implements ProgramTypeBuilderInterface {
 			$errorType && !($errorType instanceof NothingType) ?
 				$this->typeRegistry->result($fromType, $errorType) :
 				$fromType,
-			$this->expressionRegistry->functionBodyDraft(
+			$this->functionBodyBuilder->functionBodyDraft(
 				$constructorBody,
 			)
 		);

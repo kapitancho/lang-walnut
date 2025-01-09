@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
@@ -22,26 +22,23 @@ final readonly class MinValue implements NativeMethod {
 
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof IntegerType || $refType instanceof IntegerSubsetType) {
-				return $this->context->typeRegistry->union([
-					$this->context->typeRegistry->integer(),
-					$this->context->typeRegistry->withName(new TypeNameIdentifier('MinusInfinity'))
+				return $programRegistry->typeRegistry->union([
+					$programRegistry->typeRegistry->integer(),
+					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('MinusInfinity'))
 				]);
 			}
 			if ($refType instanceof RealType || $refType instanceof RealSubsetType) {
-				return $this->context->typeRegistry->union([
-					$this->context->typeRegistry->real(),
-					$this->context->typeRegistry->withName(new TypeNameIdentifier('MinusInfinity'))
+				return $programRegistry->typeRegistry->union([
+					$programRegistry->typeRegistry->real(),
+					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('MinusInfinity'))
 				]);
 			}
 		}
@@ -51,6 +48,7 @@ final readonly class MinValue implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -60,13 +58,13 @@ final readonly class MinValue implements NativeMethod {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof IntegerType || $typeValue instanceof IntegerSubsetType) {
 				return TypedValue::forValue($typeValue->range->minValue === MinusInfinity::value ?
-					$this->context->valueRegistry->atom(new TypeNameIdentifier('MinusInfinity')) :
-					$this->context->valueRegistry->integer($typeValue->range->minValue));
+					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('MinusInfinity')) :
+					$programRegistry->valueRegistry->integer($typeValue->range->minValue));
 			}
 			if ($typeValue instanceof RealType || $typeValue instanceof RealSubsetType) {
 				return TypedValue::forValue($typeValue->range->minValue === MinusInfinity::value ?
-					$this->context->valueRegistry->atom(new TypeNameIdentifier('MinusInfinity')) :
-					$this->context->valueRegistry->real($typeValue->range->minValue));
+					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('MinusInfinity')) :
+					$programRegistry->valueRegistry->real($typeValue->range->minValue));
 			}
 		}
 		// @codeCoverageIgnoreStart

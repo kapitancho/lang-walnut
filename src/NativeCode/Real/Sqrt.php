@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
@@ -21,11 +21,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class Sqrt implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -33,12 +30,12 @@ final readonly class Sqrt implements NativeMethod {
 		if ($targetType instanceof IntegerType || $targetType instanceof IntegerSubsetType ||
 			$targetType instanceof RealType || $targetType instanceof RealSubsetType
 		) {
-			$real = $this->context->typeRegistry->real(0);
+			$real = $programRegistry->typeRegistry->real(0);
 			$minValue = $targetType->range->minValue;
 			return $minValue === MinusInfinity::value || $minValue < 0 ?
-				$this->context->typeRegistry->result(
+				$programRegistry->typeRegistry->result(
 					$real,
-					$this->context->typeRegistry->atom(
+					$programRegistry->typeRegistry->atom(
 						new TypeNameIdentifier('NotANumber')
 					)
 				) :
@@ -50,6 +47,7 @@ final readonly class Sqrt implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -58,7 +56,7 @@ final readonly class Sqrt implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 
 		if ($targetValue instanceof IntegerValue || $targetValue instanceof RealValue) {
-			return TypedValue::forValue($this->context->valueRegistry->real(
+			return TypedValue::forValue($programRegistry->valueRegistry->real(
                 $targetValue->literalValue->sqrt()
 			));
 		}

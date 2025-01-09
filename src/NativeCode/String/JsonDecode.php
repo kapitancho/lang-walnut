@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
@@ -19,19 +19,16 @@ use Walnut\Lang\Implementation\Value\StringValue;
 final readonly class JsonDecode implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
-			return $this->context->typeRegistry->result(
-				$this->context->typeRegistry->withName(new TypeNameIdentifier("JsonValue")),
-				$this->context->typeRegistry->withName(new TypeNameIdentifier("InvalidJsonString"))
+			return $programRegistry->typeRegistry->result(
+				$programRegistry->typeRegistry->withName(new TypeNameIdentifier("JsonValue")),
+				$programRegistry->typeRegistry->withName(new TypeNameIdentifier("InvalidJsonString"))
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -41,23 +38,24 @@ final readonly class JsonDecode implements NativeMethod {
 
 	private function phpToValue(string|int|float|bool|null|array|object $value): Value {
 		return match(true) {
-			is_array($value) => $this->context->valueRegistry->tuple(
+			is_array($value) => $programRegistry->valueRegistry->tuple(
 				array_map(fn(string|int|float|bool|null|array|object $item): Value
 					=> $this->phpToValue($item), $value)
 			),
-			is_object($value) => $this->context->valueRegistry->record(
+			is_object($value) => $programRegistry->valueRegistry->record(
 				array_map(fn(string|int|float|bool|null|array|object $item): Value
 					=> $this->phpToValue($item), (array)$value)
 			),
-			is_string($value) => $this->context->valueRegistry->string($value),
-			is_int($value) => $this->context->valueRegistry->integer($value),
-			is_float($value) => $this->context->valueRegistry->real($value),
-			is_bool($value) => $this->context->valueRegistry->boolean($value),
-			is_null($value) => $this->context->valueRegistry->null,
+			is_string($value) => $programRegistry->valueRegistry->string($value),
+			is_int($value) => $programRegistry->valueRegistry->integer($value),
+			is_float($value) => $programRegistry->valueRegistry->real($value),
+			is_bool($value) => $programRegistry->valueRegistry->boolean($value),
+			is_null($value) => $programRegistry->valueRegistry->null,
 		};
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -68,14 +66,14 @@ final readonly class JsonDecode implements NativeMethod {
 			try {
 				$value = json_decode($targetValue->literalValue, false, 512, JSON_THROW_ON_ERROR);
 				return new TypedValue(
-					$this->context->typeRegistry->withName(new TypeNameIdentifier("JsonValue")),
+					$programRegistry->typeRegistry->withName(new TypeNameIdentifier("JsonValue")),
 					$this->phpToValue($value)
 				);
 			} catch (JsonException) {
-				return TypedValue::forValue($this->context->valueRegistry->error(
-					$this->context->valueRegistry->sealedValue(
+				return TypedValue::forValue($programRegistry->valueRegistry->error(
+					$programRegistry->valueRegistry->sealedValue(
 						new TypeNameIdentifier("InvalidJsonString"),
-						$this->context->valueRegistry->record(['value' => $targetValue])
+						$programRegistry->valueRegistry->record(['value' => $targetValue])
 					)
 				));
 			}

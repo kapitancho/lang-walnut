@@ -11,13 +11,11 @@ use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\NoErrorExpression as NoErrorExpressionInterface;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
 
 final readonly class NoErrorExpression implements NoErrorExpressionInterface, JsonSerializable {
 	public function __construct(
-		private TypeRegistry $typeRegistry,
 		public Expression $targetExpression
 	) {}
 
@@ -28,7 +26,7 @@ final readonly class NoErrorExpression implements NoErrorExpressionInterface, Js
 			return $ret->withExpressionType(
 				$expressionType->returnType
 			)->withReturnType(
-				$this->typeRegistry->result(
+				$analyserContext->programRegistry->typeRegistry->result(
 					$ret->returnType,
 					$expressionType->errorType
 				)

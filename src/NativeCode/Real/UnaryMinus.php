@@ -2,12 +2,13 @@
 
 namespace Walnut\Lang\NativeCode\Real;
 
+use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
@@ -19,25 +20,22 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class UnaryMinus implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof RealSubsetType) {
-			return $this->context->typeRegistry->realSubset(
-				array_map(fn(IntegerValue|RealValue $value): RealValue =>
-					$this->context->valueRegistry->real(-$value->literalValue),
+			return $programRegistry->typeRegistry->realSubset(
+				array_map(fn(Number $value): Number =>
+					$value->mul(-1),
 					$targetType->subsetValues
 				)
 			);
 		}
 		if ($targetType instanceof RealType) {
-			return $this->context->typeRegistry->real(
+			return $programRegistry->typeRegistry->real(
 				$targetType->range->maxValue === PlusInfinity::value ? MinusInfinity::value :
 					-$targetType->range->maxValue,
 				$targetType->range->minValue === MinusInfinity::value ? PlusInfinity::value :
@@ -50,6 +48,7 @@ final readonly class UnaryMinus implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -58,7 +57,7 @@ final readonly class UnaryMinus implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			$target = $targetValue->literalValue;
-			return TypedValue::forValue($this->context->valueRegistry->real(-$target));
+			return TypedValue::forValue($programRegistry->valueRegistry->real(-$target));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

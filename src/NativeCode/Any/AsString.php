@@ -2,10 +2,11 @@
 
 namespace Walnut\Lang\NativeCode\Any;
 
+use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AtomType;
@@ -38,10 +39,6 @@ use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Blueprint\Value\Value;
 
 final readonly class AsString implements NativeMethod {
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	/** @return list<string>|null */
 	public function detectSubsetType(Type $targetType): array|null {
 		return match(true) {
@@ -57,11 +54,11 @@ final readonly class AsString implements NativeMethod {
 				array_map(fn(EnumerationValue $enumerationValue): string =>
 					$enumerationValue->name->identifier, $targetType->subsetValues),
 			$targetType instanceof IntegerSubsetType =>
-				array_map(fn(IntegerValue $integerValue): string =>
-					(string)$integerValue->literalValue, $targetType->subsetValues),
+				array_map(fn(Number $integerValue): string =>
+					(string)$integerValue, $targetType->subsetValues),
 			$targetType instanceof RealSubsetType =>
-				array_map(fn(RealValue $realValue): string =>
-					(string)$realValue->literalValue, $targetType->subsetValues),
+				array_map(fn(Number $realValue): string =>
+					(string)$realValue, $targetType->subsetValues),
 			default => null
 		};
 	}
@@ -89,6 +86,7 @@ final readonly class AsString implements NativeMethod {
 	}
 
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType
 	): StringType|StringSubsetType|ResultType {
@@ -97,26 +95,22 @@ final readonly class AsString implements NativeMethod {
 		}
 		$subsetValues = $this->detectSubsetType($targetType);
 		if (is_array($subsetValues)) {
-			return $this->context->typeRegistry->stringSubset(
-				array_map(
-					fn(string $val) => $this->context->valueRegistry->string($val),
-					$subsetValues
-				)
-			);
+			return $programRegistry->typeRegistry->stringSubset($subsetValues);
 		}
 		$range = $this->detectRangedType($targetType);
 		if (is_array($range)) {
 			[$minLength, $maxLength] = $range;
-			return $this->context->typeRegistry->string($minLength, $maxLength);
+			return $programRegistry->typeRegistry->string($minLength, $maxLength);
 		}
 		/** @var ResultType */
-		return $this->context->typeRegistry->result(
-			$this->context->typeRegistry->string(),
-			$this->context->typeRegistry->sealed(new TypeNameIdentifier("CastNotAvailable"))
+		return $programRegistry->typeRegistry->result(
+			$programRegistry->typeRegistry->string(),
+			$programRegistry->typeRegistry->sealed(new TypeNameIdentifier("CastNotAvailable"))
 		);
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -124,16 +118,16 @@ final readonly class AsString implements NativeMethod {
 
 		$result = $this->evaluate($targetValue);
         return TypedValue::forValue($result === null ?
-	        $this->context->valueRegistry->error(
-				$this->context->valueRegistry->sealedValue(
+	        $programRegistry->valueRegistry->error(
+				$programRegistry->valueRegistry->sealedValue(
 					new TypeNameIdentifier("CastNotAvailable"),
-					$this->context->valueRegistry->record([
-						'from' => $this->context->valueRegistry->type($targetValue->type),
-						'to' => $this->context->valueRegistry->type($this->context->typeRegistry->string())
+					$programRegistry->valueRegistry->record([
+						'from' => $programRegistry->valueRegistry->type($targetValue->type),
+						'to' => $programRegistry->valueRegistry->type($programRegistry->typeRegistry->string())
 					])
 				)
 			) :
-	        $this->context->valueRegistry->string(
+	        $programRegistry->valueRegistry->string(
                 $this->evaluate($targetValue)
             )
         );

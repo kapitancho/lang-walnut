@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -16,18 +16,15 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class MergeWith implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		if ($targetType instanceof MapType) {
 			if ($parameterType instanceof MapType) {
-				return $this->context->typeRegistry->map(
-					$this->context->typeRegistry->union([
+				return $programRegistry->typeRegistry->map(
+					$programRegistry->typeRegistry->union([
 						$targetType->itemType,
 						$parameterType->itemType
 					]),
@@ -47,6 +44,7 @@ final readonly class MergeWith implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -57,7 +55,7 @@ final readonly class MergeWith implements NativeMethod {
 		if ($targetValue instanceof RecordValue) {
 			if ($parameterValue instanceof RecordValue) {
 				$values = [... $targetValue->values, ... $parameterValue->values];
-				return TypedValue::forValue($this->context->valueRegistry->record($values));
+				return TypedValue::forValue($programRegistry->valueRegistry->record($values));
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

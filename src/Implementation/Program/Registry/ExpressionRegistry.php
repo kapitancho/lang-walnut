@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Implementation\Program\Registry;
 
-use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionDefault as MatchExpressionDefaultInterface;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionOperation;
@@ -10,9 +9,6 @@ use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionPair as MatchExpression
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry as ExpressionRegistryInterface;
-use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
-use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Code\Expression\ConstantExpression;
@@ -30,51 +26,45 @@ use Walnut\Lang\Implementation\Code\Expression\TupleExpression;
 use Walnut\Lang\Implementation\Code\Expression\VariableAssignmentExpression;
 use Walnut\Lang\Implementation\Code\Expression\VariableNameExpression;
 use Walnut\Lang\Implementation\Function\FunctionBody;
-use Walnut\Lang\Implementation\Function\FunctionBodyDraft;
 
 final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
-	public function __construct(
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-		private MethodRegistry $methodRegistry
-	) {}
+	public function __construct() {}
 
 	public function constant(Value $value): ConstantExpression {
-		return new ConstantExpression($this->typeRegistry, $value);
+		return new ConstantExpression($value);
 	}
 
 	/** @param list<Expression> $values */
 	public function tuple(array $values): TupleExpression {
-		return new TupleExpression($this->typeRegistry, $this->valueRegistry, $values);
+		return new TupleExpression($values);
 	}
 	/** @param array<string, Expression> $values */
 	public function record(array $values): RecordExpression {
-		return new RecordExpression($this->typeRegistry, $this->valueRegistry, $values);
+		return new RecordExpression($values);
 	}
 
 	/** @param list<Expression> $values */
 	public function sequence(array $values): SequenceExpression {
-		return new SequenceExpression($this->typeRegistry, $this->valueRegistry, $values);
+		return new SequenceExpression($values);
 	}
 
 	public function return(Expression $returnedExpression): ReturnExpression {
-		return new ReturnExpression($this->typeRegistry, $returnedExpression);
+		return new ReturnExpression($returnedExpression);
 	}
 	public function noError(Expression $targetExpression): NoErrorExpression {
-		return new NoErrorExpression($this->typeRegistry, $targetExpression);
+		return new NoErrorExpression($targetExpression);
 	}
 	public function noExternalError(Expression $targetExpression): NoExternalErrorExpression {
-		return new NoExternalErrorExpression($this->typeRegistry, $targetExpression);
+		return new NoExternalErrorExpression($targetExpression);
 	}
 	public function variableName(VariableNameIdentifier $variableName): VariableNameExpression {
-		return new VariableNameExpression($this->typeRegistry, $variableName);
+		return new VariableNameExpression($variableName);
 	}
 	public function variableAssignment(
 		VariableNameIdentifier $variableName,
 		Expression $assignedExpression
 	): VariableAssignmentExpression {
 		return new VariableAssignmentExpression(
-			$this->typeRegistry,
 			$variableName,
 			$assignedExpression
 		);
@@ -87,8 +77,6 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 		array $pairs
 	): MatchExpression {
 		return new MatchExpression(
-			$this->typeRegistry,
-			$this->valueRegistry,
 			$target,
 			$operation,
 			$pairs
@@ -110,26 +98,18 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 		Expression $parameter
 	): MethodCallExpression {
 		return new MethodCallExpression(
-			$this->typeRegistry,
-			$this->methodRegistry,
 			$target,
 			$methodName,
 			$parameter
 		);
 	}
 
-	public function functionBodyDraft(ExpressionNode $expressionNode): FunctionBodyDraft {
-		return new FunctionBodyDraft($expressionNode);
-	}
-
 	public function functionBody(Expression $expression): FunctionBody {
-		return new FunctionBody($this->typeRegistry, $this->valueRegistry, $expression);
+		return new FunctionBody($expression);
 	}
 
 	public function mutable(Type $type, Expression $value): MutableExpression {
 		return new MutableExpression(
-			$this->typeRegistry,
-			$this->valueRegistry,
 			$type,
 			$value
 		);

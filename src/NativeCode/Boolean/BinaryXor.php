@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\BooleanType;
 use Walnut\Lang\Blueprint\Type\FalseType;
 use Walnut\Lang\Blueprint\Type\TrueType;
@@ -17,11 +17,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class BinaryXor implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -31,10 +28,10 @@ final readonly class BinaryXor implements NativeMethod {
 			if ($parameterType instanceof BooleanType || $parameterType instanceof TrueType || $parameterType instanceof FalseType) {
 				return match(true) {
 					($targetType instanceof FalseType && $parameterType instanceof FalseType) ||
-					($targetType instanceof TrueType && $parameterType instanceof TrueType) => $this->context->typeRegistry->false,
+					($targetType instanceof TrueType && $parameterType instanceof TrueType) => $programRegistry->typeRegistry->false,
 					($targetType instanceof FalseType && $parameterType instanceof TrueType) ||
-					($targetType instanceof TrueType && $parameterType instanceof FalseType) => $this->context->typeRegistry->true,
-					default => $this->context->typeRegistry->boolean
+					($targetType instanceof TrueType && $parameterType instanceof FalseType) => $programRegistry->typeRegistry->true,
+					default => $programRegistry->typeRegistry->boolean
 				};
 			}
 			// @codeCoverageIgnoreStart
@@ -47,6 +44,7 @@ final readonly class BinaryXor implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -57,7 +55,7 @@ final readonly class BinaryXor implements NativeMethod {
 		if ($targetValue instanceof BooleanValue) {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof BooleanValue) {
-	            return TypedValue::forValue($this->context->valueRegistry->boolean(
+	            return TypedValue::forValue($programRegistry->valueRegistry->boolean(
 		            ($targetValue->literalValue && !$parameterValue->literalValue) ||
 		            (!$targetValue->literalValue && $parameterValue->literalValue)
 	            ));

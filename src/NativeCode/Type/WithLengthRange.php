@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\MapType;
@@ -22,27 +22,24 @@ final readonly class WithLengthRange implements NativeMethod {
 
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($parameterType->isSubtypeOf(
-				$this->context->typeRegistry->withName(new TypeNameIdentifier('LengthRange'))
+				$programRegistry->typeRegistry->withName(new TypeNameIdentifier('LengthRange'))
 			)) {
 				if ($refType instanceof StringType) {
-					return $this->context->typeRegistry->type($this->context->typeRegistry->string());
+					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->string());
 				}
 				if ($refType instanceof ArrayType) {
-					return $this->context->typeRegistry->type($this->context->typeRegistry->array($refType->itemType));
+					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->array($refType->itemType));
 				}
 				if ($refType instanceof MapType) {
-					return $this->context->typeRegistry->type($this->context->typeRegistry->map($refType->itemType));
+					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->map($refType->itemType));
 				}
 				// @codeCoverageIgnoreStart
 				throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -58,6 +55,7 @@ final readonly class WithLengthRange implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -66,39 +64,39 @@ final readonly class WithLengthRange implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($parameter->type->isSubtypeOf(
-				$this->context->typeRegistry->withName(new TypeNameIdentifier('LengthRange'))
+				$programRegistry->typeRegistry->withName(new TypeNameIdentifier('LengthRange'))
 			)) {
 				if ($typeValue instanceof StringType) {
 					$range = $this->toBaseValue($parameter->value)->values;
 					$minValue = $range['minLength'];
 					$maxValue = $range['maxLength'];
-					$result = $this->context->typeRegistry->string(
+					$result = $programRegistry->typeRegistry->string(
 						$minValue->literalValue,
 						$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
 					);
-					return TypedValue::forValue($this->context->valueRegistry->type($result));
+					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
 				}
 				if ($typeValue instanceof ArrayType) {
 					$range = $this->toBaseValue($parameter->value)->values;
 					$minValue = $range['minLength'];
 					$maxValue = $range['maxLength'];
-					$result = $this->context->typeRegistry->array(
+					$result = $programRegistry->typeRegistry->array(
 						$typeValue->itemType,
 						$minValue->literalValue,
 						$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
 					);
-					return TypedValue::forValue($this->context->valueRegistry->type($result));
+					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
 				}
 				if ($typeValue instanceof MapType) {
 					$range = $this->toBaseValue($parameter->value)->values;
 					$minValue = $range['minLength'];
 					$maxValue = $range['maxLength'];
-					$result = $this->context->typeRegistry->map(
+					$result = $programRegistry->typeRegistry->map(
 						$typeValue->itemType,
 						$minValue->literalValue,
 						$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
 					);
-					return TypedValue::forValue($this->context->valueRegistry->type($result));
+					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
 				}
 			}
 		}

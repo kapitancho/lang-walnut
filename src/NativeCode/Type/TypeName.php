@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\NamedType;
@@ -19,11 +19,8 @@ final readonly class TypeName implements NativeMethod {
 
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
@@ -38,12 +35,12 @@ final readonly class TypeName implements NativeMethod {
 					MetaTypeValue::Subtype,
 					MetaTypeValue::Sealed,
 				], true)) {
-					return $this->context->typeRegistry->string(1);
+					return $programRegistry->typeRegistry->string(1);
 				}
 			}
 			if ($refType instanceof NamedType) {
-				return $this->context->typeRegistry->stringSubset([
-					$this->context->valueRegistry->string($refType->name->identifier)
+				return $programRegistry->typeRegistry->stringSubset([
+					$refType->name->identifier
 				]);
 			}
 		}
@@ -53,6 +50,7 @@ final readonly class TypeName implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -61,7 +59,7 @@ final readonly class TypeName implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $targetValue->typeValue;
 			if ($typeValue instanceof NamedType) {
-				return TypedValue::forValue($this->context->valueRegistry->string($typeValue->name->identifier));
+				return TypedValue::forValue($programRegistry->valueRegistry->string($typeValue->name->identifier));
 			}
 		}
 		// @codeCoverageIgnoreStart

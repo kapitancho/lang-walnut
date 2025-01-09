@@ -6,9 +6,8 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Value\TypeValue;
@@ -17,19 +16,15 @@ use Walnut\Lang\Implementation\Code\NativeCode\Hydrator;
 
 final readonly class HydrateAs implements NativeMethod {
 
-	public function __construct(
-		private MethodExecutionContext $context,
-		private MethodRegistry $methodRegistry,
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		if ($parameterType instanceof TypeType) {
-			return $this->context->typeRegistry->result(
+			return $programRegistry->typeRegistry->result(
 				$parameterType->refType,
-				$this->context->typeRegistry->withName(new TypeNameIdentifier("HydrationError"))
+				$programRegistry->typeRegistry->withName(new TypeNameIdentifier("HydrationError"))
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -38,6 +33,7 @@ final readonly class HydrateAs implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -47,17 +43,16 @@ final readonly class HydrateAs implements NativeMethod {
 		if ($parameterValue instanceof TypeValue) {
 			try {
 				return new Hydrator(
-					$this->context,
-					$this->methodRegistry,
+					$programRegistry,
 				)->hydrate($targetValue, $parameterValue->typeValue, 'value');
 			} catch (HydrationException $e) {
-				return TypedValue::forValue($this->context->valueRegistry->error(
-					$this->context->valueRegistry->sealedValue(
+				return TypedValue::forValue($programRegistry->valueRegistry->error(
+					$programRegistry->valueRegistry->sealedValue(
 						new TypeNameIdentifier("HydrationError"),
-						$this->context->valueRegistry->record([
+						$programRegistry->valueRegistry->record([
 							'value' => $e->value,
-							'hydrationPath' => $this->context->valueRegistry->string($e->hydrationPath),
-							'errorMessage' => $this->context->valueRegistry->string($e->errorMessage),
+							'hydrationPath' => $programRegistry->valueRegistry->string($e->hydrationPath),
+							'errorMessage' => $programRegistry->valueRegistry->string($e->errorMessage),
 						])
 					)
 				));

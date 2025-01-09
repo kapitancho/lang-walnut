@@ -7,11 +7,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\UnresolvableDependency;
-use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Value\TypeValue;
@@ -21,20 +19,18 @@ final readonly class ValueOf implements NativeMethod {
 
 	/** @noinspection PhpPropertyOnlyWrittenInspection */
 	public function __construct(
-		private MethodExecutionContext $context,
-		private MethodRegistry $methodRegistry,
 		private NativeCodeTypeMapper $typeMapper,
-		private DependencyContainer $dependencyContainer,
 	) {}
 
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($parameterType instanceof TypeType) {
-			return $this->context->typeRegistry->result(
+			return $programRegistry->typeRegistry->result(
 				$parameterType->refType,
-				$this->context->typeRegistry->withName(
+				$programRegistry->typeRegistry->withName(
 					new TypeNameIdentifier('DependencyContainerError')
 				)
 			);
@@ -45,6 +41,7 @@ final readonly class ValueOf implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -52,18 +49,18 @@ final readonly class ValueOf implements NativeMethod {
 		
 		if ($parameterValue instanceof TypeValue) {
 			$type = $parameterValue->typeValue;
-			$result = $this->dependencyContainer->valueByType($type);
+			$result = $programRegistry->dependencyContainer->valueByType($type);
 			if ($result instanceof Value) {
 				return new TypedValue($type, $result);
 			}
 			return TypedValue::forValue(
-				$this->context->valueRegistry->error(
-					$this->context->valueRegistry->sealedValue(
+				$programRegistry->valueRegistry->error(
+					$programRegistry->valueRegistry->sealedValue(
 						new TypeNameIdentifier('DependencyContainerError'),
-						$this->context->valueRegistry->record([
-							'targetType' => $this->context->valueRegistry->type($type),
-							'errorOnType' => $this->context->valueRegistry->type($result->type),
-							'errorMessage' => $this->context->valueRegistry->string(
+						$programRegistry->valueRegistry->record([
+							'targetType' => $programRegistry->valueRegistry->type($type),
+							'errorOnType' => $programRegistry->valueRegistry->type($result->type),
+							'errorMessage' => $programRegistry->valueRegistry->string(
 								match($result->unresolvableDependency) {
 									UnresolvableDependency::circularDependency => 'Circular dependency',
 									UnresolvableDependency::ambiguous => 'Ambiguous dependency',

@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
@@ -20,11 +20,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class ValueWithName implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
@@ -32,9 +29,9 @@ final readonly class ValueWithName implements NativeMethod {
 			$refType = $targetType->refType;
 			if ($refType instanceof EnumerationSubsetType) {
 				if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-					return $this->context->typeRegistry->result(
-						$this->context->typeRegistry->enumeration($refType->enumeration->name),
-						$this->context->typeRegistry->sealed(
+					return $programRegistry->typeRegistry->result(
+						$programRegistry->typeRegistry->enumeration($refType->enumeration->name),
+						$programRegistry->typeRegistry->sealed(
 							new TypeNameIdentifier('UnknownEnumerationValue'),
 						)
 					);
@@ -50,6 +47,7 @@ final readonly class ValueWithName implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -61,11 +59,11 @@ final readonly class ValueWithName implements NativeMethod {
 				$refType = $targetValue->typeValue;
 				if ($refType instanceof EnumerationSubsetType) {
 					return TypedValue::forValue($refType->subsetValues[$parameterValue->literalValue] ??
-						$this->context->valueRegistry->error(
-							$this->context->valueRegistry->sealedValue(
+						$programRegistry->valueRegistry->error(
+							$programRegistry->valueRegistry->sealedValue(
 								new TypeNameIdentifier('UnknownEnumerationValue'),
-								$this->context->valueRegistry->record([
-									'enumeration' => $this->context->valueRegistry->type($refType),
+								$programRegistry->valueRegistry->record([
+									'enumeration' => $programRegistry->valueRegistry->type($refType),
 									'value' => $parameterValue,
 								])
 							)

@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Blueprint\Program\Registry;
 
-use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
 use Walnut\Lang\Blueprint\Code\Expression\ConstantExpression;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpression;
@@ -22,7 +21,6 @@ use Walnut\Lang\Blueprint\Code\Expression\VariableNameExpression;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
-use Walnut\Lang\Blueprint\Function\FunctionBodyDraft;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 
@@ -63,7 +61,6 @@ interface ExpressionRegistry {
 		Expression $parameter
 	): MethodCallExpression;
 
-	public function functionBodyDraft(ExpressionNode $expressionNode): FunctionBodyDraft;
 	public function functionBody(Expression $expression): FunctionBody;
 	public function mutable(Type $type, Expression $value): MutableExpression;
 }

@@ -4,6 +4,7 @@ namespace Walnut\Lang\Implementation\Program\DependencyContainer;
 
 use SplObjectStorage;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
+use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Expression\MethodCallExpression;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
@@ -15,7 +16,7 @@ use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyError;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\UnresolvableDependency;
 use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
-use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Type\NamedType;
@@ -27,7 +28,6 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\SealedValue;
 use Walnut\Lang\Blueprint\Value\Value;
-use Walnut\Lang\Implementation\Program\GlobalContext;
 
 final class DependencyContainer implements DependencyContainerInterface {
 
@@ -38,8 +38,8 @@ final class DependencyContainer implements DependencyContainerInterface {
 	private readonly MethodCallExpression $containerCastExpression;
 
 	public function __construct(
-		private readonly ValueRegistry $valueRegistry,
-		private readonly GlobalContext $globalContext,
+		private readonly ProgramRegistry $programRegistry,
+		private readonly ExecutionContext $globalContext,
 		private readonly MethodRegistry $methodRegistry,
 		private readonly ExpressionRegistry $expressionRegistry,
 	) {
@@ -50,7 +50,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 	private function containerCastExpression(): MethodCallExpression {
 		return $this->containerCastExpression ??= $this->expressionRegistry->methodCall(
 			$this->expressionRegistry->constant(
-				$this->valueRegistry->atom(new TypeNameIdentifier('DependencyContainer'))
+				$this->programRegistry->valueRegistry->atom(new TypeNameIdentifier('DependencyContainer'))
 			),
 			new MethodNameIdentifier('as'),
 			$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
@@ -59,16 +59,16 @@ final class DependencyContainer implements DependencyContainerInterface {
 
 	private function findValueByNamedType(NamedType $type): Value|DependencyError {
 		try {
-			$sType = TypedValue::forValue($this->valueRegistry->type($type));
+			$sType = TypedValue::forValue($this->programRegistry->valueRegistry->type($type));
 			$containerCastExpression = $this->containerCastExpression();
 			$containerCastExpression->analyse(
-				$this->globalContext->withAddedVariableType(
+				$this->programRegistry->analyserContext->withAddedVariableType(
 					new VariableNameIdentifier('#'),
 					$sType->type
 				)
 			);
 			$result = $containerCastExpression->execute(
-				$this->globalContext->withAddedVariableValue(
+				$this->programRegistry->executionContext->withAddedVariableValue(
 					new VariableNameIdentifier('#'),
 					$sType
 				)
@@ -101,7 +101,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 			}
 			$found[] = $foundValue;
 		}
-		return $this->valueRegistry->tuple($found);
+		return $this->programRegistry->valueRegistry->tuple($found);
 	}
 
 	private function findRecordValue(RecordType $recordType): Value|DependencyError {
@@ -130,7 +130,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 			}
 			$found[$key] = $foundValue;
 		}
-		return $this->valueRegistry->record($found);
+		return $this->programRegistry->valueRegistry->record($found);
 	}
 
 	private function findSubtypeValue(SubtypeType $type): Value|DependencyError {
@@ -142,7 +142,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 					$this->expressionRegistry->variableName(new VariableNameIdentifier('#')),
 					new MethodNameIdentifier('construct'),
 					$this->expressionRegistry->constant(
-						$this->valueRegistry->type($type)
+						$this->programRegistry->valueRegistry->type($type)
 					)
 				)->execute(
 					$this->globalContext->withAddedVariableValue(
@@ -162,7 +162,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 	private function findSealedValue(SealedType $type): Value|DependencyError {
 		$found = $this->findValueByNamedType($type);
 		if ($found instanceof DependencyError) {
-			$constructor = $this->valueRegistry->atom(new TypeNameIdentifier('Constructor'));
+			$constructor = $this->programRegistry->valueRegistry->atom(new TypeNameIdentifier('Constructor'));
 			$method = $this->methodRegistry->method($constructor->type,
 				new MethodNameIdentifier($type->name->identifier));
 			if ($method instanceof CustomMethod) {
@@ -175,7 +175,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 					$this->expressionRegistry->variableName(new VariableNameIdentifier('#')),
 					new MethodNameIdentifier('construct'),
 					$this->expressionRegistry->constant(
-						$this->valueRegistry->type($type)
+						$this->programRegistry->valueRegistry->type($type)
 					)
 				)->execute(
 					$this->globalContext->withAddedVariableValue(

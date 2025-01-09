@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
@@ -22,11 +22,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class Sum implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -37,13 +34,13 @@ final readonly class Sum implements NativeMethod {
 		if ($targetType instanceof ArrayType) {
 			$itemType = $targetType->itemType;
 			if ($itemType->isSubtypeOf(
-				$this->context->typeRegistry->union([
-					$this->context->typeRegistry->integer(),
-					$this->context->typeRegistry->real()
+				$programRegistry->typeRegistry->union([
+					$programRegistry->typeRegistry->integer(),
+					$programRegistry->typeRegistry->real()
 				])
 			)) {
 				if ($itemType instanceof RealType || $itemType instanceof RealSubsetType) {
-					return $this->context->typeRegistry->real(
+					return $programRegistry->typeRegistry->real(
                         $itemType->range->minValue === MinusInfinity::value ? MinusInfinity::value :
                             $itemType->range->minValue * $targetType->range->minLength,
                         $itemType->range->maxValue === PlusInfinity::value ||
@@ -52,7 +49,7 @@ final readonly class Sum implements NativeMethod {
 					);
 				}
 				if ($itemType instanceof IntegerType || $itemType instanceof IntegerSubsetType) {
-					return $this->context->typeRegistry->integer(
+					return $programRegistry->typeRegistry->integer(
                         $itemType->range->minValue === MinusInfinity::value ? MinusInfinity::value :
 						    $itemType->range->minValue * $targetType->range->minLength,
                         $itemType->range->maxValue === PlusInfinity::value ||
@@ -60,7 +57,7 @@ final readonly class Sum implements NativeMethod {
 						    $itemType->range->maxValue * $targetType->range->maxLength
 					);
 				}
-				return $this->context->typeRegistry->real();
+				return $programRegistry->typeRegistry->real();
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -72,6 +69,7 @@ final readonly class Sum implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -89,7 +87,7 @@ final readonly class Sum implements NativeMethod {
 				$sum += $v;
 			}
 			return TypedValue::forValue(
-				$hasReal ? $this->context->valueRegistry->real($sum) : $this->context->valueRegistry->integer($sum)
+				$hasReal ? $programRegistry->valueRegistry->real($sum) : $programRegistry->valueRegistry->integer($sum)
 			);
 		}
 		// @codeCoverageIgnoreStart

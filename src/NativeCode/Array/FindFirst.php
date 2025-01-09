@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\FunctionType;
@@ -19,11 +19,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class FindFirst implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -31,11 +28,11 @@ final readonly class FindFirst implements NativeMethod {
 		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($type instanceof ArrayType) {
 			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf($this->context->typeRegistry->boolean)) {
+			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf($programRegistry->typeRegistry->boolean)) {
 				if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
-					return $this->context->typeRegistry->result(
+					return $programRegistry->typeRegistry->result(
 						$type->itemType,
-						$this->context->typeRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
+						$programRegistry->typeRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
 					);
 				}
 				throw new AnalyserException(
@@ -54,6 +51,7 @@ final readonly class FindFirst implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -63,24 +61,24 @@ final readonly class FindFirst implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue && $parameterValue instanceof FunctionValue) {
 			$values = $targetValue->values;
-			$true = $this->context->valueRegistry->true;
+			$true = $programRegistry->valueRegistry->true;
 			foreach($values as $value) {
-				$r = $parameterValue->execute($this->context->globalContext, $value);
+				$r = $parameterValue->execute($programRegistry->executionContext, $value);
 				if ($true->equals($r)) {
 					$resultType = $value instanceof TypedValue ? $value->type : $value->type;
 					$resultValue = $value instanceof TypedValue ? $value->value : $value;
 					return new TypedValue(
-						$this->context->typeRegistry->result(
+						$programRegistry->typeRegistry->result(
 							$resultType,
-							$this->context->typeRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
+							$programRegistry->typeRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
 						),
 						$resultValue
 					);
 				}
 			}
 			return TypedValue::forValue(
-				$this->context->valueRegistry->error(
-					$this->context->valueRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
+				$programRegistry->valueRegistry->error(
+					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
 				)
 			);
 		}

@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
@@ -17,21 +17,18 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class CountValues implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		if ($targetType instanceof ArrayType) {
 			$itemType = $targetType->itemType;
-			if ($itemType->isSubtypeOf($this->context->typeRegistry->string()) ||
-				$itemType->isSubtypeOf($this->context->typeRegistry->integer())
+			if ($itemType->isSubtypeOf($programRegistry->typeRegistry->string()) ||
+				$itemType->isSubtypeOf($programRegistry->typeRegistry->integer())
 			) {
-				return $this->context->typeRegistry->map(
-					$this->context->typeRegistry->integer(
+				return $programRegistry->typeRegistry->map(
+					$programRegistry->typeRegistry->integer(
 						1, $targetType->range->maxLength
 					),
 					min(1, $targetType->range->minLength),
@@ -48,6 +45,7 @@ final readonly class CountValues implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -79,16 +77,16 @@ final readonly class CountValues implements NativeMethod {
 					// @codeCoverageIgnoreEnd
 				}
 				$rawValues = array_count_values($rawValues);
-				return TypedValue::forValue($this->context->valueRegistry->record(array_map(
-					fn($value) => $this->context->valueRegistry->string($value),
+				return TypedValue::forValue($programRegistry->valueRegistry->record(array_map(
+					fn($value) => $programRegistry->valueRegistry->string($value),
 					$rawValues
 				)));
 			}
 			$rawValues = array_count_values($rawValues);
-			return TypedValue::forValue($this->context->valueRegistry->record(array_map(
+			return TypedValue::forValue($programRegistry->valueRegistry->record(array_map(
 				fn($value) => is_float($value) ?
-					$this->context->valueRegistry->real($value) :
-					$this->context->valueRegistry->integer($value),
+					$programRegistry->valueRegistry->real($value) :
+					$programRegistry->valueRegistry->integer($value),
 				$rawValues
 			)));
 		}

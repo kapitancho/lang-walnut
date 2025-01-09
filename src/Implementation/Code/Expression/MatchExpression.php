@@ -14,17 +14,14 @@ use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionDefault;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionOperation;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionPair;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
-use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\TypeType;
+use Walnut\Lang\Blueprint\Value\BooleanValue;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 
 final readonly class MatchExpression implements MatchExpressionInterface, JsonSerializable {
 
 	/** @param list<MatchExpressionPair|MatchExpressionDefault> $pairs */
 	public function __construct(
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
 		public Expression $target,
 		public MatchExpressionOperation $operation,
 		public array $pairs
@@ -86,14 +83,14 @@ final readonly class MatchExpression implements MatchExpressionInterface, JsonSe
 		}
 		if (!$hasDefaultMatch) {
 			if ($hasDynamicTypes || !$retTarget->expressionType->isSubtypeOf(
-				$this->typeRegistry->union($refTypes)
+				$analyserContext->programRegistry->typeRegistry->union($refTypes)
 			)) {
-				$expressionTypes[] = $this->typeRegistry->null;
+				$expressionTypes[] = $analyserContext->programRegistry->typeRegistry->null;
 			}
 		}
 		return $retTarget->asAnalyserResult(
-			$this->typeRegistry->union($expressionTypes),
-			$this->typeRegistry->union($returnTypes)
+			$analyserContext->programRegistry->typeRegistry->union($expressionTypes),
+			$analyserContext->programRegistry->typeRegistry->union($returnTypes)
 		);
 	}
 
@@ -127,13 +124,14 @@ final readonly class MatchExpression implements MatchExpressionInterface, JsonSe
 			}
 		}
 		return $executionContext->asExecutionResult(
-			TypedValue::forValue($this->valueRegistry->null)
+			TypedValue::forValue($executionContext->programRegistry->valueRegistry->null)
 		);
 	}
 
 	public function __toString(): string {
 		$isMatchTrue = $this->target instanceof ConstantExpression &&
-			$this->target->value->equals($this->valueRegistry->true);
+			$this->target->value instanceof BooleanValue &&
+			$this->target->value->literalValue;
 
 		$pairs = implode(", ", $this->pairs);
 

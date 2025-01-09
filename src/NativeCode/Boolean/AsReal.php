@@ -2,11 +2,12 @@
 
 namespace Walnut\Lang\NativeCode\Boolean;
 
+use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\BooleanType;
 use Walnut\Lang\Blueprint\Type\FalseType;
 use Walnut\Lang\Blueprint\Type\TrueType;
@@ -17,29 +18,26 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class AsReal implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof BooleanType) {
-			return $this->context->typeRegistry->realSubset([
-				$this->context->valueRegistry->real(0.0),
-				$this->context->valueRegistry->real(1.0)
+			return $programRegistry->typeRegistry->realSubset([
+				new Number(0.0),
+				new Number(1.0)
 			]);
 		}
 		if ($targetType instanceof TrueType) {
-			return $this->context->typeRegistry->realSubset([
-				$this->context->valueRegistry->real(1.0)
+			return $programRegistry->typeRegistry->realSubset([
+				new Number(1.0)
 			]);
 		}
 		if ($targetType instanceof FalseType) {
-			return $this->context->typeRegistry->realSubset([
-				$this->context->valueRegistry->real(0.0)
+			return $programRegistry->typeRegistry->realSubset([
+				new Number(0.0),
 			]);
 		}
 		// @codeCoverageIgnoreStart
@@ -48,6 +46,7 @@ final readonly class AsReal implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -56,7 +55,7 @@ final readonly class AsReal implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof BooleanValue) {
 			$target = $targetValue->literalValue;
-			return TypedValue::forValue($this->context->valueRegistry->real($target ? 1.0 : 0.0));
+			return TypedValue::forValue($programRegistry->valueRegistry->real($target ? 1.0 : 0.0));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

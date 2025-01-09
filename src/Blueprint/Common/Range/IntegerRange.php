@@ -4,7 +4,6 @@ namespace Walnut\Lang\Blueprint\Common\Range;
 
 use BcMath\Number;
 use Stringable;
-use Walnut\Lang\Blueprint\Value\IntegerValue;
 
 interface IntegerRange extends Stringable {
 	public Number|MinusInfinity $minValue { get; }
@@ -17,5 +16,5 @@ interface IntegerRange extends Stringable {
 
     public function asRealRange(): RealRange;
 
-    public function contains(IntegerValue $value): bool;
+    public function contains(Number $value): bool;
 }

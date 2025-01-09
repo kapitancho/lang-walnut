@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
@@ -21,11 +21,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class WithoutByIndex implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -33,9 +30,9 @@ final readonly class WithoutByIndex implements NativeMethod {
 		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($type instanceof ArrayType) {
 			if ($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) {
-				$returnType = $this->context->typeRegistry->record([
+				$returnType = $programRegistry->typeRegistry->record([
 					'element' => $type->itemType,
-					'array' => $this->context->typeRegistry->array(
+					'array' => $programRegistry->typeRegistry->array(
 						$type->itemType,
 						max(0, $type->range->minLength - 1),
 						$type->range->maxLength === PlusInfinity::value ?
@@ -43,9 +40,9 @@ final readonly class WithoutByIndex implements NativeMethod {
 					)
 				]);
 				return $parameterType->range->minValue < $type->range->maxLength ? $returnType :
-					$this->context->typeRegistry->result(
+					$programRegistry->typeRegistry->result(
 						$returnType,
-						$this->context->typeRegistry->sealed(
+						$programRegistry->typeRegistry->sealed(
 							new TypeNameIdentifier("IndexOutOfRange")
 						)
 					);
@@ -60,6 +57,7 @@ final readonly class WithoutByIndex implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -72,15 +70,15 @@ final readonly class WithoutByIndex implements NativeMethod {
 				$values = $targetValue->values;
 				$p = (string)$parameterValue->literalValue;
 				if (!array_key_exists($p, $values)) {
-					return TypedValue::forValue($this->context->valueRegistry->sealedValue(
+					return TypedValue::forValue($programRegistry->valueRegistry->sealedValue(
 						new TypeNameIdentifier('IndexOutOfRange'),
-						$this->context->valueRegistry->record(['index' => $parameterValue])
+						$programRegistry->valueRegistry->record(['index' => $parameterValue])
 					));
 				}
 				$removed = array_splice($values, $p, 1);
-				return TypedValue::forValue($this->context->valueRegistry->record([
+				return TypedValue::forValue($programRegistry->valueRegistry->record([
 					'element' => $removed[0],
-					'array' => $this->context->valueRegistry->tuple($values)
+					'array' => $programRegistry->valueRegistry->tuple($values)
 				]));
 			}
 			// @codeCoverageIgnoreStart

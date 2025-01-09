@@ -5,7 +5,6 @@ namespace Walnut\Lang\Implementation\Program\EntryPoint;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Compilation\Compiler;
 use Walnut\Lang\Blueprint\Program\EntryPoint\CliEntryPoint as CliEntryPointInterface;
-use Walnut\Lang\Blueprint\Program\Program;
 
 final readonly class CliEntryPoint implements CliEntryPointInterface {
 	public function __construct(
@@ -15,8 +14,8 @@ final readonly class CliEntryPoint implements CliEntryPointInterface {
 	public function call(string $source, string ... $parameters): string {
 		$compilationResult = $this->compiler->compile($source);
 		$program = $compilationResult->program;
-		$tr = $compilationResult->programRegistry->typeRegistry;
-		$vr = $compilationResult->programRegistry->valueRegistry;
+		$tr = $compilationResult->compilationContext->typeRegistry;
+		$vr = $compilationResult->compilationContext->valueRegistry;
 		$ep = $program->getEntryPoint(
 			new VariableNameIdentifier('main'),
 			$tr->array($tr->string()),

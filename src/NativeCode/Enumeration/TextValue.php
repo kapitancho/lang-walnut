@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\NullType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Value\EnumerationValue;
@@ -16,11 +16,8 @@ use Walnut\Lang\Implementation\Type\EnumerationType;
 
 final readonly class TextValue implements NativeMethod {
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
@@ -33,7 +30,7 @@ final readonly class TextValue implements NativeMethod {
 					$min = min($min, $l);
 					$max = max($max, $l);
 				}
-				return $this->context->typeRegistry->string($min, $max);
+				return $programRegistry->typeRegistry->string($min, $max);
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -45,6 +42,7 @@ final readonly class TextValue implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -53,7 +51,7 @@ final readonly class TextValue implements NativeMethod {
 		
 		if ($targetValue instanceof EnumerationValue) {
 			if ($parameterValue instanceof NullValue) {
-				return TypedValue::forValue($this->context->valueRegistry->string($targetValue->name->identifier));
+				return TypedValue::forValue($programRegistry->valueRegistry->string($targetValue->name->identifier));
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

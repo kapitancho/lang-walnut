@@ -10,15 +10,11 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\TupleExpression as TupleExpressionInterface;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
-use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 
 final readonly class TupleExpression implements TupleExpressionInterface, JsonSerializable {
 
 	/** @param list<Expression> $values */
 	public function __construct(
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
 		public array $values
 	) {}
 
@@ -31,8 +27,8 @@ final readonly class TupleExpression implements TupleExpressionInterface, JsonSe
 			$returnTypes[] = $analyserContext->returnType;
 		}
 		return $analyserContext->asAnalyserResult(
-			$this->typeRegistry->tuple($subtypes),
-			$this->typeRegistry->union($returnTypes)
+			$analyserContext->programRegistry->typeRegistry->tuple($subtypes),
+			$analyserContext->programRegistry->typeRegistry->union($returnTypes)
 		);
 	}
 
@@ -45,8 +41,8 @@ final readonly class TupleExpression implements TupleExpressionInterface, JsonSe
 			$types[] = $executionContext->valueType;
 		}
 		return $executionContext->asExecutionResult(new TypedValue(
-			$this->typeRegistry->tuple($types),
-			$this->valueRegistry->tuple($values)
+			$executionContext->programRegistry->typeRegistry->tuple($types),
+			$executionContext->programRegistry->valueRegistry->tuple($values)
 		));
 	}
 

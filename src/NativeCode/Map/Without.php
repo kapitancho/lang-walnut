@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\RecordType;
@@ -18,11 +18,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class Without implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -31,15 +28,15 @@ final readonly class Without implements NativeMethod {
 			$targetType = $targetType->asMapType();
 		}
 		if ($targetType instanceof MapType) {
-			$returnType = $this->context->typeRegistry->map(
+			$returnType = $programRegistry->typeRegistry->map(
 				$targetType->itemType,
 				max(0, $targetType->range->minLength - 1),
 				$targetType->range->maxLength === PlusInfinity::value ?
 					PlusInfinity::value : $targetType->range->maxLength - 1
 			);
-			return $this->context->typeRegistry->result(
+			return $programRegistry->typeRegistry->result(
 				$returnType,
-				$this->context->typeRegistry->atom(
+				$programRegistry->typeRegistry->atom(
 					new TypeNameIdentifier("ItemNotFound")
 				)
 			);
@@ -50,6 +47,7 @@ final readonly class Without implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -62,11 +60,11 @@ final readonly class Without implements NativeMethod {
 			foreach($values as $key => $value) {
 				if ($value->equals($parameterValue)) {
 					unset($values[$key]);
-					return TypedValue::forValue($this->context->valueRegistry->record($values));
+					return TypedValue::forValue($programRegistry->valueRegistry->record($values));
 				}
 			}
-			return TypedValue::forValue($this->context->valueRegistry->error(
-				$this->context->valueRegistry->atom(new TypeNameIdentifier("ItemNotFound"))
+			return TypedValue::forValue($programRegistry->valueRegistry->error(
+				$programRegistry->valueRegistry->atom(new TypeNameIdentifier("ItemNotFound"))
 			));
 		}
 		// @codeCoverageIgnoreStart

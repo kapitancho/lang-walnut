@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
@@ -19,17 +19,14 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class Abs implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof RealType || $targetType instanceof RealSubsetType) {
-			return $this->context->typeRegistry->real(
+			return $programRegistry->typeRegistry->real(
 				$targetType->range->minValue === MinusInfinity::value ||
 				$targetType->range->minValue < 0 ? 0 : $targetType->range->minValue,
 				$targetType->range->minValue === MinusInfinity::value ||
@@ -43,6 +40,7 @@ final readonly class Abs implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -51,7 +49,7 @@ final readonly class Abs implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			$target = $targetValue->literalValue;
-			return TypedValue::forValue($this->context->valueRegistry->real(abs((string)$target)));
+			return TypedValue::forValue($programRegistry->valueRegistry->real(abs((string)$target)));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

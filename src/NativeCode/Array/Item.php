@@ -2,13 +2,14 @@
 
 namespace Walnut\Lang\NativeCode\Array;
 
+use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
@@ -22,11 +23,8 @@ use Walnut\Lang\Implementation\Type\IntegerType;
 final readonly class Item implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType
 	): Type {
@@ -40,16 +38,16 @@ final readonly class Item implements NativeMethod {
 					$max = $parameterType->range->maxValue;
 					if ($min !== MinusInfinity::value && $min >= 0) {
 						if ($parameterType instanceof IntegerSubsetType) {
-							$returnType = $this->context->typeRegistry->union(
+							$returnType = $programRegistry->typeRegistry->union(
 								array_map(
-									static fn(IntegerValue $value) =>
-										$targetType->types[(string)$value->literalValue] ?? $targetType->restType,
+									static fn(Number $value) =>
+										$targetType->types[(string)$value] ?? $targetType->restType,
 									$parameterType->subsetValues
 								)
 							);
 						} elseif ($parameterType instanceof IntegerType) {
 							$isWithinLimit = $max !== PlusInfinity::value && $max < count($targetType->types);
-							$returnType = $this->context->typeRegistry->union(
+							$returnType = $programRegistry->typeRegistry->union(
 								$isWithinLimit ?
 								array_slice($targetType->types, (int)(string)$min, (int)(string)$max - (int)(string)$min + 1) :
 								[... array_slice($targetType->types, (int)(string)$min), $targetType->restType]
@@ -59,9 +57,9 @@ final readonly class Item implements NativeMethod {
 				}
 
 				return $type->range->minLength > $parameterType->range->maxValue ? $returnType :
-					$this->context->typeRegistry->result(
+					$programRegistry->typeRegistry->result(
 						$returnType,
-						$this->context->typeRegistry->sealed(
+						$programRegistry->typeRegistry->sealed(
 							new TypeNameIdentifier("IndexOutOfRange")
 						)
 					);
@@ -76,6 +74,7 @@ final readonly class Item implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -95,10 +94,10 @@ final readonly class Item implements NativeMethod {
 				};
 				return new TypedValue($type, $result);
 			}
-			return TypedValue::forValue($this->context->valueRegistry->error(
-				$this->context->valueRegistry->sealedValue(
+			return TypedValue::forValue($programRegistry->valueRegistry->error(
+				$programRegistry->valueRegistry->sealedValue(
 					new TypeNameIdentifier('IndexOutOfRange'),
-					$this->context->valueRegistry->record(['index' => $parameterValue])
+					$programRegistry->valueRegistry->record(['index' => $parameterValue])
 				)
 			));
 		}

@@ -12,7 +12,6 @@ use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope as VariableValueScopeInt
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Function\FunctionBodyException;
-use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyError;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
@@ -31,7 +30,6 @@ final class FunctionValue implements FunctionValueInterface, JsonSerializable {
     public function __construct(
 		private readonly TypeRegistry $typeRegistry,
 		private readonly ValueRegistry $valueRegistry,
-		private readonly DependencyContainer $dependencyContainer,
 		public readonly Type $parameterType,
 		public readonly Type $dependencyType,
 		public readonly Type $returnType,
@@ -44,7 +42,6 @@ final class FunctionValue implements FunctionValueInterface, JsonSerializable {
 		return new self(
 			$this->typeRegistry,
 			$this->valueRegistry,
-			$this->dependencyContainer,
 			$this->parameterType,
 			$this->dependencyType,
 			$this->returnType,
@@ -58,7 +55,6 @@ final class FunctionValue implements FunctionValueInterface, JsonSerializable {
 		return new self(
 			$this->typeRegistry,
 			$this->valueRegistry,
-			$this->dependencyContainer,
 			$this->parameterType,
 			$this->dependencyType,
 			$this->returnType,
@@ -98,7 +94,7 @@ final class FunctionValue implements FunctionValueInterface, JsonSerializable {
 				$this->dependencyType,
 			);
 			if (!($this->dependencyType instanceof NothingType)) {
-				$value = $this->dependencyContainer->valueByType($this->dependencyType);
+				$value = $analyserContext->programRegistry->dependencyContainer->valueByType($this->dependencyType);
 				if ($value instanceof DependencyError) {
 					throw new AnalyserException(
 						sprintf("Dependency %s cannot be instantiated", $this->dependencyType)
@@ -158,7 +154,7 @@ final class FunctionValue implements FunctionValueInterface, JsonSerializable {
 				$this->dependencyType instanceof NothingType ?
 					null : new TypedValue(
 						$this->dependencyType,
-						$this->dependencyContainer->valueByType($this->dependencyType)
+						$executionContext->programRegistry->dependencyContainer->valueByType($this->dependencyType)
 					)
 			);
 		} catch (FunctionReturn $result) {

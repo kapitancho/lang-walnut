@@ -8,9 +8,8 @@ use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\Method;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\ResultType;
@@ -28,26 +27,29 @@ use Walnut\Lang\Implementation\Type\Helper\TupleAsRecord;
 final readonly class Construct implements NativeMethod {
 	use TupleAsRecord;
 
-	public function __construct(
-		private MethodExecutionContext $context,
-		private MethodRegistry $methodRegistry,
-	) {}
-
-	public function analyse(Type $targetType, Type $parameterType): Type {
+	public function analyse(
+		ProgramRegistry $programRegistry,
+		Type $targetType,
+		Type $parameterType
+	): Type {
 		if ($parameterType instanceof TypeType) {
 			$t = $parameterType->refType;
 			if ($t instanceof SealedType || $t instanceof SubtypeType) {
 				$b = $t instanceof SealedType ? $t->valueType : $t->baseType;
 
-				$constructorType = $this->context->typeRegistry->typeByName(new TypeNameIdentifier('Constructor'));
+				$constructorType = $programRegistry->typeRegistry->typeByName(new TypeNameIdentifier('Constructor'));
 
-				$constructorMethod = $this->methodRegistry->method(
+				$constructorMethod = $programRegistry->methodRegistry->method(
 					$constructorType,
 					new MethodNameIdentifier($t->name->identifier)
 				);
 				$errorTypes = [];
 				if ($constructorMethod instanceof Method) {
-					$constructorResult = $constructorMethod->analyse($constructorType, $targetType);
+					$constructorResult = $constructorMethod->analyse(
+						$programRegistry,
+						$constructorType,
+						$targetType
+					);
 					$constructorMethodReturnType = $constructorResult instanceof ResultType ? $constructorResult->returnType : $constructorResult;
 					if ($constructorResult instanceof ResultType) {
 						$errorTypes[] = $constructorResult->errorType;
@@ -67,7 +69,7 @@ final readonly class Construct implements NativeMethod {
 						$b instanceof RecordType &&
 						$targetType instanceof TupleType &&
 						$this->isTupleCompatibleToRecord(
-							$this->context->typeRegistry,
+							$programRegistry->typeRegistry,
 							$targetType,
 							$b
 						)
@@ -82,24 +84,28 @@ final readonly class Construct implements NativeMethod {
 						);
 					}
 				}
-				$validatorMethod = $this->methodRegistry->method(
+				$validatorMethod = $programRegistry->methodRegistry->method(
 					$constructorType,
 					new MethodNameIdentifier('as' . $t->name->identifier)
 				);
 				if ($validatorMethod instanceof Method) {
-					$validatorResult = $validatorMethod->analyse($constructorType, $b);
+					$validatorResult = $validatorMethod->analyse(
+						$programRegistry,
+						$constructorType,
+						$b
+					);
 					if ($validatorResult instanceof ResultType) {
 						$errorTypes[] = $validatorResult->errorType;
 					}
 				}
-				return count($errorTypes) > 0 ? $this->context->typeRegistry->result(
+				return count($errorTypes) > 0 ? $programRegistry->typeRegistry->result(
 					$t,
-					$this->context->typeRegistry->union($errorTypes)
+					$programRegistry->typeRegistry->union($errorTypes)
 				): $t;
 			}
 			if ($t instanceof ResultType && $t->returnType instanceof NothingType) {
-				return $this->context->typeRegistry->result(
-					$this->context->typeRegistry->nothing,
+				return $programRegistry->typeRegistry->result(
+					$programRegistry->typeRegistry->nothing,
 					$targetType
 				);
 			}
@@ -118,6 +124,7 @@ final readonly class Construct implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -128,13 +135,14 @@ final readonly class Construct implements NativeMethod {
 			$t = $parameterValue->typeValue;
 
 			if ($t instanceof SealedType || $t instanceof SubtypeType) {
-				$constructorType = $this->context->typeRegistry->atom(new TypeNameIdentifier('Constructor'));
-				$constructorMethod = $this->methodRegistry->method(
+				$constructorType = $programRegistry->typeRegistry->atom(new TypeNameIdentifier('Constructor'));
+				$constructorMethod = $programRegistry->methodRegistry->method(
 					$constructorType,
 					new MethodNameIdentifier($t->name->identifier)
 				);
 				if ($constructorMethod instanceof Method) {
 					$target = $constructorMethod->execute(
+						$programRegistry,
 						TypedValue::forValue($constructorType->value),
 						$target,
 					);
@@ -144,12 +152,13 @@ final readonly class Construct implements NativeMethod {
 					}
 					$targetValue = $resultValue;
 				}
-				$validatorMethod = $this->methodRegistry->method(
+				$validatorMethod = $programRegistry->methodRegistry->method(
 					$constructorType,
 					new MethodNameIdentifier('as' . $t->name->identifier)
 				);
 				if ($validatorMethod instanceof Method) {
 					$result = $validatorMethod->execute(
+						$programRegistry,
 						TypedValue::forValue($constructorType->value),
 						$target,
 					);
@@ -162,7 +171,7 @@ final readonly class Construct implements NativeMethod {
 			if ($t instanceof SealedType) {
 				if ($targetValue instanceof TupleValue) {
 					$targetValue = $this->getTupleAsRecord(
-						$this->context->valueRegistry,
+						$programRegistry->valueRegistry,
 						$targetValue,
 						$t->valueType,
 					);
@@ -170,7 +179,7 @@ final readonly class Construct implements NativeMethod {
 				if ($targetValue instanceof RecordValue && $targetValue->type->isSubtypeOf($t->valueType)) {
 					return new TypedValue(
 						$t,
-						$this->context->valueRegistry->sealedValue(
+						$programRegistry->valueRegistry->sealedValue(
 							$t->name, $targetValue
 						)
 					);
@@ -185,7 +194,7 @@ final readonly class Construct implements NativeMethod {
 			if ($t instanceof SubtypeType) {
 				if ($targetValue instanceof TupleValue && $t->baseType instanceof RecordType) {
 					$targetValue = $this->getTupleAsRecord(
-						$this->context->valueRegistry,
+						$programRegistry->valueRegistry,
 						$targetValue,
 						$t->baseType,
 					);
@@ -193,7 +202,7 @@ final readonly class Construct implements NativeMethod {
 				if ($targetValue->type->isSubtypeOf($t->baseType)) {
 					return new TypedValue(
 						$t,
-						$this->context->valueRegistry->subtypeValue(
+						$programRegistry->valueRegistry->subtypeValue(
 							$t->name, $targetValue
 						)
 					);
@@ -208,7 +217,7 @@ final readonly class Construct implements NativeMethod {
 			if ($t instanceof ResultType && $t->returnType instanceof NothingType) {
 				return new TypedValue(
 					$t,
-					$this->context->valueRegistry->error($targetValue)
+					$programRegistry->valueRegistry->error($targetValue)
 				);
 			}
 		}

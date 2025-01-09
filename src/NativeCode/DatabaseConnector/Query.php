@@ -9,7 +9,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -20,11 +20,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class Query implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -32,15 +29,15 @@ final readonly class Query implements NativeMethod {
 			new TypeNameIdentifier('DatabaseConnector')
 		)) {
 			if ($parameterType->isSubtypeOf(
-				$this->context->typeRegistry->withName(
+				$programRegistry->typeRegistry->withName(
 					new TypeNameIdentifier('DatabaseQueryCommand')
 				)
 			)) {
-				return $this->context->typeRegistry->result(
-					$this->context->typeRegistry->withName(
+				return $programRegistry->typeRegistry->result(
+					$programRegistry->typeRegistry->withName(
 						new TypeNameIdentifier('DatabaseQueryResult')
 					),
-					$this->context->typeRegistry->withName(
+					$programRegistry->typeRegistry->withName(
 						new TypeNameIdentifier('DatabaseQueryFailure')
 					)
 				);
@@ -55,6 +52,7 @@ final readonly class Query implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -66,7 +64,7 @@ final readonly class Query implements NativeMethod {
 			new TypeNameIdentifier('DatabaseConnector')
 		)) {
 			if ($parameterValue->type->isSubtypeOf(
-				$this->context->typeRegistry->withName(
+				$programRegistry->typeRegistry->withName(
 					new TypeNameIdentifier('DatabaseQueryCommand')
 				)
 			)) {
@@ -81,13 +79,13 @@ final readonly class Query implements NativeMethod {
 					));
 					$result = [];
 					foreach($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-						$result[] = $this->context->valueRegistry->record(
+						$result[] = $programRegistry->valueRegistry->record(
 							array_map(
 								fn(string|float|int|null $value): Value => match(gettype($value)) {
-									'string' => $this->context->valueRegistry->string($value),
-									'double' => $this->context->valueRegistry->real($value),
-									'integer' => $this->context->valueRegistry->integer($value),
-									'NULL' => $this->context->valueRegistry->null,
+									'string' => $programRegistry->valueRegistry->string($value),
+									'double' => $programRegistry->valueRegistry->real($value),
+									'integer' => $programRegistry->valueRegistry->integer($value),
+									'NULL' => $programRegistry->valueRegistry->null,
 									default => throw new ExecutionException("Invalid value type")
 								},
 								$row
@@ -95,31 +93,31 @@ final readonly class Query implements NativeMethod {
 						);
 					}
 					return new TypedValue(
-						$this->context->typeRegistry->result(
-							$this->context->typeRegistry->withName(
+						$programRegistry->typeRegistry->result(
+							$programRegistry->typeRegistry->withName(
 								new TypeNameIdentifier('DatabaseQueryResult')
 							),
-							$this->context->typeRegistry->withName(
+							$programRegistry->typeRegistry->withName(
 								new TypeNameIdentifier('DatabaseQueryFailure')
 							)
 						),
-						$this->context->valueRegistry->tuple($result)
+						$programRegistry->valueRegistry->tuple($result)
 					);
 				} catch (PDOException $ex) {
 					return new TypedValue(
-						$this->context->typeRegistry->result(
-							$this->context->typeRegistry->nothing,
-							$this->context->typeRegistry->withName(
+						$programRegistry->typeRegistry->result(
+							$programRegistry->typeRegistry->nothing,
+							$programRegistry->typeRegistry->withName(
 								new TypeNameIdentifier('DatabaseQueryFailure')
 							)
 						),
-						$this->context->valueRegistry->error(
-							$this->context->valueRegistry->sealedValue(
+						$programRegistry->valueRegistry->error(
+							$programRegistry->valueRegistry->sealedValue(
 								new TypeNameIdentifier('DatabaseQueryFailure'),
-								$this->context->valueRegistry->record([
+								$programRegistry->valueRegistry->record([
 									'query' => $parameterValue->values['query'],
 									'boundParameters' => $parameterValue->values['boundParameters'],
-									'error' => $this->context->valueRegistry->string($ex->getMessage())
+									'error' => $programRegistry->valueRegistry->string($ex->getMessage())
 								])
 							)
 						)

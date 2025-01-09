@@ -8,8 +8,7 @@ use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\Method;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
-use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\UnknownType;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AnyType;
@@ -57,8 +56,7 @@ use Walnut\Lang\Blueprint\Value\Value;
 
 final readonly class Hydrator {
 	public function __construct(
-		private MethodExecutionContext $context,
-		private MethodRegistry $methodRegistry,
+		private ProgramRegistry $programRegistry,
 	) {}
 
 	/** @throws HydrationException */
@@ -112,24 +110,24 @@ final readonly class Hydrator {
 			try {
 				$typeName = $value->literalValue;
 				$type = match($typeName) {
-					'Any' => $this->context->typeRegistry->any,
-					'Nothing' => $this->context->typeRegistry->nothing,
-					'Array' => $this->context->typeRegistry->array(),
-					'Map' => $this->context->typeRegistry->map(),
-					'Mutable' => $this->context->typeRegistry->mutable($this->context->typeRegistry->any),
-					'Type' => $this->context->typeRegistry->type($this->context->typeRegistry->any),
-					'Null' => $this->context->typeRegistry->null,
-					'True' => $this->context->typeRegistry->true,
-					'False' => $this->context->typeRegistry->false,
-					'Boolean' => $this->context->typeRegistry->boolean,
-					'Integer' => $this->context->typeRegistry->integer(),
-					'Real' => $this->context->typeRegistry->real(),
-					'String' => $this->context->typeRegistry->string(),
-					default => $this->context->typeRegistry->withName(new TypeNameIdentifier($typeName)),
+					'Any' => $this->programRegistry->typeRegistry->any,
+					'Nothing' => $this->programRegistry->typeRegistry->nothing,
+					'Array' => $this->programRegistry->typeRegistry->array(),
+					'Map' => $this->programRegistry->typeRegistry->map(),
+					'Mutable' => $this->programRegistry->typeRegistry->mutable($this->programRegistry->typeRegistry->any),
+					'Type' => $this->programRegistry->typeRegistry->type($this->programRegistry->typeRegistry->any),
+					'Null' => $this->programRegistry->typeRegistry->null,
+					'True' => $this->programRegistry->typeRegistry->true,
+					'False' => $this->programRegistry->typeRegistry->false,
+					'Boolean' => $this->programRegistry->typeRegistry->boolean,
+					'Integer' => $this->programRegistry->typeRegistry->integer(),
+					'Real' => $this->programRegistry->typeRegistry->real(),
+					'String' => $this->programRegistry->typeRegistry->string(),
+					default => $this->programRegistry->typeRegistry->withName(new TypeNameIdentifier($typeName)),
 				}				;
-				//$type = $this->context->typeRegistry->withName(new TypeNameIdentifier());
+				//$type = $this->programRegistry->typeRegistry->withName(new TypeNameIdentifier());
 				if ($type->isSubtypeOf($targetType->refType)) {
-					return $this->context->valueRegistry->type($type);
+					return $this->programRegistry->valueRegistry->type($type);
 				}
 				throw new HydrationException(
 					$value,
@@ -152,16 +150,17 @@ final readonly class Hydrator {
 	}
 
 	private function hydrateAtom(Value $value, AtomType $targetType, string $hydrationPath): AtomValue {
-		$method = $this->methodRegistry->method(
-			$this->context->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
+		$method = $this->programRegistry->methodRegistry->method(
+			$this->programRegistry->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
 			new MethodNameIdentifier(
 				sprintf('as%s', $targetType->name)
 			)
 		);
 		if ($method instanceof Method) {
 			$result = $method->execute(
+				$this->programRegistry,
 				TypedValue::forValue($value),
-				TypedValue::forValue($this->context->valueRegistry->null)
+				TypedValue::forValue($this->programRegistry->valueRegistry->null)
 			);
 			$resultValue = $result->value;
 			if ($resultValue instanceof ErrorValue) {
@@ -182,16 +181,17 @@ final readonly class Hydrator {
 	}
 
 	private function hydrateEnumerationSubset(Value $value, EnumerationSubsetType $targetType, string $hydrationPath): EnumerationValue {
-		$method = $this->methodRegistry->method(
-			$this->context->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
+		$method = $this->programRegistry->methodRegistry->method(
+			$this->programRegistry->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
 			new MethodNameIdentifier(
 				sprintf('as%s', $targetType->enumeration->name)
 			)
 		);
 		if ($method instanceof Method) {
 			$result = $method->execute(
+				$this->programRegistry,
 				TypedValue::forValue($value),
-				TypedValue::forValue($this->context->valueRegistry->null)
+				TypedValue::forValue($this->programRegistry->valueRegistry->null)
 			);
 			$resultValue = $result->value;
 			if ($resultValue instanceof ErrorValue) {
@@ -219,7 +219,7 @@ final readonly class Hydrator {
 		if ($value instanceof StringValue) {
 			foreach($targetType->subsetValues as $enumValue) {
 				if ($enumValue->name->identifier === $value->literalValue) {
-					return $this->context->valueRegistry->enumerationValue(
+					return $this->programRegistry->valueRegistry->enumerationValue(
 						$targetType->enumeration->name,
 						$enumValue->name
 					);
@@ -234,79 +234,6 @@ final readonly class Hydrator {
 			)
 		);
 	}
-
-	/*private function hydrateEnumerationOld(Value $value, EnumerationType $targetType, string $hydrationPath): Value {
-		$method = $this->methodRegistry->method(
-			$this->context->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
-			new MethodNameIdentifier(
-				sprintf('as%s', $targetType->name)
-			)
-		);
-		if ($method instanceof Method) {
-			$result = $method->execute(
-				TypedValue::forValue($value),
-				TypedValue::forValue($this->context->valueRegistry->null)
-			);
-			$resultValue = $result->value;
-			if ($resultValue instanceof ErrorValue) {
-				throw new HydrationException(
-					$value,
-					$hydrationPath,
-					sprintf("Enumeration hydration failed. Error: %s", $resultValue->errorValue)
-					//TODO - consider a better error message
-				);
-			}
-			return $resultValue;
-		}
-		if ($value instanceof StringValue) {
-			foreach($targetType->values as $enumValue) {
-				if ($enumValue->name->identifier === $value->literalValue) {
-					return $this->context->valueRegistry->enumerationValue(
-						$targetType->name,
-						$enumValue->name
-					);
-				}
-			}
-		}
-		throw new HydrationException(
-			$value,
-			$hydrationPath,
-			sprintf("The value should be a string with a value among %s",
-				implode(', ', $targetType->values)
-			)
-		);
-	}
-	private function hydrateEnumerationSubsetOld(Value $value, EnumerationSubsetType $targetType, string $hydrationPath): EnumerationValue {
-		$resultValue = $this->hydrateEnumeration($value, $targetType->enumeration, $hydrationPath);
-		if (!in_array($resultValue, $targetType->subsetValues)) {
-			throw new HydrationException(
-				$value,
-				$hydrationPath,
-				sprintf("The enumeration value %s is not among %s",
-					$resultValue,
-					implode(', ', $targetType->subsetValues)
-				)
-			);
-		}
-		return $resultValue;
-	}*/
-
-	/*private function hydrateIntersection(Value $value, IntersectionType $targetType, string $hydrationPath): Value {
-		$values = [];
-		foreach($targetType->types() as $type) {
-			$result = $this->hydrate($value, $type, $hydrationPath);
-			if (!($result instanceof DictValue)) {
-				throw new HydrationException(
-					$value,
-					$hydrationPath,
-					"A record value is expected"
-				);
-			}
-			/** @noinspection SlowArrayOperationsInLoopInspection * /
-			$values = array_merge($values, $result->values());
-		}
-		return $this->context->valueRegistry->dict($values);
-	}*/
 
 	private function hydrateUnion(Value $value, UnionType $targetType, string $hydrationPath): Value {
 		$exceptions = [];
@@ -330,7 +257,7 @@ final readonly class Hydrator {
 			return $this->hydrateValue($value, $targetType->returnType, $hydrationPath);
 		} catch (HydrationException $ex) {
 			try {
-				return $this->context->valueRegistry->error(
+				return $this->programRegistry->valueRegistry->error(
 					$this->hydrateValue($value, $targetType->errorType, $hydrationPath)
 				);
 			} catch (HydrationException) {
@@ -340,16 +267,17 @@ final readonly class Hydrator {
 	}
 
 	private function hydrateSubtype(Value $value, SubtypeType $targetType, string $hydrationPath): Value {
-		$method = $this->methodRegistry->method(
-			$this->context->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
+		$method = $this->programRegistry->methodRegistry->method(
+			$this->programRegistry->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
 			new MethodNameIdentifier(
 				sprintf('as%s', $targetType->name)
 			)
 		);
 		if ($method instanceof Method) {
 			$result = $method->execute(
+				$this->programRegistry,
 				TypedValue::forValue($value),
-				TypedValue::forValue($this->context->valueRegistry->null)
+				TypedValue::forValue($this->programRegistry->valueRegistry->null)
 			);
 			$resultValue = $result->value;
 			if ($resultValue instanceof ErrorValue) {
@@ -365,13 +293,14 @@ final readonly class Hydrator {
 
 		$baseValue = $this->hydrateValue($value, $targetType->baseType, $hydrationPath);
 
-		$constructorType = $this->context->typeRegistry->atom(new TypeNameIdentifier('Constructor'));
-		$validatorMethod = $this->methodRegistry->method(
+		$constructorType = $this->programRegistry->typeRegistry->atom(new TypeNameIdentifier('Constructor'));
+		$validatorMethod = $this->programRegistry->methodRegistry->method(
 			$constructorType,
 			new MethodNameIdentifier('as' . $targetType->name->identifier)
 		);
 		if ($validatorMethod instanceof Method) {
 			$result = $validatorMethod->execute(
+				$this->programRegistry,
 				TypedValue::forValue($constructorType->value),
 				TypedValue::forValue($baseValue),
 			);
@@ -384,23 +313,24 @@ final readonly class Hydrator {
 				);
 			}
 		}
-		return $this->context->valueRegistry->subtypeValue(
+		return $this->programRegistry->valueRegistry->subtypeValue(
 			$targetType->name,
 			$baseValue
 		);
 	}
 
 	private function hydrateSealed(Value $value, SealedType $targetType, string $hydrationPath): Value {
-		$method = $this->methodRegistry->method(
-			$this->context->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
+		$method = $this->programRegistry->methodRegistry->method(
+			$this->programRegistry->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
 			new MethodNameIdentifier(
 				sprintf('as%s', $targetType->name)
 			)
 		);
 		if ($method instanceof Method) {
 			$result = $method->execute(
+				$this->programRegistry,
 				TypedValue::forValue($value),
-				TypedValue::forValue($this->context->valueRegistry->null)
+				TypedValue::forValue($this->programRegistry->valueRegistry->null)
 			);
 			$resultValue = $result->value;
 			if ($resultValue instanceof ErrorValue) {
@@ -415,13 +345,14 @@ final readonly class Hydrator {
 		}
 		$baseValue = $this->hydrateValue($value, $targetType->valueType, $hydrationPath);
 		if ($baseValue instanceof RecordValue) {
-			$constructorType = $this->context->typeRegistry->atom(new TypeNameIdentifier('Constructor'));
-			$validatorMethod = $this->methodRegistry->method(
+			$constructorType = $this->programRegistry->typeRegistry->atom(new TypeNameIdentifier('Constructor'));
+			$validatorMethod = $this->programRegistry->methodRegistry->method(
 				$constructorType,
 				new MethodNameIdentifier('as' . $targetType->name->identifier)
 			);
 			if ($validatorMethod instanceof Method) {
 				$result = $validatorMethod->execute(
+					$this->programRegistry,
 					TypedValue::forValue($constructorType->value),
 					TypedValue::forValue($baseValue),
 				);
@@ -434,7 +365,7 @@ final readonly class Hydrator {
 					);
 				}
 			}
-			return $this->context->valueRegistry->sealedValue(
+			return $this->programRegistry->valueRegistry->sealedValue(
 				$targetType->name,
 				$baseValue
 			);
@@ -447,7 +378,7 @@ final readonly class Hydrator {
 	}
 
 	private function hydrateMutable(Value $value, MutableType $targetType, string $hydrationPath): MutableValue {
-		return $this->context->valueRegistry->mutable(
+		return $this->programRegistry->valueRegistry->mutable(
 			$targetType->valueType,
 			$this->hydrateValue($value, $targetType->valueType, $hydrationPath)
 		);
@@ -628,7 +559,7 @@ final readonly class Hydrator {
 				foreach($value->values as $seq => $item) {
 					$result[] = $this->hydrateValue($item, $refType, "{$hydrationPath}[$seq]");
 				}
-				return $this->context->valueRegistry->tuple($result);
+				return $this->programRegistry->valueRegistry->tuple($result);
 			}
 			throw new HydrationException(
 				$value,
@@ -678,7 +609,7 @@ final readonly class Hydrator {
 						$targetType->types[$seq] ?? $targetType->restType, "{$hydrationPath}[$seq]");
 				}
 			}
-			return $this->context->valueRegistry->tuple($result);
+			return $this->programRegistry->valueRegistry->tuple($result);
 
 		}
 		throw new HydrationException(
@@ -702,7 +633,7 @@ final readonly class Hydrator {
 				foreach($value->values as $key => $item) {
 					$result[$key] = $this->hydrateValue($item, $refType, "$hydrationPath.$key");
 				}
-				return $this->context->valueRegistry->record($result);
+				return $this->programRegistry->valueRegistry->record($result);
 			}
 			throw new HydrationException(
 				$value,
@@ -759,7 +690,7 @@ final readonly class Hydrator {
 					$result[$key] = $this->hydrateValue($val, $targetType->restType, "$hydrationPath.$key");
 				}
 			}
-			return $this->context->valueRegistry->record( $result);
+			return $this->programRegistry->valueRegistry->record( $result);
 		}
 		throw new HydrationException(
 			$value,
@@ -779,7 +710,7 @@ final readonly class Hydrator {
 					$targetType->range->maxValue === PlusInfinity::value ||
 					$targetType->range->maxValue >= $value->literalValue
 			)) {
-				return $this->context->valueRegistry->real((float)(string)$value->literalValue);
+				return $this->programRegistry->valueRegistry->real((float)(string)$value->literalValue);
 			}
 			throw new HydrationException(
 				$value,

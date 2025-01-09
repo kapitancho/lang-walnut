@@ -1182,11 +1182,6 @@ final readonly class ParserStateMachine {
 						$this->s->result['method_name'],
 						$this->s->generated
 					);
-					/*$this->s->generated = $this->programBuilder->expressionRegistry()['method'](
-						$this->s->result['expression_left'],
-						$this->s->result['method_name'],
-						$this->s->generated
-					);*/
 					$this->s->stay(315);
 				}
 			]],

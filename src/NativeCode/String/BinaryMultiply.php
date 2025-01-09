@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
@@ -21,11 +21,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class BinaryMultiply implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -35,7 +32,7 @@ final readonly class BinaryMultiply implements NativeMethod {
 			if ($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) {
 				$minValue = $parameterType->range->minValue;
 				if ($minValue !== MinusInfinity::value && $minValue >= 0) {
-					return $this->context->typeRegistry->string(
+					return $programRegistry->typeRegistry->string(
 						$targetType->range->minLength * $minValue,
 						$targetType->range->maxLength === PlusInfinity::value ||
 							$parameterType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
@@ -53,6 +50,7 @@ final readonly class BinaryMultiply implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -68,7 +66,7 @@ final readonly class BinaryMultiply implements NativeMethod {
 					$parameterValue->literalValue
 				);
 				return TypedValue::forValue(
-					$this->context->valueRegistry->string($result)
+					$programRegistry->valueRegistry->string($result)
 				);
 			}
 			// @codeCoverageIgnoreStart

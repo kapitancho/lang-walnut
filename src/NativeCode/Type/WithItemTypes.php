@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\TupleType;
@@ -19,26 +19,23 @@ final readonly class WithItemTypes implements NativeMethod {
 
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($parameterType->isSubtypeOf(
-				$this->context->typeRegistry->array(
-					$this->context->typeRegistry->type(
-						$this->context->typeRegistry->any
+				$programRegistry->typeRegistry->array(
+					$programRegistry->typeRegistry->type(
+						$programRegistry->typeRegistry->any
 					)
 				)
 			)) {
 				if ($refType instanceof TupleType) {
-					return $this->context->typeRegistry->type(
-						$this->context->typeRegistry->metaType(
+					return $programRegistry->typeRegistry->type(
+						$programRegistry->typeRegistry->metaType(
 							MetaTypeValue::Tuple
 						)
 					);
@@ -48,15 +45,15 @@ final readonly class WithItemTypes implements NativeMethod {
 				// @codeCoverageIgnoreEnd
 			}
 			if ($parameterType->isSubtypeOf(
-				$this->context->typeRegistry->map(
-					$this->context->typeRegistry->type(
-						$this->context->typeRegistry->any
+				$programRegistry->typeRegistry->map(
+					$programRegistry->typeRegistry->type(
+						$programRegistry->typeRegistry->any
 					)
 				)
 			)) {
 				if ($refType instanceof RecordType) {
-					return $this->context->typeRegistry->type(
-						$this->context->typeRegistry->metaType(
+					return $programRegistry->typeRegistry->type(
+						$programRegistry->typeRegistry->metaType(
 							MetaTypeValue::Record
 						)
 					);
@@ -75,6 +72,7 @@ final readonly class WithItemTypes implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -83,33 +81,33 @@ final readonly class WithItemTypes implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($parameter->type->isSubtypeOf(
-				$this->context->typeRegistry->array(
-					$this->context->typeRegistry->type(
-						$this->context->typeRegistry->any
+				$programRegistry->typeRegistry->array(
+					$programRegistry->typeRegistry->type(
+						$programRegistry->typeRegistry->any
 					)
 				)
 			)) {
 				if ($typeValue instanceof TupleType) {
-					$result = $this->context->typeRegistry->tuple(
+					$result = $programRegistry->typeRegistry->tuple(
 						array_map(fn(TypeValue $tv): TypeInterface => $tv->typeValue, $parameter->value->values),
 						$typeValue->restType,
 					);
-					return TypedValue::forValue($this->context->valueRegistry->type($result));
+					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
 				}
 			}
 			if ($parameter->type->isSubtypeOf(
-				$this->context->typeRegistry->map(
-					$this->context->typeRegistry->type(
-						$this->context->typeRegistry->any
+				$programRegistry->typeRegistry->map(
+					$programRegistry->typeRegistry->type(
+						$programRegistry->typeRegistry->any
 					)
 				)
 			)) {
 				if ($typeValue instanceof RecordType) {
-					$result = $this->context->typeRegistry->record(
+					$result = $programRegistry->typeRegistry->record(
 						array_map(fn(TypeValue $tv): TypeInterface => $tv->typeValue, $parameter->value->values),
 						$typeValue->restType,
 					);
-					return TypedValue::forValue($this->context->valueRegistry->type($result));
+					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
 				}
 			}
 		}

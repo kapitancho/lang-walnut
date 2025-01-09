@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\RecordType;
@@ -19,37 +19,34 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class WithKeyValue implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof RecordType || $targetType instanceof MapType) {
 			if ($parameterType->isSubtypeOf(
-				$this->context->typeRegistry->record([
-					'key' => $this->context->typeRegistry->string(),
-					'value' => $this->context->typeRegistry->any
+				$programRegistry->typeRegistry->record([
+					'key' => $programRegistry->typeRegistry->string(),
+					'value' => $programRegistry->typeRegistry->any
 				])
 			)) {
 				$keyType = $parameterType->types['key'] ?? null;
 				if ($targetType instanceof RecordType) {
 					if ($keyType instanceof StringSubsetType && count($keyType->subsetValues) === 1) {
 						$keyValue = $keyType->subsetValues[0];
-						return $this->context->typeRegistry->record(
+						return $programRegistry->typeRegistry->record(
 							$targetType->types + [
-								$keyValue->literalValue => $parameterType->types['value']
+								$keyValue => $parameterType->types['value']
 							]
 						);
 					}
 					$targetType = $targetType->asMapType();
 				}
 				$valueType = $parameterType->types['value'] ?? null;
-				return $this->context->typeRegistry->map(
-					$this->context->typeRegistry->union([
+				return $programRegistry->typeRegistry->map(
+					$programRegistry->typeRegistry->union([
 						$targetType->itemType,
 						$valueType
 					]),
@@ -68,6 +65,7 @@ final readonly class WithKeyValue implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -83,10 +81,10 @@ final readonly class WithKeyValue implements NativeMethod {
 				if ($pValue && $pKey instanceof StringValue) {
 					$values = $targetValue->values;
 					$values[$pKey->literalValue] = $pValue;
-					$resultValue = $this->context->valueRegistry->record($values);
+					$resultValue = $programRegistry->valueRegistry->record($values);
 					$resultType = $target->type instanceof MapType ?
-						$this->context->typeRegistry->map(
-							$this->context->typeRegistry->union([
+						$programRegistry->typeRegistry->map(
+							$programRegistry->typeRegistry->union([
 								$target->type->itemType,
 								$pValue->type
 							]),

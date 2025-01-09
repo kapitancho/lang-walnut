@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
@@ -17,19 +17,16 @@ use Walnut\Lang\Implementation\Value\StringValue;
 final readonly class AsInteger implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
-			return $this->context->typeRegistry->result(
-				$this->context->typeRegistry->integer(),
-				$this->context->typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
+			return $programRegistry->typeRegistry->result(
+				$programRegistry->typeRegistry->integer(),
+				$programRegistry->typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -38,6 +35,7 @@ final readonly class AsInteger implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -47,9 +45,9 @@ final readonly class AsInteger implements NativeMethod {
 		if ($targetValue instanceof StringValue) {
 			$target = $targetValue->literalValue;
 			return TypedValue::forValue((string)($result = (int)$target) === $target ?
-				$this->context->valueRegistry->integer($result) :
-				$this->context->valueRegistry->error(
-					$this->context->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
+				$programRegistry->valueRegistry->integer($result) :
+				$programRegistry->valueRegistry->error(
+					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
 				)
 			);
 		}

@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
@@ -20,11 +20,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class Square implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -40,7 +37,7 @@ final readonly class Square implements NativeMethod {
 			}
 			$max = $maxValue === PlusInfinity::value || $minValue === MinusInfinity::value ?
 				PlusInfinity::value : max($minValue * $minValue, $maxValue * $maxValue);
-			return $this->context->typeRegistry->integer($min, $max);
+			return $programRegistry->typeRegistry->integer($min, $max);
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -48,6 +45,7 @@ final readonly class Square implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -56,7 +54,7 @@ final readonly class Square implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 
 		if ($targetValue instanceof IntegerValue) {
-			return TypedValue::forValue($this->context->valueRegistry->integer(
+			return TypedValue::forValue($programRegistry->valueRegistry->integer(
                 $targetValue->literalValue * $targetValue->literalValue
 			));
 		}

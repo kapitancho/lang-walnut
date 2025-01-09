@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\TupleValue;
@@ -16,19 +16,16 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class Flip implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		if ($targetType instanceof ArrayType) {
 			$itemType = $targetType->itemType;
-			if ($itemType->isSubtypeOf($this->context->typeRegistry->string())) {
-				return $this->context->typeRegistry->map(
-					$this->context->typeRegistry->integer(
+			if ($itemType->isSubtypeOf($programRegistry->typeRegistry->string())) {
+				return $programRegistry->typeRegistry->map(
+					$programRegistry->typeRegistry->integer(
 						0, $targetType->range->maxLength
 					),
 					min(1, $targetType->range->minLength),
@@ -45,6 +42,7 @@ final readonly class Flip implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -65,8 +63,8 @@ final readonly class Flip implements NativeMethod {
 				}
 			}
 			$rawValues = array_flip($rawValues);
-			return TypedValue::forValue($this->context->valueRegistry->record(array_map(
-				fn($value) => $this->context->valueRegistry->integer($value),
+			return TypedValue::forValue($programRegistry->valueRegistry->record(array_map(
+				fn($value) => $programRegistry->valueRegistry->integer($value),
 				$rawValues
 			)));
 		}

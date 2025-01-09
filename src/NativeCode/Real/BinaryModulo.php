@@ -8,7 +8,7 @@ use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
@@ -22,11 +22,8 @@ use Walnut\Lang\Implementation\Value\IntegerValue;
 final readonly class BinaryModulo implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -41,10 +38,10 @@ final readonly class BinaryModulo implements NativeMethod {
 			) {
 				return ($parameterType->range->minValue === MinusInfinity::value || $parameterType->range->minValue < 0) &&
 					($parameterType->range->maxValue === PlusInfinity::value || $parameterType->range->maxValue > 0) ?
-						$this->context->typeRegistry->result(
-							$this->context->typeRegistry->real(),
-							$this->context->typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
-						) : $this->context->typeRegistry->real();
+						$programRegistry->typeRegistry->result(
+							$programRegistry->typeRegistry->real(),
+							$programRegistry->typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
+						) : $programRegistry->typeRegistry->real();
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -56,6 +53,7 @@ final readonly class BinaryModulo implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -68,11 +66,11 @@ final readonly class BinaryModulo implements NativeMethod {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue || $parameterValue instanceof RealValue) {
 				if ((float)(string)$parameterValue->literalValue === 0.0) {
-					return TypedValue::forValue($this->context->valueRegistry->error(
-						$this->context->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
+					return TypedValue::forValue($programRegistry->valueRegistry->error(
+						$programRegistry->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
 					));
 				}
-                return TypedValue::forValue($this->context->valueRegistry->real(
+                return TypedValue::forValue($programRegistry->valueRegistry->real(
 	                fmod((string)$targetValue->literalValue, (string)$parameterValue->literalValue)
                 ));
 			}

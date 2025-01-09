@@ -2,22 +2,31 @@
 
 namespace Walnut\Lang\Implementation\Program\Registry;
 
-use JsonSerializable;
+use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext as AnalyserContextInterface;
+use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext as ExecutionContextInterface;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope;
-use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder;
-use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry;
+use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer as DependencyContainerInterface;
+use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry as ExpressionRegistryInterface;
+use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry as ProgramRegistryInterface;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
+use Walnut\Lang\Implementation\Code\Analyser\AnalyserContext;
+use Walnut\Lang\Implementation\Code\Execution\ExecutionContext;
 use Walnut\Lang\Implementation\Program\Builder\ScopeBuilder;
+use Walnut\Lang\Implementation\Program\DependencyContainer\DependencyContainer;
 
-final class ProgramRegistry implements ProgramRegistryInterface, JsonSerializable {
+final class ProgramRegistry implements ProgramRegistryInterface {
+	private readonly AnalyserContextInterface $analyserContextInstance;
+	private readonly ExecutionContextInterface $executionContextInstance;
+	private readonly DependencyContainerInterface $dependencyContainerInstance;
+
 	public function __construct(
-		public readonly TypeRegistry $typeRegistry,
-		public readonly ValueRegistry $valueRegistry,
-		public readonly ExpressionRegistry $expressionRegistry,
-		private readonly ScopeBuilder $globalScopeBuilder,
-		private readonly CustomMethodRegistryBuilder $customMethodRegistryBuilder
+		public readonly TypeRegistry                 $typeRegistry,
+		public readonly ValueRegistry                $valueRegistry,
+		public readonly MethodRegistry               $methodRegistry,
+		private readonly ScopeBuilder                $globalScopeBuilder,
+		private readonly ExpressionRegistryInterface $expressionRegistry,
 	) {}
 
 	public VariableValueScope $globalScope {
@@ -26,12 +35,32 @@ final class ProgramRegistry implements ProgramRegistryInterface, JsonSerializabl
 		}
 	}
 
-	public function jsonSerialize(): array {
-		return [
-			'typeRegistry' => $this->typeRegistry,
-			'variables' => $this->globalScope,
-			'customMethods' => $this->customMethodRegistryBuilder
-		];
+	public AnalyserContextInterface $analyserContext {
+		get {
+			return $this->analyserContextInstance ??= new AnalyserContext(
+				$this,
+				$this->globalScope,
+			);
+		}
+	}
+	public ExecutionContextInterface $executionContext {
+		get {
+			return $this->executionContextInstance ??= new ExecutionContext(
+				$this,
+				$this->globalScope,
+			);
+		}
+	}
+
+	public DependencyContainerInterface $dependencyContainer {
+		get {
+			return $this->dependencyContainerInstance ??= new DependencyContainer(
+				$this,
+				$this->executionContext,
+				$this->methodRegistry,
+				$this->expressionRegistry
+			);
+		}
 	}
 
 	public function __toString(): string {

@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
@@ -22,26 +22,23 @@ final readonly class MaxValue implements NativeMethod {
 
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof IntegerType || $refType instanceof IntegerSubsetType) {
-				return $this->context->typeRegistry->union([
-					$this->context->typeRegistry->integer(),
-					$this->context->typeRegistry->withName(new TypeNameIdentifier('PlusInfinity'))
+				return $programRegistry->typeRegistry->union([
+					$programRegistry->typeRegistry->integer(),
+					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('PlusInfinity'))
 				]);
 			}
 			if ($refType instanceof RealType || $refType instanceof RealSubsetType) {
-				return $this->context->typeRegistry->union([
-					$this->context->typeRegistry->real(),
-					$this->context->typeRegistry->withName(new TypeNameIdentifier('PlusInfinity'))
+				return $programRegistry->typeRegistry->union([
+					$programRegistry->typeRegistry->real(),
+					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('PlusInfinity'))
 				]);
 			}
 		}
@@ -51,6 +48,7 @@ final readonly class MaxValue implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -60,14 +58,14 @@ final readonly class MaxValue implements NativeMethod {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof IntegerType || $typeValue instanceof IntegerSubsetType) {
 				return TypedValue::forValue($typeValue->range->maxValue === PlusInfinity::value ?
-					$this->context->valueRegistry->atom(new TypeNameIdentifier('PlusInfinity')) :
-					$this->context->valueRegistry->integer($typeValue->range->maxValue)
+					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('PlusInfinity')) :
+					$programRegistry->valueRegistry->integer($typeValue->range->maxValue)
 				);
 			}
 			if ($typeValue instanceof RealType || $typeValue instanceof RealSubsetType) {
 				return TypedValue::forValue($typeValue->range->maxValue === PlusInfinity::value ?
-					$this->context->valueRegistry->atom(new TypeNameIdentifier('PlusInfinity')) :
-					$this->context->valueRegistry->real($typeValue->range->maxValue)
+					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('PlusInfinity')) :
+					$programRegistry->valueRegistry->real($typeValue->range->maxValue)
 				);
 			}
 		}

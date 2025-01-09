@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -16,11 +16,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class Split implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -28,7 +25,7 @@ final readonly class Split implements NativeMethod {
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $this->context->typeRegistry->array(
+				return $programRegistry->typeRegistry->array(
 					$targetType,
 					$targetType->range->minLength > 0 ? 1 : 0,
 					$targetType->range->maxLength
@@ -44,6 +41,7 @@ final readonly class Split implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -55,9 +53,9 @@ final readonly class Split implements NativeMethod {
 		if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof StringValue) {
 				$result = explode($parameterValue->literalValue, $targetValue->literalValue);
-				return TypedValue::forValue($this->context->valueRegistry->tuple(
+				return TypedValue::forValue($programRegistry->valueRegistry->tuple(
 					array_map(fn(string $piece): StringValue =>
-						$this->context->valueRegistry->string($piece), $result)
+						$programRegistry->valueRegistry->string($piece), $result)
 				));
 			}
 			// @codeCoverageIgnoreStart

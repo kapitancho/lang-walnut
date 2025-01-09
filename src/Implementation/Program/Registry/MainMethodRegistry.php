@@ -6,15 +6,12 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\Method;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
-use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
 use Walnut\Lang\Blueprint\Type\IntersectionType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnionType;
 use Walnut\Lang\Implementation\Function\UnionMethodCall;
-use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class MainMethodRegistry implements MethodRegistry {
@@ -23,19 +20,14 @@ final readonly class MainMethodRegistry implements MethodRegistry {
 	private NestedMethodRegistry $registry;
 
 	public function __construct(
-		private MethodExecutionContext $nativeCodeContext,
 		NativeCodeTypeMapper           $nativeCodeTypeMapper,
 		MethodRegistry                 $customMethodRegistry,
-		DependencyContainer            $dependencyContainer,
 		private array                  $lookupNamespaces
 	) {
 		$this->registry = new NestedMethodRegistry(
 			$customMethodRegistry,
 			new NativeCodeMethodRegistry(
-				$nativeCodeContext,
 				$nativeCodeTypeMapper,
-				$this,
-				$dependencyContainer,
 				$this->lookupNamespaces
 			)
 		);
@@ -81,7 +73,7 @@ final readonly class MainMethodRegistry implements MethodRegistry {
 				}
 			}
 			if (count($methods) > 0) {
-				return new UnionMethodCall($this->nativeCodeContext, $methods);
+				return new UnionMethodCall($methods);
 			}
 		}
 		return $this->registry->method($targetType, $methodName);

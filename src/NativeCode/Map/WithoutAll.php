@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\RecordValue;
@@ -15,16 +15,13 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class WithoutAll implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		if ($targetType instanceof MapType) {
-			return $this->context->typeRegistry->map(
+			return $programRegistry->typeRegistry->map(
 				$targetType->itemType,
 				0,
 				$targetType->range->maxLength
@@ -36,6 +33,7 @@ final readonly class WithoutAll implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -46,7 +44,7 @@ final readonly class WithoutAll implements NativeMethod {
 		if ($targetValue instanceof RecordValue) {
 			$values = $targetValue->values;
 			$values = array_filter($values, static fn($value) => !$value->equals($parameterValue));
-			return TypedValue::forValue($this->context->valueRegistry->record($values));
+			return TypedValue::forValue($programRegistry->valueRegistry->record($values));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
@@ -22,11 +22,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class PadLeft implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -40,7 +37,7 @@ final readonly class PadLeft implements NativeMethod {
 				if (($lengthType instanceof IntegerType || $lengthType instanceof IntegerSubsetType) &&
 					($padStringType instanceof StringType || $padStringType instanceof StringSubsetType)
 				) {
-					return $this->context->typeRegistry->string(
+					return $programRegistry->typeRegistry->string(
 						max($targetType->range->minLength, $lengthType->range->minValue),
 						$targetType->range->maxLength === PlusInfinity::value ||
 							$lengthType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
@@ -58,6 +55,7 @@ final readonly class PadLeft implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -78,7 +76,7 @@ final readonly class PadLeft implements NativeMethod {
 						$padString->literalValue,
 						STR_PAD_LEFT
 					);
-					return TypedValue::forValue($this->context->valueRegistry->string($result));
+					return TypedValue::forValue($programRegistry->valueRegistry->string($result));
 				}
 			}
 			// @codeCoverageIgnoreStart

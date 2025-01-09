@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\TupleType;
@@ -17,11 +17,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class Flatten implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -30,7 +27,7 @@ final readonly class Flatten implements NativeMethod {
 		if ($type instanceof ArrayType) {
             $itemType = $type->itemType;
             if ($itemType instanceof ArrayType) {
-                return $this->context->typeRegistry->array(
+                return $programRegistry->typeRegistry->array(
                     $itemType->itemType,
                     $type->range->minLength * $itemType->range->minLength,
                     $type->range->maxLength === PlusInfinity::value ||
@@ -46,6 +43,7 @@ final readonly class Flatten implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -64,7 +62,7 @@ final readonly class Flatten implements NativeMethod {
                     // @codeCoverageIgnoreEnd
                 }
             }
-			return TypedValue::forValue($this->context->valueRegistry->tuple($result));
+			return TypedValue::forValue($programRegistry->valueRegistry->tuple($result));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

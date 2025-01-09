@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\MapType;
@@ -22,11 +22,8 @@ final readonly class MaxLength implements NativeMethod {
 
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
@@ -34,9 +31,9 @@ final readonly class MaxLength implements NativeMethod {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof StringType || $refType instanceof StringSubsetType ||
 				$refType instanceof ArrayType || $refType instanceof MapType) {
-				return $this->context->typeRegistry->union([
-					$this->context->typeRegistry->integer(0),
-					$this->context->typeRegistry->withName(new TypeNameIdentifier('PlusInfinity'))
+				return $programRegistry->typeRegistry->union([
+					$programRegistry->typeRegistry->integer(0),
+					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('PlusInfinity'))
 				]);
 			}
 		}
@@ -46,6 +43,7 @@ final readonly class MaxLength implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -56,8 +54,8 @@ final readonly class MaxLength implements NativeMethod {
 			if ($typeValue instanceof StringType || $typeValue instanceof StringSubsetType ||
 				$typeValue instanceof ArrayType || $typeValue instanceof MapType) {
 				return TypedValue::forValue($typeValue->range->maxLength === PlusInfinity::value ?
-					$this->context->valueRegistry->atom(new TypeNameIdentifier('PlusInfinity')) :
-					$this->context->valueRegistry->integer($typeValue->range->maxLength)
+					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('PlusInfinity')) :
+					$programRegistry->valueRegistry->integer($typeValue->range->maxLength)
 				);
 			}
 		}

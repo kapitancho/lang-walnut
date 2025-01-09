@@ -10,11 +10,9 @@ use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethod as CustomMethodInterface;
-use Walnut\Lang\Blueprint\Function\FunctionBodyDraft;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
-use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyError;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\UnresolvableDependency;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\TupleType;
@@ -28,8 +26,6 @@ final readonly class CustomMethod implements CustomMethodInterface, JsonSerializ
 	private ArrayObject $isAnalysed;
 
 	public function __construct(
-		private MethodExecutionContext $methodExecutionContext,
-		private DependencyContainer $dependencyContainer,
 		public Type $targetType,
 		public MethodNameIdentifier $methodName,
 		public Type $parameterType,
@@ -42,6 +38,7 @@ final readonly class CustomMethod implements CustomMethodInterface, JsonSerializ
 
 	/** @throws AnalyserException */
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType
 	): Type {
@@ -54,7 +51,7 @@ final readonly class CustomMethod implements CustomMethodInterface, JsonSerializ
 			$this->parameterType instanceof RecordType &&
 			$parameterType instanceof TupleType &&
 			$this->isTupleCompatibleToRecord(
-				$this->methodExecutionContext->typeRegistry,
+				$programRegistry->typeRegistry,
 				$parameterType,
 				$this->parameterType
 			)
@@ -69,7 +66,7 @@ final readonly class CustomMethod implements CustomMethodInterface, JsonSerializ
 			);
 		}
 		$returnType = $this->functionBody->analyse(
-			$this->methodExecutionContext->globalContext,
+			$programRegistry->analyserContext,
 			$this->targetType,
 			$this->parameterType,
 			$this->dependencyType
@@ -89,6 +86,7 @@ final readonly class CustomMethod implements CustomMethodInterface, JsonSerializ
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -98,28 +96,28 @@ final readonly class CustomMethod implements CustomMethodInterface, JsonSerializ
 		if ($parameterValue instanceof TupleValue &&
 			$this->parameterType instanceof RecordType &&
 			$this->isTupleCompatibleToRecord(
-				$this->methodExecutionContext->typeRegistry,
+				$programRegistry->typeRegistry,
 				$parameterValue->type,
 				$this->parameterType
 			)
 		) {
 			$parameterValue = $this->getTupleAsRecord(
-				$this->methodExecutionContext->valueRegistry,
+				$programRegistry->valueRegistry,
 				$parameterValue,
 				$this->parameterType
 			);
 		}
 		$dep = null;
 		if (!($this->dependencyType instanceof NothingType)) {
-			$dep = $this->dependencyContainer->valueByType($this->dependencyType);
+			$dep = $programRegistry->dependencyContainer->valueByType($this->dependencyType);
 			if ($dep instanceof DependencyError) {
-				return TypedValue::forValue($this->methodExecutionContext->valueRegistry->error(
-					$this->methodExecutionContext->valueRegistry->sealedValue(
+				return TypedValue::forValue($programRegistry->valueRegistry->error(
+					$programRegistry->valueRegistry->sealedValue(
 						new TypeNameIdentifier('DependencyContainerError'),
-						$this->methodExecutionContext->valueRegistry->record([
-							'targetType' => $this->methodExecutionContext->valueRegistry->type($this->dependencyType),
-							'errorOnType' => $this->methodExecutionContext->valueRegistry->type($dep->type),
-							'errorMessage' => $this->methodExecutionContext->valueRegistry->string(
+						$programRegistry->valueRegistry->record([
+							'targetType' => $programRegistry->valueRegistry->type($this->dependencyType),
+							'errorOnType' => $programRegistry->valueRegistry->type($dep->type),
+							'errorMessage' => $programRegistry->valueRegistry->string(
 								match($dep->unresolvableDependency) {
 									UnresolvableDependency::circularDependency => 'Circular dependency',
 									UnresolvableDependency::ambiguous => 'Ambiguous dependency',
@@ -139,7 +137,7 @@ final readonly class CustomMethod implements CustomMethodInterface, JsonSerializ
 			return new TypedValue(
 				$this->returnType,
 				$this->functionBody->execute(
-					$this->methodExecutionContext->globalContext,
+					$programRegistry->executionContext,
 					TypedValue::forValue($targetValue),
 					TypedValue::forValue($parameterValue),
 					$dep

@@ -8,7 +8,7 @@ use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
@@ -23,11 +23,8 @@ use Walnut\Lang\Implementation\Value\AtomValue;
 final readonly class Integer implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -49,7 +46,7 @@ final readonly class Integer implements NativeMethod {
 						throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s - range is not compatible", __CLASS__, $parameterType));
 						// @codeCoverageIgnoreEnd
 					}
-					return $this->context->typeRegistry->integer(
+					return $programRegistry->typeRegistry->integer(
 						$fromType->range->minValue,
 						$toType->range->maxValue
 					);
@@ -65,6 +62,7 @@ final readonly class Integer implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -84,7 +82,7 @@ final readonly class Integer implements NativeMethod {
 					$to instanceof IntegerValue
 				) {
 					/** @noinspection PhpUnhandledExceptionInspection */
-					return TypedValue::forValue($this->context->valueRegistry->integer(random_int($from->literalValue, $to->literalValue)));
+					return TypedValue::forValue($programRegistry->valueRegistry->integer(random_int($from->literalValue, $to->literalValue)));
 				}
 			}
 			// @codeCoverageIgnoreStart

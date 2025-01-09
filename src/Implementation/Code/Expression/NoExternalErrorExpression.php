@@ -23,16 +23,15 @@ use Walnut\Lang\Blueprint\Value\SealedValue;
 
 final readonly class NoExternalErrorExpression implements NoExternalErrorExpressionInterface, JsonSerializable {
 	public function __construct(
-		private TypeRegistry $typeRegistry,
 		public Expression $targetExpression
 	) {}
 
-	private function withoutExternalError(ResultType $resultType): Type {
+	private function withoutExternalError(TypeRegistry $typeRegistry, ResultType $resultType): Type {
 		$errorType = $resultType->errorType;
 		$errorType = match(true) {
 			$errorType instanceof SealedType && $errorType->name->equals(
-				new TypeNameIdentifier('ExternalError')) => $this->typeRegistry->nothing,
-			$errorType instanceof UnionType => $this->typeRegistry->union(
+				new TypeNameIdentifier('ExternalError')) => $typeRegistry->nothing,
+			$errorType instanceof UnionType => $typeRegistry->union(
 				array_filter($errorType->types, static fn(Type $t): bool => !(
 					$t instanceof SealedType && $t->name->equals(
 						new TypeNameIdentifier('ExternalError')
@@ -42,7 +41,7 @@ final readonly class NoExternalErrorExpression implements NoExternalErrorExpress
 			default => $errorType
 		};
 		return $errorType instanceof NothingType ? $resultType->returnType :
-			$this->typeRegistry->result(
+			$typeRegistry->result(
 				$resultType->returnType,
 				$errorType
 			);
@@ -53,11 +52,11 @@ final readonly class NoExternalErrorExpression implements NoExternalErrorExpress
 		$expressionType = $ret->expressionType;
 		if ($expressionType instanceof ResultType) {
 			return $ret->withExpressionType(
-				$this->withoutExternalError($expressionType)
+				$this->withoutExternalError($analyserContext->programRegistry->typeRegistry, $expressionType)
 			)->withReturnType(
-				$this->typeRegistry->result(
+				$analyserContext->programRegistry->typeRegistry->result(
 					$ret->returnType,
-					$this->typeRegistry->withName(
+					$analyserContext->programRegistry->typeRegistry->withName(
 						new TypeNameIdentifier('ExternalError')
 					)
 				)
@@ -80,7 +79,7 @@ final readonly class NoExternalErrorExpression implements NoExternalErrorExpress
 		$vt = $result->valueType;
 		if ($vt instanceof ResultType) {
 			$result = $result->withTypedValue(new TypedValue(
-				$this->withoutExternalError($vt), $result->value));
+				$this->withoutExternalError($executionContext->programRegistry->typeRegistry, $vt), $result->value));
 		}
 		return $result;
 	}

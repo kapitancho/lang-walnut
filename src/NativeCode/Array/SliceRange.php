@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\TupleType;
@@ -19,11 +19,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class SliceRange implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -32,15 +29,15 @@ final readonly class SliceRange implements NativeMethod {
 			$targetType = $targetType->asArrayType();
 		}
 		if ($targetType instanceof ArrayType) {
-			$pInt = $this->context->typeRegistry->integer(0);
-			$pType = $this->context->typeRegistry->record([
+			$pInt = $programRegistry->typeRegistry->integer(0);
+			$pType = $programRegistry->typeRegistry->record([
 				"start" => $pInt,
 				"end" => $pInt
 			]);
 			if ($parameterType->isSubtypeOf($pType)) {
 				$parameterType = $this->toBaseType($parameterType);
 				$endType = $parameterType->types['end'];
-				return $this->context->typeRegistry->array(
+				return $programRegistry->typeRegistry->array(
 					$targetType->itemType,
 					0,
 					$endType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
@@ -58,6 +55,7 @@ final readonly class SliceRange implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -80,7 +78,7 @@ final readonly class SliceRange implements NativeMethod {
 						(string)$start->literalValue,
 						(string)$length
 					);
-					return TypedValue::forValue($this->context->valueRegistry->tuple($values));
+					return TypedValue::forValue($programRegistry->valueRegistry->tuple($values));
 				}
 				// @codeCoverageIgnoreStart
 				throw new ExecutionException("Invalid parameter value");

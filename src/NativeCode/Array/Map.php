@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\ResultType;
@@ -20,11 +20,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class Map implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -37,12 +34,12 @@ final readonly class Map implements NativeMethod {
 					$r = $parameterType->returnType;
 					$errorType = $r instanceof ResultType ? $r->errorType : null;
 					$returnType = $r instanceof ResultType ? $r->returnType : $r;
-					$t = $this->context->typeRegistry->array(
+					$t = $programRegistry->typeRegistry->array(
 						$returnType,
 						$type->range->minLength,
 						$type->range->maxLength,
 					);
-					return $errorType ? $this->context->typeRegistry->result($t, $errorType) : $t;
+					return $errorType ? $programRegistry->typeRegistry->result($t, $errorType) : $t;
 				}
 				throw new AnalyserException(
 					"The parameter type %s of the callback function is not a subtype of %s",
@@ -60,6 +57,7 @@ final readonly class Map implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -71,13 +69,13 @@ final readonly class Map implements NativeMethod {
 			$values = $targetValue->values;
 			$result = [];
 			foreach($values as $value) {
-				$r = $parameterValue->execute($this->context->globalContext, $value);
+				$r = $parameterValue->execute($programRegistry->executionContext, $value);
 				if ($r instanceof ErrorValue) {
 					return TypedValue::forValue($r);
 				}
 				$result[] = $r;
 			}
-			return TypedValue::forValue($this->context->valueRegistry->tuple($result));
+			return TypedValue::forValue($programRegistry->valueRegistry->tuple($result));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

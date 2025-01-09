@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\RecordType;
@@ -20,22 +20,19 @@ final readonly class RestType implements NativeMethod {
 
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof TupleType || $refType instanceof RecordType) {
-				return $this->context->typeRegistry->type($refType->restType);
+				return $programRegistry->typeRegistry->type($refType->restType);
 			}
 			if ($refType instanceof MetaType) {
 				if ($refType->value === MetaTypeValue::Tuple || $refType->value === MetaTypeValue::Record) {
-					return $this->context->typeRegistry->type($this->context->typeRegistry->any);
+					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->any);
 				}
 			}
 		}
@@ -45,6 +42,7 @@ final readonly class RestType implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -53,7 +51,7 @@ final readonly class RestType implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof TupleType || $typeValue instanceof RecordType) {
-				return TypedValue::forValue($this->context->valueRegistry->type($typeValue->restType));
+				return TypedValue::forValue($programRegistry->valueRegistry->type($typeValue->restType));
 			}
 		}
 		// @codeCoverageIgnoreStart

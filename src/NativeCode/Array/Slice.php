@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -19,11 +19,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class Slice implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -32,14 +29,14 @@ final readonly class Slice implements NativeMethod {
 			$targetType = $targetType->asArrayType();
 		}
 		if ($targetType instanceof ArrayType) {
-			$pInt = $this->context->typeRegistry->integer(0);
-			$pType = $this->context->typeRegistry->record([
+			$pInt = $programRegistry->typeRegistry->integer(0);
+			$pType = $programRegistry->typeRegistry->record([
 				"start" => $pInt,
-				"length" => $this->context->typeRegistry->optionalKey($pInt)
+				"length" => $programRegistry->typeRegistry->optionalKey($pInt)
 			]);
 			if ($parameterType->isSubtypeOf($pType)) {
 				$parameterType = $this->toBaseType($parameterType);
-				return $this->context->typeRegistry->array(
+				return $programRegistry->typeRegistry->array(
 					$targetType->itemType,
 					0,
 					min(
@@ -59,6 +56,7 @@ final readonly class Slice implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -73,7 +71,7 @@ final readonly class Slice implements NativeMethod {
 				try {
 					$length = $parameterValue->valueOf('length');
 				} catch (UnknownProperty) {
-					$length = $this->context->valueRegistry->integer(count($values));
+					$length = $programRegistry->valueRegistry->integer(count($values));
 				}
 				if (
 					$start instanceof IntegerValue &&
@@ -84,7 +82,7 @@ final readonly class Slice implements NativeMethod {
 						(string)$start->literalValue,
 						(string)$length->literalValue
 					);
-					return TypedValue::forValue($this->context->valueRegistry->tuple($values));
+					return TypedValue::forValue($programRegistry->valueRegistry->tuple($values));
 				}
 				// @codeCoverageIgnoreStart
 				throw new ExecutionException("Invalid parameter value");

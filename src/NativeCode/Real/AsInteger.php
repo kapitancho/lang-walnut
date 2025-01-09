@@ -2,12 +2,13 @@
 
 namespace Walnut\Lang\NativeCode\Real;
 
+use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
@@ -21,24 +22,20 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class AsInteger implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof IntegerSubsetType || $targetType instanceof RealSubsetType) {
-			return $this->context->typeRegistry->integerSubset(
-				array_map(fn(RealValue|IntegerValue $v) =>
-					$this->context->valueRegistry->integer((int)(string)$v->literalValue),
+			return $programRegistry->typeRegistry->integerSubset(
+				array_map(fn(Number $v) => $v->round(),
 					$targetType->subsetValues)
 			);
 		}
 		if ($targetType instanceof IntegerType || $targetType instanceof RealType) {
-			return $this->context->typeRegistry->integer(
+			return $programRegistry->typeRegistry->integer(
 				$targetType->range->minValue === MinusInfinity::value ? MinusInfinity::value :
 					(int)(string)$targetType->range->minValue,
 				$targetType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
@@ -51,6 +48,7 @@ final readonly class AsInteger implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -59,7 +57,7 @@ final readonly class AsInteger implements NativeMethod {
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			$target = $targetValue->literalValue;
-			return TypedValue::forValue($this->context->valueRegistry->integer((int)(string)$target));
+			return TypedValue::forValue($programRegistry->valueRegistry->integer((int)(string)$target));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

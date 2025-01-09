@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\IntersectionType;
 use Walnut\Lang\Blueprint\Type\MetaType;
@@ -22,28 +22,25 @@ final readonly class ItemTypes implements NativeMethod {
 
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof TupleType) {
-				return $this->context->typeRegistry->tuple(
+				return $programRegistry->typeRegistry->tuple(
 					array_map(
-						fn(TypeInterface $type) => $this->context->typeRegistry->type($type),
+						fn(TypeInterface $type) => $programRegistry->typeRegistry->type($type),
 						$refType->types,
 					)
 				);
 			}
 			if ($refType instanceof RecordType) {
-				return $this->context->typeRegistry->record(
+				return $programRegistry->typeRegistry->record(
 					array_map(
-						fn(TypeInterface $type) => $this->context->typeRegistry->type($type),
+						fn(TypeInterface $type) => $programRegistry->typeRegistry->type($type),
 						$refType->types,
 					)
 				);
@@ -52,16 +49,16 @@ final readonly class ItemTypes implements NativeMethod {
 				if (in_array($refType->value, [
 					MetaTypeValue::Tuple, MetaTypeValue::Union, MetaTypeValue::Intersection
 				], true)) {
-					return $this->context->typeRegistry->array(
-						$this->context->typeRegistry->type(
-							$this->context->typeRegistry->any
+					return $programRegistry->typeRegistry->array(
+						$programRegistry->typeRegistry->type(
+							$programRegistry->typeRegistry->any
 						)
 					);
 				}
 				if ($refType->value === MetaTypeValue::Record) {
-					return $this->context->typeRegistry->map(
-						$this->context->typeRegistry->type(
-							$this->context->typeRegistry->any
+					return $programRegistry->typeRegistry->map(
+						$programRegistry->typeRegistry->type(
+							$programRegistry->typeRegistry->any
 						)
 					);
 				}
@@ -73,6 +70,7 @@ final readonly class ItemTypes implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -81,17 +79,17 @@ final readonly class ItemTypes implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof TupleType || $typeValue instanceof UnionType || $typeValue instanceof IntersectionType) {
-				return TypedValue::forValue($this->context->valueRegistry->tuple(
+				return TypedValue::forValue($programRegistry->valueRegistry->tuple(
 					array_map(
-						fn(TypeInterface $type) => $this->context->valueRegistry->type($type),
+						fn(TypeInterface $type) => $programRegistry->valueRegistry->type($type),
 						$typeValue->types
 					)
 				));
 			}
 			if ($typeValue instanceof RecordType) {
-				return TypedValue::forValue($this->context->valueRegistry->record(
+				return TypedValue::forValue($programRegistry->valueRegistry->record(
 					array_map(
-						fn(TypeInterface $type) => $this->context->valueRegistry->type($type),
+						fn(TypeInterface $type) => $programRegistry->valueRegistry->type($type),
 						$typeValue->types
 					)
 				));

@@ -2,14 +2,4 @@
 
 namespace Walnut\Lang\Blueprint\Function;
 
-use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
-use Walnut\Lang\Blueprint\Type\Type;
-
-interface MethodDraft {
-	/** @throws AnalyserException */
-	public function analyse(
-		Type $targetType,
-		Type $parameterType
-	): Type;
-}
+interface MethodDraft {}

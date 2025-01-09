@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
@@ -21,11 +21,8 @@ use Walnut\Lang\Implementation\Value\IntegerValue;
 final readonly class BinaryPlus implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType
 	): Type {
@@ -46,10 +43,10 @@ final readonly class BinaryPlus implements NativeMethod {
 					$targetType->range->maxValue + $parameterType->range->maxValue;
 
 				if ($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) {
-					return $this->context->typeRegistry->integer($min, $max);
+					return $programRegistry->typeRegistry->integer($min, $max);
 				}
 				if ($parameterType instanceof RealType || $parameterType instanceof RealSubsetType) {
-					return $this->context->typeRegistry->real($min, $max);
+					return $programRegistry->typeRegistry->real($min, $max);
 				}
 			}
 			// @codeCoverageIgnoreStart
@@ -62,6 +59,7 @@ final readonly class BinaryPlus implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -72,12 +70,12 @@ final readonly class BinaryPlus implements NativeMethod {
 		if ($targetValue instanceof IntegerValue) {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue) {
-	            return TypedValue::forValue($this->context->valueRegistry->integer(
+	            return TypedValue::forValue($programRegistry->valueRegistry->integer(
 					$targetValue->literalValue + $parameterValue->literalValue
 	            ));
 			}
 			if ($parameterValue instanceof RealValue) {
-	            return TypedValue::forValue($this->context->valueRegistry->real(
+	            return TypedValue::forValue($programRegistry->valueRegistry->real(
 					$targetValue->literalValue + $parameterValue->literalValue
 	            ));
 			}

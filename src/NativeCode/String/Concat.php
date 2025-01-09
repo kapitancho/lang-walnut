@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
@@ -17,11 +17,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class Concat implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -29,15 +26,15 @@ final readonly class Concat implements NativeMethod {
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $this->context->typeRegistry->string(
+				return $programRegistry->typeRegistry->string(
 					$targetType->range->minLength + $parameterType->range->minLength,
 					$targetType->range->maxLength === PlusInfinity::value ||
 					$parameterType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
 					$targetType->range->maxLength + $parameterType->range->maxLength
 				);
 			}
-			if ($parameterType->isSubtypeOf($this->context->typeRegistry->string())) {
-				return $this->context->typeRegistry->string();
+			if ($parameterType->isSubtypeOf($programRegistry->typeRegistry->string())) {
+				return $programRegistry->typeRegistry->string();
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -49,6 +46,7 @@ final readonly class Concat implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -60,7 +58,7 @@ final readonly class Concat implements NativeMethod {
 		if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof StringValue) {
 				$result = $targetValue->literalValue . $parameterValue->literalValue;
-				return TypedValue::forValue($this->context->valueRegistry->string($result));
+				return TypedValue::forValue($programRegistry->valueRegistry->string($result));
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

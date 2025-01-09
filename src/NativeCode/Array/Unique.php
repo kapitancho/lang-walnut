@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
@@ -18,23 +18,20 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class Unique implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		if ($targetType instanceof ArrayType) {
 			$itemType = $targetType->itemType;
-			if ($itemType->isSubtypeOf($this->context->typeRegistry->string()) || $itemType->isSubtypeOf(
-				$this->context->typeRegistry->union([
-					$this->context->typeRegistry->integer(),
-					$this->context->typeRegistry->real()
+			if ($itemType->isSubtypeOf($programRegistry->typeRegistry->string()) || $itemType->isSubtypeOf(
+				$programRegistry->typeRegistry->union([
+					$programRegistry->typeRegistry->integer(),
+					$programRegistry->typeRegistry->real()
 				])
 			)) {
-				return $this->context->typeRegistry->array(
+				return $programRegistry->typeRegistry->array(
 					$targetType->itemType,
 					min(1, $targetType->range->minLength),
 					$targetType->range->maxLength
@@ -50,6 +47,7 @@ final readonly class Unique implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -81,16 +79,16 @@ final readonly class Unique implements NativeMethod {
 					// @codeCoverageIgnoreEnd
 				}
 				$rawValues = array_unique($rawValues);
-				return TypedValue::forValue($this->context->valueRegistry->tuple(array_map(
-					fn($value) => $this->context->valueRegistry->string($value),
+				return TypedValue::forValue($programRegistry->valueRegistry->tuple(array_map(
+					fn($value) => $programRegistry->valueRegistry->string($value),
 					$rawValues
 				)));
 			}
 			$rawValues = array_unique($rawValues, SORT_NUMERIC);
-			return TypedValue::forValue($this->context->valueRegistry->tuple(array_map(
+			return TypedValue::forValue($programRegistry->valueRegistry->tuple(array_map(
 				fn($value) => str_contains($value, '.') ?
-					$this->context->valueRegistry->real($value) :
-					$this->context->valueRegistry->integer($value),
+					$programRegistry->valueRegistry->real($value) :
+					$programRegistry->valueRegistry->integer($value),
 				$rawValues
 			)));
 		}

@@ -41,9 +41,6 @@ use Walnut\Lang\Blueprint\Type\TrueType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\TypeType;
-use Walnut\Lang\Blueprint\Value\IntegerValue;
-use Walnut\Lang\Blueprint\Value\RealValue;
-use Walnut\Lang\Blueprint\Value\StringValue;
 
 interface TypeRegistry {
 	public AnyType $any { get; }

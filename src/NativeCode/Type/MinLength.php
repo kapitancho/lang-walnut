@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
@@ -20,11 +20,8 @@ final readonly class MinLength implements NativeMethod {
 
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
@@ -32,7 +29,7 @@ final readonly class MinLength implements NativeMethod {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof StringType || $refType instanceof StringSubsetType ||
 				$refType instanceof ArrayType || $refType instanceof MapType) {
-				return $this->context->typeRegistry->integer(0);
+				return $programRegistry->typeRegistry->integer(0);
 			}
 		}
 		// @codeCoverageIgnoreStart
@@ -41,6 +38,7 @@ final readonly class MinLength implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -50,7 +48,7 @@ final readonly class MinLength implements NativeMethod {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof StringType || $typeValue instanceof StringSubsetType ||
 				$typeValue instanceof ArrayType || $typeValue instanceof MapType) {
-				return TypedValue::forValue($this->context->valueRegistry->integer($typeValue->range->minLength));
+				return TypedValue::forValue($programRegistry->valueRegistry->integer($typeValue->range->minLength));
 			}
 		}
 		// @codeCoverageIgnoreStart

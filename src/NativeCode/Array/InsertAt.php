@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -19,24 +19,21 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class InsertAt implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		if ($targetType instanceof ArrayType) {
-			$pInt = $this->context->typeRegistry->integer(0);
-			$pType = $this->context->typeRegistry->record([
-				"value" => $this->context->typeRegistry->any,
+			$pInt = $programRegistry->typeRegistry->integer(0);
+			$pType = $programRegistry->typeRegistry->record([
+				"value" => $programRegistry->typeRegistry->any,
 				"index" => $pInt
 			]);
 			if ($parameterType->isSubtypeOf($pType)) {
 				$parameterType = $this->toBaseType($parameterType);
-				$returnType = $this->context->typeRegistry->array(
-					$this->context->typeRegistry->union([
+				$returnType = $programRegistry->typeRegistry->array(
+					$programRegistry->typeRegistry->union([
 						$targetType->itemType,
 						$parameterType->types['value']
 					]),
@@ -47,8 +44,8 @@ final readonly class InsertAt implements NativeMethod {
 				return
 					$parameterType->types['index']->range->maxValue >= 0 &&
 					$parameterType->types['index']->range->maxValue <= $targetType->range->minLength ?
-					$returnType : $this->context->typeRegistry->result($returnType,
-						$this->context->typeRegistry->sealed(new TypeNameIdentifier('IndexOutOfRange'))
+					$returnType : $programRegistry->typeRegistry->result($returnType,
+						$programRegistry->typeRegistry->sealed(new TypeNameIdentifier('IndexOutOfRange'))
 					);
 			}
 			// @codeCoverageIgnoreStart
@@ -61,6 +58,7 @@ final readonly class InsertAt implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -82,7 +80,7 @@ final readonly class InsertAt implements NativeMethod {
 							0,
 							[$value]
 						);
-						return TypedValue::forValue($this->context->valueRegistry->tuple($values));
+						return TypedValue::forValue($programRegistry->valueRegistry->tuple($values));
 					}
 				}
 				// @codeCoverageIgnoreStart
@@ -91,7 +89,7 @@ final readonly class InsertAt implements NativeMethod {
 			}
 			$values = $targetValue->values;
 			$values[] = $parameterValue;
-			return TypedValue::forValue($this->context->valueRegistry->tuple($values));
+			return TypedValue::forValue($programRegistry->valueRegistry->tuple($values));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

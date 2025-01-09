@@ -9,13 +9,11 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\ConstantExpression as ConstantExpressionInterface;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
 use Walnut\Lang\Blueprint\Value\Value;
 
 final readonly class ConstantExpression implements ConstantExpressionInterface, JsonSerializable {
 	public function __construct(
-		private TypeRegistry $typeRegistry,
 		public Value $value
 	) {}
 
@@ -25,7 +23,7 @@ final readonly class ConstantExpression implements ConstantExpressionInterface, 
 		}
 		return $analyserContext->asAnalyserResult(
 			$this->value->type,
-			$this->typeRegistry->nothing
+			$analyserContext->programRegistry->typeRegistry->nothing
 		);
 	}
 

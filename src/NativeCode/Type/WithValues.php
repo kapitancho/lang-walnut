@@ -2,12 +2,13 @@
 
 namespace Walnut\Lang\NativeCode\Type;
 
+use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
@@ -17,6 +18,9 @@ use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Value\EnumerationValue;
+use Walnut\Lang\Blueprint\Value\IntegerValue;
+use Walnut\Lang\Blueprint\Value\RealValue;
+use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
@@ -24,11 +28,8 @@ final readonly class WithValues implements NativeMethod {
 
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
@@ -36,13 +37,13 @@ final readonly class WithValues implements NativeMethod {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof IntegerType) {
 				if ($parameterType->isSubtypeOf(
-					$this->context->typeRegistry->array(
-						$this->context->typeRegistry->integer(),
+					$programRegistry->typeRegistry->array(
+						$programRegistry->typeRegistry->integer(),
 						1
 					)
 				)) {
-					return $this->context->typeRegistry->type(
-						$this->context->typeRegistry->metaType(MetaTypeValue::IntegerSubset)
+					return $programRegistry->typeRegistry->type(
+						$programRegistry->typeRegistry->metaType(MetaTypeValue::IntegerSubset)
 					);
 				}
 				// @codeCoverageIgnoreStart
@@ -51,13 +52,13 @@ final readonly class WithValues implements NativeMethod {
 			}
 			if ($refType instanceof RealType) {
 				if ($parameterType->isSubtypeOf(
-					$this->context->typeRegistry->array(
-						$this->context->typeRegistry->real(),
+					$programRegistry->typeRegistry->array(
+						$programRegistry->typeRegistry->real(),
 						1
 					)
 				)) {
-					return $this->context->typeRegistry->type(
-						$this->context->typeRegistry->metaType(MetaTypeValue::RealSubset)
+					return $programRegistry->typeRegistry->type(
+						$programRegistry->typeRegistry->metaType(MetaTypeValue::RealSubset)
 					);
 				}
 				// @codeCoverageIgnoreStart
@@ -66,13 +67,13 @@ final readonly class WithValues implements NativeMethod {
 			}
 			if ($refType instanceof StringType) {
 				if ($parameterType->isSubtypeOf(
-					$this->context->typeRegistry->array(
-						$this->context->typeRegistry->string(),
+					$programRegistry->typeRegistry->array(
+						$programRegistry->typeRegistry->string(),
 						1
 					)
 				)) {
-					return $this->context->typeRegistry->type(
-						$this->context->typeRegistry->metaType(MetaTypeValue::StringSubset)
+					return $programRegistry->typeRegistry->type(
+						$programRegistry->typeRegistry->metaType(MetaTypeValue::StringSubset)
 					);
 				}
 				// @codeCoverageIgnoreStart
@@ -81,12 +82,12 @@ final readonly class WithValues implements NativeMethod {
 			}
 			if ($refType instanceof EnumerationType) {
 				if ($parameterType->isSubtypeOf(
-					$this->context->typeRegistry->array(
+					$programRegistry->typeRegistry->array(
 						$refType,
 						1
 					)
 				)) {
-					return $this->context->typeRegistry->type($refType);
+					return $programRegistry->typeRegistry->type($refType);
 				}
 				// @codeCoverageIgnoreStart
 				throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -97,16 +98,16 @@ final readonly class WithValues implements NativeMethod {
 				$refType->value === MetaTypeValue::EnumerationSubset
 			)) {
 				if ($parameterType->isSubtypeOf(
-					$this->context->typeRegistry->array(
-						$this->context->typeRegistry->any,
+					$programRegistry->typeRegistry->array(
+						$programRegistry->typeRegistry->any,
 						1
 					)
 				)) {
-					return $this->context->typeRegistry->result(
-						$this->context->typeRegistry->type(
-							$this->context->typeRegistry->metaType(MetaTypeValue::EnumerationSubset)
+					return $programRegistry->typeRegistry->result(
+						$programRegistry->typeRegistry->type(
+							$programRegistry->typeRegistry->metaType(MetaTypeValue::EnumerationSubset)
 						),
-						$this->context->typeRegistry->withName(
+						$programRegistry->typeRegistry->withName(
 							new TypeNameIdentifier('UnknownEnumerationValue')
 						)
 					);
@@ -122,6 +123,7 @@ final readonly class WithValues implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -131,44 +133,50 @@ final readonly class WithValues implements NativeMethod {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof IntegerType) {
 				if ($parameter->type->isSubtypeOf(
-					$this->context->typeRegistry->array(
-						$this->context->typeRegistry->integer(),
+					$programRegistry->typeRegistry->array(
+						$programRegistry->typeRegistry->integer(),
 						1
 					)
 				)) {
 					$values = $this->toBaseValue($parameter->value)->values;
-					$result = $this->context->typeRegistry->integerSubset($values);
-					return TypedValue::forValue($this->context->valueRegistry->type($result));
+					$result = $programRegistry->typeRegistry->integerSubset(
+						array_map(fn(IntegerValue $value): Number => $value->literalValue, $values)
+					);
+					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
 				}
 			}
 			if ($typeValue instanceof RealType) {
 				if ($parameter->type->isSubtypeOf(
-					$this->context->typeRegistry->array(
-						$this->context->typeRegistry->real(),
+					$programRegistry->typeRegistry->array(
+						$programRegistry->typeRegistry->real(),
 						1
 					)
 				)) {
 					$values = $this->toBaseValue($parameter->value)->values;
-					$result = $this->context->typeRegistry->realSubset($values);
-					return TypedValue::forValue($this->context->valueRegistry->type($result));
+					$result = $programRegistry->typeRegistry->realSubset(
+						array_map(fn(RealValue $value): Number => $value->literalValue, $values)
+					);
+					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
 				}
 			}
 			if ($typeValue instanceof StringType) {
 				if ($parameter->type->isSubtypeOf(
-					$this->context->typeRegistry->array(
-						$this->context->typeRegistry->string(),
+					$programRegistry->typeRegistry->array(
+						$programRegistry->typeRegistry->string(),
 						1
 					)
 				)) {
 					$values = $this->toBaseValue($parameter->value)->values;
-					$result = $this->context->typeRegistry->stringSubset($values);
-					return TypedValue::forValue($this->context->valueRegistry->type($result));
+					$result = $programRegistry->typeRegistry->stringSubset(
+						array_map(fn(StringValue $value): string => $value->literalValue, $values)
+					);
+					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
 				}
 			}
 			if ($typeValue instanceof EnumerationType) {
 				if ($parameter->type->isSubtypeOf(
-					$this->context->typeRegistry->array(
-						$this->context->typeRegistry->any,
+					$programRegistry->typeRegistry->array(
+						$programRegistry->typeRegistry->any,
 						1
 					)
 				)) {
@@ -178,11 +186,11 @@ final readonly class WithValues implements NativeMethod {
 						if ($value instanceof EnumerationValue && $value->enumeration == $typeValue) {
 							$r[] = $value->name;
 						} else {
-							return TypedValue::forValue($this->context->valueRegistry->error(
-								$this->context->valueRegistry->sealedValue(
+							return TypedValue::forValue($programRegistry->valueRegistry->error(
+								$programRegistry->valueRegistry->sealedValue(
 									new TypeNameIdentifier('UnknownEnumerationValue'),
-									$this->context->valueRegistry->record([
-										'enumeration' => $this->context->valueRegistry->type($typeValue),
+									$programRegistry->valueRegistry->record([
+										'enumeration' => $programRegistry->valueRegistry->type($typeValue),
 										'value' => $value
 									])
 								)
@@ -190,7 +198,7 @@ final readonly class WithValues implements NativeMethod {
 						}
 					}
 					$result = $typeValue->subsetType($r);
-					return TypedValue::forValue($this->context->valueRegistry->type($result));
+					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
 				}
 			}
 		}

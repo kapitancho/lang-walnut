@@ -7,6 +7,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserResult;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
+use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
 
@@ -14,6 +15,6 @@ interface Expression extends Stringable {
 	/** @throws AnalyserException */
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult;
 
-	/** @throws FunctionReturn */
+	/** @throws ExecutionException|FunctionReturn */
 	public function execute(ExecutionContext $executionContext): ExecutionResult;
 }

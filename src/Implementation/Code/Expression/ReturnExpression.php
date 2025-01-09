@@ -10,19 +10,17 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\ReturnExpression as ReturnExpressionInterface;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 
 final readonly class ReturnExpression implements ReturnExpressionInterface, JsonSerializable {
 	public function __construct(
-		private TypeRegistry $typeRegistry,
 		public Expression $returnedExpression
 	) {}
 
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
 		$ret = $this->returnedExpression->analyse($analyserContext);
 		return $ret->withExpressionType(
-			$this->typeRegistry->nothing
-		)->withReturnType($this->typeRegistry->union(
+			$analyserContext->programRegistry->typeRegistry->nothing
+		)->withReturnType($analyserContext->programRegistry->typeRegistry->union(
 			[$ret->returnType, $ret->expressionType]
 		));
 	}

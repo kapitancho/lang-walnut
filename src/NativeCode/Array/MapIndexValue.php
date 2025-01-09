@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\FunctionType;
@@ -20,11 +20,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class MapIndexValue implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -34,8 +31,8 @@ final readonly class MapIndexValue implements NativeMethod {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof FunctionType) {
 				$callbackParameterType = $parameterType->parameterType;
-				$expectedType = $this->context->typeRegistry->record([
-					'index' => $this->context->typeRegistry->integer(0,
+				$expectedType = $programRegistry->typeRegistry->record([
+					'index' => $programRegistry->typeRegistry->integer(0,
 						$type->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
 							$type->range->maxLength - 1
 					),
@@ -45,12 +42,12 @@ final readonly class MapIndexValue implements NativeMethod {
 					$r = $parameterType->returnType;
 					$errorType = $r instanceof ResultType ? $r->errorType : null;
 					$returnType = $r instanceof ResultType ? $r->returnType : $r;
-					$t = $this->context->typeRegistry->array(
+					$t = $programRegistry->typeRegistry->array(
 						$returnType,
 						$type->range->minLength,
 						$type->range->maxLength,
 					);
-					return $errorType ? $this->context->typeRegistry->result($t, $errorType) : $t;
+					return $errorType ? $programRegistry->typeRegistry->result($t, $errorType) : $t;
 				}
 				throw new AnalyserException(sprintf(
 					"The parameter type %s of the callback function is not a subtype of %s",
@@ -68,6 +65,7 @@ final readonly class MapIndexValue implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -80,15 +78,15 @@ final readonly class MapIndexValue implements NativeMethod {
 			$result = [];
 			foreach($values as $index => $value) {
 				$r = $parameterValue->execute(
-					$this->context->globalContext,
-					$this->context->valueRegistry->record([
-						'index' => $this->context->valueRegistry->integer($index),
+					$programRegistry->executionContext,
+					$programRegistry->valueRegistry->record([
+						'index' => $programRegistry->valueRegistry->integer($index),
 						'value' => $value
 					])
 				);
 				$result[] = $r;
 			}
-			return TypedValue::forValue($this->context->valueRegistry->tuple($result));
+			return TypedValue::forValue($programRegistry->valueRegistry->tuple($result));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
@@ -19,11 +19,8 @@ use Walnut\Lang\Implementation\Type\TupleType;
 final readonly class CombineAsString implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -33,9 +30,9 @@ final readonly class CombineAsString implements NativeMethod {
 		}
 		if ($targetType instanceof ArrayType) {
 			$itemType = $targetType->itemType;
-			if ($itemType->isSubtypeOf($this->context->typeRegistry->string())) {
+			if ($itemType->isSubtypeOf($programRegistry->typeRegistry->string())) {
 				if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-					return $this->context->typeRegistry->string(
+					return $programRegistry->typeRegistry->string(
 						$parameterType->range->minLength * max(0, $targetType->range->minLength - 1), /* +
 						$itemType->range->minLength * $targetType->range->minLength,
 						$parameterType->range->maxLength === PlusInfinity::value ||
@@ -56,6 +53,7 @@ final readonly class CombineAsString implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -78,7 +76,7 @@ final readonly class CombineAsString implements NativeMethod {
 					}
 				}
 				$result = implode($parameterValue->literalValue, $result);
-				return TypedValue::forValue($this->context->valueRegistry->string($result));
+				return TypedValue::forValue($programRegistry->valueRegistry->string($result));
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

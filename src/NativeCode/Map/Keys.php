@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -16,11 +16,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class Keys implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -29,8 +26,8 @@ final readonly class Keys implements NativeMethod {
 			$targetType = $targetType->asMapType();
 		}
 		if ($targetType instanceof MapType) {
-			return $this->context->typeRegistry->array(
-				$this->context->typeRegistry->string(),
+			return $programRegistry->typeRegistry->array(
+				$programRegistry->typeRegistry->string(),
 				$targetType->range->minLength,
 				$targetType->range->maxLength
 			);
@@ -41,6 +38,7 @@ final readonly class Keys implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -48,9 +46,9 @@ final readonly class Keys implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue) {
-			return TypedValue::forValue($this->context->valueRegistry->tuple(
+			return TypedValue::forValue($programRegistry->valueRegistry->tuple(
 				array_map(
-					fn($key) => $this->context->valueRegistry->string($key),
+					fn($key) => $programRegistry->valueRegistry->string($key),
 					array_keys(
 						$targetValue->values
 					)

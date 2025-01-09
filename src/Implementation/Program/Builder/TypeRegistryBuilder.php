@@ -19,9 +19,6 @@ use Walnut\Lang\Blueprint\Type\NamedType as NamedTypeInterface;
 use Walnut\Lang\Blueprint\Type\RecordType as RecordTypeInterface;
 use Walnut\Lang\Blueprint\Type\ResultType as ResultTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Value\IntegerValue;
-use Walnut\Lang\Blueprint\Value\RealValue;
-use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Implementation\Common\Range\IntegerRange;
 use Walnut\Lang\Implementation\Common\Range\LengthRange;
 use Walnut\Lang\Implementation\Common\Range\RealRange;
@@ -144,7 +141,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 			)
         );
     }
-	/** @param list<IntegerValue> $values */
+	/** @param list<Number> $values */
 	public function integerSubset(array $values): IntegerSubsetType {
 		return new IntegerSubsetType($values);
 	}
@@ -160,7 +157,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 			)
         );
     }
-	/** @param list<RealValue> $values */
+	/** @param list<Number> $values */
 	public function realSubset(array $values): RealSubsetType {
 		return new RealSubsetType($values);
 	}
@@ -174,7 +171,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
             is_int($maxLength) ? new Number($maxLength) : $maxLength
         ));
     }
-	/** @param list<StringValue> $values */
+	/** @param list<string> $values */
 	public function stringSubset(array $values): StringSubsetType {
 		return new StringSubsetType($values);
 	}

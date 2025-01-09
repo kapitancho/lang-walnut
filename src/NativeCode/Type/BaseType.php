@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\SubtypeType;
@@ -18,22 +18,19 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType as BaseTypeHelper;
 final readonly class BaseType implements NativeMethod {
 	use BaseTypeHelper;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $targetType->refType;
 			if ($refType instanceof SubtypeType) {
-				return $this->context->typeRegistry->type($refType->baseType);
+				return $programRegistry->typeRegistry->type($refType->baseType);
 			}
 			if ($refType instanceof MetaType) {
 				if ($refType->value === MetaTypeValue::Subtype) {
-					return $this->context->typeRegistry->type($this->context->typeRegistry->any);
+					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->any);
 				}
 			}
 		}
@@ -43,6 +40,7 @@ final readonly class BaseType implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -51,7 +49,7 @@ final readonly class BaseType implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $targetValue->typeValue;
 			if ($typeValue instanceof SubtypeType) {
-				return TypedValue::forValue($this->context->valueRegistry->type($typeValue->baseType));
+				return TypedValue::forValue($programRegistry->valueRegistry->type($typeValue->baseType));
 			}
 		}
 		// @codeCoverageIgnoreStart

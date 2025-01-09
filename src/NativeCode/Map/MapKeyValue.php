@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\RecordType;
@@ -19,11 +19,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class MapKeyValue implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -33,20 +30,20 @@ final readonly class MapKeyValue implements NativeMethod {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof FunctionType) {
 				$callbackParameterType = $parameterType->parameterType;
-				$expectedType = $this->context->typeRegistry->record([
-					'key' => $this->context->typeRegistry->string(),
+				$expectedType = $programRegistry->typeRegistry->record([
+					'key' => $programRegistry->typeRegistry->string(),
 					'value' => $type->itemType
 				]);
 				if ($expectedType->isSubtypeOf($callbackParameterType)) {
 					$r = $parameterType->returnType;
 					$errorType = $r instanceof ResultType ? $r->errorType : null;
 					$returnType = $r instanceof ResultType ? $r->returnType : $r;
-					$t = $this->context->typeRegistry->map(
+					$t = $programRegistry->typeRegistry->map(
 						$returnType,
 						$type->range->minLength,
 						$type->range->maxLength,
 					);
-					return $errorType ? $this->context->typeRegistry->result($t, $errorType) : $t;
+					return $errorType ? $programRegistry->typeRegistry->result($t, $errorType) : $t;
 				}
 				throw new AnalyserException(sprintf(
 					"The parameter type %s of the callback function is not a subtype of %s",
@@ -64,6 +61,7 @@ final readonly class MapKeyValue implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -76,15 +74,15 @@ final readonly class MapKeyValue implements NativeMethod {
 			$result = [];
 			foreach($values as $key => $value) {
 				$r = $parameterValue->execute(
-					$this->context->globalContext,
-					$this->context->valueRegistry->record([
-						'key' => $this->context->valueRegistry->string($key),
+					$programRegistry->executionContext,
+					$programRegistry->valueRegistry->record([
+						'key' => $programRegistry->valueRegistry->string($key),
 						'value' => $value
 					])
 				);
 				$result[$key] = $r;
 			}
-			return TypedValue::forValue($this->context->valueRegistry->record($result));
+			return TypedValue::forValue($programRegistry->valueRegistry->record($result));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

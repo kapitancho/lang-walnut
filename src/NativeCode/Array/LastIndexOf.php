@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\TupleType;
@@ -18,11 +18,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class LastIndexOf implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -32,11 +29,11 @@ final readonly class LastIndexOf implements NativeMethod {
 		}
 		if ($targetType instanceof ArrayType) {
 			$maxLength = $targetType->range->maxLength;
-			$returnType = $this->context->typeRegistry->integer(0,
+			$returnType = $programRegistry->typeRegistry->integer(0,
 				$maxLength === PlusInfinity::value ? $maxLength : $maxLength - 1);
-			return $this->context->typeRegistry->result(
+			return $programRegistry->typeRegistry->result(
 				$returnType,
-				$this->context->typeRegistry->atom(
+				$programRegistry->typeRegistry->atom(
 					new TypeNameIdentifier("ItemNotFound")
 				)
 			);
@@ -47,6 +44,7 @@ final readonly class LastIndexOf implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -58,11 +56,11 @@ final readonly class LastIndexOf implements NativeMethod {
 			$values = $targetValue->values;
 			for($index = count($values) - 1; $index >= 0; $index--) {
 				if ($values[$index]->equals($parameterValue)) {
-					return TypedValue::forValue($this->context->valueRegistry->integer($index));
+					return TypedValue::forValue($programRegistry->valueRegistry->integer($index));
 				}
 			}
-			return TypedValue::forValue($this->context->valueRegistry->error(
-				$this->context->valueRegistry->atom(
+			return TypedValue::forValue($programRegistry->valueRegistry->error(
+				$programRegistry->valueRegistry->atom(
 					new TypeNameIdentifier('ItemNotFound'),
 				)
 			));

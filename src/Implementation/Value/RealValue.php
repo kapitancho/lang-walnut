@@ -18,7 +18,7 @@ final class RealValue implements RealValueInterface, JsonSerializable {
     ) {}
 
 	public RealSubsetType $type {
-		get => $this->typeRegistry->realSubset([$this]);
+		get => $this->typeRegistry->realSubset([$this->literalValue]);
     }
 
 	public function equals(Value $other): bool {

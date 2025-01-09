@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
@@ -18,20 +18,17 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class Fire implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof SealedType && $targetType->name->equals(
 			new TypeNameIdentifier('EventBus')
 		)) {
-			return $this->context->typeRegistry->result(
+			return $programRegistry->typeRegistry->result(
 				$parameterType,
-				$this->context->typeRegistry->withName(new TypeNameIdentifier('ExternalError'))
+				$programRegistry->typeRegistry->withName(new TypeNameIdentifier('ExternalError'))
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -41,6 +38,7 @@ final readonly class Fire implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -56,11 +54,11 @@ final readonly class Fire implements NativeMethod {
 				foreach($listeners->values as $listener) {
 					if ($listener instanceof FunctionValue) {
 						if ($parameterValue->type->isSubtypeOf($listener->parameterType)) {
-							$result = $listener->execute($this->context->globalContext, $parameterValue);
+							$result = $listener->execute($programRegistry->executionContext, $parameterValue);
 							if ($result->type->isSubtypeOf(
-								$this->context->typeRegistry->result(
-									$this->context->typeRegistry->nothing,
-									$this->context->typeRegistry->withName(new TypeNameIdentifier('ExternalError'))
+								$programRegistry->typeRegistry->result(
+									$programRegistry->typeRegistry->nothing,
+									$programRegistry->typeRegistry->withName(new TypeNameIdentifier('ExternalError'))
 								)
 							)) {
 								return TypedValue::forValue($result);

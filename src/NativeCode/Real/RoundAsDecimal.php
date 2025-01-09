@@ -7,7 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
@@ -19,17 +19,14 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class RoundAsDecimal implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof RealType || $targetType instanceof RealSubsetType) {
-			return $this->context->typeRegistry->real(
+			return $programRegistry->typeRegistry->real(
 				$targetType->range->minValue === MinusInfinity::value ? MinusInfinity::value :
 					$targetType->range->minValue->floor(),
 				$targetType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
@@ -42,6 +39,7 @@ final readonly class RoundAsDecimal implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -54,7 +52,7 @@ final readonly class RoundAsDecimal implements NativeMethod {
 			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue && $parameterValue->literalValue >= 0) {
 				return TypedValue::forValue(
-					$this->context->valueRegistry->real($target->round((string)$parameterValue->literalValue))
+					$programRegistry->valueRegistry->real($target->round((string)$parameterValue->literalValue))
 				);
 			}
 			// @codeCoverageIgnoreStart

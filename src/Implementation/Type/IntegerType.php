@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Type;
 
+use BcMath\Number;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Common\Range\IntegerRange;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
@@ -11,7 +12,6 @@ use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType as IntegerTypeInterface;
 use Walnut\Lang\Blueprint\Type\RealType as RealTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Value\IntegerValue;
 
 final readonly class IntegerType implements IntegerTypeInterface, JsonSerializable {
 
@@ -46,8 +46,8 @@ final readonly class IntegerType implements IntegerTypeInterface, JsonSerializab
 		return $min !== MinusInfinity::value && $max !== PlusInfinity::value &&
 			$ofType->range->minValue <= $min && $ofType->range->maxValue >= $max &&
 			1 + (int)(string)$this->range->maxValue - (int)(string)$this->range->minValue === count(
-				array_filter($ofType->subsetValues, static fn(IntegerValue $value): bool =>
-					$value->literalValue >= $min && $value->literalValue <= $max
+				array_filter($ofType->subsetValues, static fn(Number $value): bool =>
+					$value >= $min && $value <= $max
 			));
 	}
 

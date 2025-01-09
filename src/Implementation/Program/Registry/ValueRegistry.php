@@ -6,7 +6,6 @@ use BcMath\Number;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
-use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry as ValueRegistryInterface;
 use Walnut\Lang\Blueprint\Program\UnknownType;
@@ -33,7 +32,6 @@ use Walnut\Lang\Implementation\Value\TypeValue;
 final class ValueRegistry implements ValueRegistryInterface {
 	public function __construct(
 		private readonly TypeRegistry $typeRegistry,
-		private readonly DependencyContainer $dependencyContainer
 	) {}
 
 	public NullValue $null {
@@ -99,7 +97,6 @@ final class ValueRegistry implements ValueRegistryInterface {
 		return new FunctionValue(
 			$this->typeRegistry,
 			$this,
-			$this->dependencyContainer,
 			$parameterType,
 			$dependencyType,
 			$returnType,

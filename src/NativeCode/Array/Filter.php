@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\TupleType;
@@ -18,11 +18,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class Filter implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -30,9 +27,9 @@ final readonly class Filter implements NativeMethod {
 		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($type instanceof ArrayType) {
 			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf($this->context->typeRegistry->boolean)) {
+			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf($programRegistry->typeRegistry->boolean)) {
 				if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
-					return $this->context->typeRegistry->array(
+					return $programRegistry->typeRegistry->array(
 						$type->itemType,
 						0,
 						$type->range->maxLength
@@ -56,6 +53,7 @@ final readonly class Filter implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -66,14 +64,14 @@ final readonly class Filter implements NativeMethod {
 		if ($targetValue instanceof TupleValue && $parameterValue instanceof FunctionValue) {
 			$values = $targetValue->values;
 			$result = [];
-			$true = $this->context->valueRegistry->true;
+			$true = $programRegistry->valueRegistry->true;
 			foreach($values as $value) {
-				$r = $parameterValue->execute($this->context->globalContext, $value);
+				$r = $parameterValue->execute($programRegistry->executionContext, $value);
 				if ($true->equals($r)) {
 					$result[] = $value;
 				}
 			}
-			return TypedValue::forValue($this->context->valueRegistry->tuple($result));
+			return TypedValue::forValue($programRegistry->valueRegistry->tuple($result));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

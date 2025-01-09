@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
@@ -19,11 +19,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class APPEND implements NativeMethod {
 	use BaseType;
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -46,6 +43,7 @@ final readonly class APPEND implements NativeMethod {
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
@@ -58,7 +56,7 @@ final readonly class APPEND implements NativeMethod {
 			if ($targetType instanceof StringType && $mv instanceof StringValue) {
 				$p = $this->toBaseValue($parameter->value);
 				if ($p instanceof StringValue) {
-					$v->value = $this->context->valueRegistry->string($mv->literalValue . $p->literalValue);
+					$v->value = $programRegistry->valueRegistry->string($mv->literalValue . $p->literalValue);
 					return $target;
 				}
 				// @codeCoverageIgnoreStart

@@ -1,13 +1,13 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Compilation;
+namespace Walnut\Lang\Implementation\Compilation\AST;
 
-use Walnut\Lang\Blueprint\AST\Compiler\AstModuleCompiler;
-use Walnut\Lang\Blueprint\AST\Compiler\AstProgramCompiler as AstProgramCompilerInterface;
-use Walnut\Lang\Blueprint\AST\Compiler\AstModuleCompilationException;
-use Walnut\Lang\Blueprint\AST\Compiler\AstProgramCompilationException;
 use Walnut\Lang\Blueprint\AST\Node\Module\ModuleNode;
 use Walnut\Lang\Blueprint\AST\Node\RootNode;
+use Walnut\Lang\Blueprint\Compilation\AST\AstModuleCompilationException;
+use Walnut\Lang\Blueprint\Compilation\AST\AstModuleCompiler;
+use Walnut\Lang\Blueprint\Compilation\AST\AstProgramCompilationException;
+use Walnut\Lang\Blueprint\Compilation\AST\AstProgramCompiler as AstProgramCompilerInterface;
 
 final readonly class AstProgramCompiler implements AstProgramCompilerInterface {
 	public function __construct(

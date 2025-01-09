@@ -6,7 +6,7 @@ use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\MethodExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\ArrayType;
@@ -20,7 +20,6 @@ use Walnut\Lang\Blueprint\Type\NullType;
 use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\RecordType;
-use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\SubtypeType;
@@ -40,25 +39,22 @@ use Walnut\Lang\Blueprint\Value\Value;
 
 final readonly class AsBoolean implements NativeMethod {
 
-	public function __construct(
-		private MethodExecutionContext $context
-	) {}
-
 	public function analyse(
+		ProgramRegistry $programRegistry,
 		Type $targetType,
 		Type $parameterType,
 	): BooleanType|TrueType|FalseType {
-		return $this->analyseType($targetType);
+		return $this->analyseType($programRegistry, $targetType);
 	}
 
-	private function analyseType(Type $type): BooleanType|TrueType|FalseType {
+	private function analyseType(ProgramRegistry $programRegistry, Type $type): BooleanType|TrueType|FalseType {
 		return match(true) {
 			$type instanceof AliasType
-				=> $this->analyseType($type->aliasedType),
+				=> $this->analyseType($programRegistry, $type->aliasedType),
 			$type instanceof SubtypeType
-				=> $this->analyseType($type->baseType),
+				=> $this->analyseType($programRegistry, $type->baseType),
 			$type instanceof MutableType
-				=> $this->analyseType($type->valueType),
+				=> $this->analyseType($programRegistry, $type->valueType),
 
 			$type instanceof NullType,
 			$type instanceof FalseType,
@@ -72,23 +68,23 @@ final readonly class AsBoolean implements NativeMethod {
 			($type instanceof TupleType && count($type->types) === 0),
 			($type instanceof ArrayType && $type->range->maxLength instanceof Number && (int)(string)$type->range->maxLength === 0),
 			($type instanceof MapType && $type->range->maxLength instanceof Number && (int)(string)$type->range->maxLength === 0)
-				=> $this->context->typeRegistry->false,
+				=> $programRegistry->typeRegistry->false,
 			$type instanceof TrueType,
-			($type instanceof IntegerSubsetType && !in_array(0, array_map(fn(IntegerValue $v) => (int)(string)$v->literalValue, $type->subsetValues))),
+			($type instanceof IntegerSubsetType && !in_array(0, array_map(fn(Number $v) => (int)(string)$v, $type->subsetValues))),
 			($type instanceof IntegerType && $type->range->minValue !== MinusInfinity::value && $type->range->minValue > 0),
 			($type instanceof IntegerType && $type->range->maxValue !== PlusInfinity::value && $type->range->maxValue < 0),
-			($type instanceof RealSubsetType && !in_array(0.0, array_map(fn(IntegerValue|RealValue $v) => (float)(string)$v->literalValue, $type->subsetValues))),
+			($type instanceof RealSubsetType && !in_array(0.0, array_map(fn(Number $v) => (float)(string)$v, $type->subsetValues))),
 			($type instanceof RealType && $type->range->minValue !== MinusInfinity::value && $type->range->minValue > 0),
 			($type instanceof RealType && $type->range->maxValue !== PlusInfinity::value && $type->range->maxValue < 0),
-			($type instanceof StringSubsetType && !in_array('', array_map(fn(StringValue $v) => $v->literalValue, $type->subsetValues))),
+			($type instanceof StringSubsetType && !in_array('', array_map(fn(string $v) => $v, $type->subsetValues))),
 			($type instanceof StringType && $type->range->minLength > 0),
 			/*$type instanceof SealedType,
 			($type instanceof RecordType && count($type->types) > 0),
 			($type instanceof TupleType && count($type->types) > 0),
 			($type instanceof ArrayType && $type->range->minLength > 0),
 			($type instanceof MapType && $type->range->minLength > 0)*/
-				=> $this->context->typeRegistry->true,
-			default => $this->context->typeRegistry->boolean,
+				=> $programRegistry->typeRegistry->true,
+			default => $programRegistry->typeRegistry->boolean,
 			/*$type instanceof IntegerType,
 			$type instanceof IntegerSubsetType,
 			$type instanceof RealType,
@@ -98,17 +94,18 @@ final readonly class AsBoolean implements NativeMethod {
 			$type instanceof BooleanValue,
 			$type instanceof TupleType, $type instanceof ArrayType,
 			$type instanceof RecordType, $type instanceof MapType
-				=> $this->context->typeRegistry()->boolean(),*/
+				=> $programRegistry->typeRegistry()->boolean(),*/
 		};
 	}
 
 	public function execute(
+		ProgramRegistry $programRegistry,
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
 		$targetValue = $target->value;
 		
-        return TypedValue::forValue($this->context->valueRegistry->boolean(
+        return TypedValue::forValue($programRegistry->valueRegistry->boolean(
             $this->evaluate($targetValue)
         ));
 	}
