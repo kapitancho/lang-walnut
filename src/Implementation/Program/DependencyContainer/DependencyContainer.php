@@ -122,7 +122,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 			) {
 				return new DependencyError(
 					UnresolvableDependency::errorWhileCreatingValue,
-					$err->value->values()['errorOnType']->typeValue()
+					$err->value->values['errorOnType']->typeValue()
 				);
 			}
 			if ($foundValue instanceof DependencyError) {

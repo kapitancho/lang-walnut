@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\NativeCode\Type;
 
+use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
@@ -16,7 +17,10 @@ use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Type\TypeType;
+use Walnut\Lang\Blueprint\Value\IntegerValue;
 use Walnut\Lang\Blueprint\Value\NullValue;
+use Walnut\Lang\Blueprint\Value\RealValue;
+use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 
 final readonly class Values implements NativeMethod {
@@ -79,15 +83,44 @@ final readonly class Values implements NativeMethod {
 		if ($parameterValue instanceof NullValue) {
 			if ($targetValue instanceof TypeValue) {
 				$refType = $targetValue->typeValue;
-				if ($refType instanceof IntegerSubsetType ||
-					$refType instanceof RealSubsetType ||
-					$refType instanceof StringSubsetType ||
-					$refType instanceof EnumerationSubsetType
-				) {
+				if ($refType instanceof EnumerationSubsetType) {
 					return TypedValue::forValue($programRegistry->valueRegistry->tuple(
 						array_values(
 							array_unique(
 								$refType->subsetValues
+							)
+						)
+					));
+				} elseif ($refType instanceof IntegerSubsetType) {
+					return TypedValue::forValue($programRegistry->valueRegistry->tuple(
+						array_map(
+							fn(Number $value): IntegerValue => $programRegistry->valueRegistry->integer($value),
+							array_values(
+								array_unique(
+									$refType->subsetValues
+								)
+							)
+						)
+					));
+				} elseif ($refType instanceof RealSubsetType) {
+					return TypedValue::forValue($programRegistry->valueRegistry->tuple(
+						array_map(
+							fn(Number $value): RealValue => $programRegistry->valueRegistry->real($value),
+							array_values(
+								array_unique(
+									$refType->subsetValues
+								)
+							)
+						)
+					));
+				} elseif ($refType instanceof StringSubsetType) {
+					return TypedValue::forValue($programRegistry->valueRegistry->tuple(
+						array_map(
+							fn(string $value): StringValue => $programRegistry->valueRegistry->string($value),
+							array_values(
+								array_unique(
+									$refType->subsetValues
+								)
 							)
 						)
 					));

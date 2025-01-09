@@ -67,13 +67,13 @@ final readonly class Execute implements NativeMethod {
 				)
 			)) {
 				$dsn = $targetValue->value->valueOf('connection')
-					->baseValue->values()['dsn']->literalValue;
+					->baseValue->values['dsn']->literalValue;
 				try {
 					$pdo = new PDO($dsn);
 					$stmt = $pdo->prepare($parameterValue->values['query']->literalValue);
 					$stmt->execute(array_map(static fn(Value $value): string|float|int|null =>
 						$value->literalValue instanceof Number ? (string)$value->literalValue : $value->literalValue,
-						$parameterValue->values['boundParameters']->values()
+						$parameterValue->values['boundParameters']->values
 					));
 					$rowCount = $stmt->rowCount();
 					return new TypedValue(
