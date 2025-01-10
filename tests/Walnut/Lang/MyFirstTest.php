@@ -39,7 +39,7 @@ final class MyFirstTest extends BaseProgramTestHelper {
 				)
 			)
 		);
-		$program = $this->compilationContext->analyseAndBuildProgram();
+		$program = $this->programContext->analyseAndBuildProgram();
 		$entryPoint = $program->getEntryPoint(
 			$fn,
 			$this->typeRegistry->string(),
@@ -71,7 +71,7 @@ final class MyFirstTest extends BaseProgramTestHelper {
 				)
 			)
 		);
-		$program = $this->compilationContext->analyseAndBuildProgram();
+		$program = $this->programContext->analyseAndBuildProgram();
 		$entryPoint = $program->getEntryPoint(
 			$fn,
 			$this->typeRegistry->boolean,
@@ -117,7 +117,7 @@ final class MyFirstTest extends BaseProgramTestHelper {
 				)
 			)
 		);
-		$program = $this->compilationContext->analyseAndBuildProgram();
+		$program = $this->programContext->analyseAndBuildProgram();
 		$entryPoint = $program->getEntryPoint(
 			$fn,
 			$this->typeRegistry->string(),

@@ -5,16 +5,16 @@ namespace Walnut\Lang\Test;
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
-use Walnut\Lang\Blueprint\Compilation\CompilationContext as CompilationContextInterface;
 use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Blueprint\Program\Builder\ScopeBuilder as ScopeBuilderInterface;
 use Walnut\Lang\Blueprint\Program\Builder\TypeRegistryBuilder;
+use Walnut\Lang\Blueprint\Program\ProgramContext as ProgramContextInterface;
 use Walnut\Lang\Blueprint\Program\Program as ProgramInterface;
 use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
-use Walnut\Lang\Implementation\Compilation\CompilationContextFactory;
+use Walnut\Lang\Implementation\Program\ProgramContextFactory;
 use Walnut\Lang\Implementation\Program\Type\UnionTypeNormalizer;
 use Walnut\Lang\Implementation\Type\UnionType;
 
@@ -25,33 +25,34 @@ abstract class BaseProgramTestHelper extends TestCase {
 	protected TypeRegistryBuilder $typeRegistryBuilder;
 	protected CustomMethodRegistryBuilder $customMethodRegistryBuilder;
 	protected ScopeBuilderInterface $globalScopeBuilder;
-	protected ProgramRegistry $programRegistry;
-	protected CompilationContextInterface $compilationContext;
+	protected ProgramContextInterface $programContext;
 
-	private function getCompilationContext(): CompilationContextInterface {
-		return new CompilationContextFactory()->compilationContext;
+	private function getProgramContext(): ProgramContextInterface {
+		return new ProgramContextFactory()->programContext;
 	}
 
 	protected function setUp(): void {
 		parent::setUp();
 
-		$this->compilationContext = $compilationContext = $this->getCompilationContext();
-		$this->globalScopeBuilder = $compilationContext->globalScopeBuilder;
-		$this->typeRegistry = $compilationContext->typeRegistry;
-		$this->typeRegistryBuilder = $compilationContext->typeRegistryBuilder;
-		$this->valueRegistry = $compilationContext->valueRegistry;
-		$this->expressionRegistry = $compilationContext->expressionRegistry;
-		$this->customMethodRegistryBuilder = $compilationContext->customMethodRegistryBuilder;
-		$this->programRegistry = $compilationContext->programRegistry;
+		$this->programContext = $programContext = $this->getProgramContext();
+		$this->globalScopeBuilder = $programContext->globalScopeBuilder;
+		$this->typeRegistry = $programContext->typeRegistry;
+		$this->typeRegistryBuilder = $programContext->typeRegistryBuilder;
+		$this->valueRegistry = $programContext->valueRegistry;
+		$this->expressionRegistry = $programContext->expressionRegistry;
+		$this->customMethodRegistryBuilder = $programContext->customMethodRegistryBuilder;
 
 		$this->addCoreToContext();
-		//$this->program = $compilationContext->analyseAndBuildProgram();
+	}
+
+	protected ProgramRegistry $programRegistry {
+		get => $this->programContext->programRegistry;
 	}
 
 	protected ProgramInterface $program {
-		get => $this->compilationContext->analyseAndBuildProgram();
+		get => $this->programContext->analyseAndBuildProgram();
 	}
-	
+
 	protected function addCoreToContext(): void {
 		foreach(['NotANumber', 'MinusInfinity', 'PlusInfinity', 'DependencyContainer', 'Constructor'] as $atomType) {
 			$this->typeRegistry->addAtom(

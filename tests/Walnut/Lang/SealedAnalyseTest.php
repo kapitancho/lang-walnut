@@ -56,7 +56,7 @@ final class SealedAnalyseTest extends BaseProgramTestHelper {
 				)
 			)
 		);
-		return $this->compilationContext->analyseAndBuildProgram()->getEntryPoint(
+		return $this->programContext->analyseAndBuildProgram()->getEntryPoint(
 			new VariableNameIdentifier('fn'),
 			$p ?? $this->typeRegistry->integer(),
 			$r

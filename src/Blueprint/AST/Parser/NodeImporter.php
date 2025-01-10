@@ -3,7 +3,7 @@
 namespace Walnut\Lang\Blueprint\AST\Parser;
 
 use Walnut\Lang\Blueprint\AST\Node\RootNode;
-use Walnut\Lang\Blueprint\Compilation\ModuleLookupContext;
+use Walnut\Lang\Blueprint\Compilation\Module\ModuleLookupContext;
 
 interface NodeImporter {
 	public function importFromSource(

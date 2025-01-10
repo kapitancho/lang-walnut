@@ -6,33 +6,34 @@ use Walnut\Lang\Blueprint\AST\Parser\ParserException;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Compilation\AST\AstCompilationException;
 use Walnut\Lang\Blueprint\Compilation\AST\AstProgramCompilationException;
-use Walnut\Lang\Blueprint\Compilation\CompilationContext as CompilationContextInterface;
 use Walnut\Lang\Blueprint\Compilation\CompilationResult as CompilationResultInterface;
 use Walnut\Lang\Blueprint\Compilation\Compiler as CompilerInterface;
-use Walnut\Lang\Blueprint\Compilation\ModuleDependencyException;
-use Walnut\Lang\Blueprint\Compilation\ModuleLookupContext;
+use Walnut\Lang\Blueprint\Compilation\Module\ModuleDependencyException;
+use Walnut\Lang\Blueprint\Compilation\Module\ModuleLookupContext;
+use Walnut\Lang\Blueprint\Program\ProgramContext as ProgramContextInterface;
 use Walnut\Lang\Implementation\AST\Parser\NodeImporter;
 use Walnut\Lang\Implementation\AST\Parser\TransitionLogger;
 use Walnut\Lang\Implementation\Compilation\AST\AstCompilerFactory;
 use Walnut\Lang\Implementation\Compilation\AST\AstProgramCompiler;
+use Walnut\Lang\Implementation\Program\ProgramContextFactory;
 
 final readonly class Compiler implements CompilerInterface {
 	private NodeImporter $nodeImporter;
-	private CompilationContextFactory $compilationContextFactory;
+	private ProgramContextFactory $programContextFactory;
 	public TransitionLogger $transitionLogger;
 	public function __construct(
 		private ModuleLookupContext $moduleLookupContext,
 	) {
 		$this->nodeImporter = new NodeImporter($this->transitionLogger = new TransitionLogger());
-		$this->compilationContextFactory = new CompilationContextFactory();
+		$this->programContextFactory = new ProgramContextFactory();
 	}
 
-	private function getAstCompiler(CompilationContextInterface $compilationContext): AstProgramCompiler {
-		return new AstCompilerFactory($compilationContext)->programCompiler;
+	private function getAstCompiler(ProgramContextInterface $programContext): AstProgramCompiler {
+		return new AstCompilerFactory($programContext)->programCompiler;
 	}
 
 	public function safeCompile(string $source): CompilationResultInterface {
-		$compilationContext = $this->compilationContextFactory->compilationContext;
+		$programContext = $this->programContextFactory->programContext;
 		try {
 			/// Part 1 - parser and import as AST
 			$rootNode = $this->nodeImporter->importFromSource(
@@ -43,49 +44,49 @@ final readonly class Compiler implements CompilerInterface {
 			return new CompilationResult(
 				$e,
 				null,
-				$compilationContext
+				$programContext
 			);
 		}
-		$astCompiler = $this->getAstCompiler($compilationContext);
+		$astCompiler = $this->getAstCompiler($programContext);
 		try {
 			$astCompiler->compileProgram($rootNode);
 		} catch (AstProgramCompilationException $e) {
 			return new CompilationResult(
 				$rootNode,
 				$e,
-				$compilationContext
+				$programContext
 			);
 		}
 		try {
-			$program = $compilationContext->analyseAndBuildProgram();
+			$program = $programContext->analyseAndBuildProgram();
 		} catch (AnalyserException|AstCompilationException $e) {
 			return new CompilationResult(
 				$rootNode,
 				$e,
-				$compilationContext
+				$programContext
 			);
 		}
 		return new SuccessfulCompilationResult(
 			$rootNode,
 			$program,
-			$compilationContext
+			$programContext
 		);
 	}
 
 	public function compile(string $source): SuccessfulCompilationResult {
 		$this->getAstCompiler(
-			$compilationContext = $this->compilationContextFactory->compilationContext
+			$programContext = $this->programContextFactory->programContext
 		)->compileProgram(
 				$rootNode = $this->nodeImporter->importFromSource(
 					$source,
 					$this->moduleLookupContext
 				)
 			);
-		$program = $compilationContext->analyseAndBuildProgram();
+		$program = $programContext->analyseAndBuildProgram();
 		return new SuccessfulCompilationResult(
 			$rootNode,
 			$program,
-			$compilationContext
+			$programContext
 		);
 	}
 }

@@ -11,12 +11,10 @@ use Walnut\Lang\Implementation\Code\Expression\ConstantExpression;
 use Walnut\Lang\Implementation\Code\Expression\VariableAssignmentExpression;
 use Walnut\Lang\Implementation\Code\Scope\VariableScope;
 use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
-use Walnut\Lang\Implementation\Compilation\CompilationContextFactory;
-use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
+use Walnut\Lang\Implementation\Program\ProgramContextFactory;
 use Walnut\Lang\Implementation\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
-use Walnut\Lang\Test\EmptyDependencyContainer;
 
 final class VariableAssignmentExpressionTest extends TestCase {
 	private readonly TypeRegistryBuilder $typeRegistry;
@@ -26,7 +24,7 @@ final class VariableAssignmentExpressionTest extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->programRegistry = new CompilationContextFactory()->compilationContext->programRegistry;
+		$this->programRegistry = new ProgramContextFactory()->programContext->programRegistry;
 		$this->typeRegistry = $this->programRegistry->typeRegistry;
 		$this->valueRegistry = $this->programRegistry->valueRegistry;
 		$this->variableAssignmentExpression =

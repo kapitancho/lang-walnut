@@ -4,10 +4,10 @@ namespace Walnut\Lang\Implementation\AST\Parser;
 
 use Walnut\Lang\Blueprint\AST\Node\RootNode;
 use Walnut\Lang\Blueprint\AST\Parser\NodeImporter as NodeImporterInterface;
-use Walnut\Lang\Blueprint\Compilation\ModuleLookupContext;
+use Walnut\Lang\Blueprint\Compilation\Module\ModuleLookupContext;
 use Walnut\Lang\Implementation\AST\Builder\ModuleNodeBuilderFactory;
 use Walnut\Lang\Implementation\AST\Builder\NodeBuilderFactory;
-use Walnut\Lang\Implementation\Compilation\ModuleImporter;
+use Walnut\Lang\Implementation\Compilation\Module\ModuleImporter;
 
 final readonly class NodeImporter implements NodeImporterInterface {
 	public function __construct(

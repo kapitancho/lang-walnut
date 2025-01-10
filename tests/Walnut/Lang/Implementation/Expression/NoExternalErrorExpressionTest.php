@@ -4,10 +4,13 @@ namespace Walnut\Lang\Implementation\Expression;
 
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Implementation\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Implementation\Code\Execution\ExecutionContext;
 use Walnut\Lang\Implementation\Code\Expression\ConstantExpression;
 use Walnut\Lang\Implementation\Code\Expression\NoErrorExpression;
+use Walnut\Lang\Implementation\Code\Expression\NoExternalErrorExpression;
 use Walnut\Lang\Implementation\Code\Scope\VariableScope;
 use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
@@ -15,30 +18,52 @@ use Walnut\Lang\Implementation\Program\ProgramContextFactory;
 use Walnut\Lang\Implementation\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
 
-final class NoErrorExpressionTest extends TestCase {
+final class NoExternalErrorExpressionTest extends TestCase {
 	private readonly TypeRegistryBuilder $typeRegistry;
 	private readonly ValueRegistry $valueRegistry;
 	private readonly ProgramRegistry $programRegistry;
-	private readonly NoErrorExpression $noErrorExpression;
-	private readonly NoErrorExpression $errorExpression;
+	private readonly NoExternalErrorExpression $noErrorExpression;
+	private readonly NoExternalErrorExpression $errorExpression;
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->programRegistry = new ProgramContextFactory()->programContext->programRegistry;
-		$this->typeRegistry = $this->programRegistry->typeRegistry;
-		$this->valueRegistry = $this->programRegistry->valueRegistry;
-		$this->noErrorExpression = new NoErrorExpression(
+		$programContext = new ProgramContextFactory()->programContext;
+		$this->typeRegistry = $programContext->typeRegistry;
+		$this->valueRegistry = $programContext->valueRegistry;
+		$programContext->typeRegistryBuilder->addSealed(
+			new TypeNameIdentifier('ExternalError'),
+			$programContext->typeRegistry->record([
+				'errorType' => $programContext->typeRegistry->string(),
+				'originalError' => $programContext->typeRegistry->null,
+				'errorMessage' => $programContext->typeRegistry->string(),
+			]),
+			$programContext->expressionRegistry->functionBody(
+				$programContext->expressionRegistry->variableName(
+					new VariableNameIdentifier('#')
+				)
+			),
+			null
+		);
+		$this->noErrorExpression = new NoExternalErrorExpression(
 			new ConstantExpression(
 				$this->valueRegistry->integer(123)
 			),
 		);
-		$this->errorExpression = new NoErrorExpression(
+		$this->errorExpression = new NoExternalErrorExpression(
 			new ConstantExpression(
 				$this->valueRegistry->error(
-					$this->valueRegistry->integer(123)
+					$this->valueRegistry->sealedValue(
+						new TypeNameIdentifier('ExternalError'),
+						$this->valueRegistry->record([
+							'errorType' => $this->valueRegistry->string('Error'),
+							'originalError' => $this->valueRegistry->null,
+							'errorMessage' => $this->valueRegistry->string('Message'),
+						])
+					)
 				)
 			),
 		);
+		$this->programRegistry = $programContext->programRegistry;
 	}
 
 	public function testReturnedExpression(): void {
@@ -69,7 +94,14 @@ final class NoErrorExpressionTest extends TestCase {
 		} catch (FunctionReturn $e) {
 			self::assertEquals(
 				$this->valueRegistry->error(
-					$this->valueRegistry->integer(123)
+					$this->valueRegistry->sealedValue(
+						new TypeNameIdentifier('ExternalError'),
+						$this->valueRegistry->record([
+							'errorType' => $this->valueRegistry->string('Error'),
+							'originalError' => $this->valueRegistry->null,
+							'errorMessage' => $this->valueRegistry->string('Message'),
+						])
+					)
 				),
 				$e->value
 			);

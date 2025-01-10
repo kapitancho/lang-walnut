@@ -1,15 +1,15 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Compilation;
+namespace Walnut\Lang\Implementation\Compilation\Module;
 
 use Walnut\Lang\Blueprint\AST\Builder\ModuleNodeBuilderFactory;
 use Walnut\Lang\Blueprint\AST\Builder\NodeBuilderFactory;
 use Walnut\Lang\Blueprint\AST\Node\Module\ModuleNode;
 use Walnut\Lang\Blueprint\AST\Parser\Parser;
 use Walnut\Lang\Blueprint\AST\Parser\ParserException;
-use Walnut\Lang\Blueprint\Compilation\ModuleDependencyException;
-use Walnut\Lang\Blueprint\Compilation\ModuleImporter as ModuleImporterInterface;
-use Walnut\Lang\Blueprint\Compilation\ModuleLookupContext;
+use Walnut\Lang\Blueprint\Compilation\Module\ModuleDependencyException;
+use Walnut\Lang\Blueprint\Compilation\Module\ModuleImporter as ModuleImporterInterface;
+use Walnut\Lang\Blueprint\Compilation\Module\ModuleLookupContext;
 use Walnut\Lang\Implementation\AST\Node\RootNode;
 use Walnut\Lang\Implementation\AST\Parser\WalexLexerAdapter;
 

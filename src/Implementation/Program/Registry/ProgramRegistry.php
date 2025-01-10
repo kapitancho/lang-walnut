@@ -63,12 +63,4 @@ final class ProgramRegistry implements ProgramRegistryInterface {
 			);
 		}
 	}
-
-	public function __toString(): string {
-		$result = [];
-		foreach($this->globalScope->allTypedValues() as $variableName => $typedValue) {
-			$result[] = sprintf("%s: type: %s, value: %s", $variableName, $typedValue->type, $typedValue->value);
-		}
-		return sprintf("Variables: \n%s", implode(PHP_EOL, $result));
-	}
 }

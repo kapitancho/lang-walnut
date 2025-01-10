@@ -1,9 +1,9 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Compilation;
+namespace Walnut\Lang\Implementation\Compilation\Module;
 
-use Walnut\Lang\Blueprint\Compilation\ModuleDependencyException;
-use Walnut\Lang\Blueprint\Compilation\ModuleLookupContext;
+use Walnut\Lang\Blueprint\Compilation\Module\ModuleDependencyException;
+use Walnut\Lang\Blueprint\Compilation\Module\ModuleLookupContext;
 
 final readonly class MultiFolderBasedModuleLookupContext implements ModuleLookupContext {
 

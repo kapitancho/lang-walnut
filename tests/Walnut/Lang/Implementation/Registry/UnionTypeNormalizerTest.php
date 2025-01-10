@@ -37,6 +37,12 @@ final class UnionTypeNormalizerTest extends BaseProgramTestHelper {
             $this->valueRegistry->integer(5)->type,
             )
         );
+        $this->assertEquals(
+            'Real[3.14, 5]', (string)$this->union(
+            $this->valueRegistry->real(3.14)->type,
+            $this->valueRegistry->real(5)->type,
+            )
+        );
     }
 
     public function testEmptyUnion(): void {

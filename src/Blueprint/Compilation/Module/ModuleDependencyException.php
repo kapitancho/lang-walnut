@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Blueprint\Compilation;
+namespace Walnut\Lang\Blueprint\Compilation\Module;
 
 use RuntimeException;
 

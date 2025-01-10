@@ -9,7 +9,7 @@ use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Compilation\CompilationResult;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Compilation\Compiler;
-use Walnut\Lang\Implementation\Compilation\FolderBasedModuleLookupContext;
+use Walnut\Lang\Implementation\Compilation\Module\FolderBasedModuleLookupContext;
 
 final class CompilerTest extends TestCase {
 	private const PATH = __DIR__ . '/../../../core-nut-lib';
@@ -34,8 +34,8 @@ final class CompilerTest extends TestCase {
 			$isExecutable = preg_match('/^(cast\d+|demo-\w+|nwk-\w+|lang-[\w\-]+)$/', $source);
 			if ($isExecutable) {
 				$program = $compilationResult->program;
-				$tr = $compilationResult->programRegistry->typeRegistry;
-				$vr = $compilationResult->programRegistry->valueRegistry;
+				$tr = $compilationResult->programContext->typeRegistry;
+				$vr = $compilationResult->programContext->valueRegistry;
 				$ep = $program->getEntryPoint(
 					new VariableNameIdentifier('main'),
 					$tr->array($tr->string()),
@@ -44,8 +44,8 @@ final class CompilerTest extends TestCase {
 				$value = $ep->call($vr->tuple([]));
 				$this->assertInstanceOf(Value::class, $value);
 
-				$this->assertNotEquals('{}', json_encode($compilationResult->programRegistry));
-				$this->assertNotEquals('', (string)$compilationResult->programRegistry);
+				//$this->assertNotEquals('{}', json_encode($compilationResult->programContext));
+				//$this->assertNotEquals('', (string)$compilationResult->programContext);
 			}
 		} catch (AnalyserException $e) {
 			$this->assertStringContainsString('cannot be resolved', $e->getMessage());

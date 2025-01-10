@@ -10,9 +10,9 @@ use Walnut\Lang\Implementation\Code\Execution\ExecutionContext;
 use Walnut\Lang\Implementation\Code\Expression\VariableNameExpression;
 use Walnut\Lang\Implementation\Code\Scope\VariableScope;
 use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
-use Walnut\Lang\Implementation\Compilation\CompilationContextFactory;
 use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
+use Walnut\Lang\Implementation\Program\ProgramContextFactory;
 use Walnut\Lang\Implementation\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
 use Walnut\Lang\Test\EmptyDependencyContainer;
@@ -30,7 +30,7 @@ final class VariableNameExpressionTest extends TestCase {
 		$this->variableNameExpression = new VariableNameExpression(
 			new VariableNameIdentifier('x')
 		);
-		$this->programRegistry = new CompilationContextFactory()->compilationContext->programRegistry;
+		$this->programRegistry = new ProgramContextFactory()->programContext->programRegistry;
 	}
 
 	public function testVariableName(): void {

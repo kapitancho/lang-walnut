@@ -14,8 +14,8 @@ final readonly class CliEntryPoint implements CliEntryPointInterface {
 	public function call(string $source, string ... $parameters): string {
 		$compilationResult = $this->compiler->compile($source);
 		$program = $compilationResult->program;
-		$tr = $compilationResult->compilationContext->typeRegistry;
-		$vr = $compilationResult->compilationContext->valueRegistry;
+		$tr = $compilationResult->programContext->typeRegistry;
+		$vr = $compilationResult->programContext->valueRegistry;
 		$ep = $program->getEntryPoint(
 			new VariableNameIdentifier('main'),
 			$tr->array($tr->string()),

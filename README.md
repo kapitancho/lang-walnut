@@ -17,7 +17,7 @@ You can use the `CliEntryPoint` for interactions between the language and the ho
 Sample usage:
 ```php
 use Walnut\Lang\Implementation\Compilation\Compiler;
-use Walnut\Lang\Implementation\Compilation\MultiFolderBasedModuleLookupContext;
+use Walnut\Lang\Implementation\Compilation\Module\MultiFolderBasedModuleLookupContext;
 use Walnut\Lang\Implementation\Program\EntryPoint\CliEntryPoint;
 $rootDir = __DIR__; //or something different
 $c = new CliEntryPoint(

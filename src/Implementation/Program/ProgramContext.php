@@ -1,12 +1,12 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Compilation;
+namespace Walnut\Lang\Implementation\Program;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
-use Walnut\Lang\Blueprint\Compilation\CompilationContext as CompilationContextInterface;
 use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder as CustomMethodRegistryBuilderInterface;
 use Walnut\Lang\Blueprint\Program\Builder\ScopeBuilder as ScopeBuilderInterface;
 use Walnut\Lang\Blueprint\Program\Builder\TypeRegistryBuilder as TypeRegistryBuilderInterface;
+use Walnut\Lang\Blueprint\Program\ProgramContext as ProgramContextInterface;
 use Walnut\Lang\Blueprint\Program\Registry\CustomMethodRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry as ExpressionRegistryInterface;
 use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
@@ -14,10 +14,9 @@ use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry as ProgramRegistryInt
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry as ValueRegistryInterface;
 use Walnut\Lang\Implementation\Function\CustomMethodAnalyser;
-use Walnut\Lang\Implementation\Program\Program;
 use Walnut\Lang\Implementation\Program\Registry\ProgramRegistry;
 
-final readonly class CompilationContext implements CompilationContextInterface {
+final readonly class ProgramContext implements ProgramContextInterface {
 	public ProgramRegistryInterface $programRegistry;
 
 	public function __construct(

@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Compilation;
+namespace Walnut\Lang\Implementation\Compilation\Module;
 
 final readonly class TemplatePrecompiler {
 	public function precompileSourceCode(string $moduleName, string $sourceCode): string {

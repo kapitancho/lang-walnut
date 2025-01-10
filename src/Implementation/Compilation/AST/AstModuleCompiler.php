@@ -25,10 +25,10 @@ use Walnut\Lang\Blueprint\Compilation\AST\AstModuleCompilationException;
 use Walnut\Lang\Blueprint\Compilation\AST\AstModuleCompiler as AstModuleCompilerInterface;
 use Walnut\Lang\Blueprint\Compilation\AST\AstTypeCompiler;
 use Walnut\Lang\Blueprint\Compilation\AST\AstValueCompiler;
-use Walnut\Lang\Blueprint\Compilation\CompilationContext;
 use Walnut\Lang\Blueprint\Compilation\CompilationException;
 use Walnut\Lang\Blueprint\Function\CustomMethod;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
+use Walnut\Lang\Blueprint\Program\ProgramContext;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\SubtypeType;
@@ -38,10 +38,10 @@ use Walnut\Lang\Blueprint\Value\Value;
 
 final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 	public function __construct(
-		private CompilationContext          $compilationContext,
-		private AstTypeCompiler             $astTypeCompiler,
-		private AstValueCompiler            $astValueCompiler,
-		private AstFunctionBodyCompiler     $astFunctionBodyCompiler,
+		private ProgramContext          $programContext,
+		private AstTypeCompiler         $astTypeCompiler,
+		private AstValueCompiler        $astValueCompiler,
+		private AstFunctionBodyCompiler $astFunctionBodyCompiler,
 	) {}
 
 	/** @throws AstModuleCompilationException */
@@ -68,7 +68,7 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 		Type $errorType,
 		FunctionBody $functionBody
 	): CustomMethod {
-		$type = $this->compilationContext->typeRegistry->typeByName($typeName);
+		$type = $this->programContext->typeRegistry->typeByName($typeName);
 		$returnType = match(true) {
 			$type instanceof SealedType => $type->valueType,
 			$type instanceof SubtypeType => $type->baseType,
@@ -76,12 +76,12 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 				"Constructors are only allowed for subtypes and sealed types",
 			)
 		};
-		return $this->compilationContext->customMethodRegistryBuilder->addMethod(
-			$this->compilationContext->typeRegistry->typeByName(new TypeNameIdentifier('Constructor')),
+		return $this->programContext->customMethodRegistryBuilder->addMethod(
+			$this->programContext->typeRegistry->typeByName(new TypeNameIdentifier('Constructor')),
 			new MethodNameIdentifier($typeName),
 			$parameterType,
 			$dependencyType,
-			$errorType instanceof NothingType ? $returnType : $this->compilationContext->typeRegistry->result(
+			$errorType instanceof NothingType ? $returnType : $this->programContext->typeRegistry->result(
 				$returnType, $errorType
 			),
 			$functionBody
@@ -93,12 +93,12 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 	private function compileModuleDefinition(ModuleDefinitionNode $moduleDefinition): void {
 		match(true) {
 			$moduleDefinition instanceof AddAliasTypeNode =>
-				$this->compilationContext->typeRegistryBuilder->addAlias(
+				$this->programContext->typeRegistryBuilder->addAlias(
 					$moduleDefinition->name,
 					$this->type($moduleDefinition->aliasedType)
 				),
 			$moduleDefinition instanceof AddAtomTypeNode =>
-				$this->compilationContext->typeRegistryBuilder->addAtom($moduleDefinition->name),
+				$this->programContext->typeRegistryBuilder->addAtom($moduleDefinition->name),
 			$moduleDefinition instanceof AddConstructorMethodNode =>
 				$this->addConstructorMethod(
 					$moduleDefinition->typeName,
@@ -108,12 +108,12 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 					$this->functionBody($moduleDefinition->functionBody)
 				),
 			$moduleDefinition instanceof AddEnumerationTypeNode =>
-				$this->compilationContext->typeRegistryBuilder->addEnumeration(
+				$this->programContext->typeRegistryBuilder->addEnumeration(
 					$moduleDefinition->name,
 					$moduleDefinition->values
 				),
 			$moduleDefinition instanceof AddMethodNode =>
-				$this->compilationContext->customMethodRegistryBuilder->addMethod(
+				$this->programContext->customMethodRegistryBuilder->addMethod(
 					$this->type($moduleDefinition->targetType),
 					$moduleDefinition->methodName,
 					$this->type($moduleDefinition->parameterType),
@@ -122,7 +122,7 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 					$this->functionBody($moduleDefinition->functionBody)
 				),
 			$moduleDefinition instanceof AddSealedTypeNode =>
-				$this->compilationContext->typeRegistryBuilder->addSealed(
+				$this->programContext->typeRegistryBuilder->addSealed(
 					$moduleDefinition->name,
 					$this->type($moduleDefinition->valueType),
 					$this->functionBody(
@@ -131,7 +131,7 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 					$this->type($moduleDefinition->errorType)
 				),
 			$moduleDefinition instanceof AddSubtypeTypeNode =>
-				$this->compilationContext->typeRegistryBuilder->addSubtype(
+				$this->programContext->typeRegistryBuilder->addSubtype(
 					$moduleDefinition->name,
 					$this->type($moduleDefinition->baseType),
 					$this->functionBody(
@@ -140,7 +140,7 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 					$this->type($moduleDefinition->errorType)
 				),
 			$moduleDefinition instanceof AddVariableNode =>
-				$this->compilationContext->globalScopeBuilder->addVariable($moduleDefinition->name,
+				$this->programContext->globalScopeBuilder->addVariable($moduleDefinition->name,
 					$moduleDefinition->value instanceof FunctionValueNode ?
 						$this->globalFunction(
 							new MethodNameIdentifier($moduleDefinition->name->identifier),
@@ -172,8 +172,8 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 	}
 
 	private function globalFunction(MethodNameIdentifier $methodName, FunctionValueNode $functionValueNode): FunctionValue {
-		$this->compilationContext->customMethodRegistryBuilder->addMethod(
-			$this->compilationContext->typeRegistry->typeByName(
+		$this->programContext->customMethodRegistryBuilder->addMethod(
+			$this->programContext->typeRegistry->typeByName(
 				new TypeNameIdentifier('Global')
 			),
 			$methodName,
@@ -182,17 +182,17 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 			$returnType = $this->type($functionValueNode->returnType),
 			$this->functionBody($functionValueNode->functionBody)
 		);
-		return $this->compilationContext->valueRegistry->function(
+		return $this->programContext->valueRegistry->function(
 			$parameterType,
-			$this->compilationContext->typeRegistry->typeByName(
+			$this->programContext->typeRegistry->typeByName(
 				new TypeNameIdentifier('Global')
 			),
 			$returnType,
-			$this->compilationContext->expressionRegistry->functionBody(
-				$this->compilationContext->expressionRegistry->methodCall(
-					$this->compilationContext->expressionRegistry->variableName(new VariableNameIdentifier('%')),
+			$this->programContext->expressionRegistry->functionBody(
+				$this->programContext->expressionRegistry->methodCall(
+					$this->programContext->expressionRegistry->variableName(new VariableNameIdentifier('%')),
 					$methodName,
-					$this->compilationContext->expressionRegistry->variableName(new VariableNameIdentifier('#')),
+					$this->programContext->expressionRegistry->variableName(new VariableNameIdentifier('#')),
 				)
 			)
 		);

@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Registry;
 
+use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Test\Implementation\BaseProgramTestHelper;
@@ -34,6 +35,51 @@ final class IntersectionTypeNormalizerTest extends BaseProgramTestHelper {
                 ]),
             )
         );
+        $this->assertEquals(
+            'Real[3.14]', (string)$this->intersection(
+                $this->typeRegistry->union([
+                    $this->valueRegistry->real(3.14)->type,
+                    $this->valueRegistry->real(5)->type
+                ]),
+                $this->typeRegistry->union([
+                    $this->valueRegistry->real(3.14)->type,
+                    $this->valueRegistry->real(7)->type
+                ]),
+            )
+        );
+        $this->assertEquals(
+            "String[a]", (string)$this->intersection(
+                $this->typeRegistry->union([
+                    $this->valueRegistry->string('a')->type,
+                    $this->valueRegistry->string('b')->type
+                ]),
+                $this->typeRegistry->union([
+                    $this->valueRegistry->string('a')->type,
+                    $this->valueRegistry->string('c')->type
+                ]),
+            )
+        );
+    }
+
+    public function testEnumSubsetTypes(): void {
+		$this->typeRegistryBuilder->addEnumeration($e = new TypeNameIdentifier('E'), [
+			$a = new EnumValueIdentifier('A'),
+			$b = new EnumValueIdentifier('B'),
+			$c = new EnumValueIdentifier('C'),
+			$d = new EnumValueIdentifier('D'),
+		]);
+	    $this->assertEquals(
+         "E[A]", (string)$this->intersection(
+             $this->typeRegistry->union([
+                 $this->valueRegistry->enumerationValue($e, $a)->type,
+	             $this->valueRegistry->enumerationValue($e, $b)->type
+             ]),
+             $this->typeRegistry->union([
+	             $this->valueRegistry->enumerationValue($e, $a)->type,
+				 $this->valueRegistry->enumerationValue($e, $c)->type
+             ]),
+         )
+     );
     }
 
     public function testEmptyIntersection(): void {

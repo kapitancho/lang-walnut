@@ -7,7 +7,6 @@ use LogicException;
 final class IdentifierException extends LogicException {
 
 	private const string InvalidVariableNameIdentifier = "Invalid variable name identifier: %s";
-	private const string InvalidPropertyNameIdentifier = "Invalid property name identifier: %s";
 	private const string InvalidMethodNameIdentifier = "Invalid method name identifier: %s";
 	private const string InvalidTypeNameIdentifier = "Invalid type name identifier: %s";
 	private const string InvalidEnumValueIdentifier = "Invalid enum value identifier: %s";
@@ -22,10 +21,6 @@ final class IdentifierException extends LogicException {
 
 	public static function invalidEnumValueIdentifier(string $identifier): never {
 		throw new self(sprintf(self::InvalidEnumValueIdentifier, $identifier));
-	}
-
-	public static function invalidPropertyNameIdentifier(string $identifier): never {
-		throw new self(sprintf(self::InvalidPropertyNameIdentifier, $identifier));
 	}
 
 	public static function invalidMethodNameIdentifier(string $identifier): never {

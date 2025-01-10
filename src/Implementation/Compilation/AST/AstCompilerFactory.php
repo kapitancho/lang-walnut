@@ -5,33 +5,33 @@ namespace Walnut\Lang\Implementation\Compilation\AST;
 use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode;
 use Walnut\Lang\Blueprint\Compilation\AST\AstCompilerFactory as AstCompilerFactoryInterface;
 use Walnut\Lang\Blueprint\Compilation\AST\AstFunctionBodyCompiler as AstFunctionBodyCompilerInterface;
-use Walnut\Lang\Blueprint\Compilation\CompilationContext;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
+use Walnut\Lang\Blueprint\Program\ProgramContext;
 
 final readonly class AstCompilerFactory implements AstCompilerFactoryInterface, AstFunctionBodyCompilerInterface {
 	public AstProgramCompiler $programCompiler;
 	private AstFunctionBodyCompiler $functionBodyCompiler;
 
 	public function __construct(
-		CompilationContext $compilationContext
+		ProgramContext $programContext
 	) {
-		$astTypeCompiler = new AstTypeCompiler($compilationContext->typeRegistry);
+		$astTypeCompiler = new AstTypeCompiler($programContext->typeRegistry);
 		$astValueCompiler = new AstValueCompiler(
-			$compilationContext->valueRegistry,
+			$programContext->valueRegistry,
 			$this,
 			$astTypeCompiler
 		);
 		$astExpressionCompiler = new AstExpressionCompiler(
 			$astTypeCompiler,
 			$astValueCompiler,
-			$compilationContext->expressionRegistry,
+			$programContext->expressionRegistry,
 		);
 		$this->functionBodyCompiler = new AstFunctionBodyCompiler(
 			$astExpressionCompiler,
-			$compilationContext->expressionRegistry,
+			$programContext->expressionRegistry,
 		);
 		$astModuleCompiler = new AstModuleCompiler(
-			$compilationContext,
+			$programContext,
 			$astTypeCompiler,
 			$astValueCompiler,
 			$this->functionBodyCompiler,
