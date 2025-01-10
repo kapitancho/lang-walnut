@@ -36,15 +36,17 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 			$this->expressionRegistry->variableName(new VariableNameIdentifier('a')),
 			$this->expressionRegistry->variableName(new VariableNameIdentifier('b')),
 		);
-		$this->programBuilder->addSealed(
+		$this->typeRegistryBuilder->addSealed(
 			new TypeNameIdentifier("MyCustomType"),
 			$this->typeRegistry->record(['x' => $this->typeRegistry->integer()]),
-			$this->expressionRegistry->constant(
-				$this->valueRegistry->null
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->constant(
+					$this->valueRegistry->null
+				),
 			),
-			null
+			$this->typeRegistry->nothing
 		);
-		$this->programBuilder->addMethodDraft(
+		$this->customMethodRegistryBuilder->addMethod(
 			$this->typeRegistry->withName(new TypeNameIdentifier('MyCustomType')),
 			new MethodNameIdentifier('invoke'),
 			$this->typeRegistry->integer(),
@@ -62,6 +64,12 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 				$this->typeRegistry->integer(),
 				$this->typeRegistry->string(),
 			),
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->constant(
+					$this->valueRegistry->null
+				),
+			),
+			$this->typeRegistry->nothing
 		);
 		$this->functionValue = $this->valueRegistry->function(
 			$this->typeRegistry->integer(),
@@ -76,7 +84,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 	}
 	
 	public function testAnalyseDefault(): void {
-		$result = $this->functionCallExpression->analyse(new AnalyserContext(new VariableScope([
+		$result = $this->functionCallExpression->analyse(new AnalyserContext($this->programRegistry, new VariableScope([
 			'a' => $this->typeRegistry->function(
 				$this->typeRegistry->integer(),
 				$this->typeRegistry->string(),
@@ -90,7 +98,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 	}
 
 	public function testAnalyseOnSubtypes(): void {
-		$result = $this->functionCallExpression->analyse(new AnalyserContext(new VariableScope([
+		$result = $this->functionCallExpression->analyse(new AnalyserContext($this->programRegistry, new VariableScope([
 			'a' => $this->typeRegistry->withName(new TypeNameIdentifier('MyFunction')),
 			'b' => $this->typeRegistry->integer()
 		])));
@@ -101,7 +109,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 	}
 
 	public function testAnalyseOnCustomType(): void {
-		$result = $this->functionCallExpression->analyse(new AnalyserContext(new VariableScope([
+		$result = $this->functionCallExpression->analyse(new AnalyserContext($this->programRegistry, new VariableScope([
 			'a' => $this->typeRegistry->withName(new TypeNameIdentifier('MyCustomType')),
 			'b' => $this->typeRegistry->integer()
 		])));
@@ -110,7 +118,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 
 	public function testAnalyseFailWrongParameter(): void {
 		$this->expectException(AnalyserException::class);
-		$this->functionCallExpression->analyse(new AnalyserContext(new VariableScope([
+		$this->functionCallExpression->analyse(new AnalyserContext($this->programRegistry, new VariableScope([
 			'a' => $this->typeRegistry->function(
 				$this->typeRegistry->integer(),
 				$this->typeRegistry->string(),
@@ -121,13 +129,13 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 
 	public function testAnalyseFailWrongType(): void {
 		$this->expectException(AnalyserException::class);
-		$this->functionCallExpression->analyse(new AnalyserContext(new VariableScope([
+		$this->functionCallExpression->analyse(new AnalyserContext($this->programRegistry, new VariableScope([
 			'a' => $this->typeRegistry->integer(),
 			'b' => $this->typeRegistry->integer()
 		])));
 	}
 	public function testExecuteDefault(): void {
-		$result = $this->functionCallExpression->execute(new ExecutionContext(new VariableValueScope([
+		$result = $this->functionCallExpression->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([
 			'a' => TypedValue::forValue($this->functionValue),
 			'b' => TypedValue::forValue(
 				$this->valueRegistry->integer(1)
@@ -137,7 +145,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 	}
 
 	public function testExecuteOnSubtypes(): void {
-		$result = $this->functionCallExpression->execute(new ExecutionContext(new VariableValueScope([
+		$result = $this->functionCallExpression->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([
 			'a' => TypedValue::forValue(
 				$this->valueRegistry->subtypeValue(
 					new TypeNameIdentifier('MyFunction'),
@@ -152,7 +160,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 	}
 
 	public function testExecuteOnCustomType(): void {
-		$result = $this->functionCallExpression->execute(new ExecutionContext(new VariableValueScope([
+		$result = $this->functionCallExpression->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([
 			'a' => TypedValue::forValue(
 				$this->valueRegistry->sealedValue(
 					new TypeNameIdentifier('MyCustomType'),
@@ -168,7 +176,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 
 	public function testExecuteFailWrongType(): void {
 		$this->expectException(ExecutionException::class);
-		$this->functionCallExpression->execute(new ExecutionContext(new VariableValueScope([
+		$this->functionCallExpression->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([
 			'a' => TypedValue::forValue(
 				$this->valueRegistry->integer(1)
 			),

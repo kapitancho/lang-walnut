@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\NativeCode\JsonValue;
 
+use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MethodCallExpression;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
@@ -59,9 +60,9 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			new MethodNameIdentifier('hydrateAs'),
 			$this->expressionRegistry->constant($this->valueRegistry->type($type))
 		);
-		$call->analyse(new AnalyserContext(new VariableScope([])));
+		$call->analyse(new AnalyserContext($this->programRegistry, new VariableScope([])));
 		$this->assertEquals($expected, (string)
-			$call->execute(new ExecutionContext(new VariableValueScope([])))->value
+			$call->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])))->value
 		);
 	}
 
@@ -81,7 +82,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			new TypeNameIdentifier('MyAtom'),
 		);
 
-		$this->programBuilder->addMethodDraft(
+		$this->customMethodRegistryBuilder->addMethod(
 			$this->typeRegistry->withName(new TypeNameIdentifier('MyAtom')),
 			new MethodNameIdentifier('asJsonValue'),
 			$this->typeRegistry->null,
@@ -111,11 +112,19 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		$this->typeRegistry->addSealed(
 			new TypeNameIdentifier('MyState'),
 			$this->typeRegistry->record(['x' => $this->typeRegistry->integer()]),
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
+			),
+			null
 		);
 
 		$this->typeRegistry->addSubtype(
 			new TypeNameIdentifier('MySubtype'),
 			$this->typeRegistry->integer(),
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
+			),
+			null
 		);
 
 		$this->typeRegistry->addEnumeration(
@@ -126,18 +135,17 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			]
 		);
 
-		$this->programBuilder->addMethodDraft(
+		$this->customMethodRegistryBuilder->addMethod(
 			$this->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
 			new MethodNameIdentifier('asMyCustomEnum'),
 			$this->typeRegistry->null,
 			$this->typeRegistry->nothing,
 			$this->typeRegistry->enumeration(new TypeNameIdentifier('MyCustomEnum')),
 			$this->expressionRegistry->functionBody(
-				$this->expressionRegistry->match(
+				$this->expressionRegistry->matchValue(
 					$this->expressionRegistry->variableName(
 						new VariableNameIdentifier('$')
 					),
-					new MatchExpressionEquals(),
 					[
 						$this->expressionRegistry->matchPair(
 							$this->expressionRegistry->constant(
@@ -166,20 +174,23 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		$this->typeRegistry->addSealed(
 			new TypeNameIdentifier('MyCustomState'),
 			$this->typeRegistry->record(['x' => $this->typeRegistry->string()]),
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
+			),
+			null
 		);
 
-		$this->programBuilder->addMethodDraft(
+		$this->customMethodRegistryBuilder->addMethod(
 			$this->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
 			new MethodNameIdentifier('asMyCustomState'),
 			$this->typeRegistry->null,
 			$this->typeRegistry->nothing,
 			$this->typeRegistry->sealed(new TypeNameIdentifier('MyCustomState')),
 			$this->expressionRegistry->functionBody(
-				$this->expressionRegistry->match(
+				$this->expressionRegistry->matchValue(
 					$this->expressionRegistry->variableName(
 						new VariableNameIdentifier('$')
 					),
-					new MatchExpressionEquals(),
 					[
 						$this->expressionRegistry->matchPair(
 							$this->expressionRegistry->constant(
@@ -208,20 +219,23 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		$this->typeRegistry->addSubtype(
 			new TypeNameIdentifier('MyCustomSubtype'),
 			$this->typeRegistry->string(),
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
+			),
+			null
 		);
 
-		$this->programBuilder->addMethodDraft(
+		$this->customMethodRegistryBuilder->addMethod(
 			$this->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
 			new MethodNameIdentifier('asMyCustomSubtype'),
 			$this->typeRegistry->null,
 			$this->typeRegistry->nothing,
 			$this->typeRegistry->subtype(new TypeNameIdentifier('MyCustomSubtype')),
 			$this->expressionRegistry->functionBody(
-				$this->expressionRegistry->match(
+				$this->expressionRegistry->matchValue(
 					$this->expressionRegistry->variableName(
 						new VariableNameIdentifier('$')
 					),
-					new MatchExpressionEquals(),
 					[
 						$this->expressionRegistry->matchPair(
 							$this->expressionRegistry->constant(
@@ -251,9 +265,9 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			new TypeNameIdentifier('MyConstructorSubtype'),
 			$this->typeRegistry->integer(),
 			$this->expressionRegistry->functionBody(
-				$this->expressionRegistry->match(
+				$this->expressionRegistry->matchValue(
 					$this->expressionRegistry->constant($this->valueRegistry->integer(1)),
-					new MatchExpressionEquals, [
+					 [
 						$this->expressionRegistry->matchPair(
 							$this->expressionRegistry->methodCall(
 								$this->expressionRegistry->variableName(
@@ -318,25 +332,25 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		$this->callHydrateAs(
 			$this->valueRegistry->integer(123),
 			$this->typeRegistry->integerSubset([
-				$this->valueRegistry->integer(1),
-				$this->valueRegistry->integer(5),
-				$this->valueRegistry->integer(123),
+				new Number(1),
+				new Number(5),
+				new Number(123),
 			]),
 			$this->valueRegistry->integer(123)
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->integer(123),
 			$this->typeRegistry->integerSubset([
-				$this->valueRegistry->integer(1),
-				$this->valueRegistry->integer(5),
+				new Number(1),
+				new Number(5),
 			]),
 			"@HydrationError[\n	value: 123,\n	hydrationPath: 'value',\n	errorMessage: 'The integer value should be among 1, 5'\n]"
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->true,
 			$this->typeRegistry->integerSubset([
-				$this->valueRegistry->integer(1),
-				$this->valueRegistry->integer(5),
+				new Number(1),
+				new Number(5),
 			]),
 			"@HydrationError[\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be an integer among 1, 5'\n]"
 		);
@@ -365,34 +379,34 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		$this->callHydrateAs(
 			$this->valueRegistry->real(12.3),
 			$this->typeRegistry->realSubset([
-				$this->valueRegistry->real(1),
-				$this->valueRegistry->real(3.14),
-				$this->valueRegistry->real(12.3),
+				new Number(1),
+				new Number('3.14'),
+				new Number('12.3'),
 			]),
 			$this->valueRegistry->real(12.3)
 		);
 		$this->callHydrateAs(
 			$this->valueRegistry->integer(1),
 			$this->typeRegistry->realSubset([
-				$this->valueRegistry->real(1),
-				$this->valueRegistry->real(3.14),
-				$this->valueRegistry->real(12.3),
+				new Number(1),
+				new Number('3.14'),
+				new Number('12.3'),
 			]),
 			$this->valueRegistry->real(1)
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->real(12.3),
 			$this->typeRegistry->realSubset([
-				$this->valueRegistry->real(1),
-				$this->valueRegistry->real(3.14),
+				new Number(1),
+				new Number('3.14'),
 			]),
 			"@HydrationError[\n	value: 12.3,\n	hydrationPath: 'value',\n	errorMessage: 'The real value should be among 1, 3.14'\n]"
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->true,
 			$this->typeRegistry->realSubset([
-				$this->valueRegistry->real(1),
-				$this->valueRegistry->real(3.14),
+				new Number(1),
+				new Number('3.14'),
 			]),
 			"@HydrationError[\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a real number among 1, 3.14'\n]"
 		);
@@ -416,27 +430,27 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		$this->callHydrateAs(
 			$this->valueRegistry->string('hi!'),
 			$this->typeRegistry->stringSubset([
-				$this->valueRegistry->string('hello'),
-				$this->valueRegistry->string('world'),
-				$this->valueRegistry->string('hi!'),
+				'hello',
+				'world',
+				'hi!',
 			]),
 			$this->valueRegistry->string('hi!')
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->string('hi!'),
 			$this->typeRegistry->stringSubset([
-				$this->valueRegistry->string('hello'),
-				$this->valueRegistry->string('world'),
+				'hello',
+				'world',
 			]),
-			"@HydrationError[\n	value: 'hi!',\n	hydrationPath: 'value',\n	errorMessage: 'The string value should be among \\`hello\\`, \\`world\\`'\n]"
+			"@HydrationError[\n	value: 'hi!',\n	hydrationPath: 'value',\n	errorMessage: 'The string value should be among hello, world'\n]"
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->true,
 			$this->typeRegistry->stringSubset([
-				$this->valueRegistry->string('hello'),
-				$this->valueRegistry->string('world'),
+				'hello',
+				'world',
 			]),
-			"@HydrationError[\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a string among \\`hello\\`, \\`world\\`'\n]"
+			"@HydrationError[\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a string among hello, world'\n]"
 		);
 
 		//Boolean
@@ -930,7 +944,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 					]),
 				])
 			))
-		)->execute(new ExecutionContext(new VariableValueScope([])));
+		)->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])));
 		$this->assertEquals(
 			"[\n\ta: true,\n\tb: 123,\n\tc: [MyState[x: 15], MyState[x: 20]],\n\td: [x: MyCustomEnum.B, y: MyAtom[]]\n]",
 			(string)$result->value
@@ -946,7 +960,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			),
 			new MethodNameIdentifier('stringify'),
 			$this->expressionRegistry->constant($this->valueRegistry->null)
-		)->execute(new ExecutionContext(new VariableValueScope([])));
+		)->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])));
 
 		$this->assertEquals(
 			"'" . $value . "'",
@@ -957,7 +971,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			$this->expressionRegistry->constant($this->valueRegistry->string('invalid json')),
 			new MethodNameIdentifier('jsonDecode'),
 			$this->expressionRegistry->constant($this->valueRegistry->null)
-		)->execute(new ExecutionContext(new VariableValueScope([])));
+		)->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])));
 
 		$this->assertEquals(
 			"@InvalidJsonString[value: 'invalid json']",

@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\NativeCode\Type;
 
+use BcMath\Number;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
@@ -28,15 +29,15 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 		$a = $this->typeRegistry->any;
 
 		$t1 = $this->typeRegistry->integerSubset([
-			$this->valueRegistry->integer(1),
-			$this->valueRegistry->integer(10),
-			$this->valueRegistry->integer(42)
+			new Number(1),
+			new Number(10),
+			new Number(42)
 		]);
 		$t2 = $this->typeRegistry->integerSubset([
-			$this->valueRegistry->integer(1),
-			$this->valueRegistry->integer(10),
-			$this->valueRegistry->integer(42),
-			$this->valueRegistry->integer(100)
+			new Number(1),
+			new Number(10),
+			new Number(42),
+			new Number(100)
 		]);
 		$t3 = $this->typeRegistry->integer(-50, 50);
 		$t4 = $this->typeRegistry->integer(-200, 200);
@@ -46,9 +47,9 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 		$t8 = $this->typeRegistry->integer();
 		$t9 = $this->typeRegistry->real(MinusInfinity::value, 100);
 		$t10 = $this->typeRegistry->realSubset([
-			$this->valueRegistry->real(1),
-			$this->valueRegistry->real(10),
-			$this->valueRegistry->real(42)
+			new Number(1),
+			new Number(10),
+			new Number(42)
 		]);
 
 		$matrix = [
@@ -75,15 +76,15 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 		$a = $this->typeRegistry->any;
 
 		$t1 = $this->typeRegistry->realSubset([
-			$this->valueRegistry->real(1),
-			$this->valueRegistry->real(3.14),
-			$this->valueRegistry->real(42)
+			new Number(1),
+			new Number('3.14'),
+			new Number(42)
 		]);
 		$t2 = $this->typeRegistry->realSubset([
-			$this->valueRegistry->real(1),
-			$this->valueRegistry->real(3.14),
-			$this->valueRegistry->real(42),
-			$this->valueRegistry->real(100)
+			new Number(1),
+			new Number('3.14'),
+			new Number(42),
+			new Number(100)
 		]);
 		$t3 = $this->typeRegistry->real(-50, 50);
 		$t4 = $this->typeRegistry->real(-200, 200);
@@ -116,14 +117,14 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 		$a = $this->typeRegistry->any;
 
 		$t1 = $this->typeRegistry->stringSubset([
-			$this->valueRegistry->string("Hello"),
-			$this->valueRegistry->string("World")
+			"Hello",
+			"World"
 		]);
 		$t2 = $this->typeRegistry->stringSubset([
-			$this->valueRegistry->string("Hi"),
-			$this->valueRegistry->string("Hello"),
-			$this->valueRegistry->string("World"),
-			$this->valueRegistry->string("Hello World!")
+			"Hi",
+			"Hello",
+			"World",
+			"Hello World!"
 		]);
 		$t3 = $this->typeRegistry->string(1, 5);
 		$t4 = $this->typeRegistry->string(3, 5);
@@ -382,8 +383,8 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 		$n = $this->typeRegistry->nothing;
 		$a = $this->typeRegistry->any;
 
-		$this->programBuilder->addAlias(new TypeNameIdentifier('Integer1050'), $this->typeRegistry->integer(10, 50));
-		$this->programBuilder->addAlias(new TypeNameIdentifier('Integer2040'), $this->typeRegistry->integer(20, 40));
+		$this->typeRegistryBuilder->addAlias(new TypeNameIdentifier('Integer1050'), $this->typeRegistry->integer(10, 50));
+		$this->typeRegistryBuilder->addAlias(new TypeNameIdentifier('Integer2040'), $this->typeRegistry->integer(20, 40));
 
 		$t1 = $this->typeRegistry->alias(new TypeNameIdentifier('Integer1050'));
 		$t2 = $this->typeRegistry->alias(new TypeNameIdentifier('Integer2040'));
@@ -409,10 +410,10 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 		$n = $this->typeRegistry->nothing;
 		$a = $this->typeRegistry->any;
 
-		$fnBody = $this->expressionRegistry->constant($this->valueRegistry->null);
+		$fnBody = $this->expressionRegistry->functionBody($this->expressionRegistry->constant($this->valueRegistry->null));
 
-		$this->programBuilder->addSubtype(new TypeNameIdentifier('Integer1050'), $this->typeRegistry->integer(10, 50), $fnBody, null);
-		$this->programBuilder->addSubtype(new TypeNameIdentifier('Integer2040'), $this->typeRegistry->integer(20, 40), $fnBody, null);
+		$this->typeRegistryBuilder->addSubtype(new TypeNameIdentifier('Integer1050'), $this->typeRegistry->integer(10, 50), $fnBody, null);
+		$this->typeRegistryBuilder->addSubtype(new TypeNameIdentifier('Integer2040'), $this->typeRegistry->integer(20, 40), $fnBody, null);
 
 		$t1 = $this->typeRegistry->subtype(new TypeNameIdentifier('Integer1050'));
 		$t2 = $this->typeRegistry->subtype(new TypeNameIdentifier('Integer2040'));
@@ -543,8 +544,8 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 		$n = $this->typeRegistry->nothing;
 		$a = $this->typeRegistry->any;
 
-		$this->programBuilder->addAtom(new TypeNameIdentifier('Atom1'));
-		$this->programBuilder->addAtom(new TypeNameIdentifier('Atom2'));
+		$this->typeRegistryBuilder->addAtom(new TypeNameIdentifier('Atom1'));
+		$this->typeRegistryBuilder->addAtom(new TypeNameIdentifier('Atom2'));
 
 		$t1 = $this->typeRegistry->atom(new TypeNameIdentifier('Atom1'));
 		$t2 = $this->typeRegistry->atom(new TypeNameIdentifier('Atom2'));
@@ -566,12 +567,12 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 		$n = $this->typeRegistry->nothing;
 		$a = $this->typeRegistry->any;
 
-		$this->programBuilder->addEnumeration(new TypeNameIdentifier('Enumeration1'), [
+		$this->typeRegistryBuilder->addEnumeration(new TypeNameIdentifier('Enumeration1'), [
 			new EnumValueIdentifier('A'),
 			new EnumValueIdentifier('B'),
 			new EnumValueIdentifier('C')
 		]);
-		$this->programBuilder->addEnumeration(new TypeNameIdentifier('Enumeration2'), [
+		$this->typeRegistryBuilder->addEnumeration(new TypeNameIdentifier('Enumeration2'), [
 			new EnumValueIdentifier('A'),
 			new EnumValueIdentifier('B'),
 			new EnumValueIdentifier('C')

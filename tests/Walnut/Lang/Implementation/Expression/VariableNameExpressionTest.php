@@ -10,7 +10,10 @@ use Walnut\Lang\Implementation\Code\Execution\ExecutionContext;
 use Walnut\Lang\Implementation\Code\Expression\VariableNameExpression;
 use Walnut\Lang\Implementation\Code\Scope\VariableScope;
 use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
+use Walnut\Lang\Implementation\Compilation\CompilationContextFactory;
+use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
+use Walnut\Lang\Implementation\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
 use Walnut\Lang\Test\EmptyDependencyContainer;
 
@@ -18,15 +21,16 @@ final class VariableNameExpressionTest extends TestCase {
 	private readonly TypeRegistryBuilder $typeRegistry;
 	private readonly ValueRegistry $valueRegistry;
 	private readonly VariableNameExpression $variableNameExpression;
+	private readonly ProgramRegistry $programRegistry;
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->typeRegistry = new TypeRegistryBuilder();
+		$this->typeRegistry = new TypeRegistryBuilder(new CustomMethodRegistryBuilder());
 		$this->valueRegistry = new ValueRegistry($this->typeRegistry, new EmptyDependencyContainer);
 		$this->variableNameExpression = new VariableNameExpression(
-			$this->typeRegistry,
 			new VariableNameIdentifier('x')
 		);
+		$this->programRegistry = new CompilationContextFactory()->compilationContext->programRegistry;
 	}
 
 	public function testVariableName(): void {
@@ -36,7 +40,7 @@ final class VariableNameExpressionTest extends TestCase {
 
 	public function testAnalyse(): void {
 		$result = $this->variableNameExpression->analyse(
-			new AnalyserContext(new VariableScope([
+			new AnalyserContext($this->programRegistry, new VariableScope([
 				'x' => $this->typeRegistry->integer()
 			]))
 		);
@@ -45,7 +49,7 @@ final class VariableNameExpressionTest extends TestCase {
 
 	public function testExecute(): void {
 		$result = $this->variableNameExpression->execute(
-			new ExecutionContext(
+			new ExecutionContext($this->programRegistry,
 				new VariableValueScope([
 					'x' => new TypedValue(
 						$this->typeRegistry->integer(),

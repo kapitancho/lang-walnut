@@ -22,7 +22,7 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 				$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
 			)
 		);
-		$fn->analyse(new AnalyserContext(VariableScope::empty()));
+		$fn->analyse(new AnalyserContext($this->programRegistry, VariableScope::empty()));
 	}
 
 	public function testReturnTypeNotOk(): void {
@@ -35,7 +35,7 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 				$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
 			)
 		);
-		$fn->analyse(new AnalyserContext(VariableScope::empty()));
+		$fn->analyse(new AnalyserContext($this->programRegistry, VariableScope::empty()));
 	}
 
 	public function testReturnValueOk(): void {
@@ -48,7 +48,7 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 			)
 		);
 		$result = $fn->execute(
-			new ExecutionContext(VariableValueScope::empty()),
+			new ExecutionContext($this->programRegistry, VariableValueScope::empty()),
 			$int = $this->valueRegistry->integer(15)
 		);
 		$this->assertTrue($result->equals($int));
@@ -66,7 +66,7 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 			)
 		);
 		$result = $fn->execute(
-			new ExecutionContext(VariableValueScope::empty()),
+			new ExecutionContext($this->programRegistry, VariableValueScope::empty()),
 			$int = $this->valueRegistry->integer(15)
 		);
 		$this->assertTrue($result->equals($int));

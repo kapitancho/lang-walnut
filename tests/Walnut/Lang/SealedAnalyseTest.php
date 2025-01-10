@@ -11,16 +11,23 @@ use Walnut\Lang\Test\BaseProgramTestHelper;
 
 final class SealedAnalyseTest extends BaseProgramTestHelper {
 
+	protected function addCoreToContext(): void {}
+
 	private function getSealedType(): void {
 		$mySealed = new TypeNameIdentifier('MySealed');
-		$this->programBuilder->addSealed(
+		$this->typeRegistryBuilder->addSealed(
 			$mySealed,
 			$this->typeRegistry->record([
 				'x' => $this->typeRegistry->integer(),
 				'y' => $this->typeRegistry->string()
 			]),
-			$this->expressionRegistry->constant(
-				$this->valueRegistry->null
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->sequence([
+					$this->expressionRegistry->constant(
+						$this->valueRegistry->true
+					),
+					$this->expressionRegistry->variableName(new VariableNameIdentifier('#')),
+				])
 			),
 			null
 		);
@@ -32,7 +39,7 @@ final class SealedAnalyseTest extends BaseProgramTestHelper {
 			'y' => $this->typeRegistry->string()
 		]);
 		$fn = new VariableNameIdentifier('fn');
-		$this->programBuilder->addVariable(
+		$this->globalScopeBuilder->addVariable(
 			$fn,
 			$t=$this->valueRegistry->function(
 				$p ?? $this->typeRegistry->integer(),
@@ -49,7 +56,7 @@ final class SealedAnalyseTest extends BaseProgramTestHelper {
 				)
 			)
 		);
-		return $this->programBuilder->analyseAndBuildProgram()->getEntryPoint(
+		return $this->compilationContext->analyseAndBuildProgram()->getEntryPoint(
 			new VariableNameIdentifier('fn'),
 			$p ?? $this->typeRegistry->integer(),
 			$r

@@ -59,7 +59,7 @@ final readonly class CustomMethod implements CustomMethodInterface, JsonSerializ
 			unset($this->isAnalysed[$k]);
 			throw new AnalyserException(
 				sprintf(
-					"Invalid parameter type: %s should be a subtype of %s",
+					"Invalid parameter type: %s is not a subtype of %s",
 					$parameterType,
 					$this->parameterType
 				)
@@ -75,7 +75,7 @@ final readonly class CustomMethod implements CustomMethodInterface, JsonSerializ
 			unset($this->isAnalysed[$k]);
 			throw new AnalyserException(
 				sprintf(
-					"Invalid return type: %s should be a subtype of %s", //TODO - add more info
+					"Invalid return type: %s is not a subtype of %s", //TODO - add more info
 					$returnType,
 					$this->returnType
 				)

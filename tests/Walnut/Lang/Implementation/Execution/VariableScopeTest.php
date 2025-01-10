@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownContextVariable;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Implementation\Code\Scope\VariableScope;
+use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
 
 final class VariableScopeTest extends TestCase {
@@ -15,7 +16,7 @@ final class VariableScopeTest extends TestCase {
 
 	public function setUp(): void {
 		parent::setUp();
-		$this->typeRegistry = new TypeRegistryBuilder();
+		$this->typeRegistry = new TypeRegistryBuilder(new CustomMethodRegistryBuilder());
 		$this->variableScope = new VariableScope([
 			'x' => $this->typeRegistry->integer()
 		]);

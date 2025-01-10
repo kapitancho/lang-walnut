@@ -10,7 +10,7 @@ use Walnut\Lang\Test\Implementation\BaseProgramTestHelper;
 final class EnumerationTypeTest extends BaseProgramTestHelper {
 
 	public function testProperties(): void {
-		$this->programBuilder->addEnumeration(new TypeNameIdentifier('Suit'), [
+		$this->typeRegistryBuilder->addEnumeration(new TypeNameIdentifier('Suit'), [
 			new EnumValueIdentifier('Spades'),
 			new EnumValueIdentifier('Hearts'),
 			new EnumValueIdentifier('Diamonds'),
@@ -26,7 +26,7 @@ final class EnumerationTypeTest extends BaseProgramTestHelper {
 
 	public function testEmptySubset(): void {
 		$this->expectException(InvalidArgumentException::class);
-		$this->programBuilder->addEnumeration(new TypeNameIdentifier('Suit'), [
+		$this->typeRegistryBuilder->addEnumeration(new TypeNameIdentifier('Suit'), [
 			new EnumValueIdentifier('Spades'),
 			new EnumValueIdentifier('Hearts'),
 			new EnumValueIdentifier('Diamonds'),
@@ -38,7 +38,7 @@ final class EnumerationTypeTest extends BaseProgramTestHelper {
 
 	public function testInvalidSubsetValue(): void {
 		$this->expectException(InvalidArgumentException::class);
-		$this->programBuilder->addEnumeration(new TypeNameIdentifier('Suit'), [
+		$this->typeRegistryBuilder->addEnumeration(new TypeNameIdentifier('Suit'), [
 			new EnumValueIdentifier('Spades'),
 			new EnumValueIdentifier('Hearts'),
 			new EnumValueIdentifier('Diamonds'),

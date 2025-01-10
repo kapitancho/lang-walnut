@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\NativeCode\Any;
 
+use BcMath\Number;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -26,8 +27,8 @@ final class IsOfTypeTest extends BaseProgramTestHelper {
 
 		$v1 = $this->valueRegistry->real(123.5);
 		$v2 = $this->valueRegistry->real(456.5);
-		$t1 = $this->typeRegistry->realSubset([$v1, $v2]);
-		$t2 = $this->typeRegistry->realSubset([$v2]);
+		$t1 = $this->typeRegistry->realSubset([new Number((string)$v1), new Number((string)$v2)]);
+		$t2 = $this->typeRegistry->realSubset([new Number((string)$v2)]);
 		$t3 = $this->typeRegistry->real(100.5, 200.5);
 		$t4 = $this->typeRegistry->real();
 		$z = $this->typeRegistry->string();
@@ -46,8 +47,8 @@ final class IsOfTypeTest extends BaseProgramTestHelper {
 
 		$v1 = $this->valueRegistry->integer(123);
 		$v2 = $this->valueRegistry->integer(456);
-		$t1 = $this->typeRegistry->integerSubset([$v1, $v2]);
-		$t2 = $this->typeRegistry->integerSubset([$v2]);
+		$t1 = $this->typeRegistry->integerSubset([new Number((string)$v1), new Number((string)$v2)]);
+		$t2 = $this->typeRegistry->integerSubset([new Number((string)$v2)]);
 		$t3 = $this->typeRegistry->integer(100, 200);
 		$t4 = $this->typeRegistry->integer();
 		$z = $this->typeRegistry->string();
@@ -73,10 +74,10 @@ final class IsOfTypeTest extends BaseProgramTestHelper {
 		//$this->callIsOfType($v1, $r4, true);
 		//$this->callIsOfType($v2, $r4, true);
 
-		$v1 = $this->valueRegistry->string("Hi");
-		$v2 = $this->valueRegistry->string("Hello");
-		$t1 = $this->typeRegistry->stringSubset([$v1, $v2]);
-		$t2 = $this->typeRegistry->stringSubset([$v2]);
+		$v1 = $this->valueRegistry->string($v1s = "Hi");
+		$v2 = $this->valueRegistry->string($v2s = "Hello");
+		$t1 = $this->typeRegistry->stringSubset([$v1s, $v2s]);
+		$t2 = $this->typeRegistry->stringSubset([$v2s]);
 		$t3 = $this->typeRegistry->string(1, 4);
 		$t4 = $this->typeRegistry->string();
 		$z = $this->typeRegistry->integer();
@@ -197,11 +198,21 @@ final class IsOfTypeTest extends BaseProgramTestHelper {
 		$this->callIsOfType($v1, $z, false);
 		$this->callIsOfType($v1, $a, true);
 
-		$this->programBuilder->addSubtype(new TypeNameIdentifier('Percent'), $this->typeRegistry->integer(0, 100),
-			$this->expressionRegistry->constant($this->valueRegistry->null), null
+		$this->typeRegistryBuilder->addSubtype(
+			new TypeNameIdentifier('Percent'),
+			$this->typeRegistry->integer(0, 100),
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->constant($this->valueRegistry->null)
+			),
+			$this->typeRegistry->nothing
 		);
-		$this->programBuilder->addSubtype(new TypeNameIdentifier('Digit'), $this->typeRegistry->integer(0, 9),
-				$this->expressionRegistry->constant($this->valueRegistry->null), null
+		$this->typeRegistryBuilder->addSubtype(
+			new TypeNameIdentifier('Digit'),
+			$this->typeRegistry->integer(0, 9),
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->constant($this->valueRegistry->null)
+			),
+			$this->typeRegistry->nothing
 		);
 		$v1 = $this->valueRegistry->subtypeValue(
 			$tPer = new TypeNameIdentifier('Percent'),
@@ -241,17 +252,21 @@ final class IsOfTypeTest extends BaseProgramTestHelper {
 		$this->callIsOfType($v1, $z, false);
 		$this->callIsOfType($v1, $a, true);
 
-		$this->programBuilder->addSealed(
+		$this->typeRegistryBuilder->addSealed(
 			new TypeNameIdentifier('PercentState'),
 			$this->typeRegistry->record(['x' => $this->typeRegistry->integer(0, 100)]),
-			$this->expressionRegistry->constant($this->valueRegistry->null),
-			null
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->constant($this->valueRegistry->null)
+			),
+			$this->typeRegistry->nothing
 		);
-		$this->programBuilder->addSealed(
+		$this->typeRegistryBuilder->addSealed(
 			new TypeNameIdentifier('DigitState'),
 			$this->typeRegistry->record(['x' => $this->typeRegistry->integer(0, 9)]),
-			$this->expressionRegistry->constant($this->valueRegistry->null),
-			null
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->constant($this->valueRegistry->null)
+			),
+			$this->typeRegistry->nothing
 		);
 		$v1 = $this->valueRegistry->sealedValue(
 			$tPer = new TypeNameIdentifier('PercentState'),
@@ -291,12 +306,12 @@ final class IsOfTypeTest extends BaseProgramTestHelper {
 		$this->callIsOfType($v1, $z, false);
 		$this->callIsOfType($v1, $a, true);
 
-		$this->programBuilder->addEnumeration(new TypeNameIdentifier('SE'), [
+		$this->typeRegistryBuilder->addEnumeration(new TypeNameIdentifier('SE'), [
 			new EnumValueIdentifier('A'),
 			new EnumValueIdentifier('B'),
 			new EnumValueIdentifier('C'),
 		]);
-		$this->programBuilder->addEnumeration(new TypeNameIdentifier('SG'), [
+		$this->typeRegistryBuilder->addEnumeration(new TypeNameIdentifier('SG'), [
 			new EnumValueIdentifier('A'),
 			new EnumValueIdentifier('X'),
 			new EnumValueIdentifier('Y'),
@@ -321,8 +336,8 @@ final class IsOfTypeTest extends BaseProgramTestHelper {
 		$this->callIsOfType($v1, $z, false);
 		$this->callIsOfType($v1, $a, true);
 
-		$this->programBuilder->addAtom(new TypeNameIdentifier('SH'));
-		$this->programBuilder->addAtom(new TypeNameIdentifier('SJ'));
+		$this->typeRegistryBuilder->addAtom(new TypeNameIdentifier('SH'));
+		$this->typeRegistryBuilder->addAtom(new TypeNameIdentifier('SJ'));
 
 		$v1 = $this->valueRegistry->atom($sh = new TypeNameIdentifier('SH'));
 		$v2 = $this->valueRegistry->atom(new TypeNameIdentifier('SJ'));

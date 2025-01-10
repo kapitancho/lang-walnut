@@ -20,6 +20,7 @@ final class ProgramRegistry implements ProgramRegistryInterface {
 	private readonly AnalyserContextInterface $analyserContextInstance;
 	private readonly ExecutionContextInterface $executionContextInstance;
 	private readonly DependencyContainerInterface $dependencyContainerInstance;
+	private readonly VariableValueScope $variableValueScopeInstance;
 
 	public function __construct(
 		public readonly TypeRegistry                 $typeRegistry,
@@ -31,7 +32,7 @@ final class ProgramRegistry implements ProgramRegistryInterface {
 
 	public VariableValueScope $globalScope {
 		get {
-			return $this->globalScopeBuilder->build();
+			return $this->variableValueScopeInstance ??= $this->globalScopeBuilder->build();
 		}
 	}
 

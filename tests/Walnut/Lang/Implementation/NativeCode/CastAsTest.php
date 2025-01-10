@@ -11,7 +11,6 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Implementation\Code\Execution\ExecutionContext;
-use Walnut\Lang\Implementation\Code\Expression\MatchExpressionEquals;
 use Walnut\Lang\Implementation\Code\Scope\VariableScope;
 use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
 use Walnut\Lang\Test\Implementation\BaseProgramTestHelper;
@@ -41,25 +40,24 @@ final class CastAsTest extends BaseProgramTestHelper {
 			$this->valueRegistry->false
 		);
 
-		$this->programBuilder->addEnumeration(
+		$this->typeRegistryBuilder->addEnumeration(
 			new TypeNameIdentifier('OrderStatus'), [
 				new EnumValueIdentifier('Invalid'), 
 				new EnumValueIdentifier('Draft'), 
 				new EnumValueIdentifier('Completed')
 			]
 		);
-		$this->programBuilder->addMethodDraft(
+		$this->customMethodRegistryBuilder->addMethod(
 			$this->typeRegistry->enumeration(new TypeNameIdentifier('OrderStatus')),
 			new MethodNameIdentifier('asBoolean'),
 			$this->typeRegistry->null,
 			$this->typeRegistry->nothing,
 			$this->typeRegistry->boolean,
 			$this->expressionRegistry->functionBody(
-				$this->expressionRegistry->match(
+				$this->expressionRegistry->matchValue(
 					$this->expressionRegistry->variableName(
 						new VariableNameIdentifier('$')
 					),
-					new MatchExpressionEquals(),
 					[
 						$this->expressionRegistry->matchPair(
 							$this->expressionRegistry->constant(
@@ -98,18 +96,17 @@ final class CastAsTest extends BaseProgramTestHelper {
 			$this->valueRegistry->false
 		);
 
-		$this->programBuilder->addMethodDraft(
+		$this->customMethodRegistryBuilder->addMethod(
 			$enumType = $this->typeRegistry->enumeration(new TypeNameIdentifier('OrderStatus')),
 			new MethodNameIdentifier('asInteger'),
 			$this->typeRegistry->null,
 			$this->typeRegistry->nothing,
 			$this->typeRegistry->integer(0, 2),
 			$toInt = $this->expressionRegistry->functionBody(
-				$this->expressionRegistry->match(
+				$this->expressionRegistry->matchValue(
 					$this->expressionRegistry->variableName(
 						new VariableNameIdentifier('$')
 					),
-					new MatchExpressionEquals(),
 					[
 						$this->expressionRegistry->matchPair(
 							$this->expressionRegistry->constant(
@@ -174,18 +171,17 @@ final class CastAsTest extends BaseProgramTestHelper {
 		);
 
 
-		$this->programBuilder->addMethodDraft(
+		$this->customMethodRegistryBuilder->addMethod(
 			$this->typeRegistry->integer(),
 			new MethodNameIdentifier('as' . $enumType->name),
 			$this->typeRegistry->null,
 			$this->typeRegistry->nothing,
 			$enumType,
 			$fromInt = $this->expressionRegistry->functionBody(
-				$this->expressionRegistry->match(
+				$this->expressionRegistry->matchValue(
 					$this->expressionRegistry->variableName(
 						new VariableNameIdentifier('$')
 					),
-					new MatchExpressionEquals(),
 					[
 						$this->expressionRegistry->matchPair(
 							$this->expressionRegistry->constant(
@@ -271,7 +267,7 @@ final class CastAsTest extends BaseProgramTestHelper {
 		//	$this->valueRegistry->string("1")
 		//);
 
-		$this->programBuilder->addMethodDraft(
+		$this->customMethodRegistryBuilder->addMethod(
 			$enumType,
 			new MethodNameIdentifier('asJsonValue'),
 			$this->typeRegistry->null,
@@ -289,7 +285,7 @@ final class CastAsTest extends BaseProgramTestHelper {
 			$this->valueRegistry->integer(1)
 		);
 
-		$this->programBuilder->addMethodDraft(
+		$this->customMethodRegistryBuilder->addMethod(
 			$jv,
 			new MethodNameIdentifier('as' . $enumType->name),
 			$this->typeRegistry->null,
@@ -305,9 +301,9 @@ final class CastAsTest extends BaseProgramTestHelper {
 				$this->valueRegistry->type($enumType)
 			)
 		);
-		$call->analyse(new AnalyserContext(new VariableScope(['x' => $jv])));
+		$call->analyse(new AnalyserContext($this->programRegistry, new VariableScope(['x' => $jv])));
 		$this->assertTrue($call->execute(
-			new ExecutionContext(
+			new ExecutionContext($this->programRegistry,
 				new VariableValueScope([
 					'x' => new TypedValue(
 						$jv,

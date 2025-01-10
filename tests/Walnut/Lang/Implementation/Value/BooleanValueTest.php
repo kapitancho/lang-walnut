@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Test\Implementation\Value;
 
 use PHPUnit\Framework\TestCase;
+use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
 use Walnut\Lang\Test\EmptyDependencyContainer;
@@ -14,7 +15,7 @@ final class BooleanValueTest extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->typeRegistry = new TypeRegistryBuilder();
+		$this->typeRegistry = new TypeRegistryBuilder(new CustomMethodRegistryBuilder());
 		$this->valueRegistry = new ValueRegistry($this->typeRegistry, new EmptyDependencyContainer);
 	}
 	public function testBooleanValue(): void {

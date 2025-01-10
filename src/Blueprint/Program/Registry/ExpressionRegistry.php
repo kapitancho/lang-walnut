@@ -19,6 +19,7 @@ use Walnut\Lang\Blueprint\Code\Expression\TupleExpression;
 use Walnut\Lang\Blueprint\Code\Expression\VariableAssignmentExpression;
 use Walnut\Lang\Blueprint\Code\Expression\VariableNameExpression;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -43,14 +44,6 @@ interface ExpressionRegistry {
 		VariableNameIdentifier $variableName,
 		Expression $assignedExpression
 	): VariableAssignmentExpression;
-
-	/** @param list<MatchExpressionPair|MatchExpressionDefault> $pairs */
-	public function match(
-		Expression $target,
-		MatchExpressionOperation $operation,
-		array $pairs
-	): MatchExpression;
-
 	public function matchPair(Expression $matchExpression, Expression $valueExpression): MatchExpressionPair;
 
 	public function matchDefault(Expression $valueExpression): MatchExpressionDefault;
@@ -63,4 +56,20 @@ interface ExpressionRegistry {
 
 	public function functionBody(Expression $expression): FunctionBody;
 	public function mutable(Type $type, Expression $value): MutableExpression;
+
+	/** @param list<MatchExpressionPair|MatchExpressionDefault> $pairs */
+	public function matchTrue(array $pairs): MatchExpression;
+	/** @param list<MatchExpressionPair|MatchExpressionDefault> $pairs */
+	public function matchType(Expression $condition, array $pairs): MatchExpression;
+	/** @param list<MatchExpressionPair|MatchExpressionDefault> $pairs */
+	public function matchValue(Expression $condition, array $pairs): MatchExpression;
+	public function matchIf(Expression $condition, Expression $then, Expression $else): MatchExpression;
+
+	public function functionCall(Expression $target, Expression $parameter): MethodCallExpression;
+	public function constructorCall(
+		TypeNameIdentifier $typeName,
+		Expression $parameter
+	): MethodCallExpression;
+	public function propertyAccess(Expression $target, int|string $propertyName): MethodCallExpression;
+
 }

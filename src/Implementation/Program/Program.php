@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Implementation\Program;
 
 use Walnut\Lang\Blueprint\Code\Scope\UnknownVariable;
-use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Program\InvalidEntryPoint;
 use Walnut\Lang\Blueprint\Program\Program as ProgramInterface;
@@ -16,7 +15,6 @@ final readonly class Program implements ProgramInterface {
 
 	public function __construct(
 		private ProgramRegistry $programRegistry,
-		private VariableValueScope $globalScope
 	) {}
 
 	/** @throws InvalidEntryPoint */
@@ -25,7 +23,8 @@ final readonly class Program implements ProgramInterface {
 		Type $expectedParameterType,
 		Type $expectedReturnType
 	): ProgramEntryPoint {
-		$typedValue = $this->globalScope->findTypedValueOf($functionName);
+		$typedValue = $this->programRegistry->globalScope->findTypedValueOf($functionName);
+
 		if($typedValue === UnknownVariable::value) {
 			InvalidEntryPoint::becauseFunctionIsNotDefined(
 				$functionName, $expectedParameterType, $expectedReturnType
@@ -53,8 +52,8 @@ final readonly class Program implements ProgramInterface {
 		}
 		return new ProgramEntryPoint(
 			$this->programRegistry,
-			$this->globalScope,
-			$value->withVariableValueScope($this->globalScope)
+			$this->programRegistry->globalScope,
+			$value->withVariableValueScope($this->programRegistry->globalScope)
 		);
 	}
 }

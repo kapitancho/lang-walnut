@@ -9,29 +9,30 @@ use Walnut\Lang\Implementation\Code\Expression\ConstantExpression;
 use Walnut\Lang\Implementation\Code\Expression\TupleExpression;
 use Walnut\Lang\Implementation\Code\Scope\VariableScope;
 use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
+use Walnut\Lang\Implementation\Compilation\CompilationContextFactory;
+use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
+use Walnut\Lang\Implementation\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
 use Walnut\Lang\Test\EmptyDependencyContainer;
 
 final class TupleExpressionTest extends TestCase {
 	private readonly TypeRegistryBuilder $typeRegistry;
 	private readonly ValueRegistry $valueRegistry;
+	private readonly ProgramRegistry $programRegistry;
 	private readonly TupleExpression $tupleExpression;
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->typeRegistry = new TypeRegistryBuilder();
-		$this->valueRegistry = new ValueRegistry($this->typeRegistry, new EmptyDependencyContainer);
+		$this->programRegistry = new CompilationContextFactory()->compilationContext->programRegistry;
+		$this->typeRegistry = $this->programRegistry->typeRegistry;
+		$this->valueRegistry = $this->programRegistry->valueRegistry;
 		$this->tupleExpression = new TupleExpression(
-			$this->typeRegistry,
-			$this->valueRegistry,
 			[
 				new ConstantExpression(
-					$this->typeRegistry,
 					$this->valueRegistry->integer(123)
 				),
 				new ConstantExpression(
-					$this->typeRegistry,
 					$this->valueRegistry->string("456")
 				)
 			]
@@ -43,7 +44,7 @@ final class TupleExpressionTest extends TestCase {
 	}
 
 	public function testAnalyse(): void {
-		$result = $this->tupleExpression->analyse(new AnalyserContext(VariableScope::empty()));
+		$result = $this->tupleExpression->analyse(new AnalyserContext($this->programRegistry, VariableScope::empty()));
 		self::assertTrue($result->expressionType->isSubtypeOf(
 			$this->typeRegistry->tuple([
 				$this->typeRegistry->integer(),
@@ -53,7 +54,7 @@ final class TupleExpressionTest extends TestCase {
 	}
 
 	public function testExecute(): void {
-		$result = $this->tupleExpression->execute(new ExecutionContext(new VariableValueScope([])));
+		$result = $this->tupleExpression->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])));
 		self::assertEquals(
 			$this->valueRegistry->tuple([
 				$this->valueRegistry->integer(123),

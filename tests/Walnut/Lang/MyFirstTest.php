@@ -8,9 +8,11 @@ use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 
 final class MyFirstTest extends BaseProgramTestHelper {
 
+	protected function addCoreToContext(): void {}
+
 	public function testBasicProgram(): void {
 		$myFirstType = new TypeNameIdentifier('MyFirstType');
-		$this->programBuilder->addAlias(
+		$this->typeRegistryBuilder->addAlias(
 			$myFirstType,
 			$this->typeRegistry->tuple([
 				$this->typeRegistry->integer(),
@@ -18,12 +20,12 @@ final class MyFirstTest extends BaseProgramTestHelper {
 			])
 		);
 		$x = new VariableNameIdentifier('x');
-		$this->programBuilder->addVariable(
+		$this->globalScopeBuilder->addVariable(
 			$x,
 			$this->valueRegistry->integer(10)
 		);
 		$fn = new VariableNameIdentifier('fn');
-		$this->programBuilder->addVariable(
+		$this->globalScopeBuilder->addVariable(
 			$fn,
 			$this->valueRegistry->function(
 				$this->typeRegistry->string(),
@@ -37,7 +39,7 @@ final class MyFirstTest extends BaseProgramTestHelper {
 				)
 			)
 		);
-		$program = $this->programBuilder->analyseAndBuildProgram();
+		$program = $this->compilationContext->analyseAndBuildProgram();
 		$entryPoint = $program->getEntryPoint(
 			$fn,
 			$this->typeRegistry->string(),
@@ -50,9 +52,9 @@ final class MyFirstTest extends BaseProgramTestHelper {
 
 	public function testBasicDependency(): void {
 		$atomName = new TypeNameIdentifier('MyFirstAtom');
-		$atomType = $this->programBuilder->addAtom($atomName);
+		$atomType = $this->typeRegistryBuilder->addAtom($atomName);
 		$fn = new VariableNameIdentifier('fn');
-		$this->programBuilder->addVariable(
+		$this->globalScopeBuilder->addVariable(
 			$fn,
 			$this->valueRegistry->function(
 				$this->typeRegistry->boolean,
@@ -69,7 +71,7 @@ final class MyFirstTest extends BaseProgramTestHelper {
 				)
 			)
 		);
-		$program = $this->programBuilder->analyseAndBuildProgram();
+		$program = $this->compilationContext->analyseAndBuildProgram();
 		$entryPoint = $program->getEntryPoint(
 			$fn,
 			$this->typeRegistry->boolean,
@@ -82,7 +84,7 @@ final class MyFirstTest extends BaseProgramTestHelper {
 
 	public function testBasicMethodCall(): void {
 		$f = new VariableNameIdentifier('f');
-		$this->programBuilder->addVariable(
+		$this->globalScopeBuilder->addVariable(
 			$f,
 			$this->valueRegistry->function(
 				$this->typeRegistry->string(),
@@ -98,7 +100,7 @@ final class MyFirstTest extends BaseProgramTestHelper {
 			)
 		);
 		$fn = new VariableNameIdentifier('fn');
-		$this->programBuilder->addVariable(
+		$this->globalScopeBuilder->addVariable(
 			$fn,
 			$this->valueRegistry->function(
 				$this->typeRegistry->string(),
@@ -115,7 +117,7 @@ final class MyFirstTest extends BaseProgramTestHelper {
 				)
 			)
 		);
-		$program = $this->programBuilder->analyseAndBuildProgram();
+		$program = $this->compilationContext->analyseAndBuildProgram();
 		$entryPoint = $program->getEntryPoint(
 			$fn,
 			$this->typeRegistry->string(),

@@ -4,6 +4,7 @@ namespace Walnut\Lang\Blueprint\Program\Builder;
 
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
@@ -20,10 +21,17 @@ interface TypeRegistryBuilder {
 
 	public function addAlias(TypeNameIdentifier $name, Type $aliasedType): AliasType;
 
-	public function addSubtype(TypeNameIdentifier $name, Type $baseType): SubtypeType;
+	public function addSubtype(
+		TypeNameIdentifier $name,
+		Type $baseType,
+		FunctionBody $constructorBody,
+		Type|null $errorType
+	): SubtypeType;
 
 	public function addSealed(
 		TypeNameIdentifier $name,
-		RecordType $valueType
+		RecordType $valueType,
+		FunctionBody $constructorBody,
+		Type|null $errorType
 	): SealedType;
 }

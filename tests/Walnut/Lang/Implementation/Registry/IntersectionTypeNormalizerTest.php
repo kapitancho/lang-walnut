@@ -89,7 +89,7 @@ final class IntersectionTypeNormalizerTest extends BaseProgramTestHelper {
     }
 
     public function testAliasTypes(): void {
-	    $this->programBuilder->addAlias(new TypeNameIdentifier('M'), $this->typeRegistry->boolean);
+	    $this->typeRegistryBuilder->addAlias(new TypeNameIdentifier('M'), $this->typeRegistry->boolean);
         self::assertEquals("(Integer&False)", (string)$this->intersection(
             $this->typeRegistry->alias(new TypeNameIdentifier('M')),
             $this->typeRegistry->integer(),

@@ -10,31 +10,30 @@ use Walnut\Lang\Implementation\Code\Expression\ConstantExpression;
 use Walnut\Lang\Implementation\Code\Expression\NoErrorExpression;
 use Walnut\Lang\Implementation\Code\Scope\VariableScope;
 use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
+use Walnut\Lang\Implementation\Compilation\CompilationContextFactory;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
+use Walnut\Lang\Implementation\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
-use Walnut\Lang\Test\EmptyDependencyContainer;
 
 final class NoErrorExpressionTest extends TestCase {
 	private readonly TypeRegistryBuilder $typeRegistry;
 	private readonly ValueRegistry $valueRegistry;
+	private readonly ProgramRegistry $programRegistry;
 	private readonly NoErrorExpression $noErrorExpression;
 	private readonly NoErrorExpression $errorExpression;
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->typeRegistry = new TypeRegistryBuilder();
-		$this->valueRegistry = new ValueRegistry($this->typeRegistry, new EmptyDependencyContainer);
+		$this->programRegistry = new CompilationContextFactory()->compilationContext->programRegistry;
+		$this->typeRegistry = $this->programRegistry->typeRegistry;
+		$this->valueRegistry = $this->programRegistry->valueRegistry;
 		$this->noErrorExpression = new NoErrorExpression(
-			$this->typeRegistry,
 			new ConstantExpression(
-				$this->typeRegistry,
 				$this->valueRegistry->integer(123)
 			),
 		);
 		$this->errorExpression = new NoErrorExpression(
-			$this->typeRegistry,
 			new ConstantExpression(
-				$this->typeRegistry,
 				$this->valueRegistry->error(
 					$this->valueRegistry->integer(123)
 				)
@@ -48,7 +47,7 @@ final class NoErrorExpressionTest extends TestCase {
 	}
 
 	public function testAnalyse(): void {
-		$result = $this->noErrorExpression->analyse(new AnalyserContext(new VariableScope([])));
+		$result = $this->noErrorExpression->analyse(new AnalyserContext($this->programRegistry, new VariableScope([])));
 		self::assertTrue($result->returnType()->isSubtypeOf(
 			$this->typeRegistry->integer()
 		));
@@ -56,17 +55,17 @@ final class NoErrorExpressionTest extends TestCase {
 
 	public function testExecute(): void {
 		$this->expectNotToPerformAssertions();
-		$this->noErrorExpression->execute(new ExecutionContext(new VariableValueScope([])));
+		$this->noErrorExpression->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])));
 	}
 
 	public function testExecuteOnError(): void {
 		$this->expectException(FunctionReturn::class);
-		$this->errorExpression->execute(new ExecutionContext(new VariableValueScope([])));
+		$this->errorExpression->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])));
 	}
 
 	public function testExecuteResult(): void {
 		try {
-			$this->errorExpression->execute(new ExecutionContext(new VariableValueScope([])));
+			$this->errorExpression->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])));
 		} catch (FunctionReturn $e) {
 			self::assertEquals(
 				$this->valueRegistry->error(

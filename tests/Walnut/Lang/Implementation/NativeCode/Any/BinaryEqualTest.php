@@ -91,12 +91,12 @@ final class BinaryEqualTest extends BaseProgramTestHelper {
 		$this->callBinaryEqual($c, $c4, false);
 		$this->callBinaryEqual($c, $z, false);
 
-		$this->programBuilder->addEnumeration(new TypeNameIdentifier('E'), [
+		$this->typeRegistryBuilder->addEnumeration(new TypeNameIdentifier('E'), [
 			new EnumValueIdentifier('A'),
 			new EnumValueIdentifier('B'),
 			new EnumValueIdentifier('C')
 		]);
-		$this->programBuilder->addEnumeration(new TypeNameIdentifier('G'), [
+		$this->typeRegistryBuilder->addEnumeration(new TypeNameIdentifier('G'), [
 			new EnumValueIdentifier('A'),
 			new EnumValueIdentifier('X'),
 			new EnumValueIdentifier('Y')
@@ -112,8 +112,8 @@ final class BinaryEqualTest extends BaseProgramTestHelper {
 		$this->callBinaryEqual($c, $c3, false);
 		$this->callBinaryEqual($c, $z, false);
 
-		$this->programBuilder->addAtom(new TypeNameIdentifier('H'));
-		$this->programBuilder->addAtom(new TypeNameIdentifier('J'));
+		$this->typeRegistryBuilder->addAtom(new TypeNameIdentifier('H'));
+		$this->typeRegistryBuilder->addAtom(new TypeNameIdentifier('J'));
 
 		$c1 = $this->valueRegistry->atom(new TypeNameIdentifier('H'));
 		$c2 = $this->valueRegistry->atom(new TypeNameIdentifier('J'));
@@ -131,11 +131,21 @@ final class BinaryEqualTest extends BaseProgramTestHelper {
 		$this->callBinaryEqual($c, $c2, false);
 		$this->callBinaryEqual($c, $z, false);
 
-		$this->programBuilder->addSubtype(new TypeNameIdentifier('K'), $this->typeRegistry->boolean,
-			$this->expressionRegistry->constant($this->valueRegistry->boolean(true)), null
+		$this->typeRegistryBuilder->addSubtype(
+			new TypeNameIdentifier('K'),
+			$this->typeRegistry->boolean,
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->constant($this->valueRegistry->boolean(true))
+			),
+			$this->typeRegistry->nothing
 		);
-		$this->programBuilder->addSubtype(new TypeNameIdentifier('L'), $this->typeRegistry->boolean,
-			$this->expressionRegistry->constant($this->valueRegistry->boolean(true)), null
+		$this->typeRegistryBuilder->addSubtype(
+			new TypeNameIdentifier('L'),
+			$this->typeRegistry->boolean,
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->constant($this->valueRegistry->boolean(true))
+			),
+			$this->typeRegistry->nothing
 		);
 
 		$c1 = $this->valueRegistry->subtypeValue(new TypeNameIdentifier('K'), $this->valueRegistry->boolean(true));
@@ -149,17 +159,21 @@ final class BinaryEqualTest extends BaseProgramTestHelper {
 		$this->callBinaryEqual($c, $z, false);
 
 
-		$this->programBuilder->addSealed(
+		$this->typeRegistryBuilder->addSealed(
 			new TypeNameIdentifier('M'),
 			$this->typeRegistry->record(['a' => $this->typeRegistry->boolean]),
-			$this->expressionRegistry->constant($this->valueRegistry->null),
-			null
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->constant($this->valueRegistry->null)
+			),
+			$this->typeRegistry->nothing
 		);
-		$this->programBuilder->addSealed(
+		$this->typeRegistryBuilder->addSealed(
 			new TypeNameIdentifier('N'),
 			$this->typeRegistry->record(['a' => $this->typeRegistry->boolean]),
-			$this->expressionRegistry->constant($this->valueRegistry->null),
-			null
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->constant($this->valueRegistry->null)
+			),
+			$this->typeRegistry->nothing
 		);
 
 		$c1 = $this->valueRegistry->sealedValue(new TypeNameIdentifier('M'),

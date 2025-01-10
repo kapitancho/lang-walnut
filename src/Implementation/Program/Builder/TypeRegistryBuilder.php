@@ -5,10 +5,13 @@ namespace Walnut\Lang\Implementation\Program\Builder;
 use BcMath\Number;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
+use Walnut\Lang\Blueprint\Function\FunctionBody;
+use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder as CustomMethodRegistryBuilderInterface;
 use Walnut\Lang\Blueprint\Program\Builder\TypeRegistryBuilder as TypeRegistryBuilderInterface;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\UnknownType;
@@ -88,7 +91,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
     private const string nullTypeName = 'Null';
     private const string constructorTypeName = 'Constructor';
 
-    public function __construct() {
+    public function __construct(private readonly CustomMethodRegistryBuilderInterface $customMethodRegistryBuilder) {
         $this->unionTypeNormalizer = new UnionTypeNormalizer($this);
         $this->intersectionTypeNormalizer = new IntersectionTypeNormalizer($this);
 
@@ -348,19 +351,46 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		return $result;
 	}
 
-	public function addSubtype(TypeNameIdentifier $name, Type $baseType): SubtypeType {
+	public function addSubtype(
+		TypeNameIdentifier $name,
+		Type $baseType,
+		FunctionBody $constructorBody,
+		Type|null $errorType
+	): SubtypeType {
 		$result = new SubtypeType($name, $baseType);
 		$this->subtypeTypes[$name->identifier] = $result;
+		$this->addConstructorMethod($name, $baseType, $errorType, $constructorBody);
 		return $result;
 	}
 
 	public function addSealed(
-		TypeNameIdentifier $name,
-		RecordTypeInterface $valueType
+		TypeNameIdentifier  $name,
+		RecordTypeInterface $valueType,
+		FunctionBody        $constructorBody,
+		Type|null           $errorType
 	): SealedType {
 		$result = new SealedType($name, $valueType);
 		$this->sealedTypes[$name->identifier] = $result;
+		$this->addConstructorMethod($name, $valueType, $errorType, $constructorBody);
 		return $result;
+	}
+
+	private function addConstructorMethod(
+		TypeNameIdentifier $name,
+		Type $fromType,
+		Type|null $errorType,
+		FunctionBody $constructorBody
+	): void {
+		$this->customMethodRegistryBuilder->addMethod(
+			$this->atom(new TypeNameIdentifier('Constructor')),
+			new MethodNameIdentifier('as' . $name->identifier),
+			$fromType,
+			$this->nothing,
+			$errorType && !($errorType instanceof NothingType) ?
+				$this->result($fromType, $errorType) :
+				$fromType,
+			$constructorBody,
+		);
 	}
 
 	public function jsonSerialize(): array {

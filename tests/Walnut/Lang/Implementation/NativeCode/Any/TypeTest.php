@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\NativeCode\Any;
 
+use BcMath\Number;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -30,7 +31,7 @@ final class TypeTest extends BaseProgramTestHelper {
 	public function testType(): void {
 		$this->callType(
 			$v = $this->valueRegistry->integer(123),
-			$this->valueRegistry->type($this->typeRegistry->integerSubset([$v]))
+			$this->valueRegistry->type($this->typeRegistry->integerSubset([new Number((string)$v)]))
 		);
 
         $this->analyseCallType(

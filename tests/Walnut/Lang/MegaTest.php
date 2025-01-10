@@ -2,11 +2,13 @@
 
 namespace Walnut\Lang;
 
+use BcMath\Number;
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry as TypeRegistryInterface;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry as ValueRegistryInterface;
+use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
 use Walnut\Lang\Test\EmptyDependencyContainer;
@@ -19,7 +21,7 @@ final class MegaTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
-		$this->typeRegistry = new TypeRegistryBuilder;
+		$this->typeRegistry = new TypeRegistryBuilder(new CustomMethodRegistryBuilder());
 		$this->valueRegistry = new ValueRegistry(
 			$this->typeRegistry,
 			new EmptyDependencyContainer
@@ -105,13 +107,13 @@ final class MegaTest extends TestCase {
 
 	public function testIntegerType(): void {
 		$subsetType1 = $this->typeRegistry->integerSubset([
-			$this->valueRegistry->integer(1),
-			$this->valueRegistry->integer(2),
-			$this->valueRegistry->integer(10),
+			new Number(1),
+			new Number(2),
+			new Number(10),
 		]);
 		$subsetType2 = $this->typeRegistry->integerSubset([
-			$this->valueRegistry->integer(1),
-			$this->valueRegistry->integer(2),
+			new Number(1),
+			new Number(2),
 		]);
 		$rangeType = $this->typeRegistry->integer(-5, 5);
 		$integerType = $this->typeRegistry->integer();

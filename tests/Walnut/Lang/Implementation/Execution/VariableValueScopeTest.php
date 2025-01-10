@@ -8,6 +8,7 @@ use Walnut\Lang\Blueprint\Code\Scope\UnknownContextVariable;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownVariable;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
+use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
 use Walnut\Lang\Test\EmptyDependencyContainer;
@@ -20,7 +21,7 @@ final class VariableValueScopeTest extends TestCase {
 
 	public function setUp(): void {
 		parent::setUp();
-		$this->typeRegistry = new TypeRegistryBuilder();
+		$this->typeRegistry = new TypeRegistryBuilder(new CustomMethodRegistryBuilder());
 		$this->valueRegistry = new ValueRegistry($this->typeRegistry, new EmptyDependencyContainer);
 		$this->variableValueScope = new VariableValueScope([
 			'x' => new TypedValue(

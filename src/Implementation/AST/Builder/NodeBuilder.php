@@ -284,11 +284,13 @@ final class NodeBuilder implements NodeBuilderInterface {
 		return new AddAliasTypeNode($this->getSourceLocation(), $name, $aliasedType);
 	}
 
-	private function generateConstructorBody(ExpressionNode $constructorBody): ExpressionNode {
-		return $this->sequence([
-			$constructorBody,
-			$this->variableName(new VariableNameIdentifier('#'))
-		]);
+	private function generateConstructorBody(ExpressionNode $constructorBody): FunctionBodyNode {
+		return $this->functionBody(
+			$this->sequence([
+				$constructorBody,
+				$this->variableName(new VariableNameIdentifier('#'))
+			])
+		);
 	}
 
 	public function addSealed(

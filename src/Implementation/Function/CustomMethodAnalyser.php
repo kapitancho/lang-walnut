@@ -6,13 +6,10 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Function\CustomMethod as CustomMethodInterface;
 use Walnut\Lang\Blueprint\Function\CustomMethodAnalyser as CustomMethodAnalyserInterface;
 use Walnut\Lang\Blueprint\Function\Method;
-use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyError;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\UnresolvableDependency;
 use Walnut\Lang\Blueprint\Program\Registry\CustomMethodRegistry;
-use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\SubtypeType;
@@ -20,9 +17,6 @@ use Walnut\Lang\Blueprint\Type\SubtypeType;
 final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterface {
 	public function __construct(
 		private ProgramRegistry $programRegistry,
-		private TypeRegistry $typeRegistry,
-		private MethodRegistry $methodRegistry,
-		private DependencyContainer $dependencyContainer
 	) {}
 
 	public function analyse(CustomMethodRegistry $registry): array {
@@ -31,7 +25,7 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 			foreach($methods as $method) {
 				try {
 					$sub = $method->targetType;
-					$methodFnType = $this->typeRegistry->function(
+					$methodFnType = $this->programRegistry->typeRegistry->function(
 						$method->parameterType,
 						$method->returnType
 					);
@@ -41,9 +35,9 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 							continue;
 						}
 						$sub = $sub->baseType;
-						$existingMethod = $this->methodRegistry->method($sub, $method->methodName);
+						$existingMethod = $this->programRegistry->methodRegistry->method($sub, $method->methodName);
 						if ($existingMethod instanceof CustomMethodInterface) {
-							$existingMethodFnType = $this->typeRegistry->function(
+							$existingMethodFnType = $this->programRegistry->typeRegistry->function(
 								$existingMethod->parameterType,
 								$existingMethod->returnType
 							);
@@ -82,7 +76,7 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 				}
 				$d = $method->dependencyType;
 				if (!($d instanceof NothingType)) {
-					$value = $this->dependencyContainer->valueByType($method->dependencyType);
+					$value = $this->programRegistry->dependencyContainer->valueByType($method->dependencyType);
 					if ($value instanceof DependencyError) {
 						$analyseErrors[] = sprintf("%s : the dependency %s cannot be resolved: %s (type: %s)",
 							$this->getErrorMessageFor($method),

@@ -26,7 +26,7 @@ abstract class BaseProgramTestHelper extends \Walnut\Lang\Test\BaseProgramTestHe
                 new VariableNameIdentifier('y')
             )
         );
-        $result = $call->analyse(new AnalyserContext(new VariableScope([
+        $result = $call->analyse(new AnalyserContext($this->programRegistry, new VariableScope([
 			'x' => $targetType,
             'y' => $parameterType
         ])));
@@ -43,10 +43,10 @@ abstract class BaseProgramTestHelper extends \Walnut\Lang\Test\BaseProgramTestHe
 			new MethodNameIdentifier($methodName),
 			$parameter
 		);
-		$call->analyse(new AnalyserContext(VariableScope::empty()));
+		$call->analyse(new AnalyserContext($this->programRegistry, VariableScope::empty()));
 		$this->assertTrue(
 			($r = $call
-				->execute(new ExecutionContext(VariableValueScope::empty()))
+				->execute(new ExecutionContext($this->programRegistry, VariableValueScope::empty()))
 				->value)->equals($expectedValue),
 			sprintf("'%s' is not equal to '%s'", $r, $expectedValue)
 		);

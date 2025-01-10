@@ -32,7 +32,6 @@ use Walnut\Lang\Blueprint\Compilation\AST\AstCompilationException;
 use Walnut\Lang\Blueprint\Compilation\AST\AstExpressionCompiler as AstExpressionCompilerInterface;
 use Walnut\Lang\Blueprint\Compilation\AST\AstTypeCompiler;
 use Walnut\Lang\Blueprint\Compilation\AST\AstValueCompiler;
-use Walnut\Lang\Blueprint\Compilation\CodeBuilder;
 use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -41,7 +40,6 @@ final readonly class AstExpressionCompiler implements AstExpressionCompilerInter
 	public function __construct(
 		private AstTypeCompiler    $astTypeCompiler,
 		private AstValueCompiler   $astValueCompiler,
-		private CodeBuilder        $codeBuilder,
 		private ExpressionRegistry $expressionRegistry,
 	) {}
 
@@ -88,12 +86,12 @@ final readonly class AstExpressionCompiler implements AstExpressionCompilerInter
 					$this->value($expressionNode->value)
 				),
 			$expressionNode instanceof ConstructorCallExpressionNode =>
-				$this->codeBuilder->constructorCall(
+				$this->expressionRegistry->constructorCall(
 					$expressionNode->typeName,
 					$this->expression($expressionNode->parameter)
 				),
 			$expressionNode instanceof FunctionCallExpressionNode =>
-				$this->codeBuilder->functionCall(
+				$this->expressionRegistry->functionCall(
 					$this->expression($expressionNode->target),
 					$this->expression($expressionNode->parameter)
 				),
@@ -107,22 +105,22 @@ final readonly class AstExpressionCompiler implements AstExpressionCompilerInter
 					$this->expression($expressionNode->valueExpression)
 				),*/
 			$expressionNode instanceof MatchIfExpressionNode =>
-				$this->codeBuilder->matchIf(
+				$this->expressionRegistry->matchIf(
 					$this->expression($expressionNode->condition),
 					$this->expression($expressionNode->then),
 					$this->expression($expressionNode->else)
 				),
 			$expressionNode instanceof MatchTrueExpressionNode =>
-				$this->codeBuilder->matchTrue(
+				$this->expressionRegistry->matchTrue(
 					array_map($this->matchExpression(...), $expressionNode->pairs)
 				),
 			$expressionNode instanceof MatchTypeExpressionNode =>
-				$this->codeBuilder->matchType(
+				$this->expressionRegistry->matchType(
 					$this->expression($expressionNode->target),
 					array_map($this->matchExpression(...), $expressionNode->pairs)
 				),
 			$expressionNode instanceof MatchValueExpressionNode =>
-				$this->codeBuilder->matchValue(
+				$this->expressionRegistry->matchValue(
 					$this->expression($expressionNode->target),
 					array_map($this->matchExpression(...), $expressionNode->pairs)
 				),
@@ -146,7 +144,7 @@ final readonly class AstExpressionCompiler implements AstExpressionCompilerInter
 					$this->expression($expressionNode->targetExpression),
 				),
 			$expressionNode instanceof PropertyAccessExpressionNode =>
-				$this->codeBuilder->propertyAccess(
+				$this->expressionRegistry->propertyAccess(
 					$this->expression($expressionNode->target),
 					$expressionNode->propertyName
 				),

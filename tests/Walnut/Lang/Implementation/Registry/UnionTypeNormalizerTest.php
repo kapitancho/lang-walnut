@@ -92,7 +92,7 @@ final class UnionTypeNormalizerTest extends BaseProgramTestHelper {
     }
 
     public function testAliasTypes(): void {
-	    $this->programBuilder->addAlias(new TypeNameIdentifier('M'), $this->typeRegistry->boolean);
+	    $this->typeRegistryBuilder->addAlias(new TypeNameIdentifier('M'), $this->typeRegistry->boolean);
         self::assertEquals("(Boolean|Real)", (string)$this->union(
 	        $this->typeRegistry->alias(new TypeNameIdentifier('M')),
             $this->typeRegistry->integer(),

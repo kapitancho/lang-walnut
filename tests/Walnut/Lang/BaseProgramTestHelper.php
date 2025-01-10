@@ -4,15 +4,17 @@ namespace Walnut\Lang\Test;
 
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
+use Walnut\Lang\Blueprint\Compilation\CompilationContext as CompilationContextInterface;
 use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder;
-use Walnut\Lang\Blueprint\Program\Builder\ProgramBuilder as ProgramBuilderInterface;
-use Walnut\Lang\Blueprint\Program\Builder\ScopeBuilder;
+use Walnut\Lang\Blueprint\Program\Builder\ScopeBuilder as ScopeBuilderInterface;
 use Walnut\Lang\Blueprint\Program\Builder\TypeRegistryBuilder;
-use Walnut\Lang\Blueprint\Program\Factory\ProgramFactory as ProgramFactoryInterface;
+use Walnut\Lang\Blueprint\Program\Program as ProgramInterface;
 use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
-use Walnut\Lang\Implementation\Program\Factory\ProgramFactory;
+use Walnut\Lang\Implementation\Compilation\CompilationContextFactory;
 use Walnut\Lang\Implementation\Program\Type\UnionTypeNormalizer;
 use Walnut\Lang\Implementation\Type\UnionType;
 
@@ -22,25 +24,32 @@ abstract class BaseProgramTestHelper extends TestCase {
 	protected ExpressionRegistry $expressionRegistry;
 	protected TypeRegistryBuilder $typeRegistryBuilder;
 	protected CustomMethodRegistryBuilder $customMethodRegistryBuilder;
-	protected ScopeBuilder $globalScopeBuilder;
-	protected ProgramBuilderInterface $programBuilder;
+	protected ScopeBuilderInterface $globalScopeBuilder;
+	protected ProgramRegistry $programRegistry;
+	protected CompilationContextInterface $compilationContext;
 
-	private function getProgramFactory(): ProgramFactoryInterface {
-		return new ProgramFactory();
+	private function getCompilationContext(): CompilationContextInterface {
+		return new CompilationContextFactory()->compilationContext;
 	}
 
 	protected function setUp(): void {
 		parent::setUp();
 
-		$programFactory = $this->getProgramFactory();
-		$programBuilder = $programFactory->builder;
-		$programRegistry = $programFactory->registry;
-		$this->typeRegistry = $programRegistry->typeRegistry;
-		$this->valueRegistry = $programRegistry->valueRegistry;
-		$this->expressionRegistry = $programRegistry->expressionRegistry;
-		$this->programBuilder = $programBuilder;
+		$this->compilationContext = $compilationContext = $this->getCompilationContext();
+		$this->globalScopeBuilder = $compilationContext->globalScopeBuilder;
+		$this->typeRegistry = $compilationContext->typeRegistry;
+		$this->typeRegistryBuilder = $compilationContext->typeRegistryBuilder;
+		$this->valueRegistry = $compilationContext->valueRegistry;
+		$this->expressionRegistry = $compilationContext->expressionRegistry;
+		$this->customMethodRegistryBuilder = $compilationContext->customMethodRegistryBuilder;
+		$this->programRegistry = $compilationContext->programRegistry;
 
 		$this->addCoreToContext();
+		//$this->program = $compilationContext->analyseAndBuildProgram();
+	}
+
+	protected ProgramInterface $program {
+		get => $this->compilationContext->analyseAndBuildProgram();
 	}
 	
 	protected function addCoreToContext(): void {
@@ -49,11 +58,16 @@ abstract class BaseProgramTestHelper extends TestCase {
 				new TypeNameIdentifier($atomType)
 			);
 		}
+		$ef = fn() => $this->expressionRegistry->functionBody(
+			$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
+		);
 		$this->typeRegistry->addSealed(
 			new TypeNameIdentifier('IndexOutOfRange'),
 			$this->typeRegistry->record([
 				'index' => $this->typeRegistry->integer()
-			])
+			]),
+			$ef(),
+			$this->typeRegistry->nothing
 		);
 		$this->typeRegistry->addSealed(
 			new TypeNameIdentifier('CastNotAvailable'),
@@ -61,24 +75,32 @@ abstract class BaseProgramTestHelper extends TestCase {
 				'from' => $this->typeRegistry->type($this->typeRegistry->any),
 				'to' => $this->typeRegistry->type($this->typeRegistry->any),
 			]),
+			$ef(),
+			$this->typeRegistry->nothing
 		);
 		$this->typeRegistry->addSealed(
 			new TypeNameIdentifier('MapItemNotFound'),
 			$this->typeRegistry->record([
 				'key' => $this->typeRegistry->string()
 			]),
+			$ef(),
+			$this->typeRegistry->nothing
 		);
 		$this->typeRegistry->addSealed(
 			new TypeNameIdentifier('InvalidJsonValue'),
 			$this->typeRegistry->record([
 				'value' => $this->typeRegistry->any
 			]),
+			$ef(),
+			$this->typeRegistry->nothing
 		);
 		$this->typeRegistry->addSealed(
 			new TypeNameIdentifier('InvalidJsonString'),
 			$this->typeRegistry->record([
 				'value' => $this->typeRegistry->string()
 			]),
+			$ef(),
+			$this->typeRegistry->nothing
 		);
 		$this->typeRegistry->addSealed(
 			new TypeNameIdentifier('UnknownEnumerationValue'),
@@ -86,6 +108,8 @@ abstract class BaseProgramTestHelper extends TestCase {
 				'enumeration' => $this->typeRegistry->type($this->typeRegistry->any),
 				'value' => $this->typeRegistry->string(),
 			]),
+			$ef(),
+			$this->typeRegistry->nothing
 		);
 		$this->typeRegistry->addSealed(
 			new TypeNameIdentifier('DependencyContainerError'),
@@ -93,6 +117,8 @@ abstract class BaseProgramTestHelper extends TestCase {
 				'targetType' => $this->typeRegistry->type($this->typeRegistry->any),
 				'errorMessage' => $this->typeRegistry->string(),
 			]),
+			$ef(),
+			$this->typeRegistry->nothing
 		);
 		$this->typeRegistry->addSealed(
 			new TypeNameIdentifier('HydrationError'),
@@ -101,6 +127,8 @@ abstract class BaseProgramTestHelper extends TestCase {
 				'hydrationPath' => $this->typeRegistry->string(),
 				'errorMessage' => $this->typeRegistry->string(),
 			]),
+			$ef(),
+			$this->typeRegistry->nothing
 		);
 
 		$j = $this->typeRegistry->proxyType(
@@ -127,11 +155,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 			$this->typeRegistry->record([
 				'dsn' => $this->typeRegistry->string()
 			]),
-			$this->expressionRegistry->functionBody(
-				$this->expressionRegistry->constant(
-					$this->valueRegistry->null
-				)
-			),
+			$ef(),
 			null
 		);
 		$this->typeRegistry->addAlias(
@@ -192,6 +216,8 @@ abstract class BaseProgramTestHelper extends TestCase {
 				),
 				'error' => $this->typeRegistry->string(),
 			]),
+			$ef(),
+			$this->typeRegistry->nothing
 		);
 		$this->typeRegistry->addSealed(
 			new TypeNameIdentifier('DatabaseConnector'),
@@ -199,8 +225,10 @@ abstract class BaseProgramTestHelper extends TestCase {
 				'connection' => $this->typeRegistry->subtype(
 					new TypeNameIdentifier('DatabaseConnection')
 				)
-			])
-		);		
+			]),
+			$ef(),
+			$this->typeRegistry->nothing
+		);
 	}
 
 	/*

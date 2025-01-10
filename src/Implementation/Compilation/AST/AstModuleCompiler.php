@@ -20,27 +20,28 @@ use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Compilation\AST\AstCompilationException;
-use Walnut\Lang\Blueprint\Compilation\AST\AstExpressionCompiler;
 use Walnut\Lang\Blueprint\Compilation\AST\AstFunctionBodyCompiler;
 use Walnut\Lang\Blueprint\Compilation\AST\AstModuleCompilationException;
 use Walnut\Lang\Blueprint\Compilation\AST\AstModuleCompiler as AstModuleCompilerInterface;
 use Walnut\Lang\Blueprint\Compilation\AST\AstTypeCompiler;
 use Walnut\Lang\Blueprint\Compilation\AST\AstValueCompiler;
+use Walnut\Lang\Blueprint\Compilation\CompilationContext;
+use Walnut\Lang\Blueprint\Compilation\CompilationException;
+use Walnut\Lang\Blueprint\Function\CustomMethod;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
-use Walnut\Lang\Blueprint\Program\Builder\ProgramTypeBuilder;
-use Walnut\Lang\Blueprint\Program\Builder\ScopeBuilder;
+use Walnut\Lang\Blueprint\Type\NothingType;
+use Walnut\Lang\Blueprint\Type\SealedType;
+use Walnut\Lang\Blueprint\Type\SubtypeType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
 use Walnut\Lang\Blueprint\Value\Value;
 
 final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 	public function __construct(
-		private ProgramTypeBuilder          $programTypeBuilder,
+		private CompilationContext          $compilationContext,
 		private AstTypeCompiler             $astTypeCompiler,
 		private AstValueCompiler            $astValueCompiler,
-		private AstExpressionCompiler       $astExpressionCompiler,
 		private AstFunctionBodyCompiler     $astFunctionBodyCompiler,
-		private ScopeBuilder                $globalScopeBuilder
 	) {}
 
 	/** @throws AstModuleCompilationException */
@@ -59,18 +60,47 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 		}
 	}
 
+	/** @throws CompilationException */
+	public function addConstructorMethod(
+		TypeNameIdentifier $typeName,
+		Type $parameterType,
+		Type $dependencyType,
+		Type $errorType,
+		FunctionBody $functionBody
+	): CustomMethod {
+		$type = $this->compilationContext->typeRegistry->typeByName($typeName);
+		$returnType = match(true) {
+			$type instanceof SealedType => $type->valueType,
+			$type instanceof SubtypeType => $type->baseType,
+			default => throw new CompilationException(
+				"Constructors are only allowed for subtypes and sealed types",
+			)
+		};
+		return $this->compilationContext->customMethodRegistryBuilder->addMethod(
+			$this->compilationContext->typeRegistry->typeByName(new TypeNameIdentifier('Constructor')),
+			new MethodNameIdentifier($typeName),
+			$parameterType,
+			$dependencyType,
+			$errorType instanceof NothingType ? $returnType : $this->compilationContext->typeRegistry->result(
+				$returnType, $errorType
+			),
+			$functionBody
+		);
+	}
+
+
 	/** @throws AstCompilationException */
 	private function compileModuleDefinition(ModuleDefinitionNode $moduleDefinition): void {
 		match(true) {
 			$moduleDefinition instanceof AddAliasTypeNode =>
-				$this->programTypeBuilder->addAlias(
+				$this->compilationContext->typeRegistryBuilder->addAlias(
 					$moduleDefinition->name,
 					$this->type($moduleDefinition->aliasedType)
 				),
 			$moduleDefinition instanceof AddAtomTypeNode =>
-				$this->programTypeBuilder->addAtom($moduleDefinition->name),
+				$this->compilationContext->typeRegistryBuilder->addAtom($moduleDefinition->name),
 			$moduleDefinition instanceof AddConstructorMethodNode =>
-				$this->programTypeBuilder->customMethodRegistryBuilder->addConstructorMethod(
+				$this->addConstructorMethod(
 					$moduleDefinition->typeName,
 					$this->type($moduleDefinition->parameterType),
 					$this->type($moduleDefinition->dependencyType),
@@ -78,12 +108,12 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 					$this->functionBody($moduleDefinition->functionBody)
 				),
 			$moduleDefinition instanceof AddEnumerationTypeNode =>
-				$this->programTypeBuilder->addEnumeration(
+				$this->compilationContext->typeRegistryBuilder->addEnumeration(
 					$moduleDefinition->name,
 					$moduleDefinition->values
 				),
 			$moduleDefinition instanceof AddMethodNode =>
-				$this->programTypeBuilder->customMethodRegistryBuilder->addMethod(
+				$this->compilationContext->customMethodRegistryBuilder->addMethod(
 					$this->type($moduleDefinition->targetType),
 					$moduleDefinition->methodName,
 					$this->type($moduleDefinition->parameterType),
@@ -92,21 +122,25 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 					$this->functionBody($moduleDefinition->functionBody)
 				),
 			$moduleDefinition instanceof AddSealedTypeNode =>
-				$this->programTypeBuilder->addSealed(
+				$this->compilationContext->typeRegistryBuilder->addSealed(
 					$moduleDefinition->name,
 					$this->type($moduleDefinition->valueType),
-					$this->astExpressionCompiler->expression($moduleDefinition->constructorBody),
+					$this->functionBody(
+						$moduleDefinition->constructorBody
+					),
 					$this->type($moduleDefinition->errorType)
 				),
 			$moduleDefinition instanceof AddSubtypeTypeNode =>
-				$this->programTypeBuilder->addSubtype(
+				$this->compilationContext->typeRegistryBuilder->addSubtype(
 					$moduleDefinition->name,
 					$this->type($moduleDefinition->baseType),
-					$this->astExpressionCompiler->expression($moduleDefinition->constructorBody),
+					$this->functionBody(
+						$moduleDefinition->constructorBody
+					),
 					$this->type($moduleDefinition->errorType)
 				),
 			$moduleDefinition instanceof AddVariableNode =>
-				$this->globalScopeBuilder->addVariable($moduleDefinition->name,
+				$this->compilationContext->globalScopeBuilder->addVariable($moduleDefinition->name,
 					$moduleDefinition->value instanceof FunctionValueNode ?
 						$this->globalFunction(
 							new MethodNameIdentifier($moduleDefinition->name->identifier),
@@ -138,8 +172,8 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 	}
 
 	private function globalFunction(MethodNameIdentifier $methodName, FunctionValueNode $functionValueNode): FunctionValue {
-		$this->programTypeBuilder->customMethodRegistryBuilder->addMethod(
-			$this->programTypeBuilder->typeRegistry->typeByName(
+		$this->compilationContext->customMethodRegistryBuilder->addMethod(
+			$this->compilationContext->typeRegistry->typeByName(
 				new TypeNameIdentifier('Global')
 			),
 			$methodName,
@@ -148,17 +182,17 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 			$returnType = $this->type($functionValueNode->returnType),
 			$this->functionBody($functionValueNode->functionBody)
 		);
-		return $this->programTypeBuilder->valueRegistry->function(
+		return $this->compilationContext->valueRegistry->function(
 			$parameterType,
-			$this->programTypeBuilder->typeRegistry->typeByName(
+			$this->compilationContext->typeRegistry->typeByName(
 				new TypeNameIdentifier('Global')
 			),
 			$returnType,
-			$this->programTypeBuilder->expressionRegistry->functionBody(
-				$this->programTypeBuilder->expressionRegistry->methodCall(
-					$this->programTypeBuilder->expressionRegistry->variableName(new VariableNameIdentifier('%')),
+			$this->compilationContext->expressionRegistry->functionBody(
+				$this->compilationContext->expressionRegistry->methodCall(
+					$this->compilationContext->expressionRegistry->variableName(new VariableNameIdentifier('%')),
 					$methodName,
-					$this->programTypeBuilder->expressionRegistry->variableName(new VariableNameIdentifier('#')),
+					$this->compilationContext->expressionRegistry->variableName(new VariableNameIdentifier('#')),
 				)
 			)
 		);

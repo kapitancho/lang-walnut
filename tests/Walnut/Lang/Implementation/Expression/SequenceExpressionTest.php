@@ -10,29 +10,28 @@ use Walnut\Lang\Implementation\Code\Expression\ReturnExpression;
 use Walnut\Lang\Implementation\Code\Expression\SequenceExpression;
 use Walnut\Lang\Implementation\Code\Scope\VariableScope;
 use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
+use Walnut\Lang\Implementation\Compilation\CompilationContextFactory;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
+use Walnut\Lang\Implementation\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
-use Walnut\Lang\Test\EmptyDependencyContainer;
 
 final class SequenceExpressionTest extends TestCase {
 	private readonly TypeRegistryBuilder $typeRegistry;
 	private readonly ValueRegistry $valueRegistry;
+	private readonly ProgramRegistry $programRegistry;
 	private readonly SequenceExpression $sequenceExpression;
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->typeRegistry = new TypeRegistryBuilder();
-		$this->valueRegistry = new ValueRegistry($this->typeRegistry, new EmptyDependencyContainer);
+		$this->programRegistry = new CompilationContextFactory()->compilationContext->programRegistry;
+		$this->typeRegistry = $this->programRegistry->typeRegistry;
+		$this->valueRegistry = $this->programRegistry->valueRegistry;
 		$this->sequenceExpression = new SequenceExpression(
-			$this->typeRegistry,
-			$this->valueRegistry,
 			[
 				new ConstantExpression(
-					$this->typeRegistry,
 					$this->valueRegistry->integer(123)
 				),
 				new ConstantExpression(
-					$this->typeRegistry,
 					$this->valueRegistry->string("456")
 				)
 			]
@@ -44,7 +43,7 @@ final class SequenceExpressionTest extends TestCase {
 	}
 
 	public function testAnalyse(): void {
-		$result = $this->sequenceExpression->analyse(new AnalyserContext(new VariableScope([])));
+		$result = $this->sequenceExpression->analyse(new AnalyserContext($this->programRegistry, new VariableScope([])));
 		self::assertTrue($result->expressionType->isSubtypeOf(
 			$this->typeRegistry->string()
 		));
@@ -52,7 +51,7 @@ final class SequenceExpressionTest extends TestCase {
 
 	public function testExecute(): void {
 		$result = $this->sequenceExpression->execute(
-			new ExecutionContext(new VariableValueScope([]))
+			new ExecutionContext($this->programRegistry, new VariableValueScope([]))
 		);
 		self::assertEquals(
 			$this->valueRegistry->string("456"),
@@ -62,22 +61,17 @@ final class SequenceExpressionTest extends TestCase {
 
 	public function testAnalyseWithReturn(): void {
 		$result = new SequenceExpression(
-			$this->typeRegistry,
-			$this->valueRegistry,
 			[
 				new ReturnExpression(
-					$this->typeRegistry,
 					new ConstantExpression(
-						$this->typeRegistry,
 						$this->valueRegistry->integer(123)
 					)
 				),
 				new ConstantExpression(
-					$this->typeRegistry,
 					$this->valueRegistry->string("456")
 				)
 			]
-		)->analyse(new AnalyserContext(new VariableScope([])));
+		)->analyse(new AnalyserContext($this->programRegistry, new VariableScope([])));
 		self::assertTrue($result->expressionType->isSubtypeOf(
 			$this->typeRegistry->integer()
 		));

@@ -11,25 +11,28 @@ use Walnut\Lang\Implementation\Code\Expression\ConstantExpression;
 use Walnut\Lang\Implementation\Code\Expression\VariableAssignmentExpression;
 use Walnut\Lang\Implementation\Code\Scope\VariableScope;
 use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
+use Walnut\Lang\Implementation\Compilation\CompilationContextFactory;
+use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
+use Walnut\Lang\Implementation\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
 use Walnut\Lang\Test\EmptyDependencyContainer;
 
 final class VariableAssignmentExpressionTest extends TestCase {
 	private readonly TypeRegistryBuilder $typeRegistry;
 	private readonly ValueRegistry $valueRegistry;
+	private readonly ProgramRegistry $programRegistry;
 	private readonly VariableAssignmentExpression $variableAssignmentExpression;
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->typeRegistry = new TypeRegistryBuilder();
-		$this->valueRegistry = new ValueRegistry($this->typeRegistry, new EmptyDependencyContainer);
-		$this->variableAssignmentExpression = 
+		$this->programRegistry = new CompilationContextFactory()->compilationContext->programRegistry;
+		$this->typeRegistry = $this->programRegistry->typeRegistry;
+		$this->valueRegistry = $this->programRegistry->valueRegistry;
+		$this->variableAssignmentExpression =
 			new VariableAssignmentExpression(
-				$this->typeRegistry,
 				new VariableNameIdentifier('x'),
 				new ConstantExpression(
-					$this->typeRegistry,
 					$this->valueRegistry->integer(123)
 				)
 			);
@@ -49,7 +52,7 @@ final class VariableAssignmentExpressionTest extends TestCase {
 
 	public function testAnalyse(): void {
 		$result = $this->variableAssignmentExpression->analyse(
-			new AnalyserContext(
+			new AnalyserContext($this->programRegistry,
 				new VariableScope([
 					'x' => $this->typeRegistry->integer()
 				])
@@ -65,7 +68,7 @@ final class VariableAssignmentExpressionTest extends TestCase {
 
 	public function testExecute(): void {
 		$result = $this->variableAssignmentExpression->execute(
-			new ExecutionContext(
+			new ExecutionContext($this->programRegistry,
 				new VariableValueScope([
 					'x' => new TypedValue(
 						$this->typeRegistry->integer(),

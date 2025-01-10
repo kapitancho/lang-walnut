@@ -9,29 +9,30 @@ use Walnut\Lang\Implementation\Code\Expression\ConstantExpression;
 use Walnut\Lang\Implementation\Code\Expression\RecordExpression;
 use Walnut\Lang\Implementation\Code\Scope\VariableScope;
 use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
+use Walnut\Lang\Implementation\Compilation\CompilationContextFactory;
+use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
+use Walnut\Lang\Implementation\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
 use Walnut\Lang\Test\EmptyDependencyContainer;
 
 final class RecordExpressionTest extends TestCase {
 	private readonly TypeRegistryBuilder $typeRegistry;
 	private readonly ValueRegistry $valueRegistry;
+	private readonly ProgramRegistry $programRegistry;
 	private readonly RecordExpression $recordExpression;
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->typeRegistry = new TypeRegistryBuilder();
-		$this->valueRegistry = new ValueRegistry($this->typeRegistry, new EmptyDependencyContainer);
+		$this->programRegistry = new CompilationContextFactory()->compilationContext->programRegistry;
+		$this->typeRegistry = $this->programRegistry->typeRegistry;
+		$this->valueRegistry = $this->programRegistry->valueRegistry;
 		$this->recordExpression = new RecordExpression(
-			$this->typeRegistry,
-			$this->valueRegistry,
 			[
 				'a' => new ConstantExpression(
-					$this->typeRegistry,
 					$this->valueRegistry->integer(123)
 				),
 				'b' => new ConstantExpression(
-					$this->typeRegistry,
 					$this->valueRegistry->string("456")
 				)
 			]
@@ -44,7 +45,7 @@ final class RecordExpressionTest extends TestCase {
 
 	public function testAnalyse(): void {
 		$result = $this->recordExpression->analyse(
-			new AnalyserContext(
+			new AnalyserContext($this->programRegistry,
 				new VariableScope([])
 			)
 		);
@@ -58,7 +59,7 @@ final class RecordExpressionTest extends TestCase {
 
 	public function testExecute(): void {
 		$result = $this->recordExpression->execute(
-			new ExecutionContext(
+			new ExecutionContext($this->programRegistry,
 				new VariableValueScope([])
 			)
 		);
