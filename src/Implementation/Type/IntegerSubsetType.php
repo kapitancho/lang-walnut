@@ -87,7 +87,7 @@ final class IntegerSubsetType implements IntegerSubsetTypeInterface, JsonSeriali
 	public function jsonSerialize(): array {
 		return [
 			'type' => 'IntegerSubset',
-			'values' => $this->subsetValues
+			'values' => array_map(fn(Number $value): int => (int)(string)$value, $this->subsetValues)
 		];
 	}
 }

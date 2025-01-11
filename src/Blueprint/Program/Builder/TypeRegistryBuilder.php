@@ -24,14 +24,14 @@ interface TypeRegistryBuilder {
 	public function addSubtype(
 		TypeNameIdentifier $name,
 		Type $baseType,
-		FunctionBody $constructorBody,
-		Type|null $errorType
+		FunctionBody|null $constructorBody = null,
+		Type|null $errorType = null
 	): SubtypeType;
 
 	public function addSealed(
 		TypeNameIdentifier $name,
 		RecordType $valueType,
-		FunctionBody $constructorBody,
-		Type|null $errorType
+		FunctionBody|null $constructorBody = null,
+		Type|null $errorType = null
 	): SealedType;
 }

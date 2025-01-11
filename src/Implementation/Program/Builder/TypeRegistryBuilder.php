@@ -354,24 +354,28 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 	public function addSubtype(
 		TypeNameIdentifier $name,
 		Type $baseType,
-		FunctionBody $constructorBody,
-		Type|null $errorType
+		FunctionBody|null $constructorBody = null,
+		Type|null $errorType = null
 	): SubtypeType {
 		$result = new SubtypeType($name, $baseType);
 		$this->subtypeTypes[$name->identifier] = $result;
-		$this->addConstructorMethod($name, $baseType, $errorType, $constructorBody);
+		if ($constructorBody) {
+			$this->addConstructorMethod($name, $baseType, $errorType, $constructorBody);
+		}
 		return $result;
 	}
 
 	public function addSealed(
 		TypeNameIdentifier  $name,
 		RecordTypeInterface $valueType,
-		FunctionBody        $constructorBody,
-		Type|null           $errorType
+		FunctionBody|null   $constructorBody = null,
+		Type|null           $errorType = null
 	): SealedType {
 		$result = new SealedType($name, $valueType);
 		$this->sealedTypes[$name->identifier] = $result;
-		$this->addConstructorMethod($name, $valueType, $errorType, $constructorBody);
+		if ($constructorBody) {
+			$this->addConstructorMethod($name, $valueType, $errorType, $constructorBody);
+		}
 		return $result;
 	}
 

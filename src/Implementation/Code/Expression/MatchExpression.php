@@ -14,8 +14,10 @@ use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionDefault;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionOperation;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionPair;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
+use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
+use Walnut\Lang\Blueprint\Value\NullValue;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 
 final readonly class MatchExpression implements MatchExpressionInterface, JsonSerializable {
@@ -133,15 +135,29 @@ final readonly class MatchExpression implements MatchExpressionInterface, JsonSe
 			$this->target->value instanceof BooleanValue &&
 			$this->target->value->literalValue;
 
+		$isIf = !$isMatchTrue && count($this->pairs) === 2 &&
+			$this->pairs[0] instanceof MatchExpressionPair &&
+			$this->pairs[1] instanceof MatchExpressionDefault &&
+			$this->pairs[0]->matchExpression instanceof ConstantExpression &&
+			$this->pairs[0]->matchExpression->value instanceof BooleanValue &&
+			$this->pairs[0]->matchExpression->value->literalValue &&
+			$this->target instanceof MethodCallExpression &&
+			$this->target->methodName->equals(new MethodNameIdentifier('asBoolean'));
+		$else = !$isIf || ($this->pairs[1]->valueExpression instanceof ConstantExpression &&
+			$this->pairs[1]->valueExpression->value instanceof NullValue) ? '' :
+			sprintf(" ~ { %s }", $this->pairs[1]->valueExpression);
+
 		$pairs = implode(", ", $this->pairs);
 
 		return match(true) {
 			$this->operation instanceof MatchExpressionIsSubtypeOf =>
-				sprintf("?whenTypeOf (%s) %s { %s }", $this->target, $this->operation, $pairs),
+				sprintf("?whenTypeOf (%s) is { %s }", $this->target, $pairs),
 			$isMatchTrue =>
 				sprintf("?whenIsTrue { %s }", $pairs),
+			$isIf =>
+				sprintf("?when (%s) { %s }%s", $this->target->target, $this->pairs[0]->valueExpression, $else),
 			default =>
-				sprintf("?whenValueOf (%s) %s { %s }", $this->target, $this->operation, $pairs),
+				sprintf("?whenValueOf (%s) is { %s }", $this->target, $pairs),
 		};
 	}
 

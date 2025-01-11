@@ -95,6 +95,8 @@ final readonly class RecordType implements RecordTypeInterface, JsonSerializable
 				$typeStr = $multiline ? "\t" . str_replace("\n", "\n" . "\t", $typeStr) : $typeStr;
 				$types[] = $typeStr;
 			}
+		} else {
+			$typeX = ':';
 		}
 		if ($this->restType instanceof AnyTypeInterface) {
 			$types[] = "...";
@@ -109,7 +111,7 @@ final readonly class RecordType implements RecordTypeInterface, JsonSerializable
 		}
 		return $multiline ?
 			sprintf("[\n%s%s\n]", $typeX, implode("," . "\n", $types)) :
-			sprintf("[%s%s]", $typeX, implode(", ", $types) ?: ':');
+			sprintf("[%s%s]", $typeX, implode(", ", $types));
 	}
 
 	public function __toString(): string {

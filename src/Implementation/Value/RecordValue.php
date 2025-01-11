@@ -84,8 +84,8 @@ final class RecordValue implements RecordValueInterface, JsonSerializable {
 
 	public function jsonSerialize(): array {
 		return [
-			'valueType' => 'Dict',
-			'values' => $this->values
+			'valueType' => 'Record',
+			'value' => $this->values
 		];
 	}
 

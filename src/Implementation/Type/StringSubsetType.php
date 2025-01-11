@@ -46,7 +46,10 @@ final class StringSubsetType implements StringSubsetTypeInterface, JsonSerializa
 	}
 
 	public function __toString(): string {
-		return sprintf("String[%s]", implode(', ', $this->subsetValues));
+		return sprintf("String[%s]", implode(', ', array_map(
+			fn(string $value): string => "'" . str_replace(['\\', "\n", "'"], ['\\\\', '\n', '\`'], $value) . "'",
+			$this->subsetValues
+		)));
 	}
 
 	private function minLength(): Number {
@@ -70,6 +73,9 @@ final class StringSubsetType implements StringSubsetTypeInterface, JsonSerializa
 	}
 
 	public function jsonSerialize(): array {
-		return ['type' => 'StringSubset', 'values' => $this->subsetValues];
+		return [
+			'type' => 'StringSubset',
+			'values' => $this->subsetValues
+		];
 	}
 }

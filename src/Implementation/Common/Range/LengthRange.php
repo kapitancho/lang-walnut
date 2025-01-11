@@ -49,8 +49,8 @@ final readonly class LengthRange implements LengthRangeInterface, JsonSerializab
 
 	public function jsonSerialize(): array {
 		return [
-			'minLength' => $this->minLength,
-			'maxLength' => $this->maxLength instanceof PlusInfinity ? '+Infinity' : $this->maxLength
+			'minLength' => (int)(string)$this->minLength,
+			'maxLength' => $this->maxLength instanceof PlusInfinity ? '+Infinity' : (int)(string)$this->maxLength
 		];
 	}
 }

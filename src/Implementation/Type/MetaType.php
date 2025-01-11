@@ -62,7 +62,8 @@ final readonly class MetaType implements MetaTypeInterface, SupertypeChecker, Js
 
 	public function jsonSerialize(): array {
 		return [
-			'type' => $this->value->value
+			'type' => 'MetaType',
+			'metaType' => $this->value->value
 		];
 	}
 }

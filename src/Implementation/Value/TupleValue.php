@@ -84,7 +84,7 @@ final class TupleValue implements TupleValueInterface, JsonSerializable {
 
 	public function jsonSerialize(): array {
 		return [
-			'valueType' => 'List',
+			'valueType' => 'Tuple',
 			'value' => $this->values
 		];
 	}

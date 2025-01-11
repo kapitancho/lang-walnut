@@ -98,8 +98,8 @@ final readonly class IntegerRange implements IntegerRangeInterface, JsonSerializ
 
 	public function jsonSerialize(): array {
 		return [
-			'minValue' => $this->minValue instanceof MinusInfinity ? '-Infinity' : $this->minValue,
-			'maxValue' => $this->maxValue instanceof PlusInfinity ? '+Infinity' : $this->maxValue
+			'minValue' => $this->minValue instanceof MinusInfinity ? '-Infinity' : (int)(string)$this->minValue,
+			'maxValue' => $this->maxValue instanceof PlusInfinity ? '+Infinity' : (int)(string)$this->maxValue
 		];
 	}
 }

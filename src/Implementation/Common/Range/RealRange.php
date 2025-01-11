@@ -46,8 +46,8 @@ final readonly class RealRange implements RealRangeInterface, JsonSerializable {
 
 	public function jsonSerialize(): array {
 		return [
-			'minValue' => $this->minValue instanceof MinusInfinity ? '-Infinity' : $this->minValue,
-			'maxValue' => $this->maxValue instanceof PlusInfinity ? '+Infinity' : $this->maxValue
+			'minValue' => $this->minValue instanceof MinusInfinity ? '-Infinity' : (float)(string)$this->minValue,
+			'maxValue' => $this->maxValue instanceof PlusInfinity ? '+Infinity' : (float)(string)$this->maxValue
 		];
 	}
 }

@@ -69,6 +69,9 @@ final class RealSubsetType implements RealSubsetTypeInterface, JsonSerializable 
 	}
 
 	public function jsonSerialize(): array {
-		return ['type' => 'RealSubset', 'values' => $this->subsetValues];
+		return [
+			'type' => 'RealSubset',
+			'values' => array_map(fn(Number $value): float => (float)(string)$value, $this->subsetValues)
+		];
 	}
 }

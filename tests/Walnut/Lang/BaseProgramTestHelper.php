@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Test;
 
 use PHPUnit\Framework\TestCase;
+use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder;
@@ -230,6 +231,21 @@ abstract class BaseProgramTestHelper extends TestCase {
 			$ef(),
 			$this->typeRegistry->nothing
 		);
+	}
+
+
+	protected function addSampleTypes(): void {
+		$i = fn(string $name) => new TypeNameIdentifier($name);
+		$ev = fn(string $name) => new EnumValueIdentifier($name);
+		$this->typeRegistryBuilder->addAlias($i('MyAlias'), $this->typeRegistry->null);
+		$this->typeRegistryBuilder->addAtom($i('MyAtom'));
+		$this->typeRegistryBuilder->addEnumeration($i('MyEnum'), [
+			$ev('A'),
+			$ev('B'),
+			$ev('C')
+		]);
+		$this->typeRegistryBuilder->addSealed($i('MySealed'), $this->typeRegistry->record([]));
+		$this->typeRegistryBuilder->addSubtype($i('MySubtype'), $this->typeRegistry->null);
 	}
 
 	/*

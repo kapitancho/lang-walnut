@@ -36,7 +36,7 @@ final class IntegerValue implements IntegerValueInterface, JsonSerializable {
 	public function jsonSerialize(): array {
 		return [
 			'valueType' => 'Integer',
-			'value' => $this->literalValue
+			'value' => (int)(string)$this->literalValue
 		];
 	}
 }

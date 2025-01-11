@@ -33,7 +33,7 @@ final class RealValue implements RealValueInterface, JsonSerializable {
 	public function jsonSerialize(): array {
 		return [
 			'valueType' => 'Real',
-			'value' => $this->literalValue
+			'value' => (float)(string)$this->literalValue
 		];
 	}
 

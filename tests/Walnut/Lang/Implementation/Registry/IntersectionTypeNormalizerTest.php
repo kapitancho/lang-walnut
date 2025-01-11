@@ -48,7 +48,7 @@ final class IntersectionTypeNormalizerTest extends BaseProgramTestHelper {
             )
         );
         $this->assertEquals(
-            "String[a]", (string)$this->intersection(
+            "String['a']", (string)$this->intersection(
                 $this->typeRegistry->union([
                     $this->valueRegistry->string('a')->type,
                     $this->valueRegistry->string('b')->type

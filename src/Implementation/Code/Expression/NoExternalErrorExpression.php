@@ -86,14 +86,14 @@ final readonly class NoExternalErrorExpression implements NoExternalErrorExpress
 
 	public function __toString(): string {
 		return sprintf(
-			"?noError(%s)",
+			"?noExternalError(%s)",
 			$this->targetExpression
 		);
 	}
 
 	public function jsonSerialize(): array {
 		return [
-			'expressionType' => 'noError',
+			'expressionType' => 'noExternalError',
 			'targetExpression' => $this->targetExpression
 		];
 	}
