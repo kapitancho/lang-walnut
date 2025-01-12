@@ -6,6 +6,7 @@ use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\UnknownProperty;
 
 interface RecordValue extends Value {
+	/** @var array<string, Value> */
 	public array $values { get; }
 	public RecordType $type { get; }
 

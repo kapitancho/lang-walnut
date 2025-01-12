@@ -44,6 +44,10 @@ final class CompilerTest extends TestCase {
 				$value = $ep->call($vr->tuple([]));
 				$this->assertInstanceOf(Value::class, $value);
 
+				if ($source === 'demo-all') {
+					$this->assertNotEquals('{}', json_encode($compilationResult->ast));
+				}
+
 				//$this->assertNotEquals('{}', json_encode($compilationResult->programContext));
 				//$this->assertNotEquals('', (string)$compilationResult->programContext);
 			}

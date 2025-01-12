@@ -21,6 +21,7 @@ use Walnut\Lang\Blueprint\AST\Node\Expression\PropertyAccessExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\RecordExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ReturnExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\SequenceExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\SetExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\TupleExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\VariableAssignmentExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\VariableNameExpressionNode;
@@ -55,6 +56,7 @@ use Walnut\Lang\Blueprint\AST\Node\Type\RealSubsetTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\RealTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\RecordTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\ResultTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\SetTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\StringSubsetTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\StringTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\TrueTypeNode;
@@ -70,6 +72,7 @@ use Walnut\Lang\Blueprint\AST\Node\Value\IntegerValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\NullValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\RealValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\RecordValueNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\SetValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\StringValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\TrueValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\TupleValueNode;
@@ -125,6 +128,8 @@ interface NodeBuilder {
 	public function tuple(array $values): TupleExpressionNode;
 	/** @param array<string, ExpressionNode> $values */
 	public function record(array $values): RecordExpressionNode;
+	/** @param list<ExpressionNode> $values */
+	public function set(array $values): SetExpressionNode;
 
 	public function matchPair(ExpressionNode $matchExpression, ExpressionNode $valueExpression): MatchExpressionPairNode;
 
@@ -228,6 +233,11 @@ interface NodeBuilder {
 		Number $minLength = new Number(0),
 		Number|PlusInfinity $maxLength = PlusInfinity::value
 	): MapTypeNode;
+	public function setType(
+		TypeNode|null $itemType = null,
+		Number $minLength = new Number(0),
+		Number|PlusInfinity $maxLength = PlusInfinity::value
+	): SetTypeNode;
 
 	public AnyTypeNode $anyType { get; }
 	public NothingTypeNode $nothingType { get; }
@@ -250,6 +260,8 @@ interface NodeBuilder {
 	public function recordValue(array $values): RecordValueNode;
 	/** @param list<ValueNode> $values */
 	public function tupleValue(array $values): TupleValueNode;
+	/** @param list<ValueNode> $values */
+	public function setValue(array $values): SetValueNode;
 	public function functionValue(
 		TypeNode $parameterType,
 		TypeNode $dependencyType,

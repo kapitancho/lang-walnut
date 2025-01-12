@@ -20,6 +20,7 @@ use Walnut\Lang\Blueprint\Value\NullValue;
 use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\SealedValue;
+use Walnut\Lang\Blueprint\Value\SetValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Blueprint\Value\SubtypeValue;
 use Walnut\Lang\Blueprint\Value\TupleValue;
@@ -40,6 +41,8 @@ interface ValueRegistry {
 	public function tuple(array $values): TupleValue;
 	/** @param array<string, Value> $values */
 	public function record(array $values): RecordValue;
+	/** @param list<Value> $values */
+	public function set(array $values): SetValue;
 
 	public function function(
 		Type $parameterType, Type $dependencyType, Type $returnType, FunctionBody $body

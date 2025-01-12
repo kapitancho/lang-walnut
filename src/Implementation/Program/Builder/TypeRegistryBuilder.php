@@ -7,6 +7,7 @@ use JsonSerializable;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Range\InvalidLengthRange;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
@@ -50,6 +51,7 @@ use Walnut\Lang\Implementation\Type\RealType;
 use Walnut\Lang\Implementation\Type\RecordType;
 use Walnut\Lang\Implementation\Type\ResultType;
 use Walnut\Lang\Implementation\Type\SealedType;
+use Walnut\Lang\Implementation\Type\SetType;
 use Walnut\Lang\Implementation\Type\StringSubsetType;
 use Walnut\Lang\Implementation\Type\StringType;
 use Walnut\Lang\Implementation\Type\SubtypeType;
@@ -262,6 +264,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
         return $this->enumerationTypes[$typeName->identifier] ?? UnknownType::withName($typeName);
     }
 
+	/** @throws InvalidLengthRange */
 	public function array(Type|null $itemType = null, int|Number $minLength = 0, int|Number|PlusInfinity $maxLength = PlusInfinity::value): ArrayType {
 		return new ArrayType(
 			$itemType ?? $this->any,
@@ -272,8 +275,24 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		);
 	}
 
+	/** @throws InvalidLengthRange */
 	public function map(Type|null $itemType = null, int|Number $minLength = 0, int|Number|PlusInfinity $maxLength = PlusInfinity::value): MapType {
 		return new MapType($itemType ?? $this->any,
+			new LengthRange(
+				is_int($minLength) ? new Number($minLength) : $minLength,
+		       is_int($maxLength) ? new Number($maxLength) : $maxLength
+			)
+		);
+	}
+
+	/** @throws InvalidLengthRange */
+	public function set(
+		Type|null        $itemType = null,
+		int|Number              $minLength = 0,
+		int|Number|PlusInfinity $maxLength = PlusInfinity::value
+	): SetType {
+		return new SetType(
+			$itemType ?? $this->any,
 			new LengthRange(
 				is_int($minLength) ? new Number($minLength) : $minLength,
 		       is_int($maxLength) ? new Number($maxLength) : $maxLength

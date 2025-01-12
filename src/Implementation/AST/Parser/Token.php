@@ -33,6 +33,7 @@ enum Token: string {
 	case type_end = '\>';
 	case empty_tuple = '\[\]';
 	case empty_record = '\[\:\]';
+	case empty_set = '\[\;\]';
 	case tuple_start = '\[';
 	case tuple_end = '\]';
 	case union = '\|';

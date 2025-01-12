@@ -15,6 +15,7 @@ use Walnut\Lang\Blueprint\Code\Expression\NoExternalErrorExpression;
 use Walnut\Lang\Blueprint\Code\Expression\RecordExpression;
 use Walnut\Lang\Blueprint\Code\Expression\ReturnExpression;
 use Walnut\Lang\Blueprint\Code\Expression\SequenceExpression;
+use Walnut\Lang\Blueprint\Code\Expression\SetExpression;
 use Walnut\Lang\Blueprint\Code\Expression\TupleExpression;
 use Walnut\Lang\Blueprint\Code\Expression\VariableAssignmentExpression;
 use Walnut\Lang\Blueprint\Code\Expression\VariableNameExpression;
@@ -32,6 +33,8 @@ interface ExpressionRegistry {
 	public function tuple(array $values): TupleExpression;
 	/** @param array<string, Expression> $values */
 	public function record(array $values): RecordExpression;
+	/** @param list<Expression> $values */
+	public function set(array $values): SetExpression;
 
 	/** @param list<Expression> $values */
 	public function sequence(array $values): SequenceExpression;

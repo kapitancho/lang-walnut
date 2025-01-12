@@ -24,6 +24,7 @@ use Walnut\Lang\Blueprint\AST\Node\Type\RealSubsetTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\RealTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\RecordTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\ResultTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\SetTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\StringSubsetTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\StringTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\TrueTypeNode;
@@ -71,6 +72,11 @@ final readonly class AstTypeCompiler implements AstTypeCompilerInterface {
 					$typeNode->maxLength
 				),
 				$typeNode instanceof MapTypeNode => $this->typeRegistry->map(
+					$this->type($typeNode->itemType),
+					$typeNode->minLength,
+					$typeNode->maxLength
+				),
+				$typeNode instanceof SetTypeNode => $this->typeRegistry->set(
 					$this->type($typeNode->itemType),
 					$typeNode->minLength,
 					$typeNode->maxLength

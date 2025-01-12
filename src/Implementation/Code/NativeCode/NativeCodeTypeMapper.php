@@ -26,6 +26,7 @@ use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\SealedType;
+use Walnut\Lang\Blueprint\Type\SetType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\SubtypeType;
@@ -40,6 +41,7 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 		return [
 			ArrayType::class => ['Array'],
 			MapType::class => ['Map'],
+			SetType::class => ['Set'],
 			TupleType::class => ['Tuple', 'Array'],
 			RecordType::class => ['Record', 'Map'],
 			IntegerType::class => ['Integer', 'Real'],

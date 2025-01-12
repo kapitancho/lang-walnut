@@ -24,6 +24,7 @@ use Walnut\Lang\Implementation\Value\MutableValue;
 use Walnut\Lang\Implementation\Value\RealValue;
 use Walnut\Lang\Implementation\Value\RecordValue;
 use Walnut\Lang\Implementation\Value\SealedValue;
+use Walnut\Lang\Implementation\Value\SetValue;
 use Walnut\Lang\Implementation\Value\StringValue;
 use Walnut\Lang\Implementation\Value\SubtypeValue;
 use Walnut\Lang\Implementation\Value\TupleValue;
@@ -75,6 +76,14 @@ final class ValueRegistry implements ValueRegistryInterface {
 	/** @param array<string, Value> $values */
 	public function record(array $values): RecordValue {
 		return new RecordValue(
+			$this->typeRegistry,
+			$values
+		);
+	}
+
+	/** @param list<Value> $values */
+	public function set(array $values): SetValue {
+		return new SetValue(
 			$this->typeRegistry,
 			$values
 		);

@@ -27,6 +27,7 @@ use Walnut\Lang\Implementation\Code\Expression\NoExternalErrorExpression;
 use Walnut\Lang\Implementation\Code\Expression\RecordExpression;
 use Walnut\Lang\Implementation\Code\Expression\ReturnExpression;
 use Walnut\Lang\Implementation\Code\Expression\SequenceExpression;
+use Walnut\Lang\Implementation\Code\Expression\SetExpression;
 use Walnut\Lang\Implementation\Code\Expression\TupleExpression;
 use Walnut\Lang\Implementation\Code\Expression\VariableAssignmentExpression;
 use Walnut\Lang\Implementation\Code\Expression\VariableNameExpression;
@@ -132,6 +133,10 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 	/** @param array<string, Expression> $values */
 	public function record(array $values): RecordExpression {
 		return new RecordExpression($values);
+	}
+	/** @param list<Expression> $values */
+	public function set(array $values): SetExpression {
+		return new SetExpression($values);
 	}
 
 	/** @param list<Expression> $values */

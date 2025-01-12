@@ -11,6 +11,7 @@ use Walnut\Lang\Blueprint\AST\Node\Value\IntegerValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\NullValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\RealValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\RecordValueNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\SetValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\StringValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\TrueValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\TupleValueNode;
@@ -59,6 +60,9 @@ final readonly class AstValueCompiler implements AstValueCompilerInterface {
 					array_map($this->value(...), $valueNode->values)
 				),
 				$valueNode instanceof TupleValueNode => $this->valueRegistry->tuple(
+					array_map($this->value(...), $valueNode->values)
+				),
+				$valueNode instanceof SetValueNode => $this->valueRegistry->set(
 					array_map($this->value(...), $valueNode->values)
 				),
 				$valueNode instanceof TypeValueNode => $this->valueRegistry->type(

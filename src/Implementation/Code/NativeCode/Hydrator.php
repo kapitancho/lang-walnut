@@ -30,6 +30,7 @@ use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\SealedType;
+use Walnut\Lang\Blueprint\Type\SetType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\SubtypeType;
@@ -48,6 +49,7 @@ use Walnut\Lang\Blueprint\Value\MutableValue;
 use Walnut\Lang\Blueprint\Value\NullValue;
 use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\RecordValue;
+use Walnut\Lang\Blueprint\Value\SetValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Blueprint\Value\SubtypeValue;
 use Walnut\Lang\Blueprint\Value\TupleValue;
@@ -76,6 +78,7 @@ final readonly class Hydrator {
 
 			$targetType instanceof AnyType => $this->hydrateAny(...),
 			$targetType instanceof ArrayType => $this->hydrateArray(...),
+			$targetType instanceof SetType => $this->hydrateSet(...),
 			$targetType instanceof AtomType => $this->hydrateAtom(...),
 			$targetType instanceof EnumerationType => $this->hydrateEnumeration(...),
 			$targetType instanceof EnumerationSubsetType => $this->hydrateEnumerationSubset(...),
@@ -574,6 +577,40 @@ final readonly class Hydrator {
 			$value,
 			$hydrationPath,
 			sprintf("The value should be an array with a length between %s and %s",
+				$targetType->range->minLength,
+				$targetType->range->maxLength === PlusInfinity::value ? "+Infinity" : $targetType->range->maxLength,
+			)
+		);
+	}
+
+	private function hydrateSet(Value $value, SetType $targetType, string $hydrationPath): SetValue {
+		if ($value instanceof TupleValue || $value instanceof SetValue) {
+			$refType = $targetType->itemType;
+			$result = [];
+			foreach($value->values as $seq => $item) {
+				$result[] = $this->hydrateValue($item, $refType, "{$hydrationPath}[$seq]");
+			}
+			$set = $this->programRegistry->valueRegistry->set($result);
+			$l = count($set->values);
+			if ($targetType->range->minLength <= $l && (
+					$targetType->range->maxLength === PlusInfinity::value ||
+					$targetType->range->maxLength >= $l
+			)) {
+				return $this->programRegistry->valueRegistry->set($result);
+			}
+			throw new HydrationException(
+				$value,
+				$hydrationPath,
+				sprintf("The set value should be with a length between %s and %s",
+					$targetType->range->minLength,
+					$targetType->range->maxLength === PlusInfinity::value ? "+Infinity" : $targetType->range->maxLength,
+				)
+			);
+		}
+		throw new HydrationException(
+			$value,
+			$hydrationPath,
+			sprintf("The value should be an set with a length between %s and %s",
 				$targetType->range->minLength,
 				$targetType->range->maxLength === PlusInfinity::value ? "+Infinity" : $targetType->range->maxLength,
 			)

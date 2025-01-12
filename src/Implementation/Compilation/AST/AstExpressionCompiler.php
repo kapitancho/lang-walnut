@@ -20,6 +20,7 @@ use Walnut\Lang\Blueprint\AST\Node\Expression\PropertyAccessExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\RecordExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ReturnExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\SequenceExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\SetExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\TupleExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\VariableAssignmentExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\VariableNameExpressionNode;
@@ -155,6 +156,10 @@ final readonly class AstExpressionCompiler implements AstExpressionCompilerInter
 			$expressionNode instanceof ReturnExpressionNode =>
 				$this->expressionRegistry->return(
 					$this->expression($expressionNode->returnedExpression)
+				),
+			$expressionNode instanceof SetExpressionNode =>
+				$this->expressionRegistry->set(
+					array_map($this->expression(...), $expressionNode->values)
 				),
 			$expressionNode instanceof SequenceExpressionNode =>
 				$this->expressionRegistry->sequence(

@@ -36,6 +36,7 @@ use Walnut\Lang\Implementation\AST\Node\Expression\PropertyAccessExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\RecordExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\ReturnExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\SequenceExpressionNode;
+use Walnut\Lang\Implementation\AST\Node\Expression\SetExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\TupleExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\VariableAssignmentExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\VariableNameExpressionNode;
@@ -71,6 +72,7 @@ use Walnut\Lang\Implementation\AST\Node\Type\RealSubsetTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\RealTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\RecordTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\ResultTypeNode;
+use Walnut\Lang\Implementation\AST\Node\Type\SetTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\StringSubsetTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\StringTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\TrueTypeNode;
@@ -85,6 +87,7 @@ use Walnut\Lang\Implementation\AST\Node\Value\IntegerValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\NullValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\RealValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\RecordValueNode;
+use Walnut\Lang\Implementation\AST\Node\Value\SetValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\StringValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\TrueValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\TupleValueNode;
@@ -228,6 +231,11 @@ final class NodeBuilder implements NodeBuilderInterface {
 	/** @param array<string, ExpressionNode> $values */
 	public function record(array $values): RecordExpressionNode {
 		return new RecordExpressionNode($this->getSourceLocation(), $values);
+	}
+
+	/** @param list<ExpressionNode> $values */
+	public function set(array $values): SetExpressionNode {
+		return new SetExpressionNode($this->getSourceLocation(), $values);
 	}
 
 	public function matchPair(ExpressionNode $matchExpression, ExpressionNode $valueExpression): MatchExpressionPairNode {
@@ -482,6 +490,19 @@ final class NodeBuilder implements NodeBuilderInterface {
 		);
 	}
 
+	public function setType(
+		TypeNode|null $itemType = null,
+		Number $minLength = new Number(0),
+		Number|PlusInfinity $maxLength = PlusInfinity::value
+	): SetTypeNode {
+		return new SetTypeNode(
+			$this->getSourceLocation(),
+			$itemType ?? $this->anyType,
+			$minLength,
+			$maxLength
+		);
+	}
+
 	public function integerValue(Number $value): IntegerValueNode {
 		return new IntegerValueNode($this->getSourceLocation(), $value);
 	}
@@ -514,6 +535,11 @@ final class NodeBuilder implements NodeBuilderInterface {
 	/** @param list<ValueNode> $values */
 	public function tupleValue(array $values): TupleValueNode {
 		return new TupleValueNode($this->getSourceLocation(), $values);
+	}
+
+	/** @param list<ValueNode> $values */
+	public function setValue(array $values): SetValueNode {
+		return new SetValueNode($this->getSourceLocation(), $values);
 	}
 
 	public function functionValue(TypeNode $parameterType, TypeNode $dependencyType, TypeNode $returnType, FunctionBodyNodeInterface $functionBody): FunctionValueNode {

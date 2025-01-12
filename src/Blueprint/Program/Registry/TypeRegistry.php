@@ -34,6 +34,7 @@ use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\SealedType;
+use Walnut\Lang\Blueprint\Type\SetType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\SubtypeType;
@@ -88,6 +89,13 @@ interface TypeRegistry {
 		int|Number              $minLength = 0,
 		int|Number|PlusInfinity $maxLength = PlusInfinity::value
 	): MapType;
+
+	/** @throws InvalidLengthRange */
+	public function set(
+		Type|null        $itemType = null,
+		int|Number              $minLength = 0,
+		int|Number|PlusInfinity $maxLength = PlusInfinity::value
+	): SetType;
 
 	/** @param list<Type> $itemTypes */
 	public function tuple(array $itemTypes, Type|null $restType = null): TupleType;
