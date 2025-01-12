@@ -4,6 +4,7 @@ namespace Walnut\Lang\NativeCode\Any;
 
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 
 final readonly class LOGDEBUG implements NativeMethod {

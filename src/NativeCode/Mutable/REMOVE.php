@@ -8,7 +8,6 @@ use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\SetType;
 use Walnut\Lang\Blueprint\Type\Type;

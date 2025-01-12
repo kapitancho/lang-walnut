@@ -13,7 +13,6 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Implementation\Code\Execution\ExecutionContext;
-use Walnut\Lang\Implementation\Code\Expression\MatchExpressionEquals;
 use Walnut\Lang\Implementation\Code\Scope\VariableScope;
 use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
 use Walnut\Lang\Test\Implementation\BaseProgramTestHelper;

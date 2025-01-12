@@ -7,6 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Type\NullType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -23,7 +24,10 @@ final readonly class Trim implements NativeMethod {
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
-			return $programRegistry->typeRegistry->string(0, $targetType->range->maxLength);
+			$parameterType = $this->toBaseType($parameterType);
+			if ($parameterType instanceof NullType || $parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
+				return $programRegistry->typeRegistry->string(0, $targetType->range->maxLength);
+			}
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -36,10 +40,15 @@ final readonly class Trim implements NativeMethod {
 		TypedValue $parameter
 	): TypedValue {
 		$targetValue = $target->value;
+		$parameterValue = $parameter->value;
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof StringValue) {
-			return TypedValue::forValue($programRegistry->valueRegistry->string(trim($targetValue->literalValue)));
+			$parameterValue = $this->toBaseValue($parameterValue);
+			return TypedValue::forValue($parameterValue instanceof StringValue ?
+				$programRegistry->valueRegistry->string(trim($targetValue->literalValue, $parameterValue->literalValue)) :
+				$programRegistry->valueRegistry->string(trim($targetValue->literalValue))
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

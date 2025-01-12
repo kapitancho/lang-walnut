@@ -12,7 +12,7 @@ use Walnut\Lang\Implementation\Compilation\Compiler;
 use Walnut\Lang\Implementation\Compilation\Module\FolderBasedModuleLookupContext;
 
 final class CompilerTest extends TestCase {
-	private const PATH = __DIR__ . '/../../../core-nut-lib';
+	private const string PATH = __DIR__ . '/../../../core-nut-lib';
 
 	private Compiler $compiler;
 

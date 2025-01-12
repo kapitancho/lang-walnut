@@ -5,8 +5,6 @@ namespace Walnut\Lang\NativeCode\Set;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\SetType;

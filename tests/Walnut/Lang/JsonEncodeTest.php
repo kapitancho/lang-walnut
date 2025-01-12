@@ -3,20 +3,13 @@
 namespace Walnut\Lang;
 
 use BcMath\Number;
-use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry as TypeRegistryInterface;
-use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry as ValueRegistryInterface;
-use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
-use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
-use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
 use Walnut\Lang\Test\BaseProgramTestHelper;
-use Walnut\Lang\Test\EmptyDependencyContainer;
 
 final class JsonEncodeTest extends BaseProgramTestHelper {
 

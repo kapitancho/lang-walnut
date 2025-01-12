@@ -9,7 +9,6 @@ use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Implementation\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Implementation\Code\Execution\ExecutionContext;
 use Walnut\Lang\Implementation\Code\Expression\ConstantExpression;
-use Walnut\Lang\Implementation\Code\Expression\NoErrorExpression;
 use Walnut\Lang\Implementation\Code\Expression\NoExternalErrorExpression;
 use Walnut\Lang\Implementation\Code\Scope\VariableScope;
 use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;

@@ -53,7 +53,7 @@ final readonly class OpenApiSchema implements NativeMethod {
 		// @codeCoverageIgnoreEnd
 	}
 
-	private function typeToOpenApiSchema(Type $type): Value {
+	private function typeToOpenApiSchema(ProgramRegistry $programRegistry, Type $type): Value {
 		return match(true) {
 			$type instanceof AliasType && $type->name->equals(new TypeNameIdentifier('JsonValue')) =>
 				$programRegistry->valueRegistry->record([
@@ -97,7 +97,7 @@ final readonly class OpenApiSchema implements NativeMethod {
 			$type instanceof UnionType => $programRegistry->valueRegistry->record([
 				'oneOf' => $programRegistry->valueRegistry->tuple(
 					array_map(
-						fn(Type $type) => $this->typeToOpenApiSchema($type),
+						fn(Type $type) => $this->typeToOpenApiSchema($programRegistry, $type),
 						$type->types
 					)
 				)
@@ -105,7 +105,7 @@ final readonly class OpenApiSchema implements NativeMethod {
 			$type instanceof IntersectionType => $programRegistry->valueRegistry->record([
 				'allOf' => $programRegistry->valueRegistry->tuple(
 					array_map(
-						fn(Type $type) => $this->typeToOpenApiSchema($type),
+						fn(Type $type) => $this->typeToOpenApiSchema($programRegistry, $type),
 						$type->types
 					)
 				)
@@ -113,7 +113,7 @@ final readonly class OpenApiSchema implements NativeMethod {
 			$type instanceof ArrayType => $programRegistry->valueRegistry->record([
 				... [
 					'type' => $programRegistry->valueRegistry->string('array'),
-					'items' => $this->typeToOpenApiSchema($type->itemType)
+					'items' => $this->typeToOpenApiSchema($programRegistry, $type->itemType)
 				],
 				... (($min = $type->range->minLength) > 0 ? ['minItems' => $programRegistry->valueRegistry->integer($min)] : []),
 				... (($max = $type->range->maxLength) !== PlusInfinity::value ? ['maxItems' => $programRegistry->valueRegistry->integer($max)] : []),
@@ -121,18 +121,18 @@ final readonly class OpenApiSchema implements NativeMethod {
 			$type instanceof MapType => $programRegistry->valueRegistry->record([
 				... [
 					'type' => $programRegistry->valueRegistry->string('object'),
-					'additionalProperties' => $this->typeToOpenApiSchema($type->itemType)
+					'additionalProperties' => $this->typeToOpenApiSchema($programRegistry, $type->itemType)
 				],
 				... (($min = $type->range->minLength) > 0 ? ['minProperties' => $programRegistry->valueRegistry->integer($min)] : []),
 				... (($max = $type->range->maxLength) !== PlusInfinity::value ? ['maxProperties' => $programRegistry->valueRegistry->integer($max)] : []),
 			]),
-			$type instanceof TupleType => $this->typeToOpenApiSchema($type->asArrayType()),
+			$type instanceof TupleType => $this->typeToOpenApiSchema($programRegistry, $type->asArrayType()),
 			$type instanceof RecordType => $programRegistry->valueRegistry->record([
 				... [
 					'type' => $programRegistry->valueRegistry->string('object'),
 					'properties' => $programRegistry->valueRegistry->record(
 						array_map(
-							fn(Type $type) => $this->typeToOpenApiSchema($type instanceof OptionalKeyType ? $type->valueType : $type),
+							fn(Type $type) => $this->typeToOpenApiSchema($programRegistry, $type instanceof OptionalKeyType ? $type->valueType : $type),
 							$type->types
 						)
 					)
@@ -145,9 +145,9 @@ final readonly class OpenApiSchema implements NativeMethod {
 						$requiredFields
 					)
 				)] : []),
-				... ($type->restType instanceof NothingType ? [] : ['additionalProperties' => $this->typeToOpenApiSchema($type->restType)])
+				... ($type->restType instanceof NothingType ? [] : ['additionalProperties' => $this->typeToOpenApiSchema($programRegistry, $type->restType)])
 			]),
-			$type instanceof MutableType => $this->typeToOpenApiSchema($type->valueType),
+			$type instanceof MutableType => $this->typeToOpenApiSchema($programRegistry, $type->valueType),
 			default => $programRegistry->valueRegistry->null
 		};
 	}
@@ -162,7 +162,7 @@ final readonly class OpenApiSchema implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			return new TypedValue(
 				$programRegistry->typeRegistry->alias(new TypeNameIdentifier('JsonValue')),
-				$this->typeToOpenApiSchema($targetValue->typeValue)
+				$this->typeToOpenApiSchema($programRegistry, $targetValue->typeValue)
 			);
 		}
 		// @codeCoverageIgnoreStart

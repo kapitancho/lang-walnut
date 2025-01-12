@@ -41,7 +41,7 @@ final class SealedAnalyseTest extends BaseProgramTestHelper {
 		$fn = new VariableNameIdentifier('fn');
 		$this->globalScopeBuilder->addVariable(
 			$fn,
-			$t=$this->valueRegistry->function(
+			$this->valueRegistry->function(
 				$p ?? $this->typeRegistry->integer(),
 				$this->typeRegistry->nothing,
 				$r,

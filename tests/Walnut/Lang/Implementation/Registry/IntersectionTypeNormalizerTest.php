@@ -66,7 +66,7 @@ final class IntersectionTypeNormalizerTest extends BaseProgramTestHelper {
 			$a = new EnumValueIdentifier('A'),
 			$b = new EnumValueIdentifier('B'),
 			$c = new EnumValueIdentifier('C'),
-			$d = new EnumValueIdentifier('D'),
+			new EnumValueIdentifier('D'),
 		]);
 	    $this->assertEquals(
          "E[A]", (string)$this->intersection(

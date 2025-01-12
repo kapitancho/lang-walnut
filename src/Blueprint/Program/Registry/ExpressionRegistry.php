@@ -6,7 +6,6 @@ use Walnut\Lang\Blueprint\Code\Expression\ConstantExpression;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpression;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionDefault;
-use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionOperation;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionPair;
 use Walnut\Lang\Blueprint\Code\Expression\MethodCallExpression;
 use Walnut\Lang\Blueprint\Code\Expression\MutableExpression;

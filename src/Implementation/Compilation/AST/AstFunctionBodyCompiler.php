@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Implementation\Compilation\AST;
 
-use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode;
 use Walnut\Lang\Blueprint\Compilation\AST\AstCompilationException;
 use Walnut\Lang\Blueprint\Compilation\AST\AstExpressionCompiler;
