@@ -60,7 +60,7 @@ final readonly class BinaryPower implements NativeMethod {
 			if ($parameterValue instanceof IntegerValue || $parameterValue instanceof RealValue) {
                 return TypedValue::forValue($programRegistry->valueRegistry->real(
 					str_contains($parameterValue->literalValue, '.') ?
-						(float)(string)$targetValue->literalValue ** (float)(string)$parameterValue->literalValue :
+						((float)(string)$targetValue->literalValue) ** ((float)(string)$parameterValue->literalValue) :
 	                    $targetValue->literalValue->pow($parameterValue->literalValue)
                 ));
 			}

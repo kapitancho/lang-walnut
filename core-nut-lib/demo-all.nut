@@ -14,10 +14,14 @@ MyEnum = :[Value1, Value2, Value3];
 /* Sealed types */
 MySealed = $[a: Integer, b: Integer] @ MyAtom :: null;
 MySealed0 = $[a: Integer, b: Integer];
+MySealed1 = $[a: Integer, b: Integer];
+MySealed1[a: Real, b: Real] :: [a: #a->asInteger, b: #b->asInteger];
 
 /* Subtypes */
 MySubtype <: String @ MyAtom :: null;
 MySubtype0 <: String;
+MySubtype1 <: String;
+MySubtype1(String) :: #->reverse;
 
 /* Methods */
 MyAtom->myMethod(^String => Integer) %% MyAtom :: #->length;

@@ -59,7 +59,7 @@ final readonly class Compiler implements CompilerInterface {
 		}
 		try {
 			$program = $programContext->analyseAndBuildProgram();
-		} catch (AnalyserException|AstCompilationException $e) {
+		} catch (AnalyserException $e) {
 			return new CompilationResult(
 				$rootNode,
 				$e,

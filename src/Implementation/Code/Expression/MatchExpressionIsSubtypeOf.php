@@ -18,9 +18,11 @@ final readonly class MatchExpressionIsSubtypeOf implements MatchExpressionOperat
 			);
 	}
 
+	// @codeCoverageIgnoreStart
 	public function __toString(): string {
 		return "<:";
 	}
+	// @codeCoverageIgnoreEnd
 
 	public function jsonSerialize(): string {
 		return 'isSubtypeOf';

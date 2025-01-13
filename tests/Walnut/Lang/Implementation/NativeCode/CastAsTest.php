@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Implementation\NativeCode;
+namespace Walnut\Lang\Test\Implementation\NativeCode;
 
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;

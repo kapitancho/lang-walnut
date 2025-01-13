@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Value;
+namespace Walnut\Lang\Test\Implementation\Value;
 
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\FunctionBodyException;

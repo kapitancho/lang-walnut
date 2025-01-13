@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Implementation\NativeCode\Any;
+namespace Walnut\Lang\Test\Implementation\NativeCode\Any;
 
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;

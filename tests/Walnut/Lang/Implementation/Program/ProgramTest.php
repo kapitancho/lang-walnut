@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Program;
+namespace Walnut\Lang\Test\Implementation\Program;
 
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Program\InvalidEntryPoint;

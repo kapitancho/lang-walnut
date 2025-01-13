@@ -113,11 +113,25 @@ abstract class BaseProgramTestHelper extends TestCase {
 			$ef(),
 			$this->typeRegistry->nothing
 		);
-		$this->typeRegistry->addSealed(
+		$this->typeRegistryBuilder->addEnumeration(
+			new TypeNameIdentifier('DependencyContainerErrorType'),
+			[
+				new EnumValueIdentifier('CircularDependency'),
+				new EnumValueIdentifier('Ambiguous'),
+				new EnumValueIdentifier('NotFound'),
+				new EnumValueIdentifier('UnsupportedType'),
+				new EnumValueIdentifier('ErrorWhileCreatingValue'),
+			]
+		);
+		$this->typeRegistryBuilder->addSealed(
 			new TypeNameIdentifier('DependencyContainerError'),
 			$this->typeRegistry->record([
 				'targetType' => $this->typeRegistry->type($this->typeRegistry->any),
+				'errorOnType' => $this->typeRegistry->type($this->typeRegistry->any),
 				'errorMessage' => $this->typeRegistry->string(),
+				'errorType' => $this->typeRegistry->enumeration(
+					new TypeNameIdentifier('DependencyContainerErrorType')
+				)
 			]),
 			$ef(),
 			$this->typeRegistry->nothing
@@ -231,6 +245,19 @@ abstract class BaseProgramTestHelper extends TestCase {
 			$ef(),
 			$this->typeRegistry->nothing
 		);
+
+		//$[errorType: String, originalError: Any, errorMessage: String]
+		$this->typeRegistry->addSealed(
+			new TypeNameIdentifier('ExternalError'),
+			$this->typeRegistry->record([
+				'errorType' => $this->typeRegistry->string(),
+				'originalError' => $this->typeRegistry->any,
+				'errorMessage' => $this->typeRegistry->string(),
+			]),
+			$ef(),
+			$this->typeRegistry->nothing
+		);
+
 	}
 
 

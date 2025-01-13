@@ -64,9 +64,6 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 					$type
 				);
 				$type = $this->toBaseType($type);
-				while($type instanceof SubtypeType) {
-					$type = $type->baseType;
-				}
 				if ($type instanceof TupleType) {
 					foreach($type->types as $index => $typeItem) {
 						$analyserContext = $analyserContext->withAddedVariableType(
@@ -131,7 +128,9 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 								new VariableNameIdentifier($variableName . $index),
 								new TypedValue($typeItem, $v->valueOf($index)) // TODO: not found
 							);
+						// @codeCoverageIgnoreStart
 						} catch(IdentifierException|UnknownProperty) {}
+						// @codeCoverageIgnoreEnd
 					}
 				}
 				if ($t instanceof RecordType && $v instanceof RecordValue) {
@@ -151,7 +150,9 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 								new VariableNameIdentifier($variableName . $fieldName),
 								new TypedValue($tConv($fieldType), $value)
 							);
+						// @codeCoverageIgnoreStart
 						} catch(IdentifierException) {}
+						// @codeCoverageIgnoreEnd
 					}
 				}
 			}

@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Implementation\NativeCode\Real;
+namespace Walnut\Lang\Test\Implementation\NativeCode\Real;
 
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Type\Type;

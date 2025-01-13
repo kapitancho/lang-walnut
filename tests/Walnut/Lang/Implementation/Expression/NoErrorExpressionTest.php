@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Expression;
+namespace Walnut\Lang\Test\Implementation\Expression;
 
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;

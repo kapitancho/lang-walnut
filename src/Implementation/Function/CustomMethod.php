@@ -7,6 +7,7 @@ use JsonSerializable;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
+use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethod as CustomMethodInterface;
@@ -56,6 +57,8 @@ final readonly class CustomMethod implements CustomMethodInterface, JsonSerializ
 				$this->parameterType
 			)
 		))) {
+			// Should never reach this point
+			// @codeCoverageIgnoreStart
 			unset($this->isAnalysed[$k]);
 			throw new AnalyserException(
 				sprintf(
@@ -64,6 +67,7 @@ final readonly class CustomMethod implements CustomMethodInterface, JsonSerializ
 					$this->parameterType
 				)
 			);
+			// @codeCoverageIgnoreEnd
 		}
 		$returnType = $this->functionBody->analyse(
 			$programRegistry->analyserContext,
@@ -125,7 +129,11 @@ final readonly class CustomMethod implements CustomMethodInterface, JsonSerializ
 									UnresolvableDependency::unsupportedType => 'Unsupported type',
                                    UnresolvableDependency::errorWhileCreatingValue => 'Error returned while creating value',
 								}
-							)
+							),
+							'errorType' => $programRegistry->valueRegistry->enumerationValue(
+								new TypeNameIdentifier('DependencyContainerErrorType'),
+								new EnumValueIdentifier(ucfirst($dep->unresolvableDependency->name))
+							),
 						])
 					)
 				));

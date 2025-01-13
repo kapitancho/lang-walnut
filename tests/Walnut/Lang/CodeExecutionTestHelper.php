@@ -45,7 +45,7 @@ class CodeExecutionTestHelper extends TestCase {
 		$this->moduleLookupContext->method('sourceOf')
 			->willReturnCallback(fn(string $module) => match($module) {
 				'core' => file_get_contents(self::PATH . '/core.nut'),
-				'test' => "module test: $declarations myFn = ^Array<String> => Any :: $code main = ^Array<String> => String :: myFn(#)->printed;",
+				'test' => "module test: $declarations myFn = ^Array<String> => Any :: { $code }; main = ^Array<String> => String :: myFn(#)->printed;",
 				default => ''
 			});
 		$program = $this->moduleImporter->importModules('test');

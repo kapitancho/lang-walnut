@@ -50,7 +50,7 @@ final readonly class Ln implements NativeMethod {
 
 		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
-            $val = $targetValue->literalValue;
+            $val = (string)$targetValue->literalValue;
 			return TypedValue::forValue($val > 0 ? $programRegistry->valueRegistry->real(
 				log((string)$val)
 			) : $programRegistry->valueRegistry->error(

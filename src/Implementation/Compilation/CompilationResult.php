@@ -15,7 +15,7 @@ use Walnut\Lang\Blueprint\Program\Program;
 final readonly class CompilationResult implements CompilationResultInterface {
 	public function __construct(
 		public RootNode|ModuleDependencyException|ParserException $ast,
-		public Program|AstProgramCompilationException|AstCompilationException|AnalyserException|null $program,
+		public Program|AstProgramCompilationException|AnalyserException|null $program,
 		public ProgramContext $programContext
 	) {}
 }

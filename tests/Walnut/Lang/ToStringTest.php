@@ -65,7 +65,7 @@ final class ToStringTest extends BaseProgramTestHelper {
 			'MyAlias' => $tr->alias($i('MyAlias')),
 			'MyAtom' => $tr->atom($i('MyAtom')),
 			'MyEnum' => $tr->enumeration($i('MyEnum')),
-			'MyEnum[A, B]' => $tr->enumeration($i('MyEnum'))->subsetType([$ev('A'), $ev('B')]),
+			'MyEnum[A, B]' => $tr->enumerationSubsetType($i('MyEnum'), [$ev('A'), $ev('B')]),
 			'MySealed' => $tr->sealed($i('MySealed')),
 			'MySubtype' => $tr->subtype($i('MySubtype')),
 			'Boolean' => $tr->boolean,

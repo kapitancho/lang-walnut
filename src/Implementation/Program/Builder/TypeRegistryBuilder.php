@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Implementation\Program\Builder;
 
 use BcMath\Number;
+use InvalidArgumentException;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
@@ -18,11 +19,13 @@ use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\UnknownType;
 use Walnut\Lang\Blueprint\Type\AliasType as AliasTypeInterface;
 use Walnut\Lang\Blueprint\Type\AtomType as AtomTypeInterface;
+use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\EnumerationType as EnumerationTypeInterface;
 use Walnut\Lang\Blueprint\Type\NamedType as NamedTypeInterface;
 use Walnut\Lang\Blueprint\Type\RecordType as RecordTypeInterface;
 use Walnut\Lang\Blueprint\Type\ResultType as ResultTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Type\UnknownEnumerationValue;
 use Walnut\Lang\Implementation\Common\Range\IntegerRange;
 use Walnut\Lang\Implementation\Common\Range\LengthRange;
 use Walnut\Lang\Implementation\Common\Range\RealRange;
@@ -263,6 +266,14 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
     public function enumeration(TypeNameIdentifier $typeName): EnumerationTypeInterface {
         return $this->enumerationTypes[$typeName->identifier] ?? UnknownType::withName($typeName);
     }
+
+	/**
+	  * @param non-empty-list<EnumValueIdentifier> $values
+	  * @throws UnknownEnumerationValue|InvalidArgumentException
+	  **/
+	 public function enumerationSubsetType(TypeNameIdentifier $typeName, array $values): EnumerationSubsetType {
+		 return $this->enumeration($typeName)->subsetType($values);
+	 }
 
 	/** @throws InvalidLengthRange */
 	public function array(Type|null $itemType = null, int|Number $minLength = 0, int|Number|PlusInfinity $maxLength = PlusInfinity::value): ArrayType {

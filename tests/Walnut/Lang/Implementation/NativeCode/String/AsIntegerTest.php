@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Implementation\NativeCode\String;
+namespace Walnut\Lang\Test\Implementation\NativeCode\String;
 
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Value\ErrorValue;

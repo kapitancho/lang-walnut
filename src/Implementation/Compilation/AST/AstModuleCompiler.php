@@ -72,9 +72,11 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 		$returnType = match(true) {
 			$type instanceof SealedType => $type->valueType,
 			$type instanceof SubtypeType => $type->baseType,
+			// @codeCoverageIgnoreStart
 			default => throw new CompilationException(
 				"Constructors are only allowed for subtypes and sealed types",
 			)
+			// @codeCoverageIgnoreEnd
 		};
 		return $this->programContext->customMethodRegistryBuilder->addMethod(
 			$this->programContext->typeRegistry->typeByName(new TypeNameIdentifier('Constructor')),
@@ -148,10 +150,12 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 						) :
 						$this->value($moduleDefinition->value)),
 
+			// @codeCoverageIgnoreStart
 			true => throw new AstCompilationException(
 				$moduleDefinition,
 				"Unknown module definition node type: " . get_class($moduleDefinition)
 			)
+			// @codeCoverageIgnoreEnd
 		};
 	}
 

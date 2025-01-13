@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Implementation\NativeCode\Any;
+namespace Walnut\Lang\Test\Implementation\NativeCode\Any;
 
 use BcMath\Number;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
@@ -129,6 +129,27 @@ final class IsOfTypeTest extends BaseProgramTestHelper {
 		$this->callIsOfType($v2, $t9, true);
 		$this->callIsOfType($v1, $t10, false);
 		$this->callIsOfType($v2, $t10, true);
+		$this->callIsOfType($v1, $z, false);
+		$this->callIsOfType($v1, $a, true);
+
+		$v1 = $this->valueRegistry->set([$this->valueRegistry->string("Hi"), $this->valueRegistry->integer(5)]);
+		$v2 = $this->valueRegistry->set([$this->valueRegistry->string("Hello"), $this->valueRegistry->string("World")]);
+		$t3 = $this->typeRegistry->set($this->typeRegistry->string());
+		$t4 = $this->typeRegistry->set($this->typeRegistry->string(), 0, 10);
+		$t5 = $this->typeRegistry->set($this->typeRegistry->string(), 3, 10);
+		$t6 = $this->typeRegistry->set($this->typeRegistry->union([
+			$this->typeRegistry->string(), $this->typeRegistry->integer()
+		]));
+		$z = $this->typeRegistry->integer();
+
+		$this->callIsOfType($v1, $t3, false);
+		$this->callIsOfType($v2, $t3, true);
+		$this->callIsOfType($v1, $t4, false);
+		$this->callIsOfType($v2, $t4, true);
+		$this->callIsOfType($v1, $t5, false);
+		$this->callIsOfType($v2, $t5, false);
+		$this->callIsOfType($v1, $t6, true);
+		$this->callIsOfType($v2, $t6, true);
 		$this->callIsOfType($v1, $z, false);
 		$this->callIsOfType($v1, $a, true);
 
@@ -319,9 +340,9 @@ final class IsOfTypeTest extends BaseProgramTestHelper {
 
 		$v1 = $this->valueRegistry->enumerationValue($se = new TypeNameIdentifier('SE'), new EnumValueIdentifier('A'));
 		$v2 = $this->valueRegistry->enumerationValue(new TypeNameIdentifier('SG'), new EnumValueIdentifier('A'));
-		$t1 = $this->typeRegistry->enumeration($se)->subsetType([new EnumValueIdentifier('A'), new EnumValueIdentifier('B')]);
-		$t2 = $this->typeRegistry->enumeration($se)->subsetType([new EnumValueIdentifier('B'), new EnumValueIdentifier('C')]);
-		$t3 = $this->typeRegistry->enumeration($se)->subsetType([new EnumValueIdentifier('A')]);
+		$t1 = $this->typeRegistry->enumerationSubsetType($se, [new EnumValueIdentifier('A'), new EnumValueIdentifier('B')]);
+		$t2 = $this->typeRegistry->enumerationSubsetType($se, [new EnumValueIdentifier('B'), new EnumValueIdentifier('C')]);
+		$t3 = $this->typeRegistry->enumerationSubsetType($se, [new EnumValueIdentifier('A')]);
 		$t4 = $this->typeRegistry->enumeration($se);
 		$z = $this->typeRegistry->integer();
 

@@ -42,9 +42,11 @@ final readonly class NoErrorExpression implements NoErrorExpressionInterface, Js
 			throw new FunctionReturn($value);
 		}
 		$vt = $result->valueType;
+		// @codeCoverageIgnoreStart
 		if ($vt instanceof ResultType) {
 			$result = $result->withTypedValue(new TypedValue($vt->returnType, $result->value));
 		}
+		// @codeCoverageIgnoreEnd
 		return $result;
 	}
 

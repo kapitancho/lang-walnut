@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Registry;
+namespace Walnut\Lang\Test\Implementation\Registry;
 
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Test\Implementation\BaseProgramTestHelper;

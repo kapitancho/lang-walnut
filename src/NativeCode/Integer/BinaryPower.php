@@ -12,6 +12,7 @@ use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 use Walnut\Lang\Implementation\Value\IntegerValue;
 
@@ -58,6 +59,11 @@ final readonly class BinaryPower implements NativeMethod {
 			if ($parameterValue instanceof IntegerValue) {
                 return TypedValue::forValue($programRegistry->valueRegistry->integer(
 	                $targetValue->literalValue ** $parameterValue->literalValue
+                ));
+			}
+			if ($parameterValue instanceof RealValue) {
+                return TypedValue::forValue($programRegistry->valueRegistry->real(
+	                ((int)(string)$targetValue->literalValue) ** ((float)(string)$parameterValue->literalValue)
                 ));
 			}
 			// @codeCoverageIgnoreStart

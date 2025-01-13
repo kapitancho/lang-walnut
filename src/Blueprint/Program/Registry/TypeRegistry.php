@@ -3,6 +3,8 @@
 namespace Walnut\Lang\Blueprint\Program\Registry;
 
 use BcMath\Number;
+use InvalidArgumentException;
+use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\InvalidIntegerRange;
 use Walnut\Lang\Blueprint\Common\Range\InvalidLengthRange;
@@ -16,6 +18,7 @@ use Walnut\Lang\Blueprint\Type\AnyType;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Type\BooleanType;
+use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
 use Walnut\Lang\Blueprint\Type\FalseType;
 use Walnut\Lang\Blueprint\Type\FunctionType;
@@ -42,6 +45,7 @@ use Walnut\Lang\Blueprint\Type\TrueType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\TypeType;
+use Walnut\Lang\Blueprint\Type\UnknownEnumerationValue;
 
 interface TypeRegistry {
 	public AnyType $any { get; }
@@ -131,4 +135,9 @@ interface TypeRegistry {
 	public function atom(TypeNameIdentifier $typeName): AtomType;
 	/** @throws UnknownType */
 	public function enumeration(TypeNameIdentifier $typeName): EnumerationType;
+	/**
+	  * @param non-empty-list<EnumValueIdentifier> $values
+	  * @throws UnknownEnumerationValue|InvalidArgumentException
+	  **/
+	 public function enumerationSubsetType(TypeNameIdentifier $typeName, array $values): EnumerationSubsetType;
 }

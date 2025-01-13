@@ -50,10 +50,10 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 			RealSubsetType::class => ['Real'],
 			StringType::class => ['String'],
 			StringSubsetType::class => ['String'],
-			BooleanType::class => ['Boolean', 'Enumeration'],
+			BooleanType::class => [/*'Boolean',*/ 'Enumeration'],
 			TrueType::class => ['Boolean', 'Enumeration'],
 			FalseType::class => ['Boolean', 'Enumeration'],
-			NullType::class => ['Null', 'Atom'],
+			NullType::class => [/*'Null',*/ 'Atom'],
 			EnumerationType::class => ['Enumeration'],
 			EnumerationSubsetType::class => ['Enumeration'],
 			AtomType::class => ['Atom'],
@@ -109,17 +109,16 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 			}
 		}
 		if ($type instanceof MetaType) {
+			$class = [
+				'Function' => FunctionType::class,
+				'MutableType' => MutableType::class,
+				'Tuple' => TupleType::class,
+				'Record' => RecordType::class,
+				'Union' => UnionType::class,
+				'Intersection' => IntersectionType::class
+			][$type->value->value] ?? null;
 			return array_merge($baseIds,
-				$this->getTypeMapping()[
-					[
-						'Function' => FunctionType::class,
-						'MutableType' => MutableType::class,
-						'Tuple' => TupleType::class,
-						'Record' => RecordType::class,
-						'Union' => UnionType::class,
-						'Intersection' => IntersectionType::class
-					][$type->value->value]
-				]
+				$this->getTypeMapping()[$class] ?? []
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -159,7 +158,7 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 			$result[] = 'JsonValue';
 		}
 		$result[] = 'Any';
-		if ($type instanceof NamedType) {
+		if ($type instanceof NamedType && ($result[0] ?? null) !== $type->name->identifier) {
 			array_unshift($result, $type->name->identifier);
 		}
 		return $result;

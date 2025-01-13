@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Expression;
+namespace Walnut\Lang\Test\Implementation\Expression;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;

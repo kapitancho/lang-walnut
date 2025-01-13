@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Implementation\NativeCode\JsonValue;
+namespace Walnut\Lang\Test\Implementation\NativeCode\JsonValue;
 
 use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
@@ -808,7 +808,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		);
 		$this->callHydrateAs(
 			$this->valueRegistry->string('C'),
-			$this->typeRegistry->enumeration(new TypeNameIdentifier('MyEnum'))->subsetType([
+			$this->typeRegistry->enumerationSubsetType(new TypeNameIdentifier('MyEnum'), [
 				new EnumValueIdentifier('A'),
 				new EnumValueIdentifier('B'),
 				new EnumValueIdentifier('C'),
@@ -817,7 +817,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->string('C'),
-			$this->typeRegistry->enumeration(new TypeNameIdentifier('MyEnum'))->subsetType([
+			$this->typeRegistry->enumerationSubsetType(new TypeNameIdentifier('MyEnum'), [
 				new EnumValueIdentifier('A'),
 				new EnumValueIdentifier('B'),
 			]),
@@ -825,7 +825,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->true,
-			$this->typeRegistry->enumeration(new TypeNameIdentifier('MyEnum'))->subsetType([
+			$this->typeRegistry->enumerationSubsetType(new TypeNameIdentifier('MyEnum'), [
 				new EnumValueIdentifier('A'),
 				new EnumValueIdentifier('B'),
 			]),

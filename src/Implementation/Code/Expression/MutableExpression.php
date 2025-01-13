@@ -51,6 +51,7 @@ final readonly class MutableExpression implements MutableExpressionInterface, Js
 				)
 			);
 		}
+		// @codeCoverageIgnoreStart
 		throw new ExecutionException(
 			sprintf(
 				"%s Value type %s is not a subtype of %s",
@@ -59,6 +60,7 @@ final readonly class MutableExpression implements MutableExpressionInterface, Js
 				$this->type
 			)
 		);
+		// @codeCoverageIgnoreEnd
 	}
 
 	public function __toString(): string {

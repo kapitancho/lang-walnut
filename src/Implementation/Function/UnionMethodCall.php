@@ -42,12 +42,15 @@ final readonly class UnionMethodCall implements Method {
 				 return $method->execute($programRegistry, $target, $parameter);
 			 }
 		}
+		// Should never happen
+		// @codeCoverageIgnoreStart
 		foreach($this->methods as [$methodType, $method]) {
 			 if ($target->value->type->isSubtypeOf($methodType)) {
 				 return $method->execute($programRegistry, $target, $parameter);
 			 }
 		}
 		throw new ExecutionException("Union method call is not executable");
+		// @codeCoverageIgnoreEnd
 	}
 
 }

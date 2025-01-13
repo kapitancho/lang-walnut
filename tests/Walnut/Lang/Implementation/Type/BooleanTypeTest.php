@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Type;
+namespace Walnut\Lang\Test\Implementation\Type;
 
 use InvalidArgumentException;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;

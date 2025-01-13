@@ -1,6 +1,6 @@
 <?php /** @noinspection PhpUnusedLocalVariableInspection */
 
-namespace Walnut\Lang\Implementation\NativeCode\Type;
+namespace Walnut\Lang\Test\Implementation\NativeCode\Type;
 
 use BcMath\Number;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;

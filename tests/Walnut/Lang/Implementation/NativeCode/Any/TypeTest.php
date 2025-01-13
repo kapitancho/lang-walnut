@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Implementation\NativeCode\Any;
+namespace Walnut\Lang\Test\Implementation\NativeCode\Any;
 
 use BcMath\Number;
 use Walnut\Lang\Blueprint\Type\Type;

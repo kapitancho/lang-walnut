@@ -46,8 +46,7 @@ final class MegaTest extends TestCase {
 		);
 		self::assertEquals(
 			$this->typeRegistry
-				->enumeration(new TypeNameIdentifier('Boolean'))
-				->subsetType([
+				->enumerationSubsetType(new TypeNameIdentifier('Boolean'), [
 					new EnumValueIdentifier('True'),
 					new EnumValueIdentifier('False')
 				]),
@@ -55,16 +54,14 @@ final class MegaTest extends TestCase {
 		);
 		self::assertEquals(
 			$this->typeRegistry
-				->enumeration(new TypeNameIdentifier('Boolean'))
-				->subsetType([
+				->enumerationSubsetType(new TypeNameIdentifier('Boolean'), [
 					new EnumValueIdentifier('True'),
 				]),
 			$this->typeRegistry->true
 		);
 		self::assertEquals(
 			$this->typeRegistry
-				->enumeration(new TypeNameIdentifier('Boolean'))
-				->subsetType([
+				->enumerationSubsetType(new TypeNameIdentifier('Boolean'), [
 					new EnumValueIdentifier('False'),
 				]),
 			$this->typeRegistry->false

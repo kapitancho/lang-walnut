@@ -12,10 +12,7 @@ use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
-use Walnut\Lang\Blueprint\Type\RealSubsetType;
-use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 use Walnut\Lang\Implementation\Value\IntegerValue;
 
@@ -31,11 +28,7 @@ final readonly class BinaryIntegerDivide implements NativeMethod {
 		if ($targetType instanceof IntegerType || $targetType instanceof IntegerSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 
-			if ($parameterType instanceof IntegerType ||
-				$parameterType instanceof IntegerSubsetType ||
-				$parameterType instanceof RealType ||
-				$parameterType instanceof RealSubsetType
-			) {
+			if ($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) {
 				return ($parameterType->range->minValue === MinusInfinity::value || $parameterType->range->minValue < 0) &&
 					($parameterType->range->maxValue === PlusInfinity::value || $parameterType->range->maxValue > 0) ?
 						$programRegistry->typeRegistry->result(
@@ -61,12 +54,11 @@ final readonly class BinaryIntegerDivide implements NativeMethod {
 		$parameterValue = $parameter->value;
 		
 		$targetValue = $this->toBaseValue($targetValue);
-		$parameterValue = $this->toBaseValue($parameterValue);
 
-		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
+		if ($targetValue instanceof IntegerValue) {
 			$parameterValue = $this->toBaseValue($parameterValue);
-			if ($parameterValue instanceof IntegerValue || $parameterValue instanceof RealValue) {
-				if ((float)(string)$parameterValue->literalValue === 0.0) {
+			if ($parameterValue instanceof IntegerValue) {
+				if ((int)(string)$parameterValue->literalValue === 0) {
 					return TypedValue::forValue($programRegistry->valueRegistry->error(
 						$programRegistry->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
 					));

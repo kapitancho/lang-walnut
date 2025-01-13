@@ -77,10 +77,12 @@ final readonly class NoExternalErrorExpression implements NoExternalErrorExpress
 			}
 		}
 		$vt = $result->valueType;
+		// @codeCoverageIgnoreStart
 		if ($vt instanceof ResultType) {
 			$result = $result->withTypedValue(new TypedValue(
 				$this->withoutExternalError($executionContext->programRegistry->typeRegistry, $vt), $result->value));
 		}
+		// @codeCoverageIgnoreEnd
 		return $result;
 	}
 

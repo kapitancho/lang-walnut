@@ -1,8 +1,9 @@
 <?php
 
-namespace Walnut\Lang\Blueprint\AST\Parser;
+namespace Walnut\Lang\Test\Blueprint\AST\Parser;
 
 use PHPUnit\Framework\TestCase;
+use Walnut\Lang\Blueprint\AST\Parser\ParserException;
 use Walnut\Lib\Walex\Pattern;
 use Walnut\Lib\Walex\PatternMatch;
 use Walnut\Lib\Walex\Rule;

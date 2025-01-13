@@ -128,7 +128,7 @@ final readonly class AstTypeCompiler implements AstTypeCompilerInterface {
 				$typeNode instanceof MetaTypeTypeNode => $this->typeRegistry->metaType($typeNode->value),
 				$typeNode instanceof NamedTypeNode => $this->typeRegistry->typeByName($typeNode->name),
 				$typeNode instanceof EnumerationSubsetTypeNode =>
-					$this->typeRegistry->enumeration($typeNode->name)->subsetType($typeNode->values),
+					$this->typeRegistry->enumerationSubsetType($typeNode->name, $typeNode->values),
 
 				true => throw new AstCompilationException(
 					$typeNode,

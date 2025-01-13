@@ -2,6 +2,8 @@
 
 namespace Walnut\Lang\Test;
 
+use Walnut\Lang\Blueprint\Compilation\AST\AstProgramCompilationException;
+
 final class CodeExecutionTest extends CodeExecutionTestHelper {
 
 	public function testCodeExecutionOk(): void {
@@ -12,6 +14,31 @@ final class CodeExecutionTest extends CodeExecutionTestHelper {
 	public function testCodeExecutionContextOk(): void {
 		$result = $this->executeCodeSnippet('{#=>item(0)=>asInteger} + getConst();', 'getConst = ^Any => Integer :: 7;', [5]);
 		$this->assertEquals('12', $result);
+	}
+
+	public function testCodeExecutionCompilationValueUnknownType(): void {
+		$this->expectException(AstProgramCompilationException::class);
+		$this->executeCodeSnippet('MyAtom[];');
+	}
+
+	public function testCodeExecutionCompilationValueUnknownEnumerationValue(): void {
+		$this->expectException(AstProgramCompilationException::class);
+		$this->executeCodeSnippet('MyEnum.X;', 'MyEnum = :[A, B, C];');
+	}
+
+	public function testCodeExecutionCompilationTypeUnknownEnumerationValue(): void {
+		$this->expectException(AstProgramCompilationException::class);
+		$this->executeCodeSnippet('type{MyEnum[X]};', 'MyEnum = :[A, B, C];');
+	}
+
+	public function testCodeExecutionCompilationUnknownType(): void {
+		$this->expectException(AstProgramCompilationException::class);
+		$this->executeCodeSnippet('type{MyAtom};');
+	}
+
+	public function testCodeExecutionCompilationInvalidRange(): void {
+		$this->expectException(AstProgramCompilationException::class);
+		$this->executeCodeSnippet('type{Integer<3..-2>};');
 	}
 
 }

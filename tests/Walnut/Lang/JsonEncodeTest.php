@@ -77,7 +77,7 @@ final class JsonEncodeTest extends BaseProgramTestHelper {
 			'{"type":"Enumeration","name":"MyEnum","values":{"A":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"A"},"B":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"B"},"C":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"C"}}}'
 				=> $tr->enumeration($i('MyEnum')),
 			'{"type":"EnumerationSubsetType","enumerationName":"MyEnum","subsetValues":{"A":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"A"},"B":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"B"}}}'
-				=> $tr->enumeration($i('MyEnum'))->subsetType([$ev('A'), $ev('B')]),
+				=> $tr->enumerationSubsetType($i('MyEnum'), [$ev('A'), $ev('B')]),
 			'{"type":"Sealed","name":"MySealed","valueType":{"type":"Record","types":[],"restType":{"type":"Nothing"}}}'
 				=> $tr->sealed($i('MySealed')),
 			'{"type":"Subtype","name":"MySubtype","baseType":{"type":"Null"}}' => $tr->subtype($i('MySubtype')),

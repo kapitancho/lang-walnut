@@ -1,8 +1,10 @@
 <?php
 
-namespace Walnut\Lang\Blueprint\Common\Identifier;
+namespace Walnut\Lang\Test\Blueprint\Common\Identifier;
 
 use PHPUnit\Framework\TestCase;
+use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\IdentifierException;
 
 final class EnumValueIdentifierTest extends TestCase {
 	public function testEnumValueIdentifier(): void {

@@ -23,9 +23,11 @@ LengthRange <: [minLength: Integer<0..>, maxLength: Integer<0..>|PlusInfinity] @
 
 /* dependency container */
 DependencyContainer = :[];
-DependencyContainerError = $[targetType: Type, errorOnType: Type, errorMessage: String];
+DependencyContainerErrorType = :[CircularDependency, Ambiguous, NotFound, UnsupportedType, ErrorWhileCreatingValue];
+DependencyContainerError = $[targetType: Type, errorOnType: Type, errorMessage: String, errorType: DependencyContainerErrorType];
 DependencyContainerError->errorMessage(=> String) :: $errorMessage;
 DependencyContainerError->targetType(=> Type) :: $targetType;
+DependencyContainerError->errorType(=> DependencyContainerErrorType) :: $errorType;
 
 /* json value */
 JsonValue = Null|Boolean|Integer|Real|String|Array<`JsonValue>|Map<`JsonValue>/*|Result<Nothing, `JsonValue>*/|Mutable<`JsonValue>;

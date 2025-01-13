@@ -1,8 +1,10 @@
 <?php
 
-namespace Walnut\Lang\Blueprint\Common\Identifier;
+namespace Walnut\Lang\Test\Blueprint\Common\Identifier;
 
 use PHPUnit\Framework\TestCase;
+use Walnut\Lang\Blueprint\Common\Identifier\IdentifierException;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 
 final class TypeNameIdentifierTest extends TestCase {
 	public function testTypeNameIdentifier(): void {

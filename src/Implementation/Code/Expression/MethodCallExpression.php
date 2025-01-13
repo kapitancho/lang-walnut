@@ -77,10 +77,10 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 		$retType = $executionContext->valueType;
 
 		$method = $this->getMethod($executionContext->programRegistry, $retValue->type);
-		if ($method instanceof UnknownMethod) {
+		if ($method instanceof UnknownMethod) { //This is not supposed to happen
+			// @codeCoverageIgnoreStart
 			$method = $executionContext->programRegistry->methodRegistry->method($retType, $this->methodName);
 			if ($method instanceof UnknownMethod) {
-				// @codeCoverageIgnoreStart
 				throw new ExecutionException(
 					sprintf(
 						"Cannot call method '%s' on type '%s' for value '%s' and parameter '%s'",
@@ -90,31 +90,25 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 						$this->parameter
 					)
 				);
-				// @codeCoverageIgnoreEnd
 			}
+			// @codeCoverageIgnoreEnd
 		}
 
 		$executionContext = $this->parameter->execute($executionContext);
-		$retParamType = $executionContext->valueType;
 
 		$value = $method->execute(
 			$executionContext->programRegistry,
 			$retTypedValue,
 			$executionContext->typedValue
 		);
-		if ($value instanceof ErrorValue &&
-			$value->errorValue->type instanceof SealedType &&
-			$value->errorValue->type->name === 'DependencyContainerError'
+		// @codeCoverageIgnoreStart
+		if ($value->value instanceof ErrorValue &&
+			$value->value->errorValue->type instanceof SealedType &&
+			$value->value->errorValue->type->name === 'DependencyContainerError'
 		) {
-			throw new FunctionReturn($value);
+			throw new FunctionReturn($value->value);
 		}
-		if ($value instanceof Value) {
-			$valueType = $value->type;
-			try {
-				$valueType = $method->analyse($retType, $retParamType);
-			} catch (AnalyserException) {}
-			$value = new TypedValue($valueType, $value);
-		}
+		// @codeCoverageIgnoreEnd
 		return $executionContext->asExecutionResult($value);
 	}
 
