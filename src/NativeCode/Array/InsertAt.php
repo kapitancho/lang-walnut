@@ -10,6 +10,7 @@ use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\ArrayType;
+use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
 use Walnut\Lang\Blueprint\Value\RecordValue;
@@ -24,6 +25,8 @@ final readonly class InsertAt implements NativeMethod {
 		Type $targetType,
 		Type $parameterType,
 	): Type {
+		$targetType = $this->toBaseType($targetType);
+		$targetType = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($targetType instanceof ArrayType) {
 			$pInt = $programRegistry->typeRegistry->integer(0);
 			$pType = $programRegistry->typeRegistry->record([
@@ -82,6 +85,14 @@ final readonly class InsertAt implements NativeMethod {
 						);
 						return TypedValue::forValue($programRegistry->valueRegistry->tuple($values));
 					}
+					return TypedValue::forValue($programRegistry->valueRegistry->error(
+						$programRegistry->valueRegistry->sealedValue(
+							new TypeNameIdentifier('IndexOutOfRange'),
+							$programRegistry->valueRegistry->record([
+								'index' => $index
+							])
+						)
+					));
 				}
 				// @codeCoverageIgnoreStart
 				throw new ExecutionException("Invalid parameter value");

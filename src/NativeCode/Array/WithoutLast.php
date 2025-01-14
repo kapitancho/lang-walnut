@@ -10,6 +10,7 @@ use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\ArrayType;
+use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
@@ -22,6 +23,8 @@ final readonly class WithoutLast implements NativeMethod {
 		Type $targetType,
 		Type $parameterType,
 	): Type {
+		$targetType = $this->toBaseType($targetType);
+		$targetType = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($targetType instanceof ArrayType) {
 			$returnType = $programRegistry->typeRegistry->record([
 				'element' => $targetType->itemType,
@@ -29,7 +32,7 @@ final readonly class WithoutLast implements NativeMethod {
 					$targetType->itemType,
 					max(0, $targetType->range->minLength - 1),
 					$targetType->range->maxLength === PlusInfinity::value ?
-						PlusInfinity::value : $targetType->range->maxLength - 1
+						PlusInfinity::value : max($targetType->range->maxLength - 1, 0)
 				)
 			]);
 			return $targetType->range->minLength > 0 ? $returnType :
@@ -55,9 +58,13 @@ final readonly class WithoutLast implements NativeMethod {
 		if ($targetValue instanceof TupleValue) {
 			$values = $targetValue->values;
 			if (count($values) === 0) {
-				return TypedValue::forValue($programRegistry->valueRegistry->atom(
-					new TypeNameIdentifier("ItemNotFound")
-				));
+				return TypedValue::forValue(
+					$programRegistry->valueRegistry->error(
+						$programRegistry->valueRegistry->atom(
+							new TypeNameIdentifier("ItemNotFound")
+						)
+					)
+				);
 			}
 			$element = array_pop($values);
 			return TypedValue::forValue($programRegistry->valueRegistry->record([

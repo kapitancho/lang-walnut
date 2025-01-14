@@ -30,7 +30,7 @@ final readonly class IndexOf implements NativeMethod {
 		if ($targetType instanceof ArrayType) {
 			$maxLength = $targetType->range->maxLength;
 			$returnType = $programRegistry->typeRegistry->integer(0,
-				$maxLength === PlusInfinity::value ? $maxLength : $maxLength - 1);
+				$maxLength === PlusInfinity::value ? $maxLength : max($maxLength - 1, 0));
 			return $programRegistry->typeRegistry->result(
 				$returnType,
 				$programRegistry->typeRegistry->atom(

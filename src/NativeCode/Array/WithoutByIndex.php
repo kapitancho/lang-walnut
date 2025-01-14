@@ -36,7 +36,7 @@ final readonly class WithoutByIndex implements NativeMethod {
 						$type->itemType,
 						max(0, $type->range->minLength - 1),
 						$type->range->maxLength === PlusInfinity::value ?
-							PlusInfinity::value : $type->range->maxLength - 1
+							PlusInfinity::value : max($type->range->maxLength - 1, 0)
 					)
 				]);
 				return $parameterType->range->minValue < $type->range->maxLength ? $returnType :

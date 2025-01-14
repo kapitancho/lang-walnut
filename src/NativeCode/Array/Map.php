@@ -42,9 +42,11 @@ final readonly class Map implements NativeMethod {
 					return $errorType ? $programRegistry->typeRegistry->result($t, $errorType) : $t;
 				}
 				throw new AnalyserException(
-					"The parameter type %s of the callback function is not a subtype of %s",
-					$type->itemType,
-					$parameterType->parameterType
+					sprintf(
+						"The parameter type %s of the callback function is not a subtype of %s",
+						$type->itemType,
+						$parameterType->parameterType
+					)
 				);
 			}
 			// @codeCoverageIgnoreStart

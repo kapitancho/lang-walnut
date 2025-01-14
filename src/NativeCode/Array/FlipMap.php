@@ -12,6 +12,7 @@ use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
@@ -44,9 +45,11 @@ final readonly class FlipMap implements NativeMethod {
                         return $errorType ? $programRegistry->typeRegistry->result($t, $errorType) : $t;
                     }
                     throw new AnalyserException(
-                        "The parameter type %s of the callback function is not a subtype of %s",
-                        $type->itemType,
-                        $parameterType->parameterType
+						sprintf(
+                            "The parameter type %s of the callback function is not a subtype of %s",
+                            $type->itemType,
+                            $parameterType->parameterType
+						)
                     );
                 }
 			}
@@ -78,6 +81,9 @@ final readonly class FlipMap implements NativeMethod {
                     // @codeCoverageIgnoreEnd
                 }
                 $r = $parameterValue->execute($programRegistry->executionContext, $value);
+	            if ($r instanceof ErrorValue) {
+                    return TypedValue::forValue($r);
+                }
                 $result[$value->literalValue] = $r;
             }
             return TypedValue::forValue($programRegistry->valueRegistry->record($result));

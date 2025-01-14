@@ -51,9 +51,6 @@ final readonly class Max implements NativeMethod {
 				}
 				return $programRegistry->typeRegistry->real();
 			}
-			// @codeCoverageIgnoreStart
-			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
-			// @codeCoverageIgnoreEnd
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));

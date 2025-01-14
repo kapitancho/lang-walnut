@@ -8,6 +8,7 @@ use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
+use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
 use Walnut\Lang\Blueprint\Value\TupleValue;
@@ -23,6 +24,10 @@ final readonly class Unique implements NativeMethod {
 		Type $targetType,
 		Type $parameterType,
 	): Type {
+		$targetType = $this->toBaseType($targetType);
+		if ($targetType instanceof TupleType) {
+			$targetType = $targetType->asArrayType();
+		}
 		if ($targetType instanceof ArrayType) {
 			$itemType = $targetType->itemType;
 			if ($itemType->isSubtypeOf($programRegistry->typeRegistry->string()) || $itemType->isSubtypeOf(
@@ -37,9 +42,6 @@ final readonly class Unique implements NativeMethod {
 					$targetType->range->maxLength
 				);
 			}
-			// @codeCoverageIgnoreStart
-			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
-			// @codeCoverageIgnoreEnd
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));

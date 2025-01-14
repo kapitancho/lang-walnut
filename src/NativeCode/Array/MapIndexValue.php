@@ -13,6 +13,7 @@ use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
@@ -34,7 +35,7 @@ final readonly class MapIndexValue implements NativeMethod {
 				$expectedType = $programRegistry->typeRegistry->record([
 					'index' => $programRegistry->typeRegistry->integer(0,
 						$type->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
-							$type->range->maxLength - 1
+							max($type->range->maxLength - 1, 0)
 					),
 					'value' => $type->itemType
 				]);
@@ -84,6 +85,9 @@ final readonly class MapIndexValue implements NativeMethod {
 						'value' => $value
 					])
 				);
+				if ($r instanceof ErrorValue) {
+					return TypedValue::forValue($r);
+				}
 				$result[] = $r;
 			}
 			return TypedValue::forValue($programRegistry->valueRegistry->tuple($result));

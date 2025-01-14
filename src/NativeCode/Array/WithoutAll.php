@@ -8,6 +8,7 @@ use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
+use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
@@ -20,6 +21,8 @@ final readonly class WithoutAll implements NativeMethod {
 		Type $targetType,
 		Type $parameterType,
 	): Type {
+		$targetType = $this->toBaseType($targetType);
+		$targetType = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($targetType instanceof ArrayType) {
 			return $programRegistry->typeRegistry->array(
 				$targetType->itemType,

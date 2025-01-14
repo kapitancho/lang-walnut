@@ -26,15 +26,18 @@ final readonly class Flatten implements NativeMethod {
 		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($type instanceof ArrayType) {
             $itemType = $type->itemType;
-            if ($itemType instanceof ArrayType) {
-                return $programRegistry->typeRegistry->array(
-                    $itemType->itemType,
-                    $type->range->minLength * $itemType->range->minLength,
-                    $type->range->maxLength === PlusInfinity::value ||
-                        $itemType->range->maxLength === PlusInfinity::value ?
-                        PlusInfinity::value :
-                        $type->range->maxLength * $itemType->range->maxLength,
-                );
+            if ($itemType->isSubtypeOf($programRegistry->typeRegistry->array())) {
+				if ($itemType instanceof ArrayType) {
+	                return $programRegistry->typeRegistry->array(
+	                    $itemType->itemType,
+		                ((int)(string)$type->range->minLength) * ((int)(string)$itemType->range->minLength),
+	                    $type->range->maxLength === PlusInfinity::value ||
+	                        $itemType->range->maxLength === PlusInfinity::value ?
+	                        PlusInfinity::value :
+		                    ((int)(string)$type->range->maxLength) * ((int)(string)$itemType->range->maxLength),
+	                );
+				}
+				return $programRegistry->typeRegistry->array();
             }
 		}
 		// @codeCoverageIgnoreStart

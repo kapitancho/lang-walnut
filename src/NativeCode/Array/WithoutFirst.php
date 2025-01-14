@@ -32,7 +32,7 @@ final readonly class WithoutFirst implements NativeMethod {
 					$type->itemType,
 					max(0, $type->range->minLength - 1),
 					$type->range->maxLength === PlusInfinity::value ?
-						PlusInfinity::value : $type->range->maxLength - 1
+						PlusInfinity::value : max($type->range->maxLength - 1, 0)
 				)
 			]);
 			return $type->range->minLength > 0 ? $returnType :
@@ -58,9 +58,13 @@ final readonly class WithoutFirst implements NativeMethod {
 		if ($targetValue instanceof TupleValue) {
 			$values = $targetValue->values;
 			if (count($values) === 0) {
-				return TypedValue::forValue($programRegistry->valueRegistry->atom(
-					new TypeNameIdentifier("ItemNotFound")
-				));
+				return TypedValue::forValue(
+					$programRegistry->valueRegistry->error(
+						$programRegistry->valueRegistry->atom(
+							new TypeNameIdentifier("ItemNotFound")
+						)
+					)
+				);
 			}
 			$element = array_shift($values);
 			return TypedValue::forValue($programRegistry->valueRegistry->record([

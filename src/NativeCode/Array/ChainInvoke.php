@@ -8,6 +8,7 @@ use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\FunctionType;
+use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
@@ -26,6 +27,9 @@ final readonly class ChainInvoke implements NativeMethod {
         $type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
         if ($type instanceof ArrayType) {
             $itemType = $this->toBaseType($type->itemType);
+            if ($itemType instanceof NothingType) {
+				return $parameterType;
+            }
             if ($itemType instanceof FunctionType) {
                 if ($itemType->returnType->isSubtypeOf($itemType->parameterType)) {
                     if ($parameterType->isSubtypeOf($itemType->parameterType)) {

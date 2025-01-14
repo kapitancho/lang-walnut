@@ -36,9 +36,10 @@ final readonly class FindFirst implements NativeMethod {
 					);
 				}
 				throw new AnalyserException(
-					"The parameter type %s of the callback function is not a subtype of %s",
-					$type->itemType,
-					$parameterType->parameterType
+					sprintf("The parameter type %s of the callback function is not a subtype of %s",
+						$type->itemType,
+						$parameterType->parameterType
+					),
 				);
 			}
 			// @codeCoverageIgnoreStart

@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\ArrayType;
+use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
@@ -21,7 +22,15 @@ final readonly class BinaryPlus implements NativeMethod {
 		Type $targetType,
 		Type $parameterType,
 	): Type {
+		$targetType = $this->toBaseType($targetType);
+		if ($targetType instanceof TupleType) {
+			$targetType = $targetType->asArrayType();
+		}
 		if ($targetType instanceof ArrayType) {
+			$parameterType = $this->toBaseType($parameterType);
+			if ($parameterType instanceof TupleType) {
+				$parameterType = $parameterType->asArrayType();
+			}
 			if ($parameterType instanceof ArrayType) {
 				return $programRegistry->typeRegistry->array(
 					$programRegistry->typeRegistry->union([

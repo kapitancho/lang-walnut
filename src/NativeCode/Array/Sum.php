@@ -59,9 +59,6 @@ final readonly class Sum implements NativeMethod {
 				}
 				return $programRegistry->typeRegistry->real();
 			}
-			// @codeCoverageIgnoreStart
-			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
-			// @codeCoverageIgnoreEnd
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -76,12 +73,12 @@ final readonly class Sum implements NativeMethod {
 		$targetValue = $target->value;
 
 		$targetValue = $this->toBaseValue($targetValue);
-		if ($targetValue instanceof TupleValue && count($targetValue->values) > 0) {
+		if ($targetValue instanceof TupleValue) {
 			$sum = 0;
 			$hasReal = false;
 			foreach($targetValue->values as $item) {
 				$v = $item->literalValue;
-				if (is_float($v)) {
+				if (str_contains((string)$v, '.')) {
 					$hasReal = true;
 				}
 				$sum += $v;
