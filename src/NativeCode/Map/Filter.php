@@ -38,9 +38,11 @@ final readonly class Filter implements NativeMethod {
 					);
 				}
 				throw new AnalyserException(
-					"The parameter type %s of the callback function is not a subtype of %s",
-					$targetType->itemType,
-					$parameterType->parameterType
+					sprintf(
+						"The parameter type %s of the callback function is not a subtype of %s",
+						$targetType->itemType,
+						$parameterType->parameterType
+					)
 				);
 			}
 			// @codeCoverageIgnoreStart

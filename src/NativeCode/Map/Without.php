@@ -32,7 +32,7 @@ final readonly class Without implements NativeMethod {
 				$targetType->itemType,
 				max(0, $targetType->range->minLength - 1),
 				$targetType->range->maxLength === PlusInfinity::value ?
-					PlusInfinity::value : $targetType->range->maxLength - 1
+					PlusInfinity::value : max($targetType->range->maxLength - 1, 0)
 			);
 			return $programRegistry->typeRegistry->result(
 				$returnType,

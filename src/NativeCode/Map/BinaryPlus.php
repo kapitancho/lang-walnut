@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\MapType;
+use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
@@ -21,7 +22,11 @@ final readonly class BinaryPlus implements NativeMethod {
 		Type $targetType,
 		Type $parameterType,
 	): Type {
+		$targetType = $this->toBaseType($targetType);
+		$targetType = $targetType instanceof RecordType ? $targetType->asMapType() : $targetType;
 		if ($targetType instanceof MapType) {
+			$parameterType = $this->toBaseType($parameterType);
+			$parameterType = $parameterType instanceof RecordType ? $parameterType->asMapType() : $parameterType;
 			if ($parameterType instanceof MapType) {
 				return $programRegistry->typeRegistry->map(
 					$programRegistry->typeRegistry->union([

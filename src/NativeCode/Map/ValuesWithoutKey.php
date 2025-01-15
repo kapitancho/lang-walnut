@@ -42,7 +42,7 @@ final readonly class ValuesWithoutKey implements NativeMethod {
 								$targetType->range->maxLength - 1
 							)),
 						$targetType->range->maxLength === PlusInfinity::value ?
-							PlusInfinity::value : $targetType->range->maxLength - 1
+							PlusInfinity::value : max($targetType->range->maxLength - 1, 0)
 					),
 					$programRegistry->typeRegistry->sealed(
 						new TypeNameIdentifier("MapItemNotFound")

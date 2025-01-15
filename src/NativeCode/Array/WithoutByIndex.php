@@ -70,10 +70,14 @@ final readonly class WithoutByIndex implements NativeMethod {
 				$values = $targetValue->values;
 				$p = (string)$parameterValue->literalValue;
 				if (!array_key_exists($p, $values)) {
-					return TypedValue::forValue($programRegistry->valueRegistry->sealedValue(
-						new TypeNameIdentifier('IndexOutOfRange'),
-						$programRegistry->valueRegistry->record(['index' => $parameterValue])
-					));
+					return TypedValue::forValue(
+						$programRegistry->valueRegistry->error(
+							$programRegistry->valueRegistry->sealedValue(
+								new TypeNameIdentifier('IndexOutOfRange'),
+								$programRegistry->valueRegistry->record(['index' => $parameterValue])
+							)
+						)
+					);
 				}
 				$removed = array_splice($values, $p, 1);
 				return TypedValue::forValue($programRegistry->valueRegistry->record([

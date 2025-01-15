@@ -34,15 +34,17 @@ final readonly class Map implements NativeMethod {
 					$returnType = $r instanceof ResultType ? $r->returnType : $r;
 					$t = $programRegistry->typeRegistry->set(
 						$returnType,
-						$type->range->minLength === 0 ? 0 : 1,
+						$type->range->minLength < 1 ? 0 : 1,
 						$type->range->maxLength,
 					);
 					return $errorType ? $programRegistry->typeRegistry->result($t, $errorType) : $t;
 				}
 				throw new AnalyserException(
-					"The parameter type %s of the callback function is not a subtype of %s",
-					$type->itemType,
-					$parameterType->parameterType
+					sprintf(
+						"The parameter type %s of the callback function is not a subtype of %s",
+						$type->itemType,
+						$parameterType->parameterType
+					)
 				);
 			}
 			// @codeCoverageIgnoreStart

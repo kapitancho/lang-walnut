@@ -12,6 +12,7 @@ use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
@@ -80,6 +81,9 @@ final readonly class MapKeyValue implements NativeMethod {
 						'value' => $value
 					])
 				);
+				if ($r instanceof ErrorValue) {
+					return TypedValue::forValue($r);
+				}
 				$result[$key] = $r;
 			}
 			return TypedValue::forValue($programRegistry->valueRegistry->record($result));

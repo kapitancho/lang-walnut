@@ -8,12 +8,12 @@ final class WithoutByIndexTest extends CodeExecutionTestHelper {
 
 	public function testWithoutByIndexEmpty(): void {
 		$result = $this->executeCodeSnippet("[]->withoutByIndex(3);");
-		$this->assertEquals("IndexOutOfRange[index: 3]", $result);
+		$this->assertEquals("@IndexOutOfRange[index: 3]", $result);
 	}
 
 	public function testWithoutByIndexNotFound(): void {
 		$result = $this->executeCodeSnippet("[1, 2, 5, 10, 5]->withoutByIndex(13);");
-		$this->assertEquals("IndexOutOfRange[index: 13]", $result);
+		$this->assertEquals("@IndexOutOfRange[index: 13]", $result);
 	}
 
 	public function testWithoutByIndexNonEmpty(): void {
