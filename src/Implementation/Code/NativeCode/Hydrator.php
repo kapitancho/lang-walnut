@@ -18,8 +18,10 @@ use Walnut\Lang\Blueprint\Type\BooleanType;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
 use Walnut\Lang\Blueprint\Type\FalseType;
+use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
+use Walnut\Lang\Blueprint\Type\IntersectionType;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\NothingType;
@@ -77,6 +79,8 @@ final readonly class Hydrator {
 			$targetType instanceof TrueType => $this->hydrateTrue(...),
 
 			$targetType instanceof AnyType => $this->hydrateAny(...),
+			$targetType instanceof NothingType => $this->hydrateNothing(...),
+			$targetType instanceof FunctionType => $this->hydrateFunction(...),
 			$targetType instanceof ArrayType => $this->hydrateArray(...),
 			$targetType instanceof SetType => $this->hydrateSet(...),
 			$targetType instanceof AtomType => $this->hydrateAtom(...),
@@ -84,7 +88,7 @@ final readonly class Hydrator {
 			$targetType instanceof EnumerationSubsetType => $this->hydrateEnumerationSubset(...),
 			$targetType instanceof IntegerType => $this->hydrateInteger(...),
 			$targetType instanceof IntegerSubsetType => $this->hydrateIntegerSubset(...),
-			//$targetType instanceof IntersectionType => $this->hydrateIntersection(...),
+			$targetType instanceof IntersectionType => $this->hydrateIntersection(...),
 			$targetType instanceof MapType => $this->hydrateMap(...),
 			$targetType instanceof MutableType => $this->hydrateMutable(...),
 			$targetType instanceof RealType => $this->hydrateReal(...),
@@ -99,13 +103,43 @@ final readonly class Hydrator {
 			$targetType instanceof ResultType => $this->hydrateResult(...),
 			$targetType instanceof SubtypeType => $this->hydrateSubtype(...),
 			$targetType instanceof SealedType => $this->hydrateSealed(...),
-			default => $value
+			// @codeCoverageIgnoreStart
+			default => throw new HydrationException(
+				$value,
+				$hydrationPath,
+				"Unsupported type"
+			)
+			// @codeCoverageIgnoreEnd
 		};
-		return is_callable($fn) ? $fn($value, $targetType, $hydrationPath) : $fn;
+		return $fn($value, $targetType, $hydrationPath);
 	}
 
 	private function hydrateAny(Value $value, AnyType $targetType, string $hydrationPath): Value {
 		return $value;
+	}
+
+	private function hydrateNothing(Value $value, NothingType $targetType, string $hydrationPath): Value {
+		throw new HydrationException(
+			$value,
+			$hydrationPath,
+			sprintf("There is no value allowed, %s provided", $value)
+		);
+	}
+
+	private function hydrateFunction(Value $value, FunctionType $targetType, string $hydrationPath): Value {
+		throw new HydrationException(
+			$value,
+			$hydrationPath,
+			"Functions cannot be hydrated"
+		);
+	}
+
+	private function hydrateIntersection(Value $value, IntersectionType $targetType, string $hydrationPath): Value {
+		throw new HydrationException(
+			$value,
+			$hydrationPath,
+			"Intersection type values cannot be hydrated"
+		);
 	}
 
 	private function hydrateType(Value $value, TypeType $targetType, string $hydrationPath): TypeValue {
@@ -132,11 +166,14 @@ final readonly class Hydrator {
 				if ($type->isSubtypeOf($targetType->refType)) {
 					return $this->programRegistry->valueRegistry->type($type);
 				}
+				// Should not be reachable
+				// @codeCoverageIgnoreStart
 				throw new HydrationException(
 					$value,
 					$hydrationPath,
 					sprintf("The type should be a subtype of %s", $targetType->refType)
 				);
+				// @codeCoverageIgnoreEnd
 			} catch (UnknownType) {
 				throw new HydrationException(
 					$value,
@@ -373,11 +410,14 @@ final readonly class Hydrator {
 				$baseValue
 			);
 		}
+		// This should not be reachable
+		// @codeCoverageIgnoreStart
 		throw new HydrationException(
 			$value,
 			$hydrationPath,
 			"The value should be a record"
 		);
+		// @codeCoverageIgnoreEnd
 	}
 
 	private function hydrateMutable(Value $value, MutableType $targetType, string $hydrationPath): MutableValue {
@@ -388,6 +428,9 @@ final readonly class Hydrator {
 	}
 
 	private function hydrateInteger(Value $value, IntegerType $targetType, string $hydrationPath): IntegerValue {
+		while($value instanceof SubtypeValue) {
+			$value = $value->baseValue;
+		}
 		if ($value instanceof IntegerValue) {
 			if ((
 				$targetType->range->minValue === MinusInfinity::value ||
@@ -418,6 +461,9 @@ final readonly class Hydrator {
 	}
 
 	private function hydrateIntegerSubset(Value $value, IntegerSubsetType $targetType, string $hydrationPath): IntegerValue {
+		while($value instanceof SubtypeValue) {
+			$value = $value->baseValue;
+		}
 		if ($value instanceof IntegerValue) {
 			if ($targetType->contains($value)) {
 				return $value;
@@ -529,6 +575,9 @@ final readonly class Hydrator {
 	}
 
 	private function hydrateStringSubset(Value $value, StringSubsetType $targetType, string $hydrationPath): StringValue {
+		while($value instanceof SubtypeValue) {
+			$value = $value->baseValue;
+		}
 		if ($value instanceof StringValue) {
 			if ($targetType->contains($value)) {
 				return $value;
@@ -551,7 +600,7 @@ final readonly class Hydrator {
 	}
 
 	private function hydrateArray(Value $value, ArrayType $targetType, string $hydrationPath): TupleValue {
-		if ($value instanceof TupleValue) {
+		if ($value instanceof TupleValue || $value instanceof SetValue) {
 			$l = count($value->values);
 			if ($targetType->range->minLength <= $l && (
 					$targetType->range->maxLength === PlusInfinity::value ||
@@ -739,6 +788,9 @@ final readonly class Hydrator {
 	}
 
 	private function hydrateReal(Value $value, RealType $targetType, string $hydrationPath): RealValue {
+		while($value instanceof SubtypeValue) {
+			$value = $value->baseValue;
+		}
 		if ($value instanceof IntegerValue || $value instanceof RealValue) {
 			if ((
 				$targetType->range->minValue === MinusInfinity::value ||
@@ -769,6 +821,9 @@ final readonly class Hydrator {
 	}
 
 	private function hydrateRealSubset(Value $value, RealSubsetType $targetType, string $hydrationPath): RealValue {
+		while($value instanceof SubtypeValue) {
+			$value = $value->baseValue;
+		}
 		if ($value instanceof IntegerValue) {
 			$value = $value->asRealValue();
 		}

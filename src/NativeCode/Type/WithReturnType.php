@@ -5,9 +5,11 @@ namespace Walnut\Lang\NativeCode\Type;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
+use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\FunctionType;
+use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Type\TypeType;
@@ -46,6 +48,17 @@ final readonly class WithReturnType implements NativeMethod {
 						)
 					);
 				}
+				if ($refType instanceof MetaType && $refType->value === MetaTypeValue::Function) {
+					return $programRegistry->typeRegistry->type(
+						$programRegistry->typeRegistry->function(
+							$programRegistry->typeRegistry->nothing,
+							$parameterType->refType
+						)
+					);
+				}
+				// @codeCoverageIgnoreStart
+				throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
+				// @codeCoverageIgnoreEnd
 			}
 			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));

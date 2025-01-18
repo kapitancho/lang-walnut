@@ -87,8 +87,8 @@ final readonly class WithRange implements NativeMethod {
 					$minValue = $range['minValue'];
 					$maxValue = $range['maxValue'];
 					$result = $programRegistry->typeRegistry->real(
-						$minValue instanceof RealValue ? $minValue->literalValue : MinusInfinity::value,
-						$maxValue instanceof RealValue ? $maxValue->literalValue : PlusInfinity::value,
+						$minValue instanceof RealValue || $minValue instanceof IntegerValue ? $minValue->literalValue : MinusInfinity::value,
+						$maxValue instanceof RealValue || $maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
 					);
 					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
 				}

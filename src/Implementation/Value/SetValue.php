@@ -54,15 +54,15 @@ final class SetValue implements SetValueInterface, JsonSerializable {
 
 	public function equals(Value $other): bool {
 		if ($other instanceof SetValueInterface) {
-			$thisValues = $this->values;
-			$otherValues = $other->values;
+			$thisValues = $this->valueSet;
+			$otherValues = $other->valueSet;
 			if (count($thisValues) === count($otherValues)) {
-				return array_all($thisValues, fn($value, $index) => $value->equals($otherValues[$index]));
+				return array_all(array_keys($thisValues),
+					fn(string $key) => array_key_exists($key, $otherValues));
 			}
 		}
 		return false;
 	}
-
 
 	public function asString(bool $multiline): string {
 		return match(count($this->values)) {

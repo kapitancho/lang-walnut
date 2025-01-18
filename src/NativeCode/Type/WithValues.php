@@ -94,8 +94,8 @@ final readonly class WithValues implements NativeMethod {
 				// @codeCoverageIgnoreEnd
 			}
 			if ($refType instanceof MetaType && (
-				$refType->value === MetaTypeValue::Enumeration ||
-				$refType->value === MetaTypeValue::EnumerationSubset
+				$refType->value === MetaTypeValue::Enumeration /*||
+				$refType->value === MetaTypeValue::EnumerationSubset*/
 			)) {
 				if ($parameterType->isSubtypeOf(
 					$programRegistry->typeRegistry->array(
@@ -154,7 +154,7 @@ final readonly class WithValues implements NativeMethod {
 				)) {
 					$values = $this->toBaseValue($parameter->value)->values;
 					$result = $programRegistry->typeRegistry->realSubset(
-						array_map(fn(RealValue $value): Number => $value->literalValue, $values)
+						array_map(fn(RealValue|IntegerValue $value): Number => $value->literalValue, $values)
 					);
 					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
 				}

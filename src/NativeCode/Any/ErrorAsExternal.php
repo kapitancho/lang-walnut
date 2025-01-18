@@ -44,7 +44,7 @@ final readonly class ErrorAsExternal implements NativeMethod {
 				$target;
 		}
 		// @codeCoverageIgnoreStart
-		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
+		throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		// @codeCoverageIgnoreEnd
 	}
 

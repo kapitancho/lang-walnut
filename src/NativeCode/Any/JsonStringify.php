@@ -10,6 +10,7 @@ use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\ErrorValue;
 
 final readonly class JsonStringify implements NativeMethod {
 
@@ -49,6 +50,9 @@ final readonly class JsonStringify implements NativeMethod {
 			$targetValue->type, new MethodNameIdentifier('asJsonValue')
 		);
 		$step1 = $method1->execute($programRegistry, $target, $parameter);
+		if ($step1->value instanceof ErrorValue) {
+			return $step1;
+		}
 		$method2 = $programRegistry->methodRegistry->method(
 			$programRegistry->typeRegistry->alias(new TypeNameIdentifier('JsonValue')),
 			new MethodNameIdentifier('stringify')

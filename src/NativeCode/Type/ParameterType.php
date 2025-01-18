@@ -34,7 +34,7 @@ final readonly class ParameterType implements NativeMethod {
 			}
 		}
 		// @codeCoverageIgnoreStart
-		throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
+		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
 		// @codeCoverageIgnoreEnd
 	}
 

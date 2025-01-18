@@ -24,6 +24,7 @@ use Walnut\Lang\Blueprint\Type\OptionalKeyType;
 use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\RecordType;
+use Walnut\Lang\Blueprint\Type\SetType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\TupleType;
@@ -114,6 +115,15 @@ final readonly class OpenApiSchema implements NativeMethod {
 				... [
 					'type' => $programRegistry->valueRegistry->string('array'),
 					'items' => $this->typeToOpenApiSchema($programRegistry, $type->itemType)
+				],
+				... (($min = $type->range->minLength) > 0 ? ['minItems' => $programRegistry->valueRegistry->integer($min)] : []),
+				... (($max = $type->range->maxLength) !== PlusInfinity::value ? ['maxItems' => $programRegistry->valueRegistry->integer($max)] : []),
+			]),
+			$type instanceof SetType => $programRegistry->valueRegistry->record([
+				... [
+					'type' => $programRegistry->valueRegistry->string('array'),
+					'items' => $this->typeToOpenApiSchema($programRegistry, $type->itemType),
+					'uniqueItems' => $programRegistry->valueRegistry->boolean(true)
 				],
 				... (($min = $type->range->minLength) > 0 ? ['minItems' => $programRegistry->valueRegistry->integer($min)] : []),
 				... (($max = $type->range->maxLength) !== PlusInfinity::value ? ['maxItems' => $programRegistry->valueRegistry->integer($max)] : []),

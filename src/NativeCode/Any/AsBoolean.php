@@ -20,6 +20,7 @@ use Walnut\Lang\Blueprint\Type\NullType;
 use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\RecordType;
+use Walnut\Lang\Blueprint\Type\SetType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\SubtypeType;
@@ -32,6 +33,7 @@ use Walnut\Lang\Blueprint\Value\MutableValue;
 use Walnut\Lang\Blueprint\Value\NullValue;
 use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\RecordValue;
+use Walnut\Lang\Blueprint\Value\SetValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Blueprint\Value\SubtypeValue;
 use Walnut\Lang\Blueprint\Value\TupleValue;
@@ -66,6 +68,7 @@ final readonly class AsBoolean implements NativeMethod {
 			($type instanceof StringType && $type->range->maxLength instanceof Number && (int)(string)$type->range->maxLength === 0),
 			($type instanceof RecordType && count($type->types) === 0),
 			($type instanceof TupleType && count($type->types) === 0),
+			($type instanceof SetType && ((int)(string)$type->range->maxLength) === 0),
 			($type instanceof ArrayType && $type->range->maxLength instanceof Number && (int)(string)$type->range->maxLength === 0),
 			($type instanceof MapType && $type->range->maxLength instanceof Number && (int)(string)$type->range->maxLength === 0)
 				=> $programRegistry->typeRegistry->false,
@@ -119,6 +122,7 @@ final readonly class AsBoolean implements NativeMethod {
             $value instanceof NullValue => false,
             $value instanceof TupleValue => $value->values !== [],
             $value instanceof RecordValue => $value->values !== [],
+            $value instanceof SetValue => $value->values !== [],
             $value instanceof SubtypeValue => $this->evaluate($value->baseValue),
             $value instanceof MutableValue => $this->evaluate($value->value),
             //TODO: check for cast to boolean

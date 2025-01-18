@@ -30,7 +30,7 @@ DependencyContainerError->targetType(=> Type) :: $targetType;
 DependencyContainerError->errorType(=> DependencyContainerErrorType) :: $errorType;
 
 /* json value */
-JsonValue = Null|Boolean|Integer|Real|String|Array<`JsonValue>|Map<`JsonValue>/*|Result<Nothing, `JsonValue>*/|Mutable<`JsonValue>;
+JsonValue = Null|Boolean|Integer|Real|String|Array<`JsonValue>|Map<`JsonValue>|Set<`JsonValue>/*|Result<Nothing, `JsonValue>*/|Mutable<`JsonValue>;
 InvalidJsonString = $[value: String];
 InvalidJsonString->value(=> String) :: $value;
 InvalidJsonValue = $[value: Any];

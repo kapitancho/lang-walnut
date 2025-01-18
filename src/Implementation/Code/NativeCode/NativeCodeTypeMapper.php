@@ -137,6 +137,7 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 			$type instanceof FalseType, $type instanceof NullType => true,
 			$type instanceof ArrayType => $this->isJsonType($type->itemType),
 			$type instanceof MapType => $this->isJsonType($type->itemType),
+			$type instanceof SetType => $this->isJsonType($type->itemType),
 			$type instanceof TupleType => $this->isJsonType($type->asArrayType()),
 			$type instanceof RecordType => $this->isJsonType($type->asMapType()),
 			$type instanceof MutableType => $this->isJsonType($type->valueType),

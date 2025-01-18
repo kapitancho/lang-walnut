@@ -109,12 +109,13 @@ final readonly class Construct implements NativeMethod {
 					$targetType
 				);
 			}
+			// @codeCoverageIgnoreStart
 			if ($targetType->isSubtypeOf($parameterType->refType)) {
-				// @codeCoverageIgnoreStart
 				throw new AnalyserException(
 					sprintf("The type %s has no constructor. The constructor parameter can be used directly.", $parameterType->refType)
 				);
 			}
+			// @codeCoverageIgnoreEnd
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(

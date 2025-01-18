@@ -8,6 +8,7 @@ use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
@@ -33,7 +34,9 @@ final readonly class WithItemTypes implements NativeMethod {
 					)
 				)
 			)) {
-				if ($refType instanceof TupleType) {
+				if ($refType instanceof TupleType || (
+					$refType instanceof MetaType && $refType->value === MetaTypeValue::Tuple
+				)) {
 					return $programRegistry->typeRegistry->type(
 						$programRegistry->typeRegistry->metaType(
 							MetaTypeValue::Tuple
@@ -51,7 +54,9 @@ final readonly class WithItemTypes implements NativeMethod {
 					)
 				)
 			)) {
-				if ($refType instanceof RecordType) {
+				if ($refType instanceof RecordType || (
+					$refType instanceof MetaType && $refType->value === MetaTypeValue::Record
+				)) {
 					return $programRegistry->typeRegistry->type(
 						$programRegistry->typeRegistry->metaType(
 							MetaTypeValue::Record

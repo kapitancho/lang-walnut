@@ -8,6 +8,7 @@ use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Type\TypeType;
@@ -30,7 +31,9 @@ final readonly class WithValueType implements NativeMethod {
 					$programRegistry->typeRegistry->any
 				)
 			)) {
-				if ($refType instanceof MutableType) {
+				if ($refType instanceof MutableType || (
+					$refType instanceof MetaType && $refType->value === MetaTypeValue::MutableType
+				)) {
 					return $programRegistry->typeRegistry->type(
 						$programRegistry->typeRegistry->metaType(MetaTypeValue::MutableType)
 					);

@@ -11,6 +11,7 @@ use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\MapType;
+use Walnut\Lang\Blueprint\Type\SetType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
@@ -30,7 +31,7 @@ final readonly class MaxLength implements NativeMethod {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof StringType || $refType instanceof StringSubsetType ||
-				$refType instanceof ArrayType || $refType instanceof MapType) {
+				$refType instanceof ArrayType || $refType instanceof MapType || $refType instanceof SetType) {
 				return $programRegistry->typeRegistry->union([
 					$programRegistry->typeRegistry->integer(0),
 					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('PlusInfinity'))
@@ -52,7 +53,7 @@ final readonly class MaxLength implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof StringType || $typeValue instanceof StringSubsetType ||
-				$typeValue instanceof ArrayType || $typeValue instanceof MapType) {
+				$typeValue instanceof ArrayType || $typeValue instanceof MapType || $typeValue instanceof SetType) {
 				return TypedValue::forValue($typeValue->range->maxLength === PlusInfinity::value ?
 					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('PlusInfinity')) :
 					$programRegistry->valueRegistry->integer($typeValue->range->maxLength)

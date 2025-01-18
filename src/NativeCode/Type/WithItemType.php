@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\MapType;
+use Walnut\Lang\Blueprint\Type\SetType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Value\TypeValue;
@@ -45,6 +46,14 @@ final readonly class WithItemType implements NativeMethod {
 							$refType->range->minLength,
 							$refType->range->maxLength
 						)
+					);
+				}
+				if ($refType instanceof SetType) {
+					return $programRegistry->typeRegistry->type(
+						$programRegistry->typeRegistry->set(
+							$parameterType->refType,
+							$refType->range->minLength,
+							$refType->range->maxLength)
 					);
 				}
 				// @codeCoverageIgnoreStart
@@ -84,6 +93,14 @@ final readonly class WithItemType implements NativeMethod {
 				}
 				if ($typeValue instanceof MapType) {
 					$result = $programRegistry->typeRegistry->map(
+						$parameter->value->typeValue,
+						$typeValue->range->minLength,
+						$typeValue->range->maxLength,
+					);
+					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
+				}
+				if ($typeValue instanceof SetType) {
+					$result = $programRegistry->typeRegistry->set(
 						$parameter->value->typeValue,
 						$typeValue->range->minLength,
 						$typeValue->range->maxLength,

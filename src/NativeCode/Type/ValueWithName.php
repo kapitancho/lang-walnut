@@ -6,9 +6,11 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
+use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
@@ -27,6 +29,16 @@ final readonly class ValueWithName implements NativeMethod {
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $targetType->refType;
+			if ($refType instanceof MetaType) {
+				if ($refType->value === MetaTypeValue::Enumeration || $refType->value === MetaTypeValue::EnumerationSubset) {
+					return $programRegistry->typeRegistry->result(
+						$programRegistry->typeRegistry->any,
+						$programRegistry->typeRegistry->sealed(
+							new TypeNameIdentifier('UnknownEnumerationValue'),
+						)
+					);
+				}
+			}
 			if ($refType instanceof EnumerationSubsetType) {
 				if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
 					return $programRegistry->typeRegistry->result(

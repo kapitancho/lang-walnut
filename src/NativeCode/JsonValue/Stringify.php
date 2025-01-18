@@ -10,9 +10,11 @@ use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
+use Walnut\Lang\Blueprint\Value\MutableValue;
 use Walnut\Lang\Blueprint\Value\NullValue;
 use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\RecordValue;
+use Walnut\Lang\Blueprint\Value\SetValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Blueprint\Value\SubtypeValue;
 use Walnut\Lang\Blueprint\Value\TupleValue;
@@ -46,6 +48,13 @@ final readonly class Stringify implements NativeMethod {
 			}
 			return $items;
 		}
+		if ($value instanceof SetValue) {
+			$items = [];
+			foreach($value->values as $item) {
+				$items[] = $this->doStringify($item);
+			}
+			return $items;
+		}
 		if ($value instanceof NullValue ||
 			$value instanceof BooleanValue ||
 			$value instanceof StringValue
@@ -61,9 +70,14 @@ final readonly class Stringify implements NativeMethod {
 		if ($value instanceof SubtypeValue) {
 			return $this->doStringify($value->baseValue);
 		}
+		if ($value instanceof MutableValue) {
+			return $this->doStringify($value->value);
+		}
+		// @codeCoverageIgnoreStart
 		throw new ExecutionException(
 			sprintf("Cannot stringify value of type %s", $value)
 		);
+		// @codeCoverageIgnoreEnd
 	}
 
 	public function execute(

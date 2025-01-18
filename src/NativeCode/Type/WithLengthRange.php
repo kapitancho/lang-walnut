@@ -11,6 +11,7 @@ use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\MapType;
+use Walnut\Lang\Blueprint\Type\SetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Type\TypeType;
@@ -40,6 +41,9 @@ final readonly class WithLengthRange implements NativeMethod {
 				}
 				if ($refType instanceof MapType) {
 					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->map($refType->itemType));
+				}
+				if ($refType instanceof SetType) {
+					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->set($refType->itemType));
 				}
 				// @codeCoverageIgnoreStart
 				throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -92,6 +96,17 @@ final readonly class WithLengthRange implements NativeMethod {
 					$minValue = $range['minLength'];
 					$maxValue = $range['maxLength'];
 					$result = $programRegistry->typeRegistry->map(
+						$typeValue->itemType,
+						$minValue->literalValue,
+						$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
+					);
+					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
+				}
+				if ($typeValue instanceof SetType) {
+					$range = $this->toBaseValue($parameter->value)->values;
+					$minValue = $range['minLength'];
+					$maxValue = $range['maxLength'];
+					$result = $programRegistry->typeRegistry->set(
 						$typeValue->itemType,
 						$minValue->literalValue,
 						$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,

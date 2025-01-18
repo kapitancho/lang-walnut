@@ -7,6 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\Method;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
@@ -59,9 +60,6 @@ final readonly class With implements NativeMethod {
 		if ($targetType instanceof RecordType) {
 			$targetType = $targetType->asMapType();
 		}
-		if ($parameterType instanceof RecordType) {
-			$parameterType = $parameterType->asMapType();
-		}
 		if ($targetType instanceof MapType) {
 			if ($parameterType instanceof MapType) {
 				return $programRegistry->typeRegistry->map(
@@ -70,7 +68,9 @@ final readonly class With implements NativeMethod {
 						$parameterType->itemType
 					]),
 					max($targetType->range->minLength, $parameterType->range->minLength),
-					$targetType->range->maxLength + $parameterType->range->maxLength
+					$targetType->range->maxLength === PlusInfinity::value ||
+						$parameterType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
+						((int)(string)$targetType->range->maxLength) + ((int)(string)$parameterType->range->maxLength)
 				);
 			}
 			// @codeCoverageIgnoreStart
