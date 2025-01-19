@@ -22,14 +22,12 @@ final readonly class AsMutableOfType implements NativeMethod {
 		if ($parameterType instanceof TypeType) {
 			return $programRegistry->typeRegistry->result(
 				//$programRegistry->typeRegistry->type(
-					$programRegistry->typeRegistry->metaType(MetaTypeValue::MutableType)
+					$programRegistry->typeRegistry->metaType(MetaTypeValue::MutableValue)
 				/*)*/,
 				$programRegistry->typeRegistry->sealed(new TypeNameIdentifier("CastNotAvailable"))
 			);
 		}
-		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
-		// @codeCoverageIgnoreEnd
 	}
 
 	public function execute(

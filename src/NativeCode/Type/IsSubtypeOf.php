@@ -21,9 +21,7 @@ final readonly class IsSubtypeOf implements NativeMethod {
 		if ($targetType instanceof TypeType && $parameterType instanceof TypeType) {
 			return $programRegistry->typeRegistry->boolean;
 		}
-		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
-		// @codeCoverageIgnoreEnd
 	}
 
 	public function execute(

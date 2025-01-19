@@ -31,9 +31,7 @@ final readonly class Split implements NativeMethod {
 					$targetType->range->maxLength
 				);
 			}
-			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
-			// @codeCoverageIgnoreEnd
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));

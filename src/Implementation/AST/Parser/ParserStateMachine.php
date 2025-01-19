@@ -1675,8 +1675,8 @@ final readonly class ParserStateMachine {
 				T::type_keyword->name => $c = function(LT $token) {
 					if (in_array($token->patternMatch->text, [
 						'Function', 'Tuple', 'Record', 'Union', 'Intersection', 'Atom', 'Enumeration',
-						'EnumerationSubset', 'IntegerSubset', 'MutableType', 'RealSubset', 'StringSubset',
-						'State', 'Subtype', 'Alias', 'Named'
+						'EnumerationSubset', 'EnumerationValue', 'IntegerSubset', 'MutableValue',
+						'RealSubset', 'StringSubset', 'State', 'Subtype', 'Alias', 'Named'
 					], true)) {
 						$this->s->generated = $this->nodeBuilder->metaTypeType(
 							MetaTypeValue::from($token->patternMatch->text)
@@ -1877,7 +1877,8 @@ final readonly class ParserStateMachine {
 						'Mutable' => 770,
 						'Result' => 780,
 						'Error' => 775,
-						'Any', 'Nothing', 'Boolean', 'True', 'False', 'Null', 'MutableType' => 702,
+						'Any', 'Nothing', 'Boolean', 'True', 'False', 'Null',
+						'MutableValue', 'EnumerationValue' => 702,
 						default => 789
 					};
 					$this->s->i++;
@@ -1896,7 +1897,8 @@ final readonly class ParserStateMachine {
 						'Mutable' => 770,
 						'Error' => 775,
 						'Result' => 780,
-						'Any', 'Nothing', 'Boolean', 'True', 'False', 'Null', 'MutableType' => 702,
+						'Any', 'Nothing', 'Boolean', 'True', 'False', 'Null',
+						'MutableValue', 'EnumerationValue' => 702,
 						default => 790
 					};
 					$this->s->i++;
@@ -1942,7 +1944,8 @@ final readonly class ParserStateMachine {
 						'Array' => $this->nodeBuilder->arrayType(),
 						'Set' => $this->nodeBuilder->setType(),
 						'Map' => $this->nodeBuilder->mapType(),
-						'MutableType' => $this->nodeBuilder->metaTypeType(MetaTypeValue::MutableType)
+						'EnumerationValue' => $this->nodeBuilder->metaTypeType(MetaTypeValue::EnumerationValue),
+						'MutableValue' => $this->nodeBuilder->metaTypeType(MetaTypeValue::MutableValue)
 					};
 					$this->s->pop();
 				},
@@ -2265,8 +2268,8 @@ final readonly class ParserStateMachine {
 				T::type_keyword->name => function(LT $token) {
 					if (in_array($token->patternMatch->text, [
 						'Function', 'Tuple', 'Record', 'Union', 'Intersection', 'Atom', 'Enumeration',
-						'EnumerationSubset', 'IntegerSubset', 'RealSubset', 'StringSubset',
-						'Sealed', 'Subtype', 'Alias', 'Named', 'MutableType'
+						'EnumerationSubset', 'EnumerationValue', 'IntegerSubset', 'RealSubset', 'StringSubset',
+						'Sealed', 'Subtype', 'Alias', 'Named', 'MutableValue'
 					], true)) {
 						$this->s->result['type'] = $this->nodeBuilder->metaTypeType(
 							MetaTypeValue::from($token->patternMatch->text)

@@ -111,11 +111,13 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 		if ($type instanceof MetaType) {
 			$class = [
 				'Function' => FunctionType::class,
-				'MutableType' => MutableType::class,
+				'MutableValue' => MutableType::class,
 				'Tuple' => TupleType::class,
 				'Record' => RecordType::class,
 				'Union' => UnionType::class,
-				'Intersection' => IntersectionType::class
+				'Intersection' => IntersectionType::class,
+				'Subtype' => SubtypeType::class,
+				'EnumerationValue' => EnumerationType::class,
 			][$type->value->value] ?? null;
 			return array_merge($baseIds,
 				$this->getTypeMapping()[$class] ?? []

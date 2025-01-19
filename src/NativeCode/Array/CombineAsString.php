@@ -42,9 +42,7 @@ final readonly class CombineAsString implements NativeMethod {
 								$itemType->range->maxLength * $targetType->range->maxLength*/
 					);
 				}
-				// @codeCoverageIgnoreStart
 				throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
-				// @codeCoverageIgnoreEnd
 			}
 		}
 		// @codeCoverageIgnoreStart

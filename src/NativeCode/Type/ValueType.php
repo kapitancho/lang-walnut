@@ -34,7 +34,7 @@ final readonly class ValueType implements NativeMethod {
 				if ($refType->value === MetaTypeValue::Sealed) {
 					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->any);
 				}
-				if ($refType->value === MetaTypeValue::MutableType) {
+				if ($refType->value === MetaTypeValue::MutableValue) {
 					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->any);
 				}
 			}

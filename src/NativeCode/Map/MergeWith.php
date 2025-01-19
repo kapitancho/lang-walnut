@@ -39,9 +39,7 @@ final readonly class MergeWith implements NativeMethod {
 						PlusInfinity::value : $targetType->range->maxLength + $parameterType->range->maxLength
 				);
 			}
-			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
-			// @codeCoverageIgnoreEnd
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));

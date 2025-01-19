@@ -11,8 +11,9 @@ enum MetaTypeValue: string {
 	case Atom = 'Atom';
 	case Enumeration = 'Enumeration';
 	case EnumerationSubset = 'EnumerationSubset';
+	case EnumerationValue = 'EnumerationValue';
 	case IntegerSubset = 'IntegerSubset';
-	case MutableType = 'MutableType';
+	case MutableValue = 'MutableValue';
 	case RealSubset = 'RealSubset';
 	case StringSubset = 'StringSubset';
 	case Alias = 'Alias';

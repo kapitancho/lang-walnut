@@ -70,9 +70,7 @@ final readonly class Item implements NativeMethod {
 				}
 				return $programRegistry->typeRegistry->result($returnType, $mapItemNotFound);
 			}
-			// @codeCoverageIgnoreStart
-			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType    ));
-			// @codeCoverageIgnoreEnd
+		throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));

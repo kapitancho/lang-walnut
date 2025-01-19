@@ -22,7 +22,7 @@ final class ValueTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testValueTypeMutableMetaType(): void {
-		$result = $this->executeCodeSnippet("getValueType(type{Mutable<String>});", "getValueType = ^Type<MutableType> => Type :: #->valueType;");
+		$result = $this->executeCodeSnippet("getValueType(type{Mutable<String>});", "getValueType = ^Type<MutableValue> => Type :: #->valueType;");
 		$this->assertEquals("type{String}", $result);
 	}
 

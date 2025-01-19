@@ -492,7 +492,7 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 		$this->callIsOfType($n, $t1, true);
 	}
 
-	public function testIsSubtypeOfMutableType(): void {
+	public function testIsSubtypeOfMutableValue(): void {
 		$n = $this->typeRegistry->nothing;
 		$a = $this->typeRegistry->any;
 

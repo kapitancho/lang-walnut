@@ -61,6 +61,11 @@ final class ValuesTest extends CodeExecutionTestHelper {
 			"type{String}->values;");
 	}
 
+	public function testValuesInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet('Invalid parameter type',
+			"type{String['A', 'C']}->values(42);");
+	}
+
 	public function testValuesMetaTypeInvalidTargetType(): void {
 		$this->executeErrorCodeSnippet('Invalid target type',
 			"getValues(type[Integer]);", "getValues = ^Type<Tuple> => Array<Integer, 1..> :: #->values;");

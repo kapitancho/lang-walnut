@@ -32,19 +32,17 @@ final readonly class WithValueType implements NativeMethod {
 				)
 			)) {
 				if ($refType instanceof MutableType || (
-					$refType instanceof MetaType && $refType->value === MetaTypeValue::MutableType
+					$refType instanceof MetaType && $refType->value === MetaTypeValue::MutableValue
 				)) {
 					return $programRegistry->typeRegistry->type(
-						$programRegistry->typeRegistry->metaType(MetaTypeValue::MutableType)
+						$programRegistry->typeRegistry->metaType(MetaTypeValue::MutableValue)
 					);
 				}
 				// @codeCoverageIgnoreStart
 				throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
 				// @codeCoverageIgnoreEnd
 			}
-			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
-			// @codeCoverageIgnoreEnd
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));

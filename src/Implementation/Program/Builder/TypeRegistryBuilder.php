@@ -231,6 +231,12 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 			'Integer' => $this->integer(),
 			'Real' => $this->real(),
 			'String' => $this->string(),
+		    'Atom' => $this->metaType(MetaTypeValue::Atom),
+		    'EnumerationValue' => $this->metaType(MetaTypeValue::EnumerationValue),
+		    'Record' => $this->metaType(MetaTypeValue::Record),
+		    'Sealed' => $this->metaType(MetaTypeValue::Sealed),
+		    'Subtype' => $this->metaType(MetaTypeValue::Subtype),
+		    'Tuple' => $this->metaType(MetaTypeValue::Tuple),
 			default => $this->withName($typeName)
 	    };
 	}

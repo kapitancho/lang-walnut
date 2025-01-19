@@ -45,9 +45,7 @@ final readonly class BinaryModulo implements NativeMethod {
 					$programRegistry->typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
 				) : $returnType;
 			}
-			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
-			// @codeCoverageIgnoreEnd
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));

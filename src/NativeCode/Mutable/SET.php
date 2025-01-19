@@ -25,9 +25,7 @@ final readonly class SET implements NativeMethod {
 			if ($parameterType->isSubtypeOf($t->valueType)) {
 				return $targetType;
 			}
-			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
-			// @codeCoverageIgnoreEnd
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));

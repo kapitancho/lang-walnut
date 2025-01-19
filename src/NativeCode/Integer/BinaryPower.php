@@ -34,9 +34,7 @@ final readonly class BinaryPower implements NativeMethod {
 			if ($parameterType instanceof RealType || $parameterType instanceof RealSubsetType) {
 				return $programRegistry->typeRegistry->real();
 			}
-			// @codeCoverageIgnoreStart
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
-			// @codeCoverageIgnoreEnd
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));

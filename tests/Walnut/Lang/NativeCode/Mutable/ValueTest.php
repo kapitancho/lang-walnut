@@ -12,7 +12,7 @@ final class ValueTest extends CodeExecutionTestHelper {
 	}
 
 	public function testValueMetaType(): void {
-		$result = $this->executeCodeSnippet("getValue(mutable{Real, 3.14});", "getValue = ^MutableType => Any :: #->value;");
+		$result = $this->executeCodeSnippet("getValue(mutable{Real, 3.14});", "getValue = ^MutableValue => Any :: #->value;");
 		$this->assertEquals("3.14", $result);
 	}
 

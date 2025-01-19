@@ -94,9 +94,7 @@ final readonly class CastAs implements NativeMethod {
 			}
 			return $refType instanceof AliasType ? $refType : $returnType;
 		}
-		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
-		// @codeCoverageIgnoreEnd
 	}
 
 	public function execute(

@@ -26,7 +26,7 @@ final readonly class Value implements NativeMethod {
 		if ($t instanceof MutableType) {
 			return $t->valueType;
 		}
-		if ($t instanceof MetaType && $t->value === MetaTypeValue::MutableType) {
+		if ($t instanceof MetaType && $t->value === MetaTypeValue::MutableValue) {
 			return $programRegistry->typeRegistry->any;
 		}
 		// @codeCoverageIgnoreStart

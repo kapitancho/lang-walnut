@@ -21,9 +21,7 @@ final readonly class CompileTimeType implements NativeMethod {
 		if ($parameterType instanceof NullType) {
 			return $programRegistry->typeRegistry->type($targetType);
 		}
-		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
-		// @codeCoverageIgnoreEnd
 	}
 
 	public function execute(

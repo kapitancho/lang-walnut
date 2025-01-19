@@ -27,9 +27,7 @@ final readonly class HydrateAs implements NativeMethod {
 				$programRegistry->typeRegistry->withName(new TypeNameIdentifier("HydrationError"))
 			);
 		}
-		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
-		// @codeCoverageIgnoreEnd
 	}
 
 	public function execute(

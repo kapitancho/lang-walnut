@@ -30,7 +30,7 @@ final readonly class EnumerationType implements NativeMethod {
 				return $programRegistry->typeRegistry->type($refType->enumeration);
 			}
 			if ($refType instanceof MetaType) {
-				if ($refType->value === MetaTypeValue::EnumerationSubset) {
+				if ($refType->value === MetaTypeValue::EnumerationSubset || $refType->value === MetaTypeValue::EnumerationValue) {
 					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->any);
 				}
 			}

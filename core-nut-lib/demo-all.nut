@@ -121,7 +121,7 @@ AllTypes = [
     anyAlias: Type<Alias>,
     anyTuple: Type<Tuple>,
     anyRecord: Type<Record>,
-    anyMutable: Type<MutableType>,
+    anyMutable: Type<MutableValue>,
     anyIntersection: Type<Intersection>,
     anyUnion: Type<Union>
 ];

@@ -369,11 +369,11 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 		);
 	}
 
-	public function testTypeMutableType(): void {
+	public function testTypeMutableValue(): void {
 		$this->assertEquals(
 			['Mutable', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
-				MetaTypeValue::MutableType
+				MetaTypeValue::MutableValue
 			))
 		);
 	}
@@ -407,7 +407,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testTypeSubtype(): void {
 		$this->assertEquals(
-			[/*'Subtype', */'Any'],
+			['Subtype', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::Subtype
 			))
