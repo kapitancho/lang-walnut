@@ -21,13 +21,22 @@ final class RealValue implements RealValueInterface, JsonSerializable {
 		get => $this->typeRegistry->realSubset([$this->literalValue]);
     }
 
+	private function normalize(Number $value): string {
+		$v = $value->value;
+		if (str_contains($v, '.')) {
+			$v = rtrim($v, '0');
+			$v = rtrim($v, '.');
+		}
+		return $v;
+	}
+
 	public function equals(Value $other): bool {
-		return ($other instanceof RealValueInterface && (string)$this->literalValue === (string)$other->literalValue) ||
-			($other instanceof IntegerValueInterface && (string)$this->literalValue === (string)$other->asRealValue()->literalValue);
+		return (($other instanceof RealValueInterface || $other instanceof IntegerValueInterface) &&
+			$this->normalize($this->literalValue) === $this->normalize($other->literalValue));
 	}
 
 	public function __toString(): string {
-		return (string) $this->literalValue;
+		return $this->normalize($this->literalValue);
 	}
 
 	public function jsonSerialize(): array {

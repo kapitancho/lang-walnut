@@ -13,7 +13,7 @@ final class BinaryMinusTest extends CodeExecutionTestHelper {
 
 	public function testBinaryMinusReal(): void {
 		$result = $this->executeCodeSnippet("3.14 - 5.14;");
-		$this->assertEquals("-2.00", $result);
+		$this->assertEquals("-2", $result);
 	}
 
 	public function testBinaryMinusInvalidParameter(): void {

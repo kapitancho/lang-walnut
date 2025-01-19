@@ -8,7 +8,7 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 
 	public function testBinaryMultiply(): void {
 		$result = $this->executeCodeSnippet("3.2 * 5;");
-		$this->assertEquals("16.0", $result);
+		$this->assertEquals("16", $result);
 	}
 
 	public function testBinaryMultiplyReal(): void {
