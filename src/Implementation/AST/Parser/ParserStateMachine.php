@@ -7,8 +7,6 @@ namespace Walnut\Lang\Implementation\AST\Parser;
 use BcMath\Number;
 use Walnut\Lang\Blueprint\AST\Builder\ModuleNodeBuilder;
 use Walnut\Lang\Blueprint\AST\Builder\NodeBuilder;
-use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
-use Walnut\Lang\Blueprint\AST\Node\Expression\MethodCallExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\SequenceExpressionNode;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
@@ -1022,20 +1020,25 @@ final readonly class ParserStateMachine {
 					};
 					$this->s->move(316);
 				},
-				T::union->name => $c,
-				T::intersection->name => $c,
-				T::arithmetic_op2->name => $c,
-				T::arithmetic_op_multiply->name => $c,
-				T::lambda_param->name => $c,
+
+				//binary operators start
 				T::boolean_op->name => $c,
 				T::less_than_equal->name => $c,
 				T::greater_than_equal->name => $c,
+				T::intersection->name => $c,
+				T::union->name => $c,
+				T::arithmetic_op2->name => $c,
+				T::arithmetic_op_multiply->name => $c,
 				T::equals->name => $c,
 				T::not_equals->name => $c,
-				T::this_var->name => $c,
-				T::special_var->name => $c,
 				T::type_start->name => $c,
 				T::type_end->name => $c,
+				T::lambda_param->name => $c,
+				//binary operators end
+
+
+				T::this_var->name => $c,
+				T::special_var->name => $c,
 				'' => function(LT $token) {
 					$this->s->pop();
 				},
@@ -1071,6 +1074,7 @@ final readonly class ParserStateMachine {
 				T::property_accessor->name => $c = function(LT $token) {
 					$this->s->stay(302);
 				},
+				//binary operators start
 				T::boolean_op->name => $c,
 				T::less_than_equal->name => $c,
 				T::greater_than_equal->name => $c,
@@ -1082,6 +1086,10 @@ final readonly class ParserStateMachine {
 				T::equals->name => $c,
 				T::not_equals->name => $c,
 				T::type_start->name => $c,
+				T::type_end->name => $c,
+				T::lambda_param->name => $c,
+				//binary operators end
+
 				T::this_var->name => $c,
 				T::special_var->name => $c,
 				T::pure_marker->name => $c,
@@ -1091,8 +1099,6 @@ final readonly class ParserStateMachine {
 				T::call_start->name => $c,
 				T::tuple_start->name => $c,
 				T::tuple_end->name => $c,
-				T::type_start->name => $c,
-				T::type_end->name => $c,
 				'' => function(LT $token) {
 					$this->s->pop();
 				},
@@ -1116,6 +1122,22 @@ final readonly class ParserStateMachine {
 					$this->noErrorMethodCall(false);
 					$this->s->stay(302);
 				},
+				//binary operators start
+				T::boolean_op->name => $c,
+				T::less_than_equal->name => $c,
+				T::greater_than_equal->name => $c,
+				T::arithmetic_op->name => $c,
+				T::intersection->name => $c,
+				T::union->name => $c,
+				T::arithmetic_op2->name => $c,
+				T::arithmetic_op_multiply->name => $c,
+				T::equals->name => $c,
+				T::not_equals->name => $c,
+				T::type_start->name => $c,
+				T::type_end->name => $c,
+				T::lambda_param->name => $c,
+				//binary operators end
+
 				T::pure_marker->name => $c,
 				T::method_marker->name => $c,
 				T::error_as_external->name => $c,
@@ -1213,6 +1235,22 @@ final readonly class ParserStateMachine {
 				T::property_accessor->name => $c = function(LT $token) {
 					$this->s->stay(302);
 				},
+				//binary operators start
+				T::boolean_op->name => $c,
+				T::less_than_equal->name => $c,
+				T::greater_than_equal->name => $c,
+				T::arithmetic_op->name => $c,
+				T::intersection->name => $c,
+				T::union->name => $c,
+				T::arithmetic_op2->name => $c,
+				T::arithmetic_op_multiply->name => $c,
+				T::equals->name => $c,
+				T::not_equals->name => $c,
+				T::type_start->name => $c,
+				T::type_end->name => $c,
+				T::lambda_param->name => $c,
+				//binary operators end
+
 				T::pure_marker->name => $c,
 				T::method_marker->name => $c,
 				T::lambda_return->name => $c,
@@ -1232,9 +1270,9 @@ final readonly class ParserStateMachine {
 			]],
 			317 => ['name' => 'method call arithmetic value', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->generated = $this->priorityMatch(
+					$this->s->generated = $this->nodeBuilder->methodCall(
 						$this->s->result['expression_left'],
-						$this->s->result['method_name'],
+						new MethodNameIdentifier($this->s->result['method_name']),
 						$this->s->generated
 					);
 					$this->s->stay(315);
@@ -2850,42 +2888,6 @@ final readonly class ParserStateMachine {
 		];		
 	}
 
-	private const array priorities = [
-		'binaryPlus' => 5,
-		'binaryMinus' => 5,
-		'binaryMultiply' => 8,
-		'binaryDivide' => 8,
-		'binaryModulo' => 8,
-		'binaryPower' => 10,
-		'binaryLessThan' => 4,
-		'binaryLessThanEqual' => 4,
-		'binaryGreaterThan' => 4,
-		'binaryGreaterThanEqual' => 4,
-		'binaryNotEqual' => 3,
-		'binaryEqual' => 3,
-		'binaryOr' => 1,
-		'binaryAnd' => 2,
-	];
-
-	private function priorityMatch(ExpressionNode $l, string $m, ExpressionNode $g): ExpressionNode {
-		if ($g instanceof MethodCallExpressionNode) {
-			$gm = $g->methodName;
-			$gmId = $gm->identifier;
-			if (str_starts_with($gmId, 'binary')) {
-				if ((self::priorities[$m] ?? 0) >= (self::priorities[$gmId] ?? 0)) {
-					return $this->nodeBuilder->methodCall(
-						$this->nodeBuilder->methodCall(
-							$l, new MethodNameIdentifier($m), $g->target
-						),
-						new MethodNameIdentifier($gmId),
-						$g->parameter
-					);
-				}
-			}
-		}
-		return $this->nodeBuilder->methodCall($l, new MethodNameIdentifier($m), $g);
-	}
-
 	private function noErrorMethodCall(bool $useGenerated): void {
 		$parameter = $this->s->result['expression_left'];
 		//TEMP
@@ -2897,7 +2899,7 @@ final readonly class ParserStateMachine {
 		$this->s->generated = $this->nodeBuilder->methodCall(
 			$parameter,
 			new MethodNameIdentifier($this->s->result['method_name']),
-			$useGenerated ? $this->s->generated :
+			$useGenerated ? $this->nodeBuilder->sequence([$this->s->generated]) :
 				$this->nodeBuilder->constant($this->nodeBuilder->nullValue)
 		);
 		if ($this->s->result['is_no_external_error'] ?? false) {

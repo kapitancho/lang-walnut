@@ -7,6 +7,7 @@ use Walnut\Lang\Blueprint\AST\Builder\NodeBuilder as NodeBuilderInterface;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MatchExpressionDefaultNode as MatchExpressionDefaultNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MatchExpressionPairNode as MatchExpressionPairNodeInterface;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MethodCallExpressionNode as MethodCallExpressionNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode as FunctionBodyNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\Type\RecordTypeNode as RecordTypeNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
@@ -246,8 +247,77 @@ final class NodeBuilder implements NodeBuilderInterface {
 		return new MatchExpressionDefaultNode($this->getSourceLocation(), $valueExpression);
 	}
 
+	private const array priorities = [
+		'binaryPlus' => 5,
+		'binaryMinus' => 5,
+		'binaryMultiply' => 8,
+		'binaryDivide' => 8,
+		'binaryModulo' => 8,
+		'binaryPower' => 10,
+		'binaryLessThan' => 4,
+		'binaryLessThanEqual' => 4,
+		'binaryGreaterThan' => 4,
+		'binaryGreaterThanEqual' => 4,
+		'binaryNotEqual' => 3,
+		'binaryEqual' => 3,
+		'binaryOr' => 1,
+		'binaryAnd' => 2,
+	];
+
+	private function getOperandPriority(MethodNameIdentifier $methodName): int {
+		return self::priorities[$methodName->identifier] ?? 99;
+	}
+
 	public function methodCall(ExpressionNode $target, MethodNameIdentifier $methodName, ExpressionNode $parameter): MethodCallExpressionNode {
-		return new MethodCallExpressionNode($this->getSourceLocation(), $target, $methodName, $parameter);
+		$mNode = new MethodCallExpressionNode($this->getSourceLocation(), $target, $methodName, $parameter);
+
+		$operands = [];
+		$operators = [];
+		$step = function(ExpressionNode $n) use (&$operands, &$operators, &$step): void {
+			if ($n instanceof MethodCallExpressionNodeInterface) {
+				$step($n->target);
+				$operators[] = $n->methodName;
+				$step($n->parameter);
+			} else {
+				$operands[] = $n;
+			}
+		};
+		$step($mNode);
+
+		$operandStack = [];
+		$operatorStack = [];
+
+		$add = function() use (&$operandStack, &$operatorStack): void {
+			$r = array_pop($operandStack);
+			$l = array_pop($operandStack);
+			$x = array_pop($operatorStack);
+			$operandStack[] = new MethodCallExpressionNode(
+				new SourceLocation(
+					$l->sourceLocation->startPosition,
+					$r->sourceLocation->endPosition
+				),
+				$l,
+				$x,
+				$r
+			);
+		};
+
+		$len = count($operators);
+		for ($i = 0; $i < $len; $i++) {
+			$operandStack[] = $operands[$i];
+			$op = $operators[$i];
+			$pop = $this->getOperandPriority($op);
+			while(!empty($operatorStack) && $this->getOperandPriority($operatorStack[array_key_last($operatorStack)]) >= $pop) {
+				$add();
+			}
+			$operatorStack[] = $op;
+		}
+		$operandStack[] = $operands[$len];
+		while(!empty($operatorStack)) {
+			$add();
+		}
+		return $operandStack[0];
+		//return new MethodCallExpressionNode($this->getSourceLocation(), $target, $methodName, $parameter);
 	}
 
 	public function functionBody(ExpressionNode $expression): FunctionBodyNode {

@@ -33,7 +33,7 @@ final class SealedAnalyseTest extends BaseProgramTestHelper {
 		);
 	}
 
-	private function getEntryPointFor(Type $r, Type $p = null): ProgramEntryPoint {
+	private function getEntryPointFor(Type $r, Type|null $p = null): ProgramEntryPoint {
 		$p ??= $this->typeRegistry->record([
 			'x' => $this->typeRegistry->integer(),
 			'y' => $this->typeRegistry->string()
