@@ -6,7 +6,7 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 
 final class BinaryGreaterThanTest extends CodeExecutionTestHelper {
 
-	public function testBinaryGreaterThanTrue(): void {
+	public function testBinaryGreaterThanFalse(): void {
 		$result = $this->executeCodeSnippet("3 > 5;");
 		$this->assertEquals("false", $result);
 	}
@@ -16,7 +16,7 @@ final class BinaryGreaterThanTest extends CodeExecutionTestHelper {
 		$this->assertEquals("false", $result);
 	}
 
-	public function testBinaryGreaterThanFalse(): void {
+	public function testBinaryGreaterThanTrue(): void {
 		$result = $this->executeCodeSnippet("5 > 3;");
 		$this->assertEquals("true", $result);
 	}

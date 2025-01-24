@@ -1,23 +1,23 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\Real;
+namespace Walnut\Lang\NativeCode\String;
 
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 
 final class BinaryGreaterThanTest extends CodeExecutionTestHelper {
 
 	public function testBinaryGreaterThanFalse(): void {
-		$result = $this->executeCodeSnippet("3.5 > 5.14;");
+		$result = $this->executeCodeSnippet("'abc' > 'ac';");
 		$this->assertEquals("false", $result);
 	}
 
 	public function testBinaryGreaterThanSame(): void {
-		$result = $this->executeCodeSnippet("3.5 > 3.5;");
+		$result = $this->executeCodeSnippet("'abc' > 'abc';");
 		$this->assertEquals("false", $result);
 	}
 
 	public function testBinaryGreaterThanTrue(): void {
-		$result = $this->executeCodeSnippet("5.14 > 3.5;");
+		$result = $this->executeCodeSnippet("'ac' > 'abc';");
 		$this->assertEquals("true", $result);
 	}
 }
