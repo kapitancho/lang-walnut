@@ -2580,6 +2580,9 @@ final readonly class ParserStateMachine {
 				T::rest_type->name => 830,
 				T::default_match->name => 824,
 				T::colon->name => 834,
+				T::tuple_start->name => function(LT $token) {
+					$this->s->stay(826);
+				},
 			]],
 			813 => ['name' => 'module level tuple or record decider', 'transitions' => [
 				T::colon->name => function(LT $token) {

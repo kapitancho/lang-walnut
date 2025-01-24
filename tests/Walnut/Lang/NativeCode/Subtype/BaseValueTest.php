@@ -11,11 +11,9 @@ final class BaseValueTest extends CodeExecutionTestHelper {
 		$this->assertEquals("'Hello'", $result);
 	}
 
-	/* TODO - add support
 	public function testBaseValueMetaType(): void {
 		$result = $this->executeCodeSnippet("getBaseValue(MySubtype('Hello'));",
-			"MySubtype <: String; getBaseValue = ^Subtype => String :: #->baseValue;");
+			"MySubtype <: String; getBaseValue = ^Subtype => Any :: #->baseValue;");
 		$this->assertEquals("'Hello'", $result);
 	}
-	*/
 }

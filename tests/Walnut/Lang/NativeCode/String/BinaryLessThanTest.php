@@ -20,4 +20,8 @@ final class BinaryLessThanTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("'abc' < 'ac';");
 		$this->assertEquals("true", $result);
 	}
+
+	public function testBinaryLessThanInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet('Invalid parameter type', "'a' < false;");
+	}
 }

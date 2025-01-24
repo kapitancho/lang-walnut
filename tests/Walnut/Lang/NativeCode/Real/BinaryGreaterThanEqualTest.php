@@ -20,4 +20,8 @@ final class BinaryGreaterThanEqualTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("5.14 >= 3.5;");
 		$this->assertEquals("true", $result);
 	}
+
+	public function testBinaryGreaterThanEqualInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet('Invalid parameter type', "3.5 >= false;");
+	}
 }

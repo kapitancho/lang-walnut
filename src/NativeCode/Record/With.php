@@ -13,6 +13,7 @@ use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\NothingType;
+use Walnut\Lang\Blueprint\Type\OptionalKeyType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\SubtypeType;
@@ -32,9 +33,44 @@ final readonly class With implements NativeMethod {
 	): Type {
 		$originalTargetType = $targetType;
 		$targetType = $this->toBaseType($targetType);
+		$parameterType = $this->toBaseType($parameterType);
 		if ($targetType instanceof RecordType && $parameterType instanceof RecordType) {
-			$recTypes = [...$targetType->types, ...$parameterType->types];
-			$result = $programRegistry->typeRegistry->record($recTypes);
+			$recTypes = [];
+			foreach($targetType->types as $tKey => $tType) {
+				$pType = $parameterType->types[$tKey] ?? null;
+				if ($tType instanceof OptionalKeyType) {
+					$recTypes[$tKey] = $pType instanceof OptionalKeyType ?
+						$programRegistry->typeRegistry->optionalKey(
+							$programRegistry->typeRegistry->union([
+								$tType->valueType,
+								$pType->valueType
+							])
+						) : $pType ?? $programRegistry->typeRegistry->optionalKey(
+							$programRegistry->typeRegistry->union([
+								$tType->valueType,
+								$parameterType->restType
+							])
+						);
+				} else {
+					$recTypes[$tKey] = $pType instanceof OptionalKeyType ?
+						$programRegistry->typeRegistry->union([
+							$tType,
+							$pType->valueType
+						]): $pType ?? $programRegistry->typeRegistry->union([
+						$tType,
+						$parameterType->restType
+					]);
+				}
+			}
+			foreach ($parameterType->types as $pKey => $pType) {
+				$recTypes[$pKey] ??= $pType;
+			}
+			$result = $programRegistry->typeRegistry->record($recTypes,
+				$programRegistry->typeRegistry->union([
+					$targetType->restType,
+					$parameterType->restType
+				])
+			);
 			if ($originalTargetType instanceof SubtypeType) {
 				$constructorType = $programRegistry->typeRegistry->typeByName(new TypeNameIdentifier('Constructor'));
 				$validatorMethod = $programRegistry->methodRegistry->method(
