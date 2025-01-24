@@ -57,7 +57,7 @@ enum Token: string {
 	case type_proxy_keyword = '`[A-Z][a-zA-Z0-9_]*';
 	case type_keyword = '[A-Z][a-zA-Z0-9_]*';
 	case var_keyword = '[a-z][a-zA-Z0-9_]*';
-	case special_var = '([\$\%\#][a-z][a-zA-Z0-9_]*)|[\%\#]';
+	case special_var = '([\$\%\#][a-z][a-zA-Z0-9_]*)|([\#\%\$][0-9]+)|[\%\#]|(\$\$)';
 	case this_var = '\$';
 	case real_number = '(0|(\-?[1-9][0-9]*))\.[0-9]+';
 	case positive_integer_number = '0|([1-9][0-9]*)';

@@ -57,6 +57,13 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 			)) :
 			$type;
 
+		if ($targetType instanceof SealedType) {
+			$analyserContext = $analyserContext->withAddedVariableType(
+				new VariableNameIdentifier('$$'),
+				$targetType->valueType
+			);
+		}
+
 		foreach(['$' => $targetType, '#' => $parameterType, '%' => $dependencyType] as $variableName => $type) {
 			if (!($type instanceof NothingType)) {
 				$analyserContext = $analyserContext->withAddedVariableType(
@@ -115,6 +122,12 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 			)) :
 			$type;
 
+		if ($targetValue->value instanceof SealedValue) {
+			$executionContext = $executionContext->withAddedVariableValue(
+				new VariableNameIdentifier('$$'),
+				TypedValue::forValue($targetValue->value->value)
+			);
+		}
 		foreach(['$' => $targetValue, '#' => $parameterValue, '%' => $dependencyValue] as $variableName => $value) {
 			if ($value) {
 				$executionContext = $executionContext->withAddedVariableValue(

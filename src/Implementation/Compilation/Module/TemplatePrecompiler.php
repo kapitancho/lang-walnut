@@ -19,8 +19,8 @@ final readonly class TemplatePrecompiler {
 		    output
 		};
 		CODE;
-		$sourceCode = preg_replace('/<!--\[(.*?)]-->/s', "<!-- e($1->asString);\n -->", $sourceCode);
-		$sourceCode = preg_replace('/<!--\{(.*?)}-->/s', "<!-- h($1->asString);\n -->", $sourceCode);
+		$sourceCode = preg_replace('/<!--\[(.*?)]-->/s', "<!-- e({ $1 }->asString);\n -->", $sourceCode);
+		$sourceCode = preg_replace('/<!--\{(.*?)}-->/s', "<!-- h({ $1 }->asString);\n -->", $sourceCode);
 		$sourceCode = preg_replace('/<!--%(.*?)%-->/s', "<!-- e(%templateRenderer=>render($1));\n -->", $sourceCode);
 		$sourceCode = preg_replace('/-->(.*?)<!--/s', "e('$1');\n", $sourceCode);
 		return $sourceCode;
