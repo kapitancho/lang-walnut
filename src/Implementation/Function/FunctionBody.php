@@ -122,7 +122,7 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 			)) :
 			$type;
 
-		if ($targetValue->value instanceof SealedValue) {
+		if ($targetValue && $targetValue->value instanceof SealedValue) {
 			$executionContext = $executionContext->withAddedVariableValue(
 				new VariableNameIdentifier('$$'),
 				TypedValue::forValue($targetValue->value->value)

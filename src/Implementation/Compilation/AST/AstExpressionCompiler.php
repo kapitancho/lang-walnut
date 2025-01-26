@@ -6,6 +6,7 @@ use Walnut\Lang\Blueprint\AST\Node\Expression\ConstantExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ConstructorCallExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\FunctionCallExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MatchErrorExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MatchExpressionDefaultNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MatchExpressionPairNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MatchIfExpressionNode;
@@ -110,6 +111,13 @@ final readonly class AstExpressionCompiler implements AstExpressionCompilerInter
 					$this->expression($expressionNode->condition),
 					$this->expression($expressionNode->then),
 					$this->expression($expressionNode->else)
+				),
+			$expressionNode instanceof MatchErrorExpressionNode =>
+				$this->expressionRegistry->matchError(
+					$this->expression($expressionNode->condition),
+					$this->expression($expressionNode->onError),
+					$expressionNode->else ?
+						$this->expression($expressionNode->else) : null
 				),
 			$expressionNode instanceof MatchTrueExpressionNode =>
 				$this->expressionRegistry->matchTrue(

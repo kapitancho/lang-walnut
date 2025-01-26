@@ -193,6 +193,8 @@ final class ToStringTest extends BaseProgramTestHelper {
 			]),
 			'?when (x) { 0 }' => $er->matchIf($x, $c0, $er->constant($this->valueRegistry->null)),
 			'?when (x) { x } ~ { 0 }' => $er->matchIf($x, $x, $c0),
+			'?whenIsError (x) { 0 }' => $er->matchError($x, $c0, null),
+			'?whenIsError (x) { x } ~ { 0 }' => $er->matchError($x, $x, $c0),
 		] as $string => $value) {
 			$this->assertEquals($string, (string)$value);
 		}

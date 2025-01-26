@@ -7,6 +7,7 @@ use Walnut\Lang\Blueprint\AST\Node\Expression\ConstantExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ConstructorCallExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\FunctionCallExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MatchErrorExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MatchExpressionDefaultNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MatchExpressionPairNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MatchIfExpressionNode;
@@ -104,6 +105,7 @@ interface NodeBuilder {
 	/** @param list<MatchExpressionPairNode|MatchExpressionDefaultNode> $pairs */
 	public function matchValue(ExpressionNode $target, array $pairs): MatchValueExpressionNode;
 	public function matchIf(ExpressionNode $condition, ExpressionNode $then, ExpressionNode $else): MatchIfExpressionNode;
+	public function matchError(ExpressionNode $condition, ExpressionNode $then, ExpressionNode|null $else): MatchErrorExpressionNode;
 
 	public function mutable(TypeNode $type, ExpressionNode $value): MutableExpressionNode;
 

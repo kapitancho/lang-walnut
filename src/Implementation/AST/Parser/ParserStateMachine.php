@@ -909,6 +909,11 @@ final readonly class ParserStateMachine {
 					$this->s->result['matchPairs'] = [];
 					$this->s->move(324);
 				},
+				T::when_is_error->name => function(LT $token) {
+					$this->s->result['matchType'] = 'isError';
+					$this->s->result['matchPairs'] = [];
+					$this->s->move(365);
+				},
 				T::when->name => function(LT $token) {
 					$this->s->result['matchType'] = 'matchIf';
 					$this->s->result['matchPairs'] = [];
@@ -1517,6 +1522,70 @@ final readonly class ParserStateMachine {
 						)
 					);
 				},
+			]],
+
+			365 => ['name' => 'match error start', 'transitions' => [
+				T::call_start->name => 366
+			]],
+			366 => ['name' => 'match error target', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(367);
+					$this->s->stay(201);
+				}
+			]],
+			367 => ['name' => 'match error target end', 'transitions' => [
+				T::call_end->name => function(LT $token) {
+					$this->s->result['matchTarget'] = $this->s->generated;
+					$this->s->move(368);
+				}
+			]],
+			368 => ['name' => 'match error then start', 'transitions' => [
+				T::sequence_start->name => 369
+			]],
+			369 => ['name' => 'match error then expression', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(370);
+					$this->s->stay(201);
+				}
+			]],
+			370 => ['name' => 'match error then end', 'transitions' => [
+				T::sequence_end->name => 371
+			]],
+			371 => ['name' => 'match error else check', 'transitions' => [
+				T::default_match->name => function(LT $token) {
+					$this->s->result['matchThen'] = $this->s->generated;
+					$this->s->move(372);
+				},
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->matchError(
+						$this->s->result['matchTarget'],
+						$this->s->generated,
+						null
+					);
+					$this->s->pop();
+				}
+			]],
+			372 => ['name' => 'match error start', 'transitions' => [
+				T::sequence_start->name => 373
+			]],
+			373 => ['name' => 'match error else expression', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(374);
+					$this->s->stay(201);
+				}
+			]],
+			374 => ['name' => 'match error else end', 'transitions' => [
+				T::sequence_end->name => 375
+			]],
+			375 => ['name' => 'match error else check', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->matchError(
+						$this->s->result['matchTarget'],
+						$this->s->result['matchThen'],
+						$this->s->generated
+					);
+					$this->s->pop();
+				}
 			]],
 
 

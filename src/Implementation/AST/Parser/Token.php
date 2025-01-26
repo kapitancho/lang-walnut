@@ -46,6 +46,7 @@ enum Token: string {
 	case mutable = '\bmutable\b';
 	case no_error = '\?noError';
 	case no_external_error = '\?noExternalError';
+	case when_is_error = '\?whenIsError\b';
 	case when_type_of = '\?whenTypeOf\b';
 	case when_is_true = '\?whenIsTrue\b';
 	case when_value_of = '\?whenValueOf\b';
