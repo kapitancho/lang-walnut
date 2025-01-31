@@ -63,11 +63,17 @@ Many of the built-in methods are obvious based on their names. The following is 
 - keyExists, keyOf, findFirst, findFirstKeyValue
 - withKeyValue, mergeWith, without, withoutAll, withoutByKey, valuesWithoutKey
 
+### Set (immutable, returns a new Set)
+- insert, without, withRemoved, &, ^, +, -
+- filter, flipMap, map
+- length, values
+- isDisjointWith, isSubsetOf, isSupersetOf, contains 
+
 ### Type (mostly act as a Reflection-API)
 - isSubtypeOf
 
 _Type< T > for T=_
-- Array, Map: itemType, minLength, maxLength
+- Array, Map, Set: itemType, minLength, maxLength
 - Tuple, Record: itemTypes, restType
 - String: minLength, maxLength
 - StringSubset: minLength, maxLength, values

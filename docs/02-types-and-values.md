@@ -56,19 +56,21 @@ Enumerations are types with a fixed set of values. The `Boolean` type is a speci
 - `Suit.Spades` - enumeration value (`Suit.Spade->type` is `Suit[Spades]`)
 - `true`, `false` - boolean values (`true->type` is `True` and `false->type` is `False`)
 
-## Arrays, Tuples, Maps and Records
+## Arrays, Tuples, Maps, Records, and Sets
 
 The following types and values are available for arrays, tuples, maps, and records:
 
 ### Types
 - `Array`, `Array<Integer>`, `Array<String, 1..5>`, `Array<..10>`, `Array<Array, 3..>>` - arrays and arrays with length range and/or element type constraints 
 - `Map`, `Map<Integer>`, `Map<String, 1..5>`, `Map<..10>`, `Map<Map, 3..>>` - maps and maps with length range and/or value type constraints
+- `Set`, `Set<Integer>`, `Set<String, 1..5>`, `Set<..10>`, `Set<Map, 3..>>` - sets and sets with length range and/or value type constraints
 - `[]`, `[Real]`, `[Integer, String]`, `[Any, Array, Integer<1..5>, ...], [Integer, ...Real] - tuples and tuples with rest type definition 
 - `[:]`, `[a: Real]`, `[x: Integer, y: String]`, `[a: Any, b: ?String]`, `[a: Integer, ... Real]` - records and records with optional keys and rest type definition
 
 ### Values
 - `[]`, `[1]`, `[1, 'Hello', null]` - tuples (`[1, 'Hello', null]->type` is `[Integer[1], String['Hello'], Null]`)
 - `[:]`, `[a: 1]`, `[x: 1, y: 'Hello', z: null]` - records (`[x: 1, y: 'Hello', z: null]->type` is `[x: Integer[1], y: String['Hello'], z: Null]`)
+- `[;]`, `[1;]`, `[1; 'Hello'; null]` - sets (`[1; 'Hello'; null]->type` is `Set<Integer[1]|String['Hello']|Null, 3..3>`)
 
 ### Subtyping between types
 - `[Integer, Real]` is a subtype of `Array<Real, ..5>`
@@ -89,6 +91,8 @@ The values in Walnut are immutable. The only way to specify a mutable value is b
 ## Result, Error, and Impure
 
 Every value in Walnut can be wrapped as an error. The errors have special effect in some methods like `Array->map` and in some control structures like `?noError`.
+More about errors can be read [here](23-working-with-error-values.md)
+
 
 ### Types
 - `Result<Integer, String>` - the value is either a string error or an integer. Informally this corresponds to `Integer|Error<String>`.
