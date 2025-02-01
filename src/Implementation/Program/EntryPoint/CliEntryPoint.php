@@ -8,21 +8,12 @@ use Walnut\Lang\Blueprint\Program\EntryPoint\CliEntryPoint as CliEntryPointInter
 
 final readonly class CliEntryPoint implements CliEntryPointInterface {
 	public function __construct(
-		private Compiler $compiler
+		private CliEntryPointBuilder $cliEntryPointBuilder
 	) {}
 
 	public function call(string $source, string ... $parameters): string {
-		$compilationResult = $this->compiler->compile($source);
-		$program = $compilationResult->program;
-		$tr = $compilationResult->programContext->typeRegistry;
-		$vr = $compilationResult->programContext->valueRegistry;
-		$ep = $program->getEntryPoint(
-			new VariableNameIdentifier('main'),
-			$tr->array($tr->string()),
-			$tr->string()
-		);
-		return $ep->call($vr->tuple(
-			array_map(fn(string $arg) => $vr->string($arg), $parameters)
-		))->literalValue;
+		return $this->cliEntryPointBuilder
+			->build($source)
+			->call(... $_GET['parameters'] ?? []);
 	}
 }
