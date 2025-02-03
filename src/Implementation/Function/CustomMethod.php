@@ -146,8 +146,8 @@ final readonly class CustomMethod implements CustomMethodInterface, JsonSerializ
 				$this->returnType,
 				$this->functionBody->execute(
 					$programRegistry->executionContext,
-					TypedValue::forValue($targetValue),
-					TypedValue::forValue($parameterValue),
+					new TypedValue($this->targetType, $targetValue),
+					new TypedValue($this->parameterType, $parameterValue),
 					$dep
 				)
 			);

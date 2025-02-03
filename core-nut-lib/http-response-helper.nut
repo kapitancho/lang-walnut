@@ -1,6 +1,8 @@
 module http-response-helper %% http-core:
 
-notFound = ^HttpRequest|String => HttpResponse :: {
+HttpResponseHelper = :[];
+
+HttpResponseHelper->notFound(^HttpRequest|String => HttpResponse) :: {
     ?whenTypeOf(#) is {
         type{String}: [
             statusCode: 404,
@@ -19,7 +21,7 @@ notFound = ^HttpRequest|String => HttpResponse :: {
     }
 };
 
-badRequest = ^String => HttpResponse :: {
+HttpResponseHelper->badRequest(^String => HttpResponse) :: {
     [
         statusCode: 400,
         protocolVersion: HttpProtocolVersion.HTTP11,
@@ -28,7 +30,7 @@ badRequest = ^String => HttpResponse :: {
     ]
 };
 
-conflict = ^String => HttpResponse :: {
+HttpResponseHelper->conflict(^String => HttpResponse) :: {
     [
         statusCode: 409,
         protocolVersion: HttpProtocolVersion.HTTP11,
@@ -37,7 +39,7 @@ conflict = ^String => HttpResponse :: {
     ]
 };
 
-forbidden = ^String => HttpResponse :: {
+HttpResponseHelper->forbidden(^String => HttpResponse) :: {
     [
         statusCode: 403,
         protocolVersion: HttpProtocolVersion.HTTP11,
@@ -46,7 +48,7 @@ forbidden = ^String => HttpResponse :: {
     ]
 };
 
-internalServerError = ^String => HttpResponse :: {
+HttpResponseHelper->internalServerError(^String => HttpResponse) :: {
     [
         statusCode: 500,
         protocolVersion: HttpProtocolVersion.HTTP11,

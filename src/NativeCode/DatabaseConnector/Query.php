@@ -71,9 +71,9 @@ final readonly class Query implements NativeMethod {
 				try {
 					$pdo = new PDO($dsn);
 					$stmt = $pdo->prepare($parameterValue->values['query']->literalValue);
-					$stmt->execute(array_map(static fn(Value $value): string|int|null =>
-						$value->literalValue instanceof Number ? (string)$value->literalValue : $value->literalValue,
-						 $parameterValue->values['boundParameters']->values
+					$stmt->execute(array_map(fn(Value $value): string|int|null =>
+					($v = $this->toBaseValue($value))->literalValue instanceof Number ? (string)$v->literalValue : $v->literalValue,
+						$parameterValue->values['boundParameters']->values
 					));
 					$result = [];
 					foreach($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {

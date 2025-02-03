@@ -37,8 +37,11 @@ use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Blueprint\Value\SubtypeValue;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class AsString implements NativeMethod {
+	use BaseType;
+
 	/** @return list<string>|null */
 	public function detectSubsetType(Type $targetType): array|null {
 		return match(true) {
@@ -90,8 +93,9 @@ final readonly class AsString implements NativeMethod {
 		Type $targetType,
 		Type $parameterType
 	): StringType|StringSubsetType|ResultType {
-		if ($targetType instanceof StringSubsetType || $targetType instanceof StringType) {
-			return $targetType;
+		$baseTargetType = $this->toBaseType($targetType);
+		if ($baseTargetType instanceof StringSubsetType || $baseTargetType instanceof StringType) {
+			return $baseTargetType;
 		}
 		$subsetValues = $this->detectSubsetType($targetType);
 		if (is_array($subsetValues)) {

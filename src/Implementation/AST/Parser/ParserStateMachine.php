@@ -1043,7 +1043,7 @@ final readonly class ParserStateMachine {
 
 
 				T::this_var->name => $c,
-				T::special_var->name => $c,
+				//T::special_var->name => $c,
 				'' => function(LT $token) {
 					$this->s->pop();
 				},
@@ -1394,21 +1394,15 @@ final readonly class ParserStateMachine {
 				}
 			]],
 			338 => ['name' => 'match if then start', 'transitions' => [
-				T::sequence_start->name => 339
-			]],
-			339 => ['name' => 'match if then expression', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->push(340);
+				T::sequence_start->name => function(LT $token) {
+					$this->s->push(339);
 					$this->s->stay(201);
 				}
 			]],
-			340 => ['name' => 'match if then end', 'transitions' => [
-				T::sequence_end->name => 341
-			]],
-			341 => ['name' => 'match if else check', 'transitions' => [
+			339 => ['name' => 'match if else check', 'transitions' => [
 				T::default_match->name => function(LT $token) {
 					$this->s->result['matchThen'] = $this->s->generated;
-					$this->s->move(342);
+					$this->s->move(340);
 				},
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->matchIf(
@@ -1421,19 +1415,13 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				}
 			]],
-			342 => ['name' => 'match if start', 'transitions' => [
-				T::sequence_start->name => 343
-			]],
-			343 => ['name' => 'match if else expression', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->push(344);
+			340 => ['name' => 'match if else start', 'transitions' => [
+				T::sequence_start->name => function(LT $token) {
+					$this->s->push(341);
 					$this->s->stay(201);
 				}
 			]],
-			344 => ['name' => 'match if else end', 'transitions' => [
-				T::sequence_end->name => 345
-			]],
-			345 => ['name' => 'match if else check', 'transitions' => [
+			341 => ['name' => 'match if else check', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->matchIf(
 						$this->s->result['matchTarget'],
@@ -1540,21 +1528,15 @@ final readonly class ParserStateMachine {
 				}
 			]],
 			368 => ['name' => 'match error then start', 'transitions' => [
-				T::sequence_start->name => 369
-			]],
-			369 => ['name' => 'match error then expression', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->push(370);
+				T::sequence_start->name => function(LT $token) {
+					$this->s->push(369);
 					$this->s->stay(201);
 				}
 			]],
-			370 => ['name' => 'match error then end', 'transitions' => [
-				T::sequence_end->name => 371
-			]],
-			371 => ['name' => 'match error else check', 'transitions' => [
+			369 => ['name' => 'match error else check', 'transitions' => [
 				T::default_match->name => function(LT $token) {
 					$this->s->result['matchThen'] = $this->s->generated;
-					$this->s->move(372);
+					$this->s->move(370);
 				},
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->matchError(
@@ -1565,19 +1547,13 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				}
 			]],
-			372 => ['name' => 'match error start', 'transitions' => [
-				T::sequence_start->name => 373
-			]],
-			373 => ['name' => 'match error else expression', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->push(374);
+			370 => ['name' => 'match error start', 'transitions' => [
+				T::sequence_start->name => function(LT $token) {
+					$this->s->push(371);
 					$this->s->stay(201);
 				}
 			]],
-			374 => ['name' => 'match error else end', 'transitions' => [
-				T::sequence_end->name => 375
-			]],
-			375 => ['name' => 'match error else check', 'transitions' => [
+			371 => ['name' => 'match error else check', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->matchError(
 						$this->s->result['matchTarget'],

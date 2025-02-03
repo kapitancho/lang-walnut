@@ -64,6 +64,7 @@ final readonly class CombineAsString implements NativeMethod {
 			if ($parameterValue instanceof StringValue) {
 				$result = [];
 				foreach($targetValue->values as $value) {
+					$value = $this->toBaseValue($value);
 					if ($value instanceof StringValue) {
 						$result[] = $value->literalValue;
 					} else {

@@ -92,7 +92,12 @@ final readonly class CastAs implements NativeMethod {
 					$refType
 				));
 			}
-			return $refType instanceof AliasType ? $refType : $returnType;
+			return $refType instanceof AliasType ? (
+				$returnType instanceof ResultType ? $programRegistry->typeRegistry->result(
+					$refType,
+					$returnType->errorType
+				) : $refType
+			) : $returnType;
 		}
 		throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 	}
@@ -111,7 +116,7 @@ final readonly class CastAs implements NativeMethod {
 			}
 			$runtimeMethod = $this->getMethod(
 				$programRegistry->methodRegistry,
-				$targetValue instanceof TypeValue ?
+				$tx = $targetValue instanceof TypeValue ?
 					$targetValue->typeValue :
 					$targetValue->type,
 				$parameterValue->typeValue

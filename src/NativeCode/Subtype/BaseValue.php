@@ -42,8 +42,7 @@ final readonly class BaseValue implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof SubtypeValue) {
-			return new TypedValue(
-				$target->type->baseType,
+			return TypedValue::forValue(
 				$targetValue->baseValue
 			);
 		}
