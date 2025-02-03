@@ -880,6 +880,12 @@ final readonly class ParserStateMachine {
 					);
 					$this->s->moveAndPop();
 				},
+				T::special_var_modulo->name => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->variableName(
+						new VariableNameIdentifier($token->patternMatch->text)
+					);
+					$this->s->moveAndPop();
+				},
 				T::this_var->name => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->variableName(
 						new VariableNameIdentifier($token->patternMatch->text)
@@ -1043,7 +1049,7 @@ final readonly class ParserStateMachine {
 
 
 				T::this_var->name => $c,
-				//T::special_var->name => $c,
+				T::special_var_modulo->name => $c,
 				'' => function(LT $token) {
 					$this->s->pop();
 				},
@@ -1097,6 +1103,7 @@ final readonly class ParserStateMachine {
 
 				T::this_var->name => $c,
 				T::special_var->name => $c,
+				T::special_var_modulo->name => $c,
 				T::pure_marker->name => $c,
 				T::method_marker->name => $c,
 				T::error_as_external->name => $c,

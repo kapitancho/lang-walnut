@@ -14,6 +14,6 @@ final readonly class CliEntryPoint implements CliEntryPointInterface {
 	public function call(string $source, string ... $parameters): string {
 		return $this->cliEntryPointBuilder
 			->build($source)
-			->call(... $_GET['parameters'] ?? []);
+			->call(... $parameters);
 	}
 }

@@ -19,6 +19,7 @@ use Walnut\Lang\Implementation\Compilation\Module\MultiFolderBasedModuleLookupCo
 use Walnut\Lang\Implementation\Compilation\Module\TemplatePrecompiler;
 use Walnut\Lang\Implementation\Compilation\Module\TemplatePrecompilerModuleLookupDecorator;
 use Walnut\Lang\Implementation\Program\EntryPoint\CliEntryPoint;
+use Walnut\Lang\Implementation\Program\EntryPoint\CliEntryPointBuilder;
 
 final class CompilerTest extends TestCase {
 	private const string PATH = __DIR__ . '/../../../core-nut-lib';
@@ -61,7 +62,7 @@ final class CompilerTest extends TestCase {
 			__DIR__
 		);
 		$compiler = new Compiler($moduleLookupContext);
-		$ep = new CliEntryPoint($compiler);
+		$ep = new CliEntryPoint(new CliEntryPointBuilder($compiler));
 		$output = $ep->call('main');
 		$this->assertStringContainsString('NotANumber', $output);
 	}

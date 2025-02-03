@@ -6,6 +6,7 @@ use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Compilation\Module\ModuleLookupContext;
 use Walnut\Lang\Implementation\Compilation\Compiler;
 use Walnut\Lang\Implementation\Program\EntryPoint\CliEntryPoint;
+use Walnut\Lang\Implementation\Program\EntryPoint\CliEntryPointBuilder;
 use Walnut\Lang\Test\BaseProgramTestHelper;
 
 class CliEntryPointTest extends BaseProgramTestHelper {
@@ -37,7 +38,7 @@ class CliEntryPointTest extends BaseProgramTestHelper {
 			});
 
 		$compiler = new Compiler($moduleLookupContext);
-		$cliEntryPoint = new CliEntryPoint($compiler);
+		$cliEntryPoint = new CliEntryPoint(new CliEntryPointBuilder($compiler));
 		$result = $cliEntryPoint->call('test', 'Hello, World!');
 		$this->assertEquals("['Hello, World!']", $result);
 	}
