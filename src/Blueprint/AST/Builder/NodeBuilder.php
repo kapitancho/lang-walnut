@@ -149,6 +149,7 @@ interface NodeBuilder {
 		TypeNode $targetType,
 		MethodNameIdentifier $methodName,
 		TypeNode $parameterType,
+		VariableNameIdentifier|null $parameterName,
 		TypeNode $dependencyType,
 		TypeNode $returnType,
 		FunctionBodyNode $functionBody,
@@ -157,6 +158,7 @@ interface NodeBuilder {
 	public function addConstructorMethod(
 		TypeNameIdentifier $typeName,
 		TypeNode $parameterType,
+		VariableNameIdentifier|null $parameterName,
 		TypeNode $dependencyType,
 		TypeNode|null $errorType,
 		FunctionBodyNode $functionBody,
@@ -266,8 +268,9 @@ interface NodeBuilder {
 	public function setValue(array $values): SetValueNode;
 	public function functionValue(
 		TypeNode $parameterType,
+		VariableNameIdentifier|null $parameterName,
 		TypeNode $dependencyType,
 		TypeNode $returnType,
-		FunctionBodyNode $functionBody
+		FunctionBodyNode $functionBody,
 	): FunctionValueNode;
 }

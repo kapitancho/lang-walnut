@@ -85,6 +85,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			$this->typeRegistry->withName(new TypeNameIdentifier('MyAtom')),
 			new MethodNameIdentifier('asJsonValue'),
 			$this->typeRegistry->null,
+			null,
 			$this->typeRegistry->nothing,
 			$this->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
 			$this->expressionRegistry->functionBody(
@@ -138,6 +139,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			$this->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
 			new MethodNameIdentifier('asMyCustomEnum'),
 			$this->typeRegistry->null,
+			null,
 			$this->typeRegistry->nothing,
 			$this->typeRegistry->enumeration(new TypeNameIdentifier('MyCustomEnum')),
 			$this->expressionRegistry->functionBody(
@@ -183,6 +185,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			$this->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
 			new MethodNameIdentifier('asMyCustomState'),
 			$this->typeRegistry->null,
+			null,
 			$this->typeRegistry->nothing,
 			$this->typeRegistry->sealed(new TypeNameIdentifier('MyCustomState')),
 			$this->expressionRegistry->functionBody(
@@ -228,6 +231,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			$this->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
 			new MethodNameIdentifier('asMyCustomSubtype'),
 			$this->typeRegistry->null,
+			null,
 			$this->typeRegistry->nothing,
 			$this->typeRegistry->subtype(new TypeNameIdentifier('MyCustomSubtype')),
 			$this->expressionRegistry->functionBody(

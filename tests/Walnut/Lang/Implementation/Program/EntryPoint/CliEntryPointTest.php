@@ -20,6 +20,7 @@ class CliEntryPointTest extends BaseProgramTestHelper {
 			new VariableNameIdentifier('main'),
 			$this->valueRegistry->function(
 				$this->typeRegistry->string(),
+				new VariableNameIdentifier('args'),
 				$this->typeRegistry->nothing,
 				$this->typeRegistry->integer(),
 				$this->expressionRegistry->functionBody(
@@ -33,7 +34,7 @@ class CliEntryPointTest extends BaseProgramTestHelper {
 		$moduleLookupContext->method('sourceOf')
 			->willReturnCallback(fn(string $module) => match($module) {
 				'core' => 'module core: Global = :[];',
-				'test' => 'module test: main = ^Array<String> => String :: #->printed;',
+				'test' => 'module test: main = ^args: Array<String> => String :: args->printed;',
 				default => ''
 			});
 

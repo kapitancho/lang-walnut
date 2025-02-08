@@ -13,10 +13,11 @@ use Walnut\Lang\Blueprint\Type\Type;
 
 interface FunctionValue extends Value {
 	public FunctionType $type { get; }
-		public Type $parameterType { get; }
-		public Type $dependencyType { get; }
-		public Type $returnType { get; }
-		public FunctionBody $body { get; }
+	public VariableNameIdentifier|null $parameterName { get; }
+	public Type $parameterType { get; }
+	public Type $dependencyType { get; }
+	public Type $returnType { get; }
+	public FunctionBody $body { get; }
 
 	public function withVariableValueScope(VariableValueScope $variableValueScope): self;
 	public function withSelfReferenceAs(VariableNameIdentifier $variableName): self;

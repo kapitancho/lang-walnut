@@ -31,6 +31,7 @@ final class FunctionValue implements FunctionValueInterface, JsonSerializable {
 		private readonly TypeRegistry $typeRegistry,
 		private readonly ValueRegistry $valueRegistry,
 		public readonly Type $parameterType,
+		public VariableNameIdentifier|null $parameterName,
 		public readonly Type $dependencyType,
 		public readonly Type $returnType,
 		public readonly FunctionBody $body,
@@ -43,6 +44,7 @@ final class FunctionValue implements FunctionValueInterface, JsonSerializable {
 			$this->typeRegistry,
 			$this->valueRegistry,
 			$this->parameterType,
+			$this->parameterName,
 			$this->dependencyType,
 			$this->returnType,
 			$this->body,
@@ -56,6 +58,7 @@ final class FunctionValue implements FunctionValueInterface, JsonSerializable {
 			$this->typeRegistry,
 			$this->valueRegistry,
 			$this->parameterType,
+			$this->parameterName,
 			$this->dependencyType,
 			$this->returnType,
 			$this->body,
@@ -91,6 +94,7 @@ final class FunctionValue implements FunctionValueInterface, JsonSerializable {
 				$analyserContext,
 				$this->typeRegistry->nothing,
 				$this->parameterType,
+				$this->parameterName,
 				$this->dependencyType,
 			);
 			if (!($this->dependencyType instanceof NothingType)) {
@@ -151,6 +155,7 @@ final class FunctionValue implements FunctionValueInterface, JsonSerializable {
 				null,
 				new TypedValue($this->parameterType, $value),
 				//$dependencyValue instanceof Value ? new TypedValue($this->dependencyType, $dependencyValue) : null
+				$this->parameterName,
 				$this->dependencyType instanceof NothingType ?
 					null : new TypedValue(
 						$this->dependencyType,

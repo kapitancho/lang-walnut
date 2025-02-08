@@ -329,13 +329,31 @@ final class NodeBuilder implements NodeBuilderInterface {
 		return new FunctionBodyNode($this->getSourceLocation(), $expression);
 	}
 
-	public function addMethod(TypeNode $targetType, MethodNameIdentifier $methodName, TypeNode $parameterType, TypeNode $dependencyType, TypeNode $returnType, FunctionBodyNodeInterface $functionBody): AddMethodNode {
-		return new AddMethodNode($this->getSourceLocation(), $targetType, $methodName, $parameterType, $dependencyType, $returnType, $functionBody);
+	public function addMethod(
+		TypeNode $targetType,
+		MethodNameIdentifier $methodName,
+		TypeNode $parameterType,
+		VariableNameIdentifier|null $parameterName,
+		TypeNode $dependencyType,
+		TypeNode $returnType,
+		FunctionBodyNodeInterface $functionBody
+	): AddMethodNode {
+		return new AddMethodNode(
+			$this->getSourceLocation(),
+			$targetType,
+			$methodName,
+			$parameterType,
+			$parameterName,
+			$dependencyType,
+			$returnType,
+			$functionBody
+		);
 	}
 
 	public function addConstructorMethod(
 		TypeNameIdentifier $typeName,
 		TypeNode $parameterType,
+		VariableNameIdentifier|null $parameterName,
 		TypeNode $dependencyType,
 		TypeNode|null $errorType,
 		FunctionBodyNodeInterface $functionBody
@@ -344,6 +362,7 @@ final class NodeBuilder implements NodeBuilderInterface {
 			$this->getSourceLocation(),
 			$typeName,
 			$parameterType,
+			$parameterName,
 			$dependencyType,
 			$errorType ?? $this->nothingType,
 			$functionBody
@@ -617,8 +636,21 @@ final class NodeBuilder implements NodeBuilderInterface {
 		return new SetValueNode($this->getSourceLocation(), $values);
 	}
 
-	public function functionValue(TypeNode $parameterType, TypeNode $dependencyType, TypeNode $returnType, FunctionBodyNodeInterface $functionBody): FunctionValueNode {
-		return new FunctionValueNode($this->getSourceLocation(), $parameterType, $dependencyType, $returnType, $functionBody);
+	public function functionValue(
+		TypeNode $parameterType,
+		VariableNameIdentifier|null $parameterName,
+		TypeNode $dependencyType,
+		TypeNode $returnType,
+		FunctionBodyNodeInterface $functionBody
+	): FunctionValueNode {
+		return new FunctionValueNode(
+			$this->getSourceLocation(),
+			$parameterType,
+			$parameterName,
+			$dependencyType,
+			$returnType,
+			$functionBody
+		);
 	}
 
 }

@@ -425,6 +425,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 			$this->atom(new TypeNameIdentifier('Constructor')),
 			new MethodNameIdentifier('as' . $name->identifier),
 			$fromType,
+			null,
 			$this->nothing,
 			$errorType && !($errorType instanceof NothingType) ?
 				$this->result($fromType, $errorType) :

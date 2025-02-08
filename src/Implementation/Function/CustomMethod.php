@@ -10,6 +10,7 @@ use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethod as CustomMethodInterface;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyError;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\UnresolvableDependency;
@@ -30,6 +31,7 @@ final readonly class CustomMethod implements CustomMethodInterface, JsonSerializ
 		public Type $targetType,
 		public MethodNameIdentifier $methodName,
 		public Type $parameterType,
+		public VariableNameIdentifier|null $parameterName,
 		public Type $dependencyType,
 		public Type $returnType,
 		public FunctionBody $functionBody,
@@ -73,6 +75,7 @@ final readonly class CustomMethod implements CustomMethodInterface, JsonSerializ
 			$programRegistry->analyserContext,
 			$this->targetType,
 			$this->parameterType,
+			$this->parameterName,
 			$this->dependencyType
 		);
 		if (!$returnType->isSubtypeOf($this->returnType)) {
@@ -148,6 +151,7 @@ final readonly class CustomMethod implements CustomMethodInterface, JsonSerializ
 					$programRegistry->executionContext,
 					new TypedValue($this->targetType, $targetValue),
 					new TypedValue($this->parameterType, $parameterValue),
+					$this->parameterName,
 					$dep
 				)
 			);

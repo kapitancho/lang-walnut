@@ -5,6 +5,7 @@ namespace Walnut\Lang\Blueprint\Program\Registry;
 use bcmath\Number;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Program\UnknownType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -45,7 +46,11 @@ interface ValueRegistry {
 	public function set(array $values): SetValue;
 
 	public function function(
-		Type $parameterType, Type $dependencyType, Type $returnType, FunctionBody $body
+		Type $parameterType,
+		VariableNameIdentifier|null $parameterName,
+		Type $dependencyType,
+		Type $returnType,
+		FunctionBody $body,
 	): FunctionValue;
 
 	public function mutable(Type $type, Value $value): MutableValue;

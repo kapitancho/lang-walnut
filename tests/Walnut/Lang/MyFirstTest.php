@@ -29,6 +29,7 @@ final class MyFirstTest extends BaseProgramTestHelper {
 			$fn,
 			$this->valueRegistry->function(
 				$this->typeRegistry->string(),
+				null,
 				$this->typeRegistry->nothing,
 				$this->typeRegistry->alias($myFirstType),
 				$this->expressionRegistry->functionBody(
@@ -58,6 +59,7 @@ final class MyFirstTest extends BaseProgramTestHelper {
 			$fn,
 			$this->valueRegistry->function(
 				$this->typeRegistry->boolean,
+				null,
 				$atomType,
 				$this->typeRegistry->tuple([
 					$this->typeRegistry->boolean,
@@ -88,6 +90,7 @@ final class MyFirstTest extends BaseProgramTestHelper {
 			$f,
 			$this->valueRegistry->function(
 				$this->typeRegistry->string(),
+				null,
 				$this->typeRegistry->nothing,
 				$this->typeRegistry->tuple([
 					$this->typeRegistry->string()
@@ -104,6 +107,7 @@ final class MyFirstTest extends BaseProgramTestHelper {
 			$fn,
 			$this->valueRegistry->function(
 				$this->typeRegistry->string(),
+				null,
 				$this->typeRegistry->nothing,
 				$this->typeRegistry->tuple([
 					$this->typeRegistry->string()

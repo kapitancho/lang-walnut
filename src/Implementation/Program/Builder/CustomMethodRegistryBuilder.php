@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Implementation\Program\Builder;
 
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethod as CustomMethodInterface;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Function\Method;
@@ -22,6 +23,7 @@ final class CustomMethodRegistryBuilder implements CustomMethodRegistryBuilderIn
 		Type $targetType,
 		MethodNameIdentifier $methodName,
 		Type $parameterType,
+		VariableNameIdentifier|null $parameterName,
 		Type $dependencyType,
 		Type $returnType,
 		FunctionBody $functionBody,
@@ -31,6 +33,7 @@ final class CustomMethodRegistryBuilder implements CustomMethodRegistryBuilderIn
 			$targetType,
 			$methodName,
 			$parameterType,
+			$parameterName,
 			$dependencyType,
 			$returnType,
 			$functionBody,

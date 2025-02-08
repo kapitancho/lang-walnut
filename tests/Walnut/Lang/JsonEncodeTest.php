@@ -50,6 +50,7 @@ final class JsonEncodeTest extends BaseProgramTestHelper {
 			        '{"valueType":"Function","parameterType":{"type":"Null"},"returnType":{"type":"Any"},"body":{"expression":{"expressionType":"constant","value":{"valueType":"Null"}}}}'
 			        => $vr->function(
 				$this->typeRegistry->null,
+		        null,
 				$this->typeRegistry->integer(),
 				$this->typeRegistry->any,
 				$this->expressionRegistry->functionBody(

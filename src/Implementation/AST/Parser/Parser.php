@@ -54,7 +54,7 @@ final readonly class Parser implements ParserInterface {
 				continue;
 			}
 
-			$matchingState = $states[$s->state];
+			$matchingState = $states[$s->state] ?? null;
 			$stateName = $matchingState['name'] ?? 'unknown(' . $s->state . ')';
 			$transitions = $matchingState['transitions'] ?? [];
 			$transition = $transitions[$tag] ?? $transitions[''] ?? null;

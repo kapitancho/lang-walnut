@@ -5,6 +5,7 @@ namespace Walnut\Lang\Implementation\Program\Registry;
 use BcMath\Number;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry as ValueRegistryInterface;
@@ -99,14 +100,16 @@ final class ValueRegistry implements ValueRegistryInterface {
 
 	public function function(
 		Type $parameterType,
+		VariableNameIdentifier|null $parameterName,
 		Type $dependencyType,
 		Type $returnType,
-		FunctionBody $body
+		FunctionBody $body,
     ): FunctionValue {
 		return new FunctionValue(
 			$this->typeRegistry,
 			$this,
 			$parameterType,
+			$parameterName,
 			$dependencyType,
 			$returnType,
 			$body,

@@ -50,6 +50,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 			$this->typeRegistry->withName(new TypeNameIdentifier('MyCustomType')),
 			new MethodNameIdentifier('invoke'),
 			$this->typeRegistry->integer(),
+			null,
 			$this->typeRegistry->nothing,
 			$this->typeRegistry->string(),
 			$this->expressionRegistry->functionBody(
@@ -73,6 +74,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 		);
 		$this->functionValue = $this->valueRegistry->function(
 			$this->typeRegistry->integer(),
+			null,
 			$this->typeRegistry->nothing,
 			$this->typeRegistry->string(),
 			$this->expressionRegistry->functionBody(

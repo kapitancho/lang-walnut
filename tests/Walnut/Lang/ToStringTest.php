@@ -41,6 +41,7 @@ final class ToStringTest extends BaseProgramTestHelper {
 			"type{Boolean}" => $vr->type($this->typeRegistry->boolean),
 			"^Null => Any %% Integer :: null" => $vr->function(
 				$this->typeRegistry->null,
+				null,
 				$this->typeRegistry->integer(),
 				$this->typeRegistry->any,
 				$this->expressionRegistry->functionBody(

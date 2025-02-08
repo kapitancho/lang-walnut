@@ -43,6 +43,7 @@ final class SealedAnalyseTest extends BaseProgramTestHelper {
 			$fn,
 			$this->valueRegistry->function(
 				$p ?? $this->typeRegistry->integer(),
+				null,
 				$this->typeRegistry->nothing,
 				$r,
 				$this->expressionRegistry->functionBody(

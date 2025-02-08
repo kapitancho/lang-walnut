@@ -7,12 +7,14 @@ use Walnut\Lang\Blueprint\AST\Node\Module\AddConstructorMethodNode as AddConstru
 use Walnut\Lang\Blueprint\AST\Node\SourceLocation;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 
 final readonly class AddConstructorMethodNode implements AddConstructorMethodNodeInterface {
 	public function __construct(
 		public SourceLocation $sourceLocation,
 		public TypeNameIdentifier $typeName,
 		public TypeNode $parameterType,
+		public VariableNameIdentifier|null $parameterName,
 		public TypeNode $dependencyType,
 		public TypeNode $errorType,
 		public FunctionBodyNode $functionBody
@@ -25,6 +27,7 @@ final readonly class AddConstructorMethodNode implements AddConstructorMethodNod
 			'nodeName' => 'AddConstructor',
 			'typeName' => $this->typeName,
 			'parameterType' => $this->parameterType,
+			'parameterName' => $this->parameterName,
 			'dependencyType' => $this->dependencyType,
 			'errorType' => $this->errorType,
 			'functionBody' => $this->functionBody

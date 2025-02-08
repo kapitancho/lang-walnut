@@ -62,18 +62,22 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 
 	/** @throws CompilationException */
 	public function addConstructorMethod(
-		TypeNameIdentifier $typeName,
-		Type $parameterType,
-		Type $dependencyType,
-		Type $errorType,
-		FunctionBody $functionBody
+		AddConstructorMethodNode $moduleDefinition
 	): CustomMethod {
+		$typeName = $moduleDefinition->typeName;
+		$parameterType = $this->type($moduleDefinition->parameterType);
+		$parameterName = $moduleDefinition->parameterName;
+		$dependencyType = $this->type($moduleDefinition->dependencyType);
+		$errorType = $this->type($moduleDefinition->errorType);
+		$functionBody = $this->functionBody($moduleDefinition->functionBody);
+
 		$type = $this->programContext->typeRegistry->typeByName($typeName);
 		$returnType = match(true) {
 			$type instanceof SealedType => $type->valueType,
 			$type instanceof SubtypeType => $type->baseType,
 			// @codeCoverageIgnoreStart
-			default => throw new CompilationException(
+			default => throw new AstCompilationException(
+				$moduleDefinition,
 				"Constructors are only allowed for subtypes and sealed types",
 			)
 			// @codeCoverageIgnoreEnd
@@ -82,11 +86,12 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 			$this->programContext->typeRegistry->typeByName(new TypeNameIdentifier('Constructor')),
 			new MethodNameIdentifier($typeName),
 			$parameterType,
+			$parameterName,
 			$dependencyType,
 			$errorType instanceof NothingType ? $returnType : $this->programContext->typeRegistry->result(
 				$returnType, $errorType
 			),
-			$functionBody
+			$functionBody,
 		);
 	}
 
@@ -102,13 +107,7 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 			$moduleDefinition instanceof AddAtomTypeNode =>
 				$this->programContext->typeRegistryBuilder->addAtom($moduleDefinition->name),
 			$moduleDefinition instanceof AddConstructorMethodNode =>
-				$this->addConstructorMethod(
-					$moduleDefinition->typeName,
-					$this->type($moduleDefinition->parameterType),
-					$this->type($moduleDefinition->dependencyType),
-					$this->type($moduleDefinition->errorType),
-					$this->functionBody($moduleDefinition->functionBody)
-				),
+				$this->addConstructorMethod($moduleDefinition),
 			$moduleDefinition instanceof AddEnumerationTypeNode =>
 				$this->programContext->typeRegistryBuilder->addEnumeration(
 					$moduleDefinition->name,
@@ -119,9 +118,10 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 					$this->type($moduleDefinition->targetType),
 					$moduleDefinition->methodName,
 					$this->type($moduleDefinition->parameterType),
+					$moduleDefinition->parameterName,
 					$this->type($moduleDefinition->dependencyType),
 					$this->type($moduleDefinition->returnType),
-					$this->functionBody($moduleDefinition->functionBody)
+					$this->functionBody($moduleDefinition->functionBody),
 				),
 			$moduleDefinition instanceof AddSealedTypeNode =>
 				$this->programContext->typeRegistryBuilder->addSealed(
@@ -182,12 +182,14 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 			),
 			$methodName,
 			$parameterType = $this->type($functionValueNode->parameterType),
+			$functionValueNode->parameterName,
 			$this->type($functionValueNode->dependencyType),
 			$returnType = $this->type($functionValueNode->returnType),
-			$this->functionBody($functionValueNode->functionBody)
+			$this->functionBody($functionValueNode->functionBody),
 		);
 		return $this->programContext->valueRegistry->function(
 			$parameterType,
+			$functionValueNode->parameterName,
 			$this->programContext->typeRegistry->typeByName(
 				new TypeNameIdentifier('Global')
 			),
@@ -196,9 +198,12 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 				$this->programContext->expressionRegistry->methodCall(
 					$this->programContext->expressionRegistry->variableName(new VariableNameIdentifier('%')),
 					$methodName,
-					$this->programContext->expressionRegistry->variableName(new VariableNameIdentifier('#')),
+					$this->programContext->expressionRegistry->variableName(
+						$functionValueNode->parameterName ??
+							new VariableNameIdentifier('#')
+					),
 				)
-			)
+			),
 		);
 	}
 

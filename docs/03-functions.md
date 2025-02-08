@@ -5,11 +5,11 @@ A basic function is a 4-tuple consisting of a parameter type, a return type, a d
 
 #### Example
 ```walnut
-getLength = ^String<1..10> => Integer<1..10> %% [~SomeDependency] :: #->length;
+getLength = ^s: String<1..10> => Integer<1..10> %% [~SomeDependency] :: s->length;
 ```
-
-The parameter value is accessible using the `#` variable. Since the functions accept only one parameter, the way to
-pass more than one value is to use Tuples and Records.
+The parameter value is always accessible using the `#` variable but in case a variable name is provided
+the value is available using this variable as well. In the example above this is `s`. 
+Since the functions accept only one parameter, the way to pass more than one value is to use Tuples and Records.
 The `%` variable represents the dependency type and is only available in case there is a dependency provided. 
 
 During the compilation, the function is checked for correctness and the return type should match the type of the expression.

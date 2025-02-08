@@ -51,6 +51,7 @@ final class CastAsTest extends BaseProgramTestHelper {
 			$this->typeRegistry->enumeration(new TypeNameIdentifier('OrderStatus')),
 			new MethodNameIdentifier('asBoolean'),
 			$this->typeRegistry->null,
+			null,
 			$this->typeRegistry->nothing,
 			$this->typeRegistry->boolean,
 			$this->expressionRegistry->functionBody(
@@ -100,6 +101,7 @@ final class CastAsTest extends BaseProgramTestHelper {
 			$enumType = $this->typeRegistry->enumeration(new TypeNameIdentifier('OrderStatus')),
 			new MethodNameIdentifier('asInteger'),
 			$this->typeRegistry->null,
+			null,
 			$this->typeRegistry->nothing,
 			$this->typeRegistry->integer(0, 2),
 			$toInt = $this->expressionRegistry->functionBody(
@@ -175,6 +177,7 @@ final class CastAsTest extends BaseProgramTestHelper {
 			$this->typeRegistry->integer(),
 			new MethodNameIdentifier('as' . $enumType->name),
 			$this->typeRegistry->null,
+			null,
 			$this->typeRegistry->nothing,
 			$enumType,
 			$fromInt = $this->expressionRegistry->functionBody(
@@ -271,6 +274,7 @@ final class CastAsTest extends BaseProgramTestHelper {
 			$enumType,
 			new MethodNameIdentifier('asJsonValue'),
 			$this->typeRegistry->null,
+			null,
 			$this->typeRegistry->nothing,
 			$this->typeRegistry->integer(0, 2),
 			$toInt
@@ -289,6 +293,7 @@ final class CastAsTest extends BaseProgramTestHelper {
 			$jv,
 			new MethodNameIdentifier('as' . $enumType->name),
 			$this->typeRegistry->null,
+			null,
 			$this->typeRegistry->nothing,
 			$enumType,
 			$fromInt

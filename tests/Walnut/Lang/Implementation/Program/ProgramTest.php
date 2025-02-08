@@ -26,6 +26,7 @@ final class ProgramTest extends BaseProgramTestHelper {
 			new VariableNameIdentifier('main'),
 			$this->valueRegistry->function(
 				$this->typeRegistry->string(),
+				null,
 				$this->typeRegistry->nothing,
 				$this->typeRegistry->integer(),
 				$this->expressionRegistry->functionBody(
@@ -64,6 +65,7 @@ final class ProgramTest extends BaseProgramTestHelper {
 			new VariableNameIdentifier('main'),
 			$this->valueRegistry->function(
 				$this->typeRegistry->integer(),
+				null,
 				$this->typeRegistry->nothing,
 				$this->typeRegistry->integer(),
 				$this->expressionRegistry->functionBody(
@@ -85,6 +87,7 @@ final class ProgramTest extends BaseProgramTestHelper {
 			new VariableNameIdentifier('main'),
 			$this->valueRegistry->function(
 				$this->typeRegistry->string(),
+				null,
 				$this->typeRegistry->nothing,
 				$this->typeRegistry->real(),
 				$this->expressionRegistry->functionBody(

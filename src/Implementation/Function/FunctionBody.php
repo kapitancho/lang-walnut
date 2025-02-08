@@ -46,6 +46,7 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 		AnalyserContext $analyserContext,
 		Type $targetType,
 		Type $parameterType,
+		VariableNameIdentifier|null $parameterName,
 		Type $dependencyType
 	): Type {
 		if (isset($this->returnType)) {
@@ -64,6 +65,12 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 			);
 		}
 
+		if ($parameterName) {
+			$analyserContext = $analyserContext->withAddedVariableType(
+				$parameterName,
+				$parameterType
+			);
+		}
 		foreach(['$' => $targetType, '#' => $parameterType, '%' => $dependencyType] as $variableName => $type) {
 			if (!($type instanceof NothingType)) {
 				$analyserContext = $analyserContext->withAddedVariableType(
@@ -114,6 +121,7 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 		ExecutionContext $executionContext,
 		TypedValue|null $targetValue,
 		TypedValue $parameterValue,
+		VariableNameIdentifier|null $parameterName,
 		TypedValue|null $dependencyValue
 	): Value {
 		$tConv = fn(Type $type): Type => $type instanceof OptionalKeyType ?
@@ -126,6 +134,12 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 			$executionContext = $executionContext->withAddedVariableValue(
 				new VariableNameIdentifier('$$'),
 				TypedValue::forValue($targetValue->value->value)
+			);
+		}
+		if ($parameterName) {
+			$executionContext = $executionContext->withAddedVariableValue(
+				$parameterName,
+				$parameterValue
 			);
 		}
 		foreach(['$' => $targetValue, '#' => $parameterValue, '%' => $dependencyValue] as $variableName => $value) {
