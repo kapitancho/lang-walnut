@@ -61,9 +61,9 @@ In case a value cannot be instantiated, an error of type DependencyContainerErro
 ## Constructors
 The following syntax can be used to define a constructor for a subtype or a sealed type:
 ```
-Article(String) %% [~Clock] :: [title: #, publishDate: %.clock->now];
+Article(title: String) %% [~Clock] :: [title: title, publishDate: %.clock->now];
 ```
-Once again this is presented as *Constructor->Article(String) %% [~Clock] :: [title: #, publishDate: %.clock->now];*.
+Once again this is presented as *Constructor->Article(title: String) %% [~Clock] :: [title: title, publishDate: %.clock->now];*.
 
 ## Invariant validators
 This is a unique feature of Walnut. There is a way to provide a validator function which in case it explicitly returns an 
@@ -79,7 +79,7 @@ the invariant validator is always executed. In case the validator returns an err
 ## Default types (syntactic sugar)
 In case the return type of an extended function is Any, it can be omitted.
 ```walnut
-Article->returnsAny(^String) :: ...some expression;
+Article->returnsAny(^x:String) :: ...some expression;
 ```
 A similar simplification can be applied to the parameter type in case it is Null.
 ```walnut
@@ -94,7 +94,7 @@ Article->acceptsNullAndReturnsAny() :: ...some expression;
 ## Calling functions
 Simple functions can be called using the following syntax:
 ```walnut
-getLength = ^String<1..10> => Integer<1..10> :: #->length;
+getLength = ^s: String<1..10> => Integer<1..10> :: s->length;
 // call somewhere in the code:
 getLength('Hello, World!'); /* = 13 */
 ```
