@@ -69,7 +69,7 @@ final readonly class Execute implements NativeMethod {
 				try {
 					$pdo = new PDO($dsn);
 					$stmt = $pdo->prepare($parameterValue->values['query']->literalValue);
-					$stmt->execute(array_map(static fn(Value $value): string|float|int|null =>
+					$stmt->execute(array_map(fn(Value $value): string|float|int|null =>
 					($v = $this->toBaseValue($value))->literalValue instanceof Number ? (string)$v->literalValue : $v->literalValue,
 						$parameterValue->values['boundParameters']->values
 					));

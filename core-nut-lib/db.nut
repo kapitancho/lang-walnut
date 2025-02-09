@@ -10,7 +10,7 @@ DatabaseQueryCommand = [query: DatabaseSqlQuery, boundParameters: DatabaseQueryB
 DatabaseQueryResultRow = Map<DatabaseValue>;
 DatabaseQueryResult = Array<DatabaseQueryResultRow>;
 DatabaseQueryFailure = $[query: DatabaseSqlQuery, boundParameters: DatabaseQueryBoundParameters, error: String];
-DatabaseQueryFailure->error(^Null => String) :: $error;
+DatabaseQueryFailure->error(=> String) :: $error;
 
 DatabaseQueryFailure ==> ExternalError :: ExternalError[
     errorType: $->type->typeName,

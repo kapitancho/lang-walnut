@@ -14,7 +14,7 @@ EntryPoint = $[~HttpRequestHandler];
 ==> EntryPoint %% CompositeHandler :: EntryPoint[
     httpRequestHandler: %->as(type{HttpRequestHandler})
 ];
-EntryPoint->handle(^HttpRequest => Result<HttpResponse, Any>) :: $httpRequestHandler[#];
+EntryPoint->handle(^~HttpRequest => Result<HttpResponse, Any>) :: $httpRequestHandler[httpRequest];
 
 HttpServer = :[];
-HttpServer->handleRequest(^HttpRequest => Result<HttpResponse, Any>) %% EntryPoint :: %->handle(#);
+HttpServer->handleRequest(^~HttpRequest => Result<HttpResponse, Any>) %% EntryPoint :: %->handle(httpRequest);

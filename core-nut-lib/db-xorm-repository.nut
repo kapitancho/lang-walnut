@@ -19,7 +19,7 @@ OxRepository->all(=> *Array) %% [~DatabaseConnector] :: {
         *> ('Failed to hydrate entries')
 };
 
-OxRepository->one(^DatabaseValue => *Result<Any, EntryNotFound>) %% [~DatabaseConnector] :: {
+OxRepository->one(^v: DatabaseValue => *Result<Any, EntryNotFound>) %% [~DatabaseConnector] :: {
     query = $ox->selectOneQuery /*'SELECT * FROM <table> WHERE id = ?'*/
         *> ('Failed to get query for orm model');
     entries = {%databaseConnector
@@ -29,14 +29,14 @@ OxRepository->one(^DatabaseValue => *Result<Any, EntryNotFound>) %% [~DatabaseCo
           *> ('Failed to hydrate entries');
     ?whenTypeOf(entries) is {
         type{Array<1..>}: entries.0,
-        ~: @EntryNotFound[key: #]
+        ~: @EntryNotFound[key: v]
     }
 };
 
-OxRepository->insertOne(^Map<DatabaseValue> => *Null) %% [~DatabaseConnector] :: {
+OxRepository->insertOne(^v: Map<DatabaseValue> => *Null) %% [~DatabaseConnector] :: {
     query = $ox->insertQuery
         *> ('Failed to get query for orm model');
-    result = {%databaseConnector->execute[query: query, boundParameters: #]}
+    result = {%databaseConnector->execute[query: query, boundParameters: v]}
         *> ('Failed to insert entry into the database');
     ?whenTypeOf(result) is {
         type{Integer<1..1>} : null,
@@ -48,22 +48,22 @@ OxRepository->insertOne(^Map<DatabaseValue> => *Null) %% [~DatabaseConnector] ::
     }
 };
 
-OxRepository->deleteOne(^DatabaseValue => *Result<Null, EntryNotFound>) %% [~DatabaseConnector] :: {
+OxRepository->deleteOne(^v: DatabaseValue => *Result<Null, EntryNotFound>) %% [~DatabaseConnector] :: {
     query = $ox->deleteQuery
         *> ('Failed to get query for orm model');
-    result = {%databaseConnector->execute[query: query, boundParameters: [:]->withKeyValue[key: $ox->keyField, value: #]]}
+    result = {%databaseConnector->execute[query: query, boundParameters: [:]->withKeyValue[key: $ox->keyField, value: v]]}
         -> errorAsExternal('Failed to delete entry from the database');
     ?whenTypeOf(result) is {
         type{Integer<1..1>} : null,
-        ~: @EntryNotFound[key: #]
+        ~: @EntryNotFound[key: v]
     }
 };
 
-OxRepository->updateOne(^Map<DatabaseValue> => *Result<Null, EntryNotFound>) %% [~DatabaseConnector] :: {
+OxRepository->updateOne(^v: Map<DatabaseValue> => *Result<Null, EntryNotFound>) %% [~DatabaseConnector] :: {
     entryId = #->item($ox->keyField) *> ('Failed to get entry key');
     query = $ox->updateQuery
         *> ('Failed to get query for orm model');
-    result = {%databaseConnector->execute[query: query, boundParameters: #]}
+    result = {%databaseConnector->execute[query: query, boundParameters: v]}
         *> ('Failed to update entry in the database');
     ?whenTypeOf(result) is {
         type{Integer<1..1>} : null,

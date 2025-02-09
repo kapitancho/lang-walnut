@@ -8,8 +8,7 @@ EmptyRequestBody ==> HttpRequestBodyToParameter ::
 
 JsonRequestBody = $[valueKey: String];
 JsonRequestBody ==> HttpRequestBodyToParameter ::
-    ^HttpRequest => Result<Map<JsonValue>, InvalidJsonString> :: {
-        request = #;
+    ^request: HttpRequest => Result<Map<JsonValue>, InvalidJsonString> :: {
         body = request.body;
         body = ?whenTypeOf(body) is {
             type{String}: body,
@@ -35,8 +34,8 @@ NoResponseBody ==> HttpResponseBodyFromParameter ::
 
 RedirectResponseBody = $[statusCode: HttpStatusCode];
 RedirectResponseBody ==> HttpResponseBodyFromParameter ::
-    ^Any => Result<HttpResponse, Any> :: {
-        redirectValue = #=>as(type{String});
+    ^result: Any => Result<HttpResponse, Any> :: {
+        redirectValue = result=>as(type{String});
         [
              statusCode: $statusCode,
              protocolVersion: HttpProtocolVersion.HTTP11,
@@ -47,8 +46,7 @@ RedirectResponseBody ==> HttpResponseBodyFromParameter ::
 
 JsonResponseBody = $[statusCode: HttpStatusCode];
 JsonResponseBody ==> HttpResponseBodyFromParameter ::
-    ^Any => Result<HttpResponse, Any> :: {
-        result = #;
+    ^result: Any => Result<HttpResponse, Any> :: {
         jsonValue = result->asJsonValue;
         ?whenIsError(jsonValue) { jsonValue } ~ {
             [
@@ -62,12 +60,12 @@ JsonResponseBody ==> HttpResponseBodyFromParameter ::
 
 ContentResponseBody = $[statusCode: HttpStatusCode, contentType: String];
 ContentResponseBody ==> HttpResponseBodyFromParameter ::
-    ^Any => Result<HttpResponse, Any> :: {
+    ^result: Any => Result<HttpResponse, Any> :: {
         [
              statusCode: $statusCode,
              protocolVersion: HttpProtocolVersion.HTTP11,
              headers: [:]->withKeyValue[key: 'Content-Type', value: [$contentType]],
-             body: # => asString
+             body: result => asString
         ]
     };
 
@@ -83,11 +81,9 @@ HttpRoute = $[
     response: HttpResponseBodyFromParameter
 ];
 
-HttpRoute->handleRequest(^HttpRequest => Result<HttpResponse, HttpRouteDoesNotMatch>) %% DependencyContainer :: {
-    request = #;
-
-    err = ^Any => Result<HttpResponse, HttpRouteDoesNotMatch> :: {
-        httpResponse = #->as(type{HttpResponse});
+HttpRoute->handleRequest(^request: HttpRequest => Result<HttpResponse, HttpRouteDoesNotMatch>) %% DependencyContainer :: {
+    err = ^result: Any => Result<HttpResponse, HttpRouteDoesNotMatch> :: {
+        httpResponse = result->as(type{HttpResponse});
         ?whenTypeOf(httpResponse) is {
             type{HttpResponse}: httpResponse,
             ~: [
@@ -130,12 +126,10 @@ HttpRoute->handleRequest(^HttpRequest => Result<HttpResponse, HttpRouteDoesNotMa
 };
 
 HttpRouteChain = $[routes: Array<HttpRoute, 1..>];
-HttpRouteChain->handleRequest(^HttpRequest => Result<HttpResponse, HttpRouteDoesNotMatch>) :: {
-    request = #;
+HttpRouteChain->handleRequest(^request: HttpRequest => Result<HttpResponse, HttpRouteDoesNotMatch>) :: {
     routes = $routes;
 
-    h = ^Array<HttpRoute, 1..> => Result<HttpResponse, HttpRouteDoesNotMatch> :: {
-        routes = #;
+    h = ^routes: Array<HttpRoute, 1..> => Result<HttpResponse, HttpRouteDoesNotMatch> :: {
         split = routes->withoutFirst;
         route = split.element;
         rest = split.array;
@@ -156,80 +150,80 @@ HttpRouteChain->handleRequest(^HttpRequest => Result<HttpResponse, HttpRouteDoes
 
 HttpRouteBuilder = :[];
 HttpRouteBuilder->httpPostJsonLocation(^[pattern: RoutePattern, handler: Type<^Nothing => Any>, bodyArgName: String<1..>|Null] => HttpRoute) :: {
-    a = #.bodyArgName;
+    a = #bodyArgName;
     requestBody = ?whenTypeOf(a) is {
         type{String}: JsonRequestBody[a],
         ~: EmptyRequestBody[]
     };
     HttpRoute[
         method: HttpRequestMethod.POST,
-        pattern: #.pattern,
+        pattern: #pattern,
         requestBody: requestBody->asHttpRequestBodyToParameter,
-        handler: #.handler,
+        handler: #handler,
         response: {RedirectResponseBody[201]}->asHttpResponseBodyFromParameter
     ]
 };
 
 HttpRouteBuilder->httpPost(^[pattern: RoutePattern, handler: Type<^Nothing => Any>] => HttpRoute) :: HttpRoute[
     method: HttpRequestMethod.POST,
-    pattern: #.pattern,
+    pattern: #pattern,
     requestBody: EmptyRequestBody[]->asHttpRequestBodyToParameter,
-    handler: #.handler,
+    handler: #handler,
     response: {NoResponseBody[204]}->asHttpResponseBodyFromParameter
 ];
 
 HttpRouteBuilder->httpPostJson(^[pattern: RoutePattern, handler: Type<^Nothing => Any>, bodyArgName: String<1..>] => HttpRoute) :: HttpRoute[
     method: HttpRequestMethod.POST,
-    pattern: #.pattern,
-    requestBody: {JsonRequestBody[#.bodyArgName]}->asHttpRequestBodyToParameter,
-    handler: #.handler,
+    pattern: #pattern,
+    requestBody: {JsonRequestBody[#bodyArgName]}->asHttpRequestBodyToParameter,
+    handler: #handler,
     response: {NoResponseBody[204]}->asHttpResponseBodyFromParameter
 ];
 
 HttpRouteBuilder->httpPutJson(^[pattern: RoutePattern, handler: Type<^Nothing => Any>, bodyArgName: String<1..>] => HttpRoute) :: HttpRoute[
     method: HttpRequestMethod.PUT,
-    pattern: #.pattern,
-    requestBody: {JsonRequestBody[#.bodyArgName]}->asHttpRequestBodyToParameter,
-    handler: #.handler,
+    pattern: #pattern,
+    requestBody: {JsonRequestBody[#bodyArgName]}->asHttpRequestBodyToParameter,
+    handler: #handler,
     response: {NoResponseBody[204]}->asHttpResponseBodyFromParameter
 ];
 
 HttpRouteBuilder->httpPatchJson(^[pattern: RoutePattern, handler: Type<^Nothing => Any>, bodyArgName: String<1..>] => HttpRoute) :: HttpRoute[
     method: HttpRequestMethod.PATCH,
-    pattern: #.pattern,
-    requestBody: {JsonRequestBody[#.bodyArgName]}->asHttpRequestBodyToParameter,
-    handler: #.handler,
+    pattern: #pattern,
+    requestBody: {JsonRequestBody[#bodyArgName]}->asHttpRequestBodyToParameter,
+    handler: #handler,
     response: {NoResponseBody[204]}->asHttpResponseBodyFromParameter
 ];
 
 HttpRouteBuilder->httpDelete(^[pattern: RoutePattern, handler: Type<^Nothing => Any>] => HttpRoute) :: HttpRoute[
     method: HttpRequestMethod.DELETE,
-    pattern: #.pattern,
+    pattern: #pattern,
     requestBody: EmptyRequestBody[]->asHttpRequestBodyToParameter,
-    handler: #.handler,
+    handler: #handler,
     response: {NoResponseBody[204]}->asHttpResponseBodyFromParameter
 ];
 
 HttpRouteBuilder->httpGetAsJson(^[pattern: RoutePattern, handler: Type<^Nothing => Any>] => HttpRoute) :: HttpRoute[
     method: HttpRequestMethod.GET,
-    pattern: #.pattern,
+    pattern: #pattern,
     requestBody: EmptyRequestBody[]->asHttpRequestBodyToParameter,
-    handler: #.handler,
+    handler: #handler,
     response: {JsonResponseBody[200]}->asHttpResponseBodyFromParameter
 ];
 
 HttpRouteBuilder->httpGetAsText(^[pattern: RoutePattern, handler: Type<^Nothing => Any>] => HttpRoute) :: HttpRoute[
     method: HttpRequestMethod.GET,
-    pattern: #.pattern,
+    pattern: #pattern,
     requestBody: EmptyRequestBody[]->asHttpRequestBodyToParameter,
-    handler: #.handler,
+    handler: #handler,
     response: {ContentResponseBody[200, 'text/plain']}->asHttpResponseBodyFromParameter
 ];
 
 HttpRouteBuilder->httpGetAsHtml(^[pattern: RoutePattern, handler: Type<^Nothing => Any>] => HttpRoute) :: HttpRoute[
     method: HttpRequestMethod.GET,
-    pattern: #.pattern,
+    pattern: #pattern,
     requestBody: EmptyRequestBody[]->asHttpRequestBodyToParameter,
-    handler: #.handler,
+    handler: #handler,
     response: {ContentResponseBody[200, 'text/html']}->asHttpResponseBodyFromParameter
 ];

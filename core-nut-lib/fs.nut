@@ -1,10 +1,10 @@
 module fs:
 
 File = $[path: String];
-File->path(^Null => String) :: $path;
+File->path(=> String) :: $path;
 
 CannotReadFile = $[file: File];
-CannotReadFile->file(^Null => File) :: $file;
+CannotReadFile->file(=> File) :: $file;
 CannotReadFile ==> String :: 'Cannot read from file: '->concat($file->path);
 CannotReadFile ==> ExternalError :: ExternalError[
     errorType: $->type->typeName,
@@ -13,7 +13,7 @@ CannotReadFile ==> ExternalError :: ExternalError[
 ];
 
 CannotWriteFile = $[file: File];
-CannotWriteFile->file(^Null => File) :: $file;
+CannotWriteFile->file(=> File) :: $file;
 CannotWriteFile ==> String :: 'Cannot write to file: '->concat($file->path);
 CannotWriteFile ==> ExternalError :: ExternalError[
     errorType: $->type->typeName,

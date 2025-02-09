@@ -47,13 +47,13 @@ HttpResponse->withHeader(^[headerName: String, values: Array<String, 1..>] => Ht
     [
         protocolVersion: $protocolVersion,
         body: $body,
-        headers: $headers->withKeyValue[key: #.headerName, value: #.values],
+        headers: $headers->withKeyValue[key: #headerName, value: #values],
         statusCode: $statusCode
     ]
 };
-HttpResponse->withBody(^HttpMessageBody|Null => HttpResponse) :: [
+HttpResponse->withBody(^body: HttpMessageBody|Null => HttpResponse) :: [
     protocolVersion: $protocolVersion,
-    body: #,
+    body: body,
     headers: $headers,
     statusCode: $statusCode
 ];
@@ -63,8 +63,8 @@ HttpMiddleware = ^[request: HttpRequest, handler: HttpRequestHandler] => Result<
 
 CreateHttpResponse = ^HttpStatusCode => HttpResponse;
 
-==> CreateHttpResponse :: ^HttpStatusCode => HttpResponse :: [
-    statusCode: #,
+==> CreateHttpResponse :: ^code: HttpStatusCode => HttpResponse :: [
+    statusCode: code,
     protocolVersion: HttpProtocolVersion.HTTP11,
     headers: [:],
     body: ''
