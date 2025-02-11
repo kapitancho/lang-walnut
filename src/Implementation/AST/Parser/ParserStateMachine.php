@@ -994,24 +994,15 @@ final readonly class ParserStateMachine {
 					$this->s->result = ['var_name' => $token->patternMatch->text];
 					$this->s->move(260);
 				},
-				T::special_var->name => function(LT $token) {
+				T::special_var->name => $tx = function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->variableName(
 						new VariableNameIdentifier($token->patternMatch->text)
 					);
 					$this->s->moveAndPop();
 				},
-				T::special_var_modulo->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->variableName(
-						new VariableNameIdentifier($token->patternMatch->text)
-					);
-					$this->s->moveAndPop();
-				},
-				T::this_var->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->variableName(
-						new VariableNameIdentifier($token->patternMatch->text)
-					);
-					$this->s->moveAndPop();
-				},
+				T::special_var_param->name => $tx,
+				T::special_var_modulo->name => $tx,
+				T::this_var->name => $tx,
 				T::type_keyword->name => function(LT $token) {
 					$this->s->result = ['type_name' => $token->patternMatch->text];
 					$this->s->move(270);
@@ -1223,6 +1214,7 @@ final readonly class ParserStateMachine {
 
 				T::this_var->name => $c,
 				T::special_var->name => $c,
+				T::special_var_param->name => $c,
 				T::special_var_modulo->name => $c,
 				T::pure_marker->name => $c,
 				T::method_marker->name => $c,
