@@ -35,6 +35,7 @@ use Walnut\Lang\Blueprint\Compilation\AST\AstExpressionCompiler as AstExpression
 use Walnut\Lang\Blueprint\Compilation\AST\AstTypeCompiler;
 use Walnut\Lang\Blueprint\Compilation\AST\AstValueCompiler;
 use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry;
+use Walnut\Lang\Blueprint\Program\UnknownType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 
@@ -81,6 +82,21 @@ final readonly class AstExpressionCompiler implements AstExpressionCompilerInter
 	}
 
 	/** @throws AstCompilationException */
+	private function constructorCall(ConstructorCallExpressionNode $expressionNode): Expression {
+		try {
+			return $this->expressionRegistry->constructorCall(
+				$expressionNode->typeName,
+				$this->expression($expressionNode->parameter)
+			);
+		} catch (UnknownType) {
+			throw new AstCompilationException(
+				$expressionNode,
+				sprintf("Type %s not found", $expressionNode->typeName)
+			);
+		}
+	}
+
+	/** @throws AstCompilationException */
 	public function expression(ExpressionNode $expressionNode): Expression {
 		return match(true) {
 			$expressionNode instanceof ConstantExpressionNode =>
@@ -88,10 +104,7 @@ final readonly class AstExpressionCompiler implements AstExpressionCompilerInter
 					$this->value($expressionNode->value)
 				),
 			$expressionNode instanceof ConstructorCallExpressionNode =>
-				$this->expressionRegistry->constructorCall(
-					$expressionNode->typeName,
-					$this->expression($expressionNode->parameter)
-				),
+				$this->constructorCall($expressionNode),
 			$expressionNode instanceof FunctionCallExpressionNode =>
 				$this->expressionRegistry->functionCall(
 					$this->expression($expressionNode->target),

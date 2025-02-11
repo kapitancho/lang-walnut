@@ -29,6 +29,7 @@ use Walnut\Lang\Blueprint\Compilation\CompilationException;
 use Walnut\Lang\Blueprint\Function\CustomMethod;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Program\ProgramContext;
+use Walnut\Lang\Blueprint\Program\UnknownType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\SubtypeType;
@@ -71,7 +72,14 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 		$errorType = $this->type($moduleDefinition->errorType);
 		$functionBody = $this->functionBody($moduleDefinition->functionBody);
 
-		$type = $this->programContext->typeRegistry->typeByName($typeName);
+		try {
+			$type = $this->programContext->typeRegistry->typeByName($typeName);
+		} catch (UnknownType) {
+			throw new AstCompilationException(
+				$moduleDefinition,
+				sprintf("Type %s not found", $typeName)
+			);
+		}
 		$returnType = match(true) {
 			$type instanceof SealedType => $type->valueType,
 			$type instanceof SubtypeType => $type->baseType,

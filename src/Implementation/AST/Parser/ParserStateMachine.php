@@ -71,7 +71,7 @@ final readonly class ParserStateMachine {
 				},
 				'EOF' => -1
 			]],
-			103 => ['name' => 'module level type definition', 'transitions' => [
+			103 => ['name' => 'module level var definition', 'transitions' => [
 				'assign' => function(LT $token) {
 					$this->s->push(133);
 					$this->s->move(401);
@@ -83,7 +83,15 @@ final readonly class ParserStateMachine {
 				'cast_marker' => 119,
 				'method_marker' => 122,
 				'call_start' => 141,
-				'tuple_start' => 142,
+				T::empty_tuple->name => function(LT $token) {
+					$this->s->result['parameter_type'] = $this->nodeBuilder->tupleType([]);
+					$this->s->move(144);
+				},
+				T::empty_record->name => function(LT $token) {
+					$this->s->result['parameter_type'] = $this->nodeBuilder->recordType([]);
+					$this->s->move(144);
+				},
+				T::tuple_start->name => 142,
 			]],
 			105 => ['name' => 'module level type assignment', 'transitions' => [
 				'atom_type' => 106,
@@ -486,7 +494,19 @@ final readonly class ParserStateMachine {
 				}
 			]],
 			139 => ['name' => 'method name lambda param name', 'transitions' => [
-				T::colon->name => 140
+				T::colon->name => 140,
+				T::lambda_return->name => function(LT $token) {
+					$this->s->result['parameter_type'] = $this->nodeBuilder->anyType;
+					$this->s->push(138);
+					$this->s->move(701);
+				},
+				T::call_end->name => function(LT $token) {
+					$this->s->result['parameter_type'] = $this->nodeBuilder->functionType(
+						$this->nodeBuilder->anyType,
+						$this->nodeBuilder->anyType
+					);
+					$this->s->move(126);
+				}
 			]],
 			140 => ['name' => 'method name lambda param type', 'transitions' => [
 				T::type_keyword->name => $c = function(LT $token) {
@@ -506,13 +526,21 @@ final readonly class ParserStateMachine {
 				T::default_match->name => function(LT $token) {
 					$this->s->move(157);
 				},
+				T::call_end->name => function(LT $token) {
+					$this->s->result['parameter_type'] = $this->nodeBuilder->nullType;
+					$this->s->move(144);
+				},
 				'' => function(LT $token) {
 					$this->s->push(143);
 					$this->s->stay(701);
 				}
 			]],
 			155 => ['name' => 'constructor method parameter name', 'transitions' => [
-				T::colon->name => 156
+				T::colon->name => 156,
+				T::call_end->name => function(LT $token) {
+					$this->s->result['parameter_type'] = $this->nodeBuilder->anyType;
+					$this->s->move(144);
+				}
 			]],
 			156 => ['name' => 'constructor method parameter type', 'transitions' => [
 				T::type_keyword->name => $c = function(LT $token) {
@@ -752,6 +780,12 @@ final readonly class ParserStateMachine {
 				},
 			]],
 			271 => ['name' => 'constructor call expression', 'transitions' => [
+				T::call_end->name => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->constant(
+						$this->nodeBuilder->nullValue
+					);
+					$this->s->stay(272);
+				},
 				'' => function(LT $token) {
 					$this->s->push(272);
 					$this->s->stay(201);
@@ -1914,10 +1948,42 @@ final readonly class ParserStateMachine {
 				},
 				T::default_match->name => function(LT $token) {
 					$this->s->move(512);
+				},
+				T::lambda_return->name => function(LT $token) {
+					$this->s->result['parameter'] = $this->nodeBuilder->nullType;
+					$this->s->push(505);
+					$this->s->move(701);
+				},
+				T::dependency_marker->name => function(LT $token) {
+					$this->s->result['parameter'] = $this->nodeBuilder->nullType;
+					$this->s->result['return'] = $this->nodeBuilder->anyType;
+					$this->s->push(508);
+					$this->s->move(701);
+				},
+				T::function_body_marker->name => function(LT $token) {
+					$this->s->result['parameter'] = $this->nodeBuilder->nullType;
+					$this->s->result['return'] = $this->nodeBuilder->anyType;
+					$this->s->move(506);
 				}
 			]],
 			510 => ['name' => 'function value parameter name', 'transitions' => [
-				T::colon->name => 511
+				T::colon->name => 511,
+				T::lambda_return->name => function(LT $token) {
+					$this->s->result['parameter'] = $this->nodeBuilder->anyType;
+					$this->s->push(505);
+					$this->s->move(701);
+				},
+				T::dependency_marker->name => function(LT $token) {
+					$this->s->result['parameter'] = $this->nodeBuilder->anyType;
+					$this->s->result['return'] = $this->nodeBuilder->anyType;
+					$this->s->push(508);
+					$this->s->move(701);
+				},
+				T::function_body_marker->name => function(LT $token) {
+					$this->s->result['parameter'] = $this->nodeBuilder->anyType;
+					$this->s->result['return'] = $this->nodeBuilder->anyType;
+					$this->s->move(506);
+				}
 			]],
 			511 => ['name' => 'function value parameter type after name', 'transitions' => [
 				T::type_keyword->name => $c = function(LT $token) {
@@ -1943,6 +2009,12 @@ final readonly class ParserStateMachine {
 					$this->s->result['return'] = $this->nodeBuilder->anyType;
 					$this->s->result['dependency'] = $this->nodeBuilder->nothingType;
 					$this->s->move(506);
+				},
+				T::dependency_marker->name => function(LT $token) {
+					$this->s->result['parameter'] = $this->s->generated;
+					$this->s->result['return'] = $this->nodeBuilder->anyType;
+					$this->s->push(508);
+					$this->s->move(701);
 				},
 				T::lambda_return->name => function(LT $token) {
 					$this->s->result['parameter'] = $this->s->generated;
