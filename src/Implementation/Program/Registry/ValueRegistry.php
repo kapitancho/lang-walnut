@@ -22,6 +22,7 @@ use Walnut\Lang\Implementation\Value\ErrorValue;
 use Walnut\Lang\Implementation\Value\FunctionValue;
 use Walnut\Lang\Implementation\Value\IntegerValue;
 use Walnut\Lang\Implementation\Value\MutableValue;
+use Walnut\Lang\Implementation\Value\OpenValue;
 use Walnut\Lang\Implementation\Value\RealValue;
 use Walnut\Lang\Implementation\Value\RecordValue;
 use Walnut\Lang\Implementation\Value\SealedValue;
@@ -154,9 +155,21 @@ final class ValueRegistry implements ValueRegistryInterface {
 	}
 
 	/** @throws UnknownType */
+	public function openValue(
+		TypeNameIdentifier $typeName,
+		Value $value
+	): OpenValue {
+		return new OpenValue(
+			$this->typeRegistry,
+			$typeName,
+			$value
+		);
+	}
+
+	/** @throws UnknownType */
     public function sealedValue(
         TypeNameIdentifier $typeName,
-        RecordValueInterface $value
+        Value $value
     ): SealedValue {
 		return new SealedValue(
 			$this->typeRegistry,

@@ -18,6 +18,7 @@ use Walnut\Lang\Blueprint\Value\FunctionValue;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
 use Walnut\Lang\Blueprint\Value\MutableValue;
 use Walnut\Lang\Blueprint\Value\NullValue;
+use Walnut\Lang\Blueprint\Value\OpenValue;
 use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\SealedValue;
@@ -74,8 +75,14 @@ interface ValueRegistry {
 	): SubtypeValue;
 
 	/** @throws UnknownType */
+	public function openValue(
+		TypeNameIdentifier $typeName,
+		Value $value
+	): OpenValue;
+
+	/** @throws UnknownType */
 	public function sealedValue(
 		TypeNameIdentifier $typeName,
-		RecordValue $value
+		Value $value
 	): SealedValue;
 }

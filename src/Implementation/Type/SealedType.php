@@ -4,7 +4,6 @@ namespace Walnut\Lang\Implementation\Type;
 
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\SealedType as SealedTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
 
@@ -12,7 +11,7 @@ final readonly class SealedType implements SealedTypeInterface, JsonSerializable
 
     public function __construct(
 	    public TypeNameIdentifier $name,
-        public RecordType         $valueType
+        public Type         $valueType
     ) {}
 
     public function isSubtypeOf(Type $ofType): bool {

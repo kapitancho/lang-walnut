@@ -5,7 +5,7 @@ InvalidDate = :[];
 InvalidTime = :[];
 InvalidDateAndTime = :[];
 
-Date <: [year: Integer, month: Integer<1..12>, day: Integer<1..31>] @ InvalidDate :: {
+Date = #[year: Integer, month: Integer<1..12>, day: Integer<1..31>] @ InvalidDate :: {
     ?whenValueOf(#.day) is {
         31: ?whenTypeOf(#.month) is {
             type{Integer[2, 4, 6, 9, 11]}: => Error(InvalidDate[]),
@@ -29,8 +29,8 @@ Date <: [year: Integer, month: Integer<1..12>, day: Integer<1..31>] @ InvalidDat
         ~: null
     }
 };
-Time <: [hour: Integer<0..23>, minute: Integer<0..59>, second: Integer<0..59>];
-DateAndTime <: [date: Date, time: Time];
+Time = #[hour: Integer<0..23>, minute: Integer<0..59>, second: Integer<0..59>];
+DateAndTime = #[date: Date, time: Time];
 
 Date ==> String :: [
     $year->asString,

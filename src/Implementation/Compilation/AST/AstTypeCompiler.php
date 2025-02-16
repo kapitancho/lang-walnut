@@ -25,6 +25,7 @@ use Walnut\Lang\Blueprint\AST\Node\Type\RealTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\RecordTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\ResultTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\SetTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\ShapeTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\StringSubsetTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\StringTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\TrueTypeNode;
@@ -92,6 +93,9 @@ final readonly class AstTypeCompiler implements AstTypeCompilerInterface {
 				$typeNode instanceof FunctionTypeNode => $this->typeRegistry->function(
 					$this->type($typeNode->parameterType),
 					$this->type($typeNode->returnType)
+				),
+				$typeNode instanceof ShapeTypeNode => $this->typeRegistry->shape(
+					$this->type($typeNode->refType)
 				),
 				$typeNode instanceof TypeTypeNode => $this->typeRegistry->type(
 					$this->type($typeNode->refType)

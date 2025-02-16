@@ -8,9 +8,9 @@ use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Type\SealedType;
+use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Value\SealedValue;
+use Walnut\Lang\Blueprint\Value\OpenValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
@@ -23,7 +23,7 @@ final readonly class Hash implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof SealedType && $targetType->name->equals(new TypeNameIdentifier('PasswordString'))) {
+		if ($targetType instanceof OpenType && $targetType->name->equals(new TypeNameIdentifier('PasswordString'))) {
 			return $programRegistry->typeRegistry->string(24, 255);
 		}
 		// @codeCoverageIgnoreStart
@@ -39,7 +39,7 @@ final readonly class Hash implements NativeMethod {
 		$targetValue = $target->value;
 
 		$targetValue = $this->toBaseValue($targetValue);
-		if ($targetValue instanceof SealedValue && $targetValue->type->name->equals(
+		if ($targetValue instanceof OpenValue && $targetValue->type->name->equals(
 			new TypeNameIdentifier('PasswordString')
 		)) {
 			$passwordString = $targetValue->value->valueOf('value');

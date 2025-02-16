@@ -244,8 +244,8 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testSealed(): void {
 		$this->assertEquals(
-			['HydrationError', 'Sealed', 'Any'],
-			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->sealed(
+			['HydrationError', 'Open', 'Any'],
+			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->open(
 				new TypeNameIdentifier('HydrationError')
 			))
 		);
@@ -410,6 +410,15 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 			['Subtype', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::Subtype
+			))
+		);
+	}
+
+	public function testTypeOpen(): void {
+		$this->assertEquals(
+			[/*'Sealed', */'Any'],
+			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
+				MetaTypeValue::Open
 			))
 		);
 	}

@@ -144,7 +144,17 @@ final class IntersectionTypeNormalizerTest extends BaseProgramTestHelper {
         ));
     }
 
-    public function testDisjointRanges(): void {
+
+	public function testAliasing(): void {
+		$this->typeRegistryBuilder->addAlias(new TypeNameIdentifier('M'), $this->typeRegistry->boolean);
+		$this->typeRegistryBuilder->addAlias(new TypeNameIdentifier('N'), $this->typeRegistry->integer());
+		self::assertEquals("(M&N)", (string)$this->intersection(
+			$this->typeRegistry->alias(new TypeNameIdentifier('M')),
+			$this->typeRegistry->alias(new TypeNameIdentifier('N')),
+		));
+	}
+
+	public function testDisjointRanges(): void {
         self::assertEquals("(Integer<1..10>&Integer<15..25>)", (string)$this->intersection(
             $this->typeRegistry->integer(1, 10),
             $this->typeRegistry->integer(15, 25),

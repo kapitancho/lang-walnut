@@ -14,13 +14,15 @@ use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\FunctionBody as FunctionBodyInterface;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Type\CustomType;
 use Walnut\Lang\Blueprint\Type\NothingType;
+use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\SealedType;
-use Walnut\Lang\Blueprint\Type\SubtypeType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnknownProperty;
+use Walnut\Lang\Blueprint\Value\CustomValue;
 use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\SealedValue;
 use Walnut\Lang\Blueprint\Value\TupleValue;
@@ -38,8 +40,8 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 
 	private Type $returnType;
 
-	private function getMapItemNotFound(TypeRegistry $typeRegistry): SealedType {
-		return $typeRegistry->sealed(new TypeNameIdentifier("MapItemNotFound"));
+	private function getMapItemNotFound(TypeRegistry $typeRegistry): OpenType {
+		return $typeRegistry->open(new TypeNameIdentifier("MapItemNotFound"));
 	}
 
 	public function analyse(
@@ -58,7 +60,7 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 			)) :
 			$type;
 
-		if ($targetType instanceof SealedType) {
+		if ($targetType instanceof CustomType) {
 			$analyserContext = $analyserContext->withAddedVariableType(
 				new VariableNameIdentifier('$$'),
 				$targetType->valueType
@@ -78,16 +80,17 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 					$type
 				);
 				$type = $this->toBaseType($type);
-				if ($type instanceof TupleType) {
-					foreach($type->types as $index => $typeItem) {
+				$t = $type instanceof OpenType ? $type->valueType : $type;
+				if ($t instanceof TupleType) {
+					foreach($t->types as $index => $typeItem) {
 						$analyserContext = $analyserContext->withAddedVariableType(
 							new VariableNameIdentifier($variableName . $index),
 							$typeItem
 						);
 					}
 				}
-				if ($type instanceof RecordType) {
-					foreach($type->types as $fieldName => $fieldType) {
+				if ($t instanceof RecordType) {
+					foreach($t->types as $fieldName => $fieldType) {
 						$analyserContext = $analyserContext->withAddedVariableType(
 							new VariableNameIdentifier($variableName . $fieldName),
 							$tConv($fieldType)
@@ -96,7 +99,10 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 				}
 			}
 		}
-		if ($targetType instanceof SealedType) {
+		if (
+			$targetType instanceof SealedType &&
+			($targetType->valueType instanceof RecordType || $targetType->valueType instanceof TupleType)
+		) {
 			foreach($targetType->valueType->types as $fieldName => $fieldType) {
 				$analyserContext = $analyserContext->withAddedVariableType(
 					new VariableNameIdentifier('$' . $fieldName),
@@ -166,7 +172,7 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 						try {
 							$value = $values[$fieldName] ??
 								$executionContext->programRegistry->valueRegistry->error(
-									$executionContext->programRegistry->valueRegistry->sealedValue(
+									$executionContext->programRegistry->valueRegistry->openValue(
 										new TypeNameIdentifier('MapItemNotFound'),
 										$executionContext->programRegistry->valueRegistry->record([
 											'key' => $executionContext->programRegistry->valueRegistry->string($fieldName)
@@ -184,12 +190,18 @@ final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializ
 				}
 			}
 		}
-		if ($targetValue && $targetValue->type instanceof SealedType && $targetValue->value instanceof SealedValue) {
-			$values = $targetValue->value->value->values;
-			foreach($targetValue->type->valueType->types as $fieldName => $fieldType) {
+		if (
+			$targetValue &&
+			$targetValue->type instanceof CustomType &&
+			(($vt = $targetValue->type->valueType) instanceof TupleType || $vt instanceof RecordType) &&
+			$targetValue->value instanceof CustomValue &&
+			(($tv = $targetValue->value->value) instanceof TupleValue || $tv instanceof RecordValue)
+		) {
+			$values = $tv->values;
+			foreach($vt->types as $fieldName => $fieldType) {
 				$value = $values[$fieldName] ??
 					$executionContext->programRegistry->valueRegistry->error(
-						$executionContext->programRegistry->valueRegistry->sealedValue(
+						$executionContext->programRegistry->valueRegistry->openValue(
 							new TypeNameIdentifier('MapItemNotFound'),
 							$executionContext->programRegistry->valueRegistry->record([
 								'key' => $executionContext->programRegistry->valueRegistry->string($fieldName)

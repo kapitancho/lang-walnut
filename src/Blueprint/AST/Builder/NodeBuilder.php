@@ -32,7 +32,9 @@ use Walnut\Lang\Blueprint\AST\Node\Module\AddAtomTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddConstructorMethodNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddEnumerationTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddMethodNode;
+use Walnut\Lang\Blueprint\AST\Node\Module\AddOpenTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddSealedTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Module\AddSubsetTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddSubtypeTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddVariableNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\AnyTypeNode;
@@ -58,6 +60,7 @@ use Walnut\Lang\Blueprint\AST\Node\Type\RealTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\RecordTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\ResultTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\SetTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\ShapeTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\StringSubsetTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\StringTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\TrueTypeNode;
@@ -173,12 +176,26 @@ interface NodeBuilder {
 
 	public function addAlias(TypeNameIdentifier $name, TypeNode $aliasedType): AddAliasTypeNode;
 
+	public function addOpen(
+		TypeNameIdentifier $name,
+		TypeNode $valueType,
+		ExpressionNode $constructorBody,
+		TypeNode|null $errorType
+	): AddOpenTypeNode;
+
 	public function addSealed(
 		TypeNameIdentifier $name,
-		RecordTypeNode $valueType,
+		TypeNode $valueType,
 		ExpressionNode $constructorBody,
 		TypeNode|null $errorType
 	): AddSealedTypeNode;
+
+	public function addSubset(
+		TypeNameIdentifier $name,
+		TypeNode $valueType,
+		ExpressionNode $constructorBody,
+		TypeNode|null $errorType
+	): AddSubsetTypeNode;
 
 	public function addSubtype(
 		TypeNameIdentifier $name,
@@ -201,6 +218,7 @@ interface NodeBuilder {
 	public function metaTypeType(MetaTypeValue $value): MetaTypeTypeNode;
 	public function intersectionType(TypeNode $left, TypeNode $right): IntersectionTypeNode;
 	public function unionType(TypeNode $left, TypeNode $right): UnionTypeNode;
+	public function shapeType(TypeNode $refType): ShapeTypeNode;
 	public function typeType(TypeNode $refType): TypeTypeNode;
 	public function proxyType(TypeNameIdentifier $typeName): ProxyTypeNode;
 	public function optionalKeyType(TypeNode $valueType): OptionalKeyTypeNode;

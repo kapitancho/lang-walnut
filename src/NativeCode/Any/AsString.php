@@ -109,7 +109,7 @@ final readonly class AsString implements NativeMethod {
 		/** @var ResultType */
 		return $programRegistry->typeRegistry->result(
 			$programRegistry->typeRegistry->string(),
-			$programRegistry->typeRegistry->sealed(new TypeNameIdentifier("CastNotAvailable"))
+			$programRegistry->typeRegistry->open(new TypeNameIdentifier("CastNotAvailable"))
 		);
 	}
 
@@ -123,7 +123,7 @@ final readonly class AsString implements NativeMethod {
 		$result = $this->evaluate($targetValue);
         return TypedValue::forValue($result === null ?
 	        $programRegistry->valueRegistry->error(
-				$programRegistry->valueRegistry->sealedValue(
+				$programRegistry->valueRegistry->openValue(
 					new TypeNameIdentifier("CastNotAvailable"),
 					$programRegistry->valueRegistry->record([
 						'from' => $programRegistry->valueRegistry->type($targetValue->type),

@@ -21,14 +21,17 @@ use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\NamedType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\NullType;
+use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\SetType;
+use Walnut\Lang\Blueprint\Type\ShapeType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
+use Walnut\Lang\Blueprint\Type\SubsetType;
 use Walnut\Lang\Blueprint\Type\SubtypeType;
 use Walnut\Lang\Blueprint\Type\TrueType;
 use Walnut\Lang\Blueprint\Type\TupleType;
@@ -57,12 +60,15 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 			EnumerationType::class => ['Enumeration'],
 			EnumerationSubsetType::class => ['Enumeration'],
 			AtomType::class => ['Atom'],
+			SubsetType::class => ['Subset'],
 			SubtypeType::class => ['Subtype'],
+			OpenType::class => ['Open'],
 			SealedType::class => ['Sealed'],
 			AliasType::class => ['Alias'],
 			FunctionType::class => ['Function'],
 			ResultType::class => ['Result'],
 			MutableType::class => ['Mutable'],
+			ShapeType::class => ['Shape'],
 			TypeType::class => ['Type'],
 			UnionType::class => ['Union'],
 			IntersectionType::class => ['Intersection'],
@@ -80,7 +86,8 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 		$k = 0;
 		$alias = null;
 		$subtype = null;
-		while ($type instanceof AliasType || $type instanceof SubtypeType) {
+		$subset = null;
+		while ($type instanceof AliasType || $type instanceof SubtypeType || $type instanceof SubsetType) {
 			$k++;
 			$baseIds[] = $type->name->identifier;
 			if ($type instanceof AliasType) {
@@ -88,19 +95,32 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 				$type = $type->aliasedType;
 				continue;
 			}
-            $subtype ??= $k;
-            $type = $type->baseType;
+			if ($type instanceof SubsetType) {
+				$subset ??= $k;
+				$type = $type->valueType;
+			} else {
+				$subtype ??= $k;
+				$type = $type->baseType;
+			}
 		}
 		if ($alias !== null) {
 			if ($subtype !== null && $subtype < $alias) {
 				$baseIds[] = 'Subtype';
 			}
+			if ($subset !== null && $subset < $alias) {
+				$baseIds[] = 'Subset';
+			}
 			$baseIds[] = 'Alias';
 			if ($subtype !== null && $subtype > $alias) {
 				$baseIds[] = 'Subtype';
 			}
+			if ($subset !== null && $subset > $alias) {
+				$baseIds[] = 'Subset';
+			}
 		} elseif ($subtype !== null) {
 			$baseIds[] = 'Subtype';
+		} elseif ($subset !== null) {
+			$baseIds[] = 'Subset';
 		}
 
 		foreach ($this->getTypeMapping() as $typeClass => $ids) {
@@ -117,6 +137,7 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 				'Union' => UnionType::class,
 				'Intersection' => IntersectionType::class,
 				'Subtype' => SubtypeType::class,
+				'Subset' => SubsetType::class,
 				'EnumerationValue' => EnumerationType::class,
 			][$type->value->value] ?? null;
 			return array_merge($baseIds,

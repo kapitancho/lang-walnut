@@ -33,6 +33,7 @@ final readonly class TypeName implements NativeMethod {
 					MetaTypeValue::Enumeration,
 					MetaTypeValue::Alias,
 					MetaTypeValue::Subtype,
+					MetaTypeValue::Open,
 					MetaTypeValue::Sealed,
 				], true)) {
 					return $programRegistry->typeRegistry->string(1);

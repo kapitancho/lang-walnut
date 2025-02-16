@@ -17,6 +17,7 @@ use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\Method;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
 use Walnut\Lang\Blueprint\Type\SealedType;
+use Walnut\Lang\Blueprint\Type\SubsetType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -75,24 +76,31 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 		$retTypedValue = $executionContext->typedValue;
 		$retValue = $executionContext->value;
 		$retType = $executionContext->valueType;
-
-		$method = $this->getMethod($executionContext->programRegistry, $retValue->type);
-		if ($method instanceof UnknownMethod) { //This is not supposed to happen
-			// @codeCoverageIgnoreStart
-			$method = $executionContext->programRegistry->methodRegistry->method($retType, $this->methodName);
+		if ($retType instanceof SubsetType) {
+			$method = $this->getMethod($executionContext->programRegistry, $retType);
 			if ($method instanceof UnknownMethod) {
-				throw new ExecutionException(
-					sprintf(
-						"Cannot call method '%s' on type '%s' for value '%s' and parameter '%s'",
-						$this->methodName,
-						$retValue->type,
-						$retValue,
-						$this->parameter
-					)
-				);
+				$method = $this->getMethod($executionContext->programRegistry, $retValue->type);
 			}
-			// @codeCoverageIgnoreEnd
+		} else {
+			$method = $this->getMethod($executionContext->programRegistry, $retValue->type);
+			if ($method instanceof UnknownMethod) {
+				$method = $this->getMethod($executionContext->programRegistry, $retType);
+				//$method = $executionContext->programRegistry->methodRegistry->method($retType, $this->methodName);
+			}
 		}
+		// @codeCoverageIgnoreStart
+		if ($method instanceof UnknownMethod) {
+			throw new ExecutionException(
+				sprintf(
+					"Cannot call method '%s' on type '%s' for value '%s' and parameter '%s'",
+					$this->methodName,
+					$retValue->type,
+					$retValue,
+					$this->parameter
+				)
+			);
+		}
+		// @codeCoverageIgnoreEnd
 
 		$executionContext = $this->parameter->execute($executionContext);
 

@@ -63,7 +63,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 		$ef = fn() => $this->expressionRegistry->functionBody(
 			$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
 		);
-		$this->typeRegistry->addSealed(
+		$this->typeRegistry->addOpen(
 			new TypeNameIdentifier('IndexOutOfRange'),
 			$this->typeRegistry->record([
 				'index' => $this->typeRegistry->integer()
@@ -71,7 +71,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 			$ef(),
 			$this->typeRegistry->nothing
 		);
-		$this->typeRegistry->addSealed(
+		$this->typeRegistry->addOpen(
 			new TypeNameIdentifier('CastNotAvailable'),
 			$this->typeRegistry->record([
 				'from' => $this->typeRegistry->type($this->typeRegistry->any),
@@ -80,7 +80,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 			$ef(),
 			$this->typeRegistry->nothing
 		);
-		$this->typeRegistry->addSealed(
+		$this->typeRegistry->addOpen(
 			new TypeNameIdentifier('MapItemNotFound'),
 			$this->typeRegistry->record([
 				'key' => $this->typeRegistry->string()
@@ -88,7 +88,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 			$ef(),
 			$this->typeRegistry->nothing
 		);
-		$this->typeRegistry->addSealed(
+		$this->typeRegistry->addOpen(
 			new TypeNameIdentifier('InvalidJsonValue'),
 			$this->typeRegistry->record([
 				'value' => $this->typeRegistry->any
@@ -96,7 +96,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 			$ef(),
 			$this->typeRegistry->nothing
 		);
-		$this->typeRegistry->addSealed(
+		$this->typeRegistry->addOpen(
 			new TypeNameIdentifier('InvalidJsonString'),
 			$this->typeRegistry->record([
 				'value' => $this->typeRegistry->string()
@@ -104,7 +104,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 			$ef(),
 			$this->typeRegistry->nothing
 		);
-		$this->typeRegistry->addSealed(
+		$this->typeRegistry->addOpen(
 			new TypeNameIdentifier('UnknownEnumerationValue'),
 			$this->typeRegistry->record([
 				'enumeration' => $this->typeRegistry->type($this->typeRegistry->any),
@@ -136,7 +136,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 			$ef(),
 			$this->typeRegistry->nothing
 		);
-		$this->typeRegistry->addSealed(
+		$this->typeRegistry->addOpen(
 			new TypeNameIdentifier('HydrationError'),
 			$this->typeRegistry->record([
 				'value' => $this->typeRegistry->any,

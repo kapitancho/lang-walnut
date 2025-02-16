@@ -59,7 +59,7 @@ final readonly class Item implements NativeMethod {
 				return $type->range->minLength > $parameterType->range->maxValue ? $returnType :
 					$programRegistry->typeRegistry->result(
 						$returnType,
-						$programRegistry->typeRegistry->sealed(
+						$programRegistry->typeRegistry->open(
 							new TypeNameIdentifier("IndexOutOfRange")
 						)
 					);
@@ -93,7 +93,7 @@ final readonly class Item implements NativeMethod {
 				return new TypedValue($type, $result);
 			}
 			return TypedValue::forValue($programRegistry->valueRegistry->error(
-				$programRegistry->valueRegistry->sealedValue(
+				$programRegistry->valueRegistry->openValue(
 					new TypeNameIdentifier('IndexOutOfRange'),
 					$programRegistry->valueRegistry->record(['index' => $parameterValue])
 				)

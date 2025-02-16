@@ -129,7 +129,7 @@ final readonly class CastAs implements NativeMethod {
 				);
 				if ($method instanceof UnknownMethod) {
 					$val = $programRegistry->valueRegistry->error(
-						$programRegistry->valueRegistry->sealedValue(
+						$programRegistry->valueRegistry->openValue(
 							new TypeNameIdentifier('CastNotAvailable'),
 							$programRegistry->valueRegistry->record([
 								'from' => $programRegistry->valueRegistry->type($targetType),

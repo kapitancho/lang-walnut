@@ -30,6 +30,7 @@ use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\NamedType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\NullType;
+use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\OptionalKeyType;
 use Walnut\Lang\Blueprint\Type\ProxyNamedType;
 use Walnut\Lang\Blueprint\Type\RealSubsetType;
@@ -38,6 +39,7 @@ use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\SetType;
+use Walnut\Lang\Blueprint\Type\ShapeType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\SubtypeType;
@@ -117,6 +119,7 @@ interface TypeRegistry {
 	public function optionalKey(Type $valueType): OptionalKeyType;
 	public function impure(Type $valueType): Type;
 	public function result(Type $returnType, Type $errorType): ResultType;
+	public function shape(Type $refType): ShapeType;
 	public function type(Type $refType): TypeType;
 
 	public function proxyType(TypeNameIdentifier $typeName): ProxyNamedType;
@@ -130,6 +133,7 @@ interface TypeRegistry {
 	/** @throws UnknownType */
 	public function subtype(TypeNameIdentifier $typeName): SubtypeType;
 	/** @throws UnknownType */
+	public function open(TypeNameIdentifier $typeName): OpenType;
 	public function sealed(TypeNameIdentifier $typeName): SealedType;
 	/** @throws UnknownType */
 	public function atom(TypeNameIdentifier $typeName): AtomType;

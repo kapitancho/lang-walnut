@@ -4,7 +4,6 @@ namespace Walnut\Lang\Blueprint\Value;
 
 use Walnut\Lang\Blueprint\Type\SealedType;
 
-interface SealedValue extends Value {
+interface SealedValue extends CustomValue {
 	public SealedType $type { get; }
-	public RecordValue $value { get; }
 }

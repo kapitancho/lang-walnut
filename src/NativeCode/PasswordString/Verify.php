@@ -8,10 +8,12 @@ use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\OpenValue;
 use Walnut\Lang\Blueprint\Value\SealedValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
@@ -25,7 +27,7 @@ final readonly class Verify implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof SealedType && $targetType->name->equals(new TypeNameIdentifier('PasswordString'))) {
+		if ($targetType instanceof OpenType && $targetType->name->equals(new TypeNameIdentifier('PasswordString'))) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
 				return $programRegistry->typeRegistry->boolean;
@@ -47,7 +49,7 @@ final readonly class Verify implements NativeMethod {
 		
 		$targetValue = $this->toBaseValue($targetValue);
 		$parameterValue = $this->toBaseValue($parameterValue);
-		if ($targetValue instanceof SealedValue && $targetValue->type->name->equals(
+		if ($targetValue instanceof OpenValue && $targetValue->type->name->equals(
 			new TypeNameIdentifier('PasswordString')
 		)) {
 			$passwordString = $targetValue->value->valueOf('value');

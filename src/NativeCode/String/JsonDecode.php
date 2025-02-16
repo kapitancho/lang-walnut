@@ -71,7 +71,7 @@ final readonly class JsonDecode implements NativeMethod {
 				);
 			} catch (JsonException) {
 				return TypedValue::forValue($programRegistry->valueRegistry->error(
-					$programRegistry->valueRegistry->sealedValue(
+					$programRegistry->valueRegistry->openValue(
 						new TypeNameIdentifier("InvalidJsonString"),
 						$programRegistry->valueRegistry->record(['value' => $targetValue])
 					)

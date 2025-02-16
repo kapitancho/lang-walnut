@@ -187,7 +187,7 @@ final readonly class WithValues implements NativeMethod {
 							$r[] = $value->name;
 						} else {
 							return TypedValue::forValue($programRegistry->valueRegistry->error(
-								$programRegistry->valueRegistry->sealedValue(
+								$programRegistry->valueRegistry->openValue(
 									new TypeNameIdentifier('UnknownEnumerationValue'),
 									$programRegistry->valueRegistry->record([
 										'enumeration' => $programRegistry->valueRegistry->type($typeValue),

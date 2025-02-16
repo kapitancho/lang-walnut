@@ -9,7 +9,6 @@ use Walnut\Lang\Blueprint\AST\Node\Expression\MatchExpressionDefaultNode as Matc
 use Walnut\Lang\Blueprint\AST\Node\Expression\MatchExpressionPairNode as MatchExpressionPairNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MethodCallExpressionNode as MethodCallExpressionNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode as FunctionBodyNodeInterface;
-use Walnut\Lang\Blueprint\AST\Node\Type\RecordTypeNode as RecordTypeNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\ValueNode;
 use Walnut\Lang\Blueprint\AST\Parser\ParserState;
@@ -48,7 +47,9 @@ use Walnut\Lang\Implementation\AST\Node\Module\AddAtomTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddConstructorMethodNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddEnumerationTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddMethodNode;
+use Walnut\Lang\Implementation\AST\Node\Module\AddOpenTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddSealedTypeNode;
+use Walnut\Lang\Implementation\AST\Node\Module\AddSubsetTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddSubtypeTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddVariableNode;
 use Walnut\Lang\Implementation\AST\Node\SourceLocation;
@@ -75,6 +76,7 @@ use Walnut\Lang\Implementation\AST\Node\Type\RealTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\RecordTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\ResultTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\SetTypeNode;
+use Walnut\Lang\Implementation\AST\Node\Type\ShapeTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\StringSubsetTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\StringTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\TrueTypeNode;
@@ -395,13 +397,43 @@ final class NodeBuilder implements NodeBuilderInterface {
 		);
 	}
 
+	public function addOpen(
+		TypeNameIdentifier $name,
+		TypeNode $valueType,
+		ExpressionNode $constructorBody,
+		TypeNode|null $errorType
+	): AddOpenTypeNode {
+		return new AddOpenTypeNode(
+			$this->getSourceLocation(),
+			$name,
+			$valueType,
+			$this->generateConstructorBody($constructorBody),
+			$errorType ?? $this->nothingType
+		);
+	}
+
 	public function addSealed(
 		TypeNameIdentifier $name,
-		RecordTypeNodeInterface $valueType,
+		TypeNode $valueType,
 		ExpressionNode $constructorBody,
 		TypeNode|null $errorType
 	): AddSealedTypeNode {
 		return new AddSealedTypeNode(
+			$this->getSourceLocation(),
+			$name,
+			$valueType,
+			$this->generateConstructorBody($constructorBody),
+			$errorType ?? $this->nothingType
+		);
+	}
+
+	public function addSubset(
+		TypeNameIdentifier $name,
+		TypeNode $valueType,
+		ExpressionNode $constructorBody,
+		TypeNode|null $errorType
+	): AddSubsetTypeNode {
+		return new AddSubsetTypeNode(
 			$this->getSourceLocation(),
 			$name,
 			$valueType,
@@ -496,6 +528,13 @@ final class NodeBuilder implements NodeBuilderInterface {
 			$this->getSourceLocation(),
 			$left,
 			$right
+		);
+	}
+
+	public function shapeType(TypeNode $refType): ShapeTypeNode {
+		return new ShapeTypeNode(
+			$this->getSourceLocation(),
+			$refType
 		);
 	}
 

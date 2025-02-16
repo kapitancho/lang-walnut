@@ -11,15 +11,17 @@ use Walnut\Lang\Blueprint\Function\Method;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\NothingType;
+use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\SealedType;
+use Walnut\Lang\Blueprint\Type\SubsetType;
 use Walnut\Lang\Blueprint\Type\SubtypeType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\TypeType;
+use Walnut\Lang\Blueprint\Type\UserType;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
-use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Implementation\Type\Helper\TupleAsRecord;
@@ -34,8 +36,8 @@ final readonly class Construct implements NativeMethod {
 	): Type {
 		if ($parameterType instanceof TypeType) {
 			$t = $parameterType->refType;
-			if ($t instanceof SealedType || $t instanceof SubtypeType) {
-				$b = $t instanceof SealedType ? $t->valueType : $t->baseType;
+			if ($t instanceof UserType || $t instanceof SubtypeType) {
+				$b = $t instanceof UserType ? $t->valueType : $t->baseType;
 
 				$constructorType = $programRegistry->typeRegistry->typeByName(new TypeNameIdentifier('Constructor'));
 
@@ -129,13 +131,14 @@ final readonly class Construct implements NativeMethod {
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
+		$targetValueType = $target->type;
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 
 		if ($parameterValue instanceof TypeValue) {
 			$t = $parameterValue->typeValue;
 
-			if ($t instanceof SealedType || $t instanceof SubtypeType) {
+			if ($t instanceof UserType || $t instanceof SubtypeType) {
 				$constructorType = $programRegistry->typeRegistry->atom(new TypeNameIdentifier('Constructor'));
 				$constructorMethod = $programRegistry->methodRegistry->method(
 					$constructorType,
@@ -176,13 +179,61 @@ final readonly class Construct implements NativeMethod {
 						$targetValue,
 						$t->valueType,
 					);
+					$targetValueType = $targetValue->type;
 				}
-				if ($targetValue instanceof RecordValue && $targetValue->type->isSubtypeOf($t->valueType)) {
+				if ($targetValueType->isSubtypeOf($t->valueType) ||
+					$targetValue->type->isSubtypeOf($t->valueType)
+				) {
 					return new TypedValue(
 						$t,
 						$programRegistry->valueRegistry->sealedValue(
 							$t->name, $targetValue
 						)
+					);
+				}
+				// @codeCoverageIgnoreStart
+				throw new ExecutionException(sprintf("Invalid target value: %s, %s expected",
+					$targetValueType,
+					$t->valueType
+				));
+				// @codeCoverageIgnoreEnd
+			}
+			if ($t instanceof OpenType) {
+				if ($targetValue instanceof TupleValue && $t->valueType instanceof RecordType) {
+					$targetValue = $this->getTupleAsRecord(
+						$programRegistry->valueRegistry,
+						$targetValue,
+						$t->valueType,
+					);
+					$targetValueType = $targetValue->type;
+				}
+				if ($targetValueType->isSubtypeOf($t->valueType)) {
+					return new TypedValue(
+						$t,
+						$programRegistry->valueRegistry->openValue(
+							$t->name, $targetValue
+						)
+					);
+				}
+				// @codeCoverageIgnoreStart
+				throw new ExecutionException(sprintf("Invalid target value: %s, %s expected",
+					$targetValueType,
+					$t->valueType
+				));
+				// @codeCoverageIgnoreEnd
+			}
+			if ($t instanceof SubsetType) {
+				if ($targetValue instanceof TupleValue && $t->valueType instanceof RecordType) {
+					$targetValue = $this->getTupleAsRecord(
+						$programRegistry->valueRegistry,
+						$targetValue,
+						$t->valueType,
+					);
+				}
+				if ($targetValue->type->isSubtypeOf($t->valueType)) {
+					return new TypedValue(
+						$t,
+						 $targetValue
 					);
 				}
 				// @codeCoverageIgnoreStart

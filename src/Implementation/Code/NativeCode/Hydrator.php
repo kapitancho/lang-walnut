@@ -26,6 +26,7 @@ use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\NullType;
+use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\OptionalKeyType;
 use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
@@ -35,6 +36,7 @@ use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\SetType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
+use Walnut\Lang\Blueprint\Type\SubsetType;
 use Walnut\Lang\Blueprint\Type\SubtypeType;
 use Walnut\Lang\Blueprint\Type\TrueType;
 use Walnut\Lang\Blueprint\Type\TupleType;
@@ -101,7 +103,9 @@ final readonly class Hydrator {
 			$targetType instanceof UnionType => $this->hydrateUnion(...),
 			$targetType instanceof AliasType => $this->hydrateAlias(...),
 			$targetType instanceof ResultType => $this->hydrateResult(...),
+			$targetType instanceof SubsetType => $this->hydrateSubset(...),
 			$targetType instanceof SubtypeType => $this->hydrateSubtype(...),
+			$targetType instanceof OpenType => $this->hydrateOpen(...),
 			$targetType instanceof SealedType => $this->hydrateSealed(...),
 			// @codeCoverageIgnoreStart
 			default => throw new HydrationException(
@@ -306,6 +310,56 @@ final readonly class Hydrator {
 		}
 	}
 
+	private function hydrateSubset(Value $value, SubsetType $targetType, string $hydrationPath): Value {
+		$method = $this->programRegistry->methodRegistry->method(
+			$this->programRegistry->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
+			new MethodNameIdentifier(
+				sprintf('as%s', $targetType->name)
+			)
+		);
+		if ($method instanceof Method) {
+			$result = $method->execute(
+				$this->programRegistry,
+				TypedValue::forValue($value),
+				TypedValue::forValue($this->programRegistry->valueRegistry->null)
+			);
+			$resultValue = $result->value;
+			if ($resultValue instanceof ErrorValue) {
+				throw new HydrationException(
+					$value,
+					$hydrationPath,
+					sprintf("Subset hydration failed. Error: %s", $resultValue->errorValue)
+				//TODO - consider a better error message
+				);
+			}
+			return $resultValue;
+		}
+
+		$baseValue = $this->hydrateValue($value, $targetType->valueType, $hydrationPath);
+
+		$constructorType = $this->programRegistry->typeRegistry->atom(new TypeNameIdentifier('Constructor'));
+		$validatorMethod = $this->programRegistry->methodRegistry->method(
+			$constructorType,
+			new MethodNameIdentifier('as' . $targetType->name->identifier)
+		);
+		if ($validatorMethod instanceof Method) {
+			$result = $validatorMethod->execute(
+				$this->programRegistry,
+				TypedValue::forValue($constructorType->value),
+				TypedValue::forValue($baseValue),
+			);
+			$resultValue = $result->value;
+			if ($resultValue instanceof ErrorValue) {
+				throw new HydrationException(
+					$baseValue,
+					$hydrationPath,
+					sprintf('Value construction failed. Error: %s', $resultValue->errorValue)
+				);
+			}
+		}
+		return $baseValue;
+	}
+
 	private function hydrateSubtype(Value $value, SubtypeType $targetType, string $hydrationPath): Value {
 		$method = $this->programRegistry->methodRegistry->method(
 			$this->programRegistry->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
@@ -359,6 +413,57 @@ final readonly class Hydrator {
 		);
 	}
 
+	private function hydrateOpen(Value $value, OpenType $targetType, string $hydrationPath): Value {
+		$method = $this->programRegistry->methodRegistry->method(
+			$this->programRegistry->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
+			new MethodNameIdentifier(
+				sprintf('as%s', $targetType->name)
+			)
+		);
+		if ($method instanceof Method) {
+			$result = $method->execute(
+				$this->programRegistry,
+				TypedValue::forValue($value),
+				TypedValue::forValue($this->programRegistry->valueRegistry->null)
+			);
+			$resultValue = $result->value;
+			if ($resultValue instanceof ErrorValue) {
+				throw new HydrationException(
+					$value,
+					$hydrationPath,
+					sprintf("Open type hydration failed. Error: %s", $resultValue->errorValue)
+				//TODO - consider a better error message
+				);
+			}
+			return $resultValue;
+		}
+		$baseValue = $this->hydrateValue($value, $targetType->valueType, $hydrationPath);
+		$constructorType = $this->programRegistry->typeRegistry->atom(new TypeNameIdentifier('Constructor'));
+		$validatorMethod = $this->programRegistry->methodRegistry->method(
+			$constructorType,
+			new MethodNameIdentifier('as' . $targetType->name->identifier)
+		);
+		if ($validatorMethod instanceof Method) {
+			$result = $validatorMethod->execute(
+				$this->programRegistry,
+				TypedValue::forValue($constructorType->value),
+				TypedValue::forValue($baseValue),
+			);
+			$resultValue = $result->value;
+			if ($resultValue instanceof ErrorValue) {
+				throw new HydrationException(
+					$baseValue,
+					$hydrationPath,
+					sprintf('Value construction failed. Error: %s', $resultValue->errorValue)
+				);
+			}
+		}
+		return $this->programRegistry->valueRegistry->openValue(
+			$targetType->name,
+			$baseValue
+		);
+	}
+
 	private function hydrateSealed(Value $value, SealedType $targetType, string $hydrationPath): Value {
 		$method = $this->programRegistry->methodRegistry->method(
 			$this->programRegistry->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
@@ -384,40 +489,30 @@ final readonly class Hydrator {
 			return $resultValue;
 		}
 		$baseValue = $this->hydrateValue($value, $targetType->valueType, $hydrationPath);
-		if ($baseValue instanceof RecordValue) {
-			$constructorType = $this->programRegistry->typeRegistry->atom(new TypeNameIdentifier('Constructor'));
-			$validatorMethod = $this->programRegistry->methodRegistry->method(
-				$constructorType,
-				new MethodNameIdentifier('as' . $targetType->name->identifier)
-			);
-			if ($validatorMethod instanceof Method) {
-				$result = $validatorMethod->execute(
-					$this->programRegistry,
-					TypedValue::forValue($constructorType->value),
-					TypedValue::forValue($baseValue),
-				);
-				$resultValue = $result->value;
-				if ($resultValue instanceof ErrorValue) {
-					throw new HydrationException(
-						$baseValue,
-						$hydrationPath,
-						sprintf('Value construction failed. Error: %s', $resultValue->errorValue)
-					);
-				}
-			}
-			return $this->programRegistry->valueRegistry->sealedValue(
-				$targetType->name,
-				$baseValue
-			);
-		}
-		// This should not be reachable
-		// @codeCoverageIgnoreStart
-		throw new HydrationException(
-			$value,
-			$hydrationPath,
-			"The value should be a record"
+		$constructorType = $this->programRegistry->typeRegistry->atom(new TypeNameIdentifier('Constructor'));
+		$validatorMethod = $this->programRegistry->methodRegistry->method(
+			$constructorType,
+			new MethodNameIdentifier('as' . $targetType->name->identifier)
 		);
-		// @codeCoverageIgnoreEnd
+		if ($validatorMethod instanceof Method) {
+			$result = $validatorMethod->execute(
+				$this->programRegistry,
+				TypedValue::forValue($constructorType->value),
+				TypedValue::forValue($baseValue),
+			);
+			$resultValue = $result->value;
+			if ($resultValue instanceof ErrorValue) {
+				throw new HydrationException(
+					$baseValue,
+					$hydrationPath,
+					sprintf('Value construction failed. Error: %s', $resultValue->errorValue)
+				);
+			}
+		}
+		return $this->programRegistry->valueRegistry->sealedValue(
+			$targetType->name,
+			$baseValue
+		);
 	}
 
 	private function hydrateMutable(Value $value, MutableType $targetType, string $hydrationPath): MutableValue {

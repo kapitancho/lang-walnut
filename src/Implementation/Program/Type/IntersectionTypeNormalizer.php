@@ -47,7 +47,7 @@ final readonly class IntersectionTypeNormalizer {
                 $xType = $xType->aliasedType;
             }
             $pTypes = $xType instanceof IntersectionTypeInterface ?
-                $this->parseTypes($xType->types) : [$xType];
+                $this->parseTypes($xType->types) : [$type];
             foreach ($pTypes as $tx) {
                 foreach ($queue as $qt) {
                     if ($qt->isSubtypeOf($tx)) {

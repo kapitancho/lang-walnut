@@ -19,7 +19,8 @@ enum Token: string {
 	case atom_type = '\:\[]';
 	case enum_type_start = '\:\[';
 	case colon = '\:';
-	case boolean_op = '(!|&&|\|\||\^\^)';
+	case boolean_op_not = '\!';
+	case boolean_op = '(&&|\|\||\^\^)';
 	case lambda_param = '\^';
 	case lambda_return = '\=\>';
 	case error_as_external = '\*\>';

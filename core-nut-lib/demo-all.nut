@@ -12,6 +12,12 @@ MyAtom = :[];
 MyEnum = :[Value1, Value2, Value3];
 
 /* Sealed types */
+MyOpen = #[a: Integer, b: Integer] @ MyAtom :: null;
+MyOpen0 = #[a: Integer, b: Integer];
+MyOpen1 = #[a: Integer, b: Integer];
+MyOpen1[a: Real, b: Real] :: [a: #a->asInteger, b: #b->asInteger];
+
+/* Sealed types */
 MySealed = $[a: Integer, b: Integer] @ MyAtom :: null;
 MySealed0 = $[a: Integer, b: Integer];
 MySealed1 = $[a: Integer, b: Integer];
@@ -27,6 +33,7 @@ MySubtype1(String) :: #->reverse;
 MyAtom->myMethod(^String => Integer) %% MyAtom :: #->length;
 
 /* Constructors */
+MyOpen[a: Real, b: Real] %% MyAtom :: [a: #a->asInteger, b: #b->asInteger];
 MySealed[a: Real, b: Real] %% MyAtom :: [a: #a->asInteger, b: #b->asInteger];
 
 functionName = ^Any => String :: 'function call result';
@@ -66,6 +73,7 @@ AllTypes = [
     atom: MyAtom,
     enumeration: MyEnum,
     enumerationSubset: MyEnum[Value1, Value2],
+    open: MyOpen0,
     sealed: MySealed0,
     subtype: MySubtype0,
     integer: Integer,
@@ -115,6 +123,7 @@ AllTypes = [
     anyAtom: Type<Atom>,
     anyEnumeration: Type<Enumeration>,
     anyEnumerationSubset: Type<EnumerationSubset>,
+    anyOpen: Type<Open>,
     anySealed: Type<Sealed>,
     anySubtype: Type<Subtype>,
     anyNamed: Type<Named>,
@@ -136,6 +145,7 @@ getMatchingValuesForAllTypes = ^Null => AllTypes :: [
     atom: MyAtom[],
     enumeration: MyEnum.Value1,
     enumerationSubset: MyEnum.Value1,
+    open: MyOpen0[a: 3, b: -2],
     sealed: MySealed0[a: 3, b: -2],
     subtype: MySubtype0('value'),
     integer: 5,
@@ -185,6 +195,7 @@ getMatchingValuesForAllTypes = ^Null => AllTypes :: [
     anyAtom: type{MyAtom},
     anyEnumeration: type{MyEnum},
     anyEnumerationSubset: type{MyEnum[Value1, Value2]},
+    anyOpen: type{MyOpen},
     anySealed: type{MySealed},
     anySubtype: type{MySubtype},
     anyNamed: type{MyAtom},
@@ -201,6 +212,7 @@ getAllValues = ^Any => Any :: [
     booleanTrue: true,
     booleanFalse: false,
     enumeration: MyEnum.Value1,
+    open: MyOpen[a: 3, b: -2],
     sealed: MySealed[a: 3, b: -2],
     subtype: MySubtype('value'),
     integer: 42,

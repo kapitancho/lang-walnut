@@ -107,6 +107,15 @@ final class UnionTypeNormalizerTest extends BaseProgramTestHelper {
         ));
     }
 
+    public function testAliasing(): void {
+	    $this->typeRegistryBuilder->addAlias(new TypeNameIdentifier('M'), $this->typeRegistry->boolean);
+	    $this->typeRegistryBuilder->addAlias(new TypeNameIdentifier('N'), $this->typeRegistry->integer());
+        self::assertEquals("(M|N)", (string)$this->union(
+	        $this->typeRegistry->alias(new TypeNameIdentifier('M')),
+	        $this->typeRegistry->alias(new TypeNameIdentifier('N')),
+        ));
+    }
+
     public function testDisjointRanges(): void {
         self::assertEquals("(Integer<1..10>|Integer<15..25>)", (string)$this->union(
             $this->typeRegistry->integer(1, 10),

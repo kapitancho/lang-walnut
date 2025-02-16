@@ -43,15 +43,15 @@ final readonly class Item implements NativeMethod {
 				$programRegistry->typeRegistry->any
 			);
 		}
-		$mapItemNotFound = $programRegistry->typeRegistry->sealed(new TypeNameIdentifier("MapItemNotFound"));
+		$mapItemNotFound = $programRegistry->typeRegistry->open(new TypeNameIdentifier("MapItemNotFound"));
 		if ($type instanceof MapType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
 				$returnType = $type->itemType;
 				if ($targetType instanceof RecordType && $parameterType instanceof StringSubsetType) {
-					$tConv = fn(Type $type): Type => $type instanceof OptionalKeyType ?
-						$programRegistry->typeRegistry->result($type->valueType, $mapItemNotFound) :
-						$type;
+					$tConv = fn(Type $fType): Type => $fType instanceof OptionalKeyType ?
+						$programRegistry->typeRegistry->result($fType->valueType, $mapItemNotFound) :
+						$fType;
 					$returnType = $programRegistry->typeRegistry->union(
 						array_map(
 							static fn(string $value) => $tConv(
@@ -70,7 +70,7 @@ final readonly class Item implements NativeMethod {
 				}
 				return $programRegistry->typeRegistry->result($returnType, $mapItemNotFound);
 			}
-		throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
+			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -99,7 +99,7 @@ final readonly class Item implements NativeMethod {
 				return new TypedValue($type, $result);
 			}
 			return TypedValue::forValue($programRegistry->valueRegistry->error(
-				$programRegistry->valueRegistry->sealedValue(
+				$programRegistry->valueRegistry->openValue(
 					new TypeNameIdentifier('MapItemNotFound'),
 					$programRegistry->valueRegistry->record(['key' => $parameterValue])
 				)

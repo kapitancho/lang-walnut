@@ -14,7 +14,7 @@ final class SealedValue implements SealedValueInterface, JsonSerializable {
     public function __construct(
 		private readonly TypeRegistry $typeRegistry,
 		private readonly TypeNameIdentifier $typeName,
-	    public readonly RecordValue $value
+	    public readonly Value $value
     ) {}
 
 	public SealedType $type {

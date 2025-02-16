@@ -34,7 +34,7 @@ final readonly class CompileTimeType implements NativeMethod {
 		if ($parameterValue instanceof NullValue) {
 			return TypedValue::forValue(
 				$programRegistry->valueRegistry->type(
-					$this->analyse($target->type, $parameter->type)
+					$this->analyse($programRegistry, $target->type, $parameter->type)
 				)
 			);
 		}

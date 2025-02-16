@@ -24,7 +24,7 @@ final readonly class AsMutableOfType implements NativeMethod {
 				//$programRegistry->typeRegistry->type(
 					$programRegistry->typeRegistry->metaType(MetaTypeValue::MutableValue)
 				/*)*/,
-				$programRegistry->typeRegistry->sealed(new TypeNameIdentifier("CastNotAvailable"))
+				$programRegistry->typeRegistry->open(new TypeNameIdentifier("CastNotAvailable"))
 			);
 		}
 		throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -46,7 +46,7 @@ final readonly class AsMutableOfType implements NativeMethod {
 				));
 			}
 			return TypedValue::forValue($programRegistry->valueRegistry->error(
-				$programRegistry->valueRegistry->sealedValue(
+				$programRegistry->valueRegistry->openValue(
 					new TypeNameIdentifier("CastNotAvailable"),
 					$programRegistry->valueRegistry->record([
 						'from' => $programRegistry->valueRegistry->type($targetValue->type),

@@ -12,6 +12,7 @@ use Walnut\Lang\Blueprint\Program\Registry\CustomMethodRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\NothingType;
+use Walnut\Lang\Blueprint\Type\SubsetType;
 use Walnut\Lang\Blueprint\Type\SubtypeType;
 
 final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterface {
@@ -29,12 +30,16 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 						$method->parameterType,
 						$method->returnType
 					);
-					while ($sub instanceof SubtypeType || $sub instanceof AliasType) {
+					while ($sub instanceof SubtypeType || $sub instanceof SubsetType || $sub instanceof AliasType) {
 						if ($sub instanceof AliasType) {
 							$sub = $sub->aliasedType;
 							continue;
 						}
-						$sub = $sub->baseType;
+						if ($sub instanceof SubsetType) {
+							$sub = $sub->valueType;
+						} else {
+							$sub = $sub->baseType;
+						}
 						$existingMethod = $this->programRegistry->methodRegistry->method($sub, $method->methodName);
 						if ($existingMethod instanceof CustomMethodInterface) {
 							$existingMethodFnType = $this->programRegistry->typeRegistry->function(

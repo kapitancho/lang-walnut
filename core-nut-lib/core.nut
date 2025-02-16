@@ -31,24 +31,24 @@ DependencyContainerError->errorType(=> DependencyContainerErrorType) :: $errorTy
 
 /* json value */
 JsonValue = Null|Boolean|Integer|Real|String|Array<`JsonValue>|Map<`JsonValue>|Set<`JsonValue>/*|Result<Nothing, `JsonValue>*/|Mutable<`JsonValue>;
-InvalidJsonString = $[value: String];
+InvalidJsonString = #[value: String];
 InvalidJsonString->value(=> String) :: $value;
-InvalidJsonValue = $[value: Any];
+InvalidJsonValue = #[value: Any];
 
 /* arrays and maps */
-IndexOutOfRange = $[index: Integer];
-MapItemNotFound = $[key: String];
+IndexOutOfRange = #[index: Integer];
+MapItemNotFound = #[key: String];
 ItemNotFound = :[];
 SubstringNotInString = :[];
 
 /* casts */
-CastNotAvailable = $[from: Type, to: Type];
+CastNotAvailable = #[from: Type, to: Type];
 
 /* enumerations */
-UnknownEnumerationValue = $[enumeration: Type, value: String];
+UnknownEnumerationValue = #[enumeration: Type, value: String];
 
 /* hydration */
-HydrationError = $[value: Any, hydrationPath: String, errorMessage: String];
+HydrationError = #[value: Any, hydrationPath: String, errorMessage: String];
 HydrationError->errorMessage(=> String) :: ''->concatList[
     'Error in ', $hydrationPath, ': ', $errorMessage
 ];
@@ -60,5 +60,5 @@ ExternalError = $[errorType: String, originalError: Any, errorMessage: String];
 Random = :[];
 
 /* Password handling */
-PasswordString = $[value: String];
+PasswordString = #[value: String];
 

@@ -10,6 +10,7 @@ use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 interface ProgramRegistry {
 	public TypeRegistry $typeRegistry { get; }
 	public ValueRegistry $valueRegistry { get; }
+	public MethodRegistry $methodRegistry { get; }
 	public VariableValueScope $globalScope { get; }
 
 	public AnalyserContext $analyserContext { get; }

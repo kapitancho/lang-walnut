@@ -33,7 +33,7 @@ final readonly class ValueWithName implements NativeMethod {
 				if ($refType->value === MetaTypeValue::Enumeration || $refType->value === MetaTypeValue::EnumerationSubset) {
 					return $programRegistry->typeRegistry->result(
 						$programRegistry->typeRegistry->any,
-						$programRegistry->typeRegistry->sealed(
+						$programRegistry->typeRegistry->open(
 							new TypeNameIdentifier('UnknownEnumerationValue'),
 						)
 					);
@@ -43,7 +43,7 @@ final readonly class ValueWithName implements NativeMethod {
 				if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
 					return $programRegistry->typeRegistry->result(
 						$programRegistry->typeRegistry->enumeration($refType->enumeration->name),
-						$programRegistry->typeRegistry->sealed(
+						$programRegistry->typeRegistry->open(
 							new TypeNameIdentifier('UnknownEnumerationValue'),
 						)
 					);
@@ -72,7 +72,7 @@ final readonly class ValueWithName implements NativeMethod {
 				if ($refType instanceof EnumerationSubsetType) {
 					return TypedValue::forValue($refType->subsetValues[$parameterValue->literalValue] ??
 						$programRegistry->valueRegistry->error(
-							$programRegistry->valueRegistry->sealedValue(
+							$programRegistry->valueRegistry->openValue(
 								new TypeNameIdentifier('UnknownEnumerationValue'),
 								$programRegistry->valueRegistry->record([
 									'enumeration' => $programRegistry->valueRegistry->type($refType),

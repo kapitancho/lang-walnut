@@ -10,9 +10,12 @@ use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\MutableType;
-use Walnut\Lang\Blueprint\Type\SealedType as SealedTypeInterface;
+use Walnut\Lang\Blueprint\Type\OpenType;
+use Walnut\Lang\Blueprint\Type\SealedType;
+use Walnut\Lang\Blueprint\Type\SubsetType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Type\TypeType;
+use Walnut\Lang\Blueprint\Type\UserType;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
@@ -27,19 +30,17 @@ final readonly class ValueType implements NativeMethod {
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
-			if ($refType instanceof SealedTypeInterface) {
+			if ($refType instanceof UserType || $refType instanceof MutableType) {
 				return $programRegistry->typeRegistry->type($refType->valueType);
 			}
 			if ($refType instanceof MetaType) {
-				if ($refType->value === MetaTypeValue::Sealed) {
+				if ($refType->value === MetaTypeValue::Open ||
+					$refType->value === MetaTypeValue::Sealed ||
+					$refType->value === MetaTypeValue::Subset ||
+					$refType->value === MetaTypeValue::MutableValue
+				) {
 					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->any);
 				}
-				if ($refType->value === MetaTypeValue::MutableValue) {
-					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->any);
-				}
-			}
-			if ($refType instanceof MutableType) {
-				return $programRegistry->typeRegistry->type($refType->valueType);
 			}
 		}
 		// @codeCoverageIgnoreStart
@@ -56,10 +57,11 @@ final readonly class ValueType implements NativeMethod {
 
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
-			if ($typeValue instanceof SealedTypeInterface) {
-				return TypedValue::forValue($programRegistry->valueRegistry->type($typeValue->valueType));
-			}
-			if ($typeValue instanceof MutableType) {
+			if ($typeValue instanceof OpenType ||
+				$typeValue instanceof SealedType ||
+				$typeValue instanceof SubsetType ||
+				$typeValue instanceof MutableType
+			) {
 				return TypedValue::forValue($programRegistry->valueRegistry->type($typeValue->valueType));
 			}
 		}

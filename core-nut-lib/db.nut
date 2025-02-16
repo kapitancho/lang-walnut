@@ -1,6 +1,6 @@
 module db:
 
-DatabaseConnection <: [dsn: String];
+DatabaseConnection = #[dsn: String];
 DatabaseConnector = $[connection: DatabaseConnection];
 
 DatabaseSqlQuery = String<1..>;
@@ -9,7 +9,7 @@ DatabaseQueryBoundParameters = Array<DatabaseValue>|Map<DatabaseValue>;
 DatabaseQueryCommand = [query: DatabaseSqlQuery, boundParameters: DatabaseQueryBoundParameters];
 DatabaseQueryResultRow = Map<DatabaseValue>;
 DatabaseQueryResult = Array<DatabaseQueryResultRow>;
-DatabaseQueryFailure = $[query: DatabaseSqlQuery, boundParameters: DatabaseQueryBoundParameters, error: String];
+DatabaseQueryFailure = #[query: DatabaseSqlQuery, boundParameters: DatabaseQueryBoundParameters, error: String];
 DatabaseQueryFailure->error(=> String) :: $error;
 
 DatabaseQueryFailure ==> ExternalError :: ExternalError[

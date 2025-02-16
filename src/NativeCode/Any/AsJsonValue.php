@@ -96,7 +96,7 @@ final readonly class AsJsonValue implements NativeMethod {
 			return $programRegistry->valueRegistry->string($value->name->identifier);
 		}
 		throw new FunctionReturn($programRegistry->valueRegistry->error(
-			$programRegistry->valueRegistry->sealedValue(
+			$programRegistry->valueRegistry->openValue(
 				new TypeNameIdentifier('InvalidJsonValue'),
 				$programRegistry->valueRegistry->record(['value' => $value])
 			)
