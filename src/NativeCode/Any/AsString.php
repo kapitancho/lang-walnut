@@ -6,6 +6,7 @@ use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
@@ -30,6 +31,12 @@ final readonly class AsString implements NativeMethod {
 		$baseTargetType = $this->toBaseType($targetType);
 		if ($baseTargetType instanceof StringSubsetType || $baseTargetType instanceof StringType) {
 			return $baseTargetType;
+		}
+		if ($baseTargetType instanceof MutableType && (
+				$baseTargetType->valueType instanceof StringType ||
+				$baseTargetType->valueType instanceof StringSubsetType
+			)) {
+			return $baseTargetType->valueType;
 		}
 		$subsetValues = $this->castAsString->detectSubsetType($targetType);
 		if (is_array($subsetValues)) {

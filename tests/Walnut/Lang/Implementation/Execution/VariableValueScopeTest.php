@@ -70,7 +70,7 @@ final class VariableValueScopeTest extends TestCase {
 
 	public function testTypeOf(): void {
 		self::assertEquals(
-			$this->typeRegistry->integer(),
+			$this->typeRegistry->integerSubset([123]),
 			$this->variableValueScope->typeOf(new VariableNameIdentifier('x'))
 		);
 	}
@@ -103,7 +103,7 @@ final class VariableValueScopeTest extends TestCase {
 		);
 		self::assertEquals(['x', 'y'], $variableValueScope->variables());
 		self::assertEquals(
-			$this->typeRegistry->string(),
+			$this->typeRegistry->stringSubset(['abc']),
 			$variableValueScope->typeOf(new VariableNameIdentifier('y'))
 		);
 		self::assertEquals(

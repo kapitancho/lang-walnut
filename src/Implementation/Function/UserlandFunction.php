@@ -16,11 +16,7 @@ use Walnut\Lang\Blueprint\Function\FunctionContextFiller;
 use Walnut\Lang\Blueprint\Function\UserlandFunction as UserlandFunctionInterface;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyError;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\UnresolvableDependency;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
-use Walnut\Lang\Blueprint\Type\IntersectionType;
 use Walnut\Lang\Blueprint\Type\NothingType;
-use Walnut\Lang\Blueprint\Type\ResultType;
-use Walnut\Lang\Blueprint\Type\ShapeType;
 use Walnut\Lang\Blueprint\Type\Type;
 
 final readonly class UserlandFunction implements UserlandFunctionInterface {
@@ -145,8 +141,8 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 
 		$executionContext = $this->functionContextFiller->fillExecutionContext(
 			$executionContext,
-			$targetValue?->withAdditionalType($this->targetType),
-			$parameterValue->withAdditionalType($this->parameterType),
+			$targetValue?->withType($this->targetType),
+			$parameterValue->withType($this->parameterType),
 			$this->parameterName,
 			$dependencyValue
 		);
