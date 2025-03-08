@@ -10,6 +10,7 @@ use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\ResultType;
+use Walnut\Lang\Blueprint\Type\ShapeType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnionType as UnionTypeInterface;
@@ -75,6 +76,10 @@ final readonly class UnionTypeNormalizer {
 							$this->normalize(... $returnTypes),
 							$this->normalize(... $errorTypes),
 						);
+                    } else if ($q instanceof ShapeType && $tx instanceof ShapeType) {
+	                    array_splice($queue, $ql, 1);
+	                    $shapeType = $this->normalize($q->refType, $tx->refType);
+	                    $tx = $this->typeRegistry->shape($shapeType);
                     } else if ($q instanceof IntegerType && $tx instanceof IntegerType) {
                         $newRange = $q->range->tryRangeUnionWith($tx->range);
                         if ($newRange) {

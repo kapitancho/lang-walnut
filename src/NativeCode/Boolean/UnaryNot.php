@@ -42,7 +42,6 @@ final readonly class UnaryNot implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof BooleanValue) {
             return TypedValue::forValue($programRegistry->valueRegistry->boolean(!$targetValue->literalValue));
 		}

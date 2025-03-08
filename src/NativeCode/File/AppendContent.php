@@ -50,11 +50,9 @@ final readonly class AppendContent implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof SealedValue && $targetValue->type->name->equals(
 			new TypeNameIdentifier('File')
 		)) {
-			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof StringValue) {
 				$path = $targetValue->value->valueOf('path')->literalValue;
 				$result = @file_put_contents($path, $parameterValue->literalValue, FILE_APPEND);

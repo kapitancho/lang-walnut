@@ -50,7 +50,6 @@ final readonly class WithRemoved implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof SetValue) {
 			$values = $targetValue->valueSet;
 			$key = (string)$parameterValue;

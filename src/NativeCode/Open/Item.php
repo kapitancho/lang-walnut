@@ -120,7 +120,6 @@ final readonly class Item implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof OpenValue) {
 			$baseValue = $targetValue->value;
 			if ($baseValue instanceof TupleValue && $parameterValue instanceof IntegerValue) {
@@ -133,7 +132,7 @@ final readonly class Item implements NativeMethod {
 						$targetType instanceof ArrayType => $targetType->itemType,
 						default => $result->type
 					};
-					return new TypedValue($type, $result);
+					return TypedValue::forValue($result)->withType($type);
 				}
 				return TypedValue::forValue($programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->openValue(
@@ -152,10 +151,10 @@ final readonly class Item implements NativeMethod {
 						$targetType instanceof MapType => $targetType->itemType,
 						default => $result->type
 					};
-					return new TypedValue($type, $result);
+					return TypedValue::forValue($result)->withType($type);
 				}
 				return TypedValue::forValue($programRegistry->valueRegistry->error(
-					$programRegistry->valueRegistry->sealedValue(
+					$programRegistry->valueRegistry->openValue(
 						new TypeNameIdentifier('MapItemNotFound'),
 						$programRegistry->valueRegistry->record(['key' => $parameterValue])
 					)

@@ -48,7 +48,6 @@ final readonly class Flip implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
 			$values = $targetValue->values;
 

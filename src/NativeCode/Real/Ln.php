@@ -48,7 +48,6 @@ final readonly class Ln implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
             $val = (string)$targetValue->literalValue;
 			return TypedValue::forValue($val > 0 ? $programRegistry->valueRegistry->real(

@@ -57,7 +57,6 @@ final readonly class AppendWith implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
 			if ($parameterValue instanceof TupleValue) {
 				$values = array_merge($targetValue->values, $parameterValue->values);

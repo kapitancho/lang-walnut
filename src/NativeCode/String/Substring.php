@@ -52,9 +52,7 @@ final readonly class Substring implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
-		$parameterValue = $this->toBaseValue($parameterValue);
-		if (
+				if (
 			$targetValue instanceof StringValue &&
 			$parameterValue instanceof RecordValue
 		) {

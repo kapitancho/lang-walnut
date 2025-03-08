@@ -4,6 +4,7 @@ namespace Walnut\Lang\NativeCode\Any;
 
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 
+// ESSENTIAL TEST
 final class AsBooleanTest extends CodeExecutionTestHelper {
 
 	public function testAsBooleanNull(): void {
@@ -87,7 +88,7 @@ final class AsBooleanTest extends CodeExecutionTestHelper {
 	}
 
 	public function testAsBooleanAtom(): void {
-		$result = $this->executeCodeSnippet("{MyAtom[]}->asBoolean;", "MyAtom = :[];");
+		$result = $this->executeCodeSnippet("{MyAtom()}->asBoolean;", "MyAtom = :[];");
 		$this->assertEquals("true", $result);
 	}
 
@@ -96,8 +97,8 @@ final class AsBooleanTest extends CodeExecutionTestHelper {
 		$this->assertEquals("true", $result);
 	}
 
-	public function testAsBooleanSubtype(): void {
-		$result = $this->executeCodeSnippet("{MySubtype('value')}->asBoolean;", "MySubtype <: String;");
+	public function testAsBooleanOpen(): void {
+		$result = $this->executeCodeSnippet("{MyOpen('value')}->asBoolean;", "MyOpen = #String;");
 		$this->assertEquals("true", $result);
 	}
 
@@ -118,6 +119,18 @@ final class AsBooleanTest extends CodeExecutionTestHelper {
 		$this->assertEquals("true", $result);
 	}
 
+	public function testAsBooleanSubsetFalse(): void {
+		$result = $this->executeCodeSnippet("{getMySubset()}->asBoolean;",
+			"MySubset = <: Integer; getMySubset = ^Any => MySubset :: MySubset(0);");
+		$this->assertEquals("false", $result);
+	}
+
+	public function testAsBooleanSubsetTrue(): void {
+		$result = $this->executeCodeSnippet("{getMySubset()}->asBoolean;",
+			"MySubset = <: Integer; getMySubset = ^Any => MySubset :: MySubset(1);");
+		$this->assertEquals("true", $result);
+	}
+
 	public function testAsBooleanFunction(): void {
 		$result = $this->executeCodeSnippet("{^Any => Integer :: 1}->asBoolean;");
 		$this->assertEquals("true", $result);
@@ -130,6 +143,18 @@ final class AsBooleanTest extends CodeExecutionTestHelper {
 
 	public function testAsBooleanMutableTrue(): void {
 		$result = $this->executeCodeSnippet("{mutable{Integer, 1}}->asBoolean;");
+		$this->assertEquals("true", $result);
+	}
+
+	public function testAsBooleanShapeFalse(): void {
+		$result = $this->executeCodeSnippet("getReal()->shape->asBoolean;",
+			"getReal = ^ => Shape<Real> :: 0;");
+		$this->assertEquals("false", $result);
+	}
+
+	public function testAsBooleanShapeTrue(): void {
+		$result = $this->executeCodeSnippet("getReal()->shape->asBoolean;",
+			"getReal = ^ => Shape<Real> :: 3.14;");
 		$this->assertEquals("true", $result);
 	}
 

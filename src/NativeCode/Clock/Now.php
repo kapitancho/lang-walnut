@@ -42,15 +42,14 @@ final readonly class Now implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof AtomValue && $targetValue->type->name->equals(
 			new TypeNameIdentifier('Clock')
 		)) {
 			$now = new DateTimeImmutable;
-			return TypedValue::forValue($programRegistry->valueRegistry->subtypeValue(
+			return TypedValue::forValue($programRegistry->valueRegistry->openValue(
 				new TypeNameIdentifier('DateAndTime'),
 				$programRegistry->valueRegistry->record([
-					'date' => $programRegistry->valueRegistry->subtypeValue(
+					'date' => $programRegistry->valueRegistry->openValue(
 						new TypeNameIdentifier('Date'),
 						$programRegistry->valueRegistry->record([
 							'year' => $programRegistry->valueRegistry->integer((int)$now->format('Y')),
@@ -58,7 +57,7 @@ final readonly class Now implements NativeMethod {
 							'day' => $programRegistry->valueRegistry->integer((int)$now->format('d')),
 						])
 					),
-					'time' => $programRegistry->valueRegistry->subtypeValue(
+					'time' => $programRegistry->valueRegistry->openValue(
 						new TypeNameIdentifier('Time'),
 						$programRegistry->valueRegistry->record([
 							'hour' => $programRegistry->valueRegistry->integer((int)$now->format('H')),

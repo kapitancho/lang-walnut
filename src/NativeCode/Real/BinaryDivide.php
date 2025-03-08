@@ -58,11 +58,8 @@ final readonly class BinaryDivide implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
-		$parameterValue = $this->toBaseValue($parameterValue);
 
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
-			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue || $parameterValue instanceof RealValue) {
 				if ((float)(string)$parameterValue->literalValue === 0.0) {
 					return TypedValue::forValue($programRegistry->valueRegistry->error(

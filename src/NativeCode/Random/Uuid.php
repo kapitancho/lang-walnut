@@ -23,7 +23,7 @@ final readonly class Uuid implements NativeMethod {
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof AtomType && $targetType->name->equals(new TypeNameIdentifier('Random'))) {
-			return $programRegistry->typeRegistry->string(36, 36);
+			return $programRegistry->typeRegistry->subset(new TypeNameIdentifier('Uuid'));
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -37,7 +37,6 @@ final readonly class Uuid implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof AtomValue && $targetValue->type->name->equals(
 			new TypeNameIdentifier('Random')
 		)) {

@@ -19,7 +19,6 @@ enum MetaTypeValue: string {
 	case Alias = 'Alias';
 	case Open = 'Open';
 	case Subset = 'Subset';
-	case Subtype = 'Subtype';
 	case Sealed = 'Sealed';
 	case Named = 'Named';
 }

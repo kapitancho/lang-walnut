@@ -18,7 +18,7 @@ final class CodeExecutionTest extends CodeExecutionTestHelper {
 
 	public function testCodeExecutionCompilationValueUnknownType(): void {
 		$this->expectException(AstProgramCompilationException::class);
-		$this->executeCodeSnippet('MyAtom[];');
+		$this->executeCodeSnippet('MyAtom();');
 	}
 
 	public function testCodeExecutionCompilationValueUnknownEnumerationValue(): void {

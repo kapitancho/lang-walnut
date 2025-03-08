@@ -57,21 +57,20 @@ final readonly class FindFirst implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue && $parameterValue instanceof FunctionValue) {
 			$values = $targetValue->values;
 			$true = $programRegistry->valueRegistry->true;
 			foreach($values as $value) {
-				$r = $parameterValue->execute($programRegistry->executionContext, $value);
+				$r = $parameterValue->execute($programRegistry->executionContext, $value)->value;
 				if ($true->equals($r)) {
 					$resultType = $value instanceof TypedValue ? $value->type : $value->type;
 					$resultValue = $value instanceof TypedValue ? $value->value : $value;
-					return new TypedValue(
+
+					return TypedValue::forValue($resultValue)->withType(
 						$programRegistry->typeRegistry->result(
 							$resultType,
 							$programRegistry->typeRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
-						),
-						$resultValue
+						)
 					);
 				}
 			}

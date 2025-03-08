@@ -7,7 +7,7 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 final class AsJsonValueTest extends CodeExecutionTestHelper {
 
 	public function testAsJsonValueNonJson(): void {
-		$result = $this->executeCodeSnippet("MyAtom[]->asJsonValue;", "MyAtom = :[];");
+		$result = $this->executeCodeSnippet("MyAtom()->asJsonValue;", "MyAtom = :[];");
 		$this->assertEquals("@InvalidJsonValue[value: MyAtom[]]", $result);
 	}
 

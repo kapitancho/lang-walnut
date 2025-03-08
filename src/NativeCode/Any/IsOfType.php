@@ -9,7 +9,6 @@ use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Type\TypeType;
-use Walnut\Lang\Blueprint\Value\SubtypeValue;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Blueprint\Value\Value;
 
@@ -27,8 +26,7 @@ final readonly class IsOfType implements NativeMethod {
 	}
 
 	private function isSubtypeOf(Value $targetValue, TypeInterface $type): bool {
-		return $targetValue->type->isSubtypeOf($type) ||
-			($targetValue instanceof SubtypeValue && $this->isSubtypeOf($targetValue->baseValue, $type));
+		return $targetValue->type->isSubtypeOf($type);
 	}
 
 	public function execute(
@@ -41,7 +39,7 @@ final readonly class IsOfType implements NativeMethod {
 		
 		if ($parameterValue instanceof TypeValue) {
 			return TypedValue::forValue($programRegistry->valueRegistry->boolean(
-				$this->isSubtypeOf($targetValue, $parameterValue->typeValue)
+				$target->isSubtypeOf($parameterValue->typeValue)
 			));
 		}
 		// @codeCoverageIgnoreStart

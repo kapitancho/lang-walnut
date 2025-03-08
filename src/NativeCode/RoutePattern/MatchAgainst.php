@@ -8,13 +8,13 @@ use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
-use Walnut\Lang\Blueprint\Type\SubtypeType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\OpenValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
-use Walnut\Lang\Implementation\Value\SubtypeValue;
 
 final readonly class MatchAgainst implements NativeMethod {
 	use BaseType;
@@ -28,7 +28,7 @@ final readonly class MatchAgainst implements NativeMethod {
 		Type $targetType,
 		Type $parameterType,
 	): Type {
-		if ($targetType instanceof SubtypeType && $targetType->name->equals(new TypeNameIdentifier('RoutePattern'))) {
+		if ($targetType instanceof OpenType && $targetType->name->equals(new TypeNameIdentifier('RoutePattern'))) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
 				return $programRegistry->typeRegistry->union([$programRegistry->typeRegistry->map(
@@ -53,10 +53,8 @@ final readonly class MatchAgainst implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 
-		//$targetValue = $this->toBaseValue($targetValue);
-		if ($targetValue instanceof SubtypeValue && $targetValue->type->name->equals(new TypeNameIdentifier('RoutePattern'))) {
-			$pattern = $targetValue->baseValue->literalValue;
-			$parameterValue = $this->toBaseValue($parameterValue);
+		if ($targetValue instanceof OpenValue && $targetValue->type->name->equals(new TypeNameIdentifier('RoutePattern'))) {
+			$pattern = $targetValue->value->literalValue;
 			if ($parameterValue instanceof StringValue) {
 				$path = $parameterValue->literalValue;
 

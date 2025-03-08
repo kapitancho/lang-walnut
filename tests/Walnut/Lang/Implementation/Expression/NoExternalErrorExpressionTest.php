@@ -102,7 +102,7 @@ final class NoExternalErrorExpressionTest extends TestCase {
 						])
 					)
 				),
-				$e->value
+				$e->typedValue->value
 			);
 			return;
 		}

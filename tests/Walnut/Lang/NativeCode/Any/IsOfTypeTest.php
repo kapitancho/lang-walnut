@@ -176,7 +176,7 @@ final class IsOfTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testIsOfTypeAtom(): void {
-		$result = $this->executeCodeSnippet("{MyAtom[]}->isOfType(type{MyAtom});", "MyAtom = :[];");
+		$result = $this->executeCodeSnippet("{MyAtom()}->isOfType(type{MyAtom});", "MyAtom = :[];");
 		$this->assertEquals("true", $result);
 	}
 
@@ -198,8 +198,8 @@ final class IsOfTypeTest extends CodeExecutionTestHelper {
 		$this->assertEquals("false", $result);
 	}
 
-	public function testIsOfTypeSubtype(): void {
-		$result = $this->executeCodeSnippet("{MySubtype('value')}->isOfType(type{MySubtype});", "MySubtype <: String;");
+	public function testIsOfTypeSubset(): void {
+		$result = $this->executeCodeSnippet("{MySubset('value')}->isOfType(type{MySubset});", "MySubset = <: String;");
 		$this->assertEquals("true", $result);
 	}
 

@@ -8,5 +8,5 @@ use Walnut\Lang\Blueprint\Function\UnknownMethod;
 use Walnut\Lang\Blueprint\Type\Type;
 
 interface MethodRegistry {
-	public function method(Type $targetType, MethodNameIdentifier $methodName): Method|UnknownMethod;
+	public function methodForType(Type $targetType, MethodNameIdentifier $methodName): Method|UnknownMethod;
 }

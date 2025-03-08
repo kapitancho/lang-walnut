@@ -49,13 +49,13 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 
 	public function testHydrateAsAtomFromNullCastOk(): void {
 		$result = $this->executeCodeSnippet("true->hydrateAs(type{MyAtom});",
-			"MyAtom = :[]; JsonValue ==> MyAtom @ String :: ?whenValueOf($) is { true: MyAtom[], ~ : @'error' };");
+			"MyAtom = :[]; JsonValue ==> MyAtom @ String :: ?whenValueOf($) is { true: MyAtom(), ~ : @'error' };");
 		$this->assertEquals("MyAtom[]", $result);
 	}
 
 	public function testHydrateAsAtomFromNullCastError(): void {
 		$result = $this->executeCodeSnippet("null->hydrateAs(type{MyAtom});",
-			"MyAtom = :[]; JsonValue ==> MyAtom @ String :: ?whenValueOf($) is { true: MyAtom[], ~ : @'error' };");
+			"MyAtom = :[]; JsonValue ==> MyAtom @ String :: ?whenValueOf($) is { true: MyAtom(), ~ : @'error' };");
 		$this->assertEquals("@HydrationError[\n\tvalue: null,\n\thydrationPath: 'value',\n\terrorMessage: 'Atom hydration failed. Error: \`error\`'\n]", $result);
 	}
 
@@ -110,9 +110,9 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 	}
 
 
-	public function testHydrateAsStringFromStringSubtype(): void {
-		$result = $this->executeCodeSnippet("getMySubtype()->hydrateAs(type{String});",
-			"MySubtype <: String; getMySubtype = ^Any => String :: MySubtype('hello');");
+	public function testHydrateAsStringFromStringSubset(): void {
+		$result = $this->executeCodeSnippet("getMySubset()->hydrateAs(type{String});",
+			"MySubset = <: String; getMySubset = ^Any => String :: MySubset('hello');");
 		$this->assertEquals("'hello'", $result);
 	}
 
@@ -136,9 +136,9 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 		$this->assertEquals("'hello'", $result);
 	}
 
-	public function testHydrateAsStringSubsetFromStringSubtypeInSubset(): void {
-		$result = $this->executeCodeSnippet("getMySubtype()->hydrateAs(type{String['hello', 'world']});",
-			"MySubtype <: String; getMySubtype = ^Any => String :: MySubtype('hello');");
+	public function testHydrateAsStringSubsetFromStringSubsetInSubset(): void {
+		$result = $this->executeCodeSnippet("getMySubset()->hydrateAs(type{String['hello', 'world']});",
+			"MySubset = <: String; getMySubset = ^Any => String :: MySubset('hello');");
 		$this->assertEquals("'hello'", $result);
 	}
 
@@ -159,9 +159,9 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 	}
 
 
-	public function testHydrateAsIntegerFromIntegerSubtype(): void {
-		$result = $this->executeCodeSnippet("getMySubtype()->hydrateAs(type{Integer});",
-			"MySubtype <: Integer; getMySubtype = ^Any => Integer :: MySubtype(42);");
+	public function testHydrateAsIntegerFromIntegerSubset(): void {
+		$result = $this->executeCodeSnippet("getMySubset()->hydrateAs(type{Integer});",
+			"MySubset = <: Integer; getMySubset = ^Any => Integer :: MySubset(42);");
 		$this->assertEquals("42", $result);
 	}
 
@@ -185,9 +185,9 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 		$this->assertEquals("42", $result);
 	}
 
-	public function testHydrateAsIntegerSubsetFromIntegerSubtypeInSubset(): void {
-		$result = $this->executeCodeSnippet("getMySubtype()->hydrateAs(type{Integer[12, 22, 32, 42]});",
-			"MySubtype <: Integer; getMySubtype = ^Any => Integer :: MySubtype(42);");
+	public function testHydrateAsIntegerSubsetFromIntegerSubsetInSubset(): void {
+		$result = $this->executeCodeSnippet("getMySubset()->hydrateAs(type{Integer[12, 22, 32, 42]});",
+			"MySubset = <: Integer; getMySubset = ^Any => Integer :: MySubset(42);");
 		$this->assertEquals("42", $result);
 	}
 
@@ -214,9 +214,9 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 		$this->assertEquals("42", $result);
 	}
 
-	public function testHydrateAsRealFromRealSubtype(): void {
-		$result = $this->executeCodeSnippet("getMySubtype()->hydrateAs(type{Real});",
-			"MySubtype <: Real; getMySubtype = ^Any => Real :: MySubtype(3.14);");
+	public function testHydrateAsRealFromRealSubset(): void {
+		$result = $this->executeCodeSnippet("getMySubset()->hydrateAs(type{Real});",
+			"MySubset = <: Real; getMySubset = ^Any => Real :: MySubset(3.14);");
 		$this->assertEquals("3.14", $result);
 	}
 
@@ -245,9 +245,9 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 		$this->assertEquals("2", $result);
 	}
 
-	public function testHydrateAsRealSubsetFromRealSubtypeInSubset(): void {
-		$result = $this->executeCodeSnippet("getMySubtype()->hydrateAs(type{Real[1.2, 2, 3.14]});",
-			"MySubtype <: Real; getMySubtype = ^Any => Real :: MySubtype(3.14);");
+	public function testHydrateAsRealSubsetFromRealSubsetInSubset(): void {
+		$result = $this->executeCodeSnippet("getMySubset()->hydrateAs(type{Real[1.2, 2, 3.14]});",
+			"MySubset = <: Real; getMySubset = ^Any => Real :: MySubset(3.14);");
 		$this->assertEquals("3.14", $result);
 	}
 
@@ -659,57 +659,133 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 
 
 
-	public function testHydrateAsSubtypeFromRecord(): void {
-		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MySubtype});",
-			"MySubtype <: [a: Integer, b: Integer, c: String];");
-		$this->assertEquals("MySubtype[a: 1, b: 2, c: 'hello']", $result);
+	public function testHydrateAsSubsetFromRecord(): void {
+		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MySubset});",
+			"MySubset = <: [a: Integer, b: Integer, c: String];");
+		$this->assertEquals("[a: 1, b: 2, c: 'hello']", $result);
 	}
 
-	public function testHydrateAsSubtypeFromRecordWrongPropertyType(): void {
-		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MySubtype});",
-			"MySubtype <: [a: Integer, b: Integer, c: Real];");
+	public function testHydrateAsSubsetFromRecordWrongPropertyType(): void {
+		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MySubset});",
+			"MySubset = <: [a: Integer, b: Integer, c: Real];");
 		$this->assertEquals("@HydrationError[\n\tvalue: 'hello',\n\thydrationPath: 'value.c',\n\terrorMessage: 'The value should be a real number in the range -Infinity..+Infinity'\n]", $result);
 	}
 
-	public function testHydrateAsSubtypeFromRecordWithValidatorPass(): void {
-		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MySubtype});",
-			"MySubtype <: [a: Integer, b: Integer, c: String] @ Real :: ?when(#a < 0) { => @3.14 };");
-		$this->assertEquals("MySubtype[a: 1, b: 2, c: 'hello']", $result);
+	public function testHydrateAsSubsetFromRecordWithValidatorPass(): void {
+		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MySubset});",
+			"MySubset = <: [a: Integer, b: Integer, c: String] @ Real :: ?when(#a < 0) { => @3.14 };");
+		$this->assertEquals("[a: 1, b: 2, c: 'hello']", $result);
 	}
 
-	public function testHydrateAsSubtypeFromRecordWithValidatorFail(): void {
-		$result = $this->executeCodeSnippet("[a: -1, b: 2, c: 'hello']->hydrateAs(type{MySubtype});",
-			"MySubtype <: [a: Integer, b: Integer, c: String] @ Real :: ?when(#a < 0) { => @3.14 };");
+	public function testHydrateAsSubsetFromRecordWithValidatorFail(): void {
+		$result = $this->executeCodeSnippet("[a: -1, b: 2, c: 'hello']->hydrateAs(type{MySubset});",
+			"MySubset = <: [a: Integer, b: Integer, c: String] @ Real :: ?when(#a < 0) { => @3.14 };");
 		$this->assertEquals("@HydrationError[\n\tvalue: [a: -1, b: 2, c: 'hello'],\n\thydrationPath: 'value',\n\terrorMessage: 'Value construction failed. Error: 3.14'\n]", $result);
 	}
 
-	public function testHydrateAsSubtypeFromRecordWithCastCorrectValue(): void {
-		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MySubtype});",
-			"MySubtype <: [a: Integer, b: Integer, c: String];" .
-			"JsonValue ==> MySubtype @ String :: ?whenTypeOf($) is { type[a: Integer, b: Integer<0..>, c: String]: MySubtype($), ~: @'invalid value' };"
+	public function testHydrateAsSubsetFromRecordWithCastCorrectValue(): void {
+		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MySubset});",
+			"MySubset = <: [a: Integer, b: Integer, c: String];" .
+			"JsonValue ==> MySubset @ String :: ?whenTypeOf($) is { type[a: Integer, b: Integer<0..>, c: String]: MySubset($), ~: @'invalid value' };"
 		);
-		$this->assertEquals("MySubtype[a: 1, b: 2, c: 'hello']", $result);
+		$this->assertEquals("[a: 1, b: 2, c: 'hello']", $result);
 	}
 
-	public function testHydrateAsSubtypeFromRecordWithCastIncorrectValue(): void {
-		$result = $this->executeCodeSnippet("[a: 1, b: -2, c: 'hello']->hydrateAs(type{MySubtype});",
-			"MySubtype <: [a: Integer, b: Integer, c: String];" .
-			"JsonValue ==> MySubtype @ String :: ?whenTypeOf($) is { type[a: Integer, b: Integer<0..>, c: String]: MySubtype($), ~: @'invalid value' };"
+	public function testHydrateAsSubsetFromRecordWithCastIncorrectValue(): void {
+		$result = $this->executeCodeSnippet("[a: 1, b: -2, c: 'hello']->hydrateAs(type{MySubset});",
+			"MySubset = <: [a: Integer, b: Integer, c: String];" .
+			"JsonValue ==> MySubset @ String :: ?whenTypeOf($) is { type[a: Integer, b: Integer<0..>, c: String]: MySubset($), ~: @'invalid value' };"
 		);
-		$this->assertEquals("@HydrationError[\n\tvalue: [a: 1, b: -2, c: 'hello'],\n\thydrationPath: 'value',\n\terrorMessage: 'Subtype hydration failed. Error: \`invalid value\`'\n]", $result);
+		$this->assertEquals("@HydrationError[\n\tvalue: [a: 1, b: -2, c: 'hello'],\n\thydrationPath: 'value',\n\terrorMessage: 'Subset hydration failed. Error: \`invalid value\`'\n]", $result);
 	}
 
-	public function testHydrateAsSubtypeFromRecordWithValidatorAndCastCorrectValue(): void {
-		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MySubtype});",
-			"MySubtype <: [a: Integer, b: Integer, c: String] @ Real :: ?when(#a < 0) { => @3.14 };" .
-			"JsonValue ==> MySubtype @ Real|String :: ?whenTypeOf($) is { type[a: Integer, b: Integer<0..>, c: String]: MySubtype($), ~: @'invalid value' };"
+	public function testHydrateAsSubsetFromRecordWithValidatorAndCastCorrectValue(): void {
+		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MySubset});",
+			"MySubset = <: [a: Integer, b: Integer, c: String] @ Real :: ?when(#a < 0) { => @3.14 };" .
+			"JsonValue ==> MySubset @ Real|String :: ?whenTypeOf($) is { type[a: Integer, b: Integer<0..>, c: String]: MySubset($), ~: @'invalid value' };"
 		);
-		$this->assertEquals("MySubtype[a: 1, b: 2, c: 'hello']", $result);
+		$this->assertEquals("[a: 1, b: 2, c: 'hello']", $result);
 	}
 
-	public function testHydrateAsSubtypeFromOther(): void {
-		$result = $this->executeCodeSnippet("null->hydrateAs(type{MySubtype});",
-			"MySubtype <: [a: Integer, b: Integer, c: String];");
+
+
+
+
+
+
+
+
+
+	public function testHydrateAsOpenFromRecord(): void {
+		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MyOpen});",
+			"MyOpen = #[a: Integer, b: Integer, c: String];");
+		$this->assertEquals("MyOpen[a: 1, b: 2, c: 'hello']", $result);
+	}
+
+	public function testHydrateAsOpenFromRecordWrongPropertyType(): void {
+		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MyOpen});",
+			"MyOpen = #[a: Integer, b: Integer, c: Real];");
+		$this->assertEquals("@HydrationError[\n\tvalue: 'hello',\n\thydrationPath: 'value.c',\n\terrorMessage: 'The value should be a real number in the range -Infinity..+Infinity'\n]", $result);
+	}
+
+	public function testHydrateAsOpenFromRecordWithValidatorPass(): void {
+		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MyOpen});",
+			"MyOpen = #[a: Integer, b: Integer, c: String] @ Real :: ?when(#a < 0) { => @3.14 };");
+		$this->assertEquals("MyOpen[a: 1, b: 2, c: 'hello']", $result);
+	}
+
+	public function testHydrateAsOpenFromRecordWithValidatorFail(): void {
+		$result = $this->executeCodeSnippet("[a: -1, b: 2, c: 'hello']->hydrateAs(type{MyOpen});",
+			"MyOpen = #[a: Integer, b: Integer, c: String] @ Real :: ?when(#a < 0) { => @3.14 };");
+		$this->assertEquals("@HydrationError[\n\tvalue: [a: -1, b: 2, c: 'hello'],\n\thydrationPath: 'value',\n\terrorMessage: 'Value construction failed. Error: 3.14'\n]", $result);
+	}
+
+	public function testHydrateAsOpenFromRecordWithCastCorrectValue(): void {
+		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MyOpen});",
+			"MyOpen = #[a: Integer, b: Integer, c: String];" .
+			"JsonValue ==> MyOpen @ String :: ?whenTypeOf($) is { type[a: Integer, b: Integer<0..>, c: String]: MyOpen($), ~: @'invalid value' };"
+		);
+		$this->assertEquals("MyOpen[a: 1, b: 2, c: 'hello']", $result);
+	}
+
+	public function testHydrateAsOpenFromRecordWithCastIncorrectValue(): void {
+		$result = $this->executeCodeSnippet("[a: 1, b: -2, c: 'hello']->hydrateAs(type{MyOpen});",
+			"MyOpen = #[a: Integer, b: Integer, c: String];" .
+			"JsonValue ==> MyOpen @ String :: ?whenTypeOf($) is { type[a: Integer, b: Integer<0..>, c: String]: MyOpen($), ~: @'invalid value' };"
+		);
+		$this->assertEquals("@HydrationError[\n\tvalue: [a: 1, b: -2, c: 'hello'],\n\thydrationPath: 'value',\n\terrorMessage: 'Open type hydration failed. Error: \`invalid value\`'\n]", $result);
+	}
+
+	public function testHydrateAsOpenFromRecordWithValidatorAndCastCorrectValue(): void {
+		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MyOpen});",
+			"MyOpen = #[a: Integer, b: Integer, c: String] @ Real :: ?when(#a < 0) { => @3.14 };" .
+			"JsonValue ==> MyOpen @ Real|String :: ?whenTypeOf($) is { type[a: Integer, b: Integer<0..>, c: String]: MyOpen($), ~: @'invalid value' };"
+		);
+		$this->assertEquals("MyOpen[a: 1, b: 2, c: 'hello']", $result);
+	}
+
+	public function testHydrateAsOpenFromOther(): void {
+		$result = $this->executeCodeSnippet("null->hydrateAs(type{MyOpen});",
+			"MyOpen = #[a: Integer, b: Integer, c: String];");
+		$this->assertEquals("@HydrationError[\n\tvalue: null,\n\thydrationPath: 'value',\n\terrorMessage: 'The value should be a record with 3 items'\n]", $result);
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	public function testHydrateAsSubsetFromOther(): void {
+		$result = $this->executeCodeSnippet("null->hydrateAs(type{MySubset});",
+			"MySubset = <: [a: Integer, b: Integer, c: String];");
 		$this->assertEquals("@HydrationError[\n\tvalue: null,\n\thydrationPath: 'value',\n\terrorMessage: 'The value should be a record with 3 items'\n]", $result);
 	}
 

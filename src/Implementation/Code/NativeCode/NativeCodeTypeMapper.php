@@ -32,7 +32,6 @@ use Walnut\Lang\Blueprint\Type\ShapeType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\SubsetType;
-use Walnut\Lang\Blueprint\Type\SubtypeType;
 use Walnut\Lang\Blueprint\Type\TrueType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -61,7 +60,6 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 			EnumerationSubsetType::class => ['Enumeration'],
 			AtomType::class => ['Atom'],
 			SubsetType::class => ['Subset'],
-			SubtypeType::class => ['Subtype'],
 			OpenType::class => ['Open'],
 			SealedType::class => ['Sealed'],
 			AliasType::class => ['Alias'],
@@ -85,9 +83,8 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 		$baseIds = [];
 		$k = 0;
 		$alias = null;
-		$subtype = null;
 		$subset = null;
-		while ($type instanceof AliasType || $type instanceof SubtypeType || $type instanceof SubsetType) {
+		while ($type instanceof AliasType || $type instanceof SubsetType) {
 			$k++;
 			$baseIds[] = $type->name->identifier;
 			if ($type instanceof AliasType) {
@@ -98,27 +95,16 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 			if ($type instanceof SubsetType) {
 				$subset ??= $k;
 				$type = $type->valueType;
-			} else {
-				$subtype ??= $k;
-				$type = $type->baseType;
 			}
 		}
 		if ($alias !== null) {
-			if ($subtype !== null && $subtype < $alias) {
-				$baseIds[] = 'Subtype';
-			}
 			if ($subset !== null && $subset < $alias) {
 				$baseIds[] = 'Subset';
 			}
 			$baseIds[] = 'Alias';
-			if ($subtype !== null && $subtype > $alias) {
-				$baseIds[] = 'Subtype';
-			}
 			if ($subset !== null && $subset > $alias) {
 				$baseIds[] = 'Subset';
 			}
-		} elseif ($subtype !== null) {
-			$baseIds[] = 'Subtype';
 		} elseif ($subset !== null) {
 			$baseIds[] = 'Subset';
 		}
@@ -136,7 +122,6 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 				'Record' => RecordType::class,
 				'Union' => UnionType::class,
 				'Intersection' => IntersectionType::class,
-				'Subtype' => SubtypeType::class,
 				'Subset' => SubsetType::class,
 				'EnumerationValue' => EnumerationType::class,
 			][$type->value->value] ?? null;

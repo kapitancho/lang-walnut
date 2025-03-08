@@ -37,7 +37,6 @@ final readonly class UnaryBitwiseNot implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof IntegerValue) {
 			$target = $targetValue->literalValue;
 			return TypedValue::forValue($programRegistry->valueRegistry->integer(~(int)(string)$target));

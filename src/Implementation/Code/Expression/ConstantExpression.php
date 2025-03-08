@@ -9,8 +9,8 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\ConstantExpression as ConstantExpressionInterface;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
-use Walnut\Lang\Blueprint\Value\FunctionValue;
 use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Implementation\Value\FunctionValue;
 
 final readonly class ConstantExpression implements ConstantExpressionInterface, JsonSerializable {
 	public function __construct(
@@ -19,7 +19,7 @@ final readonly class ConstantExpression implements ConstantExpressionInterface, 
 
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
 		if ($this->value instanceof FunctionValue) {
-			$this->value->analyse($analyserContext);
+			$this->value->selfAnalyse($analyserContext);
 		}
 		return $analyserContext->asAnalyserResult(
 			$this->value->type,

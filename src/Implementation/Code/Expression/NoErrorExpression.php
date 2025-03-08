@@ -37,14 +37,15 @@ final readonly class NoErrorExpression implements NoErrorExpressionInterface, Js
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
 		$result = $this->targetExpression->execute($executionContext);
-		$value = $result->value;
-		if ($value instanceof ErrorValue) {
-			throw new FunctionReturn($value);
+		if ($result->typedValue->value instanceof ErrorValue) {
+			throw new FunctionReturn($result->typedValue);
 		}
 		$vt = $result->valueType;
 		// @codeCoverageIgnoreStart
 		if ($vt instanceof ResultType) {
-			$result = $result->withTypedValue(new TypedValue($vt->returnType, $result->value));
+			$result = $result->withTypedValue(
+				$result->typedValue->withType($vt->returnType)
+			);
 		}
 		// @codeCoverageIgnoreEnd
 		return $result;

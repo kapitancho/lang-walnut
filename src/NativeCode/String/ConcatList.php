@@ -6,8 +6,8 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
@@ -32,7 +32,7 @@ final readonly class ConcatList implements NativeMethod {
 				$parameterType = $parameterType->asArrayType();
 			}
 			if ($parameterType instanceof ArrayType) {
-				$itemType = $parameterType->itemType;
+				$itemType = $this->toBaseType($parameterType->itemType);
 				if ($itemType instanceof StringType || $itemType instanceof StringSubsetType) {
 					return $programRegistry->typeRegistry->string(
 						$targetType->range->minLength +  $parameterType->range->minLength * $itemType->range->minLength,
@@ -52,18 +52,16 @@ final readonly class ConcatList implements NativeMethod {
 
 	public function execute(
 		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
+		TypedValue $targetValue,
+		TypedValue $parameterValue
 	): TypedValue {
-		$targetValue = $target->value;
-		$parameterValue = $parameter->value;
+		$target = $targetValue->value;
+		$parameter = $parameterValue?->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
-		$parameterValue = $this->toBaseValue($parameterValue);
-		if ($targetValue instanceof StringValue) {
-			if ($parameterValue instanceof TupleValue) {
-				$result = $targetValue->literalValue;
-				foreach($parameterValue->values as $value) {
+		if ($target instanceof StringValue) {
+			if ($parameter instanceof TupleValue) {
+				$result = $target->literalValue;
+				foreach($parameter->values as $value) {
 					if ($value instanceof StringValue) {
 						$result .= $value->literalValue;
 					} else {

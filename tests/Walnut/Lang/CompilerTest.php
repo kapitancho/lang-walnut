@@ -15,9 +15,13 @@ use Walnut\Lang\Blueprint\Compilation\SuccessfulCompilationResult;
 use Walnut\Lang\Blueprint\Program\Program;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Compilation\Compiler;
+use Walnut\Lang\Implementation\Compilation\Module\EmptyPrecompiler;
 use Walnut\Lang\Implementation\Compilation\Module\MultiFolderBasedModuleLookupContext;
+use Walnut\Lang\Implementation\Compilation\Module\PackageBasedModuleLookupContext;
+use Walnut\Lang\Implementation\Compilation\Module\PackageBasedModulePathFinder;
 use Walnut\Lang\Implementation\Compilation\Module\TemplatePrecompiler;
 use Walnut\Lang\Implementation\Compilation\Module\TemplatePrecompilerModuleLookupDecorator;
+use Walnut\Lang\Implementation\Compilation\Module\TestPrecompiler;
 use Walnut\Lang\Implementation\Program\EntryPoint\CliEntryPoint;
 use Walnut\Lang\Implementation\Program\EntryPoint\CliEntryPointBuilder;
 
@@ -30,19 +34,39 @@ final class CompilerTest extends TestCase {
 		parent::setUp();
 
 		$this->compiler = new Compiler(
-			new MultiFolderBasedModuleLookupContext(self::PATH)
+			new PackageBasedModuleLookupContext(
+				new PackageBasedModulePathFinder(
+					self::PATH,
+					['core' => self::PATH]
+				),
+				[
+					'.nut' => new EmptyPrecompiler(),
+					'.nut.html' => new TemplatePrecompiler(),
+					'.test.nut' => new TestPrecompiler()
+				]
+			)
 		);
 
 	}
 
 	public function testTemplateCompilation(): void {
-		$original = new MultiFolderBasedModuleLookupContext(self::PATH);
+		$original = new PackageBasedModuleLookupContext(
+			new PackageBasedModulePathFinder(
+				self::PATH,
+				['core' => self::PATH]
+			),
+			[
+				'.nut' => new EmptyPrecompiler(),
+				'.nut.html' => new TemplatePrecompiler(),
+				'.test.nut' => new TestPrecompiler()
+			]
+		);
 		$l = $this->createMock(ModuleLookupContext::class);
 		$l->method('sourceOf')->willReturnCallback(fn(string $source) => match($source) {
 			'main' => <<<NUT
 				module main %% template, tpl:
 				myFn = ^Null => Result<String, Any> %% [~TemplateRenderer] :: {
-				    %templateRenderer => render(NotANumber[])
+				    %templateRenderer => render(NotANumber())
 				};
 				main = ^Array<String> => String :: {
 				    x = myFn();
@@ -79,7 +103,17 @@ final class CompilerTest extends TestCase {
 	}
 
 	private function getSafeCompiler($mainSource): Compiler {
-		$original = new MultiFolderBasedModuleLookupContext(self::PATH);
+		$original = new PackageBasedModuleLookupContext(
+			new PackageBasedModulePathFinder(
+				self::PATH,
+				['core' => self::PATH]
+			),
+			[
+				'.nut' => new EmptyPrecompiler(),
+				'.nut.html' => new TemplatePrecompiler(),
+				'.test.nut' => new TestPrecompiler()
+			]
+		);
 		$l = $this->createMock(ModuleLookupContext::class);
 		$l->method('sourceOf')->willReturnCallback(fn(string $source) => match($source) {
 			'main' => $mainSource,
@@ -113,7 +147,7 @@ final class CompilerTest extends TestCase {
 	public function testSuccessfulSafeCompilation(): void {
 		$compiler = $this->getSafeCompiler(<<<NUT
 			module main:
-			myFn = ^Null => NotANumber :: NotANumber[];
+			myFn = ^Null => NotANumber :: NotANumber();
 		NUT);
 		$result = $compiler->safeCompile('main');
 		$this->assertInstanceOf(SuccessfulCompilationResult::class, $result);

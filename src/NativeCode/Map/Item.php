@@ -7,11 +7,12 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\IntersectionType;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\MetaType;
+use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
@@ -68,6 +69,9 @@ final readonly class Item implements NativeMethod {
 						return $returnType;
 					}
 				}
+				if ($returnType instanceof NothingType) {
+					throw new AnalyserException(sprintf("[%s] No property exists that matches the type: %s", __CLASS__, $parameterType));
+				}
 				return $programRegistry->typeRegistry->result($returnType, $mapItemNotFound);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -79,29 +83,28 @@ final readonly class Item implements NativeMethod {
 
 	public function execute(
 		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
+		TypedValue $targetValue,
+		TypedValue $parameterValue
 	): TypedValue {
-		$targetValue = $target->value;
-		$parameterValue = $parameter->value;
+		$target = $targetValue->value;
+		$parameter = $parameterValue->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
-		if ($targetValue instanceof RecordValue && $parameterValue instanceof StringValue) {
-			$values = $targetValue->values;
-			$result = $values[$parameterValue->literalValue] ?? null;
+		if ($target instanceof RecordValue && $parameter instanceof StringValue) {
+			$values = $target->values;
+			$result = $values[$parameter->literalValue] ?? null;
 			if ($result !== null) {
-				$targetType = $this->toBaseType($target->type);
+				$targetType = $this->toBaseType($targetValue->type);
 				$type = match(true) {
-					$targetType instanceof RecordType => ($targetType->types[$parameterValue->literalValue] ?? $targetType->restType),
+					$targetType instanceof RecordType => ($targetType->types[$parameter->literalValue] ?? $targetType->restType),
 					$targetType instanceof MapType => $targetType->itemType,
 					default => $result->type
 				};
-				return new TypedValue($type, $result);
+				return TypedValue::forValue($result)->withType($type);
 			}
 			return TypedValue::forValue($programRegistry->valueRegistry->error(
 				$programRegistry->valueRegistry->openValue(
 					new TypeNameIdentifier('MapItemNotFound'),
-					$programRegistry->valueRegistry->record(['key' => $parameterValue])
+					$programRegistry->valueRegistry->record(['key' => $parameter])
 				)
 			));
 		}

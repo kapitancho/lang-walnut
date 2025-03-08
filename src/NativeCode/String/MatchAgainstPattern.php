@@ -51,9 +51,7 @@ final readonly class MatchAgainstPattern implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
-		$parameterValue = $this->toBaseValue($parameterValue);
-		if ($targetValue instanceof StringValue) {
+				if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof StringValue) {
 				$target = $targetValue->literalValue;
 				$path = $parameterValue->literalValue;

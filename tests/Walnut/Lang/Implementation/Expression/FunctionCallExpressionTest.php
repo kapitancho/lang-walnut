@@ -59,19 +59,6 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 				)
 			)
 		);
-		$this->typeRegistry->addSubtype(
-			new TypeNameIdentifier("MyFunction"),
-			$this->typeRegistry->function(
-				$this->typeRegistry->integer(),
-				$this->typeRegistry->string(),
-			),
-			$this->expressionRegistry->functionBody(
-				$this->expressionRegistry->constant(
-					$this->valueRegistry->null
-				),
-			),
-			$this->typeRegistry->nothing
-		);
 		$this->functionValue = $this->valueRegistry->function(
 			$this->typeRegistry->integer(),
 			null,
@@ -91,17 +78,6 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 				$this->typeRegistry->integer(),
 				$this->typeRegistry->string(),
 			),
-			'b' => $this->typeRegistry->integer()
-		])));
-		self::assertEquals(
-			$this->typeRegistry->string(),
-			$result->expressionType
-		);
-	}
-
-	public function testAnalyseOnSubtypes(): void {
-		$result = $this->functionCallExpression->analyse(new AnalyserContext($this->programRegistry, new VariableScope([
-			'a' => $this->typeRegistry->withName(new TypeNameIdentifier('MyFunction')),
 			'b' => $this->typeRegistry->integer()
 		])));
 		self::assertEquals(
@@ -139,21 +115,6 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 	public function testExecuteDefault(): void {
 		$result = $this->functionCallExpression->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([
 			'a' => TypedValue::forValue($this->functionValue),
-			'b' => TypedValue::forValue(
-				$this->valueRegistry->integer(1)
-			)
-		])));
-		self::assertTrue($result->value->equals($this->valueRegistry->string("hi")));
-	}
-
-	public function testExecuteOnSubtypes(): void {
-		$result = $this->functionCallExpression->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([
-			'a' => TypedValue::forValue(
-				$this->valueRegistry->subtypeValue(
-					new TypeNameIdentifier('MyFunction'),
-					$this->functionValue
-				)
-			),
 			'b' => TypedValue::forValue(
 				$this->valueRegistry->integer(1)
 			)

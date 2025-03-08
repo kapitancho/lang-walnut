@@ -52,9 +52,7 @@ final readonly class LastPositionOf implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
-		$parameterValue = $this->toBaseValue($parameterValue);
-		if ($targetValue instanceof StringValue) {
+				if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof StringValue) {
 				$result = strrpos($targetValue->literalValue, $parameterValue->literalValue);
 				return TypedValue::forValue($result === false ?

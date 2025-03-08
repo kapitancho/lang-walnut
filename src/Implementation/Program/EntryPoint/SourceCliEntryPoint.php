@@ -5,7 +5,6 @@ namespace Walnut\Lang\Implementation\Program\EntryPoint;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Program\EntryPoint\SourceCliEntryPoint as SourceCliEntryPointInterface;
 use Walnut\Lang\Blueprint\Program\EntryPoint\EntryPointProvider;
-use Walnut\Lang\Blueprint\Value\SubtypeValue;
 
 final readonly class SourceCliEntryPoint implements SourceCliEntryPointInterface {
 	public function __construct(
@@ -23,9 +22,6 @@ final readonly class SourceCliEntryPoint implements SourceCliEntryPointInterface
 		$returnValue = $ep->call($vr->tuple(
 			array_map(fn(string $arg) => $vr->string($arg), $parameters)
 		));
-		while($returnValue instanceof SubtypeValue) {
-			$returnValue = $returnValue->baseValue;
-		}
 		return $returnValue->literalValue;
 	}
 }

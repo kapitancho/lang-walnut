@@ -7,8 +7,11 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 final class ItemTest extends CodeExecutionTestHelper {
 
 	public function testItemEmpty(): void {
-		$result = $this->executeCodeSnippet("[:]->item('r');");
-		$this->assertEquals("@MapItemNotFound[key: 'r']", $result);
+		$this->executeErrorCodeSnippet(
+			"No property exists that matches the type",
+			"getItem('r');",
+			"getItem = ^s: String :: [:]->item(s);"
+		);
 	}
 
 	public function testItemNonEmpty(): void {
@@ -17,7 +20,7 @@ final class ItemTest extends CodeExecutionTestHelper {
 	}
 
 	public function testItemNonEmptyIndexOutOfRange(): void {
-		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 5, d: 10, e: 5]->item('r');");
+		$result = $this->executeCodeSnippet("getItem('r');", "getItem = ^s: String :: [a: 1, b: 2, c: 5, d: 10, e: 5]->item(s);");
 		$this->assertEquals("@MapItemNotFound[key: 'r']", $result);
 	}
 

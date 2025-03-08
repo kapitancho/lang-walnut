@@ -64,7 +64,6 @@ final readonly class Max implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue && count($targetValue->values) > 0) {
 			$maxV = $targetValue->values[0];
 			$max = $maxV->literalValue;

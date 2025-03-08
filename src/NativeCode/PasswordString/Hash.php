@@ -38,7 +38,6 @@ final readonly class Hash implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof OpenValue && $targetValue->type->name->equals(
 			new TypeNameIdentifier('PasswordString')
 		)) {

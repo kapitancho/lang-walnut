@@ -1,4 +1,4 @@
-module fs:
+module $fs:
 
 File = $[path: String];
 File->path(=> String) :: $path;

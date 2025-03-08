@@ -44,9 +44,7 @@ final readonly class BinaryLessThanEqual implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof StringValue) {
-			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof StringValue) {
 				return TypedValue::forValue($programRegistry->valueRegistry->boolean(
 					$targetValue->literalValue <= $parameterValue->literalValue

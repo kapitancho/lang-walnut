@@ -60,9 +60,7 @@ final readonly class PadRight implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
-		$parameterValue = $this->toBaseValue($parameterValue);
-		if ($targetValue instanceof StringValue) {
+				if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof RecordValue) {
 				$values = $parameterValue->values;
 				$length = $values['length'] ?? null;

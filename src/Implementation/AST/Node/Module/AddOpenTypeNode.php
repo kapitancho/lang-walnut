@@ -13,8 +13,8 @@ final readonly class AddOpenTypeNode implements AddOpenTypeNodeInterface {
 		public SourceLocation $sourceLocation,
 		public TypeNameIdentifier $name,
 		public TypeNode $valueType,
-		public FunctionBodyNode $constructorBody,
-		public TypeNode $errorType,
+		public FunctionBodyNode|null $constructorBody,
+		public TypeNode|null $errorType,
 	) {}
 
 	public function jsonSerialize(): array {

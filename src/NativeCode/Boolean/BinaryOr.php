@@ -45,9 +45,7 @@ final readonly class BinaryOr implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof BooleanValue) {
-			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof BooleanValue) {
 	            return TypedValue::forValue($programRegistry->valueRegistry->boolean(
 					$targetValue->literalValue || $parameterValue->literalValue

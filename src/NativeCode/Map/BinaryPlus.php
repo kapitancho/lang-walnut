@@ -54,7 +54,6 @@ final readonly class BinaryPlus implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue) {
 			if ($parameterValue instanceof RecordValue) {
 				$values = [... $targetValue->values, ... $parameterValue->values];

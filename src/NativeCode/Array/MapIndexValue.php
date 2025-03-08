@@ -71,7 +71,6 @@ final readonly class MapIndexValue implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue && $parameterValue instanceof FunctionValue) {
 			$values = $targetValue->values;
 			$result = [];
@@ -82,7 +81,7 @@ final readonly class MapIndexValue implements NativeMethod {
 						'index' => $programRegistry->valueRegistry->integer($index),
 						'value' => $value
 					])
-				);
+				)->value;
 				if ($r instanceof ErrorValue) {
 					return TypedValue::forValue($r);
 				}

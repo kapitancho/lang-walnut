@@ -44,7 +44,7 @@ final readonly class POP implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$v = $this->toBaseValue($targetValue);
+		$v = $targetValue;
 		if ($v instanceof MutableValue) {
             $targetType = $this->toBaseType($v->targetType);
 			if ($targetType instanceof ArrayType) {
@@ -52,7 +52,8 @@ final readonly class POP implements NativeMethod {
 				if (count($values) > 0) {
 					$value = array_pop($values);
 					$v->value = $programRegistry->valueRegistry->tuple($values);
-					return new TypedValue($targetType->itemType, $value);
+
+					return TypedValue::forValue($value)->withType($targetType->itemType);
 				}
 				return TypedValue::forValue($programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->atom(new TypeNameIdentifier("ItemNotFound"))

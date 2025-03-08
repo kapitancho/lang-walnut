@@ -57,7 +57,7 @@ final class TypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testTypeAtom(): void {
-		$result = $this->executeCodeSnippet("{MyAtom[]}->type;", "MyAtom = :[];");
+		$result = $this->executeCodeSnippet("{MyAtom()}->type;", "MyAtom = :[];");
 		$this->assertEquals("type{MyAtom}", $result);
 	}
 
@@ -66,9 +66,14 @@ final class TypeTest extends CodeExecutionTestHelper {
 		$this->assertEquals("type{MyEnumeration[C]}", $result);
 	}
 
-	public function testTypeSubtype(): void {
-		$result = $this->executeCodeSnippet("{MySubtype('value')}->type;", "MySubtype <: String;");
-		$this->assertEquals("type{MySubtype}", $result);
+	public function testTypeSubset(): void {
+		$result = $this->executeCodeSnippet("{MySubset('value')}->type;", "MySubset = <: String;");
+		$this->assertEquals("type{MySubset}", $result);
+	}
+
+	public function testTypeOpen(): void {
+		$result = $this->executeCodeSnippet("{MyOpen[a: 'value']}->type;", "MyOpen = #[a: String];");
+		$this->assertEquals("type{MyOpen}", $result);
 	}
 
 	public function testTypeSealed(): void {

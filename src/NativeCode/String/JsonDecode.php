@@ -61,14 +61,12 @@ final readonly class JsonDecode implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof StringValue) {
 			try {
 				$value = json_decode($targetValue->literalValue, false, 512, JSON_THROW_ON_ERROR);
-				return new TypedValue(
-					$programRegistry->typeRegistry->withName(new TypeNameIdentifier("JsonValue")),
-					$this->phpToValue($programRegistry, $value)
-				);
+
+				return TypedValue::forValue($this->phpToValue($programRegistry, $value))
+					->withType($programRegistry->typeRegistry->withName(new TypeNameIdentifier("JsonValue")));
 			} catch (JsonException) {
 				return TypedValue::forValue($programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->openValue(

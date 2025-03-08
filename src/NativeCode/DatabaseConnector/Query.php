@@ -57,7 +57,6 @@ final readonly class Query implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof SealedValue && $targetValue->type->name->equals(
 			new TypeNameIdentifier('DatabaseConnector')
 		)) {
@@ -67,12 +66,14 @@ final readonly class Query implements NativeMethod {
 				)
 			)) {
 				$dsn = $targetValue->value->valueOf('connection')
-					->baseValue->values['dsn']->literalValue;
+					->value->values['dsn']->literalValue;
 				try {
-					$pdo = new PDO($dsn);
+					$pdo = new PDO($dsn, options: [
+						PDO::ATTR_EMULATE_PREPARES => false,
+					]);
 					$stmt = $pdo->prepare($parameterValue->values['query']->literalValue);
 					$stmt->execute(array_map(fn(Value $value): string|int|null =>
-					($v = $this->toBaseValue($value))->literalValue instanceof Number ? (string)$v->literalValue : $v->literalValue,
+					($v = $value)->literalValue instanceof Number ? (string)$v->literalValue : $v->literalValue,
 						$parameterValue->values['boundParameters']->values
 					));
 					$result = [];
@@ -90,7 +91,10 @@ final readonly class Query implements NativeMethod {
 							)
 						);
 					}
-					return new TypedValue(
+
+					return TypedValue::forValue(
+						$programRegistry->valueRegistry->tuple($result)
+					)->withType(
 						$programRegistry->typeRegistry->result(
 							$programRegistry->typeRegistry->withName(
 								new TypeNameIdentifier('DatabaseQueryResult')
@@ -98,25 +102,27 @@ final readonly class Query implements NativeMethod {
 							$programRegistry->typeRegistry->withName(
 								new TypeNameIdentifier('DatabaseQueryFailure')
 							)
-						),
-						$programRegistry->valueRegistry->tuple($result)
+						)
 					);
 				} catch (PDOException $ex) {
-					return new TypedValue(
-						$programRegistry->typeRegistry->result(
-							$programRegistry->typeRegistry->nothing,
-							$programRegistry->typeRegistry->withName(
-								new TypeNameIdentifier('DatabaseQueryFailure')
-							)
-						),
+					return TypedValue::forValue(
 						$programRegistry->valueRegistry->error(
-							$programRegistry->valueRegistry->sealedValue(
+							$programRegistry->valueRegistry->openValue(
 								new TypeNameIdentifier('DatabaseQueryFailure'),
 								$programRegistry->valueRegistry->record([
 									'query' => $parameterValue->values['query'],
 									'boundParameters' => $parameterValue->values['boundParameters'],
 									'error' => $programRegistry->valueRegistry->string($ex->getMessage())
 								])
+							)
+						)
+					)->withType(
+						$programRegistry->typeRegistry->result(
+							$programRegistry->typeRegistry->withName(
+								new TypeNameIdentifier('DatabaseQueryResult')
+							),
+							$programRegistry->typeRegistry->withName(
+								new TypeNameIdentifier('DatabaseQueryFailure')
 							)
 						)
 					);

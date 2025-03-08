@@ -28,15 +28,19 @@ final class ProgramTest extends BaseProgramTestHelper {
 				$this->typeRegistry->string(),
 				null,
 				$this->typeRegistry->nothing,
-				$this->typeRegistry->integer(),
+				$this->typeRegistry->string(),
 				$this->expressionRegistry->functionBody(
 					$this->expressionRegistry->constant(
-						$this->valueRegistry->integer(42)
+						$this->valueRegistry->string('42')
 					)
 				)
 			)
 		);
-		$result = $this->doCall();
+		$result = $this->program->getEntryPoint(
+			new VariableNameIdentifier('main'),
+			$this->typeRegistry->string(),
+			$this->typeRegistry->string(),
+		)->call($this->valueRegistry->string(''));
 		$this->assertEquals('42', (string)$result->literalValue);
 	}
 

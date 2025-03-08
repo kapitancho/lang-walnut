@@ -1,6 +1,6 @@
-module core:
+module $core:
 
-/* constructor support */
+/* global support */
 Global = :[];
 
 /* constructor support */
@@ -11,15 +11,15 @@ NotANumber = :[];
 MinusInfinity = :[];
 PlusInfinity = :[];
 InvalidRange = :[];
-IntegerRange <: [minValue: Integer|MinusInfinity, maxValue: Integer|PlusInfinity] @ InvalidRange ::
+IntegerRange = #[minValue: Integer|MinusInfinity, maxValue: Integer|PlusInfinity] @ InvalidRange ::
     ?whenTypeOf(#) is { type[minValue: Integer, maxValue: Integer]:
-        ?when (#.minValue > #.maxValue) { => @InvalidRange[] }};
-RealRange <: [minValue: Real|MinusInfinity, maxValue: Real|PlusInfinity] @ InvalidRange ::
+        ?when (#.minValue > #.maxValue) { => @InvalidRange() }};
+RealRange = #[minValue: Real|MinusInfinity, maxValue: Real|PlusInfinity] @ InvalidRange ::
     ?whenTypeOf(#) is { type[minValue: Real, maxValue: Real]:
-        ?when (#.minValue > #.maxValue) { => @InvalidRange[] }};
-LengthRange <: [minLength: Integer<0..>, maxLength: Integer<0..>|PlusInfinity] @ InvalidRange ::
+        ?when (#.minValue > #.maxValue) { => @InvalidRange() }};
+LengthRange = #[minLength: Integer<0..>, maxLength: Integer<0..>|PlusInfinity] @ InvalidRange ::
     ?whenTypeOf(#) is { type[minLength: Integer<0..>, maxLength: Integer<0..>]:
-        ?when (#.minLength > #.maxLength) { => @InvalidRange[] }};
+        ?when (#.minLength > #.maxLength) { => @InvalidRange() }};
 
 /* dependency container */
 DependencyContainer = :[];
@@ -30,7 +30,6 @@ DependencyContainerError->targetType(=> Type) :: $targetType;
 DependencyContainerError->errorType(=> DependencyContainerErrorType) :: $errorType;
 
 /* json value */
-JsonValue = Null|Boolean|Integer|Real|String|Array<`JsonValue>|Map<`JsonValue>|Set<`JsonValue>/*|Result<Nothing, `JsonValue>*/|Mutable<`JsonValue>;
 InvalidJsonString = #[value: String];
 InvalidJsonString->value(=> String) :: $value;
 InvalidJsonValue = #[value: Any];
@@ -56,8 +55,21 @@ HydrationError->errorMessage(=> String) :: ''->concatList[
 /* IO etc. */
 ExternalError = $[errorType: String, originalError: Any, errorMessage: String];
 
+/* RegExp */
+InvalidRegExp = #[expression: String];
+RegExp = $String;
+RegExpMatch = #[match: String, groups: Array<String>];
+NoRegExpMatch = :[];
+
 /* Random generator */
 Random = :[];
+
+/* UUID */
+InvalidUuid = #[value: String];
+Uuid = <: String<36> @ InvalidUuid :: ?whenIsError(
+    {RegExp('/[a-f0-9]{8}\-[a-f0-9]{4}\-4[a-f0-9]{3}\-(8|9|a|b)[a-f0-9]{3}\-[a-f0-9]{12}/')}
+        ->matchString(#)
+) { => @InvalidUuid[#] };
 
 /* Password handling */
 PasswordString = #[value: String];

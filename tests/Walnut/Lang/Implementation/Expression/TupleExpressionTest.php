@@ -54,11 +54,11 @@ final class TupleExpressionTest extends TestCase {
 	public function testExecute(): void {
 		$result = $this->tupleExpression->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])));
 		self::assertEquals(
-			$this->valueRegistry->tuple([
+			(string)$this->valueRegistry->tuple([
 				$this->valueRegistry->integer(123),
 				$this->valueRegistry->string("456")
 			]),
-			$result->value
+			(string)$result->value
 		);
 	}
 

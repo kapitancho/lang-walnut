@@ -64,7 +64,6 @@ final readonly class Min implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue && count($targetValue->values) > 0) {
 			$minV = $targetValue->values[0];
 			$min = $minV->literalValue;

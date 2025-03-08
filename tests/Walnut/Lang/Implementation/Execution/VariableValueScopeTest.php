@@ -7,9 +7,12 @@ use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownContextVariable;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownVariable;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
+use Walnut\Lang\Implementation\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
 use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
+use Walnut\Lang\Implementation\Program\Registry\MainMethodRegistry;
+use Walnut\Lang\Implementation\Program\Registry\NestedMethodRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
 use Walnut\Lang\Test\EmptyDependencyContainer;
 
@@ -21,12 +24,20 @@ final class VariableValueScopeTest extends TestCase {
 
 	public function setUp(): void {
 		parent::setUp();
-		$this->typeRegistry = new TypeRegistryBuilder(new CustomMethodRegistryBuilder());
-		$this->valueRegistry = new ValueRegistry($this->typeRegistry, new EmptyDependencyContainer);
+		$this->typeRegistry = new TypeRegistryBuilder(
+			new CustomMethodRegistryBuilder(),
+			new MainMethodRegistry(
+				new NativeCodeTypeMapper(),
+				new NestedMethodRegistry(),
+				[]
+			)
+		);
+		$this->valueRegistry = new ValueRegistry($this->typeRegistry);
 		$this->variableValueScope = new VariableValueScope([
-			'x' => new TypedValue(
-				$this->typeRegistry->integer(),
+			'x' => TypedValue::forValue(
 				$this->valueRegistry->integer(123)
+			)->withType(
+				$this->typeRegistry->integer()
 			)
 		]);
 	}
@@ -41,9 +52,10 @@ final class VariableValueScopeTest extends TestCase {
 
 	public function testFindVariable(): void {
 		self::assertEquals(
-			new TypedValue(
-				$this->typeRegistry->integer(),
+			TypedValue::forValue(
 				$this->valueRegistry->integer(123)
+			)->withType(
+				$this->typeRegistry->integer()
 			),
 			$this->variableValueScope->findTypedValueOf(new VariableNameIdentifier('x'))
 		);
@@ -83,9 +95,10 @@ final class VariableValueScopeTest extends TestCase {
 	public function testWithAddedValues(): void {
 		$variableValueScope = $this->variableValueScope->withAddedVariableValue(
 			new VariableNameIdentifier('y'),
-			new TypedValue(
-				$this->typeRegistry->string(),
+			TypedValue::forValue(
 				$this->valueRegistry->string('abc')
+			)->withType(
+				$this->typeRegistry->string()
 			)
 		);
 		self::assertEquals(['x', 'y'], $variableValueScope->variables());

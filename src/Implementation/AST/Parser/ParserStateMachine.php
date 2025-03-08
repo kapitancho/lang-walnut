@@ -79,7 +79,6 @@ final readonly class ParserStateMachine {
 			]],
 			104 => ['name' => 'module level type definition', 'transitions' => [
 				'assign' => 105,
-				'subtype' => 113,
 				'cast_marker' => 119,
 				'method_marker' => 122,
 				'call_start' => 141,
@@ -125,11 +124,12 @@ final readonly class ParserStateMachine {
 				}
 			]],
 			107 => ['name' => 'module level enum', 'transitions' => [
-				'type_keyword' => function(LT $token) {
+				'type_keyword' => $c = function(LT $token) {
 					$this->s->result['enumerationValues'] ??= [];
 					$this->s->result['enumerationValues'][] = $token->patternMatch->text;
 					$this->s->move(108);
 				},
+				'var_keyword' => $c
 			]],
 			108 => ['name' => 'module level enum separator', 'transitions' => [
 				'value_separator' => 107,
@@ -211,9 +211,9 @@ final readonly class ParserStateMachine {
 					$this->s->move(201);
 				},
 				T::expression_separator->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->constant(
+					$this->s->generated = null;/*$this->nodeBuilder->constant(
 						$this->nodeBuilder->nullValue
-					);
+					);*/
 					$this->s->stay(963);
 				},
 			]],
@@ -259,9 +259,9 @@ final readonly class ParserStateMachine {
 					$this->s->move(201);
 				},
 				T::expression_separator->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->constant(
+					$this->s->generated = null; /*$this->nodeBuilder->constant(
 						$this->nodeBuilder->nullValue
-					);
+					);*/
 					$this->s->stay(163);
 				},
 			]],
@@ -307,9 +307,9 @@ final readonly class ParserStateMachine {
 					$this->s->move(201);
 				},
 				T::expression_separator->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->constant(
+					$this->s->generated = null;/*$this->nodeBuilder->constant(
 						$this->nodeBuilder->nullValue
-					);
+					);*/
 					$this->s->stay(168);
 				},
 			]],
@@ -343,63 +343,6 @@ final readonly class ParserStateMachine {
 
 
 
-
-
-
-			113 => ['name' => 'subtype base type', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->push(114);
-					$this->s->stay(701);
-				}
-			]],
-			114 => ['name' => 'subtype base type return', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->result['base_type'] = $this->s->generated;
-					$this->s->stay(115);
-				}
-			]],
-			115 => ['name' => 'subtype error type', 'transitions' => [
-				T::error_marker->name => function(LT $token) {
-					$this->s->push(116);
-					$this->s->move(701);
-				},
-				T::function_body_marker->name => function(LT $token) {
-					$this->s->push(118);
-					$this->s->move(201);
-				},
-				T::expression_separator->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->constant(
-						$this->nodeBuilder->nullValue
-					);
-					$this->s->stay(118);
-				},
-			]],
-			116 => ['name' => 'subtype error type return', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->result['error_type'] = $this->s->generated;
-					$this->s->stay(117);
-				}
-			]],
-			117 => ['name' => 'subtype error type body start', 'transitions' => [
-				T::function_body_marker->name => function(LT $token) {
-					$this->s->push(118);
-					$this->s->move(201);
-				},
-			]],
-			118 => ['name' => 'subtype result', 'transitions' => [
-				'' => function(LT $token) {
-					$this->moduleNodeBuilder->definition(
-						$this->s->generated = $this->nodeBuilder->addSubtype(
-							new TypeNameIdentifier($this->s->result['typeName']),
-							$this->s->result['base_type'],
-							$this->s->generated,
-							//$this->nodeBuilder->functionBody($this->s->generated),
-							$this->s->result['error_type'] ?? null,
-						)
-					);
-					$this->s->move(102);
-				}
-			]],
 			119 => ['name' => 'cast base type', 'transitions' => [
 				T::type_keyword->name => function(LT $token) {
 					$this->s->result['castToTypeName'] = $token->patternMatch->text;
@@ -879,14 +822,14 @@ final readonly class ParserStateMachine {
 					$this->s->push(274);
 					$this->s->back(401);
 				},
-				T::empty_tuple->name => function(LT $token) {
+				/*T::empty_tuple->name => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->constant(
 						$this->nodeBuilder->atomValue(
 							new TypeNameIdentifier($this->s->result['type_name'])
 						)
 					);
 					$this->s->moveAndPop();
-				},
+				},*/
 				T::call_start->name => 271,
 				T::tuple_start->name => function(LT $token) {
 					$this->s->push(273);
@@ -1997,7 +1940,7 @@ final readonly class ParserStateMachine {
 					if (in_array($token->patternMatch->text, [
 						'Function', 'Tuple', 'Record', 'Union', 'Intersection', 'Atom', 'Enumeration',
 						'EnumerationSubset', 'EnumerationValue', 'IntegerSubset', 'MutableValue',
-						'RealSubset', 'StringSubset', 'State', 'Subtype', 'Alias', 'Named'
+						'RealSubset', 'StringSubset', 'State', 'Subset', 'Alias', 'Named'
 					], true)) {
 						$this->s->generated = $this->nodeBuilder->metaTypeType(
 							MetaTypeValue::from($token->patternMatch->text)
@@ -2023,7 +1966,7 @@ final readonly class ParserStateMachine {
 			]],
 
 			490 => ['name' => 'value type name', 'transitions' => [
-				T::empty_tuple->name => 491,
+				//T::empty_tuple->name => 491,
 				T::property_accessor->name => 492,
 			]],
 			491 => ['name' => 'value atom', 'transitions' => [
@@ -2033,13 +1976,14 @@ final readonly class ParserStateMachine {
 				}
 			]],
 			492 => ['name' => 'value enum', 'transitions' => [
-				T::type_keyword->name => function(LT $token) {
+				T::type_keyword->name => $c = function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->enumerationValue(
 						new TypeNameIdentifier($this->s->result['current_type_name']),
 						new EnumValueIdentifier($token->patternMatch->text)
 					);
 					$this->s->moveAndPop();
-				}
+				},
+				T::var_keyword->name => $c
 			]],
 
 			501 => ['name' => 'function value start', 'transitions' => [
@@ -2265,6 +2209,7 @@ final readonly class ParserStateMachine {
 						'Mutable' => 770,
 						'Result' => 780,
 						'Error' => 775,
+						'Shape' => 930,
 						'Any', 'Nothing', 'Boolean', 'True', 'False', 'Null',
 						'MutableValue', 'EnumerationValue' => 702,
 						default => 789
@@ -2658,7 +2603,7 @@ final readonly class ParserStateMachine {
 					if (in_array($token->patternMatch->text, [
 						'Function', 'Tuple', 'Record', 'Union', 'Intersection', 'Atom', 'Enumeration',
 						'EnumerationSubset', 'EnumerationValue', 'IntegerSubset', 'RealSubset', 'StringSubset',
-						'Sealed', 'Subtype', 'Alias', 'Named', 'MutableValue'
+						'Sealed', 'Alias', 'Named', 'MutableValue'
 					], true)) {
 						$this->s->result['type'] = $this->nodeBuilder->metaTypeType(
 							MetaTypeValue::from($token->patternMatch->text)
@@ -2865,11 +2810,12 @@ final readonly class ParserStateMachine {
 				},
 			]],
 			791 => ['name' => 'type enum subset value', 'transitions' => [
-				T::type_keyword->name => function(LT $token) {
+				T::type_keyword->name => $c = function(LT $token) {
 					$this->s->result['subsetValues'] ??= [];
 					$this->s->result['subsetValues'][] = new EnumValueIdentifier($token->patternMatch->text);
 					$this->s->move(792);
 				},
+				T::var_keyword->name => $c
 			]],
 			792 => ['name' => 'type string subset separator', 'transitions' => [
 				T::value_separator->name => 791,
@@ -3138,7 +3084,7 @@ final readonly class ParserStateMachine {
 				T::type_start->name => 931,
 				'' => function(LT $token) {
 					$this->s->pop();
-					$this->s->generated = $this->nodeBuilder->typeType(
+					$this->s->generated = $this->nodeBuilder->shapeType(
 						$this->nodeBuilder->anyType
 					);
 				},

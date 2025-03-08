@@ -95,7 +95,7 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 		return new MatchErrorExpression($condition, $onError, $else);
 	}
 
-	public function functionCall(Expression $target, Expression $parameter): \Walnut\Lang\Blueprint\Code\Expression\MethodCallExpression {
+	public function functionCall(Expression $target, Expression $parameter): MethodCallExpression {
 		return $this->methodCall(
 			$target,
 			new MethodNameIdentifier('invoke'),

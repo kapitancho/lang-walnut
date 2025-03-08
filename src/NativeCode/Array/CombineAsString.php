@@ -58,17 +58,14 @@ final readonly class CombineAsString implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
-		$parameterValue = $this->toBaseValue($parameterValue);
-		if ($targetValue instanceof TupleValue) {
+				if ($targetValue instanceof TupleValue) {
 			if ($parameterValue instanceof StringValue) {
 				$result = [];
 				foreach($targetValue->values as $value) {
-					$value = $this->toBaseValue($value);
+					$value = $value;
 					if ($value instanceof StringValue) {
 						$result[] = $value->literalValue;
 					} else {
-						echo $value::class, $targetValue;
 						// @codeCoverageIgnoreStart
 						throw new ExecutionException("Invalid parameter value");
 						// @codeCoverageIgnoreEnd

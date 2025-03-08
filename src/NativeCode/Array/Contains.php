@@ -41,7 +41,6 @@ final readonly class Contains implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
 			$values = $targetValue->values;
 			foreach ($values as $value) {

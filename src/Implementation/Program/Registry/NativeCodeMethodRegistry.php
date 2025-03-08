@@ -15,7 +15,7 @@ final readonly class NativeCodeMethodRegistry implements MethodRegistry {
 		private array                  $lookupNamespaces
 	) {}
 
-	public function method(Type $targetType, MethodNameIdentifier $methodName): Method|UnknownMethod {
+	public function methodForType(Type $targetType, MethodNameIdentifier $methodName): Method|UnknownMethod {
 		$candidates = $this->typeMapper->getTypesFor($targetType);
 		$method = ucfirst($methodName->identifier);
 

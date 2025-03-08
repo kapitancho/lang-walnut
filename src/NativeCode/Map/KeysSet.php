@@ -44,7 +44,6 @@ final readonly class KeysSet implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue) {
 			return TypedValue::forValue($programRegistry->valueRegistry->set(
 				array_map(

@@ -16,7 +16,6 @@ use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\SetValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
-use Walnut\Lang\Blueprint\Value\SubtypeValue;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Blueprint\Value\Value;
 
@@ -66,9 +65,6 @@ final readonly class Stringify implements NativeMethod {
 		}
 		if ($value instanceof RealValue) {
 			return (float)(string)$value->literalValue;
-		}
-		if ($value instanceof SubtypeValue) {
-			return $this->doStringify($value->baseValue);
 		}
 		if ($value instanceof MutableValue) {
 			return $this->doStringify($value->value);

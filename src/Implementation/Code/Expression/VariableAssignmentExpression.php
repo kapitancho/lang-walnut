@@ -13,7 +13,6 @@ use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\VariableAssignmentExpression as VariableAssignmentExpressionInterface;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
-use Walnut\Lang\Blueprint\Function\FunctionBodyException;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
 
 final readonly class VariableAssignmentExpression implements VariableAssignmentExpressionInterface, JsonSerializable {
@@ -31,8 +30,8 @@ final readonly class VariableAssignmentExpression implements VariableAssignmentE
 			$analyserContext = $analyserContext->withAddedVariableType(
 				$this->variableName,
 				$analyserContext->programRegistry->typeRegistry->function(
-					$v->parameterType,
-					$v->returnType,
+					$v->type->parameterType,
+					$v->type->returnType,
 				)
 			);
 		}
@@ -42,7 +41,7 @@ final readonly class VariableAssignmentExpression implements VariableAssignmentE
 				$this->variableName,
 				$ret->expressionType
 			);
-		} catch (AnalyserException|FunctionBodyException $e) {
+		} catch (AnalyserException $e) {
 			/** @noinspection PhpUnhandledExceptionInspection */
 			throw $innerFn ? new AnalyserException(
 				sprintf(
@@ -58,7 +57,8 @@ final readonly class VariableAssignmentExpression implements VariableAssignmentE
 		$ret = $this->assignedExpression->execute($executionContext);
 		$val = $ret->typedValue;
 		if ($val->value instanceof FunctionValue && $this->assignedExpression instanceof ConstantExpression) {
-			$val = new TypedValue($val->type, $val->value->withSelfReferenceAs($this->variableName));
+			$val = TypedValue::forValue($val->value->withSelfReferenceAs($this->variableName))
+				->withType($val->type);
 		}
 		return $ret->withAddedVariableValue(
 			$this->variableName,

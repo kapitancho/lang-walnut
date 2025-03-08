@@ -35,12 +35,11 @@ final readonly class Length implements NativeMethod {
 
 	public function execute(
 		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
+		TypedValue $targetValue,
+		TypedValue $parameterValue
 	): TypedValue {
-		$targetValue = $target->value;
+		$targetValue = $targetValue->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof StringValue) {
 			return TypedValue::forValue($programRegistry->valueRegistry->integer(
 				mb_strlen($targetValue->literalValue)

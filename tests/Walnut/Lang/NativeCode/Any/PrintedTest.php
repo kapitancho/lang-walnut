@@ -7,7 +7,7 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 final class PrintedTest extends CodeExecutionTestHelper {
 
 	public function testPrintedNonJson(): void {
-		$result = $this->executeCodeSnippet("MyAtom[]->printed;", "MyAtom = :[];");
+		$result = $this->executeCodeSnippet("MyAtom()->printed;", "MyAtom = :[];");
 		$this->assertEquals("'MyAtom[]'", $result);
 	}
 
@@ -56,10 +56,10 @@ final class PrintedTest extends CodeExecutionTestHelper {
 		$this->assertEquals("'[1; 2]'", $result);
 	}
 
-	public function testPrintedSubtype(): void {
+	public function testPrintedSubset(): void {
 		$result = $this->executeCodeSnippet("getReal()->printed;",
-			"MySubtype <: Real; getReal = ^Any => Real :: MySubtype(3.14);");
-		$this->assertEquals("'MySubtype{3.14}'", $result);
+			"MySubset = <: Real; getReal = ^Any => Real :: MySubset(3.14);");
+		$this->assertEquals("'3.14'", $result);
 	}
 
 	public function testPrintedMutable(): void {

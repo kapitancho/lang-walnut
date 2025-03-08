@@ -48,8 +48,8 @@ final readonly class ValueOf implements NativeMethod {
 		if ($parameterValue instanceof TypeValue) {
 			$type = $parameterValue->typeValue;
 			$result = $programRegistry->dependencyContainer->valueByType($type);
-			if ($result instanceof Value) {
-				return new TypedValue($type, $result);
+			if ($result instanceof TypedValue) {
+				return $result;
 			}
 			return TypedValue::forValue(
 				$programRegistry->valueRegistry->error(

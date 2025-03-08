@@ -34,7 +34,7 @@ final readonly class BinaryIntegerDivide implements NativeMethod {
 						$programRegistry->typeRegistry->result(
 							$programRegistry->typeRegistry->integer(),
 							$programRegistry->typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
-						) : $programRegistry->typeRegistry->real();
+						) : $programRegistry->typeRegistry->integer();
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}
@@ -51,10 +51,8 @@ final readonly class BinaryIntegerDivide implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
 
 		if ($targetValue instanceof IntegerValue) {
-			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue) {
 				if ((int)(string)$parameterValue->literalValue === 0) {
 					return TypedValue::forValue($programRegistry->valueRegistry->error(

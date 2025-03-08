@@ -55,9 +55,7 @@ final readonly class BinaryMultiply implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
-		$parameterValue = $this->toBaseValue($parameterValue);
-		if ($targetValue instanceof StringValue) {
+				if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof IntegerValue && $parameterValue->literalValue >= 0) {
 				$result = str_repeat(
 					$targetValue->literalValue,

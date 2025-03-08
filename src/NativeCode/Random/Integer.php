@@ -67,9 +67,7 @@ final readonly class Integer implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
-		$parameterValue = $this->toBaseValue($parameterValue);
-		if ($targetValue instanceof AtomValue && $targetValue->type->name->equals(
+				if ($targetValue instanceof AtomValue && $targetValue->type->name->equals(
 			new TypeNameIdentifier('Random')
 		)) {
 			if ($parameterValue instanceof RecordValue) {

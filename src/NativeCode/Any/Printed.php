@@ -19,10 +19,10 @@ final readonly class Printed implements NativeMethod {
 
 	public function execute(
 		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
+		TypedValue $targetValue,
+		TypedValue $parameterValue
 	): TypedValue {
-		$targetValue = $target->value;
+		$targetValue = $targetValue->value;
 
         return TypedValue::forValue($programRegistry->valueRegistry->string(
             (string)$targetValue

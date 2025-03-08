@@ -46,7 +46,6 @@ final readonly class Abs implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			$target = $targetValue->literalValue;
 			return TypedValue::forValue($programRegistry->valueRegistry->real(abs((string)$target)));

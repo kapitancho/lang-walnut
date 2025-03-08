@@ -4,10 +4,11 @@ namespace Walnut\Lang\NativeCode\Any;
 
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 
+// ESSENTIAL TEST
 final class AsStringTest extends CodeExecutionTestHelper {
 
 	public function testAsStringNonJson(): void {
-		$result = $this->executeCodeSnippet("MyAtom[]->asString;", "MyAtom = :[];");
+		$result = $this->executeCodeSnippet("MyAtom()->asString;", "MyAtom = :[];");
 		$this->assertEquals("'MyAtom'", $result);
 	}
 
@@ -56,15 +57,42 @@ final class AsStringTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@CastNotAvailable[\n\tfrom: type{Set<Integer[1, 2], 2..2>},\n\tto: type{String}\n]", $result);
 	}
 
-	public function testAsStringSubtype(): void {
+	public function testAsStringOpen(): void {
+		$result = $this->executeCodeSnippet("{MyOpen[a: 'value']}->asString;", "MyOpen = #[a: String];");
+		$this->assertEquals("@CastNotAvailable[from: type{MyOpen}, to: type{String}]", $result);
+	}
+
+	public function testAsStringSealed(): void {
+		$result = $this->executeCodeSnippet("{MySealed[a: 'value']}->asString;", "MySealed = $[a: String];");
+		$this->assertEquals("@CastNotAvailable[from: type{MySealed}, to: type{String}]", $result);
+	}
+
+	public function testAsStringAlias(): void {
 		$result = $this->executeCodeSnippet("getReal()->asString;",
-			"MySubtype <: Real; getReal = ^Any => Real :: MySubtype(3.14);");
+			"MyAlias = Real; getReal = ^ => MyAlias :: 3.14;");
+		$this->assertEquals("'3.14'", $result);
+	}
+
+	public function testAsStringSubset(): void {
+		$result = $this->executeCodeSnippet("getReal()->asString;",
+			"MySubset = <: Real; getReal = ^ => MySubset :: MySubset(3.14);");
 		$this->assertEquals("'3.14'", $result);
 	}
 
 	public function testAsStringMutable(): void {
 		$result = $this->executeCodeSnippet("mutable{Real, 3.14}->asString;");
 		$this->assertEquals("'3.14'", $result);
+	}
+
+	public function testAsStringShape(): void {
+		$result = $this->executeCodeSnippet("getReal()->shape->asString;",
+			"getReal = ^ => Shape<Real> :: 3.14;");
+		$this->assertEquals("'3.14'", $result);
+	}
+
+	public function testAsStringType(): void {
+		$result = $this->executeCodeSnippet("type{Integer}->asString;");
+		$this->assertEquals("'Integer'", $result);
 	}
 
 }

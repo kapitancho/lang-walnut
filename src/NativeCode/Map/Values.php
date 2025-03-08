@@ -42,7 +42,6 @@ final readonly class Values implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue) {
 			return TypedValue::forValue($programRegistry->valueRegistry->tuple(array_values($targetValue->values)));
 		}

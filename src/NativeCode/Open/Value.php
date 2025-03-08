@@ -12,9 +12,7 @@ use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Value\OpenValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
-use Walnut\Lang\Blueprint\Type\SubtypeType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
-use Walnut\Lang\Blueprint\Value\SubtypeValue;
 
 final readonly class Value implements NativeMethod {
 
@@ -45,10 +43,8 @@ final readonly class Value implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof OpenValue) {
-			return new TypedValue(
-				$targetValue->type->valueType,
-				$targetValue->value
-			);
+			return TypedValue::forValue($targetValue->value)
+				->withType($targetValue->type->valueType);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

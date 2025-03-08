@@ -11,9 +11,9 @@ final class DatabaseTest extends BaseProgramTestHelper {
 
         $this->assertEquals(
 			'[dsn: String]',
-	        (string)$this->typeRegistry->subtype(
+	        (string)$this->typeRegistry->open(
 				new TypeNameIdentifier('DatabaseConnection')
-	        )->baseType
+	        )->valueType
         );
         $this->assertEquals(
 			'(String|Integer|Boolean|Null)',
@@ -47,7 +47,7 @@ final class DatabaseTest extends BaseProgramTestHelper {
         );
         $this->assertEquals(
 			"[\n\tquery: String<1..>,\n\tboundParameters: DatabaseQueryBoundParameters,\n\terror: String\n]",
-	        (string)$this->typeRegistry->sealed(
+	        (string)$this->typeRegistry->open(
 				new TypeNameIdentifier('DatabaseQueryFailure')
 	        )->valueType
         );

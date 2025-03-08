@@ -21,8 +21,8 @@ final class ToStringTest extends BaseProgramTestHelper {
 		foreach([
 			'MyAtom[]' => $vr->atom($i('MyAtom')),
 			'MyEnum.A' => $vr->enumerationValue($i('MyEnum'), $ev('A')),
-			'MySealed[:]' => $vr->sealedValue($i('MySealed'), $vr->record([])),
-			'MySubtype{null}' => $vr->subtypeValue($i('MySubtype'), $vr->null),
+			'MySealed{null}' => $vr->sealedValue($i('MySealed'), $vr->null),
+			'MyOpen{null}' => $vr->openValue($i('MyOpen'), $vr->null),
 			'true' => $vr->boolean(true),
 			'false' => $vr->boolean(false),
 			'null' => $vr->null,
@@ -68,7 +68,7 @@ final class ToStringTest extends BaseProgramTestHelper {
 			'MyEnum' => $tr->enumeration($i('MyEnum')),
 			'MyEnum[A, B]' => $tr->enumerationSubsetType($i('MyEnum'), [$ev('A'), $ev('B')]),
 			'MySealed' => $tr->sealed($i('MySealed')),
-			'MySubtype' => $tr->subtype($i('MySubtype')),
+			'MyOpen' => $tr->open($i('MyOpen')),
 			'Boolean' => $tr->boolean,
 			'True' => $tr->true,
 			'False' => $tr->false,
@@ -177,7 +177,7 @@ final class ToStringTest extends BaseProgramTestHelper {
 			"x->item('a')" => $er->propertyAccess($x, 'a'),
 			"x->item('0')" => $er->propertyAccess($x, '0'),
 			'x->invoke(0)' => $er->functionCall($x, $c0),
-			'0->construct(type{MySubtype})' => $er->constructorCall(new TypeNameIdentifier('MySubtype'), $c0),
+			'0->construct(type{MyOpen})' => $er->constructorCall(new TypeNameIdentifier('MyOpen'), $c0),
 			'x->method(0)' => $er->methodCall($x, new MethodNameIdentifier('method'), $c0),
 			'x->method' => $er->methodCall($x, new MethodNameIdentifier('method'), $er->constant($this->valueRegistry->null)),
 			'?whenIsTrue { x->asBoolean: 0, ~: 0 }' => $er->matchTrue([

@@ -42,9 +42,7 @@ final readonly class TrimRight implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof StringValue) {
-			$parameterValue = $this->toBaseValue($parameterValue);
 			return TypedValue::forValue($parameterValue instanceof StringValue ?
 				$programRegistry->valueRegistry->string(rtrim($targetValue->literalValue, $parameterValue->literalValue)) :
 				$programRegistry->valueRegistry->string(rtrim($targetValue->literalValue))

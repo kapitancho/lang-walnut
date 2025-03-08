@@ -18,9 +18,9 @@ final readonly class NestedMethodRegistry implements MethodRegistry {
 		$this->registries = $registries;
 	}
 
-	public function method(Type $targetType, MethodNameIdentifier $methodName): Method|UnknownMethod {
+	public function methodForType(Type $targetType, MethodNameIdentifier $methodName): Method|UnknownMethod {
 		foreach ($this->registries as $registry) {
-			$method = $registry->method($targetType, $methodName);
+			$method = $registry->methodForType($targetType, $methodName);
 			if ($method instanceof Method) {
 				return $method;
 			}

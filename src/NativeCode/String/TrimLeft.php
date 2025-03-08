@@ -43,9 +43,7 @@ final readonly class TrimLeft implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof StringValue) {
-			$parameterValue = $this->toBaseValue($parameterValue);
 			return TypedValue::forValue($parameterValue instanceof StringValue ?
 				$programRegistry->valueRegistry->string(ltrim($targetValue->literalValue, $parameterValue->literalValue)) :
 				$programRegistry->valueRegistry->string(ltrim($targetValue->literalValue))

@@ -51,7 +51,6 @@ final readonly class LastIndexOf implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
 			$values = $targetValue->values;
 			for($index = count($values) - 1; $index >= 0; $index--) {

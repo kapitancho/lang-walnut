@@ -73,14 +73,17 @@ final readonly class NoExternalErrorExpression implements NoExternalErrorExpress
 			if ($errorValue instanceof SealedValue && $errorValue->type->name->equals(
 				new TypeNameIdentifier('ExternalError'))
 			) {
-				throw new FunctionReturn($value);
+				throw new FunctionReturn($result->typedValue);
 			}
 		}
 		$vt = $result->valueType;
 		// @codeCoverageIgnoreStart
 		if ($vt instanceof ResultType) {
-			$result = $result->withTypedValue(new TypedValue(
-				$this->withoutExternalError($executionContext->programRegistry->typeRegistry, $vt), $result->value));
+			$result = $result->withTypedValue(
+				$result->typedValue->withType(
+					$this->withoutExternalError($executionContext->programRegistry->typeRegistry, $vt)
+				)
+			);
 		}
 		// @codeCoverageIgnoreEnd
 		return $result;

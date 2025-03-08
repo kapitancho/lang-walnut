@@ -2,8 +2,8 @@
 
 namespace Walnut\Lang\Test\Implementation\Value;
 
+use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
-use Walnut\Lang\Blueprint\Function\FunctionBodyException;
 use Walnut\Lang\Implementation\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Implementation\Code\Execution\ExecutionContext;
 use Walnut\Lang\Implementation\Code\Scope\VariableScope;
@@ -23,11 +23,11 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 				$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
 			)
 		);
-		$fn->analyse(new AnalyserContext($this->programRegistry, VariableScope::empty()));
+		$fn->selfAnalyse(new AnalyserContext($this->programRegistry, VariableScope::empty()));
 	}
 
 	public function testReturnTypeNotOk(): void {
-		$this->expectException(FunctionBodyException::class);
+		$this->expectException(AnalyserException::class);
 		$fn = $this->valueRegistry->function(
 			$this->typeRegistry->integer(),
 			null,
@@ -37,7 +37,7 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 				$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
 			)
 		);
-		$fn->analyse(new AnalyserContext($this->programRegistry, VariableScope::empty()));
+		$fn->selfAnalyse(new AnalyserContext($this->programRegistry, VariableScope::empty()));
 	}
 
 	public function testReturnValueOk(): void {
@@ -54,7 +54,7 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 			new ExecutionContext($this->programRegistry, VariableValueScope::empty()),
 			$int = $this->valueRegistry->integer(15)
 		);
-		$this->assertTrue($result->equals($int));
+		$this->assertTrue($result->value->equals($int));
 	}
 
 	public function testReturnValueDirectReturnOk(): void {
@@ -73,6 +73,6 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 			new ExecutionContext($this->programRegistry, VariableValueScope::empty()),
 			$int = $this->valueRegistry->integer(15)
 		);
-		$this->assertTrue($result->equals($int));
+		$this->assertTrue($result->value->equals($int));
 	}
 }

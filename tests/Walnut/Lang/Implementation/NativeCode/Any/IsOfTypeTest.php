@@ -219,60 +219,6 @@ final class IsOfTypeTest extends BaseProgramTestHelper {
 		$this->callIsOfType($v1, $z, false);
 		$this->callIsOfType($v1, $a, true);
 
-		$this->typeRegistryBuilder->addSubtype(
-			new TypeNameIdentifier('Percent'),
-			$this->typeRegistry->integer(0, 100),
-			$this->expressionRegistry->functionBody(
-				$this->expressionRegistry->constant($this->valueRegistry->null)
-			),
-			$this->typeRegistry->nothing
-		);
-		$this->typeRegistryBuilder->addSubtype(
-			new TypeNameIdentifier('Digit'),
-			$this->typeRegistry->integer(0, 9),
-			$this->expressionRegistry->functionBody(
-				$this->expressionRegistry->constant($this->valueRegistry->null)
-			),
-			$this->typeRegistry->nothing
-		);
-		$v1 = $this->valueRegistry->subtypeValue(
-			$tPer = new TypeNameIdentifier('Percent'),
-			$this->valueRegistry->integer(50)
-		);
-		$v2 = $this->valueRegistry->subtypeValue(
-			$tPer,
-			$this->valueRegistry->integer(5)
-		);
-		$v3 = $this->valueRegistry->subtypeValue(
-			$tDig = new TypeNameIdentifier('Digit'),
-			$this->valueRegistry->integer(5)
-		);
-		$v4 = $this->valueRegistry->integer(5);
-		$t1 = $this->typeRegistry->subtype($tPer);
-		$t2 = $this->typeRegistry->subtype($tDig);
-		$t3 = $this->typeRegistry->integer(-10, 30);
-		$t4 = $this->typeRegistry->integer(-200, 200);
-		$z = $this->typeRegistry->string();
-
-		$this->callIsOfType($v1, $t1, true);
-		$this->callIsOfType($v2, $t1, true);
-		$this->callIsOfType($v3, $t1, false);
-		$this->callIsOfType($v4, $t1, false);
-		$this->callIsOfType($v1, $t2, false);
-		$this->callIsOfType($v2, $t2, false);
-		$this->callIsOfType($v3, $t2, true);
-		$this->callIsOfType($v4, $t2, false);
-		$this->callIsOfType($v1, $t3, false);
-		$this->callIsOfType($v2, $t3, true); //used to be false
-		$this->callIsOfType($v3, $t3, true);
-		$this->callIsOfType($v4, $t3, true);
-		$this->callIsOfType($v1, $t4, true);
-		$this->callIsOfType($v2, $t4, true);
-		$this->callIsOfType($v3, $t4, true);
-		$this->callIsOfType($v4, $t4, true);
-		$this->callIsOfType($v1, $z, false);
-		$this->callIsOfType($v1, $a, true);
-
 		$this->typeRegistryBuilder->addSealed(
 			new TypeNameIdentifier('PercentState'),
 			$this->typeRegistry->record(['x' => $this->typeRegistry->integer(0, 100)]),

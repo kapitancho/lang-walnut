@@ -2,232 +2,51 @@
 
 namespace Walnut\Lang\Implementation\Function;
 
-use JsonSerializable;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
+use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
+use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownContextVariable;
-use Walnut\Lang\Blueprint\Common\Identifier\IdentifierException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\FunctionBody as FunctionBodyInterface;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
-use Walnut\Lang\Blueprint\Type\CustomType;
-use Walnut\Lang\Blueprint\Type\NothingType;
-use Walnut\Lang\Blueprint\Type\OpenType;
-use Walnut\Lang\Blueprint\Type\RecordType;
-use Walnut\Lang\Blueprint\Type\SealedType;
-use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Type\UnknownProperty;
-use Walnut\Lang\Blueprint\Value\CustomValue;
-use Walnut\Lang\Blueprint\Value\RecordValue;
-use Walnut\Lang\Blueprint\Value\SealedValue;
-use Walnut\Lang\Blueprint\Value\TupleValue;
-use Walnut\Lang\Blueprint\Value\Value;
-use Walnut\Lang\Implementation\Type\Helper\BaseType;
-use Walnut\Lang\Implementation\Type\OptionalKeyType;
 
-final readonly class FunctionBody implements FunctionBodyInterface, JsonSerializable {
-
-	use BaseType;
-
+final readonly class FunctionBody implements FunctionBodyInterface {
 	public function __construct(
 		public Expression $expression
 	) {}
 
-	private Type $returnType;
-
-	private function getMapItemNotFound(TypeRegistry $typeRegistry): OpenType {
-		return $typeRegistry->open(new TypeNameIdentifier("MapItemNotFound"));
-	}
-
+	/** @throws AnalyserException */
 	public function analyse(
-		AnalyserContext $analyserContext,
-		Type $targetType,
-		Type $parameterType,
-		VariableNameIdentifier|null $parameterName,
-		Type $dependencyType
+		AnalyserContext $analyserContext
 	): Type {
-		if (isset($this->returnType)) {
-			return $this->returnType;
-		}
-		$tConv = fn(Type $type): Type => $type instanceof OptionalKeyType ?
-			$analyserContext->programRegistry->typeRegistry->result($type->valueType, $this->getMapItemNotFound(
-				$analyserContext->programRegistry->typeRegistry
-			)) :
-			$type;
-
-		if ($targetType instanceof CustomType) {
-			$analyserContext = $analyserContext->withAddedVariableType(
-				new VariableNameIdentifier('$$'),
-				$targetType->valueType
-			);
-		}
-
-		if ($parameterName) {
-			$analyserContext = $analyserContext->withAddedVariableType(
-				$parameterName,
-				$parameterType
-			);
-		}
-		foreach(['$' => $targetType, '#' => $parameterType, '%' => $dependencyType] as $variableName => $type) {
-			if (!($type instanceof NothingType)) {
-				$analyserContext = $analyserContext->withAddedVariableType(
-					new VariableNameIdentifier($variableName),
-					$type
-				);
-				$type = $this->toBaseType($type);
-				$t = $type instanceof OpenType ? $type->valueType : $type;
-				if ($t instanceof TupleType) {
-					foreach($t->types as $index => $typeItem) {
-						$analyserContext = $analyserContext->withAddedVariableType(
-							new VariableNameIdentifier($variableName . $index),
-							$typeItem
-						);
-					}
-				}
-				if ($t instanceof RecordType) {
-					foreach($t->types as $fieldName => $fieldType) {
-						$analyserContext = $analyserContext->withAddedVariableType(
-							new VariableNameIdentifier($variableName . $fieldName),
-							$tConv($fieldType)
-						);
-					}
-				}
-			}
-		}
-		if (
-			$targetType instanceof SealedType &&
-			($targetType->valueType instanceof RecordType || $targetType->valueType instanceof TupleType)
-		) {
-			foreach($targetType->valueType->types as $fieldName => $fieldType) {
-				$analyserContext = $analyserContext->withAddedVariableType(
-					new VariableNameIdentifier('$' . $fieldName),
-					$tConv($fieldType)
-				);
-			}
-		}
-		try {
-			$result = $this->expression->analyse($analyserContext);
-		} catch (UnknownContextVariable $e) {
-			throw new AnalyserException(
-				sprintf(
-					"Unknown variable '%s' in function body",
-					$e->variableName
-				)
-			);
-		}
-		return $this->returnType ??= $analyserContext->programRegistry->typeRegistry->union([$result->expressionType, $result->returnType]);
+		$analyserResult = $this->expression->analyse(
+			$analyserContext
+		);
+		return $analyserContext->programRegistry->typeRegistry->union([
+			$analyserResult->expressionType,
+			$analyserResult->returnType
+		]);
 	}
 
+	/** @throws ExecutionException */
 	public function execute(
-		ExecutionContext $executionContext,
-		TypedValue|null $targetValue,
-		TypedValue $parameterValue,
-		VariableNameIdentifier|null $parameterName,
-		TypedValue|null $dependencyValue
-	): Value {
-		$tConv = fn(Type $type): Type => $type instanceof OptionalKeyType ?
-			$executionContext->programRegistry->typeRegistry->result($type->valueType, $this->getMapItemNotFound(
-				$executionContext->programRegistry->typeRegistry
-			)) :
-			$type;
-
-		if ($targetValue && $targetValue->value instanceof SealedValue) {
-			$executionContext = $executionContext->withAddedVariableValue(
-				new VariableNameIdentifier('$$'),
-				TypedValue::forValue($targetValue->value->value)
+		ExecutionContext $executionContext
+	): TypedValue {
+		try {
+			$executionResult = $this->expression->execute(
+				$executionContext
 			);
+			return $executionResult->typedValue;
+		} catch (FunctionReturn $return) {
+			return $return->typedValue;
 		}
-		if ($parameterName) {
-			$executionContext = $executionContext->withAddedVariableValue(
-				$parameterName,
-				$parameterValue
-			);
-		}
-		foreach(['$' => $targetValue, '#' => $parameterValue, '%' => $dependencyValue] as $variableName => $value) {
-			if ($value) {
-				$executionContext = $executionContext->withAddedVariableValue(
-					new VariableNameIdentifier($variableName), $value);
-				$t = $this->toBaseType($value->type);
-				$v = $this->toBaseValue($value->value);
-				if ($t instanceof TupleType && $v instanceof TupleValue) {
-					foreach($t->types as $index => $typeItem) {
-						try {
-							$executionContext = $executionContext->withAddedVariableValue(
-								new VariableNameIdentifier($variableName . $index),
-								new TypedValue($typeItem, $v->valueOf($index)) // TODO: not found
-							);
-						// @codeCoverageIgnoreStart
-						} catch(IdentifierException|UnknownProperty) {}
-						// @codeCoverageIgnoreEnd
-					}
-				}
-				if ($t instanceof RecordType && $v instanceof RecordValue) {
-					$values = $v->values;
-					foreach($t->types as $fieldName => $fieldType) {
-						try {
-							$value = $values[$fieldName] ??
-								$executionContext->programRegistry->valueRegistry->error(
-									$executionContext->programRegistry->valueRegistry->openValue(
-										new TypeNameIdentifier('MapItemNotFound'),
-										$executionContext->programRegistry->valueRegistry->record([
-											'key' => $executionContext->programRegistry->valueRegistry->string($fieldName)
-										])
-									)
-								);
-							$executionContext = $executionContext->withAddedVariableValue(
-								new VariableNameIdentifier($variableName . $fieldName),
-								new TypedValue($tConv($fieldType), $value)
-							);
-						// @codeCoverageIgnoreStart
-						} catch(IdentifierException) {}
-						// @codeCoverageIgnoreEnd
-					}
-				}
-			}
-		}
-		if (
-			$targetValue &&
-			$targetValue->type instanceof CustomType &&
-			(($vt = $targetValue->type->valueType) instanceof TupleType || $vt instanceof RecordType) &&
-			$targetValue->value instanceof CustomValue &&
-			(($tv = $targetValue->value->value) instanceof TupleValue || $tv instanceof RecordValue)
-		) {
-			$values = $tv->values;
-			foreach($vt->types as $fieldName => $fieldType) {
-				$value = $values[$fieldName] ??
-					$executionContext->programRegistry->valueRegistry->error(
-						$executionContext->programRegistry->valueRegistry->openValue(
-							new TypeNameIdentifier('MapItemNotFound'),
-							$executionContext->programRegistry->valueRegistry->record([
-								'key' => $executionContext->programRegistry->valueRegistry->string($fieldName)
-							])
-						)
-					)
-				;
-				$executionContext = $executionContext->withAddedVariableValue(
-					new VariableNameIdentifier('$' . $fieldName),
-					new TypedValue(
-						$tConv($fieldType),
-						$value
-					)
-				);
-			}
-		}
-		return $this->expression->execute($executionContext)->value;
 	}
 
 	public function __toString(): string {
 		return (string)$this->expression;
 	}
 
-	public function jsonSerialize(): array {
-		return [
-			'expression' => $this->expression
-		];
-	}
 }

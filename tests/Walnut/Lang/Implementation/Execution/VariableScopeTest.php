@@ -5,9 +5,12 @@ namespace Walnut\Lang\Test\Implementation\Execution;
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownContextVariable;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
+use Walnut\Lang\Implementation\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Implementation\Code\Scope\VariableScope;
 use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
+use Walnut\Lang\Implementation\Program\Registry\MainMethodRegistry;
+use Walnut\Lang\Implementation\Program\Registry\NestedMethodRegistry;
 
 final class VariableScopeTest extends TestCase {
 
@@ -16,7 +19,14 @@ final class VariableScopeTest extends TestCase {
 
 	public function setUp(): void {
 		parent::setUp();
-		$this->typeRegistry = new TypeRegistryBuilder(new CustomMethodRegistryBuilder());
+		$this->typeRegistry = new TypeRegistryBuilder(
+			new CustomMethodRegistryBuilder(),
+			new MainMethodRegistry(
+				new NativeCodeTypeMapper(),
+				new NestedMethodRegistry(),
+				[]
+			)
+		);
 		$this->variableScope = new VariableScope([
 			'x' => $this->typeRegistry->integer()
 		]);

@@ -5,13 +5,16 @@ namespace Walnut\Lang\Implementation\Program\Type;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\AliasType;
+use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\IntersectionType as IntersectionTypeInterface;
+use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\ResultType;
+use Walnut\Lang\Blueprint\Type\ShapeType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\EnumerationValue;
@@ -58,6 +61,26 @@ final readonly class IntersectionTypeNormalizer {
                     $q = $queue[$ql];
                     if ($tx->isSubtypeOf($q)) {
                         array_splice($queue, $ql, 1);
+                    } else if ($q instanceof MapType && $tx instanceof MapType) {
+	                    $newRange = $q->range->tryRangeIntersectionWith($tx->range);
+	                    if ($newRange) {
+		                    array_splice($queue, $ql, 1);
+		                    $tx = $this->typeRegistry->map(
+			                    $this->normalize($q->itemType, $tx->itemType),
+			                    $newRange->minLength,
+			                    $newRange->maxLength
+		                    );
+	                    }
+                    } else if ($q instanceof ArrayType && $tx instanceof ArrayType) {
+	                    $newRange = $q->range->tryRangeIntersectionWith($tx->range);
+	                    if ($newRange) {
+		                    array_splice($queue, $ql, 1);
+		                    $tx = $this->typeRegistry->array(
+			                    $this->normalize($q->itemType, $tx->itemType),
+			                    $newRange->minLength,
+			                    $newRange->maxLength
+		                    );
+	                    }
                     } else if ($q instanceof ResultType || $tx instanceof ResultType) {
 	                    array_splice($queue, $ql, 1);
 
@@ -73,6 +96,10 @@ final readonly class IntersectionTypeNormalizer {
 						$errorType = $this->normalize(... $errorTypes);
 						$tx = $errorType instanceof NothingType ? $returnType :
 							$this->typeRegistry->result($returnType, $errorType);
+                    } else if ($q instanceof ShapeType && $tx instanceof ShapeType) {
+	                    array_splice($queue, $ql, 1);
+	                    $shapeType = $this->normalize($q->refType, $tx->refType);
+						$tx = $this->typeRegistry->shape($shapeType);
                     } else if ($q instanceof IntegerType && $tx instanceof IntegerType) {
                         $newRange = $q->range->tryRangeIntersectionWith($tx->range);
                         if ($newRange) {

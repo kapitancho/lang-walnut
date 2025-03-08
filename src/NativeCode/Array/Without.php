@@ -52,18 +52,19 @@ final readonly class Without implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
 			$values = $targetValue->values;
 			foreach($values as $index => $value) {
 				if ($value->equals($parameterValue)) {
 					array_splice($values, $index, 1);
-					return new TypedValue(
+
+					return TypedValue::forValue(
+						$programRegistry->valueRegistry->tuple($values)
+					)->withType(
 						$programRegistry->typeRegistry->result(
 							$value->type,
 							$programRegistry->typeRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
-						),
-						$programRegistry->valueRegistry->tuple($values)
+						)
 					);
 				}
 			}

@@ -54,7 +54,9 @@ final readonly class EnumerationType implements NativeMethod {
 			}
 		}
 		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid parameter value");
+		throw new ExecutionException(
+			sprintf("Invalid target value: %s", $targetValue)
+		);
 		// @codeCoverageIgnoreEnd
 	}
 

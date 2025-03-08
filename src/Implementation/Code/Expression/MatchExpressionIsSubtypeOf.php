@@ -4,18 +4,14 @@ namespace Walnut\Lang\Implementation\Code\Expression;
 
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionOperation;
-use Walnut\Lang\Blueprint\Value\SubtypeValue;
+use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Value\TypeValue;
-use Walnut\Lang\Blueprint\Value\Value;
 
 final readonly class MatchExpressionIsSubtypeOf implements MatchExpressionOperation, JsonSerializable {
 
-	public function match(Value $matchValue, Value $matchAgainst): bool {
-		return
-			($matchAgainst instanceof TypeValue) && (
-				$matchValue->type->isSubtypeOf($matchAgainst->typeValue) ||
-				($matchValue instanceof SubtypeValue && $this->match($matchValue->baseValue, $matchAgainst))
-			);
+	public function match(TypedValue $matchValue, TypedValue $matchAgainst): bool {
+		return ($matchAgainst->value instanceof TypeValue) &&
+			$matchValue->isSubtypeOf($matchAgainst->value->typeValue);
 	}
 
 	// @codeCoverageIgnoreStart

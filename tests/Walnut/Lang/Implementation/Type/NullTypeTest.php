@@ -3,8 +3,11 @@
 namespace Walnut\Lang\Test\Implementation\Type;
 
 use PHPUnit\Framework\TestCase;
+use Walnut\Lang\Implementation\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
+use Walnut\Lang\Implementation\Program\Registry\MainMethodRegistry;
+use Walnut\Lang\Implementation\Program\Registry\NestedMethodRegistry;
 
 final class NullTypeTest extends TestCase {
 
@@ -12,7 +15,14 @@ final class NullTypeTest extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->typeRegistry = new TypeRegistryBuilder(new CustomMethodRegistryBuilder());
+		$this->typeRegistry = new TypeRegistryBuilder(
+			new CustomMethodRegistryBuilder(),
+			new MainMethodRegistry(
+				new NativeCodeTypeMapper(),
+				new NestedMethodRegistry(),
+				[]
+			)
+		);
 	}
 	public function testNullType(): void {
 		$nullType = $this->typeRegistry->null;

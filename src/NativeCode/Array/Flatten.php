@@ -52,7 +52,6 @@ final readonly class Flatten implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
 			$values = $targetValue->values;
             $result = [];

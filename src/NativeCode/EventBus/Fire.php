@@ -45,7 +45,6 @@ final readonly class Fire implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof SealedValue && $targetValue->type->name->equals(
 			new TypeNameIdentifier('EventBus')
 		)) {
@@ -53,7 +52,7 @@ final readonly class Fire implements NativeMethod {
 			if ($listeners instanceof TupleValue) {
 				foreach($listeners->values as $listener) {
 					if ($listener instanceof FunctionValue) {
-						if ($parameterValue->type->isSubtypeOf($listener->parameterType)) {
+						if ($parameterValue->type->isSubtypeOf($listener->type->parameterType)) {
 							$result = $listener->execute($programRegistry->executionContext, $parameterValue);
 							if ($result->type->isSubtypeOf(
 								$programRegistry->typeRegistry->result(
@@ -61,7 +60,7 @@ final readonly class Fire implements NativeMethod {
 									$programRegistry->typeRegistry->withName(new TypeNameIdentifier('ExternalError'))
 								)
 							)) {
-								return TypedValue::forValue($result);
+								return $result;
 							}
 						}
 					} else {

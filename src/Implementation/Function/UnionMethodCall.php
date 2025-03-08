@@ -34,19 +34,19 @@ final readonly class UnionMethodCall implements Method {
 
 	public function execute(
 		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter,
+		TypedValue      $targetValue,
+		TypedValue|null $parameterValue,
 	): TypedValue {
 		foreach($this->methods as [$methodType, $method]) {
-			 if ($target->type->isSubtypeOf($methodType)) {
-				 return $method->execute($programRegistry, $target, $parameter);
+			 if ($targetValue->type->isSubtypeOf($methodType)) {
+				 return $method->execute($programRegistry, $targetValue, $parameterValue);
 			 }
 		}
 		// Should never happen
 		// @codeCoverageIgnoreStart
 		foreach($this->methods as [$methodType, $method]) {
-			 if ($target->value->type->isSubtypeOf($methodType)) {
-				 return $method->execute($programRegistry, $target, $parameter);
+			 if ($targetValue->value->type->isSubtypeOf($methodType)) {
+				 return $method->execute($programRegistry, $targetValue, $parameterValue);
 			 }
 		}
 		throw new ExecutionException("Union method call is not executable");

@@ -68,7 +68,6 @@ final readonly class FlipMap implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-        $targetValue = $this->toBaseValue($targetValue);
         if ($targetValue instanceof TupleValue && $parameterValue instanceof FunctionValue) {
             $values = $targetValue->values;
             $result = [];
@@ -78,7 +77,7 @@ final readonly class FlipMap implements NativeMethod {
                     throw new ExecutionException("Invalid target value");
                     // @codeCoverageIgnoreEnd
                 }
-                $r = $parameterValue->execute($programRegistry->executionContext, $value);
+                $r = $parameterValue->execute($programRegistry->executionContext, $value)->value;
 	            if ($r instanceof ErrorValue) {
                     return TypedValue::forValue($r);
                 }

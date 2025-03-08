@@ -25,7 +25,7 @@ final readonly class AsReal implements NativeMethod {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof MutableType) {
 			$valueType = $targetType->valueType;
-			$method = $programRegistry->methodRegistry->method(
+			$method = $programRegistry->methodFinder->methodForType(
 				$valueType,
 				new MethodNameIdentifier('asReal')
 			);
@@ -45,17 +45,16 @@ final readonly class AsReal implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof MutableValue) {
 			$value = $targetValue->value;
-			$method = $programRegistry->methodRegistry->method(
+			$method = $programRegistry->methodFinder->methodForType(
 				$targetValue->targetType,
 				new MethodNameIdentifier('asReal')
 			);
 			if ($method instanceof Method) {
 				return $method->execute(
 					$programRegistry,
-					new TypedValue($targetValue->targetType, $value),
+					TypedValue::forValue($value)->withType($targetValue->targetType),
 					$parameter
 				);
 			}

@@ -66,7 +66,6 @@ final readonly class FindFirstKeyValue implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue) {
 			if ($parameterValue instanceof FunctionValue) {
 				$values = $targetValue->values;
@@ -78,7 +77,7 @@ final readonly class FindFirstKeyValue implements NativeMethod {
 							'key' => $programRegistry->valueRegistry->string($key),
 							'value' => $value
 						])
-					);
+					)->value;
 					if ($filterResult->equals($true)) {
 						return TypedValue::forValue($val);
 					}

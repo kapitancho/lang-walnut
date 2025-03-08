@@ -35,19 +35,7 @@ final class LnTest extends BaseProgramTestHelper {
 			new TypeNameIdentifier('PositiveReal'),
 			$this->typeRegistry->real(0)
 		);
-		$this->typeRegistry->addSubtype(
-			new TypeNameIdentifier('MyReal'),
-			$this->typeRegistry->withName(new TypeNameIdentifier('PositiveReal')),
-			$this->expressionRegistry->functionBody(
-				$this->expressionRegistry->constant($this->valueRegistry->null)
-			),
-			null
-		);
 		$this->typeRegistry->addAtom(new TypeNameIdentifier('NotANumber'));
-		$this->callLn($this->valueRegistry->subtypeValue(
-			new TypeNameIdentifier('MyReal'),
-			$this->valueRegistry->real(1)
-		), 0);
 
         $this->testMethodCall(
             $this->expressionRegistry->constant(

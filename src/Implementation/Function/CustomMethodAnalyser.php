@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Implementation\Function;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethod as CustomMethodInterface;
 use Walnut\Lang\Blueprint\Function\CustomMethodAnalyser as CustomMethodAnalyserInterface;
 use Walnut\Lang\Blueprint\Function\Method;
@@ -13,7 +14,6 @@ use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\SubsetType;
-use Walnut\Lang\Blueprint\Type\SubtypeType;
 
 final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterface {
 	public function __construct(
@@ -30,17 +30,13 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 						$method->parameterType,
 						$method->returnType
 					);
-					while ($sub instanceof SubtypeType || $sub instanceof SubsetType || $sub instanceof AliasType) {
+					while ($sub instanceof SubsetType || $sub instanceof AliasType) {
 						if ($sub instanceof AliasType) {
 							$sub = $sub->aliasedType;
 							continue;
 						}
-						if ($sub instanceof SubsetType) {
-							$sub = $sub->valueType;
-						} else {
-							$sub = $sub->baseType;
-						}
-						$existingMethod = $this->programRegistry->methodRegistry->method($sub, $method->methodName);
+						$sub = $sub->valueType;
+						$existingMethod = $this->programRegistry->methodFinder->methodForType($sub, $method->methodName);
 						if ($existingMethod instanceof CustomMethodInterface) {
 							$existingMethodFnType = $this->programRegistry->typeRegistry->function(
 								$existingMethod->parameterType,
@@ -70,11 +66,7 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 							}
 						}
 					}
-					$method->analyse(
-						$this->programRegistry,
-						$method->targetType,
-						$method->parameterType,
-					);
+					$method->selfAnalyse($this->programRegistry);
 				} catch (AnalyserException $e) {
 					$analyseErrors[] = sprintf("%s : %s",$this->getErrorMessageFor($method), $e->getMessage());
 					continue;

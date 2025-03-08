@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Test;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
@@ -44,12 +45,12 @@ class CodeExecutionTestHelper extends TestCase {
 	protected function executeCodeSnippet(string $code, string $declarations = '', array $parameters = []): string {
 		$this->moduleLookupContext->method('sourceOf')
 			->willReturnCallback(fn(string $module) => match($module) {
-				'core' => file_get_contents(self::PATH . '/core.nut'),
+				'core/core' => file_get_contents(self::PATH . '/core.nut'),
 				'test' => "module test: $declarations myFn = ^Array<String> => Any :: { $code }; main = ^Array<String> => String :: myFn(#)->printed;",
 				default => ''
 			});
-		$program = $this->moduleImporter->importModules('test');
-		$this->programCompiler->compileProgram($program);
+		$programNode = $this->moduleImporter->importModules('test');
+		$this->programCompiler->compileProgram($programNode);
 		$program = $this->programContext->analyseAndBuildProgram();
 		$tr = $this->programContext->typeRegistry;
 		$vr = $this->programContext->valueRegistry;
@@ -58,9 +59,14 @@ class CodeExecutionTestHelper extends TestCase {
 			$tr->array($tr->string()),
 			$tr->string()
 		);
-		return $ep->call($vr->tuple(
-			array_map(fn(string $arg) => $vr->string($arg), $parameters)
-		))->literalValue;
+		try {
+			return $ep->call($vr->tuple(
+				array_map(fn(string $arg) => $vr->string($arg), $parameters)
+			))->literalValue;
+		} catch (Exception $e) {
+			//echo json_encode($programNode);
+			throw $e;
+		}
 	}
 
 	protected function executeErrorCodeSnippet(

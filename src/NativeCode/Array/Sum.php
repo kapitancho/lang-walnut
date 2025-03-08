@@ -72,7 +72,6 @@ final readonly class Sum implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
 			$sum = 0;
 			$hasReal = false;

@@ -25,13 +25,13 @@ final class VariableNameExpressionTest extends CodeExecutionTestHelper {
 
 	public function testVariableTargetNameTuple(): void {
 		$result = $this->executeCodeSnippet("{A[1]}->recFn;",
-			'A <: [Integer]; A->recFn(=> Integer) :: $0;');
+			'A = #[Integer]; A->recFn(=> Integer) :: $0;');
 		$this->assertEquals("1", $result);
 	}
 
 	public function testVariableTargetNameRecord(): void {
 		$result = $this->executeCodeSnippet("{A[a: 1]}->recFn;",
-			'A <: [a: Integer]; A->recFn(=> Integer) :: $a;');
+			'A = #[a: Integer]; A->recFn(=> Integer) :: $a;');
 		$this->assertEquals("1", $result);
 	}
 

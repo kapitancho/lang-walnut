@@ -20,18 +20,19 @@ final class ProgramContextFactory implements ProgramContextFactoryInterface {
 			$customMethodRegistryBuilder = new CustomMethodRegistryBuilder(),
 			$customMethodRegistryBuilder,
 			$typeRegistryBuilder = new TypeRegistryBuilder(
-				$customMethodRegistryBuilder
+				$customMethodRegistryBuilder,
+				$methodFinder = new MainMethodRegistry(
+					new NativeCodeTypeMapper(),
+					$customMethodRegistryBuilder,
+					[
+						self::lookupNamespace
+					]
+				),
 			),
 			$typeRegistryBuilder,
 			$valueRegistry = new ValueRegistry($typeRegistryBuilder),
 			new ExpressionRegistry($typeRegistryBuilder, $valueRegistry),
-			new MainMethodRegistry(
-				new NativeCodeTypeMapper(),
-				$customMethodRegistryBuilder,
-				[
-					self::lookupNamespace
-				]
-			),
+			$methodFinder,
 			new ScopeBuilder(VariableValueScope::empty())
 		);
 	}

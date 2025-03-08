@@ -47,7 +47,7 @@ final readonly class ModuleImporter implements ModuleImporterInterface {
 			$modules[] = $moduleNode;
 			$cache[$moduleName] = true;
 		};
-		$moduleImporter('core');
+		$moduleImporter('core/core');
 		$moduleImporter($startModuleName);
 
 		return new RootNode(

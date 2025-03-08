@@ -31,7 +31,6 @@ final readonly class AsInteger implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof NullValue) {
 			return TypedValue::forValue($programRegistry->valueRegistry->integer(0));
 		}

@@ -60,7 +60,6 @@ final readonly class SliceRange implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
 			if ($parameterValue instanceof RecordValue) {
 				$start = $parameterValue->valueOf('start');

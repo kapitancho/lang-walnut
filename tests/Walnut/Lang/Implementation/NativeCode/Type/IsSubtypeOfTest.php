@@ -406,62 +406,6 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 		$this->callIsOfType($n, $t1, true);
 	}
 
-	public function testIsSubtypeOfSubtype(): void {
-		$n = $this->typeRegistry->nothing;
-		$a = $this->typeRegistry->any;
-
-		$fnBody = $this->expressionRegistry->functionBody($this->expressionRegistry->constant($this->valueRegistry->null));
-
-		$this->typeRegistryBuilder->addSubtype(new TypeNameIdentifier('Integer1050'), $this->typeRegistry->integer(10, 50), $fnBody, null);
-		$this->typeRegistryBuilder->addSubtype(new TypeNameIdentifier('Integer2040'), $this->typeRegistry->integer(20, 40), $fnBody, null);
-
-		$t1 = $this->typeRegistry->subtype(new TypeNameIdentifier('Integer1050'));
-		$t2 = $this->typeRegistry->subtype(new TypeNameIdentifier('Integer2040'));
-		$t3 = $this->typeRegistry->integer(10, 50);
-		$t4 = $this->typeRegistry->integer(20, 40);
-
-		$matrix = [
-			1 => [1 =>  true, false,  true, false],
-			     [1 => false,  true,  true,  true],
-			     [1 => false, false,  true, false],
-			     [1 => false, false,  true,  true],
-		];
-		foreach($matrix as $f => $values) {
-			foreach($values as $o => $expected) {
-				$this->callIsOfType(${'t'.$f}, ${'t'.$o}, $expected);
-			}
-		}
-		$this->callIsOfType($t1, $a, true);
-		$this->callIsOfType($n, $t1, true);
-	}
-
-	/*public function testIsSubtypeOfSealedType(): void {
-		$n = $this->typeRegistry->nothing;
-		$a = $this->typeRegistry->any;
-
-		$this->builder->addSealed(new TypeNameIdentifier('Integer1060'), $this->typeRegistry->integer(10, 60));
-		$this->builder->addSealed(new TypeNameIdentifier('Integer2050'), $this->typeRegistry->integer(20, 50));
-
-		$t1 = $this->typeRegistry->sealed(new TypeNameIdentifier('Integer1060'));
-		$t2 = $this->typeRegistry->sealed(new TypeNameIdentifier('Integer2050'));
-		$t3 = $this->typeRegistry->integer(10, 50);
-		$t4 = $this->typeRegistry->integer(20, 40);
-
-		$matrix = [
-			1 => [1 =>  true, false, false, false],
-			     [1 => false,  true, false, false],
-			     [1 => false, false,  true, false],
-			     [1 => false, false,  true,  true],
-		];
-		foreach($matrix as $f => $values) {
-			foreach($values as $o => $expected) {
-				$this->callIsOfType(${'t'.$f}, ${'t'.$o}, $expected);
-			}
-		}
-		$this->callIsOfType($t1, $a, true);
-		$this->callIsOfType($n, $t1, true);
-	}*/
-
 	public function testIsSubtypeOfFunctionType(): void {
 		$n = $this->typeRegistry->nothing;
 		$a = $this->typeRegistry->any;

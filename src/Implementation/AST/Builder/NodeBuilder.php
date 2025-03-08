@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\AST\Node\Expression\MatchExpressionDefaultNode as Matc
 use Walnut\Lang\Blueprint\AST\Node\Expression\MatchExpressionPairNode as MatchExpressionPairNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MethodCallExpressionNode as MethodCallExpressionNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode as FunctionBodyNodeInterface;
+use Walnut\Lang\Blueprint\AST\Node\SourceNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\ValueNode;
 use Walnut\Lang\Blueprint\AST\Parser\ParserState;
@@ -50,7 +51,6 @@ use Walnut\Lang\Implementation\AST\Node\Module\AddMethodNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddOpenTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddSealedTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddSubsetTypeNode;
-use Walnut\Lang\Implementation\AST\Node\Module\AddSubtypeTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddVariableNode;
 use Walnut\Lang\Implementation\AST\Node\SourceLocation;
 use Walnut\Lang\Implementation\AST\Node\Type\AnyTypeNode;
@@ -103,6 +103,7 @@ final class NodeBuilder implements NodeBuilderInterface {
 
 	/** @param Token[] $tokens */
 	public function __construct(
+		private readonly string $moduleName,
 		private readonly array $tokens,
 		private readonly ParserState $state
 	) {}
@@ -112,6 +113,7 @@ final class NodeBuilder implements NodeBuilderInterface {
 		$endPosition = $token?->sourcePosition ?? new SourcePosition(9999999, 9999, 9999);
 		$startPosition = $this->state->result['startPosition'] ?? $endPosition;
 		return new SourceLocation(
+			$this->moduleName,
 			$startPosition,
 			$endPosition
 		);
@@ -275,8 +277,13 @@ final class NodeBuilder implements NodeBuilderInterface {
 		return self::priorities[$methodName->identifier] ?? 99;
 	}
 
-	public function methodCall(ExpressionNode $target, MethodNameIdentifier $methodName, ExpressionNode $parameter): MethodCallExpressionNode {
-		$mNode = new MethodCallExpressionNode($this->getSourceLocation(), $target, $methodName, $parameter);
+	public function methodCall(ExpressionNode $target, MethodNameIdentifier $methodName, ExpressionNode|null $parameter): MethodCallExpressionNode {
+		$mNode = new MethodCallExpressionNode(
+			$this->getSourceLocation(),
+			$target,
+			$methodName,
+			$parameter
+		);
 
 		$operands = [];
 		$operators = [];
@@ -291,7 +298,9 @@ final class NodeBuilder implements NodeBuilderInterface {
 		};
 		$step($mNode);
 
+		/** @var SourceNode[] $operandStack */
 		$operandStack = [];
+		/** @var string[] $operandStack */
 		$operatorStack = [];
 
 		$add = function() use (&$operandStack, &$operatorStack): void {
@@ -300,6 +309,7 @@ final class NodeBuilder implements NodeBuilderInterface {
 			$x = array_pop($operatorStack);
 			$operandStack[] = new MethodCallExpressionNode(
 				new SourceLocation(
+					$l->sourceLocation->moduleName,
 					$l->sourceLocation->startPosition,
 					$r->sourceLocation->endPosition
 				),
@@ -388,19 +398,19 @@ final class NodeBuilder implements NodeBuilderInterface {
 		return new AddAliasTypeNode($this->getSourceLocation(), $name, $aliasedType);
 	}
 
-	private function generateConstructorBody(ExpressionNode $constructorBody): FunctionBodyNode {
-		return $this->functionBody(
+	private function generateConstructorBody(ExpressionNode|null $constructorBody): FunctionBodyNode|null {
+		return $constructorBody ? $this->functionBody(
 			$this->sequence([
 				$constructorBody,
 				$this->variableName(new VariableNameIdentifier('#'))
 			])
-		);
+		) : null;
 	}
 
 	public function addOpen(
 		TypeNameIdentifier $name,
 		TypeNode $valueType,
-		ExpressionNode $constructorBody,
+		ExpressionNode|null $constructorBody,
 		TypeNode|null $errorType
 	): AddOpenTypeNode {
 		return new AddOpenTypeNode(
@@ -408,14 +418,14 @@ final class NodeBuilder implements NodeBuilderInterface {
 			$name,
 			$valueType,
 			$this->generateConstructorBody($constructorBody),
-			$errorType ?? $this->nothingType
+			$errorType
 		);
 	}
 
 	public function addSealed(
 		TypeNameIdentifier $name,
 		TypeNode $valueType,
-		ExpressionNode $constructorBody,
+		ExpressionNode|null $constructorBody,
 		TypeNode|null $errorType
 	): AddSealedTypeNode {
 		return new AddSealedTypeNode(
@@ -430,23 +440,13 @@ final class NodeBuilder implements NodeBuilderInterface {
 	public function addSubset(
 		TypeNameIdentifier $name,
 		TypeNode $valueType,
-		ExpressionNode $constructorBody,
+		ExpressionNode|null $constructorBody,
 		TypeNode|null $errorType
 	): AddSubsetTypeNode {
 		return new AddSubsetTypeNode(
 			$this->getSourceLocation(),
 			$name,
 			$valueType,
-			$this->generateConstructorBody($constructorBody),
-			$errorType ?? $this->nothingType
-		);
-	}
-
-	public function addSubtype(TypeNameIdentifier $name, TypeNode $baseType, ExpressionNode $constructorBody, TypeNode|null $errorType): AddSubtypeTypeNode {
-		return new AddSubtypeTypeNode(
-			$this->getSourceLocation(),
-			$name,
-			$baseType,
 			$this->generateConstructorBody($constructorBody),
 			$errorType ?? $this->nothingType
 		);

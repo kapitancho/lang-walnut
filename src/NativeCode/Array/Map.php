@@ -64,12 +64,11 @@ final readonly class Map implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue && $parameterValue instanceof FunctionValue) {
 			$values = $targetValue->values;
 			$result = [];
 			foreach($values as $value) {
-				$r = $parameterValue->execute($programRegistry->executionContext, $value);
+				$r = $parameterValue->execute($programRegistry->executionContext, $value)->value;
 				if ($r instanceof ErrorValue) {
 					return TypedValue::forValue($r);
 				}

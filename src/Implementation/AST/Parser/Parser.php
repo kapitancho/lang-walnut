@@ -29,6 +29,7 @@ final readonly class Parser implements ParserInterface {
 		$s->state = 101;
 
 		$nodeBuilder = $nodeBuilderFactory->newBuilder(
+			$moduleName,
 			$tokens,
 			$s
 		);

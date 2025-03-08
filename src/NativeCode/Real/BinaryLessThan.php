@@ -50,9 +50,7 @@ final readonly class BinaryLessThan implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof IntegerValue || $targetValue instanceof RealValue) {
-			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue || $targetValue instanceof RealValue) {
 				return TypedValue::forValue($programRegistry->valueRegistry->boolean(
 					$targetValue->literalValue < $parameterValue->literalValue

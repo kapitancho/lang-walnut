@@ -49,12 +49,12 @@ final readonly class APPEND implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$v = $this->toBaseValue($targetValue);
+		$v = $targetValue;
 		if ($v instanceof MutableValue) {
             $targetType = $this->toBaseType($v->targetType);
 			$mv = $v->value;
 			if ($targetType instanceof StringType && $mv instanceof StringValue) {
-				$p = $this->toBaseValue($parameter->value);
+				$p = $parameter->value;
 				if ($p instanceof StringValue) {
 					$v->value = $programRegistry->valueRegistry->string($mv->literalValue . $p->literalValue);
 					return $target;

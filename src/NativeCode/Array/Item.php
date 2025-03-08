@@ -79,7 +79,6 @@ final readonly class Item implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue && $parameterValue instanceof IntegerValue) {
 			$values = $targetValue->values;
 			$result = $values[(string)$parameterValue->literalValue] ?? null;
@@ -90,7 +89,7 @@ final readonly class Item implements NativeMethod {
 					$targetType instanceof ArrayType => $targetType->itemType,
 					default => $result->type
 				};
-				return new TypedValue($type, $result);
+				return TypedValue::forValue($result)->withType($type);
 			}
 			return TypedValue::forValue($programRegistry->valueRegistry->error(
 				$programRegistry->valueRegistry->openValue(

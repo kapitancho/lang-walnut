@@ -41,7 +41,7 @@ final readonly class CastAs implements NativeMethod {
 				//generic method asJsonValue which returns a different value (and type)
 				continue;
 			}
-			$method = $methodRegistry->method($targetType,
+			$method = $methodRegistry->methodForType($targetType,
 				$methodName = new MethodNameIdentifier(sprintf('as%s',
 					$candidate
 				))
@@ -63,7 +63,7 @@ final readonly class CastAs implements NativeMethod {
 			if ($targetType->isSubtypeOf($refType)) {
 				return $refType;
 			}
-			$method = $this->getMethod($programRegistry->methodRegistry, $targetType, $refType);
+			$method = $this->getMethod($programRegistry->methodFinder, $targetType, $refType);
 			if ($method instanceof UnknownMethod) {
 				return $programRegistry->typeRegistry->result(
 					$refType,
@@ -112,43 +112,31 @@ final readonly class CastAs implements NativeMethod {
 		
 		if ($parameterValue instanceof TypeValue) {
 			if ($targetValue->type->isSubtypeOf($parameterValue->typeValue)) {
-				return new TypedValue($parameterValue->typeValue, $targetValue);
+				return $target->withType($parameterValue->type);
 			}
-			$runtimeMethod = $this->getMethod(
-				$programRegistry->methodRegistry,
-				$tx = $targetValue instanceof TypeValue ?
-					$targetValue->typeValue :
-					$targetValue->type,
-				$parameterValue->typeValue
+
+			$method = $programRegistry->methodFinder->methodForValue(
+				$target,
+				new MethodNameIdentifier(sprintf('as%s',
+					 $parameterValue->typeValue
+				))
 			);
-			if ($runtimeMethod instanceof UnknownMethod) {
-				$method = $this->getMethod(
-					$programRegistry->methodRegistry,
-					$targetType = $target->type,
-					$parameterType = $parameterValue->typeValue
+			if ($method instanceof UnknownMethod) {
+				$val = $programRegistry->valueRegistry->error(
+					$programRegistry->valueRegistry->openValue(
+						new TypeNameIdentifier('CastNotAvailable'),
+						$programRegistry->valueRegistry->record([
+							'from' => $programRegistry->valueRegistry->type($target->type),
+							'to' => $programRegistry->valueRegistry->type($parameterValue->typeValue)
+						])
+					)
 				);
-				if ($method instanceof UnknownMethod) {
-					$val = $programRegistry->valueRegistry->error(
-						$programRegistry->valueRegistry->openValue(
-							new TypeNameIdentifier('CastNotAvailable'),
-							$programRegistry->valueRegistry->record([
-								'from' => $programRegistry->valueRegistry->type($targetType),
-								'to' => $programRegistry->valueRegistry->type($parameterType)
-							])
-						)
-					);
-					return TypedValue::forValue($val);
-				}
-				return $method[1]->execute(
-					$programRegistry,
-					$target,
-					$parameter
-				);
+				return TypedValue::forValue($val);
 			}
-			return $runtimeMethod[1]->execute(
+			return $method->execute(
 				$programRegistry,
 				$target,
-				$parameter
+				TypedValue::forValue($programRegistry->valueRegistry->null)
 			);
 		}
 		// @codeCoverageIgnoreStart

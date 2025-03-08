@@ -27,7 +27,7 @@ final readonly class ReturnExpression implements ReturnExpressionInterface, Json
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
 		throw new FunctionReturn(
-			$this->returnedExpression->execute($executionContext)->value
+			$this->returnedExpression->execute($executionContext)->typedValue
 		);
 	}
 

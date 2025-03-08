@@ -31,7 +31,6 @@ final readonly class AsReal implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof NullValue) {
 			return TypedValue::forValue($programRegistry->valueRegistry->real(0));
 		}

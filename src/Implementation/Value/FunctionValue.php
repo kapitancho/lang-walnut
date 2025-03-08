@@ -2,52 +2,48 @@
 
 namespace Walnut\Lang\Implementation\Value;
 
-use JsonSerializable;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
-use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
 use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope as VariableValueScopeInterface;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
-use Walnut\Lang\Blueprint\Function\FunctionBody;
-use Walnut\Lang\Blueprint\Function\FunctionBodyException;
-use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyError;
+use Walnut\Lang\Blueprint\Function\UserlandFunction;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
-use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
+use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\NothingType;
-use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\FunctionValue as FunctionValueInterface;
-use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Blueprint\Value\Value;
-use Walnut\Lang\Implementation\Type\FunctionType;
-use Walnut\Lang\Implementation\Type\Helper\TupleAsRecord;
 
-final class FunctionValue implements FunctionValueInterface, JsonSerializable {
-	use TupleAsRecord;
+final readonly class FunctionValue implements FunctionValueInterface {
 
-    public function __construct(
-		private readonly TypeRegistry $typeRegistry,
-		private readonly ValueRegistry $valueRegistry,
-		public readonly Type $parameterType,
-		public VariableNameIdentifier|null $parameterName,
-		public readonly Type $dependencyType,
-		public readonly Type $returnType,
-		public readonly FunctionBody $body,
-	    private readonly VariableValueScopeInterface|null $variableValueScope,
-	    private readonly VariableNameIdentifier|null $selfReferAs
-    ) {}
+	private function __construct(
+		public FunctionType $type,
+		public UserlandFunction                 $function,
+		public VariableValueScopeInterface|null $variableValueScope,
+		public VariableNameIdentifier|null      $selfReferAs
+	) {}
+
+	public static function of(
+		TypeRegistry                    $typeRegistry,
+		UserlandFunction                 $function,
+	): self {
+		return new self(
+			$typeRegistry->function(
+				$function->parameterType,
+				$function->returnType
+			),
+			$function,
+			null,
+			null
+		);
+	}
 
 	public function withVariableValueScope(VariableValueScopeInterface $variableValueScope): self {
 		return new self(
-			$this->typeRegistry,
-			$this->valueRegistry,
-			$this->parameterType,
-			$this->parameterName,
-			$this->dependencyType,
-			$this->returnType,
-			$this->body,
+			$this->type,
+			$this->function,
 			$variableValueScope,
 			$this->selfReferAs
 		);
@@ -55,27 +51,14 @@ final class FunctionValue implements FunctionValueInterface, JsonSerializable {
 
 	public function withSelfReferenceAs(VariableNameIdentifier $variableName): self {
 		return new self(
-			$this->typeRegistry,
-			$this->valueRegistry,
-			$this->parameterType,
-			$this->parameterName,
-			$this->dependencyType,
-			$this->returnType,
-			$this->body,
+			$this->type,
+			$this->function,
 			$this->variableValueScope,
 			$variableName
 		);
 	}
 
-	public FunctionType $type {
-		get => $this->typeRegistry->function(
-			$this->parameterType,
-			$this->returnType
-        );
-    }
-
-	/** @throws FunctionBodyException */
-	public function analyse(AnalyserContext $analyserContext): void {
+	private function fillAnalyserContext(AnalyserContext $analyserContext): AnalyserContext {
 		foreach ($this->variableValueScope?->allTypes() ?? [] as $variableName => $type) {
 			/** @noinspection PhpParamsInspection */ //PhpStorm bug
 			$analyserContext = $analyserContext->withAddedVariableType($variableName, $type);
@@ -83,88 +66,42 @@ final class FunctionValue implements FunctionValueInterface, JsonSerializable {
 		if ($this->selfReferAs) {
 			$analyserContext = $analyserContext->withAddedVariableType(
 				$this->selfReferAs,
-				$this->typeRegistry->function(
-					$this->parameterType,
-					$this->returnType
-				),
+				$this->type
 			);
 		}
-		//try {
-			$returnType = $this->body->analyse(
-				$analyserContext,
-				$this->typeRegistry->nothing,
-				$this->parameterType,
-				$this->parameterName,
-				$this->dependencyType,
-			);
-			if (!($this->dependencyType instanceof NothingType)) {
-				$value = $analyserContext->programRegistry->dependencyContainer->valueByType($this->dependencyType);
-				if ($value instanceof DependencyError) {
-					throw new AnalyserException(
-						sprintf("Dependency %s cannot be instantiated", $this->dependencyType)
-					);
-				}
-			}
-		//} catch (AnalyserException $ex) {
-		//	throw new FunctionBodyException($ex->getMessage());
-		//}
-		if (!$returnType->isSubtypeOf($this->returnType)) {
-			throw new FunctionBodyException(
-				sprintf(
-					"Function return type \n %s is not a subtype of \n %s",
-					$returnType,
-					$this->returnType
-				)
-			);
-		}
+		return $analyserContext;
 	}
 
-	public function execute(ExecutionContext $executionContext, Value $value): Value {
-		foreach ($this->variableValueScope?->allTypedValues() ?? [] as $variableName => $type) {
+	/** @throws AnalyserException */
+	public function selfAnalyse(AnalyserContext $analyserContext): void {
+		$this->function->selfAnalyse(
+			$this->fillAnalyserContext($analyserContext)
+		);
+	}
+
+	/** @throws AnalyserException */
+	public function analyse(AnalyserContext $analyserContext, Type $parameterType): Type {
+		return $this->function->analyse(
+			$analyserContext->programRegistry->typeRegistry->nothing,
+			$parameterType
+		);
+	}
+
+	public function execute(ExecutionContext $executionContext, TypedValue|Value $parameterValue): TypedValue {
+		if ($parameterValue instanceof Value) {
+			$parameterValue = TypedValue::forValue($parameterValue);
+		}
+		foreach ($this->variableValueScope?->allTypedValues() ?? [] as $variableName => $v) {
 			/** @noinspection PhpParamsInspection */ //PhpStorm bug
-			$executionContext = $executionContext->withAddedVariableValue($variableName, $type);
+			$executionContext = $executionContext->withAddedVariableValue($variableName, $v);
 		}
 		if ($this->selfReferAs) {
 			$executionContext = $executionContext->withAddedVariableValue(
 				$this->selfReferAs,
-				new TypedValue(
-					$this->typeRegistry->function(
-						$this->parameterType,
-						$this->returnType
-					),
-					$this
-				)
+				TypedValue::forValue($this)
 			);
 		}
-		if ($value instanceof TupleValue &&
-			$this->parameterType instanceof RecordType &&
-			$this->isTupleCompatibleToRecord(
-				$this->typeRegistry,
-				$value->type,
-				$this->parameterType
-			)
-		) {
-			$value = $this->getTupleAsRecord($this->valueRegistry, $value, $this->parameterType);
-		}
-
-		try {
-			/*$dependencyValue = $this->dependencyType instanceof NothingType ? null :
-				$this->dependencyContainer->valueByType($this->dependencyType);*/
-			return $this->body->execute(
-				$executionContext,
-				null,
-				new TypedValue($this->parameterType, $value),
-				//$dependencyValue instanceof Value ? new TypedValue($this->dependencyType, $dependencyValue) : null
-				$this->parameterName,
-				$this->dependencyType instanceof NothingType ?
-					null : new TypedValue(
-						$this->dependencyType,
-						$executionContext->programRegistry->dependencyContainer->valueByType($this->dependencyType)
-					)
-			);
-		} catch (FunctionReturn $result) {
-			return $result->value;
-		}
+		return $this->function->execute($executionContext, null, $parameterValue);
 	}
 
 	public function equals(Value $other): bool {
@@ -172,22 +109,23 @@ final class FunctionValue implements FunctionValueInterface, JsonSerializable {
 	}
 
 	public function __toString(): string {
-		$dep = $this->dependencyType instanceof NothingType ? '' : '%% ' . sprintf("%s ", $this->dependencyType);
+		$dep = $this->function->dependencyType instanceof NothingType ?
+			'' : '%% ' . sprintf("%s ", $this->function->dependencyType);
 		return sprintf(
 			"^%s => %s %s:: %s",
-			$this->parameterType,
-			$this->returnType,
+			$this->function->parameterType,
+			$this->function->returnType,
 			$dep,
-			$this->body
+			$this->function->functionBody
 		);
 	}
 
 	public function jsonSerialize(): array {
 		return [
 			'valueType' => 'Function',
-			'parameterType' => $this->parameterType,
-			'returnType' => $this->returnType,
-			'body' => $this->body
+			'parameterType' => $this->function->parameterType,
+			'returnType' => $this->function->returnType,
+			'body' => $this->function->functionBody
 		];
 	}
 }

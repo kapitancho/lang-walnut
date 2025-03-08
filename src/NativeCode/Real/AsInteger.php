@@ -30,7 +30,7 @@ final readonly class AsInteger implements NativeMethod {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof IntegerSubsetType || $targetType instanceof RealSubsetType) {
 			return $programRegistry->typeRegistry->integerSubset(
-				array_map(fn(Number $v) => $v->round(),
+				array_map(fn(Number $v) => $v > 0 ? $v->floor() : $v->ceil(),
 					$targetType->subsetValues)
 			);
 		}
@@ -54,7 +54,6 @@ final readonly class AsInteger implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			$target = $targetValue->literalValue;
 			return TypedValue::forValue($programRegistry->valueRegistry->integer((int)(string)$target));

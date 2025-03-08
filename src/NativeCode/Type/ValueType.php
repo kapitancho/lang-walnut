@@ -8,6 +8,7 @@ use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\OpenType;
@@ -29,7 +30,7 @@ final readonly class ValueType implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $this->toBaseType($targetType->refType);
+			$refType = $this->toBaseType($targetType->refType, true);
 			if ($refType instanceof UserType || $refType instanceof MutableType) {
 				return $programRegistry->typeRegistry->type($refType->valueType);
 			}
@@ -56,7 +57,7 @@ final readonly class ValueType implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof TypeValue) {
-			$typeValue = $this->toBaseType($targetValue->typeValue);
+			$typeValue = $this->toBaseType($targetValue->typeValue, true);
 			if ($typeValue instanceof OpenType ||
 				$typeValue instanceof SealedType ||
 				$typeValue instanceof SubsetType ||

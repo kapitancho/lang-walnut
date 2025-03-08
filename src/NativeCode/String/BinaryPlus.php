@@ -51,9 +51,7 @@ final readonly class BinaryPlus implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
-		$parameterValue = $this->toBaseValue($parameterValue);
-		if ($targetValue instanceof StringValue) {
+				if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof StringValue) {
 				$result = $targetValue->literalValue . $parameterValue->literalValue;
 				return TypedValue::forValue($programRegistry->valueRegistry->string($result));

@@ -7,7 +7,7 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 final class JsonStringifyTest extends CodeExecutionTestHelper {
 
 	public function testJsonStringifyNonJson(): void {
-		$result = $this->executeCodeSnippet("MyAtom[]->jsonStringify;", "MyAtom = :[];");
+		$result = $this->executeCodeSnippet("MyAtom()->jsonStringify;", "MyAtom = :[];");
 		$this->assertEquals("@InvalidJsonValue[value: MyAtom[]]", $result);
 	}
 
@@ -56,14 +56,20 @@ final class JsonStringifyTest extends CodeExecutionTestHelper {
 		$this->assertEquals("'[\\n    1,\\n    2\\n]'", $result);
 	}
 
-	public function testJsonStringifySubtype(): void {
+	public function testJsonStringifySubset(): void {
 		$result = $this->executeCodeSnippet("getReal()->jsonStringify;",
-			"MySubtype <: Real; getReal = ^Any => Real :: MySubtype(3.14);");
+			"MySubset = <: Real; getReal = ^Any => MySubset :: MySubset(3.14);");
 		$this->assertEquals("'3.14'", $result);
 	}
 
 	public function testJsonStringifyMutable(): void {
 		$result = $this->executeCodeSnippet("mutable{Real, 3.14}->jsonStringify;");
+		$this->assertEquals("'3.14'", $result);
+	}
+
+	public function testJsonStringifyShape(): void {
+		$result = $this->executeCodeSnippet("getReal()->shape->jsonStringify;",
+			"getReal = ^ => Shape<Real> :: 3.14;");
 		$this->assertEquals("'3.14'", $result);
 	}
 

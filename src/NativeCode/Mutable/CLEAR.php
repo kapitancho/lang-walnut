@@ -40,7 +40,7 @@ final readonly class CLEAR implements NativeMethod {
 		TypedValue $parameter
 	): TypedValue {
 		$targetValue = $target->value;
-		$v = $this->toBaseValue($targetValue);
+		$v = $targetValue;
 		if ($v instanceof MutableValue) {
             $targetType = $this->toBaseType($v->targetType);
 			if ($targetType instanceof SetType && $v->value instanceof SetValue) {

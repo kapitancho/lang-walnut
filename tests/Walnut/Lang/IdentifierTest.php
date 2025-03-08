@@ -24,9 +24,10 @@ final class IdentifierTest extends TestCase {
 		self::assertEquals('X', (string)(new EnumValueIdentifier("X")));
 		self::assertEquals('"X"', $this->jsonEncode(new EnumValueIdentifier("X")));
 		self::assertTrue(new EnumValueIdentifier("X")->equals(new EnumValueIdentifier("X")));
-		self::assertNotNull(new EnumValueIdentifier("ItShouldStartWithUppercaseAndContainAToZAnd0To9"));
+		self::assertNotNull(new EnumValueIdentifier("ItCouldStartWithUppercaseAndContainAToZAnd0To9"));
+		self::assertNotNull(new EnumValueIdentifier("ItCouldStartWithLowercaseAndContainAToZAnd0To9"));
 		$this->expectException(IdentifierException::class);
-		new EnumValueIdentifier("itShouldNotStartWithLowercase");
+		new EnumValueIdentifier("0itShouldNotStartAWithNumber");
 	}
 
 	public function testMethodNameIdentifier(): void {

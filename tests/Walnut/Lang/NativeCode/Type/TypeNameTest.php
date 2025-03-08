@@ -41,14 +41,24 @@ final class TypeNameTest extends CodeExecutionTestHelper {
 		$this->assertEquals("'MyAlias'", $result);
 	}
 
-	public function testTypeNameSubtype(): void {
-		$result = $this->executeCodeSnippet("type{MySubtype}->typeName;", "MySubtype <: String;");
-		$this->assertEquals("'MySubtype'", $result);
+	public function testTypeNameSubset(): void {
+		$result = $this->executeCodeSnippet("type{MySubset}->typeName;", "MySubset = <: String;");
+		$this->assertEquals("'MySubset'", $result);
 	}
 
-	public function testTypeNameSubtypeMetaType(): void {
-		$result = $this->executeCodeSnippet("getTypeName(type{MySubtype});", "MySubtype <: String; getTypeName = ^Type<Subtype> => String<1..> :: #->typeName;");
-		$this->assertEquals("'MySubtype'", $result);
+	public function testTypeNameSubsetMetaType(): void {
+		$result = $this->executeCodeSnippet("getTypeName(type{MySubset});", "MySubset = <: String; getTypeName = ^Type<Subset> => String<1..> :: #->typeName;");
+		$this->assertEquals("'MySubset'", $result);
+	}
+
+	public function testTypeNameOpen(): void {
+		$result = $this->executeCodeSnippet("type{MyOpen}->typeName;", "MyOpen = #[a: String];");
+		$this->assertEquals("'MyOpen'", $result);
+	}
+
+	public function testTypeNameOpenMetaType(): void {
+		$result = $this->executeCodeSnippet("getTypeName(type{MyOpen});", "MyOpen = #[a: String]; getTypeName = ^Type<Open> => String<1..> :: #->typeName;");
+		$this->assertEquals("'MyOpen'", $result);
 	}
 
 	public function testTypeNameSealed(): void {

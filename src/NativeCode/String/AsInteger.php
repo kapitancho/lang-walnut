@@ -41,7 +41,6 @@ final readonly class AsInteger implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof StringValue) {
 			$target = $targetValue->literalValue;
 			return TypedValue::forValue((string)($result = (int)$target) === $target ?

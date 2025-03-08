@@ -69,7 +69,7 @@ final readonly class WithRange implements NativeMethod {
 				if ($parameter->type->isSubtypeOf(
 					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('IntegerRange'))
 				)) {
-					$range = $this->toBaseValue($parameter->value)->values;
+					$range = $parameter->value->value->values;
 					$minValue = $range['minValue'];
 					$maxValue = $range['maxValue'];
 					$result = $programRegistry->typeRegistry->integer(
@@ -83,7 +83,7 @@ final readonly class WithRange implements NativeMethod {
 				if ($parameter->type->isSubtypeOf(
 					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('RealRange'))
 				)) {
-					$range = $this->toBaseValue($parameter->value)->values;
+					$range = $parameter->value->value->values;
 					$minValue = $range['minValue'];
 					$maxValue = $range['maxValue'];
 					$result = $programRegistry->typeRegistry->real(

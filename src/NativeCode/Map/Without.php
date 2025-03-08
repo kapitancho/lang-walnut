@@ -54,7 +54,6 @@ final readonly class Without implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue) {
 			$values = $targetValue->values;
 			foreach($values as $key => $value) {

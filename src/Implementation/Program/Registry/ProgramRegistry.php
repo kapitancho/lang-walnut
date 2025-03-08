@@ -7,6 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext as ExecutionContextInt
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer as DependencyContainerInterface;
 use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry as ExpressionRegistryInterface;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry as ProgramRegistryInterface;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
@@ -25,7 +26,7 @@ final class ProgramRegistry implements ProgramRegistryInterface {
 	public function __construct(
 		public readonly TypeRegistry                 $typeRegistry,
 		public readonly ValueRegistry                $valueRegistry,
-		public readonly MethodRegistry               $methodRegistry,
+		public readonly MethodFinder                 $methodFinder,
 		private readonly ScopeBuilder                $globalScopeBuilder,
 		private readonly ExpressionRegistryInterface $expressionRegistry,
 	) {}
@@ -58,7 +59,7 @@ final class ProgramRegistry implements ProgramRegistryInterface {
 			return $this->dependencyContainerInstance ??= new DependencyContainer(
 				$this,
 				$this->executionContext,
-				$this->methodRegistry,
+				$this->methodFinder,
 				$this->expressionRegistry
 			);
 		}

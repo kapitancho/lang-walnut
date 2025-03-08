@@ -9,7 +9,7 @@ final readonly class EnumValueIdentifier implements JsonSerializable {
 	public function __construct(
 		public string $identifier
 	) {
-		preg_match('/^[A-Z][a-zA-Z0-9]*$/', $identifier) ||
+		preg_match('/^[a-zA-Z][a-zA-Z0-9_]*$/', $identifier) ||
 			IdentifierException::invalidEnumValueIdentifier($identifier);
 	}
 

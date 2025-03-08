@@ -43,7 +43,7 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 			$this->expressionRegistry->variableName(new VariableNameIdentifier('#')),
 			1
 		);
-		$this->typeRegistry->addSubtype(
+		$this->typeRegistry->addSubset(
 			new TypeNameIdentifier("MyRecord"),
 			$this->typeRegistry->record([
 				'x' => $this->typeRegistry->integer(),
@@ -56,7 +56,7 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 			),
 			$this->typeRegistry->nothing
 		);
-		$this->typeRegistry->addSubtype(
+		$this->typeRegistry->addSubset(
 			new TypeNameIdentifier("MyTuple"),
 			$this->typeRegistry->tuple([
 				$this->typeRegistry->integer(),
@@ -218,13 +218,12 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 			new ExecutionContext($this->programRegistry,
 				new VariableValueScope([
 					'#' => TypedValue::forValue(
-						$this->valueRegistry->subtypeValue(
-							new TypeNameIdentifier('MyRecord'),
-							$this->valueRegistry->record([
-								'x' => $this->valueRegistry->integer(1),
-								'y' => $this->valueRegistry->string("hi"),
-							])
-						)
+						$this->valueRegistry->record([
+							'x' => $this->valueRegistry->integer(1),
+							'y' => $this->valueRegistry->string("hi"),
+						])
+					)->withType(
+						$this->typeRegistry->withName(new TypeNameIdentifier('MyRecord'))
 					)
 				])
 			)
@@ -235,12 +234,13 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 			new ExecutionContext($this->programRegistry,
 				new VariableValueScope([
 					'#' => TypedValue::forValue(
-						$this->valueRegistry->subtypeValue(
-							new TypeNameIdentifier('MyTuple'),
-							$this->valueRegistry->tuple([
-								$this->valueRegistry->integer(1),
-								$this->valueRegistry->string("hi"),
-							])
+						$this->valueRegistry->tuple([
+							$this->valueRegistry->integer(1),
+							$this->valueRegistry->string("hi"),
+						])
+					)->withType(
+						$this->typeRegistry->subset(
+							new TypeNameIdentifier('MyTuple')
 						)
 					)
 				])

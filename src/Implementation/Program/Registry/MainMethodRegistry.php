@@ -4,9 +4,11 @@ namespace Walnut\Lang\Implementation\Program\Registry;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\NativeCode\NativeCodeTypeMapper;
+use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\Method;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
 use Walnut\Lang\Blueprint\Type\IntersectionType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -14,7 +16,7 @@ use Walnut\Lang\Blueprint\Type\UnionType;
 use Walnut\Lang\Implementation\Function\UnionMethodCall;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
-final readonly class MainMethodRegistry implements MethodRegistry {
+final readonly class MainMethodRegistry implements MethodFinder {
 	use BaseType;
 
 	private NestedMethodRegistry $registry;
@@ -33,12 +35,15 @@ final readonly class MainMethodRegistry implements MethodRegistry {
 		);
 	}
 
-	public function method(Type $targetType, MethodNameIdentifier $methodName): Method|UnknownMethod {
+	public function methodForType(Type $targetType, MethodNameIdentifier $methodName): Method|UnknownMethod {
+		if ($methodName->identifier === 'as') {
+			$methodName = new MethodNameIdentifier('castAs');
+		}
 		$baseType = $this->toBaseType($targetType);
 		if ($baseType instanceof IntersectionType) {
 			$methods = [];
 			foreach($baseType->types as $type) {
-				$method = $this->method($type, $methodName);
+				$method = $this->methodForType($type, $methodName);
 				if ($method instanceof Method) {
 					$methods[] = [$type, $method];
 				}
@@ -51,7 +56,7 @@ final readonly class MainMethodRegistry implements MethodRegistry {
 				if (count($unique) === 1) {
 					return $unique[array_key_first($unique)][1];//$methods[0][1];
 				}
-				$method = $this->registry->method($targetType, $methodName);
+				$method = $this->registry->methodForType($targetType, $methodName);
 				return $method instanceof Method ? $method : throw new AnalyserException(
 					sprintf(
 						"Cannot call method '%s' on type '%s': ambiguous method",
@@ -64,7 +69,7 @@ final readonly class MainMethodRegistry implements MethodRegistry {
 		if ($baseType instanceof UnionType) {
 			$methods = [];
 			foreach($baseType->types as $type) {
-				$method = $this->method($type, $methodName);
+				$method = $this->methodForType($type, $methodName);
 				if ($method instanceof Method) {
 					$methods[] = [$type, $method];
 				} else {
@@ -76,6 +81,16 @@ final readonly class MainMethodRegistry implements MethodRegistry {
 				return new UnionMethodCall($methods);
 			}
 		}
-		return $this->registry->method($targetType, $methodName);
+		return $this->registry->methodForType($targetType, $methodName);
+	}
+
+	public function methodForValue(TypedValue $target, MethodNameIdentifier $methodName): Method|UnknownMethod {
+		foreach ($target->types as $type) {
+			$method = $this->methodForType($type, $methodName);
+			if ($method instanceof Method) {
+				return $method;
+			}
+		}
+		return UnknownMethod::value;
 	}
 }

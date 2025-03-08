@@ -29,11 +29,12 @@ final readonly class Type implements NativeMethod {
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
-		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
 		if ($parameterValue instanceof NullValue) {
-			return TypedValue::forValue($programRegistry->valueRegistry->type($targetValue->type));
+			return TypedValue::forValue(
+				$programRegistry->valueRegistry->type($target->type)
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid parameter value");

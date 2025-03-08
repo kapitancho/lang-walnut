@@ -8,11 +8,14 @@ use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Implementation\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Implementation\Code\Execution\ExecutionContext;
 use Walnut\Lang\Implementation\Code\Expression\VariableNameExpression;
+use Walnut\Lang\Implementation\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Implementation\Code\Scope\VariableScope;
 use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
 use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
 use Walnut\Lang\Implementation\Program\ProgramContextFactory;
+use Walnut\Lang\Implementation\Program\Registry\MainMethodRegistry;
+use Walnut\Lang\Implementation\Program\Registry\NestedMethodRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
 use Walnut\Lang\Test\EmptyDependencyContainer;
@@ -25,8 +28,15 @@ final class VariableNameExpressionTest extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->typeRegistry = new TypeRegistryBuilder(new CustomMethodRegistryBuilder());
-		$this->valueRegistry = new ValueRegistry($this->typeRegistry, new EmptyDependencyContainer);
+		$this->typeRegistry = new TypeRegistryBuilder(
+			new CustomMethodRegistryBuilder(),
+			new MainMethodRegistry(
+				new NativeCodeTypeMapper(),
+				new NestedMethodRegistry(),
+				[]
+			)
+		);
+		$this->valueRegistry = new ValueRegistry($this->typeRegistry);
 		$this->variableNameExpression = new VariableNameExpression(
 			new VariableNameIdentifier('x')
 		);
@@ -51,10 +61,8 @@ final class VariableNameExpressionTest extends TestCase {
 		$result = $this->variableNameExpression->execute(
 			new ExecutionContext($this->programRegistry,
 				new VariableValueScope([
-					'x' => new TypedValue(
-						$this->typeRegistry->integer(),
-						$this->valueRegistry->integer(123)
-					)
+					'x' => TypedValue::forValue($this->valueRegistry->integer(123))
+						->withType($this->typeRegistry->integer())
 				])
 			)
 		);

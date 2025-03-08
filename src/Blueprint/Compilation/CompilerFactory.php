@@ -2,9 +2,12 @@
 
 namespace Walnut\Lang\Blueprint\Compilation;
 
+use Walnut\Lang\Implementation\Compilation\Compiler;
+
 interface CompilerFactory {
+	/** @param array<string, string> $packageRoots */
 	public function compiler(
-		string|null $templateSourceRoot,
-		string ... $sourceRoots
+		string $defaultRoot,
+		array $packageRoots,
 	): Compiler;
 }

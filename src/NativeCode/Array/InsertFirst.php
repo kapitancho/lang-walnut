@@ -48,7 +48,6 @@ final readonly class InsertFirst implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
 			$values = $targetValue->values;
 			array_unshift($values, $parameterValue);

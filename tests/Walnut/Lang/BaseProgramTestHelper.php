@@ -166,7 +166,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 			)
 		);
 
-		$this->typeRegistry->addSubtype(
+		$this->typeRegistry->addOpen(
 			new TypeNameIdentifier('DatabaseConnection'),
 			$this->typeRegistry->record([
 				'dsn' => $this->typeRegistry->string()
@@ -223,7 +223,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 				)
 			)
 		);
-		$this->typeRegistry->addSealed(
+		$this->typeRegistry->addOpen(
 			new TypeNameIdentifier('DatabaseQueryFailure'),
 			$this->typeRegistry->record([
 				'query' => $this->typeRegistry->string(1),
@@ -238,7 +238,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 		$this->typeRegistry->addSealed(
 			new TypeNameIdentifier('DatabaseConnector'),
 			$this->typeRegistry->record([
-				'connection' => $this->typeRegistry->subtype(
+				'connection' => $this->typeRegistry->open(
 					new TypeNameIdentifier('DatabaseConnection')
 				)
 			]),
@@ -271,8 +271,9 @@ abstract class BaseProgramTestHelper extends TestCase {
 			$ev('B'),
 			$ev('C')
 		]);
-		$this->typeRegistryBuilder->addSealed($i('MySealed'), $this->typeRegistry->record([]));
-		$this->typeRegistryBuilder->addSubtype($i('MySubtype'), $this->typeRegistry->null);
+		$this->typeRegistryBuilder->addSealed($i('MySealed'), $this->typeRegistry->null);
+		$this->typeRegistryBuilder->addOpen($i('MyOpen'), $this->typeRegistry->null);
+		$this->typeRegistryBuilder->addSubset($i('MySubset'), $this->typeRegistry->null);
 	}
 
 	/*

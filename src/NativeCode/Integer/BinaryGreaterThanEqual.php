@@ -49,9 +49,7 @@ final readonly class BinaryGreaterThanEqual implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof IntegerValue) {
-			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue) {
 				return TypedValue::forValue($programRegistry->valueRegistry->boolean(
 					$targetValue->literalValue >= $parameterValue->literalValue

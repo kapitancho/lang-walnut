@@ -9,6 +9,6 @@ use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 interface AddUserTypeNode extends ModuleDefinitionNode {
 	public TypeNameIdentifier $name { get; }
 	public TypeNode $valueType { get; }
-	public FunctionBodyNode $constructorBody { get; }
+	public FunctionBodyNode|null $constructorBody { get; }
 	public TypeNode|null $errorType { get; }
 }

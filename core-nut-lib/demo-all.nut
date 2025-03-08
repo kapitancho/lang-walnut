@@ -24,10 +24,8 @@ MySealed1 = $[a: Integer, b: Integer];
 MySealed1[a: Real, b: Real] :: [a: #a->asInteger, b: #b->asInteger];
 
 /* Subtypes */
-MySubtype <: String @ MyAtom :: null;
-MySubtype0 <: String;
-MySubtype1 <: String;
-MySubtype1(String) :: #->reverse;
+MySubset = <: String @ MyAtom :: null;
+MySubset0 = <: String;
 
 /* Methods */
 MyAtom->myMethod(^String => Integer) %% MyAtom :: #->length;
@@ -37,7 +35,7 @@ MyOpen[a: Real, b: Real] %% MyAtom :: [a: #a->asInteger, b: #b->asInteger];
 MySealed[a: Real, b: Real] %% MyAtom :: [a: #a->asInteger, b: #b->asInteger];
 
 functionName = ^Any => String :: 'function call result';
-TypeName <: String;
+TypeName = <: String;
 
 getAllExpressions = ^Any => Any :: [
     constant: 'constant',
@@ -75,7 +73,7 @@ AllTypes = [
     enumerationSubset: MyEnum[Value1, Value2],
     open: MyOpen0,
     sealed: MySealed0,
-    subtype: MySubtype0,
+    subset: MySubset0,
     integer: Integer,
     integerRange: Integer<1..10>,
     integerSubset: Integer[2, 15],
@@ -125,7 +123,7 @@ AllTypes = [
     anyEnumerationSubset: Type<EnumerationSubset>,
     anyOpen: Type<Open>,
     anySealed: Type<Sealed>,
-    anySubtype: Type<Subtype>,
+    anySubset: Type<Subset>,
     anyNamed: Type<Named>,
     anyAlias: Type<Alias>,
     anyTuple: Type<Tuple>,
@@ -142,12 +140,12 @@ getMatchingValuesForAllTypes = ^Null => AllTypes :: [
     true: true,
     false: false,
     null: null,
-    atom: MyAtom[],
+    atom: MyAtom(),
     enumeration: MyEnum.Value1,
     enumerationSubset: MyEnum.Value1,
     open: MyOpen0[a: 3, b: -2],
     sealed: MySealed0[a: 3, b: -2],
-    subtype: MySubtype0('value'),
+    subset: MySubset0('value'),
     integer: 5,
     integerRange: 5,
     integerSubset: 2,
@@ -197,7 +195,7 @@ getMatchingValuesForAllTypes = ^Null => AllTypes :: [
     anyEnumerationSubset: type{MyEnum[Value1, Value2]},
     anyOpen: type{MyOpen},
     anySealed: type{MySealed},
-    anySubtype: type{MySubtype},
+    anySubset: type{MySubset},
     anyNamed: type{MyAtom},
     anyAlias: type{Alias},
     anyTuple: type{[Integer, String]},
@@ -208,13 +206,13 @@ getMatchingValuesForAllTypes = ^Null => AllTypes :: [
 ];
 
 getAllValues = ^Any => Any :: [
-    atom: MyAtom[],
+    atom: MyAtom(),
     booleanTrue: true,
     booleanFalse: false,
     enumeration: MyEnum.Value1,
     open: MyOpen[a: 3, b: -2],
     sealed: MySealed[a: 3, b: -2],
-    subtype: MySubtype('value'),
+    subset: MySubset('value'),
     integer: 42,
     real: 3.14,
     string: 'hi!',

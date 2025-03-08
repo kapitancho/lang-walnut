@@ -69,7 +69,7 @@ final readonly class WithLengthRange implements NativeMethod {
 				$programRegistry->typeRegistry->withName(new TypeNameIdentifier('LengthRange'))
 			)) {
 				if ($typeValue instanceof StringType) {
-					$range = $this->toBaseValue($parameter->value)->values;
+					$range = $parameter->value->value->values;
 					$minValue = $range['minLength'];
 					$maxValue = $range['maxLength'];
 					$result = $programRegistry->typeRegistry->string(
@@ -79,7 +79,7 @@ final readonly class WithLengthRange implements NativeMethod {
 					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
 				}
 				if ($typeValue instanceof ArrayType) {
-					$range = $this->toBaseValue($parameter->value)->values;
+					$range = $parameter->value->value->values;
 					$minValue = $range['minLength'];
 					$maxValue = $range['maxLength'];
 					$result = $programRegistry->typeRegistry->array(
@@ -90,7 +90,7 @@ final readonly class WithLengthRange implements NativeMethod {
 					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
 				}
 				if ($typeValue instanceof MapType) {
-					$range = $this->toBaseValue($parameter->value)->values;
+					$range = $parameter->value->value->values;
 					$minValue = $range['minLength'];
 					$maxValue = $range['maxLength'];
 					$result = $programRegistry->typeRegistry->map(
@@ -101,7 +101,7 @@ final readonly class WithLengthRange implements NativeMethod {
 					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
 				}
 				if ($typeValue instanceof SetType) {
-					$range = $this->toBaseValue($parameter->value)->values;
+					$range = $parameter->value->value->values;
 					$minValue = $range['minLength'];
 					$maxValue = $range['maxLength'];
 					$result = $programRegistry->typeRegistry->set(

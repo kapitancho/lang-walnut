@@ -233,10 +233,10 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 		);
 	}
 
-	public function testSubtype(): void {
+	public function testOpen(): void {
 		$this->assertEquals(
-			['DatabaseConnection', 'Subtype', 'Record', 'Map', 'Any'],
-			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->subtype(
+			['DatabaseConnection', 'Open', 'Any'],
+			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->open(
 				new TypeNameIdentifier('DatabaseConnection')
 			))
 		);
@@ -401,15 +401,6 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 			[/*'Alias', */'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::Alias
-			))
-		);
-	}
-
-	public function testTypeSubtype(): void {
-		$this->assertEquals(
-			['Subtype', 'Any'],
-			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
-				MetaTypeValue::Subtype
 			))
 		);
 	}

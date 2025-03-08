@@ -44,18 +44,16 @@ final readonly class BinaryGreaterThan implements NativeMethod {
 
 	public function execute(
 		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
+		TypedValue      $targetValue,
+		TypedValue $parameterValue
 	): TypedValue {
-		$targetValue = $target->value;
-		$parameterValue = $parameter->value;
+		$target = $targetValue->value;
+		$parameter = $parameterValue->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
-		if ($targetValue instanceof IntegerValue || $targetValue instanceof RealValue) {
-			$parameterValue = $this->toBaseValue($parameterValue);
-			if ($parameterValue instanceof IntegerValue || $targetValue instanceof RealValue) {
+		if ($target instanceof IntegerValue || $target instanceof RealValue) {
+			if ($parameter instanceof IntegerValue || $target instanceof RealValue) {
 				return TypedValue::forValue($programRegistry->valueRegistry->boolean(
-					$targetValue->literalValue > $parameterValue->literalValue
+					$target->literalValue > $parameter->literalValue
 				));
 			}
 			// @codeCoverageIgnoreStart

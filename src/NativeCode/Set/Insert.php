@@ -47,7 +47,6 @@ final readonly class Insert implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof SetValue) {
 			$values = $targetValue->values;
 			$exists = false;

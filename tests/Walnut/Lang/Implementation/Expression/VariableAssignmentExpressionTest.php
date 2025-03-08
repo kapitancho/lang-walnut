@@ -68,10 +68,12 @@ final class VariableAssignmentExpressionTest extends TestCase {
 		$result = $this->variableAssignmentExpression->execute(
 			new ExecutionContext($this->programRegistry,
 				new VariableValueScope([
-					'x' => new TypedValue(
-						$this->typeRegistry->integer(),
-						$this->valueRegistry->integer(123)
-					)
+					'x' =>
+						TypedValue::forValue(
+							$this->valueRegistry->integer(123)
+						)->withType(
+							$this->typeRegistry->integer()
+						)
 				])
 			)
 		);

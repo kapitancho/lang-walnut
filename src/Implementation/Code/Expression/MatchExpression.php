@@ -65,13 +65,19 @@ final readonly class MatchExpression implements MatchExpressionInterface, JsonSe
 					if ($this->operation instanceof MatchExpressionIsSubtypeOf && $matchResult->expressionType instanceof TypeType) {
 						$innerContext = $innerContext->withAddedVariableType(
 							$this->target->variableName,
-							$matchResult->expressionType->refType,
+							$analyserContext->programRegistry->typeRegistry->intersection([
+								$matchResult->expressionType->refType,
+								$innerContext->variableScope->typeOf($this->target->variableName),
+							])
 						);
 					}
 					if ($this->operation instanceof MatchExpressionEquals) {
 						$innerContext = $innerContext->withAddedVariableType(
 							$this->target->variableName,
-							$matchResult->expressionType,
+							$analyserContext->programRegistry->typeRegistry->intersection([
+								$matchResult->expressionType,
+								$innerContext->variableScope->typeOf($this->target->variableName),
+							])
 						);
 					}
 				}
@@ -104,21 +110,29 @@ final readonly class MatchExpression implements MatchExpressionInterface, JsonSe
 				return $pair->valueExpression->execute($executionContext);
 			}
 			$innerContext = $pair->matchExpression->execute($executionContext);
-			if ($this->operation->match($executionContext->value, $innerContext->value)) {
+			if ($this->operation->match($executionContext->typedValue, $innerContext->typedValue)) {
 				if ($this->target instanceof VariableNameExpression) {
 					if ($this->operation instanceof MatchExpressionIsSubtypeOf && ($type = $innerContext->value) instanceof TypeValue) {
+						$typedValue = $innerContext->variableValueScope->typedValueOf($this->target->variableName);
 						$innerContext = $innerContext->withAddedVariableValue(
 							$this->target->variableName,
-							new TypedValue(
-								$type->typeValue,
-								$innerContext->variableValueScope->valueOf($this->target->variableName)
-							)
+							$typedValue->withType($type->typeValue)
 						);
 					}
 					if ($this->operation instanceof MatchExpressionEquals) {
 						$innerContext = $innerContext->withAddedVariableValue(
 							$this->target->variableName,
-							$innerContext->typedValue,
+							$innerContext->typedValue->withType(
+								$innerContext->variableValueScope->typeOf($this->target->variableName)
+							)
+							/*new TypedValue(
+								$executionContext->programRegistry->typeRegistry->intersection([
+									$innerContext->variableValueScope->typeOf($this->target->variableName),
+									$innerContext->valueType,
+								]),
+								$innerContext->value
+							)*/
+							//$innerContext->typedValue,
 						);
 					}
 				}

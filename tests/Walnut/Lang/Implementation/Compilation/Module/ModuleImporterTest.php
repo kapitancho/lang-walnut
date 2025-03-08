@@ -33,7 +33,7 @@ final class ModuleImporterTest extends TestCase {
 	public function testImportOk(): void {
 		$this->moduleLookupContext->method('sourceOf')
 			->willReturnCallback(fn(string $module) => match($module) {
-				'core' => 'module core:',
+				'core/core' => 'module $core:',
 				'test' => 'module test %% a, b:',
 				'a' => 'module a %% c, d:',
 				'b' => 'module b %% c:',
@@ -49,7 +49,7 @@ final class ModuleImporterTest extends TestCase {
 		$this->expectException(ModuleDependencyException::class);
 		$this->moduleLookupContext->method('sourceOf')
 			->willReturnCallback(fn(string $module) => match($module) {
-				'core' => 'module core:',
+				'core/core' => 'module $core:',
 				'test' => 'module test %% a:',
 				'a' => 'module a %% test:',
 				default => ''
@@ -61,7 +61,7 @@ final class ModuleImporterTest extends TestCase {
 		$this->expectException(ModuleDependencyException::class);
 		$this->moduleLookupContext->method('sourceOf')
 			->willReturnCallback(fn(string $module) => match($module) {
-				'core' => 'module core:',
+				'core/core' => 'module $core:',
 				'test' => 'module test %% a:',
 				default => throw new ModuleDependencyException($module)
 			});

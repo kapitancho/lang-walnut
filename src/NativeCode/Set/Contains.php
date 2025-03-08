@@ -40,7 +40,6 @@ final readonly class Contains implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof SetValue) {
 			return TypedValue::forValue(
 				$programRegistry->valueRegistry->boolean(

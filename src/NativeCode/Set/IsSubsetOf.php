@@ -39,9 +39,7 @@ final readonly class IsSubsetOf implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
-		$parameterValue = $this->toBaseValue($parameterValue);
-		if ($targetValue instanceof SetValue) {
+				if ($targetValue instanceof SetValue) {
 			if ($parameterValue instanceof SetValue) {
 				foreach(array_keys($targetValue->valueSet) as $key) {
 					if (!array_key_exists($key, $parameterValue->valueSet)) {

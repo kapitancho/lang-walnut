@@ -70,7 +70,6 @@ final readonly class WithKeyValue implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue) {
 			if ($parameterValue instanceof RecordValue) {
 				$p = $parameterValue->values;
@@ -90,7 +89,8 @@ final readonly class WithKeyValue implements NativeMethod {
 							$target->type->range->maxLength === PlusInfinity::value ?
 								PlusInfinity::value : $target->type->range->maxLength + 1
 						) : $resultValue->type;
-					return new TypedValue($resultType, $resultValue);
+
+					return TypedValue::forValue($resultValue)->withType($resultType);
 				}
 			}
 			// @codeCoverageIgnoreStart

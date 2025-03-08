@@ -40,7 +40,7 @@ final readonly class SET implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$v = $this->toBaseValue($targetValue);
+		$v = $targetValue;
 		if ($v instanceof MutableValue) {
 			$v->value = $parameterValue;
 			return TypedValue::forValue($targetValue);

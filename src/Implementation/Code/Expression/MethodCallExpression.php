@@ -2,131 +2,119 @@
 
 namespace Walnut\Lang\Implementation\Code\Expression;
 
-use JsonSerializable;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserResult;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
-use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MethodCallExpression as MethodCallExpressionInterface;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\Method;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
-use Walnut\Lang\Blueprint\Type\SealedType;
-use Walnut\Lang\Blueprint\Type\SubsetType;
 use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Value\ErrorValue;
-use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Implementation\Type\Helper\BaseTypeHelper;
+use Walnut\Lang\Implementation\Type\NothingType;
 
-final readonly class MethodCallExpression implements MethodCallExpressionInterface, JsonSerializable {
+final readonly class MethodCallExpression implements MethodCallExpressionInterface {
+
+	use BaseTypeHelper;
+
 	public function __construct(
 		public Expression $target,
 		public MethodNameIdentifier $methodName,
 		public Expression $parameter,
 	) {}
 
-	private function getMethod(ProgramRegistry $programRegistry, Type $targetType): Method|UnknownMethod {
-		return $programRegistry->methodRegistry->method($targetType,
-			$this->methodName->identifier === 'as' ?
-				new MethodNameIdentifier('castAs') :
-				$this->methodName);
-	}
-
+	/** @throws AnalyserException */
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
 		$analyserContext = $this->target->analyse($analyserContext);
-		$retExpr = $analyserContext->expressionType;
+		$retTargetType = $analyserContext->expressionType;
+		$targetReturnType = $analyserContext->returnType;
 
-		//Special case: cast as - it requires the method registry and a dependency loop should be avoided.
-		$method = $this->getMethod($analyserContext->programRegistry, $retExpr);
+		$analyserContext = $this->parameter->analyse($analyserContext);
+		$retParameterType = $analyserContext->expressionType;
+		$parameterReturnType = $analyserContext->returnType;
+
+		$method = $analyserContext->programRegistry->methodFinder->methodForType(
+			$retTargetType,
+			$this->methodName
+		);
 		if ($method instanceof UnknownMethod) {
 			throw new AnalyserException(
 				sprintf(
 					"Cannot call method '%s' on type '%s'",
 					$this->methodName,
-					$retExpr
+					$retTargetType,
+
 				)
 			);
 		}
-		$targetReturnType = $analyserContext->returnType;
-
-		$analyserContext = $this->parameter->analyse($analyserContext);
-		$retParamType = $analyserContext->expressionType;
-
-		$retType = $method->analyse(
+		$retReturnType = $method->analyse(
 			$analyserContext->programRegistry,
-			$retExpr,
-			$retParamType
+			$retTargetType,
+			$retParameterType
 		);
 		return $analyserContext->asAnalyserResult(
-			$retType,
+			$retReturnType,
 			$analyserContext->programRegistry->typeRegistry->union([
 				$targetReturnType,
-				$analyserContext->returnType
+				$parameterReturnType
 			])
 		);
 	}
 
+	/** @throws ExecutionException */
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
 		$executionContext = $this->target->execute($executionContext);
-		$retTypedValue = $executionContext->typedValue;
-		$retValue = $executionContext->value;
-		$retType = $executionContext->valueType;
-		if ($retType instanceof SubsetType) {
-			$method = $this->getMethod($executionContext->programRegistry, $retType);
-			if ($method instanceof UnknownMethod) {
-				$method = $this->getMethod($executionContext->programRegistry, $retValue->type);
-			}
-		} else {
-			$method = $this->getMethod($executionContext->programRegistry, $retValue->type);
-			if ($method instanceof UnknownMethod) {
-				$method = $this->getMethod($executionContext->programRegistry, $retType);
-				//$method = $executionContext->programRegistry->methodRegistry->method($retType, $this->methodName);
-			}
-		}
-		// @codeCoverageIgnoreStart
+		$retTargetTypedValue = $executionContext->typedValue;
+		$retTargetType = $executionContext->valueType;
+
+		$executionContext = $this->parameter->execute($executionContext);
+		$retParameterTypedValue = $executionContext->typedValue;
+
+		$method = $executionContext->programRegistry->methodFinder->methodForValue(
+			$retTargetTypedValue,
+			$this->methodName
+		);
 		if ($method instanceof UnknownMethod) {
 			throw new ExecutionException(
 				sprintf(
-					"Cannot call method '%s' on type '%s' for value '%s' and parameter '%s'",
+					"Cannot call method '%s' on type '%s' for value '%s'",
 					$this->methodName,
-					$retValue->type,
-					$retValue,
-					$this->parameter
+					$retTargetType,
+					$retTargetTypedValue->value
 				)
 			);
 		}
-		// @codeCoverageIgnoreEnd
-
-		$executionContext = $this->parameter->execute($executionContext);
-
-		$value = $method->execute(
-			$executionContext->programRegistry,
-			$retTypedValue,
-			$executionContext->typedValue
-		);
-		// @codeCoverageIgnoreStart
-		if ($value->value instanceof ErrorValue &&
-			$value->value->errorValue->type instanceof SealedType &&
-			$value->value->errorValue->type->name === 'DependencyContainerError'
-		) {
-			throw new FunctionReturn($value->value);
+		try {
+			$retReturnTypedValue = $method->execute(
+				$executionContext->programRegistry,
+				$retTargetTypedValue,
+				$retParameterTypedValue
+			);
+			//TODO - DependencyContainerError
+			return $executionContext->asExecutionResult($retReturnTypedValue);
+		} catch (ExecutionException $e) {
+			throw new ExecutionException(
+				sprintf("Execution error in method call %s->%s(%s) : \n %s",
+					$this->target,
+					$this->methodName,
+					$this->parameter,
+					$e->getMessage()
+				),
+				previous: $e
+			);
 		}
-		// @codeCoverageIgnoreEnd
-		return $executionContext->asExecutionResult($value);
 	}
+
 
 	public function __toString(): string {
 		$parameter = (string)$this->parameter;
 		if (!($parameter[0] === '[' && $parameter[-1] === ']')) {
 			$parameter = "($parameter)";
-		}
-		if ($parameter === '(null)') {
-			$parameter = '';
 		}
 		return sprintf(
 			"%s->%s%s",

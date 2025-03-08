@@ -5,8 +5,11 @@ namespace Walnut\Lang\Test\Implementation\Type;
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\UnknownType;
+use Walnut\Lang\Implementation\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
+use Walnut\Lang\Implementation\Program\Registry\MainMethodRegistry;
+use Walnut\Lang\Implementation\Program\Registry\NestedMethodRegistry;
 
 final class AtomTypeTest extends TestCase {
 
@@ -15,7 +18,12 @@ final class AtomTypeTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->typeRegistry = new TypeRegistryBuilder(
-			new CustomMethodRegistryBuilder()
+			new CustomMethodRegistryBuilder(),
+			new MainMethodRegistry(
+				new NativeCodeTypeMapper(),
+				new NestedMethodRegistry(),
+				[]
+			)
 		);
 		$this->typeRegistry->addAtom(new TypeNameIdentifier('MyAtom'));
 		$this->typeRegistry->addAtom(new TypeNameIdentifier('AnotherAtom'));

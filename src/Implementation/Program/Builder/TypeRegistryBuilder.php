@@ -15,6 +15,7 @@ use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder as CustomMethodRegistryBuilderInterface;
 use Walnut\Lang\Blueprint\Program\Builder\TypeRegistryBuilder as TypeRegistryBuilderInterface;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\UnknownType;
 use Walnut\Lang\Blueprint\Type\AliasType as AliasTypeInterface;
@@ -22,7 +23,6 @@ use Walnut\Lang\Blueprint\Type\AtomType as AtomTypeInterface;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\EnumerationType as EnumerationTypeInterface;
 use Walnut\Lang\Blueprint\Type\NamedType as NamedTypeInterface;
-use Walnut\Lang\Blueprint\Type\RecordType as RecordTypeInterface;
 use Walnut\Lang\Blueprint\Type\ResultType as ResultTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnknownEnumerationValue;
@@ -60,7 +60,6 @@ use Walnut\Lang\Implementation\Type\ShapeType;
 use Walnut\Lang\Implementation\Type\StringSubsetType;
 use Walnut\Lang\Implementation\Type\StringType;
 use Walnut\Lang\Implementation\Type\SubsetType;
-use Walnut\Lang\Implementation\Type\SubtypeType;
 use Walnut\Lang\Implementation\Type\TrueType;
 use Walnut\Lang\Implementation\Type\TupleType;
 use Walnut\Lang\Implementation\Type\TypeType;
@@ -87,8 +86,6 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
     private array $enumerationTypes;
 	/** @var array<string, AliasType> */
     private array $aliasTypes;
-	/** @var array<string, SubtypeType> */
-    private array $subtypeTypes;
 	/** @var array<string, OpenType> */
     private array $openTypes;
 	/** @var array<string, SealedType> */
@@ -103,7 +100,10 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
     private const string nullTypeName = 'Null';
     private const string constructorTypeName = 'Constructor';
 
-    public function __construct(private readonly CustomMethodRegistryBuilderInterface $customMethodRegistryBuilder) {
+    public function __construct(
+		private readonly CustomMethodRegistryBuilderInterface $customMethodRegistryBuilder,
+	    private readonly MethodFinder $methodFinder
+    ) {
         $this->unionTypeNormalizer = new UnionTypeNormalizer($this);
         $this->intersectionTypeNormalizer = new IntersectionTypeNormalizer($this);
 
@@ -140,10 +140,25 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
         $this->false = $this->boolean->subsetType([$falseValue]);
         $this->enumerationTypes = $enumerationTypes;
 		$this->aliasTypes = [];
-		$this->subtypeTypes = [];
 		$this->openTypes = [];
 		$this->sealedTypes = [];
 		$this->subsetTypes = [];
+
+		$this->aliasTypes['JsonValue'] = new AliasType(
+			new TypeNameIdentifier('JsonValue'),
+			$this->union([
+				$this->null,
+				$this->boolean,
+				$this->integer(),
+				$this->real(),
+				$this->string(),
+				$this->array($this->proxyType(new TypeNameIdentifier('JsonValue'))),
+				$this->map($this->proxyType(new TypeNameIdentifier('JsonValue'))),
+				$this->set($this->proxyType(new TypeNameIdentifier('JsonValue'))),
+				$this->mutable($this->proxyType(new TypeNameIdentifier('JsonValue'))),
+				//$this->shape($this->proxyType(new TypeNameIdentifier('JsonValue')))
+			], false)
+		);
     }
 
     public function integer(
@@ -212,7 +227,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
     }
 
 	public function shape(Type $refType): ShapeType {
-		return new ShapeType($refType);
+		return new ShapeType($this->methodFinder, $refType);
 	}
 
 	public function type(Type $refType): TypeType {
@@ -250,7 +265,6 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		    'Open' => $this->metaType(MetaTypeValue::Open),
 		    'Sealed' => $this->metaType(MetaTypeValue::Sealed),
 		    'Subset' => $this->metaType(MetaTypeValue::Subset),
-		    'Subtype' => $this->metaType(MetaTypeValue::Subtype),
 		    'Tuple' => $this->metaType(MetaTypeValue::Tuple),
 			default => $this->withName($typeName)
 	    };
@@ -260,7 +274,6 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 	    return $this->atomTypes[$typeName->identifier] ??
             $this->enumerationTypes[$typeName->identifier] ??
             $this->aliasTypes[$typeName->identifier] ??
-            $this->subtypeTypes[$typeName->identifier] ??
             $this->openTypes[$typeName->identifier] ??
             $this->sealedTypes[$typeName->identifier] ??
             $this->subsetTypes[$typeName->identifier] ??
@@ -273,10 +286,11 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 	}
 
 	/** @throws UnknownType */
-	public function subtype(TypeNameIdentifier $typeName): SubtypeType {
-		return $this->subtypeTypes[$typeName->identifier] ?? UnknownType::withName($typeName);
+	public function subset(TypeNameIdentifier $typeName): SubsetType {
+		return $this->subsetTypes[$typeName->identifier] ?? UnknownType::withName($typeName);
 	}
 
+	/** @throws UnknownType */
 	public function open(TypeNameIdentifier $typeName): OpenType {
 		return $this->openTypes[$typeName->identifier] ?? UnknownType::withName($typeName);
 	}
@@ -286,11 +300,13 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		return $this->sealedTypes[$typeName->identifier] ?? UnknownType::withName($typeName);
 	}
 
-    public function atom(TypeNameIdentifier $typeName): AtomTypeInterface {
+	/** @throws UnknownType */
+	public function atom(TypeNameIdentifier $typeName): AtomTypeInterface {
         return $this->atomTypes[$typeName->identifier] ?? UnknownType::withName($typeName);
     }
 
-    public function enumeration(TypeNameIdentifier $typeName): EnumerationTypeInterface {
+	/** @throws UnknownType */
+	public function enumeration(TypeNameIdentifier $typeName): EnumerationTypeInterface {
         return $this->enumerationTypes[$typeName->identifier] ?? UnknownType::withName($typeName);
     }
 
@@ -354,15 +370,23 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		if (count($types) === 1 && $types[0] instanceof AliasTypeInterface) {
 			return $types[0];
 		}
-		return $normalize ? $this->unionTypeNormalizer->normalize(... $types) :
-			new UnionType($this->unionTypeNormalizer, ...$types);
+		if ($normalize) {
+			try {
+				return $this->unionTypeNormalizer->normalize(... $types);
+			} catch (UnknownType) {}
+		}
+		return new UnionType($this->unionTypeNormalizer, ...$types);
 	}
 
 	/** @param list<Type> $types */
 	public function intersection(array $types, bool $normalize = true): Type {
 		$types = $this->intersectionTypeNormalizer->flatten(... $types);
-        return $normalize ? $this->intersectionTypeNormalizer->normalize(... $types) :
-            new IntersectionType($this->intersectionTypeNormalizer, ...$types);
+		if ($normalize) {
+			try {
+				return $this->intersectionTypeNormalizer->normalize(... $types);
+			} catch (UnknownType) {}
+		}
+		return new IntersectionType($this->intersectionTypeNormalizer, ...$types);
 	}
 
 	public function function(Type $parameterType, Type $returnType): FunctionType {
@@ -405,20 +429,6 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 	public function addAlias(TypeNameIdentifier $name, Type $aliasedType): AliasType {
 		$result = new AliasType($name, $aliasedType);
 		$this->aliasTypes[$name->identifier] = $result;
-		return $result;
-	}
-
-	public function addSubtype(
-		TypeNameIdentifier $name,
-		Type $baseType,
-		FunctionBody|null $constructorBody = null,
-		Type|null $errorType = null
-	): SubtypeType {
-		$result = new SubtypeType($name, $baseType);
-		$this->subtypeTypes[$name->identifier] = $result;
-		if ($constructorBody) {
-			$this->addConstructorMethod($name, $baseType, $errorType, $constructorBody);
-		}
 		return $result;
 	}
 
@@ -509,7 +519,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 			'atomTypes' => $this->atomTypes,
 			'enumerationTypes' => $this->enumerationTypes,
 			'aliasTypes' => $this->aliasTypes,
-			'subtypeTypes' => $this->subtypeTypes,
+			'subsetTypes' => $this->subsetTypes,
 			'openTypes' => $this->openTypes,
 			'sealedTypes' => $this->sealedTypes
 		];

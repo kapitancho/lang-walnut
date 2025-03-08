@@ -61,9 +61,7 @@ final readonly class DownTo implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof IntegerValue) {
-			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue) {
 	            return TypedValue::forValue($programRegistry->valueRegistry->tuple(
 		            $targetValue->literalValue > $parameterValue->literalValue  ?

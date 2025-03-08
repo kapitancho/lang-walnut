@@ -37,7 +37,6 @@ final readonly class ToLowerCase implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof StringValue) {
 			return TypedValue::forValue(
 				$programRegistry->valueRegistry->string(mb_strtolower($targetValue->literalValue))

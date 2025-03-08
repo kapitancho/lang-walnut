@@ -37,7 +37,6 @@ final readonly class ToUpperCase implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof StringValue) {
 			return TypedValue::forValue(
 				$programRegistry->valueRegistry->string(mb_strtoupper($targetValue->literalValue))

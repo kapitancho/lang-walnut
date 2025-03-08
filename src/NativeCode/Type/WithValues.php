@@ -138,7 +138,7 @@ final readonly class WithValues implements NativeMethod {
 						1
 					)
 				)) {
-					$values = $this->toBaseValue($parameter->value)->values;
+					$values = $parameter->value->values;
 					$result = $programRegistry->typeRegistry->integerSubset(
 						array_map(fn(IntegerValue $value): Number => $value->literalValue, $values)
 					);
@@ -152,7 +152,7 @@ final readonly class WithValues implements NativeMethod {
 						1
 					)
 				)) {
-					$values = $this->toBaseValue($parameter->value)->values;
+					$values = $parameter->value->values;
 					$result = $programRegistry->typeRegistry->realSubset(
 						array_map(fn(RealValue|IntegerValue $value): Number => $value->literalValue, $values)
 					);
@@ -166,7 +166,7 @@ final readonly class WithValues implements NativeMethod {
 						1
 					)
 				)) {
-					$values = $this->toBaseValue($parameter->value)->values;
+					$values = $parameter->value->values;
 					$result = $programRegistry->typeRegistry->stringSubset(
 						array_map(fn(StringValue $value): string => $value->literalValue, $values)
 					);
@@ -180,7 +180,7 @@ final readonly class WithValues implements NativeMethod {
 						1
 					)
 				)) {
-					$values = $this->toBaseValue($parameter->value)->values;
+					$values = $parameter->value->values;
 					$r = [];
 					foreach($values as $value) {
 						if ($value instanceof EnumerationValue && $value->enumeration == $typeValue) {

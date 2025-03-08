@@ -32,7 +32,7 @@ final readonly class TypeName implements NativeMethod {
 					MetaTypeValue::Atom,
 					MetaTypeValue::Enumeration,
 					MetaTypeValue::Alias,
-					MetaTypeValue::Subtype,
+					MetaTypeValue::Subset,
 					MetaTypeValue::Open,
 					MetaTypeValue::Sealed,
 				], true)) {
@@ -64,7 +64,9 @@ final readonly class TypeName implements NativeMethod {
 			}
 		}
 		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid parameter value");
+		throw new ExecutionException(
+			sprintf("Invalid target value: %s", $targetValue)
+		);
 		// @codeCoverageIgnoreEnd
 	}
 

@@ -42,8 +42,7 @@ final readonly class MutableExpression implements MutableExpressionInterface, Js
 		$executionContext = $this->value->execute($executionContext);
 		if ($executionContext->valueType->isSubtypeOf($this->type)) {
 			return $executionContext->withTypedValue(
-				new TypedValue(
-					$executionContext->programRegistry->typeRegistry->mutable($this->type),
+				TypedValue::forValue(
 					$executionContext->programRegistry->valueRegistry->mutable(
 						$this->type,
 						$executionContext->value

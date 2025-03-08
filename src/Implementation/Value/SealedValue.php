@@ -38,7 +38,7 @@ final class SealedValue implements SealedValueInterface, JsonSerializable {
 
 	public function jsonSerialize(): array {
 		return [
-			'valueType' => 'State',
+			'valueType' => 'Sealed',
 			'typeName' => $this->typeName,
 			'value' => $this->value
 		];

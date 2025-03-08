@@ -40,10 +40,11 @@ final readonly class TupleExpression implements TupleExpressionInterface, JsonSe
 			$values[] = $executionContext->value;
 			$types[] = $executionContext->valueType;
 		}
-		return $executionContext->asExecutionResult(new TypedValue(
-			$executionContext->programRegistry->typeRegistry->tuple($types),
-			$executionContext->programRegistry->valueRegistry->tuple($values)
-		));
+		return $executionContext->asExecutionResult(
+			TypedValue::forValue(
+				$executionContext->programRegistry->valueRegistry->tuple($values)
+			)->withType($executionContext->programRegistry->typeRegistry->tuple($types))
+		);
 	}
 
 	public function __toString(): string {

@@ -26,24 +26,25 @@ final class WithTest extends CodeExecutionTestHelper {
 		);
 	}
 
-	public function testWithSubtype(): void {
-		$result = $this->executeCodeSnippet("recWith[t: MySubtype[a: 'hi', b: 42], p: [b: -9]];",
-			"MySubtype <: [a: String, b: Integer]; recWith = ^[t: MySubtype, p: [b: Integer]] 
-				=> MySubtype :: #t->with(#p);");
-		$this->assertEquals("MySubtype[a: 'hi', b: -9]", $result);
+
+	public function testWithSubset(): void {
+		$result = $this->executeCodeSnippet("recWith[t: MySubset[a: 'hi', b: 42], p: [b: -9]];",
+			"MySubset = <: [a: String, b: Integer]; recWith = ^[t: MySubset, p: [b: Integer]] 
+				=> MySubset :: #t->with(#p);");
+		$this->assertEquals("[a: 'hi', b: -9]", $result);
 	}
 
-	public function testWithSubtypeConstructedOk(): void {
-		$result = $this->executeCodeSnippet("recWith[t: ?noError(MySubtype[a: 'hi', b: 42]), p: [b: 9]];",
-			"MySubtype <: [a: String, b: Integer] @ String :: ?when(#b < 0) { => @'error'}; 
-				recWith = ^[t: MySubtype, p: [b: Integer]] => Result<MySubtype, String> :: #t->with(#p);");
-		$this->assertEquals("MySubtype[a: 'hi', b: 9]", $result);
+	public function testWithSubsetConstructedOk(): void {
+		$result = $this->executeCodeSnippet("v = recWith[t: ?noError(MySubset[a: 'hi', b: 42]), p: [b: 9]]; [v->isOfType(type{MySubset}), v]",
+			"MySubset = <: [a: String, b: Integer] @ String :: ?when(#b < 0) { => @'error'}; 
+				recWith = ^[t: MySubset, p: [b: Integer]] => Result<MySubset, String> :: #t->with(#p);");
+		$this->assertEquals("[true, [a: 'hi', b: 9]]", $result);
 	}
 
-	public function testWithSubtypeConstructedError(): void {
-		$result = $this->executeCodeSnippet("recWith[t: ?noError(MySubtype[a: 'hi', b: 42]), p: [b: -9]];",
-			"MySubtype <: [a: String, b: Integer] @ String :: ?when(#b < 0) { => @'error'}; 
-				recWith = ^[t: MySubtype, p: [b: Integer]] => Result<MySubtype, String> :: #t->with(#p);");
+	public function testWithSubsetConstructedError(): void {
+		$result = $this->executeCodeSnippet("recWith[t: ?noError(MySubset[a: 'hi', b: 42]), p: [b: -9]];",
+			"MySubset = <: [a: String, b: Integer] @ String :: ?when(#b < 0) { => @'error'}; 
+				recWith = ^[t: MySubset, p: [b: Integer]] => Result<MySubset, String> :: #t->with(#p);");
 		$this->assertEquals("@'error'", $result);
 	}
 

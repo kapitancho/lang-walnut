@@ -35,7 +35,6 @@ use Walnut\Lang\Blueprint\AST\Node\Module\AddMethodNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddOpenTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddSealedTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddSubsetTypeNode;
-use Walnut\Lang\Blueprint\AST\Node\Module\AddSubtypeTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddVariableNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\AnyTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\ArrayTypeNode;
@@ -143,7 +142,7 @@ interface NodeBuilder {
 	public function methodCall(
 		ExpressionNode $target,
 		MethodNameIdentifier $methodName,
-		ExpressionNode $parameter
+		ExpressionNode|null $parameter
 	): MethodCallExpressionNode;
 
 	public function functionBody(ExpressionNode $expression): FunctionBodyNode;
@@ -179,30 +178,23 @@ interface NodeBuilder {
 	public function addOpen(
 		TypeNameIdentifier $name,
 		TypeNode $valueType,
-		ExpressionNode $constructorBody,
+		ExpressionNode|null $constructorBody,
 		TypeNode|null $errorType
 	): AddOpenTypeNode;
 
 	public function addSealed(
 		TypeNameIdentifier $name,
 		TypeNode $valueType,
-		ExpressionNode $constructorBody,
+		ExpressionNode|null $constructorBody,
 		TypeNode|null $errorType
 	): AddSealedTypeNode;
 
 	public function addSubset(
 		TypeNameIdentifier $name,
 		TypeNode $valueType,
-		ExpressionNode $constructorBody,
+		ExpressionNode|null $constructorBody,
 		TypeNode|null $errorType
 	): AddSubsetTypeNode;
-
-	public function addSubtype(
-		TypeNameIdentifier $name,
-		TypeNode $baseType,
-		ExpressionNode $constructorBody,
-		TypeNode|null $errorType
-	): AddSubtypeTypeNode;
 
 	/** @param array<string, TypeNode> $types */
 	public function recordType(array $types, TypeNode|null $restType = null): RecordTypeNode;

@@ -48,7 +48,6 @@ final readonly class KeyExists implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue && $parameterValue instanceof StringValue) {
 			$values = $targetValue->values;
 			return TypedValue::forValue($programRegistry->valueRegistry->boolean(

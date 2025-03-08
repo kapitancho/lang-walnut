@@ -67,7 +67,6 @@ final readonly class MapKeyValue implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue && $parameterValue instanceof FunctionValue) {
 			$values = $targetValue->values;
 			$result = [];
@@ -78,7 +77,7 @@ final readonly class MapKeyValue implements NativeMethod {
 						'key' => $programRegistry->valueRegistry->string($key),
 						'value' => $value
 					])
-				);
+				)->value;
 				if ($r instanceof ErrorValue) {
 					return TypedValue::forValue($r);
 				}

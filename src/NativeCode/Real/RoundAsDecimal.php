@@ -46,10 +46,8 @@ final readonly class RoundAsDecimal implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			$target = $targetValue->literalValue;
-			$parameterValue = $this->toBaseValue($parameterValue);
 			if ($parameterValue instanceof IntegerValue && $parameterValue->literalValue >= 0) {
 				return TypedValue::forValue(
 					$programRegistry->valueRegistry->real($target->round((string)$parameterValue->literalValue))

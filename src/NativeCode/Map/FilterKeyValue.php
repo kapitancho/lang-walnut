@@ -70,7 +70,6 @@ final readonly class FilterKeyValue implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof RecordValue) {
 			if ($parameterValue instanceof FunctionValue) {
 				$values = $targetValue->values;
@@ -83,7 +82,7 @@ final readonly class FilterKeyValue implements NativeMethod {
 							'key' => $programRegistry->valueRegistry->string($key),
 							'value' => $value
 						])
-					);
+					)->value;
 					if ($filterResult->equals($true)) {
 						$result[$key] = $value;
 					}

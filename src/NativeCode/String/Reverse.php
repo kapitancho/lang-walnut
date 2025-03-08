@@ -37,7 +37,6 @@ final readonly class Reverse implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof StringValue) {
 			return TypedValue::forValue($programRegistry->valueRegistry->string(strrev($targetValue->literalValue)));
 		}

@@ -39,9 +39,7 @@ final readonly class IsDisjointWith implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
-		$parameterValue = $this->toBaseValue($parameterValue);
-		if ($targetValue instanceof SetValue) {
+				if ($targetValue instanceof SetValue) {
 			if ($parameterValue instanceof SetValue) {
 				return TypedValue::forValue(
 					$programRegistry->valueRegistry->boolean(

@@ -8,8 +8,11 @@ use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry as TypeRegistryInterface;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry as ValueRegistryInterface;
+use Walnut\Lang\Implementation\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
+use Walnut\Lang\Implementation\Program\Registry\MainMethodRegistry;
+use Walnut\Lang\Implementation\Program\Registry\NestedMethodRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
 use Walnut\Lang\Test\EmptyDependencyContainer;
 
@@ -21,7 +24,14 @@ final class MegaTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
-		$this->typeRegistry = new TypeRegistryBuilder(new CustomMethodRegistryBuilder());
+		$this->typeRegistry = new TypeRegistryBuilder(
+			new CustomMethodRegistryBuilder(),
+			new MainMethodRegistry(
+				new NativeCodeTypeMapper(),
+				new NestedMethodRegistry(),
+				[]
+			)
+		);
 		$this->valueRegistry = new ValueRegistry(
 			$this->typeRegistry,
 			new EmptyDependencyContainer

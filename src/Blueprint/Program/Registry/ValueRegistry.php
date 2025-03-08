@@ -24,7 +24,6 @@ use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\SealedValue;
 use Walnut\Lang\Blueprint\Value\SetValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
-use Walnut\Lang\Blueprint\Value\SubtypeValue;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -52,6 +51,7 @@ interface ValueRegistry {
 		Type $dependencyType,
 		Type $returnType,
 		FunctionBody $body,
+		string $functionName = '(Unknown)'
 	): FunctionValue;
 
 	public function mutable(Type $type, Value $value): MutableValue;
@@ -67,12 +67,6 @@ interface ValueRegistry {
 		TypeNameIdentifier $typeName,
 		EnumValueIdentifier $valueIdentifier
 	): EnumerationValue;
-
-	/** @throws UnknownType */
-	public function subtypeValue(
-		TypeNameIdentifier $typeName,
-		Value $baseValue
-	): SubtypeValue;
 
 	/** @throws UnknownType */
 	public function openValue(

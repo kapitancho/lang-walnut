@@ -80,7 +80,7 @@ final readonly class OpenApiSchema implements NativeMethod {
 				'type' => $programRegistry->valueRegistry->string('string'),
 				'enum' => $programRegistry->valueRegistry->tuple(
 					array_map(
-						static fn(StringValue $value): StringValue => $value,
+						static fn(string $value): StringValue => $programRegistry->valueRegistry->string($value),
 						$type->subsetValues
 					)
 				)
@@ -170,9 +170,10 @@ final readonly class OpenApiSchema implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof TypeValue) {
-			return new TypedValue(
-				$programRegistry->typeRegistry->alias(new TypeNameIdentifier('JsonValue')),
+			return TypedValue::forValue(
 				$this->typeToOpenApiSchema($programRegistry, $targetValue->typeValue)
+			)->withType(
+				$programRegistry->typeRegistry->alias(new TypeNameIdentifier('JsonValue'))
 			);
 		}
 		// @codeCoverageIgnoreStart

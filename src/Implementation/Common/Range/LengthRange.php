@@ -22,7 +22,45 @@ final readonly class LengthRange implements LengthRangeInterface, JsonSerializab
 		}
 	}
 
-    public function isSubRangeOf(LengthRangeInterface $range): bool {
+	private function min(
+		PlusInfinity|Number $value1,
+		PlusInfinity|Number $value2
+	): PlusInfinity|Number {
+		return match(true) {
+			$value1 === PlusInfinity::value => $value2,
+			$value2 === PlusInfinity::value => $value1,
+			default => min($value1, $value2)
+		};
+	}
+
+	private function max(
+		PlusInfinity|Number $value1,
+		PlusInfinity|Number $value2
+	): PlusInfinity|Number {
+		return match(true) {
+			$value1 === PlusInfinity::value || $value2 === PlusInfinity::value => PlusInfinity::value,
+			default => max($value1, $value2)
+		};
+	}
+
+	public function intersectsWith(LengthRangeInterface $range): bool {
+		if ($this->maxLength instanceof Number && $this->maxLength < $range->minLength) {
+			return false;
+		}
+		if ($range->maxLength instanceof Number && $this->minLength > $range->maxLength) {
+			return false;
+		}
+		return true;
+	}
+
+	public function tryRangeIntersectionWith(LengthRangeInterface $range): LengthRangeInterface|null {
+		return $this->intersectsWith($range) ? new self (
+			$this->max($this->minLength, $range->minLength),
+			$this->min($this->maxLength, $range->maxLength)
+		) : null;
+	}
+
+	public function isSubRangeOf(LengthRangeInterface $range): bool {
 		return
 			$this->compare($this->minLength, $range->minLength) > -1 &&
 			$this->compare($this->maxLength, $range->maxLength) < 1;

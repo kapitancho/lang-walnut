@@ -3,24 +3,31 @@
 namespace Walnut\Lang\Implementation\Compilation;
 
 use Walnut\Lang\Blueprint\Compilation\CompilerFactory as CompilerFactoryInterface;
-use Walnut\Lang\Implementation\Compilation\Module\MultiFolderBasedModuleLookupContext;
+use Walnut\Lang\Implementation\Compilation\Module\EmptyPrecompiler;
+use Walnut\Lang\Implementation\Compilation\Module\PackageBasedModuleLookupContext;
+use Walnut\Lang\Implementation\Compilation\Module\PackageBasedModulePathFinder;
 use Walnut\Lang\Implementation\Compilation\Module\TemplatePrecompiler;
-use Walnut\Lang\Implementation\Compilation\Module\TemplatePrecompilerModuleLookupDecorator;
+use Walnut\Lang\Implementation\Compilation\Module\TestPrecompiler;
 
 final readonly class CompilerFactory implements CompilerFactoryInterface {
 
+	/** @param array<string, string> $packageRoots */
 	public function compiler(
-		string|null $templateSourceRoot,
-		string ... $sourceRoots
+		string $defaultRoot,
+		array $packageRoots,
 	): Compiler {
-		$lookupContext = new MultiFolderBasedModuleLookupContext(... $sourceRoots);
-		if ($templateSourceRoot !== null) {
-			$lookupContext = new TemplatePrecompilerModuleLookupDecorator(
-				new TemplatePrecompiler(),
-				$lookupContext,
-				$templateSourceRoot
-			);
-		}
+		$modulePathFinder = new PackageBasedModulePathFinder(
+			$defaultRoot,
+			$packageRoots
+		);
+		$lookupContext = new PackageBasedModuleLookupContext(
+			$modulePathFinder,
+			[
+				'.nut' => new EmptyPrecompiler(),
+				'.nut.html' => new TemplatePrecompiler(),
+				'.test.nut' => new TestPrecompiler()
+			]
+		);
 		return new Compiler($lookupContext);
 	}
 }

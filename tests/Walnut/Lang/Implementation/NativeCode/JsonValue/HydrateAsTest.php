@@ -118,15 +118,6 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			null
 		);
 
-		$this->typeRegistry->addSubtype(
-			new TypeNameIdentifier('MySubtype'),
-			$this->typeRegistry->integer(),
-			$this->expressionRegistry->functionBody(
-				$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
-			),
-			null
-		);
-
 		$this->typeRegistry->addEnumeration(
 			new TypeNameIdentifier('MyCustomEnum'),[
 				new EnumValueIdentifier('A'),
@@ -216,104 +207,6 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 					]
 				),
 			)
-		);
-
-		$this->typeRegistry->addSubtype(
-			new TypeNameIdentifier('MyCustomSubtype'),
-			$this->typeRegistry->string(),
-			$this->expressionRegistry->functionBody(
-				$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
-			),
-			null
-		);
-
-		$this->customMethodRegistryBuilder->addMethod(
-			$this->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
-			new MethodNameIdentifier('asMyCustomSubtype'),
-			$this->typeRegistry->null,
-			null,
-			$this->typeRegistry->nothing,
-			$this->typeRegistry->subtype(new TypeNameIdentifier('MyCustomSubtype')),
-			$this->expressionRegistry->functionBody(
-				$this->expressionRegistry->matchValue(
-					$this->expressionRegistry->variableName(
-						new VariableNameIdentifier('$')
-					),
-					[
-						$this->expressionRegistry->matchPair(
-							$this->expressionRegistry->constant(
-								$this->valueRegistry->string('A')
-							),
-							$this->constructorCall(
-								new TypeNameIdentifier('MyCustomSubtype'),
-								$this->expressionRegistry->constant(
-									$this->valueRegistry->string('A')
-								)
-							)
-						),
-						$this->expressionRegistry->matchDefault(
-							$this->constructorCall(
-								new TypeNameIdentifier('MyCustomSubtype'),
-								$this->expressionRegistry->constant(
-									$this->valueRegistry->string('B')
-								)
-							)
-						),
-					]
-				),
-			)
-		);
-
-		$this->typeRegistry->addSubtype(
-			new TypeNameIdentifier('MyConstructorSubtype'),
-			$this->typeRegistry->integer(),
-			$this->expressionRegistry->functionBody(
-				$this->expressionRegistry->matchValue(
-					$this->expressionRegistry->constant($this->valueRegistry->integer(1)),
-					 [
-						$this->expressionRegistry->matchPair(
-							$this->expressionRegistry->methodCall(
-								$this->expressionRegistry->variableName(
-									new VariableNameIdentifier('#')
-								),
-								new MethodNameIdentifier('binaryModulo'),
-								$this->expressionRegistry->constant($this->valueRegistry->integer(2))
-							),
-							$this->expressionRegistry->constant(
-								$this->valueRegistry->error(
-									$this->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
-								)
-							),
-						),
-						$this->expressionRegistry->matchDefault(
-							$this->expressionRegistry->constant($this->valueRegistry->null)
-						)
-					]
-				)
-			),
-			$this->typeRegistry->withName(new TypeNameIdentifier('NotANumber'))
-		);
-
-
-		$this->typeRegistry->addSubtype(
-			new TypeNameIdentifier('MyNestedSubtype'),
-			$this->typeRegistry->record([
-				'a' => $this->typeRegistry->boolean,
-				'b' => $this->typeRegistry->withName(new TypeNameIdentifier('MySubtype'))
-			]),
-			$this->expressionRegistry->functionBody(
-				$this->expressionRegistry->constant($this->valueRegistry->null)
-			),
-			null
-		);
-
-
-		$this->analyseCallHydrateAs($this->typeRegistry->integer());
-		$this->analyseCallHydrateAs(
-			$this->typeRegistry->withName(new TypeNameIdentifier('MySubtype')),
-		);
-		$this->analyseCallHydrateAs(
-			$this->typeRegistry->withName(new TypeNameIdentifier('MyNestedSubtype')),
 		);
 
 		//Integer
@@ -768,16 +661,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			$this->typeRegistry->type($this->typeRegistry->any),
 			$this->valueRegistry->type($this->typeRegistry->withName(new TypeNameIdentifier('MyState')))
 		);
-		$this->callHydrateAsError(
-			$this->valueRegistry->string("MyState"),
-			$this->typeRegistry->type($this->typeRegistry->integer()),
-			"@HydrationError[\n	value: 'MyState',\n	hydrationPath: 'value',\n	errorMessage: 'The type should be a subtype of Integer'\n]"
-		);
-		if (0) $this->callHydrateAsError(
-			$this->valueRegistry->string("InvalidTypeName"),
-			$this->typeRegistry->type($this->typeRegistry->integer()),
-			"@HydrationError[\n	value: InvalidTypeName,\n	hydrationPath: 'value',\n	errorMessage: 'The string value should be a name of a valid type'\n]"
-		);
+
 		$this->callHydrateAsError(
 			$this->valueRegistry->integer(123),
 			$this->typeRegistry->type($this->typeRegistry->integer()),
@@ -868,59 +752,6 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			$this->typeRegistry->sealed(new TypeNameIdentifier('MyCustomState')),
 			$this->valueRegistry->sealedValue(new TypeNameIdentifier('MyCustomState'),
 				$this->valueRegistry->record(['x' => $this->valueRegistry->string('B')])),
-		);
-
-		//Subtype
-		$this->callHydrateAs(
-			$this->valueRegistry->integer(123),
-			$this->typeRegistry->withName(new TypeNameIdentifier('MySubtype')),
-			$this->valueRegistry->subtypeValue(
-				new TypeNameIdentifier('MySubtype'),
-				$this->valueRegistry->integer(123)
-			)
-		);
-
-		$this->callHydrateAs(
-			$this->valueRegistry->string('A'),
-			$this->typeRegistry->subtype(new TypeNameIdentifier('MyCustomSubtype')),
-			$this->valueRegistry->subtypeValue(new TypeNameIdentifier('MyCustomSubtype'), $this->valueRegistry->string('A')),
-		);
-		$this->callHydrateAs(
-			$this->valueRegistry->true,
-			$this->typeRegistry->subtype(new TypeNameIdentifier('MyCustomSubtype')),
-			$this->valueRegistry->subtypeValue(new TypeNameIdentifier('MyCustomSubtype'), $this->valueRegistry->string('B')),
-		);
-
-		$this->callHydrateAs(
-			$this->valueRegistry->integer(124),
-			$this->typeRegistry->withName(new TypeNameIdentifier('MyConstructorSubtype')),
-			$this->valueRegistry->subtypeValue(
-				new TypeNameIdentifier('MyConstructorSubtype'),
-				$this->valueRegistry->integer(124)
-			)
-		);
-		/*$this->callHydrateAsError(
-			$this->valueRegistry->integer(123),
-			$this->typeRegistry->withName(new TypeNameIdentifier('MyConstructorSubtype')),
-			"@HydrationError[\n	value: 123,\n	hydrationPath: 'value',\n	errorMessage: 'Subtype hydration failed: @NotANumber[]'\n]"
-		);*/
-
-		$this->callHydrateAs(
-			$this->valueRegistry->record([
-				'a' => $this->valueRegistry->boolean(true),
-				'b' => $this->valueRegistry->integer(123)
-			]),
-			$this->typeRegistry->withName(new TypeNameIdentifier('MyNestedSubtype')),
-			$this->valueRegistry->subtypeValue(
-				new TypeNameIdentifier('MyNestedSubtype'),
-				$this->valueRegistry->record([
-					'a' => $this->valueRegistry->boolean(true),
-					'b' => $this->valueRegistry->subtypeValue(
-						new TypeNameIdentifier('MySubtype'),
-						$this->valueRegistry->integer(123)
-					)
-				]),
-			)
 		);
 
 		$value = '{"a":true,"b":123,"c":[{"x":15},{"x":20}],"d":{"x":"B","y":2}}';

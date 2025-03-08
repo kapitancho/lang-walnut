@@ -2,15 +2,17 @@
 
 namespace Walnut\Lang\Implementation\Compilation\Module;
 
-final readonly class TemplatePrecompiler {
+use Walnut\Lang\Blueprint\Compilation\Module\CodePrecompiler;
+
+final readonly class TemplatePrecompiler implements CodePrecompiler {
 	public function precompileSourceCode(string $moduleName, string $sourceCode): string {
 		$sourceCode = preg_replace('^<!-- (.*?) %% (.*?) -->^', <<<CODE
-		module $moduleName %% tpl, $2:
+		module $moduleName %% \$tpl, $2:
 			
 		$1 ==> Template @ UnableToRenderTemplate %% [~TemplateRenderer] :: {
 			output = Template(mutable{String, ''});
-			e = ^String :: output->APPEND(#);
-			h = ^String :: output->APPEND(#->htmlEscape);
+			e = ^String :: output->value->APPEND(#);
+			h = ^String :: output->value->APPEND(#->htmlEscape);
 			-->
 								
 		CODE, $sourceCode);

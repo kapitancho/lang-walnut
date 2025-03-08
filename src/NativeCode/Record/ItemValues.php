@@ -36,7 +36,7 @@ final readonly class ItemValues implements NativeMethod {
 		TypedValue $target,
 		TypedValue $parameter
 	): TypedValue {
-		$targetValue = $this->toBaseValue($target->value);
+		$targetValue = $target->value;
 		if ($targetValue instanceof RecordValue) {
 			return $target;
 		}

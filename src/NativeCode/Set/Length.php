@@ -39,7 +39,6 @@ final readonly class Length implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof SetValue) {
 			return TypedValue::forValue($programRegistry->valueRegistry->integer(count($targetValue->values)));
 		}

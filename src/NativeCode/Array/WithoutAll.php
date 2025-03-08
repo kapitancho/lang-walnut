@@ -43,7 +43,6 @@ final readonly class WithoutAll implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
 			$values = $targetValue->values;
 			$values = array_values(array_filter($values, static fn($value) => !$value->equals($parameterValue)));

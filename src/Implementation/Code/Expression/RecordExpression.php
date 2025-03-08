@@ -40,10 +40,11 @@ final readonly class RecordExpression implements RecordExpressionInterface, Json
 			$values[$key] = $executionContext->value;
 			$types[$key] = $executionContext->valueType;
 		}
-		return $executionContext->asExecutionResult(new TypedValue(
-			$executionContext->programRegistry->typeRegistry->record($types),
-			$executionContext->programRegistry->valueRegistry->record($values)
-		));
+		return $executionContext->asExecutionResult(
+			TypedValue::forValue(
+				$executionContext->programRegistry->valueRegistry->record($values)
+			)->withType($executionContext->programRegistry->typeRegistry->record($types))
+		);
 	}
 
 	public function __toString(): string {

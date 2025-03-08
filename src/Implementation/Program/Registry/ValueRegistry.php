@@ -16,8 +16,9 @@ use Walnut\Lang\Blueprint\Value\AtomValue as AtomValueInterface;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
 use Walnut\Lang\Blueprint\Value\EnumerationValue as EnumerationValueInterface;
 use Walnut\Lang\Blueprint\Value\NullValue;
-use Walnut\Lang\Blueprint\Value\RecordValue as RecordValueInterface;
 use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Implementation\Function\FunctionContextFiller;
+use Walnut\Lang\Implementation\Function\UserlandFunction;
 use Walnut\Lang\Implementation\Value\ErrorValue;
 use Walnut\Lang\Implementation\Value\FunctionValue;
 use Walnut\Lang\Implementation\Value\IntegerValue;
@@ -28,14 +29,18 @@ use Walnut\Lang\Implementation\Value\RecordValue;
 use Walnut\Lang\Implementation\Value\SealedValue;
 use Walnut\Lang\Implementation\Value\SetValue;
 use Walnut\Lang\Implementation\Value\StringValue;
-use Walnut\Lang\Implementation\Value\SubtypeValue;
 use Walnut\Lang\Implementation\Value\TupleValue;
 use Walnut\Lang\Implementation\Value\TypeValue;
 
 final class ValueRegistry implements ValueRegistryInterface {
+
+	private readonly FunctionContextFiller $contextFiller;
+
 	public function __construct(
 		private readonly TypeRegistry $typeRegistry,
-	) {}
+	) {
+		$this->contextFiller = new FunctionContextFiller();
+	}
 
 	public NullValue $null {
 		get => $this->typeRegistry->null->value;
@@ -105,17 +110,22 @@ final class ValueRegistry implements ValueRegistryInterface {
 		Type $dependencyType,
 		Type $returnType,
 		FunctionBody $body,
+		string $functionName = '(Unknown)'
     ): FunctionValue {
-		return new FunctionValue(
+		return FunctionValue::of(
 			$this->typeRegistry,
-			$this,
-			$parameterType,
-			$parameterName,
-			$dependencyType,
-			$returnType,
-			$body,
+			new UserlandFunction(
+				$this->contextFiller,
+				$functionName,
+				$this->typeRegistry->nothing,
+				$parameterType,
+				$returnType,
+				$parameterName,
+				$dependencyType,
+				$body,
+			),
 			null,
-			null
+			null,
 		);
     }
 
@@ -140,18 +150,6 @@ final class ValueRegistry implements ValueRegistryInterface {
     ): EnumerationValueInterface {
 		return $this->typeRegistry->enumeration($typeName)
 			->value($valueIdentifier);
-	}
-
-	/** @throws UnknownType */
-    public function subtypeValue(
-        TypeNameIdentifier $typeName,
-        Value $baseValue
-    ): SubtypeValue {
-		return new SubtypeValue(
-			$this->typeRegistry,
-			$typeName,
-			$baseValue
-		);
 	}
 
 	/** @throws UnknownType */

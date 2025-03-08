@@ -37,7 +37,6 @@ final readonly class HtmlEscape implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof StringValue) {
 			return TypedValue::forValue($programRegistry->valueRegistry->string(htmlspecialchars($targetValue->literalValue)));
 		}

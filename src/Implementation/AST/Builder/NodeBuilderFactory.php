@@ -10,9 +10,10 @@ final readonly class NodeBuilderFactory implements NodeBuilderFactoryInterface {
 
 	/** @param Token[] $tokens */
 	public function newBuilder(
+		string $moduleName,
 		array $tokens,
 		ParserState $state
 	): NodeBuilder {
-		return new NodeBuilder($tokens, $state);
+		return new NodeBuilder($moduleName, $tokens, $state);
 	}
 }

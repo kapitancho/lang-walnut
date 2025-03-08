@@ -62,11 +62,11 @@ final class RecordExpressionTest extends TestCase {
 			)
 		);
 		self::assertEquals(
-			$this->valueRegistry->record([
+			(string)$this->valueRegistry->record([
 				'a' => $this->valueRegistry->integer(123),
 				'b' => $this->valueRegistry->string("456")
 			]),
-			$result->value
+			(string)$result->value
 		);
 	}
 

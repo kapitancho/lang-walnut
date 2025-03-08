@@ -11,7 +11,6 @@ use Walnut\Lang\Blueprint\AST\Node\Module\AddMethodNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddOpenTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddSealedTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddSubsetTypeNode;
-use Walnut\Lang\Blueprint\AST\Node\Module\AddSubtypeTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddVariableNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\ModuleDefinitionNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\ModuleNode;
@@ -32,11 +31,11 @@ use Walnut\Lang\Blueprint\Function\CustomMethod;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Program\ProgramContext;
 use Walnut\Lang\Blueprint\Program\UnknownType;
+use Walnut\Lang\Blueprint\Type\CustomType;
+use Walnut\Lang\Blueprint\Type\EnumerationType;
 use Walnut\Lang\Blueprint\Type\NothingType;
-use Walnut\Lang\Blueprint\Type\OpenType;
-use Walnut\Lang\Blueprint\Type\SealedType;
-use Walnut\Lang\Blueprint\Type\SubtypeType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Type\UserType;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
 use Walnut\Lang\Blueprint\Value\Value;
 
@@ -84,13 +83,15 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 			);
 		}
 		$returnType = match(true) {
-			$type instanceof SealedType,
-			$type instanceof OpenType => $type->valueType,
-			$type instanceof SubtypeType => $type->baseType,
+			$type instanceof UserType => $type->valueType,
+			$type instanceof EnumerationType => $this->programContext->typeRegistry->union([
+				$type,
+				$this->programContext->typeRegistry->string()
+			]),
 			// @codeCoverageIgnoreStart
 			default => throw new AstCompilationException(
 				$moduleDefinition,
-				"Constructors are only allowed for subtypes and sealed types",
+				"Constructors are only allowed for open and sealed types",
 			)
 			// @codeCoverageIgnoreEnd
 		};
@@ -139,37 +140,34 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 				$this->programContext->typeRegistryBuilder->addOpen(
 					$moduleDefinition->name,
 					$this->type($moduleDefinition->valueType),
-					$this->functionBody(
-						$moduleDefinition->constructorBody
-					),
-					$this->type($moduleDefinition->errorType)
+					$moduleDefinition->constructorBody ?
+						$this->functionBody(
+							$moduleDefinition->constructorBody
+						) : null,
+					$moduleDefinition->errorType ?
+						$this->type($moduleDefinition->errorType) : null
 				),
 			$moduleDefinition instanceof AddSealedTypeNode =>
 				$this->programContext->typeRegistryBuilder->addSealed(
 					$moduleDefinition->name,
 					$this->type($moduleDefinition->valueType),
-					$this->functionBody(
-						$moduleDefinition->constructorBody
-					),
-					$this->type($moduleDefinition->errorType)
+					$moduleDefinition->constructorBody ?
+						$this->functionBody(
+							$moduleDefinition->constructorBody
+						) : null,
+					$moduleDefinition->errorType ?
+						$this->type($moduleDefinition->errorType) : null
 				),
 			$moduleDefinition instanceof AddSubsetTypeNode =>
 				$this->programContext->typeRegistryBuilder->addSubset(
 					$moduleDefinition->name,
 					$this->type($moduleDefinition->valueType),
-					$this->functionBody(
-						$moduleDefinition->constructorBody
-					),
-					$this->type($moduleDefinition->errorType)
-				),
-			$moduleDefinition instanceof AddSubtypeTypeNode =>
-				$this->programContext->typeRegistryBuilder->addSubtype(
-					$moduleDefinition->name,
-					$this->type($moduleDefinition->baseType),
-					$this->functionBody(
-						$moduleDefinition->constructorBody
-					),
-					$this->type($moduleDefinition->errorType)
+					$moduleDefinition->constructorBody ?
+						$this->functionBody(
+							$moduleDefinition->constructorBody
+						) : null,
+					$moduleDefinition->errorType ?
+						$this->type($moduleDefinition->errorType) : null
 				),
 			$moduleDefinition instanceof AddVariableNode =>
 				$this->programContext->globalScopeBuilder->addVariable($moduleDefinition->name,

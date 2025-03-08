@@ -66,7 +66,6 @@ final readonly class InsertAt implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 
-		$targetValue = $this->toBaseValue($targetValue);
 		if ($targetValue instanceof TupleValue) {
 			if ($parameterValue instanceof RecordValue) {
 				$value = $parameterValue->valueOf('value');

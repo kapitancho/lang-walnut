@@ -27,6 +27,13 @@ final readonly class ItemTypes implements NativeMethod {
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
+		if ($targetType instanceof IntersectionType) {
+			foreach($targetType->types as $type) {
+				try {
+					return $this->analyse($programRegistry, $type, $parameterType);
+				} catch (AnalyserException) {}
+			}
+		}
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof TupleType) {

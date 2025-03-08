@@ -58,10 +58,7 @@ final readonly class BinaryModulo implements NativeMethod {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
 		
-		$targetValue = $this->toBaseValue($targetValue);
-		$parameterValue = $this->toBaseValue($parameterValue);
-		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
-			$parameterValue = $this->toBaseValue($parameterValue);
+				if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			if ($parameterValue instanceof IntegerValue || $parameterValue instanceof RealValue) {
 				if ((float)(string)$parameterValue->literalValue === 0.0) {
 					return TypedValue::forValue($programRegistry->valueRegistry->error(

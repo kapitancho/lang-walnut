@@ -75,6 +75,7 @@ final readonly class AstValueCompiler implements AstValueCompilerInterface {
 						$this->type($valueNode->dependencyType),
 						$this->type($valueNode->returnType),
 						$this->functionBodyCompiler->functionBody($valueNode->functionBody),
+						(string)$valueNode->sourceLocation
 					),
 				true => throw new AstCompilationException(
 					$valueNode,
