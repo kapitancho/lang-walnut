@@ -6,16 +6,6 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 
 final class ValueTypeTest extends CodeExecutionTestHelper {
 
-	public function testValueTypeSubset(): void {
-		$result = $this->executeCodeSnippet("type{MySubset}->valueType;", "MySubset = <: [a: String];");
-		$this->assertEquals("type[a: String]", $result);
-	}
-
-	public function testValueTypeSubsetMetaType(): void {
-		$result = $this->executeCodeSnippet("getValueType(type{MySubset});", "MySubset = <: [a: String]; getValueType = ^Type<Subset> => Type :: #->valueType;");
-		$this->assertEquals("type[a: String]", $result);
-	}
-
 	public function testValueTypeOpen(): void {
 		$result = $this->executeCodeSnippet("type{MyOpen}->valueType;", "MyOpen = #[a: String];");
 		$this->assertEquals("type[a: String]", $result);

@@ -32,7 +32,6 @@ final readonly class TypeName implements NativeMethod {
 					MetaTypeValue::Atom,
 					MetaTypeValue::Enumeration,
 					MetaTypeValue::Alias,
-					MetaTypeValue::Subset,
 					MetaTypeValue::Open,
 					MetaTypeValue::Sealed,
 				], true)) {

@@ -34,11 +34,4 @@ interface TypeRegistryBuilder {
 		FunctionBody|null $constructorBody = null,
 		Type|null $errorType = null
 	): SealedType;
-
-	public function addSubset(
-		TypeNameIdentifier $name,
-		Type $valueType,
-		FunctionBody|null $constructorBody = null,
-		Type|null $errorType = null
-	): SubsetType;
 }

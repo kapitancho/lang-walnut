@@ -27,27 +27,6 @@ final class WithTest extends CodeExecutionTestHelper {
 	}
 
 
-	public function testWithSubset(): void {
-		$result = $this->executeCodeSnippet("recWith[t: MySubset[a: 'hi', b: 42], p: [b: -9]];",
-			"MySubset = <: [a: String, b: Integer]; recWith = ^[t: MySubset, p: [b: Integer]] 
-				=> MySubset :: #t->with(#p);");
-		$this->assertEquals("[a: 'hi', b: -9]", $result);
-	}
-
-	public function testWithSubsetConstructedOk(): void {
-		$result = $this->executeCodeSnippet("v = recWith[t: ?noError(MySubset[a: 'hi', b: 42]), p: [b: 9]]; [v->isOfType(type{MySubset}), v]",
-			"MySubset = <: [a: String, b: Integer] @ String :: ?when(#b < 0) { => @'error'}; 
-				recWith = ^[t: MySubset, p: [b: Integer]] => Result<MySubset, String> :: #t->with(#p);");
-		$this->assertEquals("[true, [a: 'hi', b: 9]]", $result);
-	}
-
-	public function testWithSubsetConstructedError(): void {
-		$result = $this->executeCodeSnippet("recWith[t: ?noError(MySubset[a: 'hi', b: 42]), p: [b: -9]];",
-			"MySubset = <: [a: String, b: Integer] @ String :: ?when(#b < 0) { => @'error'}; 
-				recWith = ^[t: MySubset, p: [b: Integer]] => Result<MySubset, String> :: #t->with(#p);");
-		$this->assertEquals("@'error'", $result);
-	}
-
 	public function testWithRecordMap(): void {
 		$result = $this->executeCodeSnippet("recWith[t: [a: 'hi', b: 42], p: [b: -9, c: 3.14]];",
 			"recWith = ^[t: [a: String, b: Integer], p: Map<Real>] 

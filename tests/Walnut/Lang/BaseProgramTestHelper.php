@@ -273,7 +273,6 @@ abstract class BaseProgramTestHelper extends TestCase {
 		]);
 		$this->typeRegistryBuilder->addSealed($i('MySealed'), $this->typeRegistry->null);
 		$this->typeRegistryBuilder->addOpen($i('MyOpen'), $this->typeRegistry->null);
-		$this->typeRegistryBuilder->addSubset($i('MySubset'), $this->typeRegistry->null);
 	}
 
 	/*

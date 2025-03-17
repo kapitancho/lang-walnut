@@ -119,18 +119,6 @@ final class AsBooleanTest extends CodeExecutionTestHelper {
 		$this->assertEquals("true", $result);
 	}
 
-	public function testAsBooleanSubsetFalse(): void {
-		$result = $this->executeCodeSnippet("{getMySubset()}->asBoolean;",
-			"MySubset = <: Integer; getMySubset = ^Any => MySubset :: MySubset(0);");
-		$this->assertEquals("false", $result);
-	}
-
-	public function testAsBooleanSubsetTrue(): void {
-		$result = $this->executeCodeSnippet("{getMySubset()}->asBoolean;",
-			"MySubset = <: Integer; getMySubset = ^Any => MySubset :: MySubset(1);");
-		$this->assertEquals("true", $result);
-	}
-
 	public function testAsBooleanFunction(): void {
 		$result = $this->executeCodeSnippet("{^Any => Integer :: 1}->asBoolean;");
 		$this->assertEquals("true", $result);

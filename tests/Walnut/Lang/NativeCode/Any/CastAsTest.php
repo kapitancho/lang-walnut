@@ -30,10 +30,4 @@ final class CastAsTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@'error'", $result);
 	}
 
-	public function testCastAsSubset(): void {
-		$result = $this->executeCodeSnippet("MyAtomSubset(MyAtom())->as(type{MyAtom});",
-			"MyAtom = :[]; MyAtomSubset = <: MyAtom;");
-		$this->assertEquals("MyAtom[]", $result);
-	}
-
 }

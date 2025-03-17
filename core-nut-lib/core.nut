@@ -66,7 +66,7 @@ Random = :[];
 
 /* UUID */
 InvalidUuid = #[value: String];
-Uuid = <: String<36> @ InvalidUuid :: ?whenIsError(
+Uuid = #String<36> @ InvalidUuid :: ?whenIsError(
     {RegExp('/[a-f0-9]{8}\-[a-f0-9]{4}\-4[a-f0-9]{3}\-(8|9|a|b)[a-f0-9]{3}\-[a-f0-9]{12}/')}
         ->matchString(#)
 ) { => @InvalidUuid[#] };

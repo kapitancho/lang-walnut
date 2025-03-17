@@ -82,7 +82,6 @@ final class JsonEncodeTest extends BaseProgramTestHelper {
 			'{"type":"Sealed","name":"MySealed","valueType":{"type":"Null"}}'
 				=> $tr->sealed($i('MySealed')),
 			'{"type":"Open","name":"MyOpen","valueType":{"type":"Null"}}' => $tr->open($i('MyOpen')),
-			'{"type":"Subset","name":"MySubset","valueType":{"type":"Null"}}' => $tr->subset($i('MySubset')),
 			'{"type":"Boolean"}' => $tr->boolean,
 			'{"type":"True"}' => $tr->true,
 			'{"type":"False"}' => $tr->false,

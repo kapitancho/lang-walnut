@@ -56,12 +56,6 @@ final class JsonStringifyTest extends CodeExecutionTestHelper {
 		$this->assertEquals("'[\\n    1,\\n    2\\n]'", $result);
 	}
 
-	public function testJsonStringifySubset(): void {
-		$result = $this->executeCodeSnippet("getReal()->jsonStringify;",
-			"MySubset = <: Real; getReal = ^Any => MySubset :: MySubset(3.14);");
-		$this->assertEquals("'3.14'", $result);
-	}
-
 	public function testJsonStringifyMutable(): void {
 		$result = $this->executeCodeSnippet("mutable{Real, 3.14}->jsonStringify;");
 		$this->assertEquals("'3.14'", $result);

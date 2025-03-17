@@ -41,16 +41,6 @@ final class TypeNameTest extends CodeExecutionTestHelper {
 		$this->assertEquals("'MyAlias'", $result);
 	}
 
-	public function testTypeNameSubset(): void {
-		$result = $this->executeCodeSnippet("type{MySubset}->typeName;", "MySubset = <: String;");
-		$this->assertEquals("'MySubset'", $result);
-	}
-
-	public function testTypeNameSubsetMetaType(): void {
-		$result = $this->executeCodeSnippet("getTypeName(type{MySubset});", "MySubset = <: String; getTypeName = ^Type<Subset> => String<1..> :: #->typeName;");
-		$this->assertEquals("'MySubset'", $result);
-	}
-
 	public function testTypeNameOpen(): void {
 		$result = $this->executeCodeSnippet("type{MyOpen}->typeName;", "MyOpen = #[a: String];");
 		$this->assertEquals("'MyOpen'", $result);

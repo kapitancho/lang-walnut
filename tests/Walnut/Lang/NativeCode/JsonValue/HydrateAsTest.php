@@ -110,12 +110,6 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 	}
 
 
-	public function testHydrateAsStringFromStringSubset(): void {
-		$result = $this->executeCodeSnippet("getMySubset()->hydrateAs(type{String});",
-			"MySubset = <: String; getMySubset = ^Any => String :: MySubset('hello');");
-		$this->assertEquals("'hello'", $result);
-	}
-
 	public function testHydrateAsStringFromOther(): void {
 		$result = $this->executeCodeSnippet("null->hydrateAs(type{String});");
 		$this->assertEquals("@HydrationError[\n\tvalue: null,\n\thydrationPath: 'value',\n\terrorMessage: 'The value should be a string with a length between 0 and +Infinity'\n]", $result);
@@ -136,12 +130,6 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 		$this->assertEquals("'hello'", $result);
 	}
 
-	public function testHydrateAsStringSubsetFromStringSubsetInSubset(): void {
-		$result = $this->executeCodeSnippet("getMySubset()->hydrateAs(type{String['hello', 'world']});",
-			"MySubset = <: String; getMySubset = ^Any => String :: MySubset('hello');");
-		$this->assertEquals("'hello'", $result);
-	}
-
 	public function testHydrateAsStringSubsetFromStringOutOfSubset(): void {
 		$result = $this->executeCodeSnippet("'hello'->hydrateAs(type{String['welcome', 'world']});");
 		$this->assertEquals("@HydrationError[\n\tvalue: 'hello',\n\thydrationPath: 'value',\n\terrorMessage: 'The string value should be among welcome, world'\n]", $result);
@@ -158,12 +146,6 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 		$this->assertEquals("42", $result);
 	}
 
-
-	public function testHydrateAsIntegerFromIntegerSubset(): void {
-		$result = $this->executeCodeSnippet("getMySubset()->hydrateAs(type{Integer});",
-			"MySubset = <: Integer; getMySubset = ^Any => Integer :: MySubset(42);");
-		$this->assertEquals("42", $result);
-	}
 
 	public function testHydrateAsIntegerFromOther(): void {
 		$result = $this->executeCodeSnippet("null->hydrateAs(type{Integer});");
@@ -182,12 +164,6 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 
 	public function testHydrateAsIntegerSubsetFromIntegerInSubset(): void {
 		$result = $this->executeCodeSnippet("42->hydrateAs(type{Integer[12, 22, 32, 42]});");
-		$this->assertEquals("42", $result);
-	}
-
-	public function testHydrateAsIntegerSubsetFromIntegerSubsetInSubset(): void {
-		$result = $this->executeCodeSnippet("getMySubset()->hydrateAs(type{Integer[12, 22, 32, 42]});",
-			"MySubset = <: Integer; getMySubset = ^Any => Integer :: MySubset(42);");
 		$this->assertEquals("42", $result);
 	}
 
@@ -214,12 +190,6 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 		$this->assertEquals("42", $result);
 	}
 
-	public function testHydrateAsRealFromRealSubset(): void {
-		$result = $this->executeCodeSnippet("getMySubset()->hydrateAs(type{Real});",
-			"MySubset = <: Real; getMySubset = ^Any => Real :: MySubset(3.14);");
-		$this->assertEquals("3.14", $result);
-	}
-
 	public function testHydrateAsRealFromOther(): void {
 		$result = $this->executeCodeSnippet("null->hydrateAs(type{Real});");
 		$this->assertEquals("@HydrationError[\n\tvalue: null,\n\thydrationPath: 'value',\n\terrorMessage: 'The value should be a real number in the range -Infinity..+Infinity'\n]", $result);
@@ -243,12 +213,6 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 	public function testHydrateAsRealSubsetFromIntegerInSubset(): void {
 		$result = $this->executeCodeSnippet("2->hydrateAs(type{Real[1.2, 2, 3.14]});");
 		$this->assertEquals("2", $result);
-	}
-
-	public function testHydrateAsRealSubsetFromRealSubsetInSubset(): void {
-		$result = $this->executeCodeSnippet("getMySubset()->hydrateAs(type{Real[1.2, 2, 3.14]});",
-			"MySubset = <: Real; getMySubset = ^Any => Real :: MySubset(3.14);");
-		$this->assertEquals("3.14", $result);
 	}
 
 	public function testHydrateAsRealSubsetFromStringOutOfSubset(): void {
@@ -657,65 +621,6 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@HydrationError[\n\tvalue: null,\n\thydrationPath: 'value',\n\terrorMessage: 'The value should be a record with 3 items'\n]", $result);
 	}
 
-
-
-	public function testHydrateAsSubsetFromRecord(): void {
-		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MySubset});",
-			"MySubset = <: [a: Integer, b: Integer, c: String];");
-		$this->assertEquals("[a: 1, b: 2, c: 'hello']", $result);
-	}
-
-	public function testHydrateAsSubsetFromRecordWrongPropertyType(): void {
-		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MySubset});",
-			"MySubset = <: [a: Integer, b: Integer, c: Real];");
-		$this->assertEquals("@HydrationError[\n\tvalue: 'hello',\n\thydrationPath: 'value.c',\n\terrorMessage: 'The value should be a real number in the range -Infinity..+Infinity'\n]", $result);
-	}
-
-	public function testHydrateAsSubsetFromRecordWithValidatorPass(): void {
-		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MySubset});",
-			"MySubset = <: [a: Integer, b: Integer, c: String] @ Real :: ?when(#a < 0) { => @3.14 };");
-		$this->assertEquals("[a: 1, b: 2, c: 'hello']", $result);
-	}
-
-	public function testHydrateAsSubsetFromRecordWithValidatorFail(): void {
-		$result = $this->executeCodeSnippet("[a: -1, b: 2, c: 'hello']->hydrateAs(type{MySubset});",
-			"MySubset = <: [a: Integer, b: Integer, c: String] @ Real :: ?when(#a < 0) { => @3.14 };");
-		$this->assertEquals("@HydrationError[\n\tvalue: [a: -1, b: 2, c: 'hello'],\n\thydrationPath: 'value',\n\terrorMessage: 'Value construction failed. Error: 3.14'\n]", $result);
-	}
-
-	public function testHydrateAsSubsetFromRecordWithCastCorrectValue(): void {
-		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MySubset});",
-			"MySubset = <: [a: Integer, b: Integer, c: String];" .
-			"JsonValue ==> MySubset @ String :: ?whenTypeOf($) is { type[a: Integer, b: Integer<0..>, c: String]: MySubset($), ~: @'invalid value' };"
-		);
-		$this->assertEquals("[a: 1, b: 2, c: 'hello']", $result);
-	}
-
-	public function testHydrateAsSubsetFromRecordWithCastIncorrectValue(): void {
-		$result = $this->executeCodeSnippet("[a: 1, b: -2, c: 'hello']->hydrateAs(type{MySubset});",
-			"MySubset = <: [a: Integer, b: Integer, c: String];" .
-			"JsonValue ==> MySubset @ String :: ?whenTypeOf($) is { type[a: Integer, b: Integer<0..>, c: String]: MySubset($), ~: @'invalid value' };"
-		);
-		$this->assertEquals("@HydrationError[\n\tvalue: [a: 1, b: -2, c: 'hello'],\n\thydrationPath: 'value',\n\terrorMessage: 'Subset hydration failed. Error: \`invalid value\`'\n]", $result);
-	}
-
-	public function testHydrateAsSubsetFromRecordWithValidatorAndCastCorrectValue(): void {
-		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MySubset});",
-			"MySubset = <: [a: Integer, b: Integer, c: String] @ Real :: ?when(#a < 0) { => @3.14 };" .
-			"JsonValue ==> MySubset @ Real|String :: ?whenTypeOf($) is { type[a: Integer, b: Integer<0..>, c: String]: MySubset($), ~: @'invalid value' };"
-		);
-		$this->assertEquals("[a: 1, b: 2, c: 'hello']", $result);
-	}
-
-
-
-
-
-
-
-
-
-
 	public function testHydrateAsOpenFromRecord(): void {
 		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MyOpen});",
 			"MyOpen = #[a: Integer, b: Integer, c: String];");
@@ -769,27 +674,6 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 			"MyOpen = #[a: Integer, b: Integer, c: String];");
 		$this->assertEquals("@HydrationError[\n\tvalue: null,\n\thydrationPath: 'value',\n\terrorMessage: 'The value should be a record with 3 items'\n]", $result);
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	public function testHydrateAsSubsetFromOther(): void {
-		$result = $this->executeCodeSnippet("null->hydrateAs(type{MySubset});",
-			"MySubset = <: [a: Integer, b: Integer, c: String];");
-		$this->assertEquals("@HydrationError[\n\tvalue: null,\n\thydrationPath: 'value',\n\terrorMessage: 'The value should be a record with 3 items'\n]", $result);
-	}
-
-
 
 	public function testHydrateAsTypeAny(): void {
 		$result = $this->executeCodeSnippet("'Any'->hydrateAs(type{Type});");

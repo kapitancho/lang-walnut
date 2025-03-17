@@ -90,19 +90,4 @@ final class TupleAsRecordTest  extends CodeExecutionTestHelper {
 		$this->assertEquals("A[a: 1, b: 'hi']", $result);
 	}
 
-
-	public function testSubsetWithoutConstructorCall(): void {
-		$result = $this->executeCodeSnippet("A[1, 'hi'];", <<<NUT
-		A = <: [a: Integer, b: String];
-	NUT);
-		$this->assertEquals("[a: 1, b: 'hi']", $result);
-	}
-
-	public function testSubsetWithInvariantConstructorCall(): void {
-		$result = $this->executeCodeSnippet("A[1, 'hi'];", <<<NUT
-		A = <: [a: Integer, b: String] @ Any :: null;
-	NUT);
-		$this->assertEquals("[a: 1, b: 'hi']", $result);
-	}
-
 }

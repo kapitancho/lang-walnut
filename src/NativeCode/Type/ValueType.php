@@ -37,7 +37,6 @@ final readonly class ValueType implements NativeMethod {
 			if ($refType instanceof MetaType) {
 				if ($refType->value === MetaTypeValue::Open ||
 					$refType->value === MetaTypeValue::Sealed ||
-					$refType->value === MetaTypeValue::Subset ||
 					$refType->value === MetaTypeValue::MutableValue
 				) {
 					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->any);

@@ -90,8 +90,6 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
     private array $openTypes;
 	/** @var array<string, SealedType> */
     private array $sealedTypes;
-	/** @var array<string, SubsetType> */
-    private array $subsetTypes;
 
     private UnionTypeNormalizer $unionTypeNormalizer;
     private IntersectionTypeNormalizer $intersectionTypeNormalizer;
@@ -142,7 +140,6 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		$this->aliasTypes = [];
 		$this->openTypes = [];
 		$this->sealedTypes = [];
-		$this->subsetTypes = [];
 
 		$this->aliasTypes['JsonValue'] = new AliasType(
 			new TypeNameIdentifier('JsonValue'),
@@ -264,7 +261,6 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		    'Record' => $this->metaType(MetaTypeValue::Record),
 		    'Open' => $this->metaType(MetaTypeValue::Open),
 		    'Sealed' => $this->metaType(MetaTypeValue::Sealed),
-		    'Subset' => $this->metaType(MetaTypeValue::Subset),
 		    'Tuple' => $this->metaType(MetaTypeValue::Tuple),
 			default => $this->withName($typeName)
 	    };
@@ -276,18 +272,12 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
             $this->aliasTypes[$typeName->identifier] ??
             $this->openTypes[$typeName->identifier] ??
             $this->sealedTypes[$typeName->identifier] ??
-            $this->subsetTypes[$typeName->identifier] ??
             UnknownType::withName($typeName);
     }
 
 	/** @throws UnknownType */
 	public function alias(TypeNameIdentifier $typeName): AliasType {
 		return $this->aliasTypes[$typeName->identifier] ?? UnknownType::withName($typeName);
-	}
-
-	/** @throws UnknownType */
-	public function subset(TypeNameIdentifier $typeName): SubsetType {
-		return $this->subsetTypes[$typeName->identifier] ?? UnknownType::withName($typeName);
 	}
 
 	/** @throws UnknownType */
@@ -460,20 +450,6 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		return $result;
 	}
 
-	public function addSubset(
-		TypeNameIdentifier $name,
-		Type $valueType,
-		FunctionBody|null $constructorBody = null,
-		Type|null $errorType = null
-	): SubsetType {
-		$result = new SubsetType($name, $valueType);
-		$this->subsetTypes[$name->identifier] = $result;
-		if ($constructorBody) {
-			$this->addConstructorMethod($name, $valueType, $errorType, $constructorBody);
-		}
-		return $result;
-	}
-
 	private function addConstructorMethod(
 		TypeNameIdentifier $name,
 		Type $fromType,
@@ -519,7 +495,6 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 			'atomTypes' => $this->atomTypes,
 			'enumerationTypes' => $this->enumerationTypes,
 			'aliasTypes' => $this->aliasTypes,
-			'subsetTypes' => $this->subsetTypes,
 			'openTypes' => $this->openTypes,
 			'sealedTypes' => $this->sealedTypes
 		];

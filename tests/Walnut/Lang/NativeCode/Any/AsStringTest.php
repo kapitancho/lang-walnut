@@ -73,12 +73,6 @@ final class AsStringTest extends CodeExecutionTestHelper {
 		$this->assertEquals("'3.14'", $result);
 	}
 
-	public function testAsStringSubset(): void {
-		$result = $this->executeCodeSnippet("getReal()->asString;",
-			"MySubset = <: Real; getReal = ^ => MySubset :: MySubset(3.14);");
-		$this->assertEquals("'3.14'", $result);
-	}
-
 	public function testAsStringMutable(): void {
 		$result = $this->executeCodeSnippet("mutable{Real, 3.14}->asString;");
 		$this->assertEquals("'3.14'", $result);

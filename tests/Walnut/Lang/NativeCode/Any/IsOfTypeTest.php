@@ -198,11 +198,6 @@ final class IsOfTypeTest extends CodeExecutionTestHelper {
 		$this->assertEquals("false", $result);
 	}
 
-	public function testIsOfTypeSubset(): void {
-		$result = $this->executeCodeSnippet("{MySubset('value')}->isOfType(type{MySubset});", "MySubset = <: String;");
-		$this->assertEquals("true", $result);
-	}
-
 	public function testIsOfTypeSealed(): void {
 		$result = $this->executeCodeSnippet("{MySealed[a: 'value']}->isOfType(type{MySealed});", "MySealed = $[a: String];");
 		$this->assertEquals("true", $result);

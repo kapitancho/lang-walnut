@@ -43,7 +43,7 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 			$this->expressionRegistry->variableName(new VariableNameIdentifier('#')),
 			1
 		);
-		$this->typeRegistry->addSubset(
+		$this->typeRegistry->addAlias(
 			new TypeNameIdentifier("MyRecord"),
 			$this->typeRegistry->record([
 				'x' => $this->typeRegistry->integer(),
@@ -56,7 +56,7 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 			),
 			$this->typeRegistry->nothing
 		);
-		$this->typeRegistry->addSubset(
+		$this->typeRegistry->addAlias(
 			new TypeNameIdentifier("MyTuple"),
 			$this->typeRegistry->tuple([
 				$this->typeRegistry->integer(),
@@ -238,10 +238,6 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 							$this->valueRegistry->integer(1),
 							$this->valueRegistry->string("hi"),
 						])
-					)->withType(
-						$this->typeRegistry->subset(
-							new TypeNameIdentifier('MyTuple')
-						)
 					)
 				])
 			)

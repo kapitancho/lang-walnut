@@ -131,8 +131,6 @@ interface TypeRegistry {
 	/** @throws UnknownType */
 	public function alias(TypeNameIdentifier $typeName): AliasType;
 	/** @throws UnknownType */
-	public function subset(TypeNameIdentifier $typeName): SubsetType;
-	/** @throws UnknownType */
 	public function open(TypeNameIdentifier $typeName): OpenType;
 	public function sealed(TypeNameIdentifier $typeName): SealedType;
 	/** @throws UnknownType */

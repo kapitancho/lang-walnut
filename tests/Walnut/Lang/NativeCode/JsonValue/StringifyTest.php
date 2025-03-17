@@ -51,12 +51,6 @@ final class StringifyTest extends CodeExecutionTestHelper {
 		$this->assertEquals("'[\\n    1,\\n    2\\n]'", $result);
 	}
 
-	public function testStringifySubset(): void {
-		$result = $this->executeCodeSnippet("getReal()->stringify;",
-			"MySubset = <: Real; getReal = ^Any => Real :: MySubset(3.14);");
-		$this->assertEquals("'3.14'", $result);
-	}
-
 	public function testStringifyMutable(): void {
 		$result = $this->executeCodeSnippet("mutable{Real, 3.14}->stringify;");
 		$this->assertEquals("'3.14'", $result);

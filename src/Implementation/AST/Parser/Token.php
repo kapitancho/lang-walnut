@@ -13,7 +13,6 @@ enum Token: string {
 	case range_dots = '\.\.';
 	case not_equals = '\!\=';
 	case equals = '\=\=';
-	case subtype = '\<\:';
 	case expression_separator = '\;';
 	case value_separator = '\,';
 	case atom_type = '\:\[]';

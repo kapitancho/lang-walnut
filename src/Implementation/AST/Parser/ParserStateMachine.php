@@ -101,7 +101,6 @@ final readonly class ParserStateMachine {
 				//'sequence_start' => 110,
 				T::this_var->name => 110,
 				T::special_var_param->name => 111,
-				T::subtype->name => 112,
 				'type_keyword' => $c = function(LT $token) {
 					$this->s->push(131);
 					$this->s->stay(701);
@@ -166,83 +165,7 @@ final readonly class ParserStateMachine {
 				T::type_keyword->name => $c,
 				T::lambda_param->name => $c,
 			]],
-			112 => ['name' => 'subset type type', 'transitions' => [
-				T::tuple_start->name => $c = function(LT $token) {
-					$this->s->push(959);
-					$this->s->stay(701);
-				},
-				T::type_keyword->name => $c,
-				T::lambda_param->name => $c,
-			]],
-			/*111 => ['name' => 'sealed type type return', 'transitions' => [
-				T::sequence_end->name => 112
-			]],*/
-			/*112 => ['name' => 'sealed type return', 'transitions' => [
-				//T::expression_separator->name => function(LT $token) {
-				T::expression_separator->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->addSealed(
-						new TypeNameIdentifier($this->s->result['typeName']),
-						$this->s->generated
-					);
-					$this->s->move(102);
-				}
-			]],*/
 
-
-			/*163 => ['name' => 'sealed base type', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->push(164);
-					$this->s->stay(701);
-				}
-			]],*/
-			959 => ['name' => 'subset base type return', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->result['value_type'] = $this->s->generated;
-					$this->s->stay(960);
-				}
-			]],
-			960 => ['name' => 'subset error type', 'transitions' => [
-				T::error_marker->name => function(LT $token) {
-					$this->s->push(961);
-					$this->s->move(701);
-				},
-				T::function_body_marker->name => function(LT $token) {
-					$this->s->push(963);
-					$this->s->move(201);
-				},
-				T::expression_separator->name => function(LT $token) {
-					$this->s->generated = null;/*$this->nodeBuilder->constant(
-						$this->nodeBuilder->nullValue
-					);*/
-					$this->s->stay(963);
-				},
-			]],
-			961 => ['name' => 'subset error type return', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->result['error_type'] = $this->s->generated;
-					$this->s->stay(962);
-				}
-			]],
-			962 => ['name' => 'subset error type body start', 'transitions' => [
-				T::function_body_marker->name => function(LT $token) {
-					$this->s->push(963);
-					$this->s->move(201);
-				},
-			]],
-			963 => ['name' => 'subset result', 'transitions' => [
-				'' => function(LT $token) {
-					$this->moduleNodeBuilder->definition(
-						$this->s->generated = $this->nodeBuilder->addSubset(
-							new TypeNameIdentifier($this->s->result['typeName']),
-							$this->s->result['value_type'],
-							$this->s->generated,
-							//$this->nodeBuilder->functionBody($this->s->generated),
-							$this->s->result['error_type'] ?? null,
-						)
-					);
-					$this->s->move(102);
-				}
-			]],
 			159 => ['name' => 'open base type return', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->result['value_type'] = $this->s->generated;

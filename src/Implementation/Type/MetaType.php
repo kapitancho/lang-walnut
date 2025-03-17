@@ -42,7 +42,6 @@ final readonly class MetaType implements MetaTypeInterface, SupertypeChecker, Js
 			MetaTypeValue::Union => $ofType instanceof UnionType,
 			MetaTypeValue::Intersection => $ofType instanceof IntersectionType,
 			MetaTypeValue::Alias => $ofType instanceof AliasType,
-			MetaTypeValue::Subset => $ofType instanceof SubsetType,
 			MetaTypeValue::Open => $ofType instanceof OpenType,
 			MetaTypeValue::Sealed => $ofType instanceof SealedType,
 			MetaTypeValue::Atom => $ofType instanceof AtomType,

@@ -34,7 +34,6 @@ use Walnut\Lang\Blueprint\AST\Node\Module\AddEnumerationTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddMethodNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddOpenTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddSealedTypeNode;
-use Walnut\Lang\Blueprint\AST\Node\Module\AddSubsetTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddVariableNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\AnyTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\ArrayTypeNode;
@@ -188,13 +187,6 @@ interface NodeBuilder {
 		ExpressionNode|null $constructorBody,
 		TypeNode|null $errorType
 	): AddSealedTypeNode;
-
-	public function addSubset(
-		TypeNameIdentifier $name,
-		TypeNode $valueType,
-		ExpressionNode|null $constructorBody,
-		TypeNode|null $errorType
-	): AddSubsetTypeNode;
 
 	/** @param array<string, TypeNode> $types */
 	public function recordType(array $types, TypeNode|null $restType = null): RecordTypeNode;

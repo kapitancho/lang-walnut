@@ -56,12 +56,6 @@ final class PrintedTest extends CodeExecutionTestHelper {
 		$this->assertEquals("'[1; 2]'", $result);
 	}
 
-	public function testPrintedSubset(): void {
-		$result = $this->executeCodeSnippet("getReal()->printed;",
-			"MySubset = <: Real; getReal = ^Any => Real :: MySubset(3.14);");
-		$this->assertEquals("'3.14'", $result);
-	}
-
 	public function testPrintedMutable(): void {
 		$result = $this->executeCodeSnippet("mutable{Real, 3.14}->printed;");
 		$this->assertEquals("'Mutable[Real, 3.14]'", $result);

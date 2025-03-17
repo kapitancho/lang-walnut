@@ -23,14 +23,4 @@ final class CastAsStringTest extends CodeExecutionTestHelper {
 		$this->assertEquals("'Hello'", $result);
 	}
 
-	public function testAsStringOverrideNotPossible(): void {
-		$this->executeErrorCodeSnippet(
-			"the method asString is already defined for Boolean and therefore the return type Result<String, CastNotAvailable> should be a subtype of String['true', 'false']",
-			"A(true)->as(type{String});",
-		<<<NUT
-			A = <: Boolean;
-			A ==> String @ CastNotAvailable :: 'nope';
-		NUT);
-	}
-
 }

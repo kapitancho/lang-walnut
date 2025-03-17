@@ -437,21 +437,6 @@ final class NodeBuilder implements NodeBuilderInterface {
 		);
 	}
 
-	public function addSubset(
-		TypeNameIdentifier $name,
-		TypeNode $valueType,
-		ExpressionNode|null $constructorBody,
-		TypeNode|null $errorType
-	): AddSubsetTypeNode {
-		return new AddSubsetTypeNode(
-			$this->getSourceLocation(),
-			$name,
-			$valueType,
-			$this->generateConstructorBody($constructorBody),
-			$errorType ?? $this->nothingType
-		);
-	}
-
 	/** @param array<string, TypeNode> $types */
 	public function recordType(array $types, TypeNode|null $restType = null): RecordTypeNode {
 		return new RecordTypeNode(
