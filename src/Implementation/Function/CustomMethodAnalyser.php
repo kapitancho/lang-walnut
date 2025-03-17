@@ -23,7 +23,7 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 	public function analyse(CustomMethodRegistry $registry): array {
 		$analyseErrors = [];
 		foreach($registry->customMethods as $methods) {
-			foreach($methods as $method) {
+			foreach ($methods as $method) {
 				try {
 					$sub = $method->targetType;
 					$methodFnType = $this->programRegistry->typeRegistry->function(
@@ -68,31 +68,36 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 					}
 					$method->selfAnalyse($this->programRegistry);
 				} catch (AnalyserException $e) {
-					$analyseErrors[] = sprintf("%s : %s",$this->getErrorMessageFor($method), $e->getMessage());
+					$analyseErrors[] = sprintf("%s : %s", $this->getErrorMessageFor($method), $e->getMessage());
 					continue;
 				}
-				$d = $method->dependencyType;
-				if (!($d instanceof NothingType)) {
-					$value = $this->programRegistry->dependencyContainer->valueByType($method->dependencyType);
-					if ($value instanceof DependencyError) {
-						$analyseErrors[] = sprintf("%s : the dependency %s cannot be resolved: %s (type: %s)",
-							$this->getErrorMessageFor($method),
-							$method->dependencyType,
-							match($value->unresolvableDependency) {
-								UnresolvableDependency::notFound => "no appropriate value found",
-								UnresolvableDependency::ambiguous => "ambiguity - multiple values found",
-								UnresolvableDependency::circularDependency => "circular dependency detected",
-								UnresolvableDependency::unsupportedType => "unsupported type found",
-								UnresolvableDependency::errorWhileCreatingValue => 'error returned while creating value',
-							},
-							$value->type
-						);
+			}
+		}
+		if (count($analyseErrors) === 0) {
+			foreach ($registry->customMethods as $methods) {
+				foreach ($methods as $method) {
+					$d = $method->dependencyType;
+					if (!($d instanceof NothingType)) {
+						$value = $this->programRegistry->dependencyContainer->valueByType($method->dependencyType);
+						if ($value instanceof DependencyError) {
+							$analyseErrors[] = sprintf("%s : the dependency %s cannot be resolved: %s (type: %s)",
+								$this->getErrorMessageFor($method),
+								$method->dependencyType,
+								match ($value->unresolvableDependency) {
+									UnresolvableDependency::notFound => "no appropriate value found",
+									UnresolvableDependency::ambiguous => "ambiguity - multiple values found",
+									UnresolvableDependency::circularDependency => "circular dependency detected",
+									UnresolvableDependency::unsupportedType => "unsupported type found",
+									UnresolvableDependency::errorWhileCreatingValue => 'error returned while creating value',
+								},
+								$value->type
+							);
+						}
 					}
 				}
 			}
 		}
 		return $analyseErrors;
-
 	}
 
 	private function getErrorMessageFor(CustomMethodInterface $method): string {

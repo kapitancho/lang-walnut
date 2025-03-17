@@ -1033,6 +1033,7 @@ final readonly class ParserStateMachine {
 				T::false->name => $c,
 				T::lambda_param->name => $c,
 				T::type->name => $c,
+				T::type_short->name => $c,
 
 				T::error_marker->name => function(LT $token) { $this->s->move(354); },
 				T::mutable->name => function(LT $token) { $this->s->move(356); },
@@ -1745,7 +1746,6 @@ final readonly class ParserStateMachine {
 				}
 			]],
 
-
 			401 => ['name' => 'value start', 'transitions' => [
 				T::string_value->name => function(LT $token) { $this->s->stay(420); },
 				T::positive_integer_number->name => function(LT $token) { $this->s->stay(430); },
@@ -1763,6 +1763,7 @@ final readonly class ParserStateMachine {
 					$this->s->move(460);
 				},
 				T::type->name => function(LT $token) { $this->s->move(480); },
+				T::type_short->name => function(LT $token) { $this->s->move(475); },
 				T::type_keyword->name => function(LT $token) {
 					$this->s->result['current_type_name'] = $token->patternMatch->text;
 					$this->s->move(490);
@@ -1927,6 +1928,30 @@ final readonly class ParserStateMachine {
 					);
 					$this->s->pop();
 				},
+			]],
+			475 => ['name' => 'type value short', 'transitions' => [
+				T::tuple_start->name => function(LT $token) {
+					$this->s->push(483);
+					$this->s->stay(701);
+				},
+				T::type_keyword->name => $c = function(LT $token) {
+					if (in_array($token->patternMatch->text, [
+						'Function', 'Tuple', 'Record', 'Union', 'Intersection', 'Atom', 'Enumeration',
+						'EnumerationSubset', 'EnumerationValue', 'IntegerSubset', 'MutableValue',
+						'RealSubset', 'StringSubset', 'State', 'Subset', 'Alias', 'Named'
+					], true)) {
+						$this->s->generated = $this->nodeBuilder->metaTypeType(
+							MetaTypeValue::from($token->patternMatch->text)
+						);
+						$this->s->move(483);
+						return;
+					}
+					$this->s->push(483);
+					$this->s->stay(701);
+				},
+				T::arithmetic_op_multiply->name => $c,
+				T::tuple_start->name => $c,
+				T::lambda_param->name => $c,
 			]],
 			480 => ['name' => 'type value', 'transitions' => [
 				T::tuple_start->name => function(LT $token) {

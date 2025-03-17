@@ -11,11 +11,18 @@ use Walnut\Lang\Blueprint\Value\Value;
 
 final class TypedValue {
 
-	/** @param list<Type> $types */
+	/** @param list<NamedType|ShapeType> $namedTypes */
+	/** @param list<Type> $otherTypes */
 	private function __construct(
-		public readonly array $types,
+		public readonly array $namedTypes,
+		public readonly array $otherTypes,
 		public readonly Value $value,
 	) {}
+
+	/** @return array<Type> */
+	public array $types {
+		get => $this->namedTypes + $this->otherTypes;
+	}
 
 	public Type $type {
 		get => $this->types[array_key_first($this->types)];
@@ -60,14 +67,19 @@ final class TypedValue {
 		if (array_key_exists((string)$type, $this->types)) {
 			return $this;
 		}
-		return new self($this->optimizeTypes($type, $this->types, false), $this->value);
-	}
-
-	public function withAdditionalType(Type $type): self {
-		if (array_key_exists((string)$type, $this->types)) {
-			return $this;
+		if ($type instanceof NamedType || $type instanceof ShapeType) {
+			return new self(
+				[(string)$type => $type] + $this->namedTypes,
+				$this->otherTypes,
+				$this->value
+			);
+		} else {
+			return new self(
+				$this->namedTypes,
+				$this->optimizeTypes($type, $this->otherTypes, false),
+				$this->value
+			);
 		}
-		return new self($this->optimizeTypes($type, $this->types, true), $this->value);
 	}
 
 	public function isSubtypeOf(Type $type): bool {
@@ -78,6 +90,10 @@ final class TypedValue {
 	}
 
 	public static function forValue(Value $value): self {
-		return new self([(string)$value->type => $value->type], $value);
+		$t = $value->type;
+		$arr = [(string)$t => $t];
+		return $t instanceof NamedType || $t instanceof ShapeType ?
+			new self($arr, [], $value) :
+			new self([], $arr, $value);
 	}
 }

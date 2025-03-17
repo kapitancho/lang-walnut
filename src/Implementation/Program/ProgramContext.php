@@ -9,7 +9,7 @@ use Walnut\Lang\Blueprint\Program\Builder\TypeRegistryBuilder as TypeRegistryBui
 use Walnut\Lang\Blueprint\Program\ProgramContext as ProgramContextInterface;
 use Walnut\Lang\Blueprint\Program\Registry\CustomMethodRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry as ExpressionRegistryInterface;
-use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry as ProgramRegistryInterface;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry as ValueRegistryInterface;
@@ -26,7 +26,7 @@ final readonly class ProgramContext implements ProgramContextInterface {
 		public TypeRegistry                              $typeRegistry,
 		public ValueRegistryInterface                    $valueRegistry,
 		public ExpressionRegistryInterface               $expressionRegistry,
-		public MethodRegistry                            $methodRegistry,
+		public MethodFinder                              $methodRegistry,
 		public ScopeBuilderInterface                     $globalScopeBuilder,
 	) {
 		$this->programRegistry = new ProgramRegistry(
