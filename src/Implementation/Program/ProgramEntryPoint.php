@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Implementation\Program;
 
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope;
 use Walnut\Lang\Blueprint\Program\ProgramEntryPoint as ProgramEntryPointInterface;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -23,7 +22,7 @@ final readonly class ProgramEntryPoint implements ProgramEntryPointInterface {
 				$this->programRegistry,
 				$this->globalScope
 			),
-			TypedValue::forValue($parameter)
-		)->value;
+			($parameter)
+		);
 	}
 }

@@ -4,18 +4,16 @@ namespace Walnut\Lang\NativeCode\PasswordString;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\OpenType;
-use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\OpenValue;
-use Walnut\Lang\Blueprint\Value\SealedValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class Verify implements NativeMethod {
@@ -40,19 +38,19 @@ final readonly class Verify implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
-		$parameterValue = $parameter->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
+		$parameterValue = $parameter;
 		
 				if ($targetValue instanceof OpenValue && $targetValue->type->name->equals(
 			new TypeNameIdentifier('PasswordString')
 		)) {
 			$passwordString = $targetValue->value->valueOf('value');
 			if ($passwordString instanceof StringValue && $parameterValue instanceof StringValue) {
-				return TypedValue::forValue($programRegistry->valueRegistry->boolean(
+				return ($programRegistry->valueRegistry->boolean(
 					password_verify(
 						$passwordString->literalValue,
 						$parameterValue->literalValue,

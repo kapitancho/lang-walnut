@@ -4,12 +4,12 @@ namespace Walnut\Lang\NativeCode\Set;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\SetType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\SetValue;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class IsDisjointWith implements NativeMethod {
@@ -32,16 +32,16 @@ final readonly class IsDisjointWith implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
-		$parameterValue = $parameter->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
+		$parameterValue = $parameter;
 
 				if ($targetValue instanceof SetValue) {
 			if ($parameterValue instanceof SetValue) {
-				return TypedValue::forValue(
+				return (
 					$programRegistry->valueRegistry->boolean(
 						count(array_intersect(
 							array_keys($targetValue->valueSet),

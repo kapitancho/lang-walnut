@@ -16,7 +16,6 @@ use Walnut\Lang\Blueprint\Program\Program;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Compilation\Compiler;
 use Walnut\Lang\Implementation\Compilation\Module\EmptyPrecompiler;
-use Walnut\Lang\Implementation\Compilation\Module\MultiFolderBasedModuleLookupContext;
 use Walnut\Lang\Implementation\Compilation\Module\PackageBasedModuleLookupContext;
 use Walnut\Lang\Implementation\Compilation\Module\PackageBasedModulePathFinder;
 use Walnut\Lang\Implementation\Compilation\Module\TemplatePrecompiler;

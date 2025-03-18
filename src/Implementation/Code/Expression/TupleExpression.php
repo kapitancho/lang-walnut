@@ -9,7 +9,6 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\TupleExpression as TupleExpressionInterface;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 
 final readonly class TupleExpression implements TupleExpressionInterface, JsonSerializable {
 
@@ -39,7 +38,7 @@ final readonly class TupleExpression implements TupleExpressionInterface, JsonSe
 			$values[] = $executionContext->value;
 		}
 		return $executionContext->asExecutionResult(
-			TypedValue::forValue(
+			(
 				$executionContext->programRegistry->valueRegistry->tuple($values)
 			)
 		);

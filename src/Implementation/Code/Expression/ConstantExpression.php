@@ -8,7 +8,6 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserResult;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\ConstantExpression as ConstantExpressionInterface;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Value\FunctionValue;
 
@@ -33,7 +32,7 @@ final readonly class ConstantExpression implements ConstantExpressionInterface, 
 		if ($value instanceof FunctionValue) {
 			$value = $value->withVariableValueScope($variableValueScope);
 		}
-		return $executionContext->asExecutionResult(TypedValue::forValue($value));
+		return $executionContext->asExecutionResult(($value));
 	}
 
 	public function __toString(): string {

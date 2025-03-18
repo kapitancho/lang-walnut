@@ -4,15 +4,15 @@ namespace Walnut\Lang\NativeCode\Mutable;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\SetType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\MutableValue;
 use Walnut\Lang\Blueprint\Value\SetValue;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class REMOVE implements NativeMethod {
@@ -39,12 +39,12 @@ final readonly class REMOVE implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
-		$parameterValue = $parameter->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
+		$parameterValue = $parameter;
 
 		$v = $targetValue;
 		if ($v instanceof MutableValue) {
@@ -55,9 +55,9 @@ final readonly class REMOVE implements NativeMethod {
 				if (array_key_exists($k, $vs)) {
 					unset($vs[$k]);
 					$v->value = $programRegistry->valueRegistry->set($vs);
-					return TypedValue::forValue($parameterValue);
+					return ($parameterValue);
 				}
-				return TypedValue::forValue($programRegistry->valueRegistry->error(
+				return ($programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->atom(new TypeNameIdentifier("ItemNotFound"))
 				));
 			}

@@ -532,7 +532,7 @@ final readonly class ParserStateMachine {
 				T::empty_record->name => $c,
 			]],
 			157 => ['name' => 'constructor method parameter name', 'transitions' => [
-				T::type_keyword->name => $c = function(LT $token) {
+				T::type_keyword->name => function(LT $token) {
 					$this->s->result['parameter_name'] = new VariableNameIdentifier(
 						lcfirst($token->patternMatch->text)
 					);

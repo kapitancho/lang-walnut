@@ -5,10 +5,9 @@ namespace Walnut\Lang\NativeCode\Type;
 use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\MetaType;
@@ -21,6 +20,7 @@ use Walnut\Lang\Blueprint\Value\IntegerValue;
 use Walnut\Lang\Blueprint\Value\NullValue;
 use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 
 final readonly class Values implements NativeMethod {
@@ -73,18 +73,18 @@ final readonly class Values implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
-		$parameterValue = $parameter->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
+		$parameterValue = $parameter;
 		
 		if ($parameterValue instanceof NullValue) {
 			if ($targetValue instanceof TypeValue) {
 				$refType = $targetValue->typeValue;
 				if ($refType instanceof EnumerationSubsetType) {
-					return TypedValue::forValue($programRegistry->valueRegistry->tuple(
+					return ($programRegistry->valueRegistry->tuple(
 						array_values(
 							array_unique(
 								$refType->subsetValues
@@ -92,7 +92,7 @@ final readonly class Values implements NativeMethod {
 						)
 					));
 				} elseif ($refType instanceof IntegerSubsetType) {
-					return TypedValue::forValue($programRegistry->valueRegistry->tuple(
+					return ($programRegistry->valueRegistry->tuple(
 						array_map(
 							fn(Number $value): IntegerValue => $programRegistry->valueRegistry->integer($value),
 							array_values(
@@ -103,7 +103,7 @@ final readonly class Values implements NativeMethod {
 						)
 					));
 				} elseif ($refType instanceof RealSubsetType) {
-					return TypedValue::forValue($programRegistry->valueRegistry->tuple(
+					return ($programRegistry->valueRegistry->tuple(
 						array_map(
 							fn(Number $value): RealValue => $programRegistry->valueRegistry->real($value),
 							array_values(
@@ -114,7 +114,7 @@ final readonly class Values implements NativeMethod {
 						)
 					));
 				} elseif ($refType instanceof StringSubsetType) {
-					return TypedValue::forValue($programRegistry->valueRegistry->tuple(
+					return ($programRegistry->valueRegistry->tuple(
 						array_map(
 							fn(string $value): StringValue => $programRegistry->valueRegistry->string($value),
 							array_values(

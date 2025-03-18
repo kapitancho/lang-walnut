@@ -4,13 +4,13 @@ namespace Walnut\Lang\NativeCode\Result;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class Error implements NativeMethod {
@@ -31,14 +31,14 @@ final readonly class Error implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
 
 		if ($targetValue instanceof ErrorValue) {
-			return TypedValue::forValue($targetValue->errorValue);
+			return ($targetValue->errorValue);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

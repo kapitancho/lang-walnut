@@ -3,10 +3,10 @@
 namespace Walnut\Lang\Blueprint\Code\Execution;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Value\Value;
 
 interface ExecutionContext extends AnalyserContext {
 	public ProgramRegistry $programRegistry { get; }
@@ -14,8 +14,8 @@ interface ExecutionContext extends AnalyserContext {
 
 	public function withAddedVariableValue(
 		VariableNameIdentifier $variableName,
-		TypedValue $typedValue
+		Value $value
 	): self;
 
-	public function asExecutionResult(TypedValue $typedValue): ExecutionResult;
+	public function asExecutionResult(Value $typedValue): ExecutionResult;
 }

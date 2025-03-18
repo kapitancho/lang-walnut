@@ -2,8 +2,6 @@
 
 namespace Walnut\Lang\Implementation\Program\EntryPoint;
 
-use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
-use Walnut\Lang\Blueprint\Compilation\Compiler;
 use Walnut\Lang\Blueprint\Program\EntryPoint\CliEntryPoint as CliEntryPointInterface;
 use Walnut\Lang\Blueprint\Program\EntryPoint\CliEntryPointBuilder as CliEntryPointBuilderInterface;
 use Walnut\Lang\Implementation\Compilation\CompilerFactory;

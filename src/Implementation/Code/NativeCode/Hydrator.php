@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Implementation\Code\NativeCode;
 
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
@@ -37,14 +36,12 @@ use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\SetType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
-use Walnut\Lang\Blueprint\Type\SubsetType;
 use Walnut\Lang\Blueprint\Type\TrueType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Type\UnionType;
 use Walnut\Lang\Blueprint\Type\UnknownProperty;
-use Walnut\Lang\Blueprint\Value\AtomValue;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
 use Walnut\Lang\Blueprint\Value\EnumerationValue;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
@@ -55,9 +52,9 @@ use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\SetValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Blueprint\Value\TypeValue;
-use Walnut\Lang\Blueprint\Value\Value;
 
 final readonly class Hydrator {
 	public function __construct(
@@ -65,13 +62,7 @@ final readonly class Hydrator {
 	) {}
 
 	/** @throws HydrationException */
-	public function hydrate(Value $value, Type $targetType, string $hydrationPath): TypedValue {
-		$result = $this->hydrateValue($value, $targetType, $hydrationPath);
-		return TypedValue::forValue($result);
-	}
-
-	/** @throws HydrationException */
-	public function hydrateValue(Value $value, Type $targetType, string $hydrationPath): Value {
+	public function hydrate(Value $value, Type $targetType, string $hydrationPath): Value {
 		/** @var callable-string $fn */
 		$fn = match(true) {
 			$targetType instanceof BooleanType => $this->hydrateBoolean(...),
@@ -245,7 +236,7 @@ final readonly class Hydrator {
 		$exceptions = [];
 		foreach($targetType->types as $type) {
 			try {
-				return $this->hydrateValue($value, $type, $hydrationPath);
+				return $this->hydrate($value, $type, $hydrationPath);
 			} catch (HydrationException $ex) {
 				$exceptions[] = $ex;
 			}
@@ -255,16 +246,16 @@ final readonly class Hydrator {
 	}
 
 	private function hydrateAlias(Value $value, AliasType $targetType, string $hydrationPath): Value {
-		return $this->hydrateValue($value, $targetType->aliasedType, $hydrationPath);
+		return $this->hydrate($value, $targetType->aliasedType, $hydrationPath);
 	}
 
 	private function hydrateResult(Value $value, ResultType $targetType, string $hydrationPath): Value {
 		try {
-			return $this->hydrateValue($value, $targetType->returnType, $hydrationPath);
+			return $this->hydrate($value, $targetType->returnType, $hydrationPath);
 		} catch (HydrationException $ex) {
 			try {
 				return $this->programRegistry->valueRegistry->error(
-					$this->hydrateValue($value, $targetType->errorType, $hydrationPath)
+					$this->hydrate($value, $targetType->errorType, $hydrationPath)
 				);
 			} catch (HydrationException) {
 				throw $ex;
@@ -278,7 +269,7 @@ final readonly class Hydrator {
 			"Subset hydration failed. Error: %s"
 		) ?? $this->constructValue(
 			$targetType,
-			$this->hydrateValue($value, $targetType->valueType, $hydrationPath),
+			$this->hydrate($value, $targetType->valueType, $hydrationPath),
 			$hydrationPath
 		);
 	}
@@ -289,7 +280,7 @@ final readonly class Hydrator {
 			"Open type hydration failed. Error: %s"
 		) ?? $this->constructValue(
 			$targetType,
-			$this->hydrateValue($value, $targetType->valueType, $hydrationPath),
+			$this->hydrate($value, $targetType->valueType, $hydrationPath),
 			$hydrationPath
 		);
 	}
@@ -300,7 +291,7 @@ final readonly class Hydrator {
 			"Sealed type hydration failed. Error: %s"
 		) ?? $this->constructValue(
 			$targetType,
-			$this->hydrateValue($value, $targetType->valueType, $hydrationPath),
+			$this->hydrate($value, $targetType->valueType, $hydrationPath),
 			$hydrationPath
 		);
 	}
@@ -320,10 +311,10 @@ final readonly class Hydrator {
 		if ($method instanceof Method) {
 			$result = $method->execute(
 				$this->programRegistry,
-				TypedValue::forValue($value),
-				TypedValue::forValue($this->programRegistry->valueRegistry->null)
+				($value),
+				($this->programRegistry->valueRegistry->null)
 			);
-			$resultValue = $result->value;
+			$resultValue = $result;
 			if ($resultValue instanceof ErrorValue) {
 				throw new HydrationException(
 					$value,
@@ -340,9 +331,9 @@ final readonly class Hydrator {
 		$result = new ValueConstructor()->executeValidator(
 			$this->programRegistry,
 			$targetType,
-			TypedValue::forValue($baseValue)
+			($baseValue)
 		);
-		$resultValue = $result->value;
+		$resultValue = $result;
 		if ($resultValue instanceof ErrorValue) {
 			throw new HydrationException(
 				$baseValue,
@@ -356,7 +347,7 @@ final readonly class Hydrator {
 	private function hydrateMutable(Value $value, MutableType $targetType, string $hydrationPath): MutableValue {
 		return $this->programRegistry->valueRegistry->mutable(
 			$targetType->valueType,
-			$this->hydrateValue($value, $targetType->valueType, $hydrationPath)
+			$this->hydrate($value, $targetType->valueType, $hydrationPath)
 		);
 	}
 
@@ -530,7 +521,7 @@ final readonly class Hydrator {
 				$refType = $targetType->itemType;
 				$result = [];
 				foreach($value->values as $seq => $item) {
-					$result[] = $this->hydrateValue($item, $refType, "{$hydrationPath}[$seq]");
+					$result[] = $this->hydrate($item, $refType, "{$hydrationPath}[$seq]");
 				}
 				return $this->programRegistry->valueRegistry->tuple($result);
 			}
@@ -558,7 +549,7 @@ final readonly class Hydrator {
 			$refType = $targetType->itemType;
 			$result = [];
 			foreach($value->values as $seq => $item) {
-				$result[] = $this->hydrateValue($item, $refType, "{$hydrationPath}[$seq]");
+				$result[] = $this->hydrate($item, $refType, "{$hydrationPath}[$seq]");
 			}
 			$set = $this->programRegistry->valueRegistry->set($result);
 			$l = count($set->values);
@@ -601,7 +592,7 @@ final readonly class Hydrator {
 			foreach($targetType->types as $seq => $refType) {
 				try {
 					$item = $value->valueOf($seq);
-					$result[] = $this->hydrateValue($item, $refType, "{$hydrationPath}[$seq]");
+					$result[] = $this->hydrate($item, $refType, "{$hydrationPath}[$seq]");
 				} catch (UnknownProperty) {
 					throw new HydrationException(
 						$value,
@@ -612,7 +603,7 @@ final readonly class Hydrator {
 			}
 			foreach($value->values as $seq => $val) {
 				if (!isset($result[$seq])) {
-					$result[] = $this->hydrateValue($val,
+					$result[] = $this->hydrate($val,
 						$targetType->types[$seq] ?? $targetType->restType, "{$hydrationPath}[$seq]");
 				}
 			}
@@ -638,7 +629,7 @@ final readonly class Hydrator {
 				$refType = $targetType->itemType;
 				$result = [];
 				foreach($value->values as $key => $item) {
-					$result[$key] = $this->hydrateValue($item, $refType, "$hydrationPath.$key");
+					$result[$key] = $this->hydrate($item, $refType, "$hydrationPath.$key");
 				}
 				return $this->programRegistry->valueRegistry->record($result);
 			}
@@ -673,7 +664,7 @@ final readonly class Hydrator {
 				}
 				try {
 					$item = $value->valueOf($key);
-					$result[$key] = $this->hydrateValue($item, $refType, "$hydrationPath.$key");
+					$result[$key] = $this->hydrate($item, $refType, "$hydrationPath.$key");
 					$usedKeys[$key] = true;
 				} catch (UnknownProperty) {
 					if (!$isOptional) {
@@ -694,7 +685,7 @@ final readonly class Hydrator {
 							sprintf("The record value may not contain the key %s", $key)
 						);
 					}
-					$result[$key] = $this->hydrateValue($val, $targetType->restType, "$hydrationPath.$key");
+					$result[$key] = $this->hydrate($val, $targetType->restType, "$hydrationPath.$key");
 				}
 			}
 			return $this->programRegistry->valueRegistry->record( $result);

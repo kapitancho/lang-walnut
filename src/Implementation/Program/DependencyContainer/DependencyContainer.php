@@ -6,7 +6,6 @@ use SplObjectStorage;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Expression\MethodCallExpression;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
@@ -23,7 +22,6 @@ use Walnut\Lang\Blueprint\Type\NamedType;
 use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\SealedType;
-use Walnut\Lang\Blueprint\Type\SubsetType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
@@ -33,7 +31,7 @@ use Walnut\Lang\Blueprint\Value\Value;
 
 final class DependencyContainer implements DependencyContainerInterface {
 
-	/** @var SplObjectStorage<Type, TypedValue|DependencyError> */
+	/** @var SplObjectStorage<Type, Value|DependencyError> */
 	private SplObjectStorage $cache;
 	/** @var SplObjectStorage<Type> */
 	private SplObjectStorage $visited;
@@ -59,9 +57,9 @@ final class DependencyContainer implements DependencyContainerInterface {
 		);
 	}
 
-	private function findValueByNamedType(NamedType $type): TypedValue|DependencyError {
+	private function findValueByNamedType(NamedType $type): Value|DependencyError {
 		try {
-			$sType = TypedValue::forValue($this->programRegistry->valueRegistry->type($type));
+			$sType = ($this->programRegistry->valueRegistry->type($type));
 			$containerCastExpression = $this->containerCastExpression();
 			$containerCastExpression->analyse(
 				$this->programRegistry->analyserContext->withAddedVariableType(
@@ -83,31 +81,31 @@ final class DependencyContainer implements DependencyContainerInterface {
 				}
 				return new DependencyError(UnresolvableDependency::notFound, $type);
 			}
-			return $result->typedValue;
+			return $result->value;
 		} catch (AnalyserException) {
 			return new DependencyError(UnresolvableDependency::notFound, $type);
 		}
 	}
 
-	private function attemptToFindAlias(AliasType $aliasType): TypedValue|DependencyError {
+	private function attemptToFindAlias(AliasType $aliasType): Value|DependencyError {
 		$baseType = $aliasType->aliasedType;
 		return $this->findValueByType($baseType);
 	}
 
-	private function findTupleValue(TupleType $tupleType): TypedValue|DependencyError {
+	private function findTupleValue(TupleType $tupleType): Value|DependencyError {
 		$found = [];
 		foreach($tupleType->types as $type) {
 			$foundValue = $this->valueByType($type);
 			if ($foundValue instanceof DependencyError) {
 				return $foundValue;
 			}
-			$found[] = $foundValue->value;
+			$found[] = $foundValue;
 		}
 
-		return TypedValue::forValue($this->programRegistry->valueRegistry->tuple($found));
+		return ($this->programRegistry->valueRegistry->tuple($found));
 	}
 
-	private function findRecordValue(RecordType $recordType): TypedValue|DependencyError {
+	private function findRecordValue(RecordType $recordType): Value|DependencyError {
 		$found = [];
 		foreach($recordType->types as $key => $field) {
 			$foundValue = $this->valueByType($field);
@@ -120,8 +118,8 @@ final class DependencyContainer implements DependencyContainerInterface {
 				);
 			}
 			//TODO: improve
-			if ($foundValue->value instanceof ErrorValue &&
-				($err = $foundValue->value->errorValue) instanceof SealedValue &&
+			if ($foundValue instanceof ErrorValue &&
+				($err = $foundValue->errorValue) instanceof SealedValue &&
 				$err->type->name->equals(new TypeNameIdentifier('DependencyContainerError'))
 			) {
 				return new DependencyError(
@@ -133,16 +131,16 @@ final class DependencyContainer implements DependencyContainerInterface {
 			if ($foundValue instanceof DependencyError) {
 				return $foundValue;
 			}
-			$found[$key] = $foundValue->value;
+			$found[$key] = $foundValue;
 		}
-		return TypedValue::forValue($this->programRegistry->valueRegistry->record($found));
+		return ($this->programRegistry->valueRegistry->record($found));
 	}
 
-	private function findSubsetValue(SubsetType $type): TypedValue|DependencyError {
+	private function findSubsetValue(SubsetType $type): Value|DependencyError {
 		$found = $this->findValueByNamedType($type);
 		if ($found instanceof DependencyError) {
 			$baseValue = $this->findValueByType($type->valueType);
-			if ($baseValue instanceof TypedValue) {
+			if ($baseValue instanceof Value) {
 				$result = $this->expressionRegistry->methodCall(
 					$this->expressionRegistry->variableName(new VariableNameIdentifier('#')),
 					new MethodNameIdentifier('construct'),
@@ -162,17 +160,17 @@ final class DependencyContainer implements DependencyContainerInterface {
 						sprintf("Error while creating value for subset %s", $type)
 					);
 				}
-				return $result->typedValue;
+				return $result->value;
 			}
 		}
 		return $found;
 	}
 
-	private function findOpenValue(OpenType $type): TypedValue|DependencyError {
+	private function findOpenValue(OpenType $type): Value|DependencyError {
 		$found = $this->findValueByNamedType($type);
 		if ($found instanceof DependencyError) {
 			$baseValue = $this->findValueByType($type->valueType);
-			if ($baseValue instanceof TypedValue) {
+			if ($baseValue instanceof Value) {
 				$result = $this->expressionRegistry->methodCall(
 					$this->expressionRegistry->variableName(new VariableNameIdentifier('#')),
 					new MethodNameIdentifier('construct'),
@@ -192,13 +190,13 @@ final class DependencyContainer implements DependencyContainerInterface {
 						sprintf("Error while creating value for open type %s", $type)
 					);
 				}
-				return $result->typedValue;
+				return $result->value;
 			}
 		}
 		return $found;
 	}
 
-	private function findSealedValue(SealedType $type): TypedValue|DependencyError {
+	private function findSealedValue(SealedType $type): Value|DependencyError {
 		$found = $this->findValueByNamedType($type);
 		if ($found instanceof DependencyError) {
 			$constructor = $this->programRegistry->valueRegistry->atom(new TypeNameIdentifier('Constructor'));
@@ -209,7 +207,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 			} else {
 				$baseValue = $this->findValueByType($type->valueType);
 			}
-			if ($baseValue instanceof TypedValue) {
+			if ($baseValue instanceof Value) {
 				$result = $this->expressionRegistry->methodCall(
 					$this->expressionRegistry->variableName(new VariableNameIdentifier('#')),
 					new MethodNameIdentifier('construct'),
@@ -229,15 +227,15 @@ final class DependencyContainer implements DependencyContainerInterface {
 						sprintf("Error while creating value for sealed type %s", $type)
 					);
 				}
-				return $result->typedValue;
+				return $result->value;
 			}
 		}
 		return $found;
 	}
 
-	private function findValueByType(Type $type): TypedValue|DependencyError {
+	private function findValueByType(Type $type): Value|DependencyError {
 		return match(true) {
-			$type instanceof AtomType => TypedValue::forValue($type->value),
+			$type instanceof AtomType => ($type->value),
             $type instanceof SubsetType => $this->findSubsetValue($type),
             $type instanceof OpenType => $this->findOpenValue($type),
 			$type instanceof SealedType => $this->findSealedValue($type),
@@ -248,7 +246,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 		};
 	}
 
-	public function valueByType(Type $type): TypedValue|DependencyError {
+	public function valueByType(Type $type): Value|DependencyError {
 		if ($this->visited->contains($type)) {
 			return new DependencyError(UnresolvableDependency::circularDependency, $type);
 		}
@@ -258,7 +256,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 		}
 		$this->visited->attach($type);
 		$result = $this->findValueByType($type);
-		if (!($result instanceof DependencyError) && !$result->isSubtypeOf($type)) {
+		if (!($result instanceof DependencyError) && !$result->type->isSubtypeOf($type)) {
 			$result = new DependencyError(
 				UnresolvableDependency::errorWhileCreatingValue,
 				$type,

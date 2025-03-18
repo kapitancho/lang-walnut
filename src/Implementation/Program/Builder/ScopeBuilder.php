@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Implementation\Program\Builder;
 
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Builder\ScopeBuilder as ScopeBuilderInterface;
@@ -14,7 +13,7 @@ final class ScopeBuilder implements ScopeBuilderInterface {
 	) {}
 
 	public function addVariable(VariableNameIdentifier $name, Value $value): ScopeBuilderInterface {
-		$this->scope = $this->scope->withAddedVariableValue($name, TypedValue::forValue($value));
+		$this->scope = $this->scope->withAddedVariableValue($name, ($value));
 		return $this;
 	}
 

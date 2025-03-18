@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Test\Feature\Proto;
 
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Type\BooleanType;
@@ -178,9 +177,12 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 		$executionContext = $this->programContext->programRegistry->executionContext;
 		$filledExecutionContext = $this->functionContextFiller->fillExecutionContext(
 			$executionContext,
+			$this->programContext->typeRegistry->nothing,
+			null,
+			$this->programContext->typeRegistry->nothing,
 			null,
 			null,
-			null,
+			$this->programContext->typeRegistry->nothing,
 			null,
 		);
 		$this->assertEquals($executionContext, $filledExecutionContext);
@@ -190,10 +192,13 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 		$executionContext = $this->programContext->programRegistry->executionContext;
 		$filledExecutionContext = $this->functionContextFiller->fillExecutionContext(
 			$executionContext,
-			TypedValue::forValue($this->programContext->valueRegistry->boolean(true)),
-			TypedValue::forValue($this->programContext->valueRegistry->integer(123)),
+			$this->programContext->typeRegistry->boolean,
+			($this->programContext->valueRegistry->boolean(true)),
+			$this->programContext->typeRegistry->integer(),
+			($this->programContext->valueRegistry->integer(123)),
 			new VariableNameIdentifier('x'),
-			TypedValue::forValue($this->programContext->valueRegistry->string('abc')),
+			$this->programContext->typeRegistry->string(),
+			($this->programContext->valueRegistry->string('abc')),
 		);
 		$this->assertCount(4, $filledExecutionContext->variableValueScope->variables());
 		$this->assertInstanceOf(
@@ -218,15 +223,24 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 		$executionContext = $this->programContext->programRegistry->executionContext;
 		$filledExecutionContext = $this->functionContextFiller->fillExecutionContext(
 			$executionContext,
-			TypedValue::forValue($this->programContext->valueRegistry->sealedValue(
+			$this->programContext->typeRegistry->sealed(
+				new TypeNameIdentifier('MySealed')
+			),
+			($this->programContext->valueRegistry->sealedValue(
 				new TypeNameIdentifier('MySealed'),
 				$this->programContext->valueRegistry->real(1.23)
 			)),
-			TypedValue::forValue($this->programContext->valueRegistry->tuple([
+			$this->programContext->typeRegistry->tuple([
+				$this->programContext->typeRegistry->string()
+			]),
+			($this->programContext->valueRegistry->tuple([
 				$this->programContext->valueRegistry->string('str')
 			])),
 			null,
-			TypedValue::forValue($this->programContext->valueRegistry->openValue(
+			$this->programContext->typeRegistry->open(
+				new TypeNameIdentifier('MyOpenTuple')
+			),
+			($this->programContext->valueRegistry->openValue(
 				new TypeNameIdentifier('MyOpenTuple'),
 				$this->programContext->valueRegistry->tuple([
 					$this->programContext->valueRegistry->false
@@ -252,18 +266,33 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 		$executionContext = $this->programContext->programRegistry->executionContext;
 		$filledExecutionContext = $this->functionContextFiller->fillExecutionContext(
 			$executionContext,
-			TypedValue::forValue($this->programContext->valueRegistry->openValue(
+			$this->programContext->typeRegistry->open(
+				new TypeNameIdentifier('MyOpen')
+			),
+			($this->programContext->valueRegistry->openValue(
 				new TypeNameIdentifier('MyOpen'),
 				$this->programContext->valueRegistry->integer(42)
 			)),
-			TypedValue::forValue(
+			$this->programContext->typeRegistry->record([
+				'a' => $this->programContext->typeRegistry->boolean,
+				'b' => $this->programContext->typeRegistry->optionalKey(
+					$this->programContext->typeRegistry->integer()
+				),
+				'c' => $this->programContext->typeRegistry->optionalKey(
+					$this->programContext->typeRegistry->integer()
+				),
+			]),
+			(
 				$this->programContext->valueRegistry->record([
 					'a' => $this->programContext->valueRegistry->true,
 					'b' => $this->programContext->valueRegistry->integer(99),
 				])
 			),
 			null,
-			TypedValue::forValue($this->programContext->valueRegistry->openValue(
+			$this->programContext->typeRegistry->open(
+				new TypeNameIdentifier('MyOpenRecord')
+			),
+			($this->programContext->valueRegistry->openValue(
 				new TypeNameIdentifier('MyOpenRecord'),
 				$this->programContext->valueRegistry->record([
 					'a' => $this->programContext->valueRegistry->real(-1.5),
@@ -306,14 +335,20 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 		$executionContext = $this->programContext->programRegistry->executionContext;
 		$filledExecutionContext = $this->functionContextFiller->fillExecutionContext(
 			$executionContext,
-			TypedValue::forValue($this->programContext->valueRegistry->sealedValue(
+			($this->programContext->typeRegistry->sealed(
+				new TypeNameIdentifier('MySealedRecord')
+			)),
+			($this->programContext->valueRegistry->sealedValue(
 				new TypeNameIdentifier('MySealedRecord'),
 				$this->programContext->valueRegistry->record([
 					'a' => $this->programContext->valueRegistry->real(3.14),
 					'b' => $this->programContext->valueRegistry->string('str'),
 				]),
 			)),
-			TypedValue::forValue($this->programContext->valueRegistry->sealedValue(
+			($this->programContext->typeRegistry->sealed(
+				new TypeNameIdentifier('MySealedRecord')
+			)),
+			($this->programContext->valueRegistry->sealedValue(
 				new TypeNameIdentifier('MySealedRecord'),
 				$this->programContext->valueRegistry->record([
 					'a' => $this->programContext->valueRegistry->real(3.14),
@@ -321,6 +356,7 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 				]),
 			)),
 			null,
+			$this->programContext->typeRegistry->nothing,
 			null,
 		);
 		$this->assertCount(6, $filledExecutionContext->variableValueScope->variables());
@@ -354,14 +390,20 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 		$executionContext = $this->programContext->programRegistry->executionContext;
 		$filledExecutionContext = $this->functionContextFiller->fillExecutionContext(
 			$executionContext,
-			TypedValue::forValue($this->programContext->valueRegistry->openValue(
+			$this->programContext->typeRegistry->open(
+				new TypeNameIdentifier('MyOpenRecord')
+			),
+			($this->programContext->valueRegistry->openValue(
 				new TypeNameIdentifier('MyOpenRecord'),
 				$this->programContext->valueRegistry->record([
 					'a' => $this->programContext->valueRegistry->real(3.14),
 					'b' => $this->programContext->valueRegistry->string('str'),
 				]),
 			)),
-			TypedValue::forValue($this->programContext->valueRegistry->openValue(
+			$this->programContext->typeRegistry->open(
+				new TypeNameIdentifier('MyOpenRecord')
+			),
+			($this->programContext->valueRegistry->openValue(
 				new TypeNameIdentifier('MyOpenRecord'),
 				$this->programContext->valueRegistry->record([
 					'a' => $this->programContext->valueRegistry->real(3.14),
@@ -369,6 +411,7 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 				]),
 			)),
 			null,
+			$this->programContext->typeRegistry->nothing,
 			null,
 		);
 		$this->assertCount(9, $filledExecutionContext->variableValueScope->variables());

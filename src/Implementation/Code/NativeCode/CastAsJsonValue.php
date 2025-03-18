@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Implementation\Code\NativeCode;
 
 use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\Method;
@@ -20,8 +19,8 @@ use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\SealedValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
-use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\NativeCode\Any\AsJsonValue;
 
 final readonly class CastAsJsonValue {
@@ -66,9 +65,9 @@ final readonly class CastAsJsonValue {
 		if ($method instanceof Method && !($method instanceof AsJsonValue)) {
 			return $method->execute(
 				$this->programRegistry,
-				TypedValue::forValue($value),
-				TypedValue::forValue($this->valueRegistry->null)
-			)->value;
+				($value),
+				($this->valueRegistry->null)
+			);
 		}
 		if ($value instanceof MutableValue || $value instanceof OpenValue || $value instanceof SealedValue) {
 			return $this->getJsonValue($value->value);
@@ -76,7 +75,7 @@ final readonly class CastAsJsonValue {
 		if ($value instanceof EnumerationValue) {
 			return $this->valueRegistry->string($value->name->identifier);
 		}
-		throw new FunctionReturn(TypedValue::forValue(
+		throw new FunctionReturn((
 			$this->valueRegistry->error(
 				$this->valueRegistry->openValue(
 					new TypeNameIdentifier('InvalidJsonValue'),

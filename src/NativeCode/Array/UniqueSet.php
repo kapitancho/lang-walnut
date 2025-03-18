@@ -4,16 +4,16 @@ namespace Walnut\Lang\NativeCode\Array;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
-use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
+use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class UniqueSet implements NativeMethod {
@@ -48,11 +48,11 @@ final readonly class UniqueSet implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
 
 		if ($targetValue instanceof TupleValue) {
 			$values = $targetValue->values;
@@ -79,13 +79,13 @@ final readonly class UniqueSet implements NativeMethod {
 					// @codeCoverageIgnoreEnd
 				}
 				$rawValues = array_unique($rawValues);
-				return TypedValue::forValue($programRegistry->valueRegistry->set(array_map(
+				return ($programRegistry->valueRegistry->set(array_map(
 					fn($value) => $programRegistry->valueRegistry->string($value),
 					$rawValues
 				)));
 			}
 			$rawValues = array_unique($rawValues, SORT_NUMERIC);
-			return TypedValue::forValue($programRegistry->valueRegistry->set(array_map(
+			return ($programRegistry->valueRegistry->set(array_map(
 				fn($value) => str_contains($value, '.') ?
 					$programRegistry->valueRegistry->real($value) :
 					$programRegistry->valueRegistry->integer($value),

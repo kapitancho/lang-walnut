@@ -56,7 +56,7 @@ final class ReturnExpressionTest extends TestCase {
 		} catch (FunctionReturn $e) {
 			self::assertEquals(
 				$this->valueRegistry->integer(123),
-				$e->typedValue->value
+				$e->typedValue
 			);
 			return;
 		}

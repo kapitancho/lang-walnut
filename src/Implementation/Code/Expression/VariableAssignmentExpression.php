@@ -11,7 +11,6 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\ConstantExpression;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\VariableAssignmentExpression as VariableAssignmentExpressionInterface;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
 
@@ -55,9 +54,9 @@ final readonly class VariableAssignmentExpression implements VariableAssignmentE
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
 		$ret = $this->assignedExpression->execute($executionContext);
-		$val = $ret->typedValue;
-		if ($val->value instanceof FunctionValue && $this->assignedExpression instanceof ConstantExpression) {
-			$val = TypedValue::forValue($val->value->withSelfReferenceAs($this->variableName));
+		$val = $ret->value;
+		if ($val instanceof FunctionValue && $this->assignedExpression instanceof ConstantExpression) {
+			$val = ($val->withSelfReferenceAs($this->variableName));
 		}
 		return $ret->withAddedVariableValue(
 			$this->variableName,

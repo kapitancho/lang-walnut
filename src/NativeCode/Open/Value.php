@@ -4,15 +4,15 @@ namespace Walnut\Lang\NativeCode\Open;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\OpenType;
-use Walnut\Lang\Blueprint\Value\OpenValue;
-use Walnut\Lang\Implementation\Type\Helper\BaseType;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
+use Walnut\Lang\Blueprint\Value\OpenValue;
+use Walnut\Lang\Blueprint\Value\Value as ValueInterface;
+use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class Value implements NativeMethod {
 
@@ -36,14 +36,14 @@ final readonly class Value implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
+		ProgramRegistry        $programRegistry,
+		ValueInterface $target,
+		ValueInterface $parameter
+	): ValueInterface {
+		$targetValue = $target;
 
 		if ($targetValue instanceof OpenValue) {
-			return TypedValue::forValue($targetValue->value);
+			return ($targetValue->value);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

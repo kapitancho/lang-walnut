@@ -15,10 +15,6 @@ final readonly class PackageBasedModuleLookupContext implements ModuleLookupCont
 		private array $precompilers,
 	) {}
 
-	private function pathOf(string $sourceRoot, string $moduleName): string {
-		return $sourceRoot . '/' . str_replace('\\', '/', $moduleName) . '.nut';
-	}
-
 	/** @throws ModuleDependencyException */
 	public function sourceOf(string $moduleName): string {
 		$sourcePath = $this->modulePathFinder->pathFor($moduleName);

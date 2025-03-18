@@ -8,7 +8,7 @@ final class ShapeTypeTest extends CodeExecutionTestHelper {
 
 
 	public function testAsStringShape(): void {
-		$result = $this->executeCodeSnippet("getReal()->shape->asString;",
+		$result = $this->executeCodeSnippet("getReal()->shape(`Real)->asString;",
 			"getReal = ^ => Shape<Real> :: 3.14;");
 		$this->assertEquals("'3.14'", $result);
 	}
@@ -16,7 +16,7 @@ final class ShapeTypeTest extends CodeExecutionTestHelper {
 	public function testAsStringShapeParam(): void {
 		$result = $this->executeCodeSnippet("getValue(getReal());",
 			"
-				getValue = ^ r: Shape<Real> => Real :: r->shape;
+				getValue = ^ r: Shape<Real> => Real :: r->shape(`Real);
 				getReal = ^ => Shape<Real> :: 3.14;
 			"
 		);
@@ -35,11 +35,11 @@ final class ShapeTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testAsStringShapeParamWithCast(): void {
-		$result = $this->executeCodeSnippet("getReal()->shape->ceil;",
+		$result = $this->executeCodeSnippet("getReal()->shape(`Real)->ceil;",
 			"
 				MyReal = #[value: Real];
 				MyReal ==> Real :: \$value;
-				getValue = ^ r: Shape<Real> => Real :: r->shape;
+				getValue = ^ r: Shape<Real> => Real :: r->shape(`Real);
 				getReal = ^ => Shape<Real> :: MyReal[3.14];
 			"
 		);
@@ -50,7 +50,7 @@ final class ShapeTypeTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("useReal(getReal());",
 			"
 				useReal = ^p: Any => Any :: ?whenTypeOf(p) is {
-					type{Shape<Real>}: p->shape->ceil,
+					type{Shape<Real>}: p->shape(`Real)->ceil,
 					type{String}: p
 				};
 				getReal = ^ => Shape<Real> :: 3.14;
@@ -58,6 +58,5 @@ final class ShapeTypeTest extends CodeExecutionTestHelper {
 		);
 		$this->assertEquals("4", $result);
 	}
-
 
 }

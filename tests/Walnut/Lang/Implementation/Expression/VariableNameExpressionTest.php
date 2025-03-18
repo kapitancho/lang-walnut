@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Test\Implementation\Expression;
 
 use PHPUnit\Framework\TestCase;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Implementation\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Implementation\Code\Execution\ExecutionContext;
@@ -18,7 +17,6 @@ use Walnut\Lang\Implementation\Program\Registry\MainMethodRegistry;
 use Walnut\Lang\Implementation\Program\Registry\NestedMethodRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
-use Walnut\Lang\Test\EmptyDependencyContainer;
 
 final class VariableNameExpressionTest extends TestCase {
 	private readonly TypeRegistryBuilder $typeRegistry;
@@ -61,7 +59,7 @@ final class VariableNameExpressionTest extends TestCase {
 		$result = $this->variableNameExpression->execute(
 			new ExecutionContext($this->programRegistry,
 				new VariableValueScope([
-					'x' => TypedValue::forValue($this->valueRegistry->integer(123))
+					'x' => ($this->valueRegistry->integer(123))
 				])
 			)
 		);

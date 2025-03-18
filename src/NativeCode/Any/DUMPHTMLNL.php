@@ -2,10 +2,10 @@
 
 namespace Walnut\Lang\NativeCode\Any;
 
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\Value;
 
 final readonly class DUMPHTMLNL implements NativeMethod {
 
@@ -18,11 +18,11 @@ final readonly class DUMPHTMLNL implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
 
         echo htmlspecialchars($targetValue), '<br/>', PHP_EOL;
 		return $target;

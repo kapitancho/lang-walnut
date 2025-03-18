@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Test\Implementation\NativeCode;
 
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
@@ -310,7 +309,7 @@ final class CastAsTest extends BaseProgramTestHelper {
 		$this->assertTrue($call->execute(
 			new ExecutionContext($this->programRegistry,
 				new VariableValueScope([
-					'x' => 	TypedValue::forValue($this->valueRegistry->integer(1))
+					'x' => 	($this->valueRegistry->integer(1))
 				])))
 				->value->equals(
 					$this->valueRegistry->enumerationValue(

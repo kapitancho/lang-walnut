@@ -4,12 +4,12 @@ namespace Walnut\Lang\NativeCode\String;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 use Walnut\Lang\Implementation\Value\StringValue;
 
@@ -35,14 +35,12 @@ final readonly class Length implements NativeMethod {
 
 	public function execute(
 		ProgramRegistry $programRegistry,
-		TypedValue $targetValue,
-		TypedValue $parameterValue
-	): TypedValue {
-		$targetValue = $targetValue->value;
-
-		if ($targetValue instanceof StringValue) {
-			return TypedValue::forValue($programRegistry->valueRegistry->integer(
-				mb_strlen($targetValue->literalValue)
+		Value $target,
+		Value $parameter
+	): Value {
+		if ($target instanceof StringValue) {
+			return ($programRegistry->valueRegistry->integer(
+				mb_strlen($target->literalValue)
 			));
 		}
 		// @codeCoverageIgnoreStart

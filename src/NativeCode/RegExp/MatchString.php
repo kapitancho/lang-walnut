@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\RegExp;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -14,6 +13,7 @@ use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\SealedValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class MatchString implements NativeMethod {
@@ -41,19 +41,19 @@ final readonly class MatchString implements NativeMethod {
 		// @codeCoverageIgnoreEnd
 	}
 
-	public function execute(ProgramRegistry $programRegistry, TypedValue $target, TypedValue $parameter): TypedValue {
-		if ($target->value instanceof SealedValue && $target->value->type->name->equals(
+	public function execute(ProgramRegistry $programRegistry, Value $target, Value $parameter): Value {
+		if ($target instanceof SealedValue && $target->type->name->equals(
 			new TypeNameIdentifier('RegExp')
 		)) {
-			$v = $parameter->value;
+			$v = $parameter;
 			if ($v instanceof StringValue) {
 				$result = preg_match(
-					$target->value->value->literalValue,
+					$target->value->literalValue,
 					$v->literalValue,
 					$matches
 				);
 				if ($result) {
-					return TypedValue::forValue(
+					return (
 						$programRegistry->valueRegistry->openValue(
 							new TypeNameIdentifier('RegExpMatch'),
 							$programRegistry->valueRegistry->record([
@@ -68,7 +68,7 @@ final readonly class MatchString implements NativeMethod {
 						)
 					);
 				} else {
-					return TypedValue::forValue(
+					return (
 						$programRegistry->valueRegistry->error(
 							$programRegistry->valueRegistry->atom(
 								new TypeNameIdentifier('NoRegExpMatch'),

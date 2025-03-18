@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\Real;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
@@ -13,6 +12,7 @@ use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\RealValue;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 use Walnut\Lang\Implementation\Value\IntegerValue;
 
@@ -44,15 +44,12 @@ final readonly class BinaryGreaterThan implements NativeMethod {
 
 	public function execute(
 		ProgramRegistry $programRegistry,
-		TypedValue      $targetValue,
-		TypedValue $parameterValue
-	): TypedValue {
-		$target = $targetValue->value;
-		$parameter = $parameterValue->value;
-		
+		Value $target,
+		Value $parameter
+	): Value {
 		if ($target instanceof IntegerValue || $target instanceof RealValue) {
 			if ($parameter instanceof IntegerValue || $target instanceof RealValue) {
-				return TypedValue::forValue($programRegistry->valueRegistry->boolean(
+				return ($programRegistry->valueRegistry->boolean(
 					$target->literalValue > $parameter->literalValue
 				));
 			}

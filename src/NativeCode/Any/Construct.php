@@ -4,11 +4,11 @@ namespace Walnut\Lang\NativeCode\Any;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\TypeType;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Implementation\Code\NativeCode\ValueConstructor;
 use Walnut\Lang\Implementation\Type\Helper\TupleAsRecord;
@@ -37,12 +37,12 @@ final readonly class Construct implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
 		//$targetValue = $target->value;
-		$parameterValue = $parameter->value;
+		$parameterValue = $parameter;
 
 		if ($parameterValue instanceof TypeValue) {
 			$t = $parameterValue->typeValue;

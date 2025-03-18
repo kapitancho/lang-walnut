@@ -4,7 +4,6 @@ namespace Walnut\Lang\Implementation\Program\Registry;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\NativeCode\NativeCodeTypeMapper;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\Method;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
@@ -13,6 +12,7 @@ use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
 use Walnut\Lang\Blueprint\Type\IntersectionType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnionType;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Function\UnionMethodCall;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
@@ -84,7 +84,7 @@ final readonly class MainMethodRegistry implements MethodFinder {
 		return $this->registry->methodForType($targetType, $methodName);
 	}
 
-	public function methodForValue(TypedValue $target, MethodNameIdentifier $methodName): Method|UnknownMethod {
+	public function methodForValue(Value $target, MethodNameIdentifier $methodName): Method|UnknownMethod {
 		$method = $this->methodForType($target->type, $methodName);
 		if ($method instanceof Method) {
 			return $method;

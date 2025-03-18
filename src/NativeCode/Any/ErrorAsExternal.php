@@ -3,16 +3,16 @@
 namespace Walnut\Lang\NativeCode\Any;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\SealedValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class ErrorAsExternal implements NativeMethod {
@@ -47,21 +47,21 @@ final readonly class ErrorAsExternal implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
 		if ($targetValue instanceof ErrorValue) {
 			$errorValue = $targetValue->errorValue;
 			if (!($errorValue instanceof SealedValue && $errorValue->type->name->equals(
 				new TypeNameIdentifier("ExternalError")
 			))) {
-				$parameterValue = $parameter->value;
+				$parameterValue = $parameter;
 				$errorMessage = $parameterValue instanceof StringValue ? $parameterValue :
 					$programRegistry->valueRegistry->string('Error');
 
-				return TypedValue::forValue(
+				return (
 				 $programRegistry->valueRegistry->error(
 						$programRegistry->valueRegistry->sealedValue(
 							new TypeNameIdentifier("ExternalError"),

@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Implementation\Function;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethod as CustomMethodInterface;
 use Walnut\Lang\Blueprint\Function\CustomMethodAnalyser as CustomMethodAnalyserInterface;
 use Walnut\Lang\Blueprint\Function\Method;
@@ -13,7 +12,6 @@ use Walnut\Lang\Blueprint\Program\Registry\CustomMethodRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\NothingType;
-use Walnut\Lang\Blueprint\Type\SubsetType;
 
 final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterface {
 	public function __construct(

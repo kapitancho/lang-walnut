@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\String;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -13,6 +12,7 @@ use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\StringValue;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 use Walnut\Lang\Implementation\Type\TupleType;
@@ -51,13 +51,10 @@ final readonly class ConcatList implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $targetValue,
-		TypedValue $parameterValue
-	): TypedValue {
-		$target = $targetValue->value;
-		$parameter = $parameterValue?->value;
-		
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
 		if ($target instanceof StringValue) {
 			if ($parameter instanceof TupleValue) {
 				$result = $target->literalValue;
@@ -70,7 +67,7 @@ final readonly class ConcatList implements NativeMethod {
 						// @codeCoverageIgnoreEnd
 					}
 				}
-				return TypedValue::forValue($programRegistry->valueRegistry->string($result));
+				return ($programRegistry->valueRegistry->string($result));
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

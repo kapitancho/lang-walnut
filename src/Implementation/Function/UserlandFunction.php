@@ -6,7 +6,6 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownContextVariable;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
@@ -18,6 +17,7 @@ use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyError;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\UnresolvableDependency;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\Value;
 
 final readonly class UserlandFunction implements UserlandFunctionInterface {
 
@@ -86,14 +86,14 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 	}
 
 	/** @throws ExecutionException */
-	private function checkValueType(string $parameterName, TypedValue $value, Type $expectedType): void {
-		if (!$value->isSubtypeOf($expectedType)) {
+	private function checkValueType(string $parameterName, Value $value, Type $expectedType): void {
+		if (!$value->type->isSubtypeOf($expectedType)) {
 			throw new ExecutionException(
 				sprintf(
 					"Error in %s: expected a %s value of type < %s >, got %s for value %s",
 						$this->displayName, $parameterName, $expectedType,
 						$value->type,
-						$value->value
+						$value
 				)
 			);
 		}
@@ -101,10 +101,10 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 
 	/** @throws ExecutionException */
 	public function execute(
-		ExecutionContext $executionContext,
-		TypedValue|null $targetValue,
-		TypedValue $parameterValue,
-	): TypedValue {
+		ExecutionContext            $executionContext,
+		Value|null $targetValue,
+		Value      $parameterValue,
+	): Value {
 		if ($targetValue) {
 			$this->checkValueType('target', $targetValue, $this->targetType);
 		}
@@ -115,7 +115,7 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 
 		if ($dependencyValue instanceof DependencyError) {
 			$vr = $executionContext->programRegistry->valueRegistry;
-			return TypedValue::forValue($vr->error(
+			return ($vr->error(
 				$vr->sealedValue(
 					new TypeNameIdentifier('DependencyContainerError'),
 					$vr->record([
@@ -141,9 +141,12 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 
 		$executionContext = $this->functionContextFiller->fillExecutionContext(
 			$executionContext,
+			$this->targetType,
 			$targetValue,
+			$this->parameterType,
 			$parameterValue,
 			$this->parameterName,
+			$this->dependencyType,
 			$dependencyValue
 		);
 		try {

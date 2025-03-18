@@ -9,7 +9,6 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\RecordExpression as RecordExpressionInterface;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 
 final readonly class RecordExpression implements RecordExpressionInterface, JsonSerializable {
 
@@ -39,7 +38,7 @@ final readonly class RecordExpression implements RecordExpressionInterface, Json
 			$values[$key] = $executionContext->value;
 		}
 		return $executionContext->asExecutionResult(
-			TypedValue::forValue(
+			(
 				$executionContext->programRegistry->valueRegistry->record($values)
 			)
 		);

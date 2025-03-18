@@ -4,11 +4,10 @@ namespace Walnut\Lang\NativeCode\Type;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
@@ -16,6 +15,7 @@ use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Value\StringValue;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
@@ -59,18 +59,18 @@ final readonly class ValueWithName implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
-		$parameterValue = $parameter->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
+		$parameterValue = $parameter;
 		
 		if ($parameterValue instanceof StringValue) {
 			if ($targetValue instanceof TypeValue) {
 				$refType = $targetValue->typeValue;
 				if ($refType instanceof EnumerationSubsetType) {
-					return TypedValue::forValue($refType->subsetValues[$parameterValue->literalValue] ??
+					return ($refType->subsetValues[$parameterValue->literalValue] ??
 						$programRegistry->valueRegistry->error(
 							$programRegistry->valueRegistry->openValue(
 								new TypeNameIdentifier('UnknownEnumerationValue'),

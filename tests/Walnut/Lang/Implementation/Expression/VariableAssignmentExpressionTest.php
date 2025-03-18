@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Test\Implementation\Expression;
 
 use PHPUnit\Framework\TestCase;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Implementation\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Implementation\Code\Execution\ExecutionContext;
@@ -69,7 +68,7 @@ final class VariableAssignmentExpressionTest extends TestCase {
 			new ExecutionContext($this->programRegistry,
 				new VariableValueScope([
 					'x' =>
-						TypedValue::forValue(
+						(
 							$this->valueRegistry->integer(123)
 						)
 				])

@@ -31,7 +31,7 @@ final readonly class Program implements ProgramInterface {
 			);
 		}
 		$type = $typedValue->type;
-		$value = $typedValue->value;
+		$value = $typedValue;
 		if (!($type instanceof FunctionType) || !($value instanceof FunctionValue)) {
 			InvalidEntryPoint::becauseValueIsNotAFunction(
 				$functionName, $expectedParameterType, $expectedReturnType

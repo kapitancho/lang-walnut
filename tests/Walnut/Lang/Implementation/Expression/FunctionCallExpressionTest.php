@@ -6,7 +6,6 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MethodCallExpression;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
@@ -114,8 +113,8 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 	}
 	public function testExecuteDefault(): void {
 		$result = $this->functionCallExpression->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([
-			'a' => TypedValue::forValue($this->functionValue),
-			'b' => TypedValue::forValue(
+			'a' => ($this->functionValue),
+			'b' => (
 				$this->valueRegistry->integer(1)
 			)
 		])));
@@ -124,13 +123,13 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 
 	public function testExecuteOnCustomType(): void {
 		$result = $this->functionCallExpression->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([
-			'a' => TypedValue::forValue(
+			'a' => (
 				$this->valueRegistry->sealedValue(
 					new TypeNameIdentifier('MyCustomType'),
 					$this->valueRegistry->record(['x' => $this->valueRegistry->integer(1)])
 				)
 			),
-			'b' => TypedValue::forValue(
+			'b' => (
 				$this->valueRegistry->integer(1)
 			)
 		])));
@@ -140,10 +139,10 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 	public function testExecuteFailWrongType(): void {
 		$this->expectException(ExecutionException::class);
 		$this->functionCallExpression->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([
-			'a' => TypedValue::forValue(
+			'a' => (
 				$this->valueRegistry->integer(1)
 			),
-			'b' => TypedValue::forValue(
+			'b' => (
 				$this->valueRegistry->integer(1)
 			)
 		])));

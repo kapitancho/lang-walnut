@@ -4,7 +4,6 @@ namespace Walnut\Lang\Implementation\Code\Execution;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserResult as AnalyserResultInterface;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult as ExecutionResultInterface;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Code\Scope\VariableScope;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
@@ -20,20 +19,20 @@ final class ExecutionResult implements ExecutionResultInterface {
 	public function __construct(
 		public readonly ProgramRegistry $programRegistry,
 		public readonly VariableValueScope $variableValueScope,
-		public readonly TypedValue         $typedValue
+		public readonly Value $typedValue
 	) {
 		$this->variableScope = $variableValueScope;
 	}
 
-	public function withAddedVariableValue(VariableNameIdentifier $variableName, TypedValue $typedValue): self {
+	public function withAddedVariableValue(VariableNameIdentifier $variableName, Value $value): self {
 		return new self(
 			$this->programRegistry,
-			$this->variableValueScope->withAddedVariableValue($variableName, $typedValue),
+			$this->variableValueScope->withAddedVariableValue($variableName, $value),
 			$this->typedValue
 		);
 	}
 
-	public function asExecutionResult(TypedValue $typedValue): ExecutionResult {
+	public function asExecutionResult(Value $typedValue): ExecutionResult {
 		return new self(
 			$this->programRegistry,
 			$this->variableValueScope,
@@ -41,14 +40,14 @@ final class ExecutionResult implements ExecutionResultInterface {
 		);
 	}
 
-	public Value $value { get => $this->typedValue->value; }
+	public Value $value { get => $this->typedValue; }
 	public Type $valueType { get => $this->typedValue->type; }
 
-	public function withTypedValue(TypedValue $typedValue): ExecutionResultInterface {
+	public function withValue(Value $typedValue): ExecutionResultInterface {
 		return $this->asExecutionResult($typedValue);
 	}
 
-	public function withAddedVariableType(VariableNameIdentifier $variableName, Type $variableType,): AnalyserResultInterface {
+	public function withAddedVariableType(VariableNameIdentifier $variableName, Type $variableType): AnalyserResultInterface {
 		return new AnalyserResult(
 			$this->programRegistry,
 			$this->variableScope->withAddedVariableType($variableName, $variableType),

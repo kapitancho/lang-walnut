@@ -4,14 +4,14 @@ namespace Walnut\Lang\NativeCode\Mutable;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\MutableValue;
+use Walnut\Lang\Blueprint\Value\Value as ValueInterface;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class Value implements NativeMethod {
@@ -35,15 +35,15 @@ final readonly class Value implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
+		ProgramRegistry        $programRegistry,
+		ValueInterface $target,
+		ValueInterface $parameter
+	): ValueInterface {
+		$targetValue = $target;
 
 		$v = $targetValue;
 		if ($v instanceof MutableValue) {
-			return TypedValue::forValue($v->value);
+			return ($v->value);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

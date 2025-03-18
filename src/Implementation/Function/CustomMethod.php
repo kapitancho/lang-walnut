@@ -4,12 +4,12 @@ namespace Walnut\Lang\Implementation\Function;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethod as CustomMethodInterface;
 use Walnut\Lang\Blueprint\Function\UserlandFunction;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\TupleAsRecord;
 
 final class CustomMethod implements CustomMethodInterface {
@@ -43,17 +43,17 @@ final class CustomMethod implements CustomMethodInterface {
 
 	/** @throws ExecutionException */
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $targetValue,
-		TypedValue $parameterValue
-	): TypedValue {
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
 		return $this->function->execute(
 			$programRegistry->executionContext,
-			$targetValue,
+			$target,
 			$this->adjustParameterValue(
 				$programRegistry->valueRegistry,
 				$this->function->parameterType,
-				$parameterValue,
+				$parameter,
 			)
 		);
 	}

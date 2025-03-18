@@ -8,10 +8,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
-use Walnut\Lang\Blueprint\Code\Scope\UnknownContextVariable;
 use Walnut\Lang\Blueprint\Function\FunctionBody as FunctionBodyInterface;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\Value;
 
 final readonly class FunctionBody implements FunctionBodyInterface {
 	public function __construct(
@@ -34,12 +33,12 @@ final readonly class FunctionBody implements FunctionBodyInterface {
 	/** @throws ExecutionException */
 	public function execute(
 		ExecutionContext $executionContext
-	): TypedValue {
+	): Value {
 		try {
 			$executionResult = $this->expression->execute(
 				$executionContext
 			);
-			return $executionResult->typedValue;
+			return $executionResult->value;
 		} catch (FunctionReturn $return) {
 			return $return->typedValue;
 		}

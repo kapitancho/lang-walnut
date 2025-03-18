@@ -71,7 +71,7 @@ final class NoErrorExpressionTest extends TestCase {
 				$this->valueRegistry->error(
 					$this->valueRegistry->integer(123)
 				),
-				$e->typedValue->value
+				$e->typedValue
 			);
 			return;
 		}

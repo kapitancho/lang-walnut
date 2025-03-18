@@ -2,11 +2,11 @@
 
 namespace Walnut\Lang\NativeCode\Any;
 
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\BooleanType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\Value;
 
 final readonly class BinaryNotEqual implements NativeMethod {
 
@@ -19,14 +19,14 @@ final readonly class BinaryNotEqual implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
-		$parameterValue = $parameter->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
+		$parameterValue = $parameter;
 		
-		return TypedValue::forValue($programRegistry->valueRegistry->boolean(
+		return ($programRegistry->valueRegistry->boolean(
             !$targetValue->equals($parameterValue)
         ));
 	}

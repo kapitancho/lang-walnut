@@ -13,7 +13,6 @@ use Walnut\Lang\Blueprint\Code\Expression\MatchExpression as MatchExpressionInte
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionDefault;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionOperation;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionPair;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
@@ -110,9 +109,9 @@ final readonly class MatchExpression implements MatchExpressionInterface, JsonSe
 				return $pair->valueExpression->execute($executionContext);
 			}
 			$innerContext = $pair->matchExpression->execute($executionContext);
-			if ($this->operation->match($executionContext->typedValue, $innerContext->typedValue)) {
+			if ($this->operation->match($executionContext->value, $innerContext->value)) {
 				if ($this->target instanceof VariableNameExpression) {
-					if ($this->operation instanceof MatchExpressionIsSubtypeOf && ($type = $innerContext->value) instanceof TypeValue) {
+					if ($this->operation instanceof MatchExpressionIsSubtypeOf && $innerContext->value instanceof TypeValue) {
 						$typedValue = $innerContext->variableValueScope->typedValueOf($this->target->variableName);
 						$innerContext = $innerContext->withAddedVariableValue(
 							$this->target->variableName,
@@ -122,7 +121,7 @@ final readonly class MatchExpression implements MatchExpressionInterface, JsonSe
 					if ($this->operation instanceof MatchExpressionEquals) {
 						$innerContext = $innerContext->withAddedVariableValue(
 							$this->target->variableName,
-							$innerContext->typedValue
+							$innerContext->value
 						);
 					}
 				}
@@ -130,7 +129,7 @@ final readonly class MatchExpression implements MatchExpressionInterface, JsonSe
 			}
 		}
 		return $executionContext->asExecutionResult(
-			TypedValue::forValue($executionContext->programRegistry->valueRegistry->null)
+			($executionContext->programRegistry->valueRegistry->null)
 		);
 	}
 

@@ -10,7 +10,6 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\NoErrorExpression as NoErrorExpressionInterface;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
 
@@ -37,14 +36,14 @@ final readonly class NoErrorExpression implements NoErrorExpressionInterface, Js
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
 		$result = $this->targetExpression->execute($executionContext);
-		if ($result->typedValue->value instanceof ErrorValue) {
-			throw new FunctionReturn($result->typedValue);
+		if ($result->value instanceof ErrorValue) {
+			throw new FunctionReturn($result->value);
 		}
-		$vt = $result->valueType;
+		$vt = $result->value->type;
 		// @codeCoverageIgnoreStart
 		if ($vt instanceof ResultType) {
-			$result = $result->withTypedValue(
-				$result->typedValue
+			$result = $result->withValue(
+				$result->value
 			);
 		}
 		// @codeCoverageIgnoreEnd

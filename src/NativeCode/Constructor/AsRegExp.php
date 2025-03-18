@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\Constructor;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -14,6 +13,7 @@ use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\AtomValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class AsRegExp implements NativeMethod {
@@ -56,16 +56,16 @@ final readonly class AsRegExp implements NativeMethod {
 		// @codeCoverageIgnoreEnd
 	}
 
-	public function execute(ProgramRegistry $programRegistry, TypedValue $target, TypedValue $parameter): TypedValue {
-		if ($target->value instanceof AtomValue && $target->value->type->name->equals(
+	public function execute(ProgramRegistry $programRegistry, Value $target, Value $parameter): Value {
+		if ($target instanceof AtomValue && $target->type->name->equals(
 			new TypeNameIdentifier('Constructor')
 		)) {
-			$v = $parameter->value;
+			$v = $parameter;
 			if ($v instanceof StringValue) {
 				if ($this->isValidRegexp($v->literalValue)) {
 					return $parameter;
 				}
-				return TypedValue::forValue(
+				return (
 					$programRegistry->valueRegistry->error(
 						$programRegistry->valueRegistry->openValue(
 							new TypeNameIdentifier('InvalidRegExp'),

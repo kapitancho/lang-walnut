@@ -10,7 +10,6 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\NoExternalErrorExpression as NoExternalErrorExpressionInterface;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\NothingType;
@@ -73,14 +72,14 @@ final readonly class NoExternalErrorExpression implements NoExternalErrorExpress
 			if ($errorValue instanceof SealedValue && $errorValue->type->name->equals(
 				new TypeNameIdentifier('ExternalError'))
 			) {
-				throw new FunctionReturn($result->typedValue);
+				throw new FunctionReturn($result->value);
 			}
 		}
-		$vt = $result->valueType;
+		$vt = $result->value->type;
 		// @codeCoverageIgnoreStart
 		if ($vt instanceof ResultType) {
-			$result = $result->withTypedValue(
-				$result->typedValue
+			$result = $result->withValue(
+				$result->value
 			);
 		}
 		// @codeCoverageIgnoreEnd

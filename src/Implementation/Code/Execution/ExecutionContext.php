@@ -5,12 +5,12 @@ namespace Walnut\Lang\Implementation\Code\Execution;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext as AnalyserContextInterface;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserResult as AnalyserResultInterface;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext as ExecutionContextInterface;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Code\Scope\VariableScope;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Implementation\Code\Analyser\AnalyserResult;
 
@@ -25,14 +25,14 @@ final readonly class ExecutionContext implements ExecutionContextInterface {
 		$this->variableScope = $this->variableValueScope;
 	}
 
-	public function withAddedVariableValue(VariableNameIdentifier $variableName, TypedValue $typedValue): self {
+	public function withAddedVariableValue(VariableNameIdentifier $variableName, Value $value): self {
 		return new self(
 			$this->programRegistry,
-			$this->variableValueScope->withAddedVariableValue($variableName, $typedValue)
+			$this->variableValueScope->withAddedVariableValue($variableName, $value)
 		);
 	}
 
-	public function asExecutionResult(TypedValue $typedValue): ExecutionResult {
+	public function asExecutionResult(Value $typedValue): ExecutionResult {
 		return new ExecutionResult(
 			$this->programRegistry,
 			$this->variableValueScope,
@@ -40,7 +40,7 @@ final readonly class ExecutionContext implements ExecutionContextInterface {
 		);
 	}
 
-	public function withAddedVariableType(VariableNameIdentifier $variableName, Type $variableType,): AnalyserContextInterface {
+	public function withAddedVariableType(VariableNameIdentifier $variableName, Type $variableType): AnalyserContextInterface {
 		return new AnalyserContext(
 			$this->programRegistry,
 			$this->variableScope->withAddedVariableType($variableName, $variableType),

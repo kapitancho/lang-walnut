@@ -2,7 +2,6 @@
 
 use Walnut\Lang\Blueprint\AST\Parser\ParserException;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
-use Walnut\Lang\Implementation\Program\EntryPoint\CliEntryPointFactory;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 

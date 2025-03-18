@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Implementation\Code\NativeCode;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
@@ -13,6 +12,7 @@ use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AtomType;
+use Walnut\Lang\Blueprint\Type\CustomType;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
 use Walnut\Lang\Blueprint\Type\NamedType;
 use Walnut\Lang\Blueprint\Type\NothingType;
@@ -20,10 +20,8 @@ use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
-use Walnut\Lang\Blueprint\Type\SubsetType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnknownEnumerationValue;
-use Walnut\Lang\Blueprint\Type\UserType;
 use Walnut\Lang\Blueprint\Value\EnumerationValue;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
@@ -41,7 +39,7 @@ final readonly class ValueConstructor {
 
 	private function getConstructingType(TypeRegistry $typeRegistry, Type $type, Type $parameterType): Type {
 		return match(true) {
-			$type instanceof UserType => $type->valueType,
+			$type instanceof CustomType => $type->valueType,
 			$type instanceof AtomType => $typeRegistry->null,
 			$type instanceof AliasType => $type->aliasedType,
 			$type instanceof ResultType && $type->returnType instanceof NothingType => $parameterType,
@@ -186,11 +184,11 @@ final readonly class ValueConstructor {
 	}
 
 	private function getValidatorOutputValue(
-		TypeRegistry $typeRegistry,
-		ValueRegistry $valueRegistry,
-		Type $type,
-		TypedValue $parameter
-	): TypedValue {
+		TypeRegistry           $typeRegistry,
+		ValueRegistry          $valueRegistry,
+		Type                   $type,
+		Value $parameter
+	): Value {
 		$et = function(EnumerationType $type, Value $parameterValue) use ($valueRegistry): Value {
 			try {
 				if ($parameterValue instanceof EnumerationValue &&
@@ -213,13 +211,13 @@ final readonly class ValueConstructor {
 				)
 			);
 		};
-		$parameterValue = $parameter->value;
+		$parameterValue = $parameter;
 		if ($type instanceof ResultType) {
-			return TypedValue::forValue(
+			return (
 				$valueRegistry->error($parameterValue)
 			);
 		}
-		return TypedValue::forValue(
+		return (
 			match(true) {
 				$type instanceof OpenType => $valueRegistry->openValue(
 					$type->name, $parameterValue
@@ -235,10 +233,10 @@ final readonly class ValueConstructor {
 	}
 
 	public function executeConstructor(
-		ProgramRegistry $programRegistry,
-		Type $resultType,
-		TypedValue $parameter
-	): TypedValue {
+		ProgramRegistry        $programRegistry,
+		Type                   $resultType,
+		Value $parameter
+	): Value {
 		$constructorType = $this->getConstructorType($programRegistry);
 		$constructorMethod = $resultType instanceof NamedType ? $programRegistry->methodFinder->methodForType(
 			$constructorType,
@@ -248,10 +246,10 @@ final readonly class ValueConstructor {
 		if ($constructorMethod instanceof Method) {
 			$parameter = $constructorMethod->execute(
 				$programRegistry,
-				TypedValue::forValue($constructorType->value),
+				($constructorType->value),
 				$parameter,
 			);
-			$resultValue = $parameter->value;
+			$resultValue = $parameter;
 			if ($resultValue instanceof ErrorValue) {
 				return $parameter;
 			}
@@ -264,10 +262,10 @@ final readonly class ValueConstructor {
 	}
 
 	public function executeValidator(
-		ProgramRegistry $programRegistry,
-		Type $resultType,
-		TypedValue $parameter
-	): TypedValue {
+		ProgramRegistry        $programRegistry,
+		Type                   $resultType,
+		Value $parameter
+	): Value {
 		$constructingType = $this->getConstructingType(
 			$programRegistry->typeRegistry,
 			$resultType,
@@ -288,10 +286,10 @@ final readonly class ValueConstructor {
 		if ($validatorMethod instanceof Method) {
 			$result = $validatorMethod->execute(
 				$programRegistry,
-				TypedValue::forValue($constructorType->value),
+				($constructorType->value),
 				$parameter
 			);
-			$resultValue = $result->value;
+			$resultValue = $result;
 			if ($resultValue instanceof ErrorValue) {
 				return $result;
 			}

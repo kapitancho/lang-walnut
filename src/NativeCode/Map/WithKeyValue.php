@@ -4,16 +4,16 @@ namespace Walnut\Lang\NativeCode\Map;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class WithKeyValue implements NativeMethod {
@@ -63,12 +63,12 @@ final readonly class WithKeyValue implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
-		$parameterValue = $parameter->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
+		$parameterValue = $parameter;
 		
 		if ($targetValue instanceof RecordValue) {
 			if ($parameterValue instanceof RecordValue) {
@@ -78,19 +78,7 @@ final readonly class WithKeyValue implements NativeMethod {
 				if ($pValue && $pKey instanceof StringValue) {
 					$values = $targetValue->values;
 					$values[$pKey->literalValue] = $pValue;
-					$resultValue = $programRegistry->valueRegistry->record($values);
-					$resultType = $target->type instanceof MapType ?
-						$programRegistry->typeRegistry->map(
-							$programRegistry->typeRegistry->union([
-								$target->type->itemType,
-								$pValue->type
-							]),
-							$target->type->range->minLength,
-							$target->type->range->maxLength === PlusInfinity::value ?
-								PlusInfinity::value : $target->type->range->maxLength + 1
-						) : $resultValue->type;
-
-					return TypedValue::forValue($resultValue);
+					return $programRegistry->valueRegistry->record($values);
 				}
 			}
 			// @codeCoverageIgnoreStart

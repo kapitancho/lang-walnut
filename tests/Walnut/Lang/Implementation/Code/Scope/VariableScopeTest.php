@@ -2,15 +2,9 @@
 
 namespace Walnut\Lang\Implementation\Code\Scope;
 
-use BcMath\Number;
-use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownContextVariable;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownVariable;
-use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
-use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
-use Walnut\Lang\Implementation\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Test\BaseProgramTestHelper;
 
 class VariableScopeTest extends BaseProgramTestHelper {

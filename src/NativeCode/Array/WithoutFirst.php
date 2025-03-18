@@ -4,14 +4,14 @@ namespace Walnut\Lang\NativeCode\Array;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
@@ -48,16 +48,16 @@ final readonly class WithoutFirst implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
 
 		if ($targetValue instanceof TupleValue) {
 			$values = $targetValue->values;
 			if (count($values) === 0) {
-				return TypedValue::forValue(
+				return (
 					$programRegistry->valueRegistry->error(
 						$programRegistry->valueRegistry->atom(
 							new TypeNameIdentifier("ItemNotFound")
@@ -66,7 +66,7 @@ final readonly class WithoutFirst implements NativeMethod {
 				);
 			}
 			$element = array_shift($values);
-			return TypedValue::forValue($programRegistry->valueRegistry->record([
+			return ($programRegistry->valueRegistry->record([
 				'element' => $element,
 				'array' => $programRegistry->valueRegistry->tuple($values)
 			]));

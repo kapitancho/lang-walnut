@@ -4,13 +4,12 @@ namespace Walnut\Lang\NativeCode\Any;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Type\TypeType;
-use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Blueprint\Value\TypeValue;
 
 final readonly class IsOfType implements NativeMethod {
 
@@ -25,21 +24,14 @@ final readonly class IsOfType implements NativeMethod {
 		throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 	}
 
-	private function isSubtypeOf(Value $targetValue, TypeInterface $type): bool {
-		return $targetValue->type->isSubtypeOf($type);
-	}
-
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
-		$parameterValue = $parameter->value;
-		
-		if ($parameterValue instanceof TypeValue) {
-			return TypedValue::forValue($programRegistry->valueRegistry->boolean(
-				$target->isSubtypeOf($parameterValue->typeValue)
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		if ($parameter instanceof TypeValue) {
+			return ($programRegistry->valueRegistry->boolean(
+				$target->type->isSubtypeOf($parameter->typeValue)
 			));
 		}
 		// @codeCoverageIgnoreStart

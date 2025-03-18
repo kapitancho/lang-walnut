@@ -7,10 +7,9 @@ use PDO;
 use PDOException;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\SealedValue;
@@ -50,12 +49,12 @@ final readonly class Query implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
-		$parameterValue = $parameter->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
+		$parameterValue = $parameter;
 		
 		if ($targetValue instanceof SealedValue && $targetValue->type->name->equals(
 			new TypeNameIdentifier('DatabaseConnector')
@@ -92,11 +91,11 @@ final readonly class Query implements NativeMethod {
 						);
 					}
 
-					return TypedValue::forValue(
+					return (
 						$programRegistry->valueRegistry->tuple($result)
 					);
 				} catch (PDOException $ex) {
-					return TypedValue::forValue(
+					return (
 						$programRegistry->valueRegistry->error(
 							$programRegistry->valueRegistry->openValue(
 								new TypeNameIdentifier('DatabaseQueryFailure'),

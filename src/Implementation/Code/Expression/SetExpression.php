@@ -9,7 +9,6 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\SetExpression as SetExpressionInterface;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 
 final readonly class SetExpression implements SetExpressionInterface, JsonSerializable {
 
@@ -43,7 +42,7 @@ final readonly class SetExpression implements SetExpressionInterface, JsonSerial
 			$executionContext = $value->execute($executionContext);
 			$values[] = $executionContext->value;
 		}
-		return $executionContext->asExecutionResult(TypedValue::forValue(
+		return $executionContext->asExecutionResult((
 			$executionContext->programRegistry->valueRegistry->set($values)
 		));
 	}

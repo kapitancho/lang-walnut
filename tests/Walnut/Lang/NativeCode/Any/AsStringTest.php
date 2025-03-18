@@ -79,7 +79,7 @@ final class AsStringTest extends CodeExecutionTestHelper {
 	}
 
 	public function testAsStringShape(): void {
-		$result = $this->executeCodeSnippet("getReal()->shape->asString;",
+		$result = $this->executeCodeSnippet("getReal()->shape(`Real)->asString;",
 			"getReal = ^ => Shape<Real> :: 3.14;");
 		$this->assertEquals("'3.14'", $result);
 	}

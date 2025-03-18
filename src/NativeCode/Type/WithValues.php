@@ -5,11 +5,10 @@ namespace Walnut\Lang\NativeCode\Type;
 use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\MetaType;
@@ -21,6 +20,7 @@ use Walnut\Lang\Blueprint\Value\EnumerationValue;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
 use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
@@ -123,11 +123,11 @@ final readonly class WithValues implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
 
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
@@ -138,11 +138,11 @@ final readonly class WithValues implements NativeMethod {
 						1
 					)
 				)) {
-					$values = $parameter->value->values;
+					$values = $parameter->values;
 					$result = $programRegistry->typeRegistry->integerSubset(
 						array_map(fn(IntegerValue $value): Number => $value->literalValue, $values)
 					);
-					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
+					return ($programRegistry->valueRegistry->type($result));
 				}
 			}
 			if ($typeValue instanceof RealType) {
@@ -152,11 +152,11 @@ final readonly class WithValues implements NativeMethod {
 						1
 					)
 				)) {
-					$values = $parameter->value->values;
+					$values = $parameter->values;
 					$result = $programRegistry->typeRegistry->realSubset(
 						array_map(fn(RealValue|IntegerValue $value): Number => $value->literalValue, $values)
 					);
-					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
+					return ($programRegistry->valueRegistry->type($result));
 				}
 			}
 			if ($typeValue instanceof StringType) {
@@ -166,11 +166,11 @@ final readonly class WithValues implements NativeMethod {
 						1
 					)
 				)) {
-					$values = $parameter->value->values;
+					$values = $parameter->values;
 					$result = $programRegistry->typeRegistry->stringSubset(
 						array_map(fn(StringValue $value): string => $value->literalValue, $values)
 					);
-					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
+					return ($programRegistry->valueRegistry->type($result));
 				}
 			}
 			if ($typeValue instanceof EnumerationType) {
@@ -180,13 +180,13 @@ final readonly class WithValues implements NativeMethod {
 						1
 					)
 				)) {
-					$values = $parameter->value->values;
+					$values = $parameter->values;
 					$r = [];
 					foreach($values as $value) {
 						if ($value instanceof EnumerationValue && $value->enumeration == $typeValue) {
 							$r[] = $value->name;
 						} else {
-							return TypedValue::forValue($programRegistry->valueRegistry->error(
+							return ($programRegistry->valueRegistry->error(
 								$programRegistry->valueRegistry->openValue(
 									new TypeNameIdentifier('UnknownEnumerationValue'),
 									$programRegistry->valueRegistry->record([
@@ -198,7 +198,7 @@ final readonly class WithValues implements NativeMethod {
 						}
 					}
 					$result = $typeValue->subsetType($r);
-					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
+					return ($programRegistry->valueRegistry->type($result));
 				}
 			}
 		}

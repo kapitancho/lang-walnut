@@ -11,12 +11,8 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MethodCallExpression as MethodCallExpressionInterface;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
-use Walnut\Lang\Blueprint\Function\Method;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
-use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Implementation\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Implementation\Type\Helper\BaseTypeHelper;
-use Walnut\Lang\Implementation\Type\NothingType;
 
 final readonly class MethodCallExpression implements MethodCallExpressionInterface {
 
@@ -69,14 +65,14 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 	/** @throws ExecutionException */
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
 		$executionContext = $this->target->execute($executionContext);
-		$retTargetTypedValue = $executionContext->typedValue;
-		$retTargetType = $executionContext->valueType;
+		$retTargetValue = $executionContext->value;
+		$retTargetType = $retTargetValue->type;
 
 		$executionContext = $this->parameter->execute($executionContext);
-		$retParameterTypedValue = $executionContext->typedValue;
+		$retParameterTypedValue = $executionContext->value;
 
 		$method = $executionContext->programRegistry->methodFinder->methodForValue(
-			$retTargetTypedValue,
+			$retTargetValue,
 			$this->methodName
 		);
 		if ($method instanceof UnknownMethod) {
@@ -85,14 +81,14 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 					"Cannot call method '%s' on type '%s' for value '%s'",
 					$this->methodName,
 					$retTargetType,
-					$retTargetTypedValue->value
+					$retTargetValue
 				)
 			);
 		}
 		try {
 			$retReturnTypedValue = $method->execute(
 				$executionContext->programRegistry,
-				$retTargetTypedValue,
+				$retTargetValue,
 				$retParameterTypedValue
 			);
 			//TODO - DependencyContainerError

@@ -3,7 +3,6 @@
 namespace Walnut\Lang\NativeCode\Array;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
@@ -12,6 +11,7 @@ use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
@@ -49,12 +49,12 @@ final readonly class ChainInvoke implements NativeMethod {
     }
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
-		$parameterValue = $parameter->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
+		$parameterValue = $parameter;
 
         if ($targetValue instanceof TupleValue) {
             foreach($targetValue->values as $fnValue) {
@@ -62,11 +62,11 @@ final readonly class ChainInvoke implements NativeMethod {
                     $parameterValue = $fnValue->execute(
 						$programRegistry->executionContext,
 						$parameterValue
-                    )->value;
+                    );
 	            }
             }
         }
-		return TypedValue::forValue($parameterValue);
+		return ($parameterValue);
     }
 
 }

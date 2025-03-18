@@ -4,13 +4,13 @@ namespace Walnut\Lang\NativeCode\File;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\SealedValue;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class Content implements NativeMethod {
@@ -37,11 +37,11 @@ final readonly class Content implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
 
 		if ($targetValue instanceof SealedValue && $targetValue->type->name->equals(
 			new TypeNameIdentifier('File')
@@ -49,14 +49,14 @@ final readonly class Content implements NativeMethod {
 			$path = $targetValue->value->valueOf('path')->literalValue;
 			$contents = @file_get_contents($path);
 			if ($contents === false) {
-				return TypedValue::forValue($programRegistry->valueRegistry->error(
+				return ($programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->sealedValue(
 						new TypeNameIdentifier('CannotReadFile'),
 						$targetValue->value
 					)
 				));
 			}
-			return TypedValue::forValue($programRegistry->valueRegistry->string($contents));
+			return ($programRegistry->valueRegistry->string($contents));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

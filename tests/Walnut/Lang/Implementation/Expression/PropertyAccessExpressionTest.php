@@ -6,7 +6,6 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MethodCallExpression;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
@@ -187,7 +186,7 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 		$result = $this->recordPropertyAccessExpression->execute(
 			new ExecutionContext($this->programRegistry,
 				new VariableValueScope([
-					'#' => TypedValue::forValue(
+					'#' => (
 						$this->valueRegistry->record([
 							'x' => $this->valueRegistry->integer(1),
 							'y' => $this->valueRegistry->string("hi"),
@@ -201,7 +200,7 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 		$result = $this->tuplePropertyAccessExpression->execute(
 			new ExecutionContext($this->programRegistry,
 				new VariableValueScope([
-					'#' => TypedValue::forValue(
+					'#' => (
 						$this->valueRegistry->tuple([
 							$this->valueRegistry->integer(1),
 							$this->valueRegistry->string("hi"),
@@ -217,7 +216,7 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 		$result = $this->recordPropertyAccessExpression->execute(
 			new ExecutionContext($this->programRegistry,
 				new VariableValueScope([
-					'#' => TypedValue::forValue(
+					'#' => (
 						$this->valueRegistry->record([
 							'x' => $this->valueRegistry->integer(1),
 							'y' => $this->valueRegistry->string("hi"),
@@ -231,7 +230,7 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 		$result = $this->tuplePropertyAccessExpression->execute(
 			new ExecutionContext($this->programRegistry,
 				new VariableValueScope([
-					'#' => TypedValue::forValue(
+					'#' => (
 						$this->valueRegistry->tuple([
 							$this->valueRegistry->integer(1),
 							$this->valueRegistry->string("hi"),
@@ -248,7 +247,7 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 		$this->recordPropertyAccessExpression->execute(
 			new ExecutionContext($this->programRegistry,
 				new VariableValueScope([
-					'#' => TypedValue::forValue(
+					'#' => (
 						$this->valueRegistry->integer(1)
 					)
 				])

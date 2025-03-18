@@ -5,12 +5,11 @@ namespace Walnut\Lang\NativeCode\Open;
 use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\MapType;
@@ -24,6 +23,7 @@ use Walnut\Lang\Blueprint\Value\IntegerValue;
 use Walnut\Lang\Blueprint\Value\OpenValue;
 use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 use Walnut\Lang\Implementation\Type\IntegerType;
@@ -113,12 +113,12 @@ final readonly class Item implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
-		$parameterValue = $parameter->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
+		$parameterValue = $parameter;
 		
 		if ($targetValue instanceof OpenValue) {
 			$baseValue = $targetValue->value;
@@ -126,15 +126,9 @@ final readonly class Item implements NativeMethod {
 				$values = $baseValue->values;
 				$result = $values[(string)$parameterValue->literalValue] ?? null;
 				if ($result !== null) {
-					$targetType = $this->toBaseType($target->type);
-					$type = match (true) {
-						$targetType instanceof TupleType => ($targetType->types[(string)$parameterValue->literalValue] ?? $targetType->restType),
-						$targetType instanceof ArrayType => $targetType->itemType,
-						default => $result->type
-					};
-					return TypedValue::forValue($result);
+					return $result;
 				}
-				return TypedValue::forValue($programRegistry->valueRegistry->error(
+				return ($programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->openValue(
 						new TypeNameIdentifier('IndexOutOfRange'),
 						$programRegistry->valueRegistry->record(['index' => $parameterValue])
@@ -151,9 +145,9 @@ final readonly class Item implements NativeMethod {
 						$targetType instanceof MapType => $targetType->itemType,
 						default => $result->type
 					};
-					return TypedValue::forValue($result);
+					return ($result);
 				}
-				return TypedValue::forValue($programRegistry->valueRegistry->error(
+				return ($programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->openValue(
 						new TypeNameIdentifier('MapItemNotFound'),
 						$programRegistry->valueRegistry->record(['key' => $parameterValue])

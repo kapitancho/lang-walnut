@@ -5,7 +5,6 @@ namespace Walnut\Lang\Implementation\Value;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope as VariableValueScopeInterface;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\UserlandFunction;
@@ -87,9 +86,9 @@ final readonly class FunctionValue implements FunctionValueInterface {
 		);
 	}
 
-	public function execute(ExecutionContext $executionContext, TypedValue|Value $parameterValue): TypedValue {
+	public function execute(ExecutionContext $executionContext, Value $parameterValue): Value {
 		if ($parameterValue instanceof Value) {
-			$parameterValue = TypedValue::forValue($parameterValue);
+			$parameterValue = ($parameterValue);
 		}
 		foreach ($this->variableValueScope?->allTypedValues() ?? [] as $variableName => $v) {
 			/** @noinspection PhpParamsInspection */ //PhpStorm bug
@@ -98,7 +97,7 @@ final readonly class FunctionValue implements FunctionValueInterface {
 		if ($this->selfReferAs) {
 			$executionContext = $executionContext->withAddedVariableValue(
 				$this->selfReferAs,
-				TypedValue::forValue($this)
+				($this)
 			);
 		}
 		return $this->function->execute($executionContext, null, $parameterValue);

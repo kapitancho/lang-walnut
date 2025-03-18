@@ -2,4 +2,6 @@
 
 namespace Walnut\Lang\Blueprint\Type;
 
-interface CustomType extends UserType {}
+interface CustomType extends NamedType {
+	public Type $valueType { get; }
+}

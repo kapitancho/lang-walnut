@@ -2,15 +2,15 @@
 
 namespace Walnut\Lang\NativeCode\Any;
 
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Code\NativeCode\CastAsString;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
@@ -55,14 +55,14 @@ final readonly class AsString implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
 
 		$result = $this->castAsString->evaluate($targetValue);
-        return TypedValue::forValue($result === null ?
+        return ($result === null ?
 	        $programRegistry->valueRegistry->error(
 				$programRegistry->valueRegistry->openValue(
 					new TypeNameIdentifier("CastNotAvailable"),

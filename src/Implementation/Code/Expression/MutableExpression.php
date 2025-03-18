@@ -11,7 +11,6 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MutableExpression as MutableExpressionInterface;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Type\Type;
 
 final readonly class MutableExpression implements MutableExpressionInterface, JsonSerializable {
@@ -40,9 +39,9 @@ final readonly class MutableExpression implements MutableExpressionInterface, Js
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
 		$executionContext = $this->value->execute($executionContext);
-		if ($executionContext->valueType->isSubtypeOf($this->type)) {
-			return $executionContext->withTypedValue(
-				TypedValue::forValue(
+		if ($executionContext->value->type->isSubtypeOf($this->type)) {
+			return $executionContext->withValue(
+				(
 					$executionContext->programRegistry->valueRegistry->mutable(
 						$this->type,
 						$executionContext->value
@@ -55,7 +54,7 @@ final readonly class MutableExpression implements MutableExpressionInterface, Js
 			sprintf(
 				"%s Value type %s is not a subtype of %s",
 				__CLASS__,
-				$executionContext->valueType,
+				$executionContext->value->type,
 				$this->type
 			)
 		);

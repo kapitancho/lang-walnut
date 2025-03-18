@@ -54,7 +54,7 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 			new ExecutionContext($this->programRegistry, VariableValueScope::empty()),
 			$int = $this->valueRegistry->integer(15)
 		);
-		$this->assertTrue($result->value->equals($int));
+		$this->assertTrue($result->equals($int));
 	}
 
 	public function testReturnValueDirectReturnOk(): void {
@@ -73,6 +73,6 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 			new ExecutionContext($this->programRegistry, VariableValueScope::empty()),
 			$int = $this->valueRegistry->integer(15)
 		);
-		$this->assertTrue($result->value->equals($int));
+		$this->assertTrue($result->equals($int));
 	}
 }

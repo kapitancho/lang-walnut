@@ -2,16 +2,15 @@
 
 namespace Walnut\Lang\NativeCode\Any;
 
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
-use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
+use Walnut\Lang\Blueprint\Value\Value;
 
 final readonly class JsonStringify implements NativeMethod {
 
@@ -34,11 +33,11 @@ final readonly class JsonStringify implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
 
 		$method0 = $programRegistry->methodFinder->methodForType(
 			$targetValue->type, new MethodNameIdentifier('stringify')
@@ -51,7 +50,7 @@ final readonly class JsonStringify implements NativeMethod {
 			$targetValue->type, new MethodNameIdentifier('asJsonValue')
 		);
 		$step1 = $method1->execute($programRegistry, $target, $parameter);
-		if ($step1->value instanceof ErrorValue) {
+		if ($step1 instanceof ErrorValue) {
 			return $step1;
 		}
 		$method2 = $programRegistry->methodFinder->methodForType(

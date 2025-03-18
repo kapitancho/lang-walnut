@@ -3,10 +3,10 @@
 namespace Walnut\Lang\Implementation\Function;
 
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\Method;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\Value;
 
 final readonly class UnionMethodCall implements Method {
 
@@ -34,19 +34,19 @@ final readonly class UnionMethodCall implements Method {
 
 	public function execute(
 		ProgramRegistry $programRegistry,
-		TypedValue      $targetValue,
-		TypedValue|null $parameterValue,
-	): TypedValue {
+		Value           $target,
+		Value|null      $parameter,
+	): Value {
 		foreach($this->methods as [$methodType, $method]) {
-			 if ($targetValue->type->isSubtypeOf($methodType)) {
-				 return $method->execute($programRegistry, $targetValue, $parameterValue);
+			 if ($target->type->isSubtypeOf($methodType)) {
+				 return $method->execute($programRegistry, $target, $parameter);
 			 }
 		}
 		// Should never happen
 		// @codeCoverageIgnoreStart
 		foreach($this->methods as [$methodType, $method]) {
-			 if ($targetValue->value->type->isSubtypeOf($methodType)) {
-				 return $method->execute($programRegistry, $targetValue, $parameterValue);
+			 if ($target->type->isSubtypeOf($methodType)) {
+				 return $method->execute($programRegistry, $target, $parameter);
 			 }
 		}
 		throw new ExecutionException("Union method call is not executable");

@@ -2,10 +2,7 @@
 
 namespace Walnut\Lang\Test\Feature;
 
-use Exception;
 use PHPUnit\Framework\TestCase;
-use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
-use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Compilation\AST\AstProgramCompiler;
 use Walnut\Lang\Blueprint\Compilation\Module\ModuleLookupContext;
 use Walnut\Lang\Blueprint\Program\ProgramContext;

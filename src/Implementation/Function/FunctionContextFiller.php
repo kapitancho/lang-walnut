@@ -4,7 +4,6 @@ namespace Walnut\Lang\Implementation\Function;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\IdentifierException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
@@ -25,6 +24,7 @@ use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\OpenValue;
 use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\SealedValue;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 use Walnut\Lang\Implementation\Type\Helper\TupleAsRecord;
@@ -105,21 +105,19 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 
 	public function fillExecutionContext(
 		ExecutionContext $executionContext,
-		TypedValue|null $targetValue,
-		TypedValue|null $parameterValue,
+		Type $targetType,
+		Value|null $targetValue,
+		Type $parameterType,
+		Value|null $parameterValue,
 		VariableNameIdentifier|null $parameterName,
-		TypedValue|null $dependencyValue
+		Type $dependencyType,
+		Value|null $dependencyValue
 	): ExecutionContext {
-		$tConv = fn(Type $type): Type => $type instanceof OptionalKeyType ?
-			$executionContext->programRegistry->typeRegistry->result($type->valueType, $this->getMapItemNotFound(
-				$executionContext->programRegistry->typeRegistry
-			)) :
-			$type;
-
-		if ($targetValue && $targetValue->value instanceof CustomValue) {
+		$t = $this->toBaseType($targetType);
+		if ($t instanceof CustomType && $targetValue instanceof CustomValue) {
 			$executionContext = $executionContext->withAddedVariableValue(
 				new VariableNameIdentifier('$$'),
-				TypedValue::forValue($targetValue->value->value)
+				$targetValue->value
 			);
 		}
 		if ($parameterValue && $parameterName) {
@@ -128,14 +126,18 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 				$parameterValue
 			);
 		}
-		foreach(['$' => $targetValue, '#' => $parameterValue, '%' => $dependencyValue] as $variableName => $value) {
+		foreach([
+			'$' => [$targetType, $targetValue],
+	        '#' => [$parameterType, $parameterValue],
+	        '%' => [$dependencyType, $dependencyValue]
+        ] as $variableName => [$xType, $value]) {
 			if ($value) {
 				$executionContext = $executionContext->withAddedVariableValue(
 					new VariableNameIdentifier($variableName), $value);
-				$type = $this->toBaseType($value->type);
-				[$t, $v] = $type instanceof OpenType && $value->value instanceof OpenValue ?
-					[$type->valueType, $value->value->value] :
-					[$type, $value->value];
+				$type = $this->toBaseType($xType);
+				[$t, $v] = $type instanceof OpenType && $value instanceof OpenValue ?
+					[$type->valueType, $value->value] :
+					[$type, $value];
 				if ($t instanceof ResultType && !($v instanceof ErrorValue)) {
 					$t = $t->returnType;
 				}
@@ -144,7 +146,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 						try {
 							$executionContext = $executionContext->withAddedVariableValue(
 								new VariableNameIdentifier($variableName . $index),
-								TypedValue::forValue($v->valueOf($index))
+								($v->valueOf($index))
 							);
 							// @codeCoverageIgnoreStart
 						} catch(IdentifierException|UnknownProperty) {}
@@ -165,7 +167,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 								);
 							$executionContext = $executionContext->withAddedVariableValue(
 								new VariableNameIdentifier($variableName . $fieldName),
-								TypedValue::forValue($rValue)
+								($rValue)
 							);
 							// @codeCoverageIgnoreStart
 						} catch(IdentifierException) {}
@@ -178,8 +180,8 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 			$targetValue &&
 			$targetValue->type instanceof SealedType &&
 			//(($vt = $targetValue->type->valueType) instanceof TupleType || $vt instanceof RecordType) &&
-			$targetValue->value instanceof SealedValue &&
-			(($tv = $targetValue->value->value) instanceof TupleValue || $tv instanceof RecordValue)
+			$targetValue instanceof SealedValue &&
+			(($tv = $targetValue->value) instanceof TupleValue || $tv instanceof RecordValue)
 		) {
 			$values = $tv->values;
 			foreach($targetValue->type->valueType->types /*?? $tv->type->types*/ as $fieldName => $fieldType) {
@@ -195,7 +197,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 				;
 				$executionContext = $executionContext->withAddedVariableValue(
 					new VariableNameIdentifier('$' . $fieldName),
-					TypedValue::forValue($value)
+					($value)
 				);
 			}
 		}

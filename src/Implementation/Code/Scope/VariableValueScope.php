@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Implementation\Code\Scope;
 
 use JsonSerializable;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownContextVariable;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownVariable;
 use Walnut\Lang\Blueprint\Code\Scope\VariableScope as VariableScopeInterface;
@@ -13,7 +12,7 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 
 final readonly class VariableValueScope implements VariableValueScopeInterface, JsonSerializable {
-	/** @param array<string, TypedValue> $variables */
+	/** @param array<string, Value> $variables */
 	public function __construct(
 		private array $variables
 	) {}
@@ -37,32 +36,32 @@ final readonly class VariableValueScope implements VariableValueScopeInterface, 
 		Type $variableType
 	): VariableScopeInterface {
 		return new VariableScope([
-			...array_map(static fn(TypedValue $typedValue): Type => $typedValue->type, $this->variables),
+			...array_map(static fn(Value $typedValue): Type => $typedValue->type, $this->variables),
 			$variableName->identifier => $variableType
 		]);
 	}
 
-	public function findTypedValueOf(VariableNameIdentifier $variableName): TypedValue|UnknownVariable {
+	public function findTypedValueOf(VariableNameIdentifier $variableName): Value|UnknownVariable {
 		return $this->variables[$variableName->identifier] ?? UnknownVariable::value;
 	}
 
 	public function findValueOf(VariableNameIdentifier $variableName): Value|UnknownVariable {
 		$var = $this->findTypedValueOf($variableName);
-		return $var instanceof UnknownVariable ? $var : $var->value;
+		return $var instanceof UnknownVariable ? $var : $var;
 	}
 
-	public function typedValueOf(VariableNameIdentifier $variableName): TypedValue {
+	public function typedValueOf(VariableNameIdentifier $variableName): Value {
 		return $this->variables[$variableName->identifier] ??
 			UnknownContextVariable::withName($variableName);
 	}
 
 	public function valueOf(VariableNameIdentifier $variableName): Value {
-		return $this->typedValueOf($variableName)->value;
+		return $this->typedValueOf($variableName);
 	}
 
 	public function withAddedVariableValue(
 		VariableNameIdentifier $variableName,
-		TypedValue $value
+		Value $value
 	): VariableValueScopeInterface {
 		return new self([
 			...$this->variables,
@@ -70,7 +69,7 @@ final readonly class VariableValueScope implements VariableValueScopeInterface, 
 		]);
 	}
 
-	/** @return iterable<VariableNameIdentifier, TypedValue> */
+	/** @return iterable<VariableNameIdentifier, Value> */
 	public function allTypedValues(): iterable {
 		foreach($this->variables as $name => $typedValue) {
 			yield new VariableNameIdentifier($name) => $typedValue;
@@ -87,7 +86,7 @@ final readonly class VariableValueScope implements VariableValueScopeInterface, 
 	/** @return iterable<VariableNameIdentifier, Value> */
 	public function allValues(): iterable {
 		foreach($this->allTypedValues() as $name => $typedValue) {
-			yield $name => $typedValue->value;
+			yield $name => $typedValue;
 		}
 	}
 
@@ -96,9 +95,9 @@ final readonly class VariableValueScope implements VariableValueScopeInterface, 
 	}
 
 	public function jsonSerialize(): array {
-		return array_map(static fn(TypedValue $typedValue): array => [
+		return array_map(static fn(Value $typedValue): array => [
 			'type' => $typedValue->type,
-			'value' => $typedValue->value
+			'value' => $typedValue
 		], $this->variables);
 	}
 }

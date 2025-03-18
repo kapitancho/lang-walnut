@@ -4,7 +4,6 @@ namespace Walnut\Lang\Implementation\Type\Helper;
 
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\ProxyNamedType;
-use Walnut\Lang\Blueprint\Type\SubsetType;
 use Walnut\Lang\Blueprint\Type\Type;
 
 trait BaseType {

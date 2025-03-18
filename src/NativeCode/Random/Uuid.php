@@ -4,12 +4,12 @@ namespace Walnut\Lang\NativeCode\Random;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 use Walnut\Lang\Implementation\Value\AtomValue;
 
@@ -31,11 +31,11 @@ final readonly class Uuid implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
 
 		if ($targetValue instanceof AtomValue && $targetValue->type->name->equals(
 			new TypeNameIdentifier('Random')
@@ -48,7 +48,7 @@ final readonly class Uuid implements NativeMethod {
 			$arr[2] = ($arr[2] & 0x0fff) | 0x4000;
 			$arr[3] = ($arr[3] & 0x3fff) | 0x8000;
 			$uuid = vsprintf('%08x-%04x-%04x-%04x-%04x%08x', $arr);
-			return TypedValue::forValue($programRegistry->valueRegistry->string($uuid));
+			return ($programRegistry->valueRegistry->string($uuid));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

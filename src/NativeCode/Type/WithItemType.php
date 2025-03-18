@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\Type;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
@@ -12,6 +11,7 @@ use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\SetType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Type\TypeType;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
@@ -68,11 +68,11 @@ final readonly class WithItemType implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
 
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
@@ -83,27 +83,27 @@ final readonly class WithItemType implements NativeMethod {
 			)) {
 				if ($typeValue instanceof ArrayType) {
 					$result = $programRegistry->typeRegistry->array(
-						$parameter->value->typeValue,
+						$parameter->typeValue,
 						$typeValue->range->minLength,
 						$typeValue->range->maxLength,
 					);
-					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
+					return ($programRegistry->valueRegistry->type($result));
 				}
 				if ($typeValue instanceof MapType) {
 					$result = $programRegistry->typeRegistry->map(
-						$parameter->value->typeValue,
+						$parameter->typeValue,
 						$typeValue->range->minLength,
 						$typeValue->range->maxLength,
 					);
-					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
+					return ($programRegistry->valueRegistry->type($result));
 				}
 				if ($typeValue instanceof SetType) {
 					$result = $programRegistry->typeRegistry->set(
-						$parameter->value->typeValue,
+						$parameter->typeValue,
 						$typeValue->range->minLength,
 						$typeValue->range->maxLength,
 					);
-					return TypedValue::forValue($programRegistry->valueRegistry->type($result));
+					return ($programRegistry->valueRegistry->type($result));
 				}
 			}
 		}

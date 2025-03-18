@@ -30,10 +30,10 @@ use Walnut\Lang\Blueprint\Function\CustomMethod;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Program\ProgramContext;
 use Walnut\Lang\Blueprint\Program\UnknownType;
+use Walnut\Lang\Blueprint\Type\CustomType;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Type\UserType;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
 use Walnut\Lang\Blueprint\Value\Value;
 
@@ -81,7 +81,7 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 			);
 		}
 		$returnType = match(true) {
-			$type instanceof UserType => $type->valueType,
+			$type instanceof CustomType => $type->valueType,
 			$type instanceof EnumerationType => $this->programContext->typeRegistry->union([
 				$type,
 				$this->programContext->typeRegistry->string()

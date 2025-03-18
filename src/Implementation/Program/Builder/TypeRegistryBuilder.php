@@ -59,7 +59,6 @@ use Walnut\Lang\Implementation\Type\SetType;
 use Walnut\Lang\Implementation\Type\ShapeType;
 use Walnut\Lang\Implementation\Type\StringSubsetType;
 use Walnut\Lang\Implementation\Type\StringType;
-use Walnut\Lang\Implementation\Type\SubsetType;
 use Walnut\Lang\Implementation\Type\TrueType;
 use Walnut\Lang\Implementation\Type\TupleType;
 use Walnut\Lang\Implementation\Type\TypeType;

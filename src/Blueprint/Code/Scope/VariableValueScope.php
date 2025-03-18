@@ -6,21 +6,21 @@ use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Value\Value;
 
 interface VariableValueScope extends VariableScope {
-	public function findTypedValueOf(VariableNameIdentifier $variableName): TypedValue|UnknownVariable;
+	public function findTypedValueOf(VariableNameIdentifier $variableName): Value|UnknownVariable;
 	public function findValueOf(VariableNameIdentifier $variableName): Value|UnknownVariable;
 
 	/** @throws UnknownContextVariable */
-	public function typedValueOf(VariableNameIdentifier $variableName): TypedValue;
+	public function typedValueOf(VariableNameIdentifier $variableName): Value;
 
 	/** @throws UnknownContextVariable */
 	public function valueOf(VariableNameIdentifier $variableName): Value;
 
 	public function withAddedVariableValue(
 		VariableNameIdentifier $variableName,
-		TypedValue $value
+		Value $value
 	): VariableValueScope;
 
-	/** @return iterable<VariableNameIdentifier, TypedValue> */
+	/** @return iterable<VariableNameIdentifier, Value> */
 	public function allTypedValues(): iterable;
 
 	/** @return iterable<VariableNameIdentifier, Value> */

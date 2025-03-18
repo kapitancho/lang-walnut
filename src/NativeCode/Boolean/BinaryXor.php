@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\Boolean;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\BooleanType;
@@ -12,6 +11,7 @@ use Walnut\Lang\Blueprint\Type\FalseType;
 use Walnut\Lang\Blueprint\Type\TrueType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class BinaryXor implements NativeMethod {
@@ -42,16 +42,16 @@ final readonly class BinaryXor implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
-		$parameterValue = $parameter->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
+		$parameterValue = $parameter;
 
 		if ($targetValue instanceof BooleanValue) {
 			if ($parameterValue instanceof BooleanValue) {
-	            return TypedValue::forValue($programRegistry->valueRegistry->boolean(
+	            return ($programRegistry->valueRegistry->boolean(
 		            ($targetValue->literalValue && !$parameterValue->literalValue) ||
 		            (!$targetValue->literalValue && $parameterValue->literalValue)
 	            ));

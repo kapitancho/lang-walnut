@@ -7,19 +7,10 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserResult;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
-use Walnut\Lang\Blueprint\Code\Expression\ConstantExpression;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MatchErrorExpression as MatchErrorExpressionInterface;
-use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionDefault;
-use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionPair;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
-use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Type\ResultType;
-use Walnut\Lang\Blueprint\Type\TypeType;
-use Walnut\Lang\Blueprint\Value\BooleanValue;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
-use Walnut\Lang\Blueprint\Value\NullValue;
-use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class MatchErrorExpression implements MatchErrorExpressionInterface, JsonSerializable {
@@ -67,9 +58,6 @@ final readonly class MatchErrorExpression implements MatchErrorExpressionInterfa
 		if ($this->else) {
 			$innerContext = $retTarget;
 			if ($this->target instanceof VariableNameExpression) {
-				$errorType = $bType instanceof ResultType ? $bType->errorType :
-					$analyserContext->programRegistry->typeRegistry->any;
-
 				$innerContext = $innerContext->withAddedVariableType(
 					$this->target->variableName,
 					$elseExpressionType,
@@ -91,8 +79,8 @@ final readonly class MatchErrorExpression implements MatchErrorExpressionInterfa
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
 		$executionContext = $this->target->execute($executionContext);
-		$typedValue = $executionContext->typedValue;
-		if ($typedValue->value instanceof ErrorValue) {
+		$typedValue = $executionContext->value;
+		if ($typedValue instanceof ErrorValue) {
 			$innerContext = $executionContext;
 			if ($this->target instanceof VariableNameExpression) {
 				$innerContext = $innerContext->withAddedVariableValue(

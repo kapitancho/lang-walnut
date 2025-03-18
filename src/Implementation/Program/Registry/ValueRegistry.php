@@ -123,9 +123,7 @@ final class ValueRegistry implements ValueRegistryInterface {
 				$parameterName,
 				$dependencyType,
 				$body,
-			),
-			null,
-			null,
+			)
 		);
     }
 

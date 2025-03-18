@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Test\Implementation\Execution;
 
 use PHPUnit\Framework\TestCase;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownContextVariable;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownVariable;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
@@ -14,7 +13,6 @@ use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Registry\MainMethodRegistry;
 use Walnut\Lang\Implementation\Program\Registry\NestedMethodRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
-use Walnut\Lang\Test\EmptyDependencyContainer;
 
 final class VariableValueScopeTest extends TestCase {
 
@@ -34,7 +32,7 @@ final class VariableValueScopeTest extends TestCase {
 		);
 		$this->valueRegistry = new ValueRegistry($this->typeRegistry);
 		$this->variableValueScope = new VariableValueScope([
-			'x' => TypedValue::forValue(
+			'x' => (
 				$this->valueRegistry->integer(123)
 			)
 		]);
@@ -50,7 +48,7 @@ final class VariableValueScopeTest extends TestCase {
 
 	public function testFindVariable(): void {
 		self::assertEquals(
-			TypedValue::forValue(
+			(
 				$this->valueRegistry->integer(123)
 			),
 			$this->variableValueScope->findTypedValueOf(new VariableNameIdentifier('x'))
@@ -91,7 +89,7 @@ final class VariableValueScopeTest extends TestCase {
 	public function testWithAddedValues(): void {
 		$variableValueScope = $this->variableValueScope->withAddedVariableValue(
 			new VariableNameIdentifier('y'),
-			TypedValue::forValue(
+			(
 				$this->valueRegistry->string('abc')
 			)
 		);

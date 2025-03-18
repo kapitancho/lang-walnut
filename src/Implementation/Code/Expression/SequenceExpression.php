@@ -9,7 +9,6 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\SequenceExpression as SequenceExpressionInterface;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 
 final readonly class SequenceExpression implements SequenceExpressionInterface, JsonSerializable {
 
@@ -37,10 +36,10 @@ final readonly class SequenceExpression implements SequenceExpressionInterface, 
 	}
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
-		$result = TypedValue::forValue($executionContext->programRegistry->valueRegistry->null);
+		$result = ($executionContext->programRegistry->valueRegistry->null);
 		foreach($this->expressions as $expression) {
 			$executionContext = $expression->execute($executionContext);
-			$result = $executionContext->typedValue;
+			$result = $executionContext->value;
 		}
 		return $executionContext->asExecutionResult($result);
 	}

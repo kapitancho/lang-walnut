@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\Map;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
@@ -19,6 +18,7 @@ use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 use Walnut\Lang\Implementation\Type\OptionalKeyType;
 
@@ -82,26 +82,17 @@ final readonly class Item implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $targetValue,
-		TypedValue $parameterValue
-	): TypedValue {
-		$target = $targetValue->value;
-		$parameter = $parameterValue->value;
-		
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
 		if ($target instanceof RecordValue && $parameter instanceof StringValue) {
 			$values = $target->values;
 			$result = $values[$parameter->literalValue] ?? null;
 			if ($result !== null) {
-				$targetType = $this->toBaseType($targetValue->type);
-				$type = match(true) {
-					$targetType instanceof RecordType => ($targetType->types[$parameter->literalValue] ?? $targetType->restType),
-					$targetType instanceof MapType => $targetType->itemType,
-					default => $result->type
-				};
-				return TypedValue::forValue($result);
+				return $result;
 			}
-			return TypedValue::forValue($programRegistry->valueRegistry->error(
+			return ($programRegistry->valueRegistry->error(
 				$programRegistry->valueRegistry->openValue(
 					new TypeNameIdentifier('MapItemNotFound'),
 					$programRegistry->valueRegistry->record(['key' => $parameter])

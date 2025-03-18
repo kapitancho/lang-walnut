@@ -4,16 +4,16 @@ namespace Walnut\Lang\NativeCode\RoutePattern;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\OpenValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class MatchAgainst implements NativeMethod {
@@ -46,12 +46,12 @@ final readonly class MatchAgainst implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
-		$parameterValue = $parameter->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
+		$parameterValue = $parameter;
 
 		if ($targetValue instanceof OpenValue && $targetValue->type->name->equals(new TypeNameIdentifier('RoutePattern'))) {
 			$pattern = $targetValue->value->literalValue;
@@ -67,10 +67,10 @@ final readonly class MatchAgainst implements NativeMethod {
 				}
 				$pattern = strtolower($pattern);
 				if (!preg_match('#' . $pattern . '#', $path, $matches)) {
-					return TypedValue::forValue($programRegistry->valueRegistry->atom(new TypeNameIdentifier('RoutePatternDoesNotMatch')));
+					return ($programRegistry->valueRegistry->atom(new TypeNameIdentifier('RoutePatternDoesNotMatch')));
 				}
 				if (!is_array($pathArgs)) {
-					return TypedValue::forValue($programRegistry->valueRegistry->record([]));
+					return ($programRegistry->valueRegistry->record([]));
 				}
 				$values = [];
 				$matchedValues = array_slice($matches, 1);
@@ -85,7 +85,7 @@ final readonly class MatchAgainst implements NativeMethod {
 						);
 					}
 				}
-				return TypedValue::forValue($programRegistry->valueRegistry->record($values));
+				return ($programRegistry->valueRegistry->record($values));
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

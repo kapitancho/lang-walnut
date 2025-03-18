@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Implementation\Type\Helper;
 
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\OptionalKeyType;
@@ -11,6 +10,7 @@ use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnknownProperty;
 use Walnut\Lang\Blueprint\Value\RecordValue;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 
 trait TupleAsRecord {
@@ -47,18 +47,18 @@ trait TupleAsRecord {
 	}
 
 	private function adjustParameterValue(
-		ValueRegistry $valueRegistry,
-		Type $expectedType,
-		TypedValue|null $actualValue,
-	): TypedValue|null {
+		ValueRegistry               $valueRegistry,
+		Type                        $expectedType,
+		Value|null $actualValue,
+	): Value|null {
 		if ($actualValue === null) {
 			return null;
 		}
-		if ($actualValue->value instanceof TupleValue && $expectedType instanceof RecordType) {
-			$actualValue = TypedValue::forValue(
+		if ($actualValue instanceof TupleValue && $expectedType instanceof RecordType) {
+			$actualValue = (
 				$this->getTupleAsRecord(
 					$valueRegistry,
-					$actualValue->value,
+					$actualValue,
 					$expectedType
 				)
 			);

@@ -4,12 +4,12 @@ namespace Walnut\Lang\NativeCode\JsonValue;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\TypedValue;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\TypeType;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Implementation\Code\NativeCode\HydrationException;
 use Walnut\Lang\Implementation\Code\NativeCode\Hydrator;
@@ -31,12 +31,12 @@ final readonly class HydrateAs implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry $programRegistry,
-		TypedValue $target,
-		TypedValue $parameter
-	): TypedValue {
-		$targetValue = $target->value;
-		$parameterValue = $parameter->value;
+		ProgramRegistry        $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		$targetValue = $target;
+		$parameterValue = $parameter;
 		
 		if ($parameterValue instanceof TypeValue) {
 			try {
@@ -44,7 +44,7 @@ final readonly class HydrateAs implements NativeMethod {
 					$programRegistry,
 				)->hydrate($targetValue, $parameterValue->typeValue, 'value');
 			} catch (HydrationException $e) {
-				return TypedValue::forValue($programRegistry->valueRegistry->error(
+				return ($programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->openValue(
 						new TypeNameIdentifier("HydrationError"),
 						$programRegistry->valueRegistry->record([

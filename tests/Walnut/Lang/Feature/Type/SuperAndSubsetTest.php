@@ -11,7 +11,7 @@ final class SuperAndSubsetTest extends CodeExecutionTestHelper {
 			IntPairType = #[first: Integer, second: Integer];
 			IntPair = [first: Integer, second: Integer];
 			getIntPair = ^p: IntPairType => Shape<IntPair> :: p;
-			useIntPair = ^p: Shape<IntPair> => Integer :: p->shape.first + p->shape.second;
+			useIntPair = ^p: Shape<IntPair> => Integer :: p->shape(`IntPair).first + p->shape(`IntPair).second;
 		NUT);
 		$this->assertEquals("6", $result);
 	}
@@ -22,7 +22,7 @@ final class SuperAndSubsetTest extends CodeExecutionTestHelper {
 			IntPair = [first: Integer, second: Integer];
 			IntPairType ==> IntPair :: [first: \$a, second: \$b];
 			getIntPair = ^p: IntPairType => Shape<IntPair> :: p;
-			useIntPair = ^p: Shape<IntPair> => Integer :: p->shape.first + p->shape.second;
+			useIntPair = ^p: Shape<IntPair> => Integer :: p->shape(`IntPair).first + p->shape(`IntPair).second;
 		NUT);
 		$this->assertEquals("6", $result);
 	}
@@ -35,7 +35,7 @@ final class SuperAndSubsetTest extends CodeExecutionTestHelper {
 			Incompatible = :[];
 			IntPairType ==> IntPair :: [first: \$a, second: \$b];
 			getIntPair = ^p: IntPairType => Result<Shape<IntPair>, Incompatible> :: p=>shaped(type{IntPair});
-			useIntPair = ^p: Shape<IntPair> => Integer :: p->shape.first + p->shape.second;
+			useIntPair = ^p: Shape<IntPair> => Integer :: p->shape(`IntPair).first + p->shape(`IntPair).second;
 		NUT);
 		$this->assertEquals("6", $result);
 	}
