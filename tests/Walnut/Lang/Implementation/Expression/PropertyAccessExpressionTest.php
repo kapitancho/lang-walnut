@@ -222,8 +222,6 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 							'x' => $this->valueRegistry->integer(1),
 							'y' => $this->valueRegistry->string("hi"),
 						])
-					)->withType(
-						$this->typeRegistry->withName(new TypeNameIdentifier('MyRecord'))
 					)
 				])
 			)

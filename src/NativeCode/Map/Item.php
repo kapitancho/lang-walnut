@@ -99,7 +99,7 @@ final readonly class Item implements NativeMethod {
 					$targetType instanceof MapType => $targetType->itemType,
 					default => $result->type
 				};
-				return TypedValue::forValue($result)->withType($type);
+				return TypedValue::forValue($result);
 			}
 			return TypedValue::forValue($programRegistry->valueRegistry->error(
 				$programRegistry->valueRegistry->openValue(

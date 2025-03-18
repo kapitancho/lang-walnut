@@ -261,8 +261,6 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 					'a' => $this->programContext->valueRegistry->true,
 					'b' => $this->programContext->valueRegistry->integer(99),
 				])
-			)->withType(
-				$this->programContext->typeRegistry->typeByName(new TypeNameIdentifier('MyRecord')),
 			),
 			null,
 			TypedValue::forValue($this->programContext->valueRegistry->openValue(

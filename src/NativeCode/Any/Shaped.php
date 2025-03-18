@@ -83,7 +83,7 @@ final readonly class Shaped implements NativeMethod {
 		TypedValue $parameter
 	): TypedValue {
 		if ($parameter->value instanceof TypeValue) {
-			return $target->withType($parameter->value->typeValue);
+			return $target;
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid parameter value");

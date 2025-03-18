@@ -217,10 +217,7 @@ final readonly class ValueConstructor {
 		if ($type instanceof ResultType) {
 			return TypedValue::forValue(
 				$valueRegistry->error($parameterValue)
-			)->withType($typeRegistry->result(
-				$typeRegistry->nothing,
-				$parameter->type
-			));
+			);
 		}
 		return TypedValue::forValue(
 			match(true) {
@@ -234,7 +231,7 @@ final readonly class ValueConstructor {
 				$type instanceof EnumerationType => $et($type, $parameterValue),
 				$type instanceof SubsetType => $parameterValue,
 			}
-		)->withType($type);
+		);
 	}
 
 	public function executeConstructor(

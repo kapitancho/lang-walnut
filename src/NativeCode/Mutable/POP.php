@@ -53,7 +53,7 @@ final readonly class POP implements NativeMethod {
 					$value = array_pop($values);
 					$v->value = $programRegistry->valueRegistry->tuple($values);
 
-					return TypedValue::forValue($value)->withType($targetType->itemType);
+					return TypedValue::forValue($value);
 				}
 				return TypedValue::forValue($programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->atom(new TypeNameIdentifier("ItemNotFound"))

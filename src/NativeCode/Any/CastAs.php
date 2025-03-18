@@ -112,7 +112,7 @@ final readonly class CastAs implements NativeMethod {
 		
 		if ($parameterValue instanceof TypeValue) {
 			if ($targetValue->type->isSubtypeOf($parameterValue->typeValue)) {
-				return $target->withType($parameterValue->type);
+				return $target;
 			}
 
 			$method = $programRegistry->methodFinder->methodForValue(

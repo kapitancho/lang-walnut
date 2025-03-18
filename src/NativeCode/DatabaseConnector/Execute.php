@@ -76,13 +76,6 @@ final readonly class Execute implements NativeMethod {
 
 					return TypedValue::forValue(
 						$programRegistry->valueRegistry->integer($rowCount)
-					)->withType(
-						$programRegistry->typeRegistry->result(
-							$programRegistry->typeRegistry->integer(0),
-							$programRegistry->typeRegistry->withName(
-								new TypeNameIdentifier('DatabaseQueryFailure')
-							)
-						)
 					);
 				} catch (PDOException $ex) {
 					return TypedValue::forValue($programRegistry->valueRegistry->error(

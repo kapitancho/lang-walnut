@@ -66,12 +66,7 @@ final readonly class FindFirst implements NativeMethod {
 					$resultType = $value instanceof TypedValue ? $value->type : $value->type;
 					$resultValue = $value instanceof TypedValue ? $value->value : $value;
 
-					return TypedValue::forValue($resultValue)->withType(
-						$programRegistry->typeRegistry->result(
-							$resultType,
-							$programRegistry->typeRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
-						)
-					);
+					return TypedValue::forValue($resultValue);
 				}
 			}
 			return TypedValue::forValue(

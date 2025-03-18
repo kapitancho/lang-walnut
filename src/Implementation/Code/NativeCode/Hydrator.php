@@ -67,7 +67,7 @@ final readonly class Hydrator {
 	/** @throws HydrationException */
 	public function hydrate(Value $value, Type $targetType, string $hydrationPath): TypedValue {
 		$result = $this->hydrateValue($value, $targetType, $hydrationPath);
-		return TypedValue::forValue($result)->withType($targetType);
+		return TypedValue::forValue($result);
 	}
 
 	/** @throws HydrationException */

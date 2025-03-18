@@ -55,12 +55,10 @@ final readonly class ChainInvoke implements NativeMethod {
 	): TypedValue {
 		$targetValue = $target->value;
 		$parameterValue = $parameter->value;
-		$type = $parameter->type;
-		
+
         if ($targetValue instanceof TupleValue) {
             foreach($targetValue->values as $fnValue) {
 				if ($fnValue instanceof FunctionValue) {
-					$type = $fnValue->type->returnType;
                     $parameterValue = $fnValue->execute(
 						$programRegistry->executionContext,
 						$parameterValue
@@ -68,7 +66,7 @@ final readonly class ChainInvoke implements NativeMethod {
 	            }
             }
         }
-		return TypedValue::forValue($parameterValue)->withType($type);
+		return TypedValue::forValue($parameterValue);
     }
 
 }

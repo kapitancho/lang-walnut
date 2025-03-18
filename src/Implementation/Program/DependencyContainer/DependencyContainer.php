@@ -104,8 +104,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 			$found[] = $foundValue->value;
 		}
 
-		return TypedValue::forValue($this->programRegistry->valueRegistry->tuple($found))
-			->withType($tupleType);
+		return TypedValue::forValue($this->programRegistry->valueRegistry->tuple($found));
 	}
 
 	private function findRecordValue(RecordType $recordType): TypedValue|DependencyError {
@@ -136,8 +135,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 			}
 			$found[$key] = $foundValue->value;
 		}
-		return TypedValue::forValue($this->programRegistry->valueRegistry->record($found))
-			->withType($recordType);
+		return TypedValue::forValue($this->programRegistry->valueRegistry->record($found));
 	}
 
 	private function findSubsetValue(SubsetType $type): TypedValue|DependencyError {

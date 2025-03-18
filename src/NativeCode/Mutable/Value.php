@@ -43,7 +43,7 @@ final readonly class Value implements NativeMethod {
 
 		$v = $targetValue;
 		if ($v instanceof MutableValue) {
-			return TypedValue::forValue($v->value)->withType($v->targetType);
+			return TypedValue::forValue($v->value);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

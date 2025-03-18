@@ -62,7 +62,6 @@ final class VariableNameExpressionTest extends TestCase {
 			new ExecutionContext($this->programRegistry,
 				new VariableValueScope([
 					'x' => TypedValue::forValue($this->valueRegistry->integer(123))
-						->withType($this->typeRegistry->integer())
 				])
 			)
 		);

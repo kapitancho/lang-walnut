@@ -38,13 +38,7 @@ final readonly class Error implements NativeMethod {
 		$targetValue = $target->value;
 
 		if ($targetValue instanceof ErrorValue) {
-			return TypedValue::forValue($targetValue->errorValue)
-				->withType(
-					$programRegistry->typeRegistry->result(
-						$programRegistry->typeRegistry->nothing,
-						$targetValue->type
-					),
-				);
+			return TypedValue::forValue($targetValue->errorValue);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

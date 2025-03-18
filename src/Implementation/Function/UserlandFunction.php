@@ -92,7 +92,7 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 				sprintf(
 					"Error in %s: expected a %s value of type < %s >, got %s for value %s",
 						$this->displayName, $parameterName, $expectedType,
-						implode(' & ', $value->types),
+						$value->type,
 						$value->value
 				)
 			);
@@ -141,8 +141,8 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 
 		$executionContext = $this->functionContextFiller->fillExecutionContext(
 			$executionContext,
-			$targetValue?->withType($this->targetType),
-			$parameterValue->withType($this->parameterType),
+			$targetValue,
+			$parameterValue,
 			$this->parameterName,
 			$dependencyValue
 		);
@@ -157,7 +157,7 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 			);
 		}
 		$this->checkValueType('return', $returnValue, $this->returnType);
-		return $returnValue->withType($this->returnType);
+		return $returnValue;
 	}
 
 }

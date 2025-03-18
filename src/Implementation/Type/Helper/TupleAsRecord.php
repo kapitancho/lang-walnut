@@ -61,7 +61,7 @@ trait TupleAsRecord {
 					$actualValue->value,
 					$expectedType
 				)
-			)->withType($expectedType);
+			);
 		}
 		return $actualValue;
 	}

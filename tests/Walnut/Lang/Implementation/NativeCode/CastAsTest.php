@@ -310,7 +310,7 @@ final class CastAsTest extends BaseProgramTestHelper {
 		$this->assertTrue($call->execute(
 			new ExecutionContext($this->programRegistry,
 				new VariableValueScope([
-					'x' => 	TypedValue::forValue($this->valueRegistry->integer(1))->withType($jv)
+					'x' => 	TypedValue::forValue($this->valueRegistry->integer(1))
 				])))
 				->value->equals(
 					$this->valueRegistry->enumerationValue(

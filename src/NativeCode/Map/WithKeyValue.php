@@ -90,7 +90,7 @@ final readonly class WithKeyValue implements NativeMethod {
 								PlusInfinity::value : $target->type->range->maxLength + 1
 						) : $resultValue->type;
 
-					return TypedValue::forValue($resultValue)->withType($resultType);
+					return TypedValue::forValue($resultValue);
 				}
 			}
 			// @codeCoverageIgnoreStart

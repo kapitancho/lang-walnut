@@ -94,15 +94,6 @@ final readonly class Query implements NativeMethod {
 
 					return TypedValue::forValue(
 						$programRegistry->valueRegistry->tuple($result)
-					)->withType(
-						$programRegistry->typeRegistry->result(
-							$programRegistry->typeRegistry->withName(
-								new TypeNameIdentifier('DatabaseQueryResult')
-							),
-							$programRegistry->typeRegistry->withName(
-								new TypeNameIdentifier('DatabaseQueryFailure')
-							)
-						)
 					);
 				} catch (PDOException $ex) {
 					return TypedValue::forValue(
@@ -114,15 +105,6 @@ final readonly class Query implements NativeMethod {
 									'boundParameters' => $parameterValue->values['boundParameters'],
 									'error' => $programRegistry->valueRegistry->string($ex->getMessage())
 								])
-							)
-						)
-					)->withType(
-						$programRegistry->typeRegistry->result(
-							$programRegistry->typeRegistry->withName(
-								new TypeNameIdentifier('DatabaseQueryResult')
-							),
-							$programRegistry->typeRegistry->withName(
-								new TypeNameIdentifier('DatabaseQueryFailure')
 							)
 						)
 					);

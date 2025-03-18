@@ -34,16 +34,14 @@ final readonly class TupleExpression implements TupleExpressionInterface, JsonSe
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
 		$values = [];
-		$types = [];
 		foreach($this->values as $value) {
 			$executionContext = $value->execute($executionContext);
 			$values[] = $executionContext->value;
-			$types[] = $executionContext->valueType;
 		}
 		return $executionContext->asExecutionResult(
 			TypedValue::forValue(
 				$executionContext->programRegistry->valueRegistry->tuple($values)
-			)->withType($executionContext->programRegistry->typeRegistry->tuple($types))
+			)
 		);
 	}
 

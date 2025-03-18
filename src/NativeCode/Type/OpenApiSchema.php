@@ -172,8 +172,6 @@ final readonly class OpenApiSchema implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			return TypedValue::forValue(
 				$this->typeToOpenApiSchema($programRegistry, $targetValue->typeValue)
-			)->withType(
-				$programRegistry->typeRegistry->alias(new TypeNameIdentifier('JsonValue'))
 			);
 		}
 		// @codeCoverageIgnoreStart

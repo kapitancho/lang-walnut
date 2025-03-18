@@ -58,10 +58,7 @@ final readonly class AsJsonValue implements NativeMethod {
 		} catch (FunctionReturn $return) {
 			return $return->typedValue;
 		}
-		return TypedValue::forValue($result)
-			->withType($programRegistry->typeRegistry->withName(
-				new TypeNameIdentifier('JsonValue')
-			));
+		return TypedValue::forValue($result);
 	}
 
 }

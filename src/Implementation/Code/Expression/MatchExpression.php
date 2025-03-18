@@ -116,23 +116,13 @@ final readonly class MatchExpression implements MatchExpressionInterface, JsonSe
 						$typedValue = $innerContext->variableValueScope->typedValueOf($this->target->variableName);
 						$innerContext = $innerContext->withAddedVariableValue(
 							$this->target->variableName,
-							$typedValue->withType($type->typeValue)
+							$typedValue
 						);
 					}
 					if ($this->operation instanceof MatchExpressionEquals) {
 						$innerContext = $innerContext->withAddedVariableValue(
 							$this->target->variableName,
-							$innerContext->typedValue->withType(
-								$innerContext->variableValueScope->typeOf($this->target->variableName)
-							)
-							/*new TypedValue(
-								$executionContext->programRegistry->typeRegistry->intersection([
-									$innerContext->variableValueScope->typeOf($this->target->variableName),
-									$innerContext->valueType,
-								]),
-								$innerContext->value
-							)*/
-							//$innerContext->typedValue,
+							$innerContext->typedValue
 						);
 					}
 				}

@@ -63,7 +63,7 @@ final readonly class Shape implements NativeMethod {
 			}
 			$tv = $target->value;
 			if ($tv instanceof OpenValue && $tv->type->valueType->isSubtypeOf($targetType->refType)) {
-				return TypedValue::forValue($tv->value)->withType($tv->type->valueType);
+				return TypedValue::forValue($tv->value);
 			}
 			$method = $programRegistry->methodFinder->methodForType(
 				$targetType,

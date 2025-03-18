@@ -132,49 +132,44 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 			if ($value) {
 				$executionContext = $executionContext->withAddedVariableValue(
 					new VariableNameIdentifier($variableName), $value);
-				foreach($value->types as $vType) {
-					$type = $this->toBaseType($vType);
-					[$t, $v] = $type instanceof OpenType && $value->value instanceof OpenValue ?
-						[$type->valueType, $value->value->value] :
-						[$type, $value->value];
-					if ($t instanceof ResultType && !($v instanceof ErrorValue)) {
-						$t = $t->returnType;
+				$type = $this->toBaseType($value->type);
+				[$t, $v] = $type instanceof OpenType && $value->value instanceof OpenValue ?
+					[$type->valueType, $value->value->value] :
+					[$type, $value->value];
+				if ($t instanceof ResultType && !($v instanceof ErrorValue)) {
+					$t = $t->returnType;
+				}
+				if ($t instanceof TupleType && $v instanceof TupleValue) {
+					foreach($t->types as $index => $typeItem) {
+						try {
+							$executionContext = $executionContext->withAddedVariableValue(
+								new VariableNameIdentifier($variableName . $index),
+								TypedValue::forValue($v->valueOf($index))
+							);
+							// @codeCoverageIgnoreStart
+						} catch(IdentifierException|UnknownProperty) {}
+						// @codeCoverageIgnoreEnd
 					}
-					if ($t instanceof TupleType && $v instanceof TupleValue) {
-						foreach($t->types as $index => $typeItem) {
-							try {
-								$executionContext = $executionContext->withAddedVariableValue(
-									new VariableNameIdentifier($variableName . $index),
-									TypedValue::forValue($v->valueOf($index))->withType($typeItem)
+				} elseif ($t instanceof RecordType && $v instanceof RecordValue) {
+					$values = $v->values;
+					foreach($t->types as $fieldName => $fieldType) {
+						try {
+							$rValue = $values[$fieldName] ??
+								$executionContext->programRegistry->valueRegistry->error(
+									$executionContext->programRegistry->valueRegistry->openValue(
+										new TypeNameIdentifier('MapItemNotFound'),
+										$executionContext->programRegistry->valueRegistry->record([
+											'key' => $executionContext->programRegistry->valueRegistry->string($fieldName)
+										])
+									)
 								);
-								// @codeCoverageIgnoreStart
-							} catch(IdentifierException|UnknownProperty) {}
-							// @codeCoverageIgnoreEnd
-						}
-						break;
-					}
-					if ($t instanceof RecordType && $v instanceof RecordValue) {
-						$values = $v->values;
-						foreach($t->types as $fieldName => $fieldType) {
-							try {
-								$rValue = $values[$fieldName] ??
-									$executionContext->programRegistry->valueRegistry->error(
-										$executionContext->programRegistry->valueRegistry->openValue(
-											new TypeNameIdentifier('MapItemNotFound'),
-											$executionContext->programRegistry->valueRegistry->record([
-												'key' => $executionContext->programRegistry->valueRegistry->string($fieldName)
-											])
-										)
-									);
-								$executionContext = $executionContext->withAddedVariableValue(
-									new VariableNameIdentifier($variableName . $fieldName),
-									TypedValue::forValue($rValue)->withType($tConv($fieldType))
-								);
-								// @codeCoverageIgnoreStart
-							} catch(IdentifierException) {}
-							// @codeCoverageIgnoreEnd
-						}
-						break;
+							$executionContext = $executionContext->withAddedVariableValue(
+								new VariableNameIdentifier($variableName . $fieldName),
+								TypedValue::forValue($rValue)
+							);
+							// @codeCoverageIgnoreStart
+						} catch(IdentifierException) {}
+						// @codeCoverageIgnoreEnd
 					}
 				}
 			}
@@ -200,7 +195,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 				;
 				$executionContext = $executionContext->withAddedVariableValue(
 					new VariableNameIdentifier('$' . $fieldName),
-					TypedValue::forValue($value)->withType($tConv($fieldType))
+					TypedValue::forValue($value)
 				);
 			}
 		}

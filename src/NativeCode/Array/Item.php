@@ -84,12 +84,7 @@ final readonly class Item implements NativeMethod {
 			$result = $values[(string)$parameterValue->literalValue] ?? null;
 			if ($result !== null) {
 				$targetType = $this->toBaseType($target->type);
-				$type = match(true) {
-					$targetType instanceof TupleType => ($targetType->types[(string)$parameterValue->literalValue] ?? $targetType->restType),
-					$targetType instanceof ArrayType => $targetType->itemType,
-					default => $result->type
-				};
-				return TypedValue::forValue($result)->withType($type);
+				return TypedValue::forValue($result);
 			}
 			return TypedValue::forValue($programRegistry->valueRegistry->error(
 				$programRegistry->valueRegistry->openValue(

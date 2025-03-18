@@ -71,8 +71,6 @@ final class VariableAssignmentExpressionTest extends TestCase {
 					'x' =>
 						TypedValue::forValue(
 							$this->valueRegistry->integer(123)
-						)->withType(
-							$this->typeRegistry->integer()
 						)
 				])
 			)

@@ -147,7 +147,7 @@ final readonly class With implements NativeMethod {
 							return $validatorResult;
 						}
 					}
-					$r = TypedValue::forValue($result)->withType($targetType);
+					$r = TypedValue::forValue($result);
 				}
 				return $r;
 			}

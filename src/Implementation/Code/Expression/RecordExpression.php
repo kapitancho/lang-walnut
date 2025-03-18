@@ -34,16 +34,14 @@ final readonly class RecordExpression implements RecordExpressionInterface, Json
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
 		$values = [];
-		$types = [];
 		foreach($this->values as $key => $value) {
 			$executionContext = $value->execute($executionContext);
 			$values[$key] = $executionContext->value;
-			$types[$key] = $executionContext->valueType;
 		}
 		return $executionContext->asExecutionResult(
 			TypedValue::forValue(
 				$executionContext->programRegistry->valueRegistry->record($values)
-			)->withType($executionContext->programRegistry->typeRegistry->record($types))
+			)
 		);
 	}
 

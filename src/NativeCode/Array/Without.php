@@ -60,11 +60,6 @@ final readonly class Without implements NativeMethod {
 
 					return TypedValue::forValue(
 						$programRegistry->valueRegistry->tuple($values)
-					)->withType(
-						$programRegistry->typeRegistry->result(
-							$value->type,
-							$programRegistry->typeRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
-						)
 					);
 				}
 			}

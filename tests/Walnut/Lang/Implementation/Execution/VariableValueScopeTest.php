@@ -36,8 +36,6 @@ final class VariableValueScopeTest extends TestCase {
 		$this->variableValueScope = new VariableValueScope([
 			'x' => TypedValue::forValue(
 				$this->valueRegistry->integer(123)
-			)->withType(
-				$this->typeRegistry->integer()
 			)
 		]);
 	}
@@ -54,8 +52,6 @@ final class VariableValueScopeTest extends TestCase {
 		self::assertEquals(
 			TypedValue::forValue(
 				$this->valueRegistry->integer(123)
-			)->withType(
-				$this->typeRegistry->integer()
 			),
 			$this->variableValueScope->findTypedValueOf(new VariableNameIdentifier('x'))
 		);
@@ -97,8 +93,6 @@ final class VariableValueScopeTest extends TestCase {
 			new VariableNameIdentifier('y'),
 			TypedValue::forValue(
 				$this->valueRegistry->string('abc')
-			)->withType(
-				$this->typeRegistry->string()
 			)
 		);
 		self::assertEquals(['x', 'y'], $variableValueScope->variables());

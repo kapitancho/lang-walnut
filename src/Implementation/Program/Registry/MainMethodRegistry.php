@@ -85,11 +85,9 @@ final readonly class MainMethodRegistry implements MethodFinder {
 	}
 
 	public function methodForValue(TypedValue $target, MethodNameIdentifier $methodName): Method|UnknownMethod {
-		foreach ($target->types as $type) {
-			$method = $this->methodForType($type, $methodName);
-			if ($method instanceof Method) {
-				return $method;
-			}
+		$method = $this->methodForType($target->type, $methodName);
+		if ($method instanceof Method) {
+			return $method;
 		}
 		return UnknownMethod::value;
 	}

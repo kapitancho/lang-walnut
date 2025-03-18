@@ -54,7 +54,7 @@ final readonly class AsReal implements NativeMethod {
 			if ($method instanceof Method) {
 				return $method->execute(
 					$programRegistry,
-					TypedValue::forValue($value)->withType($targetValue->targetType),
+					TypedValue::forValue($value),
 					$parameter
 				);
 			}
