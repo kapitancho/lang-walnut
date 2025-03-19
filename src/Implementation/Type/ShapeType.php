@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Implementation\Type;
 
 use JsonSerializable;
+use PHPUnit\Framework\MockObject\Generator\InvalidMethodNameException;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
@@ -12,7 +13,7 @@ use Walnut\Lang\Blueprint\Type\ShapeType as ShapeTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
 
 /** @psalm-immutable */
-final class ShapeType implements ShapeTypeInterface, SupertypeChecker, JsonSerializable {
+final class ShapeType implements ShapeTypeInterface, JsonSerializable {
 
 	private readonly Type $realValueType;
 
@@ -35,25 +36,26 @@ final class ShapeType implements ShapeTypeInterface, SupertypeChecker, JsonSeria
     }
 
 	private function isShapeOf(Type $ofType): bool {
-		if ($ofType instanceof NamedType) {
+		try {
+			$methodName = new MethodNameIdentifier(
+				sprintf("as%s", $this->refType) // this is ugly
+			);
 			$method = $this->methodFinder->methodForType(
 				$ofType,
-				new MethodNameIdentifier(
-					sprintf("as%s", $this->refType) // this is ugly
-				)
+				$methodName
 			);
 			if ($method instanceof CustomMethod) {
 				if ($method->returnType->isSubtypeOf($this->refType)) {
 					return true;
 				}
 			}
-		}
+		} catch (InvalidMethodNameException) {}
 		return false;
 	}
 
 	public function isSupertypeOf(Type $ofType): bool {
 		return
-			($ofType instanceof OpenType && $ofType->valueType->isSubtypeOf($this->refType)) ||
+			($ofType instanceof OpenType && $ofType->valueType->isSubtypeOf($this)) ||
 			$ofType->isSubtypeOf($this->refType) ||
 			$this->isShapeOf($ofType);
 	}

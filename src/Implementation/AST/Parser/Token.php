@@ -18,6 +18,7 @@ enum Token: string {
 	case atom_type = '\:\[]';
 	case enum_type_start = '\:\[';
 	case colon = '\:';
+	case type_proxy_keyword = '\![A-Z][a-zA-Z0-9_]*';
 	case boolean_op_not = '\!';
 	case boolean_op = '(&&|\|\||\^\^)';
 	case lambda_param = '\^';
@@ -57,7 +58,6 @@ enum Token: string {
 	//TOOD: allow forward slash but not two consecutive forward slashes
 	case module_identifier = 'module \$?[a-z][a-z0-9_-]*(\/[a-z][a-z0-9_-]*)*(\s*\%\%\s+\$?[a-z][a-z0-9_-]*(\/[a-z][a-z0-9_-]*)*(\s*\,\s*\$?[a-z][a-z0-9_-]*(\/[a-z][a-z0-9_-]*)*)*)?\:';
 	case type_short = '`';
-	case type_proxy_keyword = '$[A-Z][a-zA-Z0-9_]*';
 	case type_keyword = '[A-Z][a-zA-Z0-9_]*';
 	case var_keyword = '[a-z][a-zA-Z0-9_]*';
 	case special_var = '([\$\%\#][a-z][a-zA-Z0-9_]*)|([\#\%\$][0-9]+)|(\$\$)';

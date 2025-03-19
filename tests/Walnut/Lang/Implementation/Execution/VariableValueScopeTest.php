@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Test\Implementation\Execution;
 
+use BcMath\Number;
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownContextVariable;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownVariable;
@@ -64,7 +65,7 @@ final class VariableValueScopeTest extends TestCase {
 
 	public function testTypeOf(): void {
 		self::assertEquals(
-			$this->typeRegistry->integerSubset([123]),
+			$this->typeRegistry->integerSubset([new Number('123')]),
 			$this->variableValueScope->typeOf(new VariableNameIdentifier('x'))
 		);
 	}

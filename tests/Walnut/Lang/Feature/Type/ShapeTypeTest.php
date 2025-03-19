@@ -25,8 +25,8 @@ final class ShapeTypeTest extends CodeExecutionTestHelper {
 
 	public function testShapeWithCastError(): void {
 		$this->executeErrorCodeSnippet(
-			"Incompatible shape: String shaped as Real cannot be cast. An error value of type NotANumber is possible",
-			"getValue(getString()->shaped(type{Real}));",
+			"Invalid parameter type",
+			"getValue(getString());",
 			"
 				getString = ^ => String :: '7 days';
 				getValue = ^ r: Shape<Real> => Real :: r->shape;

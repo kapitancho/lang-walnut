@@ -177,14 +177,11 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 			}
 		}
 		if (
-			$targetValue &&
-			$targetValue->type instanceof SealedType &&
-			//(($vt = $targetValue->type->valueType) instanceof TupleType || $vt instanceof RecordType) &&
-			$targetValue instanceof SealedValue &&
+			$targetType instanceof SealedType && $targetValue instanceof SealedValue &&
 			(($tv = $targetValue->value) instanceof TupleValue || $tv instanceof RecordValue)
 		) {
 			$values = $tv->values;
-			foreach($targetValue->type->valueType->types /*?? $tv->type->types*/ as $fieldName => $fieldType) {
+			foreach($targetType->valueType->types /*?? $tv->type->types*/ as $fieldName => $fieldType) {
 				$value = $values[$fieldName] ??
 					$executionContext->programRegistry->valueRegistry->error(
 						$executionContext->programRegistry->valueRegistry->openValue(
