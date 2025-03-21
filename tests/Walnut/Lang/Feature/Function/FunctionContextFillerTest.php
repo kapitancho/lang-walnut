@@ -1,11 +1,13 @@
 <?php
 
-namespace Walnut\Lang\Test\Feature\Proto;
+namespace Walnut\Lang\Feature\Function;
 
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
+use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\BooleanType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
+use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
@@ -16,6 +18,7 @@ use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\SealedValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
+use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Implementation\Function\FunctionContextFiller;
 use Walnut\Lang\Test\Feature\ProgramContextTestHelper;
 
@@ -34,11 +37,11 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 			MyTuple = [String];
 			MyRecord = [a: Boolean, b: ?Integer, c: ?Integer];
 			MySealed = \$Real;
-			MySealedTuple = \$[Boolean];
-			MySealedRecord = \$[a: Real, b: ?String, c: ?String];
+			MySealedTuple = \$[Boolean, ... Integer];
+			MySealedRecord = \$[a: Real, b: ?String, c: ?String, ... Boolean];
 			MyOpen = #Integer;
-			MyOpenTuple = #[Boolean];
-			MyOpenRecord = #[a: Real, b: ?String, c: ?String];
+			MyOpenTuple = #[Boolean, ... String];
+			MyOpenRecord = #[a: Real, b: ?String, c: ?String, ... Integer];
 		NUT;
 	}
 
@@ -91,7 +94,7 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 			null,
 			$this->programContext->typeRegistry->typeByName(new TypeNameIdentifier('MyOpenTuple')),
 		);
-		$this->assertCount(6, $filledAnalyserContext->variableScope->variables());
+		$this->assertCount(7, $filledAnalyserContext->variableScope->variables());
 		$this->assertInstanceOf(
 			RealType::class,
 			$filledAnalyserContext->variableScope->typeOf(new VariableNameIdentifier('$$'))
@@ -104,6 +107,14 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 			BooleanType::class,
 			$filledAnalyserContext->variableScope->typeOf(new VariableNameIdentifier('%0'))
 		);
+		$this->assertInstanceOf(
+			ArrayType::class,
+			$filledAnalyserContext->variableScope->typeOf(new VariableNameIdentifier('%_'))
+		);
+		$this->assertInstanceOf(
+			StringType::class,
+			$filledAnalyserContext->variableScope->typeOf(new VariableNameIdentifier('%_'))->itemType,
+		);
 	}
 
 	public function testAnalyseSpreadPart2(): void {
@@ -115,7 +126,7 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 			null,
 			$this->programContext->typeRegistry->typeByName(new TypeNameIdentifier('MyOpenRecord')),
 		);
-		$this->assertCount(10, $filledAnalyserContext->variableScope->variables());
+		$this->assertCount(11, $filledAnalyserContext->variableScope->variables());
 		$this->assertInstanceOf(
 			IntegerType::class,
 			$filledAnalyserContext->variableScope->typeOf(new VariableNameIdentifier('$$'))
@@ -128,6 +139,14 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 			RealType::class,
 			$filledAnalyserContext->variableScope->typeOf(new VariableNameIdentifier('%a'))
 		);
+		$this->assertInstanceOf(
+			MapType::class,
+			$filledAnalyserContext->variableScope->typeOf(new VariableNameIdentifier('%_'))
+		);
+		$this->assertInstanceOf(
+			IntegerType::class,
+			$filledAnalyserContext->variableScope->typeOf(new VariableNameIdentifier('%_'))->itemType,
+		);
 	}
 
 	public function testAnalyseSpreadPart3(): void {
@@ -139,13 +158,21 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 			null,
 			$this->programContext->typeRegistry->nothing,
 		);
-		$this->assertCount(6, $filledAnalyserContext->variableScope->variables());
+		$this->assertCount(7, $filledAnalyserContext->variableScope->variables());
 		$this->assertInstanceOf(
 			RealType::class,
 			$filledAnalyserContext->variableScope->typeOf(new VariableNameIdentifier('$a'))
 		);
+		$this->assertInstanceOf(
+			MapType::class,
+			$filledAnalyserContext->variableScope->typeOf(new VariableNameIdentifier('$_'))
+		);
+		$this->assertInstanceOf(
+			BooleanType::class,
+			$filledAnalyserContext->variableScope->typeOf(new VariableNameIdentifier('$_'))->itemType,
+		);
 		$this->assertEquals(
-			['$$', '$', '#', '$a', '$b', '$c'],
+			['$$', '$', '#', '$a', '$b', '$c', '$_'],
 			$filledAnalyserContext->variableScope->variables()
 		);
 	}
@@ -159,13 +186,21 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 			null,
 			$this->programContext->typeRegistry->nothing,
 		);
-		$this->assertCount(4, $filledAnalyserContext->variableScope->variables());
+		$this->assertCount(5, $filledAnalyserContext->variableScope->variables());
 		$this->assertInstanceOf(
 			BooleanType::class,
 			$filledAnalyserContext->variableScope->typeOf(new VariableNameIdentifier('$0'))
 		);
+		$this->assertInstanceOf(
+			ArrayType::class,
+			$filledAnalyserContext->variableScope->typeOf(new VariableNameIdentifier('$_'))
+		);
+		$this->assertInstanceOf(
+			IntegerType::class,
+			$filledAnalyserContext->variableScope->typeOf(new VariableNameIdentifier('$_'))->itemType,
+		);
 		$this->assertEquals(
-			['$$', '$', '#', '$0'],
+			['$$', '$', '#', '$0', '$_'],
 			$filledAnalyserContext->variableScope->variables()
 		);
 	}
@@ -243,11 +278,12 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 			($this->programContext->valueRegistry->openValue(
 				new TypeNameIdentifier('MyOpenTuple'),
 				$this->programContext->valueRegistry->tuple([
-					$this->programContext->valueRegistry->false
+					$this->programContext->valueRegistry->false,
+					$this->programContext->valueRegistry->string('str'),
 				])
 			)),
 		);
-		$this->assertCount(6, $filledExecutionContext->variableValueScope->variables());
+		$this->assertCount(7, $filledExecutionContext->variableValueScope->variables());
 		$this->assertInstanceOf(
 			RealValue::class,
 			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('$$'))
@@ -259,6 +295,14 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 		$this->assertInstanceOf(
 			BooleanValue::class,
 			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('%0'))
+		);
+		$this->assertInstanceOf(
+			TupleValue::class,
+			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('%_'))
+		);
+		$this->assertInstanceOf(
+			StringValue::class,
+			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('%_'))->valueOf(0)
 		);
 	}
 
@@ -297,10 +341,11 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 				$this->programContext->valueRegistry->record([
 					'a' => $this->programContext->valueRegistry->real(-1.5),
 					'b' => $this->programContext->valueRegistry->string('str'),
+					'd' => $this->programContext->valueRegistry->integer(42),
 				])
 			)),
 		);
-		$this->assertCount(10, $filledExecutionContext->variableValueScope->variables());
+		$this->assertCount(11, $filledExecutionContext->variableValueScope->variables());
 		$this->assertInstanceOf(
 			IntegerValue::class,
 			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('$$'))
@@ -329,6 +374,14 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 			ErrorValue::class,
 			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('%c'))
 		);
+		$this->assertInstanceOf(
+			RecordValue::class,
+			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('%_'))
+		);
+		$this->assertInstanceOf(
+			IntegerValue::class,
+			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('%_'))->valueOf('d')
+		);
 	}
 
 	public function testExecuteSpreadPart3(): void {
@@ -343,6 +396,7 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 				$this->programContext->valueRegistry->record([
 					'a' => $this->programContext->valueRegistry->real(3.14),
 					'b' => $this->programContext->valueRegistry->string('str'),
+					'd' => $this->programContext->valueRegistry->true,
 				]),
 			)),
 			($this->programContext->typeRegistry->sealed(
@@ -352,14 +406,14 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 				new TypeNameIdentifier('MySealedRecord'),
 				$this->programContext->valueRegistry->record([
 					'a' => $this->programContext->valueRegistry->real(3.14),
-					'b' => $this->programContext->valueRegistry->string('str'),
+					'b' => $this->programContext->valueRegistry->string('str')
 				]),
 			)),
 			null,
 			$this->programContext->typeRegistry->nothing,
 			null,
 		);
-		$this->assertCount(6, $filledExecutionContext->variableValueScope->variables());
+		$this->assertCount(7, $filledExecutionContext->variableValueScope->variables());
 		$this->assertInstanceOf(
 			RecordValue::class,
 			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('$$'))
@@ -379,6 +433,14 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 		$this->assertInstanceOf(
 			ErrorValue::class,
 			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('$c'))
+		);
+		$this->assertInstanceOf(
+			RecordValue::class,
+			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('$_'))
+		);
+		$this->assertInstanceOf(
+			BooleanValue::class,
+			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('$_'))->valueOf('d')
 		);
 		$this->assertInstanceOf(
 			SealedValue::class,
@@ -414,7 +476,7 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 			$this->programContext->typeRegistry->nothing,
 			null,
 		);
-		$this->assertCount(9, $filledExecutionContext->variableValueScope->variables());
+		$this->assertCount(11, $filledExecutionContext->variableValueScope->variables());
 		$this->assertInstanceOf(
 			RecordValue::class,
 			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('$$'))
@@ -430,6 +492,10 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 		$this->assertInstanceOf(
 			StringValue::class,
 			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('$b'))
+		);
+		$this->assertInstanceOf(
+			RecordValue::class,
+			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('$_'))
 		);
 		$this->assertInstanceOf(
 			ErrorValue::class,

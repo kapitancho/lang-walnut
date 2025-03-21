@@ -19,20 +19,16 @@ final readonly class AsJsonValue implements NativeMethod {
 		Type $parameterType
 	): Type {
 		$resultType = $programRegistry->typeRegistry->alias(new TypeNameIdentifier('JsonValue'));
-		return $this->isSafeConversion($programRegistry->typeRegistry, $targetType) ? $resultType : $programRegistry->typeRegistry->result(
+		return new CastAsJsonValue($programRegistry)->isSafeToCastType(
+			$targetType
+		) ? $resultType : $programRegistry->typeRegistry->result(
 			$resultType,
 			$programRegistry->typeRegistry->withName(new TypeNameIdentifier('InvalidJsonValue'))
 		);
 	}
 
-	private function isSafeConversion(TypeRegistry $typeRegistry, Type $fromType): bool {
-		return $fromType->isSubtypeOf(
-			$typeRegistry->withName(new TypeNameIdentifier('JsonValue'))
-		);
-	}
-
 	public function execute(
-		ProgramRegistry        $programRegistry,
+		ProgramRegistry $programRegistry,
 		Value $target,
 		Value $parameter
 	): Value {

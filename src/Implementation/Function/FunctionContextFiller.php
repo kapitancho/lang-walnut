@@ -78,12 +78,24 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 							$typeItem
 						);
 					}
+					if (!$t->restType instanceof NothingType) {
+						$analyserContext = $analyserContext->withAddedVariableType(
+							new VariableNameIdentifier($variableName . '_'),
+							$analyserContext->programRegistry->typeRegistry->array($t->restType)
+						);
+					}
 				}
 				if ($t instanceof RecordType) {
 					foreach($t->types as $fieldName => $fieldType) {
 						$analyserContext = $analyserContext->withAddedVariableType(
 							new VariableNameIdentifier($variableName . $fieldName),
 							$tConv($fieldType)
+						);
+					}
+					if (!$t->restType instanceof NothingType) {
+						$analyserContext = $analyserContext->withAddedVariableType(
+							new VariableNameIdentifier($variableName . '_'),
+							$analyserContext->programRegistry->typeRegistry->map($t->restType)
 						);
 					}
 				}
@@ -97,6 +109,17 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 				$analyserContext = $analyserContext->withAddedVariableType(
 					new VariableNameIdentifier('$' . $fieldName),
 					$tConv($fieldType)
+				);
+			}
+			if (!$targetType->valueType->restType instanceof NothingType) {
+				$analyserContext = $analyserContext->withAddedVariableType(
+					new VariableNameIdentifier('$_'),
+					$targetType->valueType instanceof RecordType ?
+						$analyserContext->programRegistry->typeRegistry->map(
+							$targetType->valueType->restType
+						) : $analyserContext->programRegistry->typeRegistry->array(
+							$targetType->valueType->restType
+						)
 				);
 			}
 		}
@@ -152,9 +175,17 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 						} catch(IdentifierException|UnknownProperty) {}
 						// @codeCoverageIgnoreEnd
 					}
+					if (!$t->restType instanceof NothingType) {
+						$executionContext = $executionContext->withAddedVariableValue(
+							new VariableNameIdentifier($variableName . '_'),
+							$executionContext->programRegistry->valueRegistry->tuple(array_slice($v->values, count($t->types)))
+						);
+					}
 				} elseif ($t instanceof RecordType && $v instanceof RecordValue) {
+					$recordValues = $v->values;
 					$values = $v->values;
 					foreach($t->types as $fieldName => $fieldType) {
+						unset($recordValues[$fieldName]);
 						try {
 							$rValue = $values[$fieldName] ??
 								$executionContext->programRegistry->valueRegistry->error(
@@ -173,6 +204,12 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 						} catch(IdentifierException) {}
 						// @codeCoverageIgnoreEnd
 					}
+					if (!$t->restType instanceof NothingType) {
+						$executionContext = $executionContext->withAddedVariableValue(
+							new VariableNameIdentifier($variableName . '_'),
+							$executionContext->programRegistry->valueRegistry->record($recordValues)
+						);
+					}
 				}
 			}
 		}
@@ -180,8 +217,10 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 			$targetType instanceof SealedType && $targetValue instanceof SealedValue &&
 			(($tv = $targetValue->value) instanceof TupleValue || $tv instanceof RecordValue)
 		) {
+			$restValues = $tv->values;
 			$values = $tv->values;
 			foreach($targetType->valueType->types /*?? $tv->type->types*/ as $fieldName => $fieldType) {
+				unset($restValues[$fieldName]);
 				$value = $values[$fieldName] ??
 					$executionContext->programRegistry->valueRegistry->error(
 						$executionContext->programRegistry->valueRegistry->openValue(
@@ -195,6 +234,14 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 				$executionContext = $executionContext->withAddedVariableValue(
 					new VariableNameIdentifier('$' . $fieldName),
 					($value)
+				);
+			}
+			if (!$targetType->valueType->restType instanceof NothingType) {
+				$executionContext = $executionContext->withAddedVariableValue(
+					new VariableNameIdentifier('$_'),
+					$tv instanceof RecordValue ?
+						$executionContext->programRegistry->valueRegistry->record($restValues) :
+						$executionContext->programRegistry->valueRegistry->tuple(array_values($restValues))
 				);
 			}
 		}
