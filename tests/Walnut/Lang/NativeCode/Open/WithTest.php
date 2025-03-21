@@ -217,4 +217,42 @@ final class WithTest extends CodeExecutionTestHelper {
 		NUT);
 	}
 
+
+
+	public function testWithValidatorOk(): void {
+		$result = $this->executeCodeSnippet("{MyOpen[a:1,b:3,c:5]}->testWith[b:2,c:6];", <<<NUT
+			MyOpen = #[a: Integer, b: Integer, c: Integer] :: null;
+			MyOpen->testWith(^param: [b: Integer, c: Integer] => MyOpen) :: $->with(param);
+		NUT);
+		$this->assertEquals("MyOpen[a: 1, b: 2, c: 6]", $result);
+	}
+
+	public function testWithValidatorWithErrorTypeOk(): void {
+		$result = $this->executeCodeSnippet("?noError(MyOpen[a:1,b:3,c:5])->testWith[b:2,c:6];", <<<NUT
+			MyError = :[];
+			MyOpen = #[a: Integer, b: Integer, c: Integer] @ MyError :: null;
+			MyOpen->testWith(^param: [b: Integer, c: Integer] => Result<MyOpen, MyError>) :: $->with(param);
+		NUT);
+		$this->assertEquals("MyOpen[a: 1, b: 2, c: 6]", $result);
+	}
+
+	public function testWithValidatorWithErrorTypeReturnErrorValue(): void {
+		$result = $this->executeCodeSnippet("?noError(MyOpen[a:1,b:3,c:5])->testWith[b:2,c:6];", <<<NUT
+			MyError = :[];
+			MyOpen = #[a: Integer, b: Integer, c: Integer] @ MyError :: ?when(#b == 2) { => @MyError() };
+			MyOpen->testWith(^param: [b: Integer, c: Integer] => Result<MyOpen, MyError>) :: $->with(param);
+		NUT);
+		$this->assertEquals("@MyError[]", $result);
+	}
+
+	public function testWithValidatorWithErrorTypeWrongReturnType(): void {
+		$this->executeErrorCodeSnippet(
+			"expected a return value of type MyOpen, got Result<MyOpen, MyError>",
+			"?noError(MyOpen[a:1,b:3,c:5])->testWith[b:2,c:6];", <<<NUT
+			MyError = :[];
+			MyOpen = #[a: Integer, b: Integer, c: Integer] @ MyError :: null;
+			MyOpen->testWith(^param: [b: Integer, c: Integer] => MyOpen) :: $->with(param);
+		NUT);
+	}
+
 }

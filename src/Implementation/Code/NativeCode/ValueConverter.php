@@ -2,16 +2,18 @@
 
 namespace Walnut\Lang\Implementation\Code\NativeCode;
 
-use PHPUnit\Framework\MockObject\Generator\InvalidMethodNameException;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
+use Walnut\Lang\Blueprint\Common\Identifier\IdentifierException;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\Method;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\ResultType;
+use Walnut\Lang\Blueprint\Type\ShapeType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Type\UnionType;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\OpenValue;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -25,7 +27,9 @@ final readonly class ValueConverter {
 		Type $sourceType,
 		Type $targetType,
 	): Type {
-		if ($targetType->isSubtypeOf($sourceType)) {
+		$shapeTargetType = $programRegistry->typeRegistry->shape($targetType);
+
+		if ($sourceType->isSubtypeOf($shapeTargetType)) {
 			return $targetType;
 		}
 		try {
@@ -57,7 +61,7 @@ final readonly class ValueConverter {
 				}
 				return $returnType;
 			}
-		} catch (InvalidMethodNameException) {}
+		} catch (IdentifierException) {}
 
 		$bType = $this->toBaseType($sourceType);
 		if ($bType instanceof OpenType) {
@@ -99,9 +103,14 @@ final readonly class ValueConverter {
 			}
 			$tv = $tv->value;
 		}
-		$converted = $this->convertValueToType($programRegistry, $sourceValue, $targetType);
-		if (!$this->isError($converted)) {
-			return $converted;
+		$baseType = $this->toBaseType($targetType);
+
+		$convertTypes = $baseType instanceof UnionType ? $baseType->types : [];
+		foreach([$targetType, ... $convertTypes] as $convertType) {
+			$converted = $this->convertValueToType($programRegistry, $sourceValue, $convertType);
+			if (!$this->isError($converted)) {
+				return $converted;
+			}
 		}
 
 		// @codeCoverageIgnoreStart
@@ -139,11 +148,12 @@ final readonly class ValueConverter {
 				}
 				return $errorType ? $programRegistry->typeRegistry->result($targetType, $errorType) : $targetType;
 			}
-		} catch (InvalidMethodNameException) {}
+		} catch (IdentifierException) {}
 
 		return $programRegistry->typeRegistry->result(
 			$targetType,
-			$programRegistry->typeRegistry->withName(new TypeNameIdentifier('CastNotAvailable'))
+			$programRegistry->typeRegistry->any
+			//$programRegistry->typeRegistry->withName(new TypeNameIdentifier('CastNotAvailable'))
 		);
 	}
 
@@ -166,7 +176,7 @@ final readonly class ValueConverter {
 					$programRegistry->valueRegistry->null
 				);
 			}
-		} catch (InvalidMethodNameException) {}
+		} catch (IdentifierException) {}
 
 		return $programRegistry->valueRegistry->error(
 			$programRegistry->valueRegistry->openValue(

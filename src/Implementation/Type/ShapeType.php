@@ -3,17 +3,20 @@
 namespace Walnut\Lang\Implementation\Type;
 
 use JsonSerializable;
-use PHPUnit\Framework\MockObject\Generator\InvalidMethodNameException;
+use Walnut\Lang\Blueprint\Common\Identifier\IdentifierException;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethod;
+use Walnut\Lang\Blueprint\Function\Method;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
-use Walnut\Lang\Blueprint\Type\NamedType;
 use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\ShapeType as ShapeTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Type\UnionType;
+use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 /** @psalm-immutable */
 final class ShapeType implements ShapeTypeInterface, JsonSerializable {
+	use BaseType;
 
 	private readonly Type $realValueType;
 
@@ -36,20 +39,26 @@ final class ShapeType implements ShapeTypeInterface, JsonSerializable {
     }
 
 	private function isShapeOf(Type $ofType): bool {
-		try {
-			$methodName = new MethodNameIdentifier(
-				sprintf("as%s", $this->refType) // this is ugly
-			);
-			$method = $this->methodFinder->methodForType(
-				$ofType,
-				$methodName
-			);
-			if ($method instanceof CustomMethod) {
-				if ($method->returnType->isSubtypeOf($this->refType)) {
+		$baseType = $this->toBaseType($this->refType);
+		$refTypes = $baseType instanceof UnionType ? $baseType->types : [];
+		foreach([$this->refType, ...$refTypes] as $checkType) {
+			try {
+				$methodName = new MethodNameIdentifier(
+					sprintf("as%s", $checkType) // this is ugly
+				);
+				$method = $this->methodFinder->methodForType(
+					$ofType,
+					$methodName
+				);
+				if ($method instanceof CustomMethod) {
+					if ($method->returnType->isSubtypeOf($this->refType)) {
+						return true;
+					}
+				} elseif ($method instanceof Method) {
 					return true;
 				}
-			}
-		} catch (InvalidMethodNameException) {}
+			} catch (IdentifierException) {}
+		}
 		return false;
 	}
 
