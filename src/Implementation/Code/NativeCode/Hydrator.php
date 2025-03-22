@@ -93,7 +93,6 @@ final readonly class Hydrator {
 			$targetType instanceof UnionType => $this->hydrateUnion(...),
 			$targetType instanceof AliasType => $this->hydrateAlias(...),
 			$targetType instanceof ResultType => $this->hydrateResult(...),
-			$targetType instanceof SubsetType => $this->hydrateSubset(...),
 			$targetType instanceof OpenType => $this->hydrateOpen(...),
 			$targetType instanceof SealedType => $this->hydrateSealed(...),
 			// @codeCoverageIgnoreStart
@@ -261,17 +260,6 @@ final readonly class Hydrator {
 				throw $ex;
 			}
 		}
-	}
-
-	private function hydrateSubset(Value $value, SubsetType $targetType, string $hydrationPath): Value {
-		return $this->tryJsonValueCast(
-			$targetType, $value, $hydrationPath,
-			"Subset hydration failed. Error: %s"
-		) ?? $this->constructValue(
-			$targetType,
-			$this->hydrate($value, $targetType->valueType, $hydrationPath),
-			$hydrationPath
-		);
 	}
 
 	private function hydrateOpen(Value $value, OpenType $targetType, string $hydrationPath): Value {

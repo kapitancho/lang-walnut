@@ -18,8 +18,6 @@ trait BaseTypeHelper {
 		return match (true) {
 			$sourceType instanceof AliasType =>
 				$this->toTargetBaseType($sourceType->aliasedType, $targetType),
-			$sourceType instanceof SubsetType =>
-				$this->toTargetBaseType($sourceType->valueType, $targetType),
 			$sourceType instanceof ProxyNamedType =>
 				$this->toTargetBaseType($sourceType->actualType, $targetType),
 			$sourceType instanceof IntersectionType =>

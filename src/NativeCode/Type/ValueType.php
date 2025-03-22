@@ -57,7 +57,6 @@ final readonly class ValueType implements NativeMethod {
 			$typeValue = $this->toBaseType($targetValue->typeValue, true);
 			if ($typeValue instanceof OpenType ||
 				$typeValue instanceof SealedType ||
-				$typeValue instanceof SubsetType ||
 				$typeValue instanceof MutableType
 			) {
 				return ($programRegistry->valueRegistry->type($typeValue->valueType));

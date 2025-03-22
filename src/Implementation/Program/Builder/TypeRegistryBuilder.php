@@ -262,6 +262,10 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		    'Open' => $this->metaType(MetaTypeValue::Open),
 		    'Sealed' => $this->metaType(MetaTypeValue::Sealed),
 		    'Tuple' => $this->metaType(MetaTypeValue::Tuple),
+		    'Alias' => $this->metaType(MetaTypeValue::Alias),
+		    'Enumeration' => $this->metaType(MetaTypeValue::Enumeration),
+		    'Union' => $this->metaType(MetaTypeValue::Union),
+		    'Intersection' => $this->metaType(MetaTypeValue::Intersection),
 			default => $this->withName($typeName)
 	    };
 	}

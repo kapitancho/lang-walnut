@@ -36,7 +36,6 @@ final readonly class CastAsString {
 	public function detectSubsetType(Type $targetType): array|null {
 		return match(true) {
 			$targetType instanceof AliasType => $this->detectSubsetType($targetType->aliasedType),
-			$targetType instanceof SubsetType => $this->detectSubsetType($targetType->valueType),
 			$targetType instanceof MutableType => $this->detectSubsetType($targetType->valueType),
 			$targetType instanceof NullType => ['null'],
 			$targetType instanceof AtomType => [$targetType->name->identifier],
@@ -60,7 +59,6 @@ final readonly class CastAsString {
 	public function detectRangedType(Type $targetType): array|null {
 		return match(true) {
 			$targetType instanceof AliasType => $this->detectRangedType($targetType->aliasedType),
-			$targetType instanceof SubsetType => $this->detectRangedType($targetType->valueType),
 			$targetType instanceof MutableType => $this->detectRangedType($targetType->valueType),
 			$targetType instanceof IntegerType => [
 				1,

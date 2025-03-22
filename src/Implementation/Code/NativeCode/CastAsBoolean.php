@@ -40,8 +40,6 @@ final readonly class CastAsBoolean {
 		return match(true) {
 			$type instanceof AliasType
 			=> $this->analyseType($boolean, $true, $false, $type->aliasedType),
-			$type instanceof SubsetType
-			=> $this->analyseType($boolean, $true, $false, $type->valueType),
 			$type instanceof MutableType
 			=> $this->analyseType($boolean, $true, $false, $type->valueType),
 

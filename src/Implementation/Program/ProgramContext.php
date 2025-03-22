@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Implementation\Program;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
+use Walnut\Lang\Blueprint\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder as CustomMethodRegistryBuilderInterface;
 use Walnut\Lang\Blueprint\Program\Builder\ScopeBuilder as ScopeBuilderInterface;
 use Walnut\Lang\Blueprint\Program\Builder\TypeRegistryBuilder as TypeRegistryBuilderInterface;
@@ -28,6 +29,7 @@ final readonly class ProgramContext implements ProgramContextInterface {
 		public ExpressionRegistryInterface               $expressionRegistry,
 		public MethodFinder                              $methodRegistry,
 		public ScopeBuilderInterface                     $globalScopeBuilder,
+		private NativeCodeTypeMapper                     $nativeCodeTypeMapper,
 	) {
 		$this->programRegistry = new ProgramRegistry(
 			$this->typeRegistry,
@@ -42,6 +44,7 @@ final readonly class ProgramContext implements ProgramContextInterface {
 	public function analyseAndBuildProgram(): Program {
 		$customMethodAnalyser = new CustomMethodAnalyser(
 			$this->programRegistry,
+			$this->nativeCodeTypeMapper
 		);
 		$analyseErrors = $customMethodAnalyser->analyse($this->customMethodRegistry);
 		if (count($analyseErrors) > 0) {

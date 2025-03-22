@@ -136,36 +136,6 @@ final class DependencyContainer implements DependencyContainerInterface {
 		return ($this->programRegistry->valueRegistry->record($found));
 	}
 
-	private function findSubsetValue(SubsetType $type): Value|DependencyError {
-		$found = $this->findValueByNamedType($type);
-		if ($found instanceof DependencyError) {
-			$baseValue = $this->findValueByType($type->valueType);
-			if ($baseValue instanceof Value) {
-				$result = $this->expressionRegistry->methodCall(
-					$this->expressionRegistry->variableName(new VariableNameIdentifier('#')),
-					new MethodNameIdentifier('construct'),
-					$this->expressionRegistry->constant(
-						$this->programRegistry->valueRegistry->type($type)
-					)
-				)->execute(
-					$this->globalContext->withAddedVariableValue(
-						new VariableNameIdentifier('#'),
-						$baseValue
-					)
-				);
-				if ($result->value instanceof ErrorValue) {
-					return new DependencyError(
-						UnresolvableDependency::errorWhileCreatingValue,
-						$type,
-						sprintf("Error while creating value for subset %s", $type)
-					);
-				}
-				return $result->value;
-			}
-		}
-		return $found;
-	}
-
 	private function findOpenValue(OpenType $type): Value|DependencyError {
 		$found = $this->findValueByNamedType($type);
 		if ($found instanceof DependencyError) {
@@ -236,7 +206,6 @@ final class DependencyContainer implements DependencyContainerInterface {
 	private function findValueByType(Type $type): Value|DependencyError {
 		return match(true) {
 			$type instanceof AtomType => ($type->value),
-            $type instanceof SubsetType => $this->findSubsetValue($type),
             $type instanceof OpenType => $this->findOpenValue($type),
 			$type instanceof SealedType => $this->findSealedValue($type),
 			$type instanceof NamedType => $this->findValueByNamedType($type),

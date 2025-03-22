@@ -22,7 +22,7 @@ final class ProgramContextFactory implements ProgramContextFactoryInterface {
 			$typeRegistryBuilder = new TypeRegistryBuilder(
 				$customMethodRegistryBuilder,
 				$methodFinder = new MainMethodRegistry(
-					new NativeCodeTypeMapper(),
+					$nativeCodeTypeMapper = new NativeCodeTypeMapper(),
 					$customMethodRegistryBuilder,
 					[
 						self::lookupNamespace
@@ -33,7 +33,8 @@ final class ProgramContextFactory implements ProgramContextFactoryInterface {
 			$valueRegistry = new ValueRegistry($typeRegistryBuilder),
 			new ExpressionRegistry($typeRegistryBuilder, $valueRegistry),
 			$methodFinder,
-			new ScopeBuilder(VariableValueScope::empty())
+			new ScopeBuilder(VariableValueScope::empty()),
+			$nativeCodeTypeMapper
 		);
 	}
 }

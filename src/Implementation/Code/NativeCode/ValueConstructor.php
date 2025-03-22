@@ -227,7 +227,6 @@ final readonly class ValueConstructor {
 				),
 				$type instanceof AtomType => $type->value,
 				$type instanceof EnumerationType => $et($type, $parameterValue),
-				$type instanceof SubsetType => $parameterValue,
 			}
 		);
 	}

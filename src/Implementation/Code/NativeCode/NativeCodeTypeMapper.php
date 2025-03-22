@@ -58,7 +58,6 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 			EnumerationType::class => ['Enumeration'],
 			EnumerationSubsetType::class => ['Enumeration'],
 			AtomType::class => ['Atom'],
-			SubsetType::class => ['Subset'],
 			OpenType::class => ['Open'],
 			SealedType::class => ['Sealed'],
 			AliasType::class => ['Alias'],
@@ -83,18 +82,11 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 		$k = 0;
 		$alias = null;
 		$subset = null;
-		while ($type instanceof AliasType || $type instanceof SubsetType) {
+		while ($type instanceof AliasType) {
 			$k++;
 			$baseIds[] = $type->name->identifier;
-			if ($type instanceof AliasType) {
-				$alias ??= $k;
-				$type = $type->aliasedType;
-				continue;
-			}
-			if ($type instanceof SubsetType) {
-				$subset ??= $k;
-				$type = $type->valueType;
-			}
+			$alias ??= $k;
+			$type = $type->aliasedType;
 		}
 		if ($alias !== null) {
 			if ($subset !== null && $subset < $alias) {
@@ -121,7 +113,6 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 				'Record' => RecordType::class,
 				'Union' => UnionType::class,
 				'Intersection' => IntersectionType::class,
-				'Subset' => SubsetType::class,
 				'EnumerationValue' => EnumerationType::class,
 			][$type->value->value] ?? null;
 			return array_merge($baseIds,
