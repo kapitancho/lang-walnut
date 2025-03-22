@@ -96,6 +96,19 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 					}
 				}
 			}
+			foreach ($methods as $method) {
+				try {
+					$sub = $method->targetType;
+					$methodFnType = $this->programRegistry->typeRegistry->function(
+						$method->parameterType,
+						$method->returnType
+					);
+					$method->selfAnalyse($this->programRegistry);
+				} catch (AnalyserException $e) {
+					$analyseErrors[] = sprintf("%s : %s", $this->getErrorMessageFor($method), $e->getMessage());
+					continue;
+				}
+			}
 		}
 		if (count($analyseErrors) === 0) {
 			foreach ($registry->customMethods as $methods) {

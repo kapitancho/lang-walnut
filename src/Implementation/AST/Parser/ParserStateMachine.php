@@ -105,6 +105,8 @@ final readonly class ParserStateMachine {
 					$this->s->push(131);
 					$this->s->stay(701);
 				},
+				T::arithmetic_op_multiply->name => $c,
+				T::sequence_start->name => $c, //Shape<T>
 				'lambda_param' => $c,
 				'tuple_start' => $c,
 				'call_start' => $c,
@@ -154,7 +156,9 @@ final readonly class ParserStateMachine {
 					$this->s->push(164);
 					$this->s->stay(701);
 				},
+				T::arithmetic_op_multiply->name => $c,
 				T::type_keyword->name => $c,
+				T::sequence_start->name => $c, //Shape<T>
 				T::lambda_param->name => $c,
 			]],
 			111 => ['name' => 'open type type', 'transitions' => [
@@ -162,7 +166,9 @@ final readonly class ParserStateMachine {
 					$this->s->push(159);
 					$this->s->stay(701);
 				},
+				T::arithmetic_op_multiply->name => $c,
 				T::type_keyword->name => $c,
+				T::sequence_start->name => $c, //Shape<T>
 				T::lambda_param->name => $c,
 			]],
 
@@ -1872,6 +1878,7 @@ final readonly class ParserStateMachine {
 					$this->s->push(483);
 					$this->s->stay(701);
 				},
+				T::sequence_start->name => $c, //Shape<T>
 				T::arithmetic_op_multiply->name => $c,
 				T::tuple_start->name => $c,
 				T::lambda_param->name => $c,
@@ -1942,6 +1949,8 @@ final readonly class ParserStateMachine {
 					$this->s->push(503);
 					$this->s->stay(701);
 				},
+				T::sequence_start->name => $c,
+				T::arithmetic_op_multiply->name => $c,
 				T::tuple_start->name => $c,
 				T::empty_tuple->name => $c,
 				T::empty_record->name => $c,
@@ -2029,6 +2038,7 @@ final readonly class ParserStateMachine {
 					$this->s->push(505);
 					$this->s->stay(701);
 				},
+				T::sequence_start->name => $c, //Shape<T>
 				T::arithmetic_op_multiply->name => $c,
 				T::tuple_start->name => $c,
 				T::lambda_param->name => $c,
@@ -2185,6 +2195,7 @@ final readonly class ParserStateMachine {
 					};
 					$this->s->i++;
 				},
+				T::sequence_start->name => 935, //Shape<T>
 				T::empty_tuple->name => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->tupleType([]);
 					$this->s->moveAndPop();
@@ -2812,10 +2823,12 @@ final readonly class ParserStateMachine {
 					);
 					$this->s->move(813);
 				},
-				'type_keyword' => function(LT $token) {
+				'type_keyword' => $t = function(LT $token) {
 					$this->s->result['first_token'] = $token;
 					$this->s->move(813);
 				},
+				T::arithmetic_op_multiply->name => $t,
+				T::sequence_start->name => $t, //Shape<T>
 				'word' => $c = function(LT $token) {
 					$this->s->result['first_token'] = $token;
 					$this->s->move(814);
@@ -3060,6 +3073,24 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
+			935 => ['name' => 'name shape type in quotes', 'transitions' => [
+				T::type_keyword->name => $c = function(LT $token) {
+					$this->s->push(936);
+					$this->s->stay(701);
+				},
+				T::arithmetic_op_multiply->name => $c,
+				T::tuple_start->name => $c,
+				T::empty_tuple->name => $c,
+				T::empty_record->name => $c,
+			]],
+			936 => ['name' => 'type shape separator', 'transitions' => [
+				T::sequence_end->name => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->shapeType(
+						$this->s->generated,
+					);
+					$this->s->moveAndPop();
+				}
+			]],
 
 
 			940 => ['name' => 'type set', 'transitions' => [
@@ -3132,6 +3163,8 @@ final readonly class ParserStateMachine {
 					$this->s->push(902);
 					$this->s->stay(701);
 				},
+				T::arithmetic_op_multiply->name => $c,
+				T::sequence_start->name => $c, //Shape<T>
 				T::tuple_start->name => $c,
 				T::empty_tuple->name => $c,
 				T::empty_record->name => $c,
@@ -3152,6 +3185,7 @@ final readonly class ParserStateMachine {
 					$this->s->push(904);
 					$this->s->stay(701);
 				},
+				T::sequence_start->name => $c, //Shape<T>
 				T::type_keyword->name => $c,
 				T::tuple_start->name => $c,
 				T::arithmetic_op_multiply->name => $c,
