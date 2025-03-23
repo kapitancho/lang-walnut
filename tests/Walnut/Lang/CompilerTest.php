@@ -21,8 +21,8 @@ use Walnut\Lang\Implementation\Compilation\Module\PackageBasedModulePathFinder;
 use Walnut\Lang\Implementation\Compilation\Module\TemplatePrecompiler;
 use Walnut\Lang\Implementation\Compilation\Module\TemplatePrecompilerModuleLookupDecorator;
 use Walnut\Lang\Implementation\Compilation\Module\TestPrecompiler;
-use Walnut\Lang\Implementation\Program\EntryPoint\CliEntryPoint;
-use Walnut\Lang\Implementation\Program\EntryPoint\CliEntryPointBuilder;
+use Walnut\Lang\Implementation\Program\EntryPoint\Cli\CliEntryPoint;
+use Walnut\Lang\Implementation\Program\EntryPoint\Cli\CliEntryPointBuilder;
 
 final class CompilerTest extends TestCase {
 	private const string PATH = __DIR__ . '/../../../core-nut-lib';

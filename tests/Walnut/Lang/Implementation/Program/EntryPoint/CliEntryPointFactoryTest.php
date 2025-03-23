@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Program\EntryPoint;
 
+use Walnut\Lang\Implementation\Program\EntryPoint\Cli\CliEntryPointFactory;
 use Walnut\Lang\Test\BaseProgramTestHelper;
 
 class CliEntryPointFactoryTest extends BaseProgramTestHelper {

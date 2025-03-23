@@ -1,9 +1,9 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Program\EntryPoint;
+namespace Walnut\Lang\Implementation\Program\EntryPoint\Cli;
 
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
-use Walnut\Lang\Blueprint\Program\EntryPoint\SourceCliEntryPoint as SourceCliEntryPointInterface;
+use Walnut\Lang\Blueprint\Program\EntryPoint\Cli\SourceCliEntryPoint as SourceCliEntryPointInterface;
 use Walnut\Lang\Blueprint\Program\EntryPoint\EntryPointProvider;
 
 final readonly class SourceCliEntryPoint implements SourceCliEntryPointInterface {

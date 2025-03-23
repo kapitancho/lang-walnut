@@ -1,9 +1,9 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Program\EntryPoint;
+namespace Walnut\Lang\Implementation\Program\EntryPoint\Cli;
 
-use Walnut\Lang\Blueprint\Program\EntryPoint\CliEntryPoint as CliEntryPointInterface;
-use Walnut\Lang\Blueprint\Program\EntryPoint\CliEntryPointBuilder as CliEntryPointBuilderInterface;
+use Walnut\Lang\Blueprint\Program\EntryPoint\Cli\CliEntryPoint as CliEntryPointInterface;
+use Walnut\Lang\Blueprint\Program\EntryPoint\Cli\CliEntryPointBuilder as CliEntryPointBuilderInterface;
 use Walnut\Lang\Implementation\Compilation\CompilerFactory;
 
 final class CliEntryPointFactory {

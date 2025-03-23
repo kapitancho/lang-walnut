@@ -15,20 +15,15 @@ Walnut is a programming language which you can easily call from any PHP code.
 You can use the `CliEntryPoint` for interactions between the language and the host environment.
 
 Sample usage:
+
 ```php
-use Walnut\Lang\Implementation\Compilation\Compiler;
-use Walnut\Lang\Implementation\Compilation\Module\MultiFolderBasedModuleLookupContext;
-use Walnut\Lang\Implementation\Program\EntryPoint\CliEntryPoint;
+use Walnut\Lang\Implementation\Program\EntryPoint\Cli\CliEntryPointFactory;
 $rootDir = __DIR__; //or something different
-$c = new CliEntryPoint(
-    new Compiler(
-        new MultiFolderBasedModuleLookupContext(
-            $rootDir . '/nut-src',
-            $rootDir . '/vendor/walnut/lang/core-nut-lib',
-        )
-    )
-);
-$result = $c->call('start', ['arg1', 'arg2']); //Call the main function of the `start` module
+$sourceRoot = $rootDir . '/nut-src';
+$packages = ['core' => $rootDir . '/vendor/walnut/lang/core-nut-lib'];
+
+$result = new CliEntryPointFactory($sourceRoot, $packages)
+    ->entryPoint->call('start', 'arg1', 'arg2'); //Call the main function of the `start` module
 echo "Result: $result", PHP_EOL;
 ```
 

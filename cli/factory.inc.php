@@ -1,6 +1,6 @@
 <?php
 
-use Walnut\Lang\Implementation\Program\EntryPoint\CliEntryPointFactory;
+use Walnut\Lang\Implementation\Program\EntryPoint\Cli\CliEntryPointFactory;
 
 $cfg = @json_decode(@file_get_contents('nutcfg.json') ?? '{}', true);
 $sourceRoot = $cfg['sourceRoot'] ?? __DIR__ . '/../walnut-src';
