@@ -29,9 +29,11 @@ final class SetValue implements SetValueInterface, JsonSerializable {
 		$set = [];
 		foreach($values as $value) {
 			if (!$value instanceof Value) {
+				// @codeCoverageIgnoreStart
 				throw new InvalidArgumentException(
 					'SetValue must be constructed with a list of Value instances'
 				);
+				// @codeCoverageIgnoreEnd
 			}
 			$set[(string)$value] = $value;
 		}

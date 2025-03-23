@@ -4,6 +4,7 @@ namespace Walnut\Lang\Test\Implementation\Registry;
 
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Test\Implementation\BaseProgramTestHelper;
 
@@ -134,6 +135,13 @@ final class IntersectionTypeNormalizerTest extends BaseProgramTestHelper {
         ));
     }
 
+	public function testShapeTypes(): void {
+     self::assertEquals("Shape<(Integer&String)>", (string)$this->intersection(
+         $this->typeRegistry->shape($this->typeRegistry->integer()),
+         $this->typeRegistry->shape($this->typeRegistry->string()),
+     ));
+ }
+
     public function testAliasTypes(): void {
 	    $this->typeRegistryBuilder->addAlias(new TypeNameIdentifier('M'), $this->typeRegistry->boolean);
         self::assertEquals("(Integer&False)", (string)$this->intersection(
@@ -208,5 +216,50 @@ final class IntersectionTypeNormalizerTest extends BaseProgramTestHelper {
 			),
 		));
 	}
+
+	public function testLengthRangeMinMax(): void {
+		$this->assertEquals('Map<Integer, 6..7>',
+			(string)$this->intersection(
+				$this->typeRegistry->map($this->typeRegistry->real(), 3, 7),
+				$this->typeRegistry->map($this->typeRegistry->integer(), 6, 10),
+			),
+		);
+    }
+
+	public function testLengthRangeMap(): void {
+		$this->assertEquals('Map<Integer, 6..10>',
+			(string)$this->intersection(
+				$this->typeRegistry->map($this->typeRegistry->real(), 2),
+				$this->typeRegistry->map($this->typeRegistry->integer(), 6, 10),
+			),
+		);
+    }
+
+	public function testLengthRangeMapNoIntersection(): void {
+		$this->assertEquals('(Map<Real, 6..>&Map<Integer, 2..5>)',
+			(string)$this->intersection(
+				$this->typeRegistry->map($this->typeRegistry->real(), 6),
+				$this->typeRegistry->map($this->typeRegistry->integer(), 2, 5),
+			),
+		);
+    }
+
+	public function testLengthRangeArray(): void {
+		$this->assertEquals('Array<Integer, 6..8>',
+			(string)$this->intersection(
+				$this->typeRegistry->array($this->typeRegistry->real(), 2, 8),
+				$this->typeRegistry->array($this->typeRegistry->integer(), 6),
+			),
+		);
+    }
+
+	public function testLengthRangeArrayNoIntersection(): void {
+		$this->assertEquals('(Array<Real, 2..5>&Array<Integer, 6..>)',
+			(string)$this->intersection(
+				$this->typeRegistry->array($this->typeRegistry->real(), 2, 5),
+				$this->typeRegistry->array($this->typeRegistry->integer(), 6),
+			),
+		);
+    }
 
 }

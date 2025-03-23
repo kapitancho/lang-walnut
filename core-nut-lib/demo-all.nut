@@ -54,6 +54,8 @@ getAllExpressions = ^Any => Any :: [
     matchValue: ?whenValueOf ('value') is { 'value': 'then 1', 'other value': 'then 2', ~: 'default' },
     matchIfThenElse: ?when('condition') { 'then' } ~ { 'else' },
     matchIfThen: ?when('condition') { 'then' },
+    matchIsErrorElse: ?whenIsError('condition') { 'then' } ~ { 'else' },
+    matchIsError: ?whenIsError('condition') { 'then' },
     functionCall: functionName('parameter'),
     constructorCall: TypeName('parameter'),
     propertyAccess: [property: 'value'].property
@@ -101,6 +103,10 @@ AllTypes = [
 
     impure: Impure,
     impureWithType: Impure<Integer>,
+
+    shape: Shape<Integer>,
+    shapeAny: Shape,
+    proxy: Array<!MyOpen0>,
 
     any: Any,
     /* nothing: Nothing */
@@ -171,6 +177,10 @@ getMatchingValuesForAllTypes = ^Null => AllTypes :: [
 
     impure: 'impure',
     impureWithType: @ExternalError[errorType: 'Error', originalError: 'Error', errorMessage: 'Error'],
+
+    shape: 42,
+    shapeAny: null,
+    proxy: [MyOpen0[a: 3, b: -2]],
 
     any: -12,
     /* nothing: Nothing */

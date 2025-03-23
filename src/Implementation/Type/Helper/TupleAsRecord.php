@@ -49,18 +49,13 @@ trait TupleAsRecord {
 	private function adjustParameterValue(
 		ValueRegistry               $valueRegistry,
 		Type                        $expectedType,
-		Value|null $actualValue,
-	): Value|null {
-		if ($actualValue === null) {
-			return null;
-		}
+		Value $actualValue,
+	): Value {
 		if ($actualValue instanceof TupleValue && $expectedType instanceof RecordType) {
-			$actualValue = (
-				$this->getTupleAsRecord(
-					$valueRegistry,
-					$actualValue,
-					$expectedType
-				)
+			$actualValue = $this->getTupleAsRecord(
+				$valueRegistry,
+				$actualValue,
+				$expectedType
 			);
 		}
 		return $actualValue;
@@ -77,11 +72,13 @@ trait TupleAsRecord {
 			try {
 				$value = $tupleValue->valueOf($index++);
 				$result[$key] = $value;
+			// @codeCoverageIgnoreStart
 			} catch (UnknownProperty $e) {
 				if (!($rType instanceof OptionalKeyType)) {
 					throw $e;
 				}
 			}
+			// @codeCoverageIgnoreEnd
 		}
 		return $valueRegistry->record($result);
 	}

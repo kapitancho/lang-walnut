@@ -5,7 +5,9 @@ namespace Walnut\Lang\Implementation\Program\Registry;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
+use Walnut\Lang\Blueprint\Function\CustomMethod;
 use Walnut\Lang\Blueprint\Function\Method;
+use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
@@ -51,18 +53,22 @@ final readonly class MainMethodRegistry implements MethodFinder {
 			if (count($methods) > 0) {
 				$unique = [];
 				foreach($methods as $method) {
-					$unique[$method[0]::class . $method[1]::class] = $method;
+					$uKey = $method[1] instanceof NativeMethod ? $method[1]::class : (string)$method[0];
+					$unique[$uKey] = $method;
 				}
 				if (count($unique) === 1) {
 					return $unique[array_key_first($unique)][1];//$methods[0][1];
 				}
 				$method = $this->registry->methodForType($targetType, $methodName);
-				return $method instanceof Method ? $method : throw new AnalyserException(
+				return $method instanceof Method ? $method :
+					// @codeCoverageIgnoreStart
+					throw new AnalyserException(
 					sprintf(
 						"Cannot call method '%s' on type '%s': ambiguous method",
 						$methodName,
 						$targetType
 					)
+					// @codeCoverageIgnoreEnd
 				);
 			}
 		}

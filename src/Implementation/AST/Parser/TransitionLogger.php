@@ -15,6 +15,7 @@ final class TransitionLogger {
         ];
 	}
 
+	// @codeCoverageIgnoreStart
 	public function __toString(): string {
 		$lines = [];
 		foreach($this->steps as [$i, $state, $token, $transition, $depth, $tag]) {
@@ -24,4 +25,5 @@ final class TransitionLogger {
 		}
 		return implode("\n", $lines);
 	}
+	// @codeCoverageIgnoreEnd
 }

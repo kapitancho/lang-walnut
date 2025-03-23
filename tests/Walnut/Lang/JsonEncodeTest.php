@@ -4,6 +4,7 @@ namespace Walnut\Lang;
 
 use BcMath\Number;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
@@ -46,7 +47,7 @@ final class JsonEncodeTest extends BaseProgramTestHelper {
 				=> $vr->mutable($this->typeRegistry->integer(), $vr->integer(42)),
 			'{"valueType":"Error","errorValue":{"valueType":"String","value":"error"}}' => $vr->error($vr->string('error')),
 			'{"valueType":"Type","value":{"type":"Boolean"}}' => $vr->type($this->typeRegistry->boolean),
-	        /*'{"valueType":"Function","parameterType":{"type":"Null"},"returnType":{"type":"Any"},"body":{"expression":{"expressionType":"constant","value":{"valueType":"Null"}}}}'
+	        '{"valueType":"Function","parameterType":{"type":"Null"},"returnType":{"type":"Any"},"body":{"expression":{"expressionType":"constant","value":{"valueType":"Null"}}}}'
 			        => $vr->function(
 				$this->typeRegistry->null,
 		        null,
@@ -57,7 +58,7 @@ final class JsonEncodeTest extends BaseProgramTestHelper {
 						$vr->null
 					)
 				)
-			),*/
+			),
         ] as $string => $value) {
 			$this->assertEquals($string, json_encode($value));
 		}
@@ -85,6 +86,7 @@ final class JsonEncodeTest extends BaseProgramTestHelper {
 			'{"type":"True"}' => $tr->true,
 			'{"type":"False"}' => $tr->false,
 			'{"type":"Null"}' => $tr->null,
+			'{"type":"Shape","refType":{"type":"Null"}}' => $tr->shape($tr->null),
 			'{"type":"Integer","range":{"minValue":"-Infinity","maxValue":"+Infinity"}}' => $tr->integer(),
 			'{"type":"Integer","range":{"minValue":1,"maxValue":"+Infinity"}}' => $tr->integer(1),
 			'{"type":"Integer","range":{"minValue":1,"maxValue":5}}' => $tr->integer(1, 5),
@@ -185,16 +187,16 @@ final class JsonEncodeTest extends BaseProgramTestHelper {
 			'{"expressionType":"noError","targetExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->noError($c0),
 			'{"expressionType":"noExternalError","targetExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->noExternalError($c0),
 			'{"expressionType":"sequence","expressions":[{"expressionType":"constant","value":{"valueType":"Integer","value":0}},{"expressionType":"constant","value":{"valueType":"Integer","value":0}}]}' => $er->sequence([$c0, $c0]),
-			//'{"expressionType":"methodCall","target":{"expressionType":"variableName","variableName":"x"},"methodName":"item","parameter":{"expressionType":"constant","value":{"valueType":"String","value":"a"}}}' => $er->propertyAccess($x, 'a'),
-			//'{"expressionType":"methodCall","target":{"expressionType":"variableName","variableName":"x"},"methodName":"item","parameter":{"expressionType":"constant","value":{"valueType":"String","value":"0"}}}' => $er->propertyAccess($x, '0'),
-			//'{"expressionType":"methodCall","target":{"expressionType":"variableName","variableName":"x"},"methodName":"invoke","parameter":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->functionCall($x, $c0),
-			//'{"expressionType":"methodCall","target":{"expressionType":"constant","value":{"valueType":"Integer","value":0}},"methodName":"construct","parameter":{"expressionType":"constant","value":{"valueType":"Type","value":{"type":"Open","name":"MyOpen","valueType":{"type":"Null"}}}}}' => $er->constructorCall(new TypeNameIdentifier('MyOpen'), $c0),
-			//'{"expressionType":"methodCall","target":{"expressionType":"variableName","variableName":"x"},"methodName":"method","parameter":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->methodCall($x, new MethodNameIdentifier('method'), $c0),
-			//'{"expressionType":"methodCall","target":{"expressionType":"variableName","variableName":"x"},"methodName":"method","parameter":{"expressionType":"constant","value":{"valueType":"Null"}}}' => $er->methodCall($x, new MethodNameIdentifier('method'), $er->constant($this->valueRegistry->null)),
-			/*'{"expressionType":"Match","target":{"expressionType":"constant","value":{"valueType":"Boolean","value":"true"}},"operation":"equals","pairs":[{"matchExpression":{"expressionType":"methodCall","target":{"expressionType":"variableName","variableName":"x"},"methodName":"asBoolean","parameter":{"expressionType":"constant","value":{"valueType":"Null"}}},"valueExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}},{"valueExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}]}' => $er->matchTrue([
+			'{"expressionType":"methodCall","target":{"expressionType":"variableName","variableName":"x"},"methodName":"item","parameter":{"expressionType":"constant","value":{"valueType":"String","value":"a"}}}' => $er->propertyAccess($x, 'a'),
+			'{"expressionType":"methodCall","target":{"expressionType":"variableName","variableName":"x"},"methodName":"item","parameter":{"expressionType":"constant","value":{"valueType":"String","value":"0"}}}' => $er->propertyAccess($x, '0'),
+			'{"expressionType":"methodCall","target":{"expressionType":"variableName","variableName":"x"},"methodName":"invoke","parameter":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->functionCall($x, $c0),
+			'{"expressionType":"methodCall","target":{"expressionType":"constant","value":{"valueType":"Integer","value":0}},"methodName":"construct","parameter":{"expressionType":"constant","value":{"valueType":"Type","value":{"type":"Open","name":"MyOpen","valueType":{"type":"Null"}}}}}' => $er->constructorCall(new TypeNameIdentifier('MyOpen'), $c0),
+			'{"expressionType":"methodCall","target":{"expressionType":"variableName","variableName":"x"},"methodName":"method","parameter":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->methodCall($x, new MethodNameIdentifier('method'), $c0),
+			'{"expressionType":"methodCall","target":{"expressionType":"variableName","variableName":"x"},"methodName":"method","parameter":{"expressionType":"constant","value":{"valueType":"Null"}}}' => $er->methodCall($x, new MethodNameIdentifier('method'), $er->constant($this->valueRegistry->null)),
+			'{"expressionType":"Match","target":{"expressionType":"constant","value":{"valueType":"Boolean","value":"true"}},"operation":"equals","pairs":[{"matchExpression":{"expressionType":"methodCall","target":{"expressionType":"variableName","variableName":"x"},"methodName":"asBoolean","parameter":{"expressionType":"constant","value":{"valueType":"Null"}}},"valueExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}},{"valueExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}]}' => $er->matchTrue([
 				$er->matchPair($x, $c0),
 				$er->matchDefault($c0)
-			]),*/
+			]),
 	        '{"expressionType":"Match","target":{"expressionType":"variableName","variableName":"x"},"operation":"isSubtypeOf","pairs":[{"matchExpression":{"expressionType":"variableName","variableName":"x"},"valueExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}},{"valueExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}]}' => $er->matchType($x, [
                 $er->matchPair($x, $c0),
                 $er->matchDefault($c0)
@@ -203,8 +205,10 @@ final class JsonEncodeTest extends BaseProgramTestHelper {
 				$er->matchPair($x, $c0),
 				$er->matchDefault($c0)
 			]),
-			//'{"expressionType":"Match","target":{"expressionType":"methodCall","target":{"expressionType":"variableName","variableName":"x"},"methodName":"asBoolean","parameter":{"expressionType":"constant","value":{"valueType":"Null"}}},"operation":"equals","pairs":[{"matchExpression":{"expressionType":"constant","value":{"valueType":"Boolean","value":"true"}},"valueExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}},{"valueExpression":{"expressionType":"constant","value":{"valueType":"Null"}}}]}' => $er->matchIf($x, $c0, $er->constant($this->valueRegistry->null)),
-			//'{"expressionType":"Match","target":{"expressionType":"methodCall","target":{"expressionType":"variableName","variableName":"x"},"methodName":"asBoolean","parameter":{"expressionType":"constant","value":{"valueType":"Null"}}},"operation":"equals","pairs":[{"matchExpression":{"expressionType":"constant","value":{"valueType":"Boolean","value":"true"}},"valueExpression":{"expressionType":"variableName","variableName":"x"}},{"valueExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}]}' => $er->matchIf($x, $x, $c0),
+			'{"expressionType":"Match","target":{"expressionType":"methodCall","target":{"expressionType":"variableName","variableName":"x"},"methodName":"asBoolean","parameter":{"expressionType":"constant","value":{"valueType":"Null"}}},"operation":"equals","pairs":[{"matchExpression":{"expressionType":"constant","value":{"valueType":"Boolean","value":"true"}},"valueExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}},{"valueExpression":{"expressionType":"constant","value":{"valueType":"Null"}}}]}' => $er->matchIf($x, $c0, $er->constant($this->valueRegistry->null)),
+			'{"expressionType":"Match","target":{"expressionType":"methodCall","target":{"expressionType":"variableName","variableName":"x"},"methodName":"asBoolean","parameter":{"expressionType":"constant","value":{"valueType":"Null"}}},"operation":"equals","pairs":[{"matchExpression":{"expressionType":"constant","value":{"valueType":"Boolean","value":"true"}},"valueExpression":{"expressionType":"variableName","variableName":"x"}},{"valueExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}]}' => $er->matchIf($x, $x, $c0),
+
+			'{"expressionType":"MatchError","target":{"expressionType":"variableName","variableName":"x"},"onError":{"expressionType":"constant","value":{"valueType":"Integer","value":0}},"else":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->matchError($x, $c0, $c0)
 		] as $string => $value) {
 			$this->assertEquals($string, json_encode($value));
 		}

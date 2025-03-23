@@ -82,7 +82,6 @@ use Walnut\Lang\Implementation\AST\Node\Type\TrueTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\TupleTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\TypeTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\UnionTypeNode;
-use Walnut\Lang\Implementation\AST\Node\Value\AtomValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\EnumerationValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\FalseValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\FunctionValueNode;
@@ -634,10 +633,6 @@ final class NodeBuilder implements NodeBuilderInterface {
 
 	public function typeValue(TypeNode $type): TypeValueNode {
 		return new TypeValueNode($this->getSourceLocation(), $type);
-	}
-
-	public function atomValue(TypeNameIdentifier $name): AtomValueNode {
-		return new AtomValueNode($this->getSourceLocation(), $name);
 	}
 
 	public function enumerationValue(TypeNameIdentifier $name, EnumValueIdentifier $enumValue): EnumerationValueNode {

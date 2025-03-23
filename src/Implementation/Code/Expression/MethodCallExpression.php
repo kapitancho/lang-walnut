@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Code\Expression;
 
+use JsonSerializable;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserResult;
@@ -14,7 +15,7 @@ use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
 use Walnut\Lang\Implementation\Type\Helper\BaseTypeHelper;
 
-final readonly class MethodCallExpression implements MethodCallExpressionInterface {
+final readonly class MethodCallExpression implements MethodCallExpressionInterface, JsonSerializable {
 
 	use BaseTypeHelper;
 
@@ -93,6 +94,7 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 			);
 			//TODO - DependencyContainerError
 			return $executionContext->asExecutionResult($retReturnTypedValue);
+		// @codeCoverageIgnoreStart
 		} catch (ExecutionException $e) {
 			throw new ExecutionException(
 				sprintf("Execution error in method call %s->%s(%s) : \n %s",
@@ -104,6 +106,7 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 				previous: $e
 			);
 		}
+		// @codeCoverageIgnoreEnd
 	}
 
 

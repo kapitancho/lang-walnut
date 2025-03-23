@@ -97,6 +97,13 @@ final class UnionTypeNormalizerTest extends BaseProgramTestHelper {
         ));
     }
 
+    public function testShapeTypes(): void {
+        self::assertEquals("Shape<(Integer|String)>", (string)$this->union(
+            $this->typeRegistry->shape($this->typeRegistry->integer()),
+            $this->typeRegistry->shape($this->typeRegistry->string()),
+        ));
+    }
+
     public function testAliasTypes(): void {
 	    $this->typeRegistryBuilder->addAlias(new TypeNameIdentifier('M'), $this->typeRegistry->boolean);
         self::assertEquals("(M|Real)", (string)$this->union(

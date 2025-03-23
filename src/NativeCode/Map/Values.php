@@ -6,6 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Type\IntersectionType;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -22,13 +23,19 @@ final readonly class Values implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof RecordType) {
-			$targetType = $targetType->asMapType();
-		}
-		if ($targetType instanceof MapType) {
-			return $programRegistry->typeRegistry->array(
-				$targetType->itemType, $targetType->range->minLength, $targetType->range->maxLength
-			);
+		$checkTypes = $targetType instanceof IntersectionType
+			? $targetType->types
+			: [$targetType];
+		foreach($checkTypes as $checkType) {
+			$checkType = $this->toBaseType($checkType);
+			if ($checkType instanceof RecordType) {
+				$checkType = $checkType->asMapType();
+			}
+			if ($checkType instanceof MapType) {
+				return $programRegistry->typeRegistry->array(
+					$checkType->itemType, $checkType->range->minLength, $checkType->range->maxLength
+				);
+			}
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));

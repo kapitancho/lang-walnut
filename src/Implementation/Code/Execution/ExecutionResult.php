@@ -47,6 +47,7 @@ final class ExecutionResult implements ExecutionResultInterface {
 		return $this->asExecutionResult($typedValue);
 	}
 
+	// @codeCoverageIgnoreStart
 	public function withAddedVariableType(VariableNameIdentifier $variableName, Type $variableType): AnalyserResultInterface {
 		return new AnalyserResult(
 			$this->programRegistry,
@@ -64,4 +65,5 @@ final class ExecutionResult implements ExecutionResultInterface {
 			$returnType
 		);
 	}
+	// @codeCoverageIgnoreEnd
 }

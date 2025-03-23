@@ -81,7 +81,6 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 		$baseIds = [];
 		$k = 0;
 		$alias = null;
-		$subset = null;
 		while ($type instanceof AliasType) {
 			$k++;
 			$baseIds[] = $type->name->identifier;
@@ -89,15 +88,7 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 			$type = $type->aliasedType;
 		}
 		if ($alias !== null) {
-			if ($subset !== null && $subset < $alias) {
-				$baseIds[] = 'Subset';
-			}
 			$baseIds[] = 'Alias';
-			if ($subset !== null && $subset > $alias) {
-				$baseIds[] = 'Subset';
-			}
-		} elseif ($subset !== null) {
-			$baseIds[] = 'Subset';
 		}
 
 		foreach ($this->getTypeMapping() as $typeClass => $ids) {

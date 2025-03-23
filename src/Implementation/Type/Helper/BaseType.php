@@ -15,10 +15,12 @@ trait BaseType {
 				$step = true;
 				$targetType = $targetType->aliasedType;
 			}
+			// @codeCoverageIgnoreStart
 			if ($targetType instanceof ProxyNamedType) {
 				$step = true;
 				$targetType = $targetType->actualType;
 			}
+			// @codeCoverageIgnoreEnd
 		}
 		return $targetType;
 	}

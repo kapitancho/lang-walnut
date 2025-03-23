@@ -26,6 +26,60 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 		$fn->selfAnalyse(new AnalyserContext($this->programRegistry, VariableScope::empty()));
 	}
 
+	public function testReturnTypeWithContextOk(): void {
+		$this->expectNotToPerformAssertions();
+		$fn = $this->valueRegistry->function(
+			$this->typeRegistry->null,
+			null,
+			$this->typeRegistry->nothing,
+			$this->typeRegistry->any,
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->tuple([
+					$this->expressionRegistry->variableName(new VariableNameIdentifier('self')),
+					$this->expressionRegistry->variableName(new VariableNameIdentifier('y'))
+				])
+			)
+		)->withSelfReferenceAs(new VariableNameIdentifier('self'))
+		->withVariableValueScope(
+			VariableValueScope::empty()->withAddedVariableValue(
+				new VariableNameIdentifier('y'),
+				$this->valueRegistry->integer(15)
+			)
+		);
+		$fn->selfAnalyse(new AnalyserContext($this->programRegistry,
+			VariableScope::empty()->withAddedVariableType(
+				new VariableNameIdentifier('y'),
+				$this->typeRegistry->integer()
+			)));
+	}
+
+	public function testReturnTypeWithContextExecuteOk(): void {
+		$fn = $this->valueRegistry->function(
+			$this->typeRegistry->null,
+			null,
+			$this->typeRegistry->nothing,
+			$this->typeRegistry->any,
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->tuple([
+					$this->expressionRegistry->variableName(new VariableNameIdentifier('self')),
+					$this->expressionRegistry->variableName(new VariableNameIdentifier('y'))
+				])
+			)
+		)->withSelfReferenceAs(new VariableNameIdentifier('self'));
+		$result = $fn->execute(new ExecutionContext($this->programRegistry,
+			VariableValueScope::empty()->withAddedVariableValue(
+				new VariableNameIdentifier('y'),
+				$this->valueRegistry->integer(15)
+			)),
+		$this->valueRegistry->null);
+		$this->assertTrue($result->equals(
+			$this->valueRegistry->tuple([
+				$fn,
+				$this->valueRegistry->integer(15)
+			])
+		));
+	}
+
 	public function testReturnTypeNotOk(): void {
 		$this->expectException(AnalyserException::class);
 		$fn = $this->valueRegistry->function(

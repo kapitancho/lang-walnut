@@ -68,7 +68,7 @@ use Walnut\Lang\Implementation\Value\BooleanValue;
 use Walnut\Lang\Implementation\Value\EnumerationValue;
 use Walnut\Lang\Implementation\Value\NullValue;
 
-final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInterface, JsonSerializable {
+final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInterface /*, JsonSerializable*/ {
 
     public AnyType $any;
     public NothingType $nothing;
@@ -256,6 +256,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 			'Integer' => $this->integer(),
 			'Real' => $this->real(),
 			'String' => $this->string(),
+		    'Shape' => $this->shape($this->any),
 		    'Atom' => $this->metaType(MetaTypeValue::Atom),
 		    'EnumerationValue' => $this->metaType(MetaTypeValue::EnumerationValue),
 		    'Record' => $this->metaType(MetaTypeValue::Record),
@@ -473,7 +474,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		);
 	}
 
-	public function jsonSerialize(): array {
+	/*public function jsonSerialize(): array {
 		return [
 			'coreTypes' => [
 				'Any' => $this->any,
@@ -502,5 +503,5 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 			'openTypes' => $this->openTypes,
 			'sealedTypes' => $this->sealedTypes
 		];
-	}
+	}*/
 }

@@ -11,7 +11,7 @@ use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 
-final readonly class VariableValueScope implements VariableValueScopeInterface, JsonSerializable {
+final readonly class VariableValueScope implements VariableValueScopeInterface {
 	/** @param array<string, Value> $variables */
 	public function __construct(
 		private array $variables
@@ -92,12 +92,5 @@ final readonly class VariableValueScope implements VariableValueScopeInterface, 
 
 	public static function empty(): VariableValueScopeInterface {
 		return new self([]);
-	}
-
-	public function jsonSerialize(): array {
-		return array_map(static fn(Value $typedValue): array => [
-			'type' => $typedValue->type,
-			'value' => $typedValue
-		], $this->variables);
 	}
 }

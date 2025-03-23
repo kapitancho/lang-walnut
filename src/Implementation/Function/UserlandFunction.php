@@ -88,6 +88,7 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 	/** @throws ExecutionException */
 	private function checkValueType(string $parameterName, Value $value, Type $expectedType): void {
 		if (!$value->type->isSubtypeOf($expectedType)) {
+			// @codeCoverageIgnoreStart
 			throw new ExecutionException(
 				sprintf(
 					"Error in %s: expected a %s value of type < %s >, got %s for value %s",
@@ -96,6 +97,7 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 						$value
 				)
 			);
+			// @codeCoverageIgnoreEnd
 		}
 	}
 
@@ -114,8 +116,9 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 			$executionContext->programRegistry->dependencyContainer->valueByType($this->dependencyType);
 
 		if ($dependencyValue instanceof DependencyError) {
+			// @codeCoverageIgnoreStart
 			$vr = $executionContext->programRegistry->valueRegistry;
-			return ($vr->error(
+			return $vr->error(
 				$vr->sealedValue(
 					new TypeNameIdentifier('DependencyContainerError'),
 					$vr->record([
@@ -136,7 +139,8 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 						),
 					])
 				)
-			));
+			);
+			// @codeCoverageIgnoreEnd
 		}
 
 		$executionContext = $this->functionContextFiller->fillExecutionContext(
@@ -151,6 +155,7 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 		);
 		try {
 			$returnValue = $this->functionBody->execute($executionContext);
+		// @codeCoverageIgnoreStart
 		} catch (UnknownContextVariable $e) {
 			throw new ExecutionException(
 				sprintf(
@@ -159,6 +164,7 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 				)
 			);
 		}
+		// @codeCoverageIgnoreEnd
 		$this->checkValueType('return', $returnValue, $this->returnType);
 		return $returnValue;
 	}

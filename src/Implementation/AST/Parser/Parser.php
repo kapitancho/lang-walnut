@@ -46,7 +46,9 @@ final readonly class Parser implements ParserInterface {
 		while($s->i < $l) {
 			$token = $tokens[$s->i];
 			if (++$ctr > 20000) {
+				// @codeCoverageIgnoreStart
 				throw new ParserException($s, "Recursion limit reached", $token, $moduleName);
+				// @codeCoverageIgnoreEnd
 			}
             $tag = is_string($token->rule->tag) ? $token->rule->tag :
                 strtoupper($token->rule->tag->name);
@@ -72,7 +74,9 @@ final readonly class Parser implements ParserInterface {
 				$lastState = $s->state;
 					$transition($token, $s, $nodeBuilder);
 				if ($s->i === $lastI && $s->state === $lastState) {
+					// @codeCoverageIgnoreStart
 					throw new ParserException($s, "Transition did not change state or index ($lastI, $lastState)", $token, $moduleName);
+					// @codeCoverageIgnoreEnd
 				}
 			} else {
 				$t = (int)$transition;

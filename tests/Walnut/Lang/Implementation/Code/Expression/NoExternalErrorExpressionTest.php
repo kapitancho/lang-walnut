@@ -37,4 +37,21 @@ final class NoExternalErrorExpressionTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("noExternalError(@0);", $declaration);
 		$this->assertEquals("true", $result);
 	}
+
+	//TODO - better analysis may find out the ExternalError is not possible
+	public function testNoExternalErrorOtherErrorType(): void {
+		$declaration = <<<NUT
+			noExternalError = ^Result<String, Real> => Result<String, Real|ExternalError> :: ?noExternalError(#);
+		NUT;
+		$result = $this->executeCodeSnippet("noExternalError('ok');", $declaration);
+		$this->assertEquals("'ok'", $result);
+	}
+
+	public function testNoExternalErrorOtherType(): void {
+		$declaration = <<<NUT
+			noExternalError = ^String => Integer :: {?noExternalError(#)}->length;
+		NUT;
+		$result = $this->executeCodeSnippet("noExternalError('ok');", $declaration);
+		$this->assertEquals("2", $result);
+	}
 }

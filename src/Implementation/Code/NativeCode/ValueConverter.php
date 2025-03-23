@@ -52,12 +52,14 @@ final readonly class ValueConverter {
 					);
 				}
 				if (!$returnType->isSubtypeOf($targetType)) {
+					// @codeCoverageIgnoreStart
 					throw new AnalyserException(sprintf(
 						"Cast method '%s' returns '%s' which is not a subtype of '%s'",
 						$methodName,
 						$returnType,
 						$targetType
 					));
+					// @codeCoverageIgnoreEnd
 				}
 				return $returnType;
 			}
@@ -139,12 +141,14 @@ final readonly class ValueConverter {
 				$errorType = $returnType instanceof ResultType ? $returnType->errorType : null;
 				$returnType = $returnType instanceof ResultType ? $returnType->returnType : $returnType;
 				if (!$returnType->isSubtypeOf($targetType)) {
+					// @codeCoverageIgnoreStart
 					throw new AnalyserException(sprintf(
 						"Cast method '%s' returns '%s' which is not a subtype of '%s'",
 						$methodName,
 						$returnType,
 						$targetType
 					));
+					// @codeCoverageIgnoreEnd
 				}
 				return $errorType ? $programRegistry->typeRegistry->result($targetType, $errorType) : $targetType;
 			}

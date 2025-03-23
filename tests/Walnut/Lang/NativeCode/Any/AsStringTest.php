@@ -12,6 +12,11 @@ final class AsStringTest extends CodeExecutionTestHelper {
 		$this->assertEquals("'MyAtom'", $result);
 	}
 
+	public function testAsStringEnumerationValue(): void {
+		$result = $this->executeCodeSnippet("MyEnum.a->asString;", "MyEnum = :[a, b];");
+		$this->assertEquals("'a'", $result);
+	}
+
 	public function testAsStringNull(): void {
 		$result = $this->executeCodeSnippet("null->asString;");
 		$this->assertEquals("'null'", $result);

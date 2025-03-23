@@ -16,6 +16,16 @@ final class ShapeTest extends CodeExecutionTestHelper {
 		$this->assertEquals("6", $result);
 	}
 
+	public function testFullSupersetDirectWithShapeExplicit(): void {
+		$result = $this->executeCodeSnippet("useIntPair(getIntPair(IntPairType[1, 5]));", <<<NUT
+			IntPairType = #[first: Integer, second: Integer];
+			IntPair = [first: Integer, second: Integer];
+			getIntPair = ^p: IntPairType => Shape<IntPair> :: p->shape(`IntPair);
+			useIntPair = ^p: Shape<IntPair> => Integer :: p->shape(`IntPair).first + p->shape(`IntPair).second;
+		NUT);
+		$this->assertEquals("6", $result);
+	}
+
 	public function testFullSupersetDirectNoShape(): void {
 		$result = $this->executeCodeSnippet("useIntPair(IntPairType[1, 5]);", <<<NUT
 			IntPairType = #[first: Integer, second: Integer];
@@ -70,6 +80,21 @@ final class ShapeTest extends CodeExecutionTestHelper {
 			Incompatible = :[];
 			IntPairType ==> IntPair @ Incompatible :: [first: \$a, second: \$b];
 			getIntPair = ^p: IntPairType => Shape<IntPair> :: p;
+			useIntPair = ^p: Shape<IntPair> => Integer :: p->shape.first + p->shape.second;
+		NUT);
+	}
+
+	public function testStrictSupersetCastErrorShapeCall(): void {
+		// The cast may return an error and therefore an implicit usage is not allowed.
+		$this->executeErrorCodeSnippet(
+			"Cannot convert value of type 'IntPairType' to shape 'IntPair' because the cast may return an error of type Incompatible",
+			"useIntPair(getIntPair(IntPairType[1, 5]));",
+		<<<NUT
+			IntPairType = #[a: Integer, b: Integer];
+			IntPair = [first: Integer, second: Integer];
+			Incompatible = :[];
+			IntPairType ==> IntPair @ Incompatible :: [first: \$a, second: \$b];
+			getIntPair = ^p: IntPairType => Shape<IntPair> :: p->shape(`IntPair);
 			useIntPair = ^p: Shape<IntPair> => Integer :: p->shape.first + p->shape.second;
 		NUT);
 	}

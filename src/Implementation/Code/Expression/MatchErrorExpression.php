@@ -40,7 +40,9 @@ final readonly class MatchErrorExpression implements MatchErrorExpressionInterfa
 			$innerContext = $retTarget;
 			if ($this->target instanceof VariableNameExpression) {
 				$errorType = $bType instanceof ResultType ? $bType->errorType :
+					// @codeCoverageIgnoreStart
 					$analyserContext->programRegistry->typeRegistry->any;
+					// @codeCoverageIgnoreEnd
 
 				$innerContext = $innerContext->withAddedVariableType(
 					$this->target->variableName,

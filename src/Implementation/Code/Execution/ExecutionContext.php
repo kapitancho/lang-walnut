@@ -40,6 +40,7 @@ final readonly class ExecutionContext implements ExecutionContextInterface {
 		);
 	}
 
+	// @codeCoverageIgnoreStart
 	public function withAddedVariableType(VariableNameIdentifier $variableName, Type $variableType): AnalyserContextInterface {
 		return new AnalyserContext(
 			$this->programRegistry,
@@ -55,4 +56,5 @@ final readonly class ExecutionContext implements ExecutionContextInterface {
 			$returnType
 		);
 	}
+	// @codeCoverageIgnoreEnd
 }

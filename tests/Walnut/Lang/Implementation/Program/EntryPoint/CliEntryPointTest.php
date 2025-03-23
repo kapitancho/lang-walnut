@@ -11,10 +11,6 @@ use Walnut\Lang\Test\BaseProgramTestHelper;
 
 class CliEntryPointTest extends BaseProgramTestHelper {
 
-	public function setUp(): void {
-		parent::setUp();
-	}
-
 	public function testCall(): void {
 		$this->programContext->globalScopeBuilder->addVariable(
 			new VariableNameIdentifier('main'),

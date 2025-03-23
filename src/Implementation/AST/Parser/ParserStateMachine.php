@@ -751,14 +751,6 @@ final readonly class ParserStateMachine {
 					$this->s->push(274);
 					$this->s->back(401);
 				},
-				/*T::empty_tuple->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->constant(
-						$this->nodeBuilder->atomValue(
-							new TypeNameIdentifier($this->s->result['type_name'])
-						)
-					);
-					$this->s->moveAndPop();
-				},*/
 				T::call_start->name => 271,
 				T::tuple_start->name => function(LT $token) {
 					$this->s->push(273);
@@ -1921,14 +1913,7 @@ final readonly class ParserStateMachine {
 			]],
 
 			490 => ['name' => 'value type name', 'transitions' => [
-				//T::empty_tuple->name => 491,
 				T::property_accessor->name => 492,
-			]],
-			491 => ['name' => 'value atom', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->atomValue($this->s->result['current_type_name']);
-					$this->s->pop();
-				}
 			]],
 			492 => ['name' => 'value enum', 'transitions' => [
 				T::type_keyword->name => $c = function(LT $token) {

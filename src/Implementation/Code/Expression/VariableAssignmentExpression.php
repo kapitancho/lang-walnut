@@ -56,7 +56,7 @@ final readonly class VariableAssignmentExpression implements VariableAssignmentE
 		$ret = $this->assignedExpression->execute($executionContext);
 		$val = $ret->value;
 		if ($val instanceof FunctionValue && $this->assignedExpression instanceof ConstantExpression) {
-			$val = ($val->withSelfReferenceAs($this->variableName));
+			$val = $val->withSelfReferenceAs($this->variableName);
 		}
 		return $ret->withAddedVariableValue(
 			$this->variableName,

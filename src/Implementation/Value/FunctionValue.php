@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Value;
 
+use JsonSerializable;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
@@ -11,11 +12,10 @@ use Walnut\Lang\Blueprint\Function\UserlandFunction;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\NothingType;
-use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\FunctionValue as FunctionValueInterface;
 use Walnut\Lang\Blueprint\Value\Value;
 
-final readonly class FunctionValue implements FunctionValueInterface {
+final readonly class FunctionValue implements FunctionValueInterface, JsonSerializable {
 
 	private function __construct(
 		public FunctionType $type,
@@ -78,18 +78,7 @@ final readonly class FunctionValue implements FunctionValueInterface {
 		);
 	}
 
-	/** @throws AnalyserException */
-	public function analyse(AnalyserContext $analyserContext, Type $parameterType): Type {
-		return $this->function->analyse(
-			$analyserContext->programRegistry->typeRegistry->nothing,
-			$parameterType
-		);
-	}
-
 	public function execute(ExecutionContext $executionContext, Value $parameterValue): Value {
-		if ($parameterValue instanceof Value) {
-			$parameterValue = ($parameterValue);
-		}
 		foreach ($this->variableValueScope?->allTypedValues() ?? [] as $variableName => $v) {
 			/** @noinspection PhpParamsInspection */ //PhpStorm bug
 			$executionContext = $executionContext->withAddedVariableValue($variableName, $v);
