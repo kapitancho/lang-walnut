@@ -22,6 +22,7 @@ foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . $fo
 			echo "\033[0;34m", $analyserException->getMessage(), "\033[0m", PHP_EOL;
 		} catch (Throwable $exception) {
 			echo $exception->getMessage(), PHP_EOL;
+			//echo $exception->getTraceAsString(), PHP_EOL;
 		}
 	}
 }

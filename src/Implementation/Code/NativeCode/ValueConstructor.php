@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Implementation\Code\NativeCode;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
+use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
@@ -227,6 +228,9 @@ final readonly class ValueConstructor {
 				),
 				$type instanceof AtomType => $type->value,
 				$type instanceof EnumerationType => $et($type, $parameterValue),
+				default => throw new ExecutionException(
+					sprintf("Cannot construct a value of type: %s", $type)
+				)
 			}
 		);
 	}

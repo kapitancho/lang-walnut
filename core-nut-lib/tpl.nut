@@ -1,7 +1,7 @@
 module $tpl:
 
 UnableToRenderTemplate = $[type: Type];
-UnableToRenderTemplate ==> String :: 'Unable to render template of type '->concat($type->printed);
+UnableToRenderTemplate ==> String :: 'Unable to render template of type '->concat($type->asString);
 
 Template = #Mutable<String>;
 

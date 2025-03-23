@@ -499,6 +499,8 @@ final readonly class ParserStateMachine {
 					$this->s->push(125);
 					$this->s->stay(901);
 				},
+				T::sequence_start->name => $c,
+				T::arithmetic_op_multiply->name => $c,
 				T::tuple_start->name => $c,
 				T::empty_tuple->name => $c,
 				T::empty_record->name => $c,
@@ -1987,6 +1989,9 @@ final readonly class ParserStateMachine {
 					$this->s->push(503);
 					$this->s->stay(701);
 				},
+				T::arithmetic_op_multiply->name => $c,
+				T::type_proxy_keyword->name => $c,
+				T::sequence_start->name => $c,
 				T::tuple_start->name => $c,
 				T::empty_tuple->name => $c,
 				T::empty_record->name => $c,
