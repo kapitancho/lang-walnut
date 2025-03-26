@@ -40,7 +40,7 @@ Atoms are types with a single value and `Null` is a special `Atom` type.
 
 ### Values
 - `null` - the value of the Null type (`null->type` is `Null`)
-- `MyAtom[]` - the value of the `MyAtom` type (`MyAtom[]->type` is `MyAtom`)
+- `MyAtom()` - the value of the `MyAtom` type (`MyAtom()->type` is `MyAtom`)
 
 ## Enumerations and Boolean
 
@@ -58,13 +58,13 @@ Enumerations are types with a fixed set of values. The `Boolean` type is a speci
 
 ## Arrays, Tuples, Maps, Records, and Sets
 
-The following types and values are available for arrays, tuples, maps, and records:
+The following types and values are available for arrays, tuples, maps, records, and sets:
 
 ### Types
 - `Array`, `Array<Integer>`, `Array<String, 1..5>`, `Array<..10>`, `Array<Array, 3..>>` - arrays and arrays with length range and/or element type constraints 
 - `Map`, `Map<Integer>`, `Map<String, 1..5>`, `Map<..10>`, `Map<Map, 3..>>` - maps and maps with length range and/or value type constraints
 - `Set`, `Set<Integer>`, `Set<String, 1..5>`, `Set<..10>`, `Set<Map, 3..>>` - sets and sets with length range and/or value type constraints
-- `[]`, `[Real]`, `[Integer, String]`, `[Any, Array, Integer<1..5>, ...], [Integer, ...Real] - tuples and tuples with rest type definition 
+- `[]`, `[Real]`, `[Integer, String]`, `[Any, Array, Integer<1..5>, ...]`, `[Integer, ...Real]` - tuples and tuples with rest type definition 
 - `[:]`, `[a: Real]`, `[x: Integer, y: String]`, `[a: Any, b: ?String]`, `[a: Integer, ... Real]` - records and records with optional keys and rest type definition
 
 ### Values
@@ -119,18 +119,17 @@ Sealed types are used to encapsulate the data and behavior similarly to OOP. The
 
 Check [Functions](03-functions.md#Constructors) for more information on how to define a constructor and an invariant checker.
 
-## Subtype
+## Open
 
-Subtypes are ideal as subsets of existing types, optionally providing a value restriction. Notably any type can be subtyped including scalars.
-The values can be passed wherever the base type is expected.
+Open types are similar to structs and records in other languages. Their data is accessible.
 
 ### Types
-- `OddInteger <: Integer @ NotAnOddInteger :: ?whenValueOf(# % 2) is { 0: Error(NotAnOddInteger[]) }` - subtype definition
-- `GpsPoint` <: [latitude: Real<-90..90>, longitude: Real<-180..180>] - subtype definition based on a tuple type
+- `OddInteger = #Integer @ NotAnOddInteger :: ?whenValueOf(# % 2) is { 0: Error(NotAnOddInteger[]) }` - open type definition
+- `GpsPoint = [latitude: Real<-90..90>, longitude: Real<-180..180>]` - open type definition based on a tuple type
 
 ### Values
-- `x = OddInteger[5]` - subtype value (`x->type` is `OddInteger`)
-- `p = GpsPoint[51.5074, 0.1278]` - subtype value (`p->type` is `GpsPoint`)
+- `x = OddInteger(5)` - open type value (`x->type` is `OddInteger`, `x->value` is `5`)
+- `p = GpsPoint[51.5074, 0.1278]` - open type value (`p->type` is `GpsPoint`, `p.0` is `51.5074`)
 
 ## Function
 
@@ -140,7 +139,7 @@ The functions are first-class citizens in Walnut. They can be passed as argument
 - `^Integer => Real`, `^[x: Integer, y: Real] => Result<Boolean, String>` - function type definition
 
 ### Values
-- `f = ^Integer => Real %% [~MyDependency] :: # * 3.14` - function value (`f->type` is `^Integer => Real`)
+- `f = ^i: Integer => Real %% [~MyDependency] :: i * 3.14` - function value (`f->type` is `^Integer => Real`)
 
 ## Type
 
@@ -163,6 +162,19 @@ In addition, methods can be assigned to an alias type.
 - `MyInt = Integer<1..10>` - alias type definition
 - `MyInt->doubled(^Null => Integer<2..20) :: # * 2` - method assignment to an alias type
 - `x->doubled` - method call on a value of the alias type `MyInt` provided that the type is known on compile-time.
+
+### Shapes
+The shape types define a common way to access different values which share a similar "shape".
+- `Shape<Integer>` (or in short syntax - `{Integer}`)
+- `Shape<[x: Real, y: Real, ...]>` (or in short syntax - `{x: Real, y: Real, ...}`) 
+
+A value `v` is of type `Shape<T>` if its type `V` is a subtype of `T` or `V` is an open type based on `T` or 
+there is a defined cast method `V ==> T` with no error return type.
+```walnut
+getName = ^obj: {String} => String :: 'The name is: + obj->shape(`{String});
+
+getName(Product[id: 1, title: 'Tomato', price: 2.34]); //returns 'The name is: Tomato'
+```
 
 ### Any
 This is the top type in Walnut. It can be used to represent any value. Type like `Array` and `Map` are in fact `Array<Any>` and `Map<Any>`.

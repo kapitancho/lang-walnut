@@ -19,14 +19,15 @@ In addition to the basic functions, Walnut supports behavior-driven functions (o
 They are a 6-tuple consisting of a target type, a method name, a dependency type, a parameter type, a return type,
 and a body in the form of an expression.
 
-#### Example (main syntax)
+### Example (main syntax)
 ```walnut
 Article->publish(^Null => ArticlePublished) %% [~Clock] :: {
-    $.publishDate->SET(%.clock->now);
+    $$.publishDate->SET(%.clock->now);
     ArticlePublished[]
 };
 ```
-In addition to the `#` and `%` variables, there is one more: `$`. The `$` variable represents the target type.
+In addition to the `#` and `%` variables, there is at least one more: `$`. The `$` variable represents the target type.
+For methods targeting sealed and open types, the `$$` variable points to the base value of the target type.
 It is also the only variable through which the properties of a sealed type can be accessed.
 In its core, this syntax is just a syntactic sugar over the basic function syntax. The example above resembles a 
 function similar to this one in a C-like language:
@@ -38,10 +39,20 @@ function article_publish(%: [~Clock], $: Article, #: Null): ArticlePublished {
 ```
 One convenience is that the dependency parameter is automatically injected (or curried) using the built-in dependency injection mechanism.
 
+### Additional variables
+For all three parameters - the target (`$`) the parameter (`#`) and the dependency (`%`), all types that are 
+either tuples or records as well as open and sealed types based on tuples and records have their properties automatically
+available. So for example #name is the same value as #.name, %clock is %.clock etc. In case the tuple or record type
+definition includes a rest type, the `$_`, `#_` and `%_` variables are available, and they represent the remaining values.
+```walnut
+buildTags = ^[category: String, priority: Integer, ...String] => String :: 
+    'Priority: ' + {#priority->asString} + ', category: ' + #category + ', tags: ' + #_->values->combineAsString(', ');
+```
+
 ## Casts
 Between every two named types there can be a cast function. It is a function that converts a value of one type to a value of another type.
 ```walnut
-Article ==> String :: #.title;  
+Article ==> String :: $title;  
 ```
 
 The method *Any->as(Type)* can be used to cast any value to a given target type. In case the cast is proven to be possible
@@ -59,7 +70,7 @@ This is just a short version of the cast *DependencyContainer ==> ArticleService
 In case a value cannot be instantiated, an error of type DependencyContainerError is returned.
 
 ## Constructors
-The following syntax can be used to define a constructor for a subtype or a sealed type:
+The following syntax can be used to define a constructor for an open or a sealed type:
 ```
 Article(title: String) %% [~Clock] :: [title: title, publishDate: %.clock->now];
 ```
@@ -67,17 +78,17 @@ Once again this is presented as *Constructor->Article(title: String) %% [~Clock]
 
 ## Invariant validators
 This is a unique feature of Walnut. There is a way to provide a validator function which in case it explicitly returns an 
-error the value construction is rejected and the error is returned instead. It may again be used for both subtypes and sealed types.
+error the value construction is rejected and the error is returned instead. It may again be used for both open and sealed types.
 Invariant validators and constructors can be used or omitted independently.
 ```walnut
 NotAnOddInteger = :[]; /* define an Atom type for the error */
-OddInteger <: Integer @ NotAnOddInteger :: ?whenValueOf(# % 2) is { 0: => Error(NotAnOddInteger[]) };
+OddInteger = #Integer @ NotAnOddInteger :: ?whenValueOf(# % 2) is { 0: => Error(NotAnOddInteger[]) };
 ```
 It is important to know that while the constructor can be bypassed by using the `JsonValue->hydrateAs` method, 
 the invariant validator is always executed. In case the validator returns an error, the `hydrateAs` method will return a `HydrationError`.
 
 ## Default types (syntactic sugar)
-In case the return type of an extended function is Any, it can be omitted.
+In case the return type of extended function is Any, it can be omitted.
 ```walnut
 Article->returnsAny(^x:String) :: ...some expression;
 ```
@@ -130,8 +141,8 @@ Constructors can be called using the same function call syntax:
 a = Article('My first article');
 b = Book[isbn: 1234567890, title: 'My first book'];
 ```
-Alongside the constructor calls for sealed types and subtypes the only special calls are the ones for the following built-in types:
-Error, Mutable
+Alongside the constructor calls for open and sealed types the only special calls are the ones for the following 
+built-in types: `Error`, `Mutable`
 
 Constructing an error value of type String:
 ```walnut

@@ -12,7 +12,7 @@ Values are the simplest form of expressions. They can be constants or references
 ```walnut
 3.14
 null
-type{Real}
+type{Real} /* or just `Real */
 ^Integer => String
 MyAtom[]
 Suit.Clubs
@@ -54,7 +54,7 @@ x = @ExternalError[ ... ];
 
 ## Conditionals
 More about conditionals can be read [here](22-conditional-expressions.md)
-There are four conditionals with a similar syntax:
+There are five conditionals with a similar syntax:
 
 ### ?whenValueOf
 ```walnut
@@ -64,8 +64,8 @@ There are four conditionals with a similar syntax:
 ### ?whenTypeOf
 ```walnut
 ?whenTypeOf(x) is {
-    type{Integer<1..>} : 1,
-    type{Real} : 2,
+    `Integer<1..> : 1,
+    `Real : 2,
     ~ : 0 /* ~ is the default branch */
 };
 ```
@@ -84,13 +84,13 @@ There are four conditionals with a similar syntax:
 
 ### ?whenIsError
 ```walnut
-?whenIsError (x) { 1 }; /* no else branch means 'null' */
+?whenIsError (x) { 1 }; /* no else branch means 'use x' */
 
 ?whenIsError (x) { 1 } ~ { -1 };
 ```
 
-Warning: in all three cases if the default branch (~) is omitted the expression value for the branch will be null unless the
-analyser can detect that all cases are covered.
+Warning: for both  `whenValueOf` and `whenTypeOf`, if the default branch (~) is omitted the 
+expression value for the branch will be null unless the analyser can detect that all cases are covered.
 
 
 ## Function Calls
@@ -124,7 +124,8 @@ which converts any error into an `ExternalError`.
 
 ## Sequences
 The sequences are a series of expressions separated by semicolons. 
-The value of the sequence is the value of the last expression in the sequence.
+The value of the sequence is the value of the last expression in the sequence unless there is an early return
+which gets evaluated before reaching the last expression.
 
 ```walnut
 {

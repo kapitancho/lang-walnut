@@ -17,7 +17,7 @@ Many of the built-in methods are obvious based on their names. The following is 
 
 ### Any (of every value)
 - binaryEqual, binaryNotEqual (==, !=)
-- isOfType, type, as, jsonStringify, printed
+- isOfType, type, as, shape, jsonStringify, printed
 - _(output to stdout)_ DUMP, DUMPNL
 - errorAsExternal
 - _Casts_: asBoolean, asJsonValue, asString
@@ -85,32 +85,38 @@ _Type< T > for T=_
 - EnumerationSubset: values, enumerationType, valueWithName
 - Function: parameterType, returnType
 - Mutable: valueType
-- Subtype: typeName, baseType
+- Open: typeName, valueType
 - Sealed: typeName, valueType
+- Shape: typeName, valueType
 - Result: errorType
 - Type: refType
 
 ### Mutable
 - value, SET
 - (for Mutable< Array > only) POP, SHIFT
+- (for Mutable< Array > if there is no array size constraint) PUSH, UNSHIFT
+- (for Mutable< Set > only) ADD, REMOVE, CLEAR
 
 ### Function
 - invoke
 
 ### Record
-- with
+- with, itemValues
+
+### Tuple
+- itemValues
 
 ### Result< Nothing, T >
 - error
 
 ### Sealed types
-- item
+- *no methods available*
 
-### Subtype types
-- baseValue
+### Open types
+- item, value, with
 
 ### Enumeration types
-- textValue
+- enumeration, textValue
 
 ### JsonValue
 - hydrateAs, stringify

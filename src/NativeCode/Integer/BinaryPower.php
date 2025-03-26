@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\NativeCode\Integer;
 
+use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
@@ -11,6 +12,7 @@ use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\IntegerValue as IntegerValueAlias;
 use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
@@ -28,6 +30,12 @@ final readonly class BinaryPower implements NativeMethod {
 		if ($targetType instanceof IntegerType || $targetType instanceof IntegerSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 
+			if ($parameterType instanceof IntegerSubsetType && array_all(
+					$parameterType->subsetValues, fn(Number $value)
+				=> (int)(string)$value % 2 === 0
+				)) {
+				return $programRegistry->typeRegistry->integer(0);
+			}
 			if ($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) {
 				return $programRegistry->typeRegistry->integer();
 			}

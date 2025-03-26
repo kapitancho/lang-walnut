@@ -6,7 +6,7 @@ The Walnut language allows defining a wide range of custom types.
 Once defined and given a name, every custom type may be enriched with behavior.
 This includes adding methods and defining casts from and to other types.
 There are five different kinds of custom types in Walnut:
-`Atoms`, `Enumerations`, `Aliases`, `Subtypes`, and `Sealed` types.
+`Atoms`, `Enumerations`, `Aliases`, `Open` types, and `Sealed` types.
 
 ## Atoms
 
@@ -16,7 +16,7 @@ There are five different kinds of custom types in Walnut:
 UnknownProduct = :[];
 
 /* Atom value usage */
-myProduct = UnknownProduct[]; 
+myProduct = UnknownProduct(); 
 ```
 ### Summary
 The atoms represent values that form their own type.
@@ -32,7 +32,7 @@ UnknownProduct->getProductTitle(=> String) :: 'n/a';
 /* Define a cast from the atom type to another type (Boolean) */
 UnknownProduct ==> Boolean :: false;
 
-myProduct = UnknownProduct[];
+myProduct = UnknownProduct();
 title = myProduct->getProductTitle; /* 'n/a' */
 ?when(myProduct->asBoolean) 
       { 'The product is ok' } 
@@ -57,22 +57,20 @@ and its two values are `true` and `false`.
 ### Usage examples
 ```walnut
 /* Define behavior for the enumeration type */
-Suit->getSuitColor(=> String['black', 'white']) :: 
-    ?whenValueOf(#) is {
-        Suit.Clubs: 'black',
-        Suit.Spades: 'black',
-        ~: 'red' 
+Suit->getSuitColor(=> String['black', 'red']) :: 
+    ?whenTypeOf($) is {
+        `Suit[Clubs, Spades]: 'black',
+        `Suit[Diamonds, Hearts]: 'red' 
     };
 
 /* Define a cast from the enumeration type to another type (Integer) */
 Suit ==> Integer :: 
-    ?whenValueOf(#) is {
+    ?whenValueOf($) is {
         Suit.Clubs: 1,
         Suit.Diamonds: 2,
         Suit.Hearts: 3,
         Suit.Spades: 4
     };
-
 
 mySuit = Suit.Spades;
 color = mySuit->getSuitColor; /* 'black' */
@@ -92,50 +90,50 @@ Scalar = Real | String | Boolean | Null;
 By defining an alias, you can give a new name to an existing type.
 This can be useful to make the code more readable but in addition,
 methods and casts can be added to the alias type. 
-As long as the compiler can infer the type of a variable, 
+As long as the compiler can infer the type of variable, 
 these methods and casts can be used.
 
 ### Usage examples
 ```walnut
 /* Define behavior for the alias type */
-MyPoint->distanceTo(^MyPoint => Real) :: {{{$x - #x} ** 2} + {{$y - #y} ** 2}}->sqrt;
+MyPoint->distanceTo(^MyPoint => Real) :: {{$x - #x} ** 2 + {$y - #y} ** 2}->sqrt;
 
 /* Define a cast from the alias type to another type (String) */
-MyPoint ==> String :: ['(x: ', #x->asString, ', y:', #y->asString, ')']
+MyPoint ==> String :: ['(x: ', $x->asString, ', y:', $y->asString, ')']
     ->combineAsString('');
 
-p = {[x: 3.3, y: 1]}->as(type{MyPoint}); /* make sure the compiler knows the type */
-q = {[x: 7.1, y: -2]}->as(type{MyPoint});
+p = [x: 3.3, y: 1];
+q = [x: 7.1, y: -2];
 distance = p->distanceTo(q); /* 5 */
 s = p->asString; /* '(x: 3.3, y: 1.0)' */
 ```
 
-## Subtypes
+## Open types
 
 ### Short syntax (examples)
 ```walnut
-GpsPoint <: [latitude: Real<-90..90>, longitude: Real<-180..180>]
+GpsPoint = #[latitude: Real<-90..90>, longitude: Real<-180..180>]
 
-OddInteger <: Integer @ NotAnOddInteger :: 
+OddInteger #Integer @ NotAnOddInteger :: 
     ?when({# % 2} == 0) { => @NotAnOddInteger[] }
 ```
 
 ### Summary
-A subtype is a type that is a subset of another type.
-This resembles inheritance, but it is not restricted and 
-even scalars can be subtyped. While the values can be used
-on places where the base type is expected, the opposite is not permitted.
-More on subtype constructors and invariant checkers can be found 
+Open types are types for which the value that they are bound to is exposed and fully accessible.
+Their value can be based on any type, and they are treated as distinct values so MyInteger(5) is different from 5.
+More on open type constructors and invariant checkers can be found 
 [here](#Constructors and invariant validators).
 
 ### Usage examples
 ```walnut
-square = ^Integer => Integer :: # * #;
-addOne = ^OddInteger => Integer :: # + 1;
+square = ^x: Integer => Integer :: x ** 2;
+addOne = ^x: OddInteger => Integer :: x->value + 1;
+isPointNorth = ^pt: GpsPoint => Boolean :: pt.latitude > 0;
 
 x = ?noError(OddInteger(5));
 xSquared = square(5); /* 25 */
 xPlusOne = addOne(x); /* Compilation error - OddInteger expected but Integer provided */
+xIsNorth = isPointNorth[latitude: 51.5074, longitude: 0.1278]; /* true */
 ```
 
 ## Sealed types
@@ -149,9 +147,7 @@ Point = $[x: Real, y: Real];
 
 ### Summary
 Sealed types are used to encapsulate the data and behavior similarly to OOP.
-They must be defined based on a record type. Unlike subtypes, the sealed types
-are not compatible with their base types. The only way to access the properties
-is by using the methods defined on the sealed type.
+The only way to access the properties is by using methods defined on the sealed type.
 More on sealed type constructors and invariant checkers can be found
 [here](#Constructors and invariant validators).
 
@@ -197,7 +193,7 @@ error the value construction is rejected and the error is returned instead. It m
 Invariant validators and constructors can be used or omitted independently.
 ```walnut
 NotAnOddInteger = :[]; /* define an Atom type for the error */
-OddInteger <: Integer @ NotAnOddInteger :: ?whenValueOf(# % 2) is { 0: => Error(NotAnOddInteger[]) };
+OddInteger = #Integer @ NotAnOddInteger :: ?whenValueOf(# % 2) is { 0: => Error(NotAnOddInteger[]) };
 ```
 It is important to know that while the constructor can be bypassed by using the `JsonValue->hydrateAs` method,
 the invariant validator is always executed. In case the validator returns an error, the `hydrateAs` method will return a `HydrationError`.
