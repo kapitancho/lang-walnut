@@ -230,6 +230,27 @@ getAllValues = ^Any => Any :: [
     function: ^Any => Any :: 'function body'
 ];
 
+allConstants = [
+    atom: MyAtom(),
+    booleanTrue: true,
+    booleanFalse: false,
+    enumeration: MyEnum.Value1,
+    integer: 42,
+    real: 3.14,
+    string: 'hi!',
+    null: null,
+    emptyTuple: [],
+    tuple: [1, 'hi!'],
+    emptyRecord: [:],
+    record: [a: 1, b: 'hi!'],
+    emptySet: [;],
+    set: [1; 'hi!'],
+    type: `String,
+    mutable: mutable{String, 'mutable'},
+    error: @'error',
+    function: ^Any => Any :: 'function body'
+];
+
 /* Variables */
 a = 1;
 b = ^MyAlias => Integer :: # + a;
@@ -238,5 +259,6 @@ c = `String;
 main = ^Array<String> => String :: [
     allExpressions: getAllExpressions(),
     allTypesAndSampleValues: getAllTypes(getMatchingValuesForAllTypes()),
-    allValues: getAllValues()
+    allValues: getAllValues(),
+    allConstants: allConstants
 ]->printed;

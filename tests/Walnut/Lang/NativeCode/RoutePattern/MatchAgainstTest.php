@@ -21,7 +21,7 @@ final class MatchAgainstTest extends CodeExecutionTestHelper {
 	public function testMatchAgainstPatternNo(): void {
 		$result = $this->executeCodeSnippet("RoutePattern('goodbye/{who}')->matchAgainst('hello/world');",
 			"RoutePatternDoesNotMatch = :[]; RoutePattern = # String;");
-		$this->assertEquals('RoutePatternDoesNotMatch[]', $result);
+		$this->assertEquals('RoutePatternDoesNotMatch()', $result);
 	}
 
 	public function testMatchAgainstPatternNumeric(): void {
@@ -33,7 +33,7 @@ final class MatchAgainstTest extends CodeExecutionTestHelper {
 	public function testMatchAgainstPatternNumericNo(): void {
 		$result = $this->executeCodeSnippet("RoutePattern('hello/{+who}')->matchAgainst('hello/world');",
 			"RoutePatternDoesNotMatch = :[]; RoutePattern = # String;");
-		$this->assertEquals("RoutePatternDoesNotMatch[]", $result);
+		$this->assertEquals("RoutePatternDoesNotMatch()", $result);
 	}
 
 }

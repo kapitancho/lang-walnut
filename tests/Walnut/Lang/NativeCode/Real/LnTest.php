@@ -13,6 +13,6 @@ final class LnTest extends CodeExecutionTestHelper {
 
 	public function testLnNegative(): void {
 		$result = $this->executeCodeSnippet("-4.14->ln;");
-		$this->assertEquals("@NotANumber[]", $result);
+		$this->assertEquals("@NotANumber()", $result);
 	}
 }

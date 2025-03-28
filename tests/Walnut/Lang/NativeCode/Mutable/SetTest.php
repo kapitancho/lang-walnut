@@ -8,7 +8,7 @@ final class SetTest extends CodeExecutionTestHelper {
 
 	public function testSet(): void {
 		$result = $this->executeCodeSnippet("mutable{Real, 3.14}->SET(8);");
-		$this->assertEquals("Mutable[Real, 8]", $result);
+		$this->assertEquals("mutable{Real, 8}", $result);
 	}
 
 	public function testSetInvalidParameterType(): void {

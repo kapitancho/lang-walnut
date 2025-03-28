@@ -19,7 +19,7 @@ final class ToStringTest extends BaseProgramTestHelper {
 		$ev = fn(string $name) => new EnumValueIdentifier($name);
 		$vr = $this->valueRegistry;
 		foreach([
-			'MyAtom[]' => $vr->atom($i('MyAtom')),
+			'MyAtom()' => $vr->atom($i('MyAtom')),
 			'MyEnum.A' => $vr->enumerationValue($i('MyEnum'), $ev('A')),
 			'MySealed{null}' => $vr->sealedValue($i('MySealed'), $vr->null),
 			'MyOpen{null}' => $vr->openValue($i('MyOpen'), $vr->null),
@@ -36,7 +36,7 @@ final class ToStringTest extends BaseProgramTestHelper {
 			'[;]' => $vr->set([]),
 	        "[1;]" => $vr->set([$vr->integer(1)]),
 	        "[1; 'abc']" => $vr->set([$vr->integer(1), $vr->string('abc')]),
-			'Mutable[Integer, 42]' => $vr->mutable($this->typeRegistry->integer(), $vr->integer(42)),
+			'mutable{Integer, 42}' => $vr->mutable($this->typeRegistry->integer(), $vr->integer(42)),
 			"@'error'" => $vr->error($vr->string('error')),
 			"type{Boolean}" => $vr->type($this->typeRegistry->boolean),
 			"^Null => Any %% Integer :: null" => $vr->function(

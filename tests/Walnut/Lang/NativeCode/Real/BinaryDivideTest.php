@@ -18,7 +18,7 @@ final class BinaryDivideTest extends CodeExecutionTestHelper {
 
 	public function testBinaryDivideZero(): void {
 		$result = $this->executeCodeSnippet("3.6 / 0;");
-		$this->assertEquals("@NotANumber[]", $result);
+		$this->assertEquals("@NotANumber()", $result);
 	}
 
 	public function testBinaryDivideInvalidParameter(): void {

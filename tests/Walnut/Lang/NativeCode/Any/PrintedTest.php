@@ -8,7 +8,7 @@ final class PrintedTest extends CodeExecutionTestHelper {
 
 	public function testPrintedNonJson(): void {
 		$result = $this->executeCodeSnippet("MyAtom()->printed;", "MyAtom = :[];");
-		$this->assertEquals("'MyAtom[]'", $result);
+		$this->assertEquals("'MyAtom()'", $result);
 	}
 
 	public function testPrintedNull(): void {
@@ -58,7 +58,7 @@ final class PrintedTest extends CodeExecutionTestHelper {
 
 	public function testPrintedMutable(): void {
 		$result = $this->executeCodeSnippet("mutable{Real, 3.14}->printed;");
-		$this->assertEquals("'Mutable[Real, 3.14]'", $result);
+		$this->assertEquals("'mutable{Real, 3.14}'", $result);
 	}
 
 }

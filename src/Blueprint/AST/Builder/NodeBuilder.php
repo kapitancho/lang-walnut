@@ -66,10 +66,13 @@ use Walnut\Lang\Blueprint\AST\Node\Type\TupleTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\UnionTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\AtomValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\EnumerationValueNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\ErrorValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\FalseValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\FunctionValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\IntegerValueNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\MutableValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\NullValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\RealValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\RecordValueNode;
@@ -259,6 +262,9 @@ interface NodeBuilder {
 	public function realValue(Number $value): RealValueNode;
 	public function stringValue(string $value): StringValueNode;
 	public function typeValue(TypeNode $type): TypeValueNode;
+	public function errorValue(ValueNode $value): ErrorValueNode;
+	public function mutableValue(TypeNode $type, ValueNode $value): MutableValueNode;
+	public function atomValue(TypeNameIdentifier $name): AtomValueNode;
 	public function enumerationValue(TypeNameIdentifier $name, EnumValueIdentifier $enumValue): EnumerationValueNode;
 	/** @param array<string, ValueNode> $values */
 	public function recordValue(array $values): RecordValueNode;

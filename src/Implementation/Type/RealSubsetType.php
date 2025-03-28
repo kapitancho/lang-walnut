@@ -3,7 +3,9 @@
 namespace Walnut\Lang\Implementation\Type;
 
 use BcMath\Number;
+use InvalidArgumentException;
 use JsonSerializable;
+use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\RealSubsetType as RealSubsetTypeInterface;
 use Walnut\Lang\Blueprint\Type\RealType as RealTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -17,7 +19,31 @@ final class RealSubsetType implements RealSubsetTypeInterface, JsonSerializable 
     /** @param list<Number> $subsetValues */
     public function __construct(
         public readonly array $subsetValues
-    ) {}
+    ) {
+	    if ($subsetValues === []) {
+		    throw new InvalidArgumentException("Cannot create an empty subset type");
+	    }
+	    $selected = [];
+	    foreach($subsetValues as $value) {
+		    if (!$value instanceof Number) {
+			    throw new InvalidArgumentException(
+				    sprintf("Invalid value: '%s'", $value)
+			    );
+		    }
+			$vs = (string)$value;
+			if (!str_contains($vs, '.')) {
+				$vs .= '.';
+			}
+			$vs = rtrim(rtrim($vs, '0'), '.');
+		    if (array_key_exists($vs, $selected)) {
+			    DuplicateSubsetValue::ofReal(
+				    sprintf("Real[%s]",
+					    implode(', ', $subsetValues)),
+				    $value);
+		    }
+		    $selected[$vs] = true;
+	    }
+    }
 
     public function isSubtypeOf(Type $ofType): bool {
         return match(true) {

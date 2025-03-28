@@ -8,7 +8,7 @@ final class LastIndexOfTest extends CodeExecutionTestHelper {
 
 	public function testLastIndexOfEmpty(): void {
 		$result = $this->executeCodeSnippet("[]->lastIndexOf(5);");
-		$this->assertEquals("@ItemNotFound[]", $result);
+		$this->assertEquals("@ItemNotFound()", $result);
 	}
 
 	public function testLastIndexOfNonEmpty(): void {

@@ -10,6 +10,7 @@ use Walnut\Lang\Blueprint\Type\EnumerationSubsetType as EnumerationSubsetTypeInt
 use Walnut\Lang\Blueprint\Type\EnumerationType as EnumerationTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnknownEnumerationValue;
+use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Value\EnumerationValue;
 
 final class EnumerationType implements EnumerationTypeInterface, JsonSerializable {
@@ -38,7 +39,7 @@ final class EnumerationType implements EnumerationTypeInterface, JsonSerializabl
 
     /**
      * @param list<EnumValueIdentifier> $values
-     * @throws UnknownEnumerationValue|InvalidArgumentException
+     * @throws UnknownEnumerationValue|DuplicateSubsetValue|InvalidArgumentException
      **/
     public function subsetType(array $values): EnumerationSubsetTypeInterface {
 	    if ($values === []) {
@@ -46,6 +47,12 @@ final class EnumerationType implements EnumerationTypeInterface, JsonSerializabl
         }
         $selected = [];
         foreach($values as $value) {
+			if (array_key_exists($value->identifier, $selected)) {
+				DuplicateSubsetValue::ofEnumeration(
+					sprintf("%s[%s]", $this->name, implode(', ', $values)),
+					$value
+				);
+			}
             $v = $this->values[$value->identifier] ?? null;
             if ($v === null) {
 				UnknownEnumerationValue::of($this->name, $value);

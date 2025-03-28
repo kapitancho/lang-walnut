@@ -8,7 +8,7 @@ final class PushTest extends CodeExecutionTestHelper {
 
 	public function testPush(): void {
 		$result = $this->executeCodeSnippet("mutable{Array, [1, 2, 3]}->PUSH(5);");
-		$this->assertEquals("Mutable[Array, [1, 2, 3, 5]]", $result);
+		$this->assertEquals("mutable{Array, [1, 2, 3, 5]}", $result);
 	}
 
 	public function testPushInvalidTargetType(): void {

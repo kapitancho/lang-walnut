@@ -13,7 +13,7 @@ final class MaxValueTest extends CodeExecutionTestHelper {
 
 	public function testMaxValueIntegerPlusInfinity(): void {
 		$result = $this->executeCodeSnippet("type{Integer<2..>}->maxValue;");
-		$this->assertEquals("PlusInfinity[]", $result);
+		$this->assertEquals("PlusInfinity()", $result);
 	}
 
 	public function testMaxValueReal(): void {
@@ -23,7 +23,7 @@ final class MaxValueTest extends CodeExecutionTestHelper {
 
 	public function testMaxValueRealPlusInfinity(): void {
 		$result = $this->executeCodeSnippet("type{Real<2..>}->maxValue;");
-		$this->assertEquals("PlusInfinity[]", $result);
+		$this->assertEquals("PlusInfinity()", $result);
 	}
 
 }

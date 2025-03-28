@@ -13,7 +13,7 @@ final class MinValueTest extends CodeExecutionTestHelper {
 
 	public function testMinValueIntegerMinusInfinity(): void {
 		$result = $this->executeCodeSnippet("type{Integer<..5>}->minValue;");
-		$this->assertEquals("MinusInfinity[]", $result);
+		$this->assertEquals("MinusInfinity()", $result);
 	}
 
 	public function testMinValueReal(): void {
@@ -23,7 +23,7 @@ final class MinValueTest extends CodeExecutionTestHelper {
 
 	public function testMinValueRealMinusInfinity(): void {
 		$result = $this->executeCodeSnippet("type{Real<..5>}->minValue;");
-		$this->assertEquals("MinusInfinity[]", $result);
+		$this->assertEquals("MinusInfinity()", $result);
 	}
 
 }

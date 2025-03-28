@@ -3,7 +3,9 @@
 namespace Walnut\Lang\Implementation\Type;
 
 use BcMath\Number;
+use InvalidArgumentException;
 use JsonSerializable;
+use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\StringSubsetType as StringSubsetTypeInterface;
 use Walnut\Lang\Blueprint\Type\StringType as StringTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -17,7 +19,31 @@ final class StringSubsetType implements StringSubsetTypeInterface, JsonSerializa
 	/** @param list<string> $subsetValues */
     public function __construct(
         public readonly array $subsetValues
-    ) {}
+    ) {
+	    if ($subsetValues === []) {
+		    throw new InvalidArgumentException("Cannot create an empty subset type");
+	    }
+	    $selected = [];
+	    foreach($subsetValues as $value) {
+		    if (!is_string($value)) {
+			    throw new InvalidArgumentException(
+				    sprintf("Invalid value: '%s'", $value)
+			    );
+		    }
+		    if (array_key_exists($value, $selected)) {
+			    DuplicateSubsetValue::ofString(
+				    sprintf("String[%s]",
+					    implode(', ',
+						    array_map(
+								fn(string $value) =>
+									"'" . str_replace(['\\', "\n", "'"], ['\\\\', '\n', '\`'], $value) . "'",
+							    $subsetValues
+						    ))),
+				    $value);
+		    }
+		    $selected[$value] = true;
+	    }
+    }
 
     public function isSubtypeOf(Type $ofType): bool {
         return match(true) {

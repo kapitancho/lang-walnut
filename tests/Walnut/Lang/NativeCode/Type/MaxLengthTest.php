@@ -13,7 +13,7 @@ final class MaxLengthTest extends CodeExecutionTestHelper {
 
 	public function testMaxLengthStringPlusInfinity(): void {
 		$result = $this->executeCodeSnippet("type{String<2..>}->maxLength;");
-		$this->assertEquals("PlusInfinity[]", $result);
+		$this->assertEquals("PlusInfinity()", $result);
 	}
 
 	public function testMaxLengthArray(): void {
@@ -23,7 +23,7 @@ final class MaxLengthTest extends CodeExecutionTestHelper {
 
 	public function testMaxLengthArrayPlusInfinity(): void {
 		$result = $this->executeCodeSnippet("type{Array<String, 2..>}->maxLength;");
-		$this->assertEquals("PlusInfinity[]", $result);
+		$this->assertEquals("PlusInfinity()", $result);
 	}
 
 	public function testMaxLengthMap(): void {
@@ -33,7 +33,7 @@ final class MaxLengthTest extends CodeExecutionTestHelper {
 
 	public function testMaxLengthMapPlusInfinity(): void {
 		$result = $this->executeCodeSnippet("type{Map<String, 2..>}->maxLength;");
-		$this->assertEquals("PlusInfinity[]", $result);
+		$this->assertEquals("PlusInfinity()", $result);
 	}
 
 	public function testMaxLengthSet(): void {
@@ -43,7 +43,7 @@ final class MaxLengthTest extends CodeExecutionTestHelper {
 
 	public function testMaxLengthSetPlusInfinity(): void {
 		$result = $this->executeCodeSnippet("type{Set<String, 2..>}->maxLength;");
-		$this->assertEquals("PlusInfinity[]", $result);
+		$this->assertEquals("PlusInfinity()", $result);
 	}
 
 }

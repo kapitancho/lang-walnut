@@ -4,7 +4,6 @@ namespace Walnut\Lang\Implementation\Program\Builder;
 
 use BcMath\Number;
 use InvalidArgumentException;
-use JsonSerializable;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
@@ -12,6 +11,7 @@ use Walnut\Lang\Blueprint\Common\Range\InvalidLengthRange;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
+use Walnut\Lang\Blueprint\Compilation\CompilationException;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder as CustomMethodRegistryBuilderInterface;
 use Walnut\Lang\Blueprint\Program\Builder\TypeRegistryBuilder as TypeRegistryBuilderInterface;
@@ -20,6 +20,7 @@ use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\UnknownType;
 use Walnut\Lang\Blueprint\Type\AliasType as AliasTypeInterface;
 use Walnut\Lang\Blueprint\Type\AtomType as AtomTypeInterface;
+use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\EnumerationType as EnumerationTypeInterface;
 use Walnut\Lang\Blueprint\Type\NamedType as NamedTypeInterface;
@@ -170,7 +171,10 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 			)
         );
     }
-	/** @param list<Number> $values */
+	/**
+	 * @param list<Number> $values
+	 * @throws DuplicateSubsetValue
+	 */
 	public function integerSubset(array $values): IntegerSubsetType {
 		return new IntegerSubsetType($values);
 	}
@@ -186,7 +190,10 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 			)
         );
     }
-	/** @param list<Number> $values */
+	/**
+	 * @param list<Number> $values
+	 * @throws DuplicateSubsetValue
+	 */
 	public function realSubset(array $values): RealSubsetType {
 		return new RealSubsetType($values);
 	}
@@ -200,7 +207,10 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
             is_int($maxLength) ? new Number($maxLength) : $maxLength
         ));
     }
-	/** @param list<string> $values */
+	/**
+	 * @param list<string> $values
+	 * @throws DuplicateSubsetValue
+	 */
 	public function stringSubset(array $values): StringSubsetType {
 		return new StringSubsetType($values);
 	}
@@ -307,7 +317,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 
 	/**
 	  * @param non-empty-list<EnumValueIdentifier> $values
-	  * @throws UnknownEnumerationValue|InvalidArgumentException
+	  * @throws UnknownEnumerationValue|DuplicateSubsetValue|InvalidArgumentException
 	  **/
 	 public function enumerationSubsetType(TypeNameIdentifier $typeName, array $values): EnumerationSubsetType {
 		 return $this->enumeration($typeName)->subsetType($values);
@@ -401,15 +411,30 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		return $result;
 	}
 
-	/** @param list<EnumValueIdentifier> $values */
+	/**
+	 * @param list<EnumValueIdentifier> $values
+	 * @throws DuplicateSubsetValue
+	 **/
 	public function addEnumeration(TypeNameIdentifier $name, array $values): EnumerationType {
+		$keys = [];
+		foreach ($values as $value) {
+			if (!$value instanceof EnumValueIdentifier) {
+				throw new InvalidArgumentException(
+					'Expected EnumValueIdentifier, got ' . get_debug_type($value)
+				);
+			}
+			if (in_array($value->identifier, $keys, true)) {
+				DuplicateSubsetValue::ofEnumeration(
+					$name->identifier,
+					$value
+				);
+			}
+			$keys[] = $value->identifier;
+		}
 		$result = new EnumerationType(
 			$name,
 			array_combine(
-				array_map(
-					static fn(EnumValueIdentifier $value): string => $value->identifier,
-					$values
-				),
+				$keys,
 				array_map(
 					fn(EnumValueIdentifier $value): EnumerationValue =>
 						new EnumerationValue($this, $name, $value),

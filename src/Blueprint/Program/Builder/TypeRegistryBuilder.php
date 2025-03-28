@@ -7,6 +7,7 @@ use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AtomType;
+use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
 use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\SealedType;
@@ -15,7 +16,10 @@ use Walnut\Lang\Blueprint\Type\Type;
 interface TypeRegistryBuilder {
     public function addAtom(TypeNameIdentifier $name): AtomType;
 
-    /** @param list<EnumValueIdentifier> $values */
+    /**
+     * @param list<EnumValueIdentifier> $values
+     * @throws DuplicateSubsetValue
+     **/
     public function addEnumeration(TypeNameIdentifier $name, array $values): EnumerationType;
 
 	public function addAlias(TypeNameIdentifier $name, Type $aliasedType): AliasType;

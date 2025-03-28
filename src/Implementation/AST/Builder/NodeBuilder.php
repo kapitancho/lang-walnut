@@ -11,6 +11,7 @@ use Walnut\Lang\Blueprint\AST\Node\Expression\MethodCallExpressionNode as Method
 use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode as FunctionBodyNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\SourceNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\AtomValueNode as AtomValueNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\Value\ValueNode;
 use Walnut\Lang\Blueprint\AST\Parser\ParserState;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
@@ -82,10 +83,13 @@ use Walnut\Lang\Implementation\AST\Node\Type\TrueTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\TupleTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\TypeTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\UnionTypeNode;
+use Walnut\Lang\Implementation\AST\Node\Value\AtomValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\EnumerationValueNode;
+use Walnut\Lang\Implementation\AST\Node\Value\ErrorValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\FalseValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\FunctionValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\IntegerValueNode;
+use Walnut\Lang\Implementation\AST\Node\Value\MutableValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\NullValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\RealValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\RecordValueNode;
@@ -633,6 +637,18 @@ final class NodeBuilder implements NodeBuilderInterface {
 
 	public function typeValue(TypeNode $type): TypeValueNode {
 		return new TypeValueNode($this->getSourceLocation(), $type);
+	}
+
+	public function errorValue(ValueNode $value): ErrorValueNode {
+		return new ErrorValueNode($this->getSourceLocation(), $value);
+	}
+
+	public function mutableValue(TypeNode $type, ValueNode $value): MutableValueNode {
+		return new MutableValueNode($this->getSourceLocation(), $type, $value);
+	}
+
+	public function atomValue(TypeNameIdentifier $name): AtomValueNodeInterface {
+		return new AtomValueNode($this->getSourceLocation(), $name);
 	}
 
 	public function enumerationValue(TypeNameIdentifier $name, EnumValueIdentifier $enumValue): EnumerationValueNode {

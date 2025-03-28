@@ -8,7 +8,7 @@ final class AppendTest extends CodeExecutionTestHelper {
 
 	public function testAppend(): void {
 		$result = $this->executeCodeSnippet("mutable{String, 'hello'}->APPEND(' world');");
-		$this->assertEquals("Mutable[String, 'hello world']", $result);
+		$this->assertEquals("mutable{String, 'hello world'}", $result);
 	}
 
 	public function testSetInvalidParameterType(): void {

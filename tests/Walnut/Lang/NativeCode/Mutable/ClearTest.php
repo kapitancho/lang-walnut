@@ -8,7 +8,7 @@ final class ClearTest extends CodeExecutionTestHelper {
 
 	public function testClear(): void {
 		$result = $this->executeCodeSnippet("mutable{Set, [1; 2; 3]}->CLEAR;");
-		$this->assertEquals("Mutable[Set, [;]]", $result);
+		$this->assertEquals("mutable{Set, [;]}", $result);
 	}
 
 	public function testClearInvalidTargetType(): void {

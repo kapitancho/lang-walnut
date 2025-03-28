@@ -3,10 +3,13 @@
 namespace Walnut\Lang\Implementation\Compilation\AST;
 
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\AtomValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\EnumerationValueNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\ErrorValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\FalseValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\FunctionValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\IntegerValueNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\MutableValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\NullValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\RealValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\RecordValueNode;
@@ -48,6 +51,14 @@ final readonly class AstValueCompiler implements AstValueCompilerInterface {
 				$valueNode instanceof IntegerValueNode => $this->valueRegistry->integer($valueNode->value),
 				$valueNode instanceof RealValueNode => $this->valueRegistry->real($valueNode->value),
 				$valueNode instanceof StringValueNode => $this->valueRegistry->string($valueNode->value),
+				$valueNode instanceof MutableValueNode => $this->valueRegistry->mutable(
+					$this->type($valueNode->type),
+					$this->value($valueNode->value),
+				),
+				$valueNode instanceof ErrorValueNode => $this->valueRegistry->error(
+					$this->value($valueNode->value),
+				),
+				$valueNode instanceof AtomValueNode => $this->valueRegistry->atom($valueNode->name),
 				$valueNode instanceof EnumerationValueNode => $this->valueRegistry->enumerationValue(
 					$valueNode->name,
 					$valueNode->enumValue

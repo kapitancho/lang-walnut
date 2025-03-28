@@ -30,7 +30,7 @@ final class MutableValue implements MutableValueInterface, JsonSerializable {
 
 	public function __toString(): string {
 		return sprintf(
-			"Mutable[%s, %s]",
+			"mutable{%s, %s}",
 			$this->targetType,
 			$this->value
 		);

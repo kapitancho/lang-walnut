@@ -10,7 +10,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("A();", <<<NUT
 		A = :[];
 	NUT);
-		$this->assertEquals("A[]", $result);
+		$this->assertEquals("A()", $result);
 	}
 
 	public function testAtomWrongParameter(): void {

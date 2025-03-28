@@ -3,9 +3,11 @@
 namespace Walnut\Lang\Implementation\Type;
 
 use BcMath\Number;
+use InvalidArgumentException;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Common\Range\IntegerRange as IntegerRangeInterface;
 use Walnut\Lang\Blueprint\Common\Range\RealRange;
+use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType as IntegerSubsetTypeInterface;
 use Walnut\Lang\Blueprint\Type\IntegerType as IntegerTypeInterface;
 use Walnut\Lang\Blueprint\Type\RealSubsetType as RealSubsetTypeInterface;
@@ -18,10 +20,32 @@ final class IntegerSubsetType implements IntegerSubsetTypeInterface, JsonSeriali
 
 	private readonly IntegerRangeInterface $actualRange;
 
-    /** @param list<Number> $subsetValues */
+    /**
+     * @param list<Number> $subsetValues
+     * @throws InvalidArgumentException|DuplicateSubsetValue
+     */
     public function __construct(
         public readonly array $subsetValues
-    ) {}
+    ) {
+		if ($subsetValues === []) {
+			throw new InvalidArgumentException("Cannot create an empty subset type");
+		}
+		$selected = [];
+		foreach($subsetValues as $value) {
+			if (!$value instanceof Number || ((string)$value !== (string)$value->floor())) {
+				throw new InvalidArgumentException(
+					sprintf("Invalid value: '%s'", $value)
+				);
+			}
+			if (array_key_exists((string)$value, $selected)) {
+				DuplicateSubsetValue::ofInteger(
+					sprintf("Integer[%s]",
+						implode(', ', $subsetValues)),
+					$value);
+			}
+			$selected[(string)$value] = true;
+		}
+    }
 
     public function isSubtypeOf(Type $ofType): bool {
         return match(true) {

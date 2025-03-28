@@ -12,7 +12,7 @@ interface EnumerationType extends EnumerationSubsetType, NamedType {
 
     /**
      * @param non-empty-list<EnumValueIdentifier> $values
-     * @throws UnknownEnumerationValue|InvalidArgumentException
+     * @throws UnknownEnumerationValue|DuplicateSubsetValue|InvalidArgumentException
      **/
     public function subsetType(array $values): EnumerationSubsetType;
 

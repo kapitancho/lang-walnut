@@ -780,7 +780,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			))
 		)->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])));
 		$this->assertEquals(
-			"[\n\ta: true,\n\tb: 123,\n\tc: [MyState[x: 15], MyState[x: 20]],\n\td: [x: MyCustomEnum.B, y: MyAtom[]]\n]",
+			"[\n\ta: true,\n\tb: 123,\n\tc: [MyState[x: 15], MyState[x: 20]],\n\td: [x: MyCustomEnum.B, y: MyAtom()]\n]",
 			(string)$result->value
 		);
 		$back = $this->expressionRegistry->methodCall(

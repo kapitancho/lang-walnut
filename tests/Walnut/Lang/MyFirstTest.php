@@ -79,7 +79,7 @@ final class MyFirstTest extends BaseProgramTestHelper {
 			$this->typeRegistry->boolean,
 			$this->typeRegistry->array()
 		);
-		$this->assertEquals("[true, MyFirstAtom[]]", (string)$entryPoint->call(
+		$this->assertEquals("[true, MyFirstAtom()]", (string)$entryPoint->call(
 			$this->valueRegistry->true
 		));
 	}

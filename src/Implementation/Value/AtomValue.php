@@ -25,7 +25,7 @@ final class AtomValue implements AtomValueInterface, JsonSerializable {
 	}
 
 	public function __toString(): string {
-		return sprintf("%s[]", $this->typeName);
+		return sprintf("%s()", $this->typeName);
 	}
 
 	public function jsonSerialize(): array {

@@ -13,7 +13,7 @@ final class AsIntegerTest extends CodeExecutionTestHelper {
 
 	public function testAsIntegerInvalidInteger(): void {
 		$result = $this->executeCodeSnippet("'12 days'->asInteger;");
-		$this->assertEquals("@NotANumber[]", $result);
+		$this->assertEquals("@NotANumber()", $result);
 	}
 
 }

@@ -18,6 +18,7 @@ use Walnut\Lang\Blueprint\Type\AnyType;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Type\BooleanType;
+use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
 use Walnut\Lang\Blueprint\Type\FalseType;
@@ -62,7 +63,10 @@ interface TypeRegistry {
 		int|Number|MinusInfinity $min = MinusInfinity::value,
 		int|Number|PlusInfinity $max = PlusInfinity::value
 	): IntegerType;
-	/** @param list<Number> $values */
+	/**
+	 * @param list<Number> $values
+	 * @throws DuplicateSubsetValue
+	 */
 	public function integerSubset(array $values): IntegerSubsetType;
 
 	/** @throws InvalidRealRange */
@@ -70,7 +74,10 @@ interface TypeRegistry {
 		float|Number|MinusInfinity $min = MinusInfinity::value,
 		float|Number|PlusInfinity $max = PlusInfinity::value
 	): RealType;
-	/** @param list<Number> $values */
+	/**
+	 * @param list<Number> $values
+	 * @throws DuplicateSubsetValue
+	 */
 	public function realSubset(array $values): RealSubsetType;
 
 	/** @throws InvalidLengthRange */
@@ -78,7 +85,10 @@ interface TypeRegistry {
 		int|Number $minLength = 0,
 		int|Number|PlusInfinity $maxLength = PlusInfinity::value
 	): StringType;
-	/** @param list<string> $values */
+	/**
+	 * @param list<string> $values
+	 * @throws DuplicateSubsetValue
+	 */
 	public function stringSubset(array $values): StringSubsetType;
 
 	/** @throws InvalidLengthRange */
@@ -138,7 +148,7 @@ interface TypeRegistry {
 	public function enumeration(TypeNameIdentifier $typeName): EnumerationType;
 	/**
 	  * @param non-empty-list<EnumValueIdentifier> $values
-	  * @throws UnknownEnumerationValue|InvalidArgumentException
+	  * @throws UnknownEnumerationValue|DuplicateSubsetValue|InvalidArgumentException
 	  **/
 	 public function enumerationSubsetType(TypeNameIdentifier $typeName, array $values): EnumerationSubsetType;
 }

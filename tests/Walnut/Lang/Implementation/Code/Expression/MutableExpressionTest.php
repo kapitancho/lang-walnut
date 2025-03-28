@@ -8,7 +8,7 @@ final class MutableExpressionTest extends CodeExecutionTestHelper {
 
 	public function testMutable(): void {
 		$result = $this->executeCodeSnippet("mutable{Integer, 42};");
-		$this->assertEquals("Mutable[Integer, 42]", $result);
+		$this->assertEquals("mutable{Integer, 42}", $result);
 	}
 
 	public function testMutableNotASubtype(): void {

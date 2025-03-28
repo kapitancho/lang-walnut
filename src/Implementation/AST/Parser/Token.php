@@ -64,7 +64,7 @@ enum Token: string {
 	case special_var_param = '\#';
 	case special_var_modulo = '\%';
 	case this_var = '\$';
-	case real_number = '(0|(\-?[1-9][0-9]*))\.[0-9]+';
+	case real_number = '(-0\.[0-9]*[1-9]+[0-9]*)|((0|(\-?[1-9][0-9]*))\.[0-9]+)';
 	case positive_integer_number = '0|([1-9][0-9]*)';
 	case integer_number = '0|(\-?[1-9][0-9]*)';
 	case arithmetic_op2 = '(\*\*|\/\/)';

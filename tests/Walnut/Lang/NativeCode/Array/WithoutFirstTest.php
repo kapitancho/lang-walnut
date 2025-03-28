@@ -8,7 +8,7 @@ final class WithoutFirstTest extends CodeExecutionTestHelper {
 
 	public function testWithoutFirstEmpty(): void {
 		$result = $this->executeCodeSnippet("[]->withoutFirst;");
-		$this->assertEquals("@ItemNotFound[]", $result);
+		$this->assertEquals("@ItemNotFound()", $result);
 	}
 
 	public function testWithoutFirstNonEmpty(): void {

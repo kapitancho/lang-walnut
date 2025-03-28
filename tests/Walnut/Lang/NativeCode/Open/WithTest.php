@@ -242,7 +242,7 @@ final class WithTest extends CodeExecutionTestHelper {
 			MyOpen = #[a: Integer, b: Integer, c: Integer] @ MyError :: ?when(#b == 2) { => @MyError() };
 			MyOpen->testWith(^param: [b: Integer, c: Integer] => Result<MyOpen, MyError>) :: $->with(param);
 		NUT);
-		$this->assertEquals("@MyError[]", $result);
+		$this->assertEquals("@MyError()", $result);
 	}
 
 	public function testWithValidatorWithErrorTypeWrongReturnType(): void {

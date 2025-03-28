@@ -8,7 +8,7 @@ final class UnshiftTest extends CodeExecutionTestHelper {
 
 	public function testUnshift(): void {
 		$result = $this->executeCodeSnippet("mutable{Array, [1, 2, 3]}->UNSHIFT(5);");
-		$this->assertEquals("Mutable[Array, [5, 1, 2, 3]]", $result);
+		$this->assertEquals("mutable{Array, [5, 1, 2, 3]}", $result);
 	}
 
 	public function testUnshiftInvalidTargetType(): void {

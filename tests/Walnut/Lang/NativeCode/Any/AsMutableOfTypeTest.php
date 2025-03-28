@@ -13,7 +13,7 @@ final class AsMutableOfTypeTest extends CodeExecutionTestHelper {
 
 	public function testAsMutableOfTypeOk(): void {
 		$result = $this->executeCodeSnippet("3.14->asMutableOfType(type{Real});");
-		$this->assertEquals("Mutable[Real, 3.14]", $result);
+		$this->assertEquals("mutable{Real, 3.14}", $result);
 	}
 
 }

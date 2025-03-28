@@ -8,12 +8,12 @@ final class WithRemovedTest extends CodeExecutionTestHelper {
 
 	public function testWithRemovedEmpty(): void {
 		$result = $this->executeCodeSnippet("[;]->withRemoved(3);");
-		$this->assertEquals("@ItemNotFound[]", $result);
+		$this->assertEquals("@ItemNotFound()", $result);
 	}
 
 	public function testWithRemovedNotFound(): void {
 		$result = $this->executeCodeSnippet("[1; 2; 5; 10; 5]->withRemoved(3);");
-		$this->assertEquals("@ItemNotFound[]", $result);
+		$this->assertEquals("@ItemNotFound()", $result);
 	}
 
 	public function testWithRemovedNonEmpty(): void {

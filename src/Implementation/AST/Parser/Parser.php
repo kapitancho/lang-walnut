@@ -43,6 +43,7 @@ final readonly class Parser implements ParserInterface {
 
 		$l = count($tokens);
 		$ctr = 0;
+		$stateRepeatProtection = 0;
 		while($s->i < $l) {
 			$token = $tokens[$s->i];
 			if (++$ctr > 20000) {
@@ -75,8 +76,12 @@ final readonly class Parser implements ParserInterface {
 					$transition($token, $s, $nodeBuilder);
 				if ($s->i === $lastI && $s->state === $lastState) {
 					// @codeCoverageIgnoreStart
-					throw new ParserException($s, "Transition did not change state or index ($lastI, $lastState)", $token, $moduleName);
+					if ($stateRepeatProtection++ > 10) {
+						throw new ParserException($s, "Transition did not change state or index ($lastI, $lastState)", $token, $moduleName);
+					}
 					// @codeCoverageIgnoreEnd
+				} else {
+					$stateRepeatProtection = 0;
 				}
 			} else {
 				$t = (int)$transition;

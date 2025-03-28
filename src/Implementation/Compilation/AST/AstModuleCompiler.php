@@ -31,6 +31,7 @@ use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Program\ProgramContext;
 use Walnut\Lang\Blueprint\Program\UnknownType;
 use Walnut\Lang\Blueprint\Type\CustomType;
+use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -109,22 +110,23 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 
 	/** @throws AstCompilationException */
 	private function compileModuleDefinition(ModuleDefinitionNode $moduleDefinition): void {
-		match(true) {
-			$moduleDefinition instanceof AddAliasTypeNode =>
+		try {
+			match(true) {
+				$moduleDefinition instanceof AddAliasTypeNode =>
 				$this->programContext->typeRegistryBuilder->addAlias(
 					$moduleDefinition->name,
 					$this->type($moduleDefinition->aliasedType)
 				),
-			$moduleDefinition instanceof AddAtomTypeNode =>
+				$moduleDefinition instanceof AddAtomTypeNode =>
 				$this->programContext->typeRegistryBuilder->addAtom($moduleDefinition->name),
-			$moduleDefinition instanceof AddConstructorMethodNode =>
+				$moduleDefinition instanceof AddConstructorMethodNode =>
 				$this->addConstructorMethod($moduleDefinition),
-			$moduleDefinition instanceof AddEnumerationTypeNode =>
+				$moduleDefinition instanceof AddEnumerationTypeNode =>
 				$this->programContext->typeRegistryBuilder->addEnumeration(
 					$moduleDefinition->name,
 					$moduleDefinition->values
 				),
-			$moduleDefinition instanceof AddMethodNode =>
+				$moduleDefinition instanceof AddMethodNode =>
 				$this->programContext->customMethodRegistryBuilder->addMethod(
 					$this->type($moduleDefinition->targetType),
 					$moduleDefinition->methodName,
@@ -134,7 +136,7 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 					$this->type($moduleDefinition->returnType),
 					$this->functionBody($moduleDefinition->functionBody),
 				),
-			$moduleDefinition instanceof AddOpenTypeNode =>
+				$moduleDefinition instanceof AddOpenTypeNode =>
 				$this->programContext->typeRegistryBuilder->addOpen(
 					$moduleDefinition->name,
 					$this->type($moduleDefinition->valueType),
@@ -145,7 +147,7 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 					$moduleDefinition->errorType ?
 						$this->type($moduleDefinition->errorType) : null
 				),
-			$moduleDefinition instanceof AddSealedTypeNode =>
+				$moduleDefinition instanceof AddSealedTypeNode =>
 				$this->programContext->typeRegistryBuilder->addSealed(
 					$moduleDefinition->name,
 					$this->type($moduleDefinition->valueType),
@@ -156,7 +158,7 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 					$moduleDefinition->errorType ?
 						$this->type($moduleDefinition->errorType) : null
 				),
-			$moduleDefinition instanceof AddVariableNode =>
+				$moduleDefinition instanceof AddVariableNode =>
 				$this->programContext->globalScopeBuilder->addVariable($moduleDefinition->name,
 					$moduleDefinition->value instanceof FunctionValueNode ?
 						$this->globalFunction(
@@ -165,13 +167,19 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 						) :
 						$this->value($moduleDefinition->value)),
 
-			// @codeCoverageIgnoreStart
-			true => throw new AstCompilationException(
+				// @codeCoverageIgnoreStart
+				true => throw new AstCompilationException(
+					$moduleDefinition,
+					"Unknown module definition node type: " . get_class($moduleDefinition)
+				)
+				// @codeCoverageIgnoreEnd
+			};
+		} catch (DuplicateSubsetValue $e) {
+			throw new AstCompilationException(
 				$moduleDefinition,
-				"Unknown module definition node type: " . get_class($moduleDefinition)
-			)
-			// @codeCoverageIgnoreEnd
-		};
+				$e->getMessage()
+			);
+		}
 	}
 
 	/** @throws AstCompilationException */

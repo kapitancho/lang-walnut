@@ -39,18 +39,18 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 
 	public function testHydrateAsAtomFromNull(): void {
 		$result = $this->executeCodeSnippet("null->hydrateAs(type{MyAtom});", "MyAtom = :[];");
-		$this->assertEquals("MyAtom[]", $result);
+		$this->assertEquals("MyAtom()", $result);
 	}
 
 	public function testHydrateAsAtomFromOther(): void {
 		$result = $this->executeCodeSnippet("'hello'->hydrateAs(type{MyAtom});", "MyAtom = :[];");
-		$this->assertEquals("MyAtom[]", $result);
+		$this->assertEquals("MyAtom()", $result);
 	}
 
 	public function testHydrateAsAtomFromNullCastOk(): void {
 		$result = $this->executeCodeSnippet("true->hydrateAs(type{MyAtom});",
 			"MyAtom = :[]; JsonValue ==> MyAtom @ String :: ?whenValueOf($) is { true: MyAtom(), ~ : @'error' };");
-		$this->assertEquals("MyAtom[]", $result);
+		$this->assertEquals("MyAtom()", $result);
 	}
 
 	public function testHydrateAsAtomFromNullCastError(): void {
@@ -435,7 +435,7 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 
 	public function testHydrateAsMutableCorrectType(): void {
 		$result = $this->executeCodeSnippet("3.14->hydrateAs(type{Mutable<Real>});");
-		$this->assertEquals("Mutable[Real, 3.14]", $result);
+		$this->assertEquals("mutable{Real, 3.14}", $result);
 	}
 
 	public function testHydrateAsMutableCorrectTypeOutOfRange(): void {

@@ -40,6 +40,7 @@ use Walnut\Lang\Blueprint\Compilation\AST\AstCompilationException;
 use Walnut\Lang\Blueprint\Compilation\AST\AstTypeCompiler as AstTypeCompilerInterface;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\UnknownType;
+use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnknownEnumerationValue;
 
@@ -141,6 +142,8 @@ final readonly class AstTypeCompiler implements AstTypeCompilerInterface {
 			};
 		} catch (UnknownType $e) {
 			throw new AstCompilationException($typeNode, "Type issue: " . $e->getMessage(), $e);
+		} catch (DuplicateSubsetValue $e) {
+			throw new AstCompilationException($typeNode, "Duplication issue: " . $e->getMessage(), $e);
 		} catch (UnknownEnumerationValue $e) {
 			throw new AstCompilationException($typeNode, "Enumeration issue: " . $e->getMessage(), $e);
 		} catch (InvalidIntegerRange|InvalidRealRange|InvalidLengthRange $e) {
