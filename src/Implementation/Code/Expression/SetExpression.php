@@ -7,6 +7,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserResult;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
+use Walnut\Lang\Blueprint\Code\Expression\ConstantExpression;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\SetExpression as SetExpressionInterface;
 
@@ -20,17 +21,25 @@ final readonly class SetExpression implements SetExpressionInterface, JsonSerial
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
 		$subtypes = [];
 		$returnTypes = [];
+		$set = [];
+		$dynamic = 0;
 		foreach($this->values as $value) {
+			if ($value instanceof ConstantExpression) {
+				$set[(string)$value] = true;
+			} else {
+				$dynamic++;
+			}
 			$analyserContext = $value->analyse($analyserContext);
 			$subtypes[] = $analyserContext->expressionType;
 			$returnTypes[] = $analyserContext->returnType;
 		}
 		$subtype = $analyserContext->programRegistry->typeRegistry->union($subtypes);
+
 		return $analyserContext->asAnalyserResult(
 			$analyserContext->programRegistry->typeRegistry->set(
 				$subtype,
-				min(1, count($this->values)),
-				count($this->values)
+				min(max(1, count($set)), count($this->values)),
+				count($set) + $dynamic
 			),
 			$analyserContext->programRegistry->typeRegistry->union($returnTypes)
 		);
