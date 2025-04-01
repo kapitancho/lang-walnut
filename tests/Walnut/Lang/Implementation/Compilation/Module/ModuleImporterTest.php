@@ -5,9 +5,9 @@ namespace Walnut\Lang\Test\Implementation\Compilation\Module;
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Compilation\Module\ModuleDependencyException;
 use Walnut\Lang\Blueprint\Compilation\Module\ModuleLookupContext;
-use Walnut\Lang\Implementation\AST\Builder\ModuleNodeBuilderFactory;
 use Walnut\Lang\Implementation\AST\Builder\NodeBuilderFactory;
 use Walnut\Lang\Implementation\AST\Parser\Parser;
+use Walnut\Lang\Implementation\AST\Parser\ParserStateRunner;
 use Walnut\Lang\Implementation\AST\Parser\TransitionLogger;
 use Walnut\Lang\Implementation\AST\Parser\WalexLexerAdapter;
 use Walnut\Lang\Implementation\Compilation\Module\ModuleImporter;
@@ -24,9 +24,7 @@ final class ModuleImporterTest extends TestCase {
 		$this->moduleImporter = new ModuleImporter(
 			new WalexLexerAdapter(),
 			$this->moduleLookupContext,
-			new Parser(new TransitionLogger()),
-			new NodeBuilderFactory(),
-			new ModuleNodeBuilderFactory(),
+			new Parser(new ParserStateRunner(new TransitionLogger(), new NodeBuilderFactory())),
 		);
 	}
 

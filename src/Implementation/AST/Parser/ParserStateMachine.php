@@ -5,7 +5,6 @@
 namespace Walnut\Lang\Implementation\AST\Parser;
 
 use BcMath\Number;
-use Walnut\Lang\Blueprint\AST\Builder\ModuleNodeBuilder;
 use Walnut\Lang\Blueprint\AST\Builder\NodeBuilder;
 use Walnut\Lang\Blueprint\AST\Node\Expression\SequenceExpressionNode;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
@@ -23,7 +22,6 @@ final readonly class ParserStateMachine {
 	public function __construct(
 		private ParserState $s,
 		private NodeBuilder $nodeBuilder,
-		private ModuleNodeBuilder $moduleNodeBuilder
 	) {}
 
 	public function getAllStates(): array {
@@ -43,7 +41,7 @@ final readonly class ParserStateMachine {
 						$moduleName = $moduleId;
 						$dependencyNames = [];
 					}
-					$this->moduleNodeBuilder
+					$this->nodeBuilder
 						->moduleName($moduleName)
 						->moduleDependencies($dependencyNames);
 
@@ -116,7 +114,7 @@ final readonly class ParserStateMachine {
 
 			106 => ['name' => 'module level atom', 'transitions' => [
 				'expression_separator' => function(LT $token) {
-					$this->moduleNodeBuilder->definition(
+					$this->nodeBuilder->definition(
 						$this->s->generated = $this->nodeBuilder->addAtom(
 							new TypeNameIdentifier($this->s->result['typeName'])
 						)
@@ -138,7 +136,7 @@ final readonly class ParserStateMachine {
 			]],
 			109 => ['name' => 'module level enum end', 'transitions' => [
 				T::expression_separator->name => function(LT $token) {
-					$this->moduleNodeBuilder->definition(
+					$this->nodeBuilder->definition(
 						$this->s->generated = $this->nodeBuilder->addEnumeration(
 							new TypeNameIdentifier($this->s->result['typeName']),
 							array_map(
@@ -208,7 +206,7 @@ final readonly class ParserStateMachine {
 			]],
 			163 => ['name' => 'open result', 'transitions' => [
 				'' => function(LT $token) {
-					$this->moduleNodeBuilder->definition(
+					$this->nodeBuilder->definition(
 						$this->s->generated = $this->nodeBuilder->addOpen(
 							new TypeNameIdentifier($this->s->result['typeName']),
 							$this->s->result['value_type'],
@@ -256,7 +254,7 @@ final readonly class ParserStateMachine {
 			]],
 			168 => ['name' => 'sealed result', 'transitions' => [
 				'' => function(LT $token) {
-					$this->moduleNodeBuilder->definition(
+					$this->nodeBuilder->definition(
 						$this->s->generated = $this->nodeBuilder->addSealed(
 							new TypeNameIdentifier($this->s->result['typeName']),
 							$this->s->result['value_type'],
@@ -301,7 +299,7 @@ final readonly class ParserStateMachine {
 					if ($errorType) {
 						$returnType = $this->nodeBuilder->resultType($returnType, $errorType);
 					}
-					$this->moduleNodeBuilder->definition(
+					$this->nodeBuilder->definition(
 						$this->s->generated = $this->nodeBuilder->addMethod(
 							$this->nodeBuilder->namedType(
 								new TypeNameIdentifier($this->s->result['typeName'])
@@ -361,7 +359,7 @@ final readonly class ParserStateMachine {
 			]],
 			127 => ['name' => 'method name result', 'transitions' => [
 				'' => function(LT $token) {
-					$this->moduleNodeBuilder->definition(
+					$this->nodeBuilder->definition(
 						$this->s->generated = $this->nodeBuilder->addMethod(
 							$this->nodeBuilder->namedType(
 								new TypeNameIdentifier($this->s->result['typeName'])
@@ -406,7 +404,7 @@ final readonly class ParserStateMachine {
 
 			131 => ['name' => 'module level type alias end', 'transitions' => [
 				'' => function(LT $token) {
-					$this->moduleNodeBuilder->definition(
+					$this->nodeBuilder->definition(
 						$this->s->generated = $this->nodeBuilder->addAlias(
 							new TypeNameIdentifier($this->s->result['typeName']),
 							$this->s->generated
@@ -421,7 +419,7 @@ final readonly class ParserStateMachine {
 
 			133 => ['name' => 'variable name end', 'transitions' => [
 				'' => function(LT $token) {
-					$this->moduleNodeBuilder->definition(
+					$this->nodeBuilder->definition(
 						/*$this->s->generated =*/ $this->nodeBuilder->addVariable(
 							new VariableNameIdentifier($this->s->result['variableName']),
 							$this->s->generated
@@ -576,7 +574,7 @@ final readonly class ParserStateMachine {
 			]],
 			145 => ['name' => 'constructor method result', 'transitions' => [
 				'' => function(LT $token, ParserState $state) {
-					$this->moduleNodeBuilder->definition(
+					$this->nodeBuilder->definition(
 						$this->nodeBuilder->addConstructorMethod(
 							new TypeNameIdentifier($this->s->result['typeName']),
 							$this->s->result['parameter_type'],
@@ -2895,7 +2893,7 @@ final readonly class ParserStateMachine {
 
 			810 => ['name' => 'module level empty tuple', 'transitions' => [
 				'expression_separator' => function(LT $token) {
-					$this->moduleNodeBuilder->definition(
+					$this->nodeBuilder->definition(
 						$this->s->generated = $this->nodeBuilder->addAlias(
 							new TypeNameIdentifier($this->s->result['typeName']),
 							$this->nodeBuilder->tupleType([])
@@ -2906,7 +2904,7 @@ final readonly class ParserStateMachine {
 			]],
 			811 => ['name' => 'module level empty record', 'transitions' => [
 				'expression_separator' => function(LT $token) {
-					$this->moduleNodeBuilder->definition(
+					$this->nodeBuilder->definition(
 						$this->s->generated = $this->nodeBuilder->addAlias(
 							new TypeNameIdentifier($this->s->result['typeName']),
 							$this->nodeBuilder->recordType([])

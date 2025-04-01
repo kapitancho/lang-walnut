@@ -4,16 +4,17 @@ namespace Walnut\Lang\Implementation\AST\Builder;
 
 use BcMath\Number;
 use Walnut\Lang\Blueprint\AST\Builder\NodeBuilder as NodeBuilderInterface;
+use Walnut\Lang\Blueprint\AST\Builder\SourceLocator;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MatchExpressionDefaultNode as MatchExpressionDefaultNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MatchExpressionPairNode as MatchExpressionPairNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MethodCallExpressionNode as MethodCallExpressionNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode as FunctionBodyNodeInterface;
+use Walnut\Lang\Blueprint\AST\Node\Module\ModuleDefinitionNode;
 use Walnut\Lang\Blueprint\AST\Node\SourceNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\AtomValueNode as AtomValueNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\Value\ValueNode;
-use Walnut\Lang\Blueprint\AST\Parser\ParserState;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
@@ -52,6 +53,7 @@ use Walnut\Lang\Implementation\AST\Node\Module\AddMethodNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddOpenTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddSealedTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddVariableNode;
+use Walnut\Lang\Implementation\AST\Node\Module\ModuleNode;
 use Walnut\Lang\Implementation\AST\Node\SourceLocation;
 use Walnut\Lang\Implementation\AST\Node\Type\AnyTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\ArrayTypeNode;
@@ -98,27 +100,45 @@ use Walnut\Lang\Implementation\AST\Node\Value\StringValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\TrueValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\TupleValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\TypeValueNode;
-use Walnut\Lib\Walex\SourcePosition;
-use Walnut\Lib\Walex\Token;
 
 final class NodeBuilder implements NodeBuilderInterface {
+	private string $moduleName;
+	/** @param list<string> $moduleDependencies */
+	private array $moduleDependencies = [];
+	/** @param list<ModuleDefinitionNode> $definitions */
+	private array $definitions = [];
 
-	/** @param Token[] $tokens */
 	public function __construct(
-		private readonly string $moduleName,
-		private readonly array $tokens,
-		private readonly ParserState $state
-	) {}
+		private readonly SourceLocator $sourceLocator
+	) {
+		$this->moduleName = $this->sourceLocator->getSourceLocation()->moduleName;
+	}
+
+	public function moduleName(string $moduleName): self {
+		$this->moduleName = $moduleName;
+		return $this;
+	}
+
+	public function moduleDependencies(array $dependencies): self {
+		$this->moduleDependencies = $dependencies;
+		return $this;
+	}
+
+	public function definition(ModuleDefinitionNode $definition): self {
+		$this->definitions[] = $definition;
+		return $this;
+	}
+
+	public function build(): ModuleNode {
+		return new ModuleNode(
+			$this->moduleName,
+			$this->moduleDependencies,
+			$this->definitions
+		);
+	}
 
 	private function getSourceLocation(): SourceLocation {
-		$token = $this->tokens[$this->state->i] ?? null;
-		$endPosition = $token?->sourcePosition ?? new SourcePosition(9999999, 9999, 9999);
-		$startPosition = $this->state->result['startPosition'] ?? $endPosition;
-		return new SourceLocation(
-			$this->moduleName,
-			$startPosition,
-			$endPosition
-		);
+		return $this->sourceLocator->getSourceLocation();
 	}
 
 	public AnyTypeNode $anyType {

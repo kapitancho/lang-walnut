@@ -2,8 +2,6 @@
 
 namespace Walnut\Lang\Implementation\Compilation\Module;
 
-use Walnut\Lang\Blueprint\AST\Builder\ModuleNodeBuilderFactory;
-use Walnut\Lang\Blueprint\AST\Builder\NodeBuilderFactory;
 use Walnut\Lang\Blueprint\AST\Node\Module\ModuleNode;
 use Walnut\Lang\Blueprint\AST\Parser\Parser;
 use Walnut\Lang\Blueprint\AST\Parser\ParserException;
@@ -19,8 +17,6 @@ final readonly class ModuleImporter implements ModuleImporterInterface {
 		private WalexLexerAdapter        $lexer,
 		private ModuleLookupContext      $moduleLookupContext,
 		private Parser                   $parser,
-		private NodeBuilderFactory       $nodeBuilderFactory,
-		private ModuleNodeBuilderFactory $moduleNodeBuilderFactory
 	) {}
 
 	/** @throws ModuleDependencyException|ParserException */
@@ -60,10 +56,7 @@ final readonly class ModuleImporter implements ModuleImporterInterface {
 	private function parseModule(string $moduleName): ModuleNode {
 		$sourceCode = $this->moduleLookupContext->sourceOf($moduleName);
 		$tokens = $this->lexer->tokensFromSource($sourceCode);
-		$moduleNodeBuilder = $this->moduleNodeBuilderFactory->newBuilder();
 		return $this->parser->parseAndBuildCodeFromTokens(
-			$this->nodeBuilderFactory,
-			$moduleNodeBuilder,
 			$tokens,
 			$moduleName
 		);

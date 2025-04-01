@@ -35,6 +35,8 @@ use Walnut\Lang\Blueprint\AST\Node\Module\AddMethodNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddOpenTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddSealedTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddVariableNode;
+use Walnut\Lang\Blueprint\AST\Node\Module\ModuleDefinitionNode;
+use Walnut\Lang\Blueprint\AST\Node\Module\ModuleNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\AnyTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\ArrayTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\BooleanTypeNode;
@@ -91,6 +93,12 @@ use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 
 interface NodeBuilder {
+	public function moduleName(string $moduleName): self;
+	/** @param list<string> $dependencies */
+	public function moduleDependencies(array $dependencies): self;
+	public function definition(ModuleDefinitionNode $definition): self;
+
+	public function build(): ModuleNode;
 
 	public function constant(ValueNode $value): ConstantExpressionNode;
 

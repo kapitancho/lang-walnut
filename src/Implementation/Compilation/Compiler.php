@@ -10,6 +10,7 @@ use Walnut\Lang\Blueprint\Compilation\Compiler as CompilerInterface;
 use Walnut\Lang\Blueprint\Compilation\Module\ModuleDependencyException;
 use Walnut\Lang\Blueprint\Compilation\Module\ModuleLookupContext;
 use Walnut\Lang\Blueprint\Program\ProgramContext as ProgramContextInterface;
+use Walnut\Lang\Implementation\AST\Builder\NodeBuilderFactory;
 use Walnut\Lang\Implementation\AST\Parser\NodeImporter;
 use Walnut\Lang\Implementation\AST\Parser\TransitionLogger;
 use Walnut\Lang\Implementation\Compilation\AST\AstCompilerFactory;
@@ -23,7 +24,10 @@ final readonly class Compiler implements CompilerInterface {
 	public function __construct(
 		private ModuleLookupContext $moduleLookupContext,
 	) {
-		$this->nodeImporter = new NodeImporter($this->transitionLogger = new TransitionLogger());
+		$this->nodeImporter = new NodeImporter(
+			$this->transitionLogger = new TransitionLogger(),
+			new NodeBuilderFactory()
+		);
 		$this->programContextFactory = new ProgramContextFactory();
 	}
 
