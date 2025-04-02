@@ -537,7 +537,7 @@ final readonly class ParserStateMachine {
 				T::empty_tuple->name => $c,
 				T::empty_record->name => $c,
 			]],
-			157 => ['name' => 'constructor method parameter name', 'transitions' => [
+			157 => ['name' => 'constructor method parameter name from type', 'transitions' => [
 				T::type_keyword->name => function(LT $token) {
 					$this->s->result['parameter_name'] = new VariableNameIdentifier(
 						lcfirst($token->patternMatch->text)
@@ -1955,10 +1955,6 @@ final readonly class ParserStateMachine {
 			]],
 
 			479 => ['name' => 'type value short', 'transitions' => [
-				T::tuple_start->name => function(LT $token) {
-					$this->s->push(483);
-					$this->s->stay(701);
-				},
 				T::type_keyword->name => $c = function(LT $token) {
 					if (in_array($token->patternMatch->text, [
 						'Function', 'Tuple', 'Record', 'Union', 'Intersection', 'Atom', 'Enumeration',
@@ -2207,7 +2203,7 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
-			796 => ['name' => 'union return', 'transitions' => [
+			796 => ['name' => 'intersection return', 'transitions' => [
 				T::intersection->name => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->intersectionType(
 						$this->s->result['intersection_left'],
@@ -2332,12 +2328,14 @@ final readonly class ParserStateMachine {
 						'True' => $this->nodeBuilder->trueType,
 						'False' => $this->nodeBuilder->falseType,
 						'Null' => $this->nodeBuilder->nullType,
+						/*
 						'String' => $this->nodeBuilder->stringType(),
 						'Integer' => $this->nodeBuilder->integerType(),
 						'Real' => $this->nodeBuilder->realType(),
 						'Array' => $this->nodeBuilder->arrayType(),
 						'Set' => $this->nodeBuilder->setType(),
 						'Map' => $this->nodeBuilder->mapType(),
+						*/
 						'EnumerationValue' => $this->nodeBuilder->metaTypeType(MetaTypeValue::EnumerationValue),
 						'MutableValue' => $this->nodeBuilder->metaTypeType(MetaTypeValue::MutableValue)
 					};
@@ -3031,6 +3029,10 @@ final readonly class ParserStateMachine {
 				},
 			]],
 			819 => ['name' => 'module level record key', 'transitions' => [
+				T::string_value->name => function(LT $token) {
+					$this->s->result['current_key'] = str_replace(['\`', '\n', '\\\\'], ["'", "\n", "\\"], substr($token->patternMatch->text, 1, -1));
+					$this->s->move(814);
+				},
 				T::word->name => $c = function(LT $token) {
 					$this->s->result['current_key'] = $token->patternMatch->text;
 					$this->s->move(814);

@@ -455,7 +455,7 @@ final class NodeBuilder implements NodeBuilderInterface {
 			$name,
 			$valueType,
 			$this->generateConstructorBody($constructorBody),
-			$errorType ?? $this->nothingType
+			$errorType
 		);
 	}
 
