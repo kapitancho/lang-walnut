@@ -5,6 +5,28 @@ namespace Walnut\Lang\Test\Implementation\AST\Parser;
 use BcMath\Number;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Walnut\Lang\Blueprint\AST\Node\Expression\ConstantExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\ConstructorCallExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\FunctionCallExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MatchErrorExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MatchExpressionDefaultNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MatchExpressionPairNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MatchIfExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MatchTrueExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MatchTypeExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MatchValueExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MethodCallExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MutableExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\NoErrorExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\NoExternalErrorExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\PropertyAccessExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\RecordExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\ReturnExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\SequenceExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\SetExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\TupleExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\VariableAssignmentExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\VariableNameExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddAliasTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddAtomTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddConstructorMethodNode;
@@ -77,13 +99,14 @@ class ParserTest extends TestCase {
 
 	protected WalexLexerAdapter $walexLexerAdapter;
 	protected ParserStateRunner $parserStateRunner;
+	protected TransitionLogger $transitionLogger;
 
 	protected function setUp(): void {
 		parent::setUp();
 
 		$this->walexLexerAdapter = new WalexLexerAdapter();
 		$this->parserStateRunner = new ParserStateRunner(
-			new TransitionLogger(),
+			$this->transitionLogger = new TransitionLogger(),
 			new NodeBuilderFactory()
 		);
 	}
@@ -129,7 +152,6 @@ class ParserTest extends TestCase {
 		}
 	}
 
-
 	public static function moduleLevelDefinitions(): iterable {
 		yield ['MyAtom = :[];', AddAtomTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MyAtom'))];
 		yield ['MyEnum = :[v1, v2];', AddEnumerationTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MyEnum')) &&
@@ -152,6 +174,10 @@ class ParserTest extends TestCase {
 			$d->valueType instanceOf RecordTypeNode && $d->constructorBody === null && $d->errorType === null];
 		yield ['MyAlias = Null;', AddAliasTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MyAlias')) &&
 			$d->aliasedType instanceOf NullTypeNode];
+		yield ['MyAlias = [];', AddAliasTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MyAlias')) &&
+			$d->aliasedType instanceOf TupleTypeNode && count($d->aliasedType->types) === 0];
+		yield ['MyAlias = [:];', AddAliasTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MyAlias')) &&
+			$d->aliasedType instanceOf RecordTypeNode && count($d->aliasedType->types) === 0];
 		yield ['myVar = null;', AddVariableNode::class, fn($d) => $d->name->equals(new VariableNameIdentifier('myVar')) &&
 			$d->value instanceOf NullValueNode];
 
@@ -449,6 +475,510 @@ class ParserTest extends TestCase {
 		];
 	}
 
+	#[DataProvider('expressions')]
+	public function testParseExpressions(string $code, string $className, callable|null $checker = null): void {
+		[$s] = $this->runParserTest($code, 201);
+		self::assertInstanceOf($className, $s->generated);
+		if (is_callable($checker)) {
+			self::assertTrue($checker($s->generated));
+		}
+		//echo $this->transitionLogger;
+	}
+
+	public static function expressions(): iterable {
+		yield ['[];', ConstantExpressionNode::class, fn(ConstantExpressionNode $e) =>
+			$e->value instanceof TupleValueNode && count($e->value->values) === 0
+		];
+		yield ['[;];', ConstantExpressionNode::class, fn(ConstantExpressionNode $e) =>
+			$e->value instanceof SetValueNode && count($e->value->values) === 0
+		];
+		yield ['[:];', ConstantExpressionNode::class, fn(ConstantExpressionNode $e) =>
+			$e->value instanceof RecordValueNode && count($e->value->values) === 0
+		];
+		yield ['4;', ConstantExpressionNode::class, fn(ConstantExpressionNode $e) =>
+			$e->value instanceof IntegerValueNode && (string)$e->value->value === '4'];
+		yield ['C.value;', ConstantExpressionNode::class, fn(ConstantExpressionNode $e) =>
+			$e->value instanceof EnumerationValueNode && $e->value->name->equals(new TypeNameIdentifier('C')) &&
+			$e->value->enumValue->equals(new EnumValueIdentifier('value'))
+		];
+		yield ['x;', VariableNameExpressionNode::class, fn(VariableNameExpressionNode $e) => $e->variableName->equals(new VariableNameIdentifier('x'))];
+		yield ['$;', VariableNameExpressionNode::class, fn(VariableNameExpressionNode $e) => $e->variableName->equals(new VariableNameIdentifier('$'))];
+		yield ['x = y;', VariableAssignmentExpressionNode::class, fn(VariableAssignmentExpressionNode $e) =>
+			$e->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->assignedExpression instanceof VariableNameExpressionNode && $e->assignedExpression->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ['mutable{A, x};', MutableExpressionNode::class, fn(MutableExpressionNode $e) =>
+			$e->type instanceof NamedTypeNode && $e->type->name->equals(new TypeNameIdentifier('A')) &&
+			$e->value instanceof VariableNameExpressionNode && $e->value->variableName->equals(new VariableNameIdentifier('x'))
+		];
+		yield ['{x; y};', SequenceExpressionNode::class, fn(SequenceExpressionNode $e) =>
+			count($e->expressions) === 2 &&
+			$e->expressions[0] instanceof VariableNameExpressionNode && $e->expressions[0]->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->expressions[1] instanceof VariableNameExpressionNode && $e->expressions[1]->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ['{x};', SequenceExpressionNode::class, fn(SequenceExpressionNode $e) =>
+			count($e->expressions) === 1 &&
+			$e->expressions[0] instanceof VariableNameExpressionNode && $e->expressions[0]->variableName->equals(new VariableNameIdentifier('x'))
+		];
+		yield ['{x;};', SequenceExpressionNode::class, fn(SequenceExpressionNode $e) =>
+			count($e->expressions) === 1 &&
+			$e->expressions[0] instanceof VariableNameExpressionNode && $e->expressions[0]->variableName->equals(new VariableNameIdentifier('x'))
+		];
+		yield ['{};', SequenceExpressionNode::class, fn(SequenceExpressionNode $e) =>
+			count($e->expressions) === 1 &&
+			$e->expressions[0] instanceof SequenceExpressionNode
+		];
+		yield ['[x, y];', TupleExpressionNode::class, fn(TupleExpressionNode $e) =>
+			count($e->values) === 2 &&
+			$e->values[0] instanceof VariableNameExpressionNode && $e->values[0]->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->values[1] instanceof VariableNameExpressionNode && $e->values[1]->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ['[$];', TupleExpressionNode::class, fn(TupleExpressionNode $e) =>
+			count($e->values) === 1 &&
+			$e->values[0] instanceof VariableNameExpressionNode && $e->values[0]->variableName->equals(new VariableNameIdentifier('$'))
+		];
+		yield ['[x];', TupleExpressionNode::class, fn(TupleExpressionNode $e) =>
+			count($e->values) === 1 &&
+			$e->values[0] instanceof VariableNameExpressionNode && $e->values[0]->variableName->equals(new VariableNameIdentifier('x'))
+		];
+		yield ["['x'];", TupleExpressionNode::class, fn(TupleExpressionNode $e) =>
+			count($e->values) === 1 &&
+			$e->values[0] instanceof ConstantExpressionNode && $e->values[0]->value instanceof StringValueNode && $e->values[0]->value->value === 'x'
+		];
+		yield ["['x', 'y'];", TupleExpressionNode::class, fn(TupleExpressionNode $e) =>
+			count($e->values) === 2 &&
+			$e->values[0] instanceof ConstantExpressionNode && $e->values[0]->value instanceof StringValueNode && $e->values[0]->value->value === 'x' &&
+			$e->values[1] instanceof ConstantExpressionNode && $e->values[1]->value instanceof StringValueNode && $e->values[1]->value->value === 'y'
+		];
+		yield ['[x; y];', SetExpressionNode::class, fn(SetExpressionNode $e) =>
+			count($e->values) === 2 &&
+			$e->values[0] instanceof VariableNameExpressionNode && $e->values[0]->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->values[1] instanceof VariableNameExpressionNode && $e->values[1]->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ['[x;];', SetExpressionNode::class, fn(SetExpressionNode $e) =>
+			count($e->values) === 1 &&
+			$e->values[0] instanceof VariableNameExpressionNode && $e->values[0]->variableName->equals(new VariableNameIdentifier('x'))
+		];
+		yield ['[a: x, b: y];', RecordExpressionNode::class, fn(RecordExpressionNode $e) =>
+			count($e->values) === 2 &&
+			$e->values['a'] instanceof VariableNameExpressionNode && $e->values['a']->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->values['b'] instanceof VariableNameExpressionNode && $e->values['b']->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ["['a': x, 'b': y];", RecordExpressionNode::class, fn(RecordExpressionNode $e) =>
+			count($e->values) === 2 &&
+			$e->values['a'] instanceof VariableNameExpressionNode && $e->values['a']->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->values['b'] instanceof VariableNameExpressionNode && $e->values['b']->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ['[a: x];', RecordExpressionNode::class, fn(RecordExpressionNode $e) =>
+			count($e->values) === 1 &&
+			$e->values['a'] instanceof VariableNameExpressionNode && $e->values['a']->variableName->equals(new VariableNameIdentifier('x'))
+		];
+		yield ['=> x;', ReturnExpressionNode::class, fn(ReturnExpressionNode $e) =>
+			$e->returnedExpression instanceof VariableNameExpressionNode && $e->returnedExpression->variableName->equals(new VariableNameIdentifier('x'))];
+		yield ['?noError(x);', NoErrorExpressionNode::class, fn(NoErrorExpressionNode $e) =>
+			$e->targetExpression instanceof VariableNameExpressionNode && $e->targetExpression->variableName->equals(new VariableNameIdentifier('x'))];
+		yield ['?noExternalError(x);', NoExternalErrorExpressionNode::class, fn(NoExternalErrorExpressionNode $e) =>
+			$e->targetExpression instanceof VariableNameExpressionNode && $e->targetExpression->variableName->equals(new VariableNameIdentifier('x'))];
+		yield ['x.y;', PropertyAccessExpressionNode::class, fn(PropertyAccessExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->propertyName === 'y'
+		];
+		yield ["x.'y';", PropertyAccessExpressionNode::class, fn(PropertyAccessExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->propertyName === 'y'
+		];
+		yield ['x.0;', PropertyAccessExpressionNode::class, fn(PropertyAccessExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->propertyName === 0
+		];
+		yield ['x.y.z;', PropertyAccessExpressionNode::class, fn(PropertyAccessExpressionNode $e) =>
+			$e->target instanceof PropertyAccessExpressionNode &&
+			$e->target->target instanceof VariableNameExpressionNode && $e->target->target->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->target->propertyName === 'y' &&
+			$e->propertyName === 'z'
+		];
+		yield ['@x;', ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('Error')) &&
+			$e->parameter instanceof VariableNameExpressionNode && $e->parameter->variableName->equals(new VariableNameIdentifier('x'))];
+
+		yield ['C();', ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('C')) &&
+			$e->parameter instanceof ConstantExpressionNode && $e->parameter->value instanceof NullValueNode];
+		yield ['C(x);', ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('C')) &&
+			$e->parameter instanceof VariableNameExpressionNode && $e->parameter->variableName->equals(new VariableNameIdentifier('x'))];
+		yield ['C[];', ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('C')) &&
+			$e->parameter instanceof ConstantExpressionNode &&
+			$e->parameter->value instanceof TupleValueNode && count($e->parameter->value->values) === 0];
+		yield ['C[x];', ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('C')) &&
+			$e->parameter instanceof TupleExpressionNode && count($e->parameter->values) === 1 &&
+			$e->parameter->values[0] instanceof VariableNameExpressionNode && $e->parameter->values[0]->variableName->equals(new VariableNameIdentifier('x'))];
+		yield ['C[x, y];', ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('C')) &&
+			$e->parameter instanceof TupleExpressionNode && count($e->parameter->values) === 2 &&
+			$e->parameter->values[0] instanceof VariableNameExpressionNode && $e->parameter->values[0]->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->parameter->values[1] instanceof VariableNameExpressionNode && $e->parameter->values[1]->variableName->equals(new VariableNameIdentifier('y'))];
+		yield ["C['x'];", ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('C')) &&
+			$e->parameter instanceof TupleExpressionNode && count($e->parameter->values) === 1 &&
+			$e->parameter->values[0] instanceof ConstantExpressionNode && $e->parameter->values[0]->value instanceof StringValueNode && $e->parameter->values[0]->value->value === 'x'];
+		yield ["C['x', 'y'];", ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('C')) &&
+			$e->parameter instanceof TupleExpressionNode && count($e->parameter->values) === 2 &&
+						$e->parameter->values[0] instanceof ConstantExpressionNode && $e->parameter->values[0]->value instanceof StringValueNode && $e->parameter->values[0]->value->value === 'x' &&
+						$e->parameter->values[1] instanceof ConstantExpressionNode && $e->parameter->values[1]->value instanceof StringValueNode && $e->parameter->values[1]->value->value === 'y'];
+
+		yield ['C[;];', ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('C')) &&
+			$e->parameter instanceof ConstantExpressionNode &&
+			$e->parameter->value instanceof SetValueNode && count($e->parameter->value->values) === 0];
+		yield ['C[x;];', ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('C')) &&
+			$e->parameter instanceof SetExpressionNode && count($e->parameter->values) === 1 &&
+			$e->parameter->values[0] instanceof VariableNameExpressionNode && $e->parameter->values[0]->variableName->equals(new VariableNameIdentifier('x'))];
+		yield ['C[x; y];', ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('C')) &&
+			$e->parameter instanceof SetExpressionNode && count($e->parameter->values) === 2 &&
+			$e->parameter->values[0] instanceof VariableNameExpressionNode && $e->parameter->values[0]->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->parameter->values[1] instanceof VariableNameExpressionNode && $e->parameter->values[1]->variableName->equals(new VariableNameIdentifier('y'))];
+
+		yield ['C[:];', ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('C')) &&
+			$e->parameter instanceof ConstantExpressionNode &&
+			$e->parameter->value instanceof RecordValueNode && count($e->parameter->value->values) === 0];
+		yield ['C[a: x];', ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('C')) &&
+			$e->parameter instanceof RecordExpressionNode && count($e->parameter->values) === 1 &&
+			$e->parameter->values['a'] instanceof VariableNameExpressionNode && $e->parameter->values['a']->variableName->equals(new VariableNameIdentifier('x'))];
+		yield ['C[a: x, b: y];', ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('C')) &&
+			$e->parameter instanceof RecordExpressionNode && count($e->parameter->values) === 2 &&
+			$e->parameter->values['a'] instanceof VariableNameExpressionNode && $e->parameter->values['a']->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->parameter->values['b'] instanceof VariableNameExpressionNode && $e->parameter->values['b']->variableName->equals(new VariableNameIdentifier('y'))];
+		yield ["C['a': x];", ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('C')) &&
+			$e->parameter instanceof RecordExpressionNode && count($e->parameter->values) === 1 &&
+			$e->parameter->values['a'] instanceof VariableNameExpressionNode && $e->parameter->values['a']->variableName->equals(new VariableNameIdentifier('x'))];
+		yield ["C['a': x, 'b': y];", ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('C')) &&
+			$e->parameter instanceof RecordExpressionNode && count($e->parameter->values) === 2 &&
+			$e->parameter->values['a'] instanceof VariableNameExpressionNode && $e->parameter->values['a']->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->parameter->values['b'] instanceof VariableNameExpressionNode && $e->parameter->values['b']->variableName->equals(new VariableNameIdentifier('y'))];
+
+		yield ['f();', FunctionCallExpressionNode::class, fn(FunctionCallExpressionNode $e) => $e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('f')) &&
+			$e->parameter instanceof ConstantExpressionNode && $e->parameter->value instanceof NullValueNode];
+		yield ['f(x);', FunctionCallExpressionNode::class, fn(FunctionCallExpressionNode $e) => $e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('f')) &&
+			$e->parameter instanceof VariableNameExpressionNode && $e->parameter->variableName->equals(new VariableNameIdentifier('x'))];
+		yield ['f[];', FunctionCallExpressionNode::class, fn(FunctionCallExpressionNode $e) => $e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('f')) &&
+			$e->parameter instanceof ConstantExpressionNode &&
+			$e->parameter->value instanceof TupleValueNode && count($e->parameter->value->values) === 0];
+		yield ['f[x];', FunctionCallExpressionNode::class, fn(FunctionCallExpressionNode $e) => $e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('f')) &&
+			$e->parameter instanceof TupleExpressionNode && count($e->parameter->values) === 1 &&
+			$e->parameter->values[0] instanceof VariableNameExpressionNode && $e->parameter->values[0]->variableName->equals(new VariableNameIdentifier('x'))];
+		yield ['f[x, y];', FunctionCallExpressionNode::class, fn(FunctionCallExpressionNode $e) => $e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('f')) &&
+			$e->parameter instanceof TupleExpressionNode && count($e->parameter->values) === 2 &&
+			$e->parameter->values[0] instanceof VariableNameExpressionNode && $e->parameter->values[0]->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->parameter->values[1] instanceof VariableNameExpressionNode && $e->parameter->values[1]->variableName->equals(new VariableNameIdentifier('y'))];
+		yield ["f['x'];", FunctionCallExpressionNode::class, fn(FunctionCallExpressionNode $e) => $e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('f')) &&
+			$e->parameter instanceof TupleExpressionNode && count($e->parameter->values) === 1 &&
+			$e->parameter->values[0] instanceof ConstantExpressionNode && $e->parameter->values[0]->value instanceof StringValueNode && $e->parameter->values[0]->value->value === 'x'];
+		yield ["f['x', 'y'];", FunctionCallExpressionNode::class, fn(FunctionCallExpressionNode $e) => $e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('f')) &&
+			$e->parameter instanceof TupleExpressionNode && count($e->parameter->values) === 2 &&
+						$e->parameter->values[0] instanceof ConstantExpressionNode && $e->parameter->values[0]->value instanceof StringValueNode && $e->parameter->values[0]->value->value === 'x' &&
+						$e->parameter->values[1] instanceof ConstantExpressionNode && $e->parameter->values[1]->value instanceof StringValueNode && $e->parameter->values[1]->value->value === 'y'];
+
+		yield ['f[;];', FunctionCallExpressionNode::class, fn(FunctionCallExpressionNode $e) => $e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('f')) &&
+			$e->parameter instanceof ConstantExpressionNode &&
+			$e->parameter->value instanceof SetValueNode && count($e->parameter->value->values) === 0];
+		yield ['f[x;];', FunctionCallExpressionNode::class, fn(FunctionCallExpressionNode $e) => $e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('f')) &&
+			$e->parameter instanceof SetExpressionNode && count($e->parameter->values) === 1 &&
+			$e->parameter->values[0] instanceof VariableNameExpressionNode && $e->parameter->values[0]->variableName->equals(new VariableNameIdentifier('x'))];
+		yield ['f[x; y];', FunctionCallExpressionNode::class, fn(FunctionCallExpressionNode $e) => $e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('f')) &&
+			$e->parameter instanceof SetExpressionNode && count($e->parameter->values) === 2 &&
+			$e->parameter->values[0] instanceof VariableNameExpressionNode && $e->parameter->values[0]->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->parameter->values[1] instanceof VariableNameExpressionNode && $e->parameter->values[1]->variableName->equals(new VariableNameIdentifier('y'))];
+
+		yield ['f[:];', FunctionCallExpressionNode::class, fn(FunctionCallExpressionNode $e) => $e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('f')) &&
+			$e->parameter instanceof ConstantExpressionNode &&
+			$e->parameter->value instanceof RecordValueNode && count($e->parameter->value->values) === 0];
+		yield ['f[a: x];', FunctionCallExpressionNode::class, fn(FunctionCallExpressionNode $e) => $e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('f')) &&
+			$e->parameter instanceof RecordExpressionNode && count($e->parameter->values) === 1 &&
+			$e->parameter->values['a'] instanceof VariableNameExpressionNode && $e->parameter->values['a']->variableName->equals(new VariableNameIdentifier('x'))];
+		yield ['f[a: x, b: y];', FunctionCallExpressionNode::class, fn(FunctionCallExpressionNode $e) => $e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('f')) &&
+			$e->parameter instanceof RecordExpressionNode && count($e->parameter->values) === 2 &&
+			$e->parameter->values['a'] instanceof VariableNameExpressionNode && $e->parameter->values['a']->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->parameter->values['b'] instanceof VariableNameExpressionNode && $e->parameter->values['b']->variableName->equals(new VariableNameIdentifier('y'))];
+		yield ["f['a': x];", FunctionCallExpressionNode::class, fn(FunctionCallExpressionNode $e) => $e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('f')) &&
+			$e->parameter instanceof RecordExpressionNode && count($e->parameter->values) === 1 &&
+			$e->parameter->values['a'] instanceof VariableNameExpressionNode && $e->parameter->values['a']->variableName->equals(new VariableNameIdentifier('x'))];
+		yield ["f['a': x, 'b': y];", FunctionCallExpressionNode::class, fn(FunctionCallExpressionNode $e) => $e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('f')) &&
+			$e->parameter instanceof RecordExpressionNode && count($e->parameter->values) === 2 &&
+			$e->parameter->values['a'] instanceof VariableNameExpressionNode && $e->parameter->values['a']->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->parameter->values['b'] instanceof VariableNameExpressionNode && $e->parameter->values['b']->variableName->equals(new VariableNameIdentifier('y'))];
+
+		yield ['a=>b;', NoErrorExpressionNode::class, fn(NoErrorExpressionNode $e) =>
+			$e->targetExpression instanceof MethodCallExpressionNode &&
+			$e->targetExpression->target instanceof VariableNameExpressionNode && $e->targetExpression->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->targetExpression->methodName->equals(new MethodNameIdentifier('b')) &&
+			$e->targetExpression->parameter instanceof ConstantExpressionNode && $e->targetExpression->parameter->value instanceof NullValueNode];
+		yield ['a|>b;', NoExternalErrorExpressionNode::class, fn(NoExternalErrorExpressionNode $e) =>
+			$e->targetExpression instanceof MethodCallExpressionNode &&
+			$e->targetExpression->target instanceof VariableNameExpressionNode && $e->targetExpression->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->targetExpression->methodName->equals(new MethodNameIdentifier('b')) &&
+			$e->targetExpression->parameter instanceof ConstantExpressionNode && $e->targetExpression->parameter->value instanceof NullValueNode];
+		yield ['+a;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->methodName->equals(new MethodNameIdentifier('unaryPlus')) &&
+			$e->parameter instanceof ConstantExpressionNode && $e->parameter->value instanceof NullValueNode];
+		yield ['-a;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->methodName->equals(new MethodNameIdentifier('unaryMinus')) &&
+			$e->parameter instanceof ConstantExpressionNode && $e->parameter->value instanceof NullValueNode];
+		yield ['~a;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->methodName->equals(new MethodNameIdentifier('unaryBitwiseNot')) &&
+			$e->parameter instanceof ConstantExpressionNode && $e->parameter->value instanceof NullValueNode];
+		yield ['!a;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->methodName->equals(new MethodNameIdentifier('unaryNot')) &&
+			$e->parameter instanceof ConstantExpressionNode && $e->parameter->value instanceof NullValueNode];
+
+		yield ['a + x;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->methodName->equals(new MethodNameIdentifier('binaryPlus')) &&
+			$e->parameter instanceof VariableNameExpressionNode && $e->parameter->variableName->equals(new VariableNameIdentifier('x'))];
+		yield ['a - x;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryMinus'))];
+		yield ['a * x;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryMultiply'))];
+		yield ['a / x;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryDivide'))];
+		yield ['a // x;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryIntegerDivide'))];
+		yield ['a % x;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryModulo'))];
+		yield ['a ** x;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryPower'))];
+		yield ['a & x;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryBitwiseAnd'))];
+		yield ['a | x;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryBitwiseOr'))];
+		yield ['a ^ x;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryBitwiseXor'))];
+		yield ['a < x;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryLessThan'))];
+		yield ['a <= x;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryLessThanEqual'))];
+		yield ['a > x;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryGreaterThan'))];
+		yield ['a >= x;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryGreaterThanEqual'))];
+		yield ['a != x;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryNotEqual'))];
+		yield ['a == x;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryEqual'))];
+		yield ['a || x;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryOr'))];
+		yield ['a && x;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryAnd'))];
+		yield ['a ^^ x;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryXor'))];
+
+		yield ['a *> (null);', NoErrorExpressionNode::class, fn(NoErrorExpressionNode $e) =>
+			$e->targetExpression instanceof MethodCallExpressionNode &&
+			$e->targetExpression->target instanceof VariableNameExpressionNode && $e->targetExpression->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->targetExpression->methodName->equals(new MethodNameIdentifier('errorAsExternal')) &&
+			$e->targetExpression->parameter instanceof SequenceExpressionNode && count($e->targetExpression->parameter->expressions) === 1 &&
+			$e->targetExpression->parameter->expressions[0] instanceof ConstantExpressionNode && $e->targetExpression->parameter->expressions[0]->value instanceof NullValueNode];
+
+		yield ['a->b->c;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof MethodCallExpressionNode &&
+			$e->target->target instanceof VariableNameExpressionNode && $e->target->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->target->methodName->equals(new MethodNameIdentifier('b')) &&
+			$e->target->parameter instanceof ConstantExpressionNode && $e->target->parameter->value instanceof NullValueNode &&
+			$e->methodName->equals(new MethodNameIdentifier('c')) &&
+			$e->parameter instanceof ConstantExpressionNode && $e->parameter->value instanceof NullValueNode];
+		yield ['a->b(c)->d;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof MethodCallExpressionNode &&
+			$e->target->target instanceof VariableNameExpressionNode && $e->target->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->target->methodName->equals(new MethodNameIdentifier('b')) &&
+			$e->target->parameter instanceof SequenceExpressionNode && count($e->target->parameter->expressions) === 1 &&
+			$e->target->parameter->expressions[0] instanceof VariableNameExpressionNode && $e->target->parameter->expressions[0]->variableName->equals(new VariableNameIdentifier('c')) &&
+			$e->methodName->equals(new MethodNameIdentifier('d')) &&
+			$e->parameter instanceof ConstantExpressionNode && $e->parameter->value instanceof NullValueNode];
+		yield ['a->b.c;', PropertyAccessExpressionNode::class, fn(PropertyAccessExpressionNode $e) =>
+			$e->target instanceof MethodCallExpressionNode &&
+			$e->target->target instanceof VariableNameExpressionNode && $e->target->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->target->methodName->equals(new MethodNameIdentifier('b')) &&
+			$e->target->parameter instanceof ConstantExpressionNode && $e->target->parameter->value instanceof NullValueNode &&
+			$e->propertyName === 'c'];
+
+		yield ['a->b;', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->methodName->equals(new MethodNameIdentifier('b')) &&
+			$e->parameter instanceof ConstantExpressionNode && $e->parameter->value instanceof NullValueNode];
+		yield ['a->b(x);', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->methodName->equals(new MethodNameIdentifier('b')) &&
+			$e->parameter instanceof SequenceExpressionNode && count($e->parameter->expressions) === 1 &&
+			$e->parameter->expressions[0] instanceof VariableNameExpressionNode && $e->parameter->expressions[0]->variableName->equals(new VariableNameIdentifier('x'))];
+		/*yield ['a->b[];', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->methodName->equals(new MethodNameIdentifier('b')) &&
+			$e->parameter instanceof ConstantExpressionNode &&
+			$e->parameter->value instanceof TupleValueNode && count($e->parameter->value->values) === 0];*/
+		yield ['a->b[x.y];', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->methodName->equals(new MethodNameIdentifier('b')) &&
+			$e->parameter instanceof SequenceExpressionNode && count($e->parameter->expressions) === 1 &&
+			$e->parameter->expressions[0] instanceof TupleExpressionNode && count($e->parameter->expressions[0]->values) === 1 &&
+			$e->parameter->expressions[0]->values[0] instanceof PropertyAccessExpressionNode &&
+			$e->parameter->expressions[0]->values[0]->target instanceof VariableNameExpressionNode && $e->parameter->expressions[0]->values[0]->target->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->parameter->expressions[0]->values[0]->propertyName === 'y'
+		];
+
+		yield ['a->b[x];', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->methodName->equals(new MethodNameIdentifier('b')) &&
+			$e->parameter instanceof SequenceExpressionNode && count($e->parameter->expressions) === 1 &&
+			$e->parameter->expressions[0] instanceof TupleExpressionNode && count($e->parameter->expressions[0]->values) === 1 &&
+			$e->parameter->expressions[0]->values[0] instanceof VariableNameExpressionNode && $e->parameter->expressions[0]->values[0]->variableName->equals(new VariableNameIdentifier('x'))];
+		yield ['a->b[x, y];', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->methodName->equals(new MethodNameIdentifier('b')) &&
+			$e->parameter instanceof SequenceExpressionNode && count($e->parameter->expressions) === 1 &&
+			$e->parameter->expressions[0] instanceof TupleExpressionNode && count($e->parameter->expressions[0]->values) === 2 &&
+			$e->parameter->expressions[0]->values[0] instanceof VariableNameExpressionNode && $e->parameter->expressions[0]->values[0]->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->parameter->expressions[0]->values[1] instanceof VariableNameExpressionNode && $e->parameter->expressions[0]->values[1]->variableName->equals(new VariableNameIdentifier('y'))];
+		yield ["a->b['x'];", MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->methodName->equals(new MethodNameIdentifier('b')) &&
+			$e->parameter instanceof SequenceExpressionNode && count($e->parameter->expressions) === 1 &&
+			$e->parameter->expressions[0] instanceof TupleExpressionNode && count($e->parameter->expressions[0]->values) === 1 &&
+			$e->parameter->expressions[0]->values[0] instanceof ConstantExpressionNode && $e->parameter->expressions[0]->values[0]->value instanceof StringValueNode && $e->parameter->expressions[0]->values[0]->value->value === 'x'];
+		yield ["a->b['x', 'y'];", MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->methodName->equals(new MethodNameIdentifier('b')) &&
+			$e->parameter instanceof SequenceExpressionNode && count($e->parameter->expressions) === 1 &&
+			$e->parameter->expressions[0] instanceof TupleExpressionNode && count($e->parameter->expressions[0]->values) === 2 &&
+			$e->parameter->expressions[0]->values[0] instanceof ConstantExpressionNode && $e->parameter->expressions[0]->values[0]->value instanceof StringValueNode && $e->parameter->expressions[0]->values[0]->value->value === 'x' &&
+			$e->parameter->expressions[0]->values[1] instanceof ConstantExpressionNode && $e->parameter->expressions[0]->values[1]->value instanceof StringValueNode && $e->parameter->expressions[0]->values[1]->value->value === 'y'];
+		yield ['a->b[x;];', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->methodName->equals(new MethodNameIdentifier('b')) &&
+			$e->parameter instanceof SequenceExpressionNode && count($e->parameter->expressions) === 1 &&
+			$e->parameter->expressions[0] instanceof SetExpressionNode && count($e->parameter->expressions[0]->values) === 1 &&
+			$e->parameter->expressions[0]->values[0] instanceof VariableNameExpressionNode && $e->parameter->expressions[0]->values[0]->variableName->equals(new VariableNameIdentifier('x'))];
+		yield ['a->b[x; y];', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->methodName->equals(new MethodNameIdentifier('b')) &&
+			$e->parameter instanceof SequenceExpressionNode && count($e->parameter->expressions) === 1 &&
+			$e->parameter->expressions[0] instanceof SetExpressionNode && count($e->parameter->expressions[0]->values) === 2 &&
+			$e->parameter->expressions[0]->values[0] instanceof VariableNameExpressionNode && $e->parameter->expressions[0]->values[0]->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->parameter->expressions[0]->values[1] instanceof VariableNameExpressionNode && $e->parameter->expressions[0]->values[1]->variableName->equals(new VariableNameIdentifier('y'))];
+		yield ['a->b[a: x];', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->methodName->equals(new MethodNameIdentifier('b')) &&
+			$e->parameter instanceof SequenceExpressionNode && count($e->parameter->expressions) === 1 &&
+			$e->parameter->expressions[0] instanceof RecordExpressionNode && count($e->parameter->expressions[0]->values) === 1 &&
+			$e->parameter->expressions[0]->values['a'] instanceof VariableNameExpressionNode && $e->parameter->expressions[0]->values['a']->variableName->equals(new VariableNameIdentifier('x'))];
+		yield ['a->b[a: x, b: y];', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->methodName->equals(new MethodNameIdentifier('b')) &&
+			$e->parameter instanceof SequenceExpressionNode && count($e->parameter->expressions) === 1 &&
+			$e->parameter->expressions[0] instanceof RecordExpressionNode && count($e->parameter->expressions[0]->values) === 2 &&
+			$e->parameter->expressions[0]->values['a'] instanceof VariableNameExpressionNode && $e->parameter->expressions[0]->values['a']->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->parameter->expressions[0]->values['b'] instanceof VariableNameExpressionNode && $e->parameter->expressions[0]->values['b']->variableName->equals(new VariableNameIdentifier('y'))];
+		yield ["a->b['a': x];", MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->methodName->equals(new MethodNameIdentifier('b')) &&
+			$e->parameter instanceof SequenceExpressionNode && count($e->parameter->expressions) === 1 &&
+			$e->parameter->expressions[0] instanceof RecordExpressionNode && count($e->parameter->expressions[0]->values) === 1 &&
+			$e->parameter->expressions[0]->values['a'] instanceof VariableNameExpressionNode && $e->parameter->expressions[0]->values['a']->variableName->equals(new VariableNameIdentifier('x'))];
+		yield ["a->b['a': x, 'b': y];", MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->methodName->equals(new MethodNameIdentifier('b')) &&
+			$e->parameter instanceof SequenceExpressionNode && count($e->parameter->expressions) === 1 &&
+			$e->parameter->expressions[0] instanceof RecordExpressionNode && count($e->parameter->expressions[0]->values) === 2 &&
+			$e->parameter->expressions[0]->values['a'] instanceof VariableNameExpressionNode && $e->parameter->expressions[0]->values['a']->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->parameter->expressions[0]->values['b'] instanceof VariableNameExpressionNode && $e->parameter->expressions[0]->values['b']->variableName->equals(new VariableNameIdentifier('y'))];
+		//more
+		yield ['?whenIsError(x) { y };', MatchErrorExpressionNode::class, fn(MatchErrorExpressionNode $e) =>
+			$e->condition instanceof VariableNameExpressionNode && $e->condition->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->onError instanceof SequenceExpressionNode && count($e->onError->expressions) === 1 &&
+			$e->onError->expressions[0] instanceof VariableNameExpressionNode && $e->onError->expressions[0]->variableName->equals(new VariableNameIdentifier('y')) &&
+			$e->else === null
+		];
+		yield ['?whenIsError(x) { y } ~ { z };', MatchErrorExpressionNode::class, fn(MatchErrorExpressionNode $e) =>
+			$e->condition instanceof VariableNameExpressionNode && $e->condition->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->onError instanceof SequenceExpressionNode && count($e->onError->expressions) === 1 &&
+			$e->onError->expressions[0] instanceof VariableNameExpressionNode && $e->onError->expressions[0]->variableName->equals(new VariableNameIdentifier('y')) &&
+			$e->else instanceof SequenceExpressionNode && count($e->else->expressions) === 1 &&
+			$e->else->expressions[0] instanceof VariableNameExpressionNode && $e->else->expressions[0]->variableName->equals(new VariableNameIdentifier('z'))
+		];
+		yield ['?when(x) { y };', MatchIfExpressionNode::class, fn(MatchIfExpressionNode $e) =>
+			$e->condition instanceof VariableNameExpressionNode && $e->condition->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->then instanceof SequenceExpressionNode && count($e->then->expressions) === 1 &&
+			$e->then->expressions[0] instanceof VariableNameExpressionNode && $e->then->expressions[0]->variableName->equals(new VariableNameIdentifier('y')) &&
+			$e->else instanceof ConstantExpressionNode && $e->else->value instanceof NullValueNode
+		];
+		yield ['?when(x) { y } ~ { z };', MatchIfExpressionNode::class, fn(MatchIfExpressionNode $e) =>
+			$e->condition instanceof VariableNameExpressionNode && $e->condition->variableName->equals(new VariableNameIdentifier('x')) &&
+			$e->then instanceof SequenceExpressionNode && count($e->then->expressions) === 1 &&
+			$e->then->expressions[0] instanceof VariableNameExpressionNode && $e->then->expressions[0]->variableName->equals(new VariableNameIdentifier('y')) &&
+			$e->else instanceof SequenceExpressionNode && count($e->else->expressions) === 1 &&
+			$e->else->expressions[0] instanceof VariableNameExpressionNode && $e->else->expressions[0]->variableName->equals(new VariableNameIdentifier('z'))
+		];
+		yield ['?whenTypeOf(x) is { a: b };', MatchTypeExpressionNode::class, fn(MatchTypeExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('x')) &&
+			count($e->pairs) === 1 && $e->pairs[0] instanceof MatchExpressionPairNode &&
+			$e->pairs[0]->matchExpression instanceof VariableNameExpressionNode && $e->pairs[0]->matchExpression->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->pairs[0]->valueExpression instanceof VariableNameExpressionNode && $e->pairs[0]->valueExpression->variableName->equals(new VariableNameIdentifier('b'))
+		];
+		yield ['?whenTypeOf(x) is { a: b, c: d };', MatchTypeExpressionNode::class, fn(MatchTypeExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('x')) &&
+			count($e->pairs) === 2 && $e->pairs[0] instanceof MatchExpressionPairNode && $e->pairs[1] instanceof MatchExpressionPairNode &&
+			$e->pairs[0]->matchExpression instanceof VariableNameExpressionNode && $e->pairs[0]->matchExpression->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->pairs[0]->valueExpression instanceof VariableNameExpressionNode && $e->pairs[0]->valueExpression->variableName->equals(new VariableNameIdentifier('b')) &&
+			$e->pairs[1]->matchExpression instanceof VariableNameExpressionNode && $e->pairs[1]->matchExpression->variableName->equals(new VariableNameIdentifier('c')) &&
+			$e->pairs[1]->valueExpression instanceof VariableNameExpressionNode && $e->pairs[1]->valueExpression->variableName->equals(new VariableNameIdentifier('d'))
+		];
+		yield ['?whenTypeOf(x) is { ~: e };', MatchTypeExpressionNode::class, fn(MatchTypeExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('x')) &&
+			count($e->pairs) === 1 && $e->pairs[0] instanceof MatchExpressionDefaultNode &&
+			$e->pairs[0]->valueExpression instanceof VariableNameExpressionNode && $e->pairs[0]->valueExpression->variableName->equals(new VariableNameIdentifier('e'))
+		];
+		yield ['?whenTypeOf(x) is { a: b, c: d, ~: e };', MatchTypeExpressionNode::class, fn(MatchTypeExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('x')) &&
+			count($e->pairs) === 3 && $e->pairs[0] instanceof MatchExpressionPairNode && $e->pairs[1] instanceof MatchExpressionPairNode && $e->pairs[2] instanceof MatchExpressionDefaultNode &&
+			$e->pairs[0]->matchExpression instanceof VariableNameExpressionNode && $e->pairs[0]->matchExpression->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->pairs[0]->valueExpression instanceof VariableNameExpressionNode && $e->pairs[0]->valueExpression->variableName->equals(new VariableNameIdentifier('b')) &&
+			$e->pairs[1]->matchExpression instanceof VariableNameExpressionNode && $e->pairs[1]->matchExpression->variableName->equals(new VariableNameIdentifier('c')) &&
+			$e->pairs[1]->valueExpression instanceof VariableNameExpressionNode && $e->pairs[1]->valueExpression->variableName->equals(new VariableNameIdentifier('d')) &&
+			$e->pairs[2]->valueExpression instanceof VariableNameExpressionNode && $e->pairs[2]->valueExpression->variableName->equals(new VariableNameIdentifier('e'))
+		];
+		yield ['?whenValueOf(x) is { a: b };', MatchValueExpressionNode::class, fn(MatchValueExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('x')) &&
+			count($e->pairs) === 1 && $e->pairs[0] instanceof MatchExpressionPairNode &&
+			$e->pairs[0]->matchExpression instanceof VariableNameExpressionNode && $e->pairs[0]->matchExpression->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->pairs[0]->valueExpression instanceof VariableNameExpressionNode && $e->pairs[0]->valueExpression->variableName->equals(new VariableNameIdentifier('b'))
+		];
+		yield ['?whenValueOf(x) is { a: b, c: d };', MatchValueExpressionNode::class, fn(MatchValueExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('x')) &&
+			count($e->pairs) === 2 && $e->pairs[0] instanceof MatchExpressionPairNode && $e->pairs[1] instanceof MatchExpressionPairNode &&
+			$e->pairs[0]->matchExpression instanceof VariableNameExpressionNode && $e->pairs[0]->matchExpression->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->pairs[0]->valueExpression instanceof VariableNameExpressionNode && $e->pairs[0]->valueExpression->variableName->equals(new VariableNameIdentifier('b')) &&
+			$e->pairs[1]->matchExpression instanceof VariableNameExpressionNode && $e->pairs[1]->matchExpression->variableName->equals(new VariableNameIdentifier('c')) &&
+			$e->pairs[1]->valueExpression instanceof VariableNameExpressionNode && $e->pairs[1]->valueExpression->variableName->equals(new VariableNameIdentifier('d'))
+		];
+		yield ['?whenValueOf(x) is { ~: e };', MatchValueExpressionNode::class, fn(MatchValueExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('x')) &&
+			count($e->pairs) === 1 && $e->pairs[0] instanceof MatchExpressionDefaultNode &&
+			$e->pairs[0]->valueExpression instanceof VariableNameExpressionNode && $e->pairs[0]->valueExpression->variableName->equals(new VariableNameIdentifier('e'))
+		];
+		yield ['?whenValueOf(x) is { a: b, c: d, ~: e };', MatchValueExpressionNode::class, fn(MatchValueExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('x')) &&
+			count($e->pairs) === 3 && $e->pairs[0] instanceof MatchExpressionPairNode && $e->pairs[1] instanceof MatchExpressionPairNode && $e->pairs[2] instanceof MatchExpressionDefaultNode &&
+			$e->pairs[0]->matchExpression instanceof VariableNameExpressionNode && $e->pairs[0]->matchExpression->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->pairs[0]->valueExpression instanceof VariableNameExpressionNode && $e->pairs[0]->valueExpression->variableName->equals(new VariableNameIdentifier('b')) &&
+			$e->pairs[1]->matchExpression instanceof VariableNameExpressionNode && $e->pairs[1]->matchExpression->variableName->equals(new VariableNameIdentifier('c')) &&
+			$e->pairs[1]->valueExpression instanceof VariableNameExpressionNode && $e->pairs[1]->valueExpression->variableName->equals(new VariableNameIdentifier('d')) &&
+			$e->pairs[2]->valueExpression instanceof VariableNameExpressionNode && $e->pairs[2]->valueExpression->variableName->equals(new VariableNameIdentifier('e'))
+		];
+		yield ['?whenIsTrue { a: b };', MatchTrueExpressionNode::class, fn(MatchTrueExpressionNode $e) =>
+			count($e->pairs) === 1 && $e->pairs[0] instanceof MatchExpressionPairNode &&
+			$e->pairs[0]->matchExpression instanceof VariableNameExpressionNode && $e->pairs[0]->matchExpression->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->pairs[0]->valueExpression instanceof VariableNameExpressionNode && $e->pairs[0]->valueExpression->variableName->equals(new VariableNameIdentifier('b'))
+		];
+		yield ['?whenIsTrue { a: b, c: d };', MatchTrueExpressionNode::class, fn(MatchTrueExpressionNode $e) =>
+			count($e->pairs) === 2 && $e->pairs[0] instanceof MatchExpressionPairNode && $e->pairs[1] instanceof MatchExpressionPairNode &&
+			$e->pairs[0]->matchExpression instanceof VariableNameExpressionNode && $e->pairs[0]->matchExpression->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->pairs[0]->valueExpression instanceof VariableNameExpressionNode && $e->pairs[0]->valueExpression->variableName->equals(new VariableNameIdentifier('b')) &&
+			$e->pairs[1]->matchExpression instanceof VariableNameExpressionNode && $e->pairs[1]->matchExpression->variableName->equals(new VariableNameIdentifier('c')) &&
+			$e->pairs[1]->valueExpression instanceof VariableNameExpressionNode && $e->pairs[1]->valueExpression->variableName->equals(new VariableNameIdentifier('d'))
+		];
+		yield ['?whenIsTrue { ~: e };', MatchTrueExpressionNode::class, fn(MatchTrueExpressionNode $e) =>
+			count($e->pairs) === 1 && $e->pairs[0] instanceof MatchExpressionDefaultNode &&
+			$e->pairs[0]->valueExpression instanceof VariableNameExpressionNode && $e->pairs[0]->valueExpression->variableName->equals(new VariableNameIdentifier('e'))
+		];
+		yield ['?whenIsTrue { a: b, c: d, ~: e };', MatchTrueExpressionNode::class, fn(MatchTrueExpressionNode $e) =>
+			count($e->pairs) === 3 && $e->pairs[0] instanceof MatchExpressionPairNode && $e->pairs[1] instanceof MatchExpressionPairNode && $e->pairs[2] instanceof MatchExpressionDefaultNode &&
+			$e->pairs[0]->matchExpression instanceof VariableNameExpressionNode && $e->pairs[0]->matchExpression->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->pairs[0]->valueExpression instanceof VariableNameExpressionNode && $e->pairs[0]->valueExpression->variableName->equals(new VariableNameIdentifier('b')) &&
+			$e->pairs[1]->matchExpression instanceof VariableNameExpressionNode && $e->pairs[1]->matchExpression->variableName->equals(new VariableNameIdentifier('c')) &&
+			$e->pairs[1]->valueExpression instanceof VariableNameExpressionNode && $e->pairs[1]->valueExpression->variableName->equals(new VariableNameIdentifier('d')) &&
+			$e->pairs[2]->valueExpression instanceof VariableNameExpressionNode && $e->pairs[2]->valueExpression->variableName->equals(new VariableNameIdentifier('e'))
+		];
+	}
+
 	#[DataProvider('types')]
 	public function testParseTypes(string $code, string $className, callable|null $checker = null): void {
 		[$s] = $this->runParserTest($code, 701);
@@ -538,6 +1068,7 @@ class ParserTest extends TestCase {
 		yield ['Shape', ShapeTypeNode::class, fn($t) => $t->refType instanceOf AnyTypeNode];
 		yield ['!Shape', ShapeTypeNode::class, fn($t) => $t->refType instanceOf AnyTypeNode];
 		yield ['Shape<Boolean>', ShapeTypeNode::class, fn($t) => $t->refType instanceOf BooleanTypeNode];
+		yield ['{Boolean}', ShapeTypeNode::class, fn($t) => $t->refType instanceOf BooleanTypeNode];
 		yield ['Result', ResultTypeNode::class, fn($t) => $t->returnType instanceOf AnyTypeNode && $t->errorType instanceOf AnyTypeNode];
 		yield ['!Result', ResultTypeNode::class, fn($t) => $t->returnType instanceOf AnyTypeNode && $t->errorType instanceOf AnyTypeNode];
 		yield ['Result<Null>', ResultTypeNode::class, fn($t) => $t->returnType instanceOf NullTypeNode && $t->errorType instanceOf AnyTypeNode];
@@ -552,6 +1083,9 @@ class ParserTest extends TestCase {
 		yield ['[]', TupleTypeNode::class, fn($t) => count($t->types) === 0 && $t->restType instanceOf NothingTypeNode];
 		yield ['[...]', TupleTypeNode::class, fn($t) => count($t->types) === 0 && $t->restType instanceOf AnyTypeNode];
 		yield ['[... Boolean]', TupleTypeNode::class, fn($t) => count($t->types) === 0 && $t->restType instanceOf BooleanTypeNode];
+		yield ['[[Null]]', TupleTypeNode::class, fn($t) => count($t->types) === 1 &&
+			$t->types[0] instanceof TupleTypeNode && count($t->types[0]->types) === 1 && $t->restType instanceOf NothingTypeNode &&
+			$t->types[0]->types[0] instanceof NullTypeNode && $t->types[0]->restType instanceOf NothingTypeNode];
 		yield ['[Null]', TupleTypeNode::class, fn($t) => count($t->types) === 1 && $t->types[0] instanceof NullTypeNode && $t->restType instanceOf NothingTypeNode];
 		yield ['[Null, ...]', TupleTypeNode::class, fn($t) => count($t->types) === 1 && $t->types[0] instanceof NullTypeNode && $t->restType instanceOf AnyTypeNode];
 		yield ['[Null, ... Boolean]', TupleTypeNode::class, fn($t) => count($t->types) === 1 && $t->types[0] instanceof NullTypeNode && $t->restType instanceOf BooleanTypeNode];
@@ -561,17 +1095,19 @@ class ParserTest extends TestCase {
 		yield ['[:]', RecordTypeNode::class, fn($t) => count($t->types) === 0 && $t->restType instanceOf NothingTypeNode];
 		yield ['[: ...]', RecordTypeNode::class, fn($t) => count($t->types) === 0 && $t->restType instanceOf AnyTypeNode];
 		yield ['[: ... Boolean]', RecordTypeNode::class, fn($t) => count($t->types) === 0 && $t->restType instanceOf BooleanTypeNode];
+		yield ['[~A]', RecordTypeNode::class, fn($t) => count($t->types) === 1 && $t->types['a'] instanceof NamedTypeNode && $t->types['a']->name->equals(new TypeNameIdentifier('A')) && $t->restType instanceOf NothingTypeNode];
 		yield ['[a: Null]', RecordTypeNode::class, fn($t) => count($t->types) === 1 && $t->types['a'] instanceof NullTypeNode && $t->restType instanceOf NothingTypeNode];
 		yield ['[a: Null, ...]', RecordTypeNode::class, fn($t) => count($t->types) === 1 && $t->types['a'] instanceof NullTypeNode && $t->restType instanceOf AnyTypeNode];
 		yield ['[a: Null, ... Boolean]', RecordTypeNode::class, fn($t) => count($t->types) === 1 && $t->types['a'] instanceof NullTypeNode && $t->restType instanceOf BooleanTypeNode];
 		yield ['[a: Null, b: Any]', RecordTypeNode::class, fn($t) => count($t->types) === 2 && $t->types['a'] instanceof NullTypeNode && $t->types['b'] instanceof AnyTypeNode && $t->restType instanceOf NothingTypeNode];
 		yield ['[a: Null, b: Any, ...]', RecordTypeNode::class, fn($t) => count($t->types) === 2 && $t->types['a'] instanceof NullTypeNode && $t->types['b'] instanceof AnyTypeNode && $t->restType instanceOf AnyTypeNode];
 		yield ['[a: Null, b: Any, ... Boolean]', RecordTypeNode::class, fn($t) => count($t->types) === 2 && $t->types['a'] instanceof NullTypeNode && $t->types['b'] instanceof AnyTypeNode && $t->restType instanceOf BooleanTypeNode];
-		yield ['[a: Null, b: Any, c: ?Null, d: OptionalKey<Null>, ... Boolean]', RecordTypeNode::class, fn($t) => count($t->types) === 4 &&
+		yield ['[a: Null, b: Any, c: ?Null, d: OptionalKey<Null>, e: OptionalKey, ... Boolean]', RecordTypeNode::class, fn($t) => count($t->types) === 5 &&
 			$t->types['a'] instanceof NullTypeNode &&
 			$t->types['b'] instanceof AnyTypeNode &&
 			$t->types['c'] instanceof OptionalKeyTypeNode && $t->types['c']->valueType instanceof NullTypeNode &&
 			$t->types['d'] instanceof OptionalKeyTypeNode && $t->types['d']->valueType instanceof NullTypeNode &&
+			$t->types['e'] instanceof OptionalKeyTypeNode && $t->types['e']->valueType instanceof AnyTypeNode &&
 			$t->restType instanceOf BooleanTypeNode];
 		yield ["['a': Null, 'b': Any, ... Boolean]", RecordTypeNode::class, fn($t) => count($t->types) === 2 && $t->types['a'] instanceof NullTypeNode && $t->types['b'] instanceof AnyTypeNode && $t->restType instanceOf BooleanTypeNode];
 
@@ -642,10 +1178,14 @@ class ParserTest extends TestCase {
 		yield ['MyEnum.Value', EnumerationValueNode::class, fn($v) => $v->name->equals(new TypeNameIdentifier('MyEnum')) && $v->enumValue->equals(new EnumValueIdentifier('Value'))];
 		yield ['^ :: null', FunctionValueNode::class, fn($v) => $v->parameterName === null && $v->parameterType instanceof NullTypeNode &&
 									$v->returnType instanceof AnyTypeNode && $v->dependencyType instanceof NothingTypeNode];
+		yield ['^ %% True :: null', FunctionValueNode::class, fn($v) => $v->parameterName === null && $v->parameterType instanceof NullTypeNode &&
+									$v->returnType instanceof AnyTypeNode && $v->dependencyType instanceof TrueTypeNode];
 		yield ['^ => Any :: null', FunctionValueNode::class, fn($v) => $v->parameterName === null && $v->parameterType instanceof NullTypeNode &&
 									$v->returnType instanceof AnyTypeNode && $v->dependencyType instanceof NothingTypeNode];
 		yield ['^p :: null', FunctionValueNode::class, fn($v) => $v->parameterName->equals(new VariableNameIdentifier('p')) && $v->parameterType instanceof AnyTypeNode &&
 									$v->returnType instanceof AnyTypeNode && $v->dependencyType instanceof NothingTypeNode];
+		yield ['^p %% True :: null', FunctionValueNode::class, fn($v) => $v->parameterName->equals(new VariableNameIdentifier('p')) && $v->parameterType instanceof AnyTypeNode &&
+									$v->returnType instanceof AnyTypeNode && $v->dependencyType instanceof TrueTypeNode];
 		yield ['^p => Any :: null', FunctionValueNode::class, fn($v) => $v->parameterName->equals(new VariableNameIdentifier('p')) && $v->parameterType instanceof AnyTypeNode &&
 									$v->returnType instanceof AnyTypeNode && $v->dependencyType instanceof NothingTypeNode];
 		yield ['^ ~P => Any :: null', FunctionValueNode::class, fn($v) => $v->parameterName->equals(new VariableNameIdentifier('p')) && $v->parameterType instanceof NamedTypeNode &&
@@ -659,6 +1199,8 @@ class ParserTest extends TestCase {
 		yield ['^ => Any :: null', FunctionValueNode::class, fn($v) => $v->parameterName === null && $v->parameterType instanceof NullTypeNode &&
 									$v->returnType instanceof AnyTypeNode && $v->dependencyType instanceof NothingTypeNode];
 		yield ['^Null => Any %% True :: null', FunctionValueNode::class, fn($v) => $v->parameterName === null && $v->parameterType instanceof NullTypeNode &&
+									$v->returnType instanceof AnyTypeNode && $v->dependencyType instanceof TrueTypeNode];
+		yield ['^Null %% True :: null', FunctionValueNode::class, fn($v) => $v->parameterName === null && $v->parameterType instanceof NullTypeNode &&
 									$v->returnType instanceof AnyTypeNode && $v->dependencyType instanceof TrueTypeNode];
 		yield ['^p: False => Any :: null', FunctionValueNode::class, fn($v) => $v->parameterName->equals(new VariableNameIdentifier('p')) && $v->parameterType instanceof FalseTypeNode &&
 									$v->returnType instanceof AnyTypeNode && $v->dependencyType instanceof NothingTypeNode];

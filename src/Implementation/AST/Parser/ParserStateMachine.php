@@ -751,6 +751,24 @@ final readonly class ParserStateMachine {
 					$this->s->push(274);
 					$this->s->back(401);
 				},
+				T::empty_tuple->name => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->constant(
+						$this->nodeBuilder->tupleValue([])
+					);
+					$this->s->move(275);
+				},
+				T::empty_set->name => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->constant(
+						$this->nodeBuilder->setValue([])
+					);
+					$this->s->move(275);
+				},
+				T::empty_record->name => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->constant(
+						$this->nodeBuilder->recordValue([])
+					);
+					$this->s->move(275);
+				},
 				T::call_start->name => 271,
 				T::tuple_start->name => function(LT $token) {
 					$this->s->push(273);
@@ -790,6 +808,15 @@ final readonly class ParserStateMachine {
 			274 => ['name' => 'enum value', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->constant($this->s->generated);
+					$this->s->pop();
+				}
+			]],
+			275 => ['name' => 'constructor call empty value', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->constructorCall(
+						new TypeNameIdentifier($this->s->result['type_name']),
+						$this->s->generated
+					);
 					$this->s->pop();
 				}
 			]],
@@ -1092,10 +1119,10 @@ final readonly class ParserStateMachine {
 					$this->s->move(315);
 				},
 				T::arithmetic_op->name => $c = function(LT $token) {
-					if ($token->patternMatch->text === '$') {
+					/*if ($token->patternMatch->text === '$') {
 						$this->s->pop();
 						return;
-					}
+					}*/
 					$this->s->result = [];
 					$this->s->result['startPosition'] = $token->sourcePosition;
 					$this->s->result['expression_left'] = $this->s->generated;
@@ -1140,7 +1167,7 @@ final readonly class ParserStateMachine {
 				//binary operators end
 
 
-				T::this_var->name => $c,
+				//T::this_var->name => $c,
 				T::special_var_modulo->name => $c,
 				'' => function(LT $token) {
 					$this->s->pop();
@@ -1273,7 +1300,7 @@ final readonly class ParserStateMachine {
 				}
 			]],
 			310 => ['name' => 'method call value tuple or record', 'transitions' => [
-				T::property_accessor->name => $c = function(LT $token) {
+				/*T::property_accessor->name => $c = function(LT $token) {
 					$this->noErrorMethodCall(true);
 					$this->s->stay(302);
 				},
@@ -1282,7 +1309,7 @@ final readonly class ParserStateMachine {
 				T::lambda_return->name => $c,
 				T::error_as_external->name => $c,
 				T::call_start->name => $c,
-				T::tuple_start->name => $c,
+				T::tuple_start->name => $c,*/
 				'' => function(LT $token) {
 					$this->noErrorMethodCall(true);
 					$this->s->pop();
@@ -1317,7 +1344,7 @@ final readonly class ParserStateMachine {
 				}
 			]],
 			314 => ['name' => 'function call value tuple or record', 'transitions' => [
-				T::property_accessor->name => $c = function(LT $token) {
+				/*T::property_accessor->name => $c = function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->functionCall(
 						$this->s->result['expression_left'],
 						$this->s->generated
@@ -1329,7 +1356,7 @@ final readonly class ParserStateMachine {
 				T::lambda_return->name => $c,
 				T::error_as_external->name => $c,
 				T::call_start->name => $c,
-				T::tuple_start->name => $c,
+				T::tuple_start->name => $c,*/
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->functionCall(
 						$this->s->result['expression_left'],
@@ -1589,7 +1616,9 @@ final readonly class ParserStateMachine {
 						'-' => 'unaryMinus',
 						'~' => 'unaryBitwiseNot',
 						'!' => 'unaryNot',
+						// @codeCoverageIgnoreStart
 						default => 'unaryUnknown',
+						// @codeCoverageIgnoreEnd
 					};
 					$this->s->push(362);
 					$this->s->move(301);
@@ -3083,12 +3112,12 @@ final readonly class ParserStateMachine {
 					$this->s->move(817);
 				},
 			]],
-			825 => ['name' => 'module level record value rest return point', 'transitions' => [
+			/*825 => ['name' => 'module level record value rest return point', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->result['restType'] = $this->s->generated;
 					$this->s->stay(822);
 				}
-			]],
+			]],*/
 
 			826 => ['name' => 'module level tuple value type', 'transitions' => [
 				T::rest_type->name => 830,
