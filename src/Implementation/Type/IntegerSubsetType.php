@@ -28,14 +28,18 @@ final class IntegerSubsetType implements IntegerSubsetTypeInterface, JsonSeriali
         public readonly array $subsetValues
     ) {
 		if ($subsetValues === []) {
+			// @codeCoverageIgnoreStart
 			throw new InvalidArgumentException("Cannot create an empty subset type");
+			// @codeCoverageIgnoreEnd
 		}
 		$selected = [];
 		foreach($subsetValues as $value) {
 			if (!$value instanceof Number || ((string)$value !== (string)$value->floor())) {
+				// @codeCoverageIgnoreStart
 				throw new InvalidArgumentException(
 					sprintf("Invalid value: '%s'", $value)
 				);
+				// @codeCoverageIgnoreEnd
 			}
 			if (array_key_exists((string)$value, $selected)) {
 				DuplicateSubsetValue::ofInteger(

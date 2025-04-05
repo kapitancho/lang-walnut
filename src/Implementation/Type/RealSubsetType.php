@@ -21,14 +21,18 @@ final class RealSubsetType implements RealSubsetTypeInterface, JsonSerializable 
         public readonly array $subsetValues
     ) {
 	    if ($subsetValues === []) {
+		    // @codeCoverageIgnoreStart
 		    throw new InvalidArgumentException("Cannot create an empty subset type");
+		    // @codeCoverageIgnoreEnd
 	    }
 	    $selected = [];
 	    foreach($subsetValues as $value) {
 		    if (!$value instanceof Number) {
+			    // @codeCoverageIgnoreStart
 			    throw new InvalidArgumentException(
 				    sprintf("Invalid value: '%s'", $value)
 			    );
+			    // @codeCoverageIgnoreEnd
 		    }
 			$vs = (string)$value;
 			if (!str_contains($vs, '.')) {

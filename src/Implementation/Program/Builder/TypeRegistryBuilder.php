@@ -419,9 +419,11 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		$keys = [];
 		foreach ($values as $value) {
 			if (!$value instanceof EnumValueIdentifier) {
+				// @codeCoverageIgnoreStart
 				throw new InvalidArgumentException(
 					'Expected EnumValueIdentifier, got ' . get_debug_type($value)
 				);
+				// @codeCoverageIgnoreEnd
 			}
 			if (in_array($value->identifier, $keys, true)) {
 				DuplicateSubsetValue::ofEnumeration(

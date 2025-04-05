@@ -82,9 +82,11 @@ final class DependencyContainer implements DependencyContainerInterface {
 				return new DependencyError(UnresolvableDependency::notFound, $type);
 			}
 			return $result->value;
+		// @codeCoverageIgnoreStart
 		} catch (AnalyserException) {
 			return new DependencyError(UnresolvableDependency::notFound, $type);
 		}
+		// @codeCoverageIgnoreEnd
 	}
 
 	private function attemptToFindAlias(AliasType $aliasType): Value|DependencyError {
@@ -94,12 +96,26 @@ final class DependencyContainer implements DependencyContainerInterface {
 
 	private function findTupleValue(TupleType $tupleType): Value|DependencyError {
 		$found = [];
-		foreach($tupleType->types as $type) {
+		foreach($tupleType->types as $index => $type) {
 			$foundValue = $this->valueByType($type);
 			if ($foundValue instanceof DependencyError) {
-				return $foundValue;
+				return new DependencyError(
+					UnresolvableDependency::errorWhileCreatingValue,
+					$foundValue->type,
+					sprintf("Error while creating value for field %d", $index)
+				);
 			}
-			$found[] = $foundValue;
+			/*if ($foundValue instanceof ErrorValue &&
+				($err = $foundValue->errorValue) instanceof SealedValue &&
+				$err->type->name->equals(new TypeNameIdentifier('DependencyContainerError'))
+			) {
+				return new DependencyError(
+					UnresolvableDependency::errorWhileCreatingValue,
+					$err->value->values['errorOnType']->typeValue(),
+					sprintf("Nested DependencyContainerError while creating value for field %d", $index)
+				);
+			}*/
+			$found[$index] = $foundValue;
 		}
 
 		return ($this->programRegistry->valueRegistry->tuple($found));
@@ -118,7 +134,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 				);
 			}
 			//TODO: improve
-			if ($foundValue instanceof ErrorValue &&
+			/*if ($foundValue instanceof ErrorValue &&
 				($err = $foundValue->errorValue) instanceof SealedValue &&
 				$err->type->name->equals(new TypeNameIdentifier('DependencyContainerError'))
 			) {
@@ -127,10 +143,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 					$err->value->values['errorOnType']->typeValue(),
 					sprintf("Nested DependencyContainerError while creating value for field %s", $key)
 				);
-			}
-			if ($foundValue instanceof DependencyError) {
-				return $foundValue;
-			}
+			}*/
 			$found[$key] = $foundValue;
 		}
 		return ($this->programRegistry->valueRegistry->record($found));
@@ -139,7 +152,14 @@ final class DependencyContainer implements DependencyContainerInterface {
 	private function findOpenValue(OpenType $type): Value|DependencyError {
 		$found = $this->findValueByNamedType($type);
 		if ($found instanceof DependencyError) {
-			$baseValue = $this->findValueByType($type->valueType);
+			$constructor = $this->programRegistry->valueRegistry->atom(new TypeNameIdentifier('Constructor'));
+			$method = $this->methodRegistry->methodForType($constructor->type,
+				new MethodNameIdentifier($type->name->identifier));
+			if ($method instanceof CustomMethod) {
+                $baseValue = $this->findValueByType($method->parameterType);
+			} else {
+				$baseValue = $this->findValueByType($type->valueType);
+			}
 			if ($baseValue instanceof Value) {
 				$result = $this->expressionRegistry->methodCall(
 					$this->expressionRegistry->variableName(new VariableNameIdentifier('#')),

@@ -21,10 +21,11 @@ final readonly class SourceLocator implements SourceLocatorInterface {
 		$token = $this->tokens[$this->state->i] ?? null;
 		$endPosition = $token?->sourcePosition ?? new SourcePosition(9999999, 9999, 9999);
 		$startPosition = $this->state->result['startPosition'] ?? $endPosition;
+		$len = strlen($token?->patternMatch->text ?? '-') - 1;
 		return new SourceLocation(
 			$this->moduleName,
 			$startPosition,
-			$endPosition
+			new SourcePosition($endPosition->offset + $len, $endPosition->line, $endPosition->column + $len)
 		);
 	}
 

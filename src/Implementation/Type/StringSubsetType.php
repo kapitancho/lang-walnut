@@ -21,14 +21,18 @@ final class StringSubsetType implements StringSubsetTypeInterface, JsonSerializa
         public readonly array $subsetValues
     ) {
 	    if ($subsetValues === []) {
+		    // @codeCoverageIgnoreStart
 		    throw new InvalidArgumentException("Cannot create an empty subset type");
+		    // @codeCoverageIgnoreEnd
 	    }
 	    $selected = [];
 	    foreach($subsetValues as $value) {
 		    if (!is_string($value)) {
+			    // @codeCoverageIgnoreStart
 			    throw new InvalidArgumentException(
 				    sprintf("Invalid value: '%s'", $value)
 			    );
+			    // @codeCoverageIgnoreEnd
 		    }
 		    if (array_key_exists($value, $selected)) {
 			    DuplicateSubsetValue::ofString(

@@ -524,7 +524,11 @@ final class NodeBuilder implements NodeBuilderInterface {
 
 	public function intersectionType(TypeNode $left, TypeNode $right): IntersectionTypeNode {
 		return new IntersectionTypeNode(
-			$this->getSourceLocation(),
+			new SourceLocation(
+				$left->sourceLocation->moduleName,
+				$left->sourceLocation->startPosition,
+				$right->sourceLocation->endPosition
+			),
 			$left,
 			$right
 		);
@@ -532,7 +536,11 @@ final class NodeBuilder implements NodeBuilderInterface {
 
 	public function unionType(TypeNode $left, TypeNode $right): UnionTypeNode {
 		return new UnionTypeNode(
-			$this->getSourceLocation(),
+			new SourceLocation(
+				$left->sourceLocation->moduleName,
+				$left->sourceLocation->startPosition,
+				$right->sourceLocation->endPosition
+			),
 			$left,
 			$right
 		);
