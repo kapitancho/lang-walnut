@@ -44,14 +44,12 @@ final readonly class ParserStateRunner implements ParserStateRunnerInterface {
 			$transition = $transitions[$tag] ?? $transitions[''] ?? null;
 			$this->transitionLogger->logStep($s, $token, $transition);
 			if (!$transition) {
-				// @codeCoverageIgnoreStart
 				throw new ParserException($s,
                     sprintf("No transition found for token '%s' in state '%s'",
                         $tag,
                         $stateName
                     ), $token, $sourceLocator->moduleName
 				);
-				// @codeCoverageEnd
 			}
 			if (is_callable($transition)) {
 				$lastI = $s->i;

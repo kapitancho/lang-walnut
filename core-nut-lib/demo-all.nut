@@ -259,6 +259,7 @@ c = `String;
 main = ^Array<String> => String :: [
     allExpressions: getAllExpressions(),
     allTypesAndSampleValues: getAllTypes(getMatchingValuesForAllTypes()),
+    allTypes: `AllTypes,
     allValues: getAllValues(),
     allConstants: allConstants
 ]->printed;

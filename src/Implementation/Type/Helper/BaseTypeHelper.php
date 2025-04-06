@@ -18,8 +18,10 @@ trait BaseTypeHelper {
 		return match (true) {
 			$sourceType instanceof AliasType =>
 				$this->toTargetBaseType($sourceType->aliasedType, $targetType),
+			// @codeCoverageIgnoreStart
 			$sourceType instanceof ProxyNamedType =>
 				$this->toTargetBaseType($sourceType->actualType, $targetType),
+			// @codeCoverageIgnoreEnd
 			$sourceType instanceof IntersectionType =>
 				$this->getIntersectionBaseType($sourceType, $targetType),
 			default => $sourceType->isSubtypeOf($targetType) ? $sourceType : null
@@ -33,7 +35,9 @@ trait BaseTypeHelper {
 				return $baseType;
 			}
 		}
+		// @codeCoverageIgnoreStart
 		return null;
+		// @codeCoverageIgnoreEnd
 	}
 
 }

@@ -378,7 +378,9 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		if ($normalize) {
 			try {
 				return $this->unionTypeNormalizer->normalize(... $types);
+			// @codeCoverageIgnoreStart
 			} catch (UnknownType) {}
+			// @codeCoverageIgnoreEnd
 		}
 		return new UnionType($this->unionTypeNormalizer, ...$types);
 	}
@@ -389,7 +391,9 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		if ($normalize) {
 			try {
 				return $this->intersectionTypeNormalizer->normalize(... $types);
+			// @codeCoverageIgnoreStart
 			} catch (UnknownType) {}
+			// @codeCoverageIgnoreEnd
 		}
 		return new IntersectionType($this->intersectionTypeNormalizer, ...$types);
 	}

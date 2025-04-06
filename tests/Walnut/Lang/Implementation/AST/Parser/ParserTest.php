@@ -82,6 +82,7 @@ use Walnut\Lang\Blueprint\AST\Node\Value\StringValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\TrueValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\TupleValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\TypeValueNode;
+use Walnut\Lang\Blueprint\AST\Parser\ParserException;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
@@ -133,6 +134,15 @@ class ParserTest extends TestCase {
 		self::assertInstanceOf(AddAliasTypeNode::class, $moduleNode->definitions[0]);
 		self::assertEquals('A', $moduleNode->definitions[0]->name->identifier);
 		self::assertInstanceOf(IntegerTypeNode::class, $moduleNode->definitions[0]->aliasedType);
+	}
+
+	public function testParseError(): void {
+		try {
+			$this->runParserTest('module test: A = Integer{;');
+			$this->fail("There should be a parser error for this code.");
+		} catch (ParserException $ex) {
+			$this->assertStringContainsString('No transition found', $ex->getMessage());
+		}
 	}
 
 	public function testSimpleWithDependencies(): void {

@@ -6,6 +6,11 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 
 final class ShapeTest extends CodeExecutionTestHelper {
 
+	public function testShapeString(): void {
+		$result = $this->executeCodeSnippet("{`Shape};");
+		$this->assertEquals("type{Shape}", $result);
+	}
+
 	public function testFullSupersetDirectWithShape(): void {
 		$result = $this->executeCodeSnippet("useIntPair(getIntPair(IntPairType[1, 5]));", <<<NUT
 			IntPairType = #[first: Integer, second: Integer];
@@ -95,7 +100,7 @@ final class ShapeTest extends CodeExecutionTestHelper {
 			Incompatible = :[];
 			IntPairType ==> IntPair @ Incompatible :: [first: \$a, second: \$b];
 			getIntPair = ^p: IntPairType => Shape<IntPair> :: p->shape(`IntPair);
-			useIntPair = ^p: Shape<IntPair> => Integer :: p->shape.first + p->shape.second;
+			useIntPair = ^p: Shape<IntPair> => Integer :: p->shape(`IntPair).first + p->shape(`IntPair).second;
 		NUT);
 	}
 

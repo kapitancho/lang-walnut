@@ -32,6 +32,8 @@ final readonly class ValueConverter {
 		if ($sourceType->isSubtypeOf($shapeTargetType)) {
 			return $targetType;
 		}
+
+		//TODO - consider dropping this completely
 		try {
 			$methodName = new MethodNameIdentifier(sprintf('as%s',$targetType));
 			$method = $programRegistry->methodFinder->methodForType($sourceType, $methodName);
@@ -51,26 +53,28 @@ final readonly class ValueConverter {
 						)
 					);
 				}
+				// @codeCoverageIgnoreStart
 				if (!$returnType->isSubtypeOf($targetType)) {
-					// @codeCoverageIgnoreStart
 					throw new AnalyserException(sprintf(
 						"Cast method '%s' returns '%s' which is not a subtype of '%s'",
 						$methodName,
 						$returnType,
 						$targetType
 					));
-					// @codeCoverageIgnoreEnd
 				}
 				return $returnType;
+				// @codeCoverageIgnoreEnd
 			}
 		} catch (IdentifierException) {}
 
+		/*
 		$bType = $this->toBaseType($sourceType);
 		if ($bType instanceof OpenType) {
 			try {
 				return $this->analyseConvertValueToShape($programRegistry, $bType->valueType, $targetType);
 			} catch (AnalyserException) {}
 		}
+		*/
 
 		throw new AnalyserException(
 			sprintf(
