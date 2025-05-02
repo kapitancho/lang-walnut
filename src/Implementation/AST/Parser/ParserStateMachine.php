@@ -73,16 +73,19 @@ final readonly class ParserStateMachine {
 				'EOF' => -1
 			]],
 			103 => ['name' => 'module level var definition', 'transitions' => [
-				'assign' => function(LT $token) {
+				T::assign->name => function(LT $token) {
 					$this->s->push(133);
 					$this->s->move(401);
 				}
 			]],
 			104 => ['name' => 'module level type definition', 'transitions' => [
-				'assign' => 105,
-				'cast_marker' => 119,
-				'method_marker' => 122,
-				'call_start' => 141,
+				T::assign->name => 105,
+				T::cast_marker->name => 119,
+				T::method_marker->name => 122,
+				T::call_start->name => function(LT $token) {
+					$this->s->push(141);
+					$this->s->move(611);
+				},
 				T::empty_tuple->name => function(LT $token) {
 					$this->s->result['parameter_type'] = $this->nodeBuilder->tupleType([]);
 					$this->s->move(144);
@@ -94,29 +97,28 @@ final readonly class ParserStateMachine {
 				T::tuple_start->name => 142,
 			]],
 			105 => ['name' => 'module level type assignment', 'transitions' => [
-				'atom_type' => 106,
-				'enum_type_start' => function(LT $token) {
+				T::atom_type->name => 106,
+				T::enum_type_start->name => function(LT $token) {
 					$this->s->result['enumerationValues'] = [];
 					$this->s->move(107);
 				},
-				//'sequence_start' => 110,
 				T::this_var->name => 110,
 				T::special_var_param->name => 111,
-				'type_keyword' => $c = function(LT $token) {
+				T::type_keyword->name => $c = function(LT $token) {
 					$this->s->push(131);
 					$this->s->stay(701);
 				},
 				T::arithmetic_op_multiply->name => $c,
 				T::sequence_start->name => $c, //Shape<T>
-				'lambda_param' => $c,
-				'tuple_start' => $c,
-				'call_start' => $c,
-				'empty_tuple' => 810,
-				'empty_record' => 811,
+				T::lambda_param->name => $c,
+				T::tuple_start->name => $c,
+				T::call_start->name => $c,
+				T::empty_tuple->name => 810,
+				T::empty_record->name => 811,
 			]],
 
 			106 => ['name' => 'module level atom', 'transitions' => [
-				'expression_separator' => function(LT $token) {
+				T::expression_separator->name => function(LT $token) {
 					$this->nodeBuilder->definition(
 						$this->s->generated = $this->nodeBuilder->addAtom(
 							new TypeNameIdentifier($this->s->result['typeName'])
@@ -126,16 +128,16 @@ final readonly class ParserStateMachine {
 				}
 			]],
 			107 => ['name' => 'module level enum', 'transitions' => [
-				'type_keyword' => $c = function(LT $token) {
+				T::type_keyword->name => $c = function(LT $token) {
 					$this->s->result['enumerationValues'] ??= [];
 					$this->s->result['enumerationValues'][] = $token->patternMatch->text;
 					$this->s->move(108);
 				},
-				'var_keyword' => $c
+				T::var_keyword->name => $c
 			]],
 			108 => ['name' => 'module level enum separator', 'transitions' => [
-				'value_separator' => 107,
-				'tuple_end' => 109
+				T::value_separator->name => 107,
+				T::tuple_end->name => 109
 			]],
 			109 => ['name' => 'module level enum end', 'transitions' => [
 				T::expression_separator->name => function(LT $token) {
@@ -328,25 +330,18 @@ final readonly class ParserStateMachine {
 			]],
 
 			123 => ['name' => 'method name next', 'transitions' => [
-				T::call_start->name => 124
-			]],
-			124 => ['name' => 'method name lambda', 'transitions' => [
-				T::lambda_param->name => 135,
-				T::lambda_return->name => function(LT $token) {
-					$this->s->push(128);
-					$this->s->move(701);
-				},
-				T::call_end->name => function(LT $token) {
-					$this->s->result['parameter_type'] = $this->nodeBuilder->functionType(
-						$this->nodeBuilder->nullType,
-						$this->nodeBuilder->anyType,
-					);
-					$this->s->move(126);
+				T::call_start->name => function(LT $token) {
+					$this->s->push(124);
+					$this->s->move(602);
 				}
 			]],
-			125 => ['name' => 'method name close param', 'transitions' => [
+			124 => ['name' => 'method name next parameter', 'transitions' => [
 				T::call_end->name => function(LT $token) {
-					$this->s->result['parameter_type'] = $this->s->generated;
+					$this->s->result['parameter_name'] = $this->s->generated['parameter_name'];
+					$this->s->result['parameter_type'] = $this->nodeBuilder->functionType(
+						$this->s->generated['parameter_type'],
+						$this->s->generated['return_type'],
+					);
 					$this->s->move(126);
 				}
 			]],
@@ -417,7 +412,7 @@ final readonly class ParserStateMachine {
 				},
 			]],
 			132 => ['name' => 'module level separator', 'transitions' => [
-				'expression_separator' => 102
+				T::expression_separator->name => 102
 			]],
 
 			133 => ['name' => 'variable name end', 'transitions' => [
@@ -432,133 +427,21 @@ final readonly class ParserStateMachine {
 				},
 			]],
 			134 => ['name' => 'variable name separator', 'transitions' => [
-				'expression_separator' => 102
-			]],
-			135 => ['name' => 'method name lambda param check', 'transitions' => [
-				T::default_match->name => function(LT $token) {
-					$this->s->move(136);
-				},
-				T::var_keyword->name => function(LT $token) {
-					$this->s->result['parameter_name'] = new VariableNameIdentifier($token->patternMatch->text);
-					$this->s->move(139);
-				},
-				'' => function(LT $token) {
-					$this->s->push(125);
-					$this->s->stay(901);
-				},
-			]],
-			136 => ['name' => 'method name lambda param check type name', 'transitions' => [
-				T::type_keyword->name => function(LT $token) {
-					$this->s->result['parameter_type'] = $this->nodeBuilder->namedType(
-						new TypeNameIdentifier($token->patternMatch->text)
-					);
-					$this->s->result['parameter_name'] = new VariableNameIdentifier(
-						lcfirst($token->patternMatch->text)
-					);
-					$this->s->move(137);
-				},
-			]],
-			137 => ['name' => 'method name lambda type sym return', 'transitions' => [
-				T::lambda_return->name => function(LT $token) {
-					$this->s->push(138);
-					$this->s->move(701);
-				},
-				T::call_end->name => function(LT $token) {
-					$this->s->result['parameter_type'] = $this->nodeBuilder->functionType(
-						$this->s->result['parameter_type'],
-						$this->nodeBuilder->anyType,
-					);
-					$this->s->move(126);
-				}
-			]],
-			138 => ['name' => 'method name lambda type sym result', 'transitions' => [
-				T::call_end->name => function(LT $token) {
-					$this->s->result['parameter_type'] = $this->nodeBuilder->functionType(
-						$this->s->result['parameter_type'],
-						$this->s->generated,
-					);
-					$this->s->move(126);
-				}
-			]],
-			139 => ['name' => 'method name lambda param name', 'transitions' => [
-				T::colon->name => 140,
-				T::lambda_return->name => function(LT $token) {
-					$this->s->result['parameter_type'] = $this->nodeBuilder->anyType;
-					$this->s->push(138);
-					$this->s->move(701);
-				},
-				T::call_end->name => function(LT $token) {
-					$this->s->result['parameter_type'] = $this->nodeBuilder->functionType(
-						$this->nodeBuilder->anyType,
-						$this->nodeBuilder->anyType
-					);
-					$this->s->move(126);
-				}
-			]],
-			140 => ['name' => 'method name lambda param type', 'transitions' => [
-				T::type_keyword->name => $c = function(LT $token) {
-					$this->s->push(125);
-					$this->s->stay(901);
-				},
-				T::sequence_start->name => $c,
-				T::arithmetic_op_multiply->name => $c,
-				T::tuple_start->name => $c,
-				T::empty_tuple->name => $c,
-				T::empty_record->name => $c,
+				T::expression_separator->name => 102
 			]],
 
 			141 => ['name' => 'constructor method parameter', 'transitions' => [
-				T::var_keyword->name => function(LT $token) {
-					$this->s->result['parameter_name'] = new VariableNameIdentifier($token->patternMatch->text);
-					$this->s->move(155);
-				},
-				T::default_match->name => function(LT $token) {
-					$this->s->move(157);
-				},
 				T::call_end->name => function(LT $token) {
-					$this->s->result['parameter_type'] = $this->nodeBuilder->nullType;
+					$this->s->result['parameter_name'] = $this->s->generated['parameter_name'];
+					$this->s->result['parameter_type'] = $this->s->generated['parameter_type'];
 					$this->s->move(144);
 				},
-				'' => function(LT $token) {
-					$this->s->push(143);
-					$this->s->stay(701);
-				}
 			]],
-			155 => ['name' => 'constructor method parameter name', 'transitions' => [
-				T::colon->name => 156,
-				T::call_end->name => function(LT $token) {
-					$this->s->result['parameter_type'] = $this->nodeBuilder->anyType;
-					$this->s->move(144);
-				}
-			]],
-			156 => ['name' => 'constructor method parameter type', 'transitions' => [
-				T::type_keyword->name => $c = function(LT $token) {
-					$this->s->push(143);
-					$this->s->stay(701);
-				},
-				T::tuple_start->name => $c,
-				T::empty_tuple->name => $c,
-				T::empty_record->name => $c,
-			]],
-			157 => ['name' => 'constructor method parameter name from type', 'transitions' => [
-				T::type_keyword->name => function(LT $token) {
-					$this->s->result['parameter_name'] = new VariableNameIdentifier(
-						lcfirst($token->patternMatch->text)
-					);
-					$this->s->push(143);
-					$this->s->stay(701);
-				},
-			]],
+
 			142 => ['name' => 'constructor method parameter tuple or record', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->push(146);
 					$this->s->back(701);
-				}
-			]],
-			143 => ['name' => 'constructor method parameter return', 'transitions' => [
-				T::call_end->name => function(LT $token) {
-					$this->s->result['parameter_type'] = $this->s->generated;
-					$this->s->move(144);
 				}
 			]],
 			144 => ['name' => 'constructor method body', 'transitions' => [
@@ -2095,121 +1978,34 @@ final readonly class ParserStateMachine {
 			]],
 
 			501 => ['name' => 'function value start', 'transitions' => [
-				T::lambda_param->name => -502
+				'' => function(LT $token) {
+					$this->s->result['startPosition'] = $token->sourcePosition;
+					$this->s->push(502);
+					$this->s->stay(601);
+				},
+				//T::lambda_param->name => -502
 			]],
-			502 => ['name' => 'function value parameter type', 'transitions' => [
-				T::type_keyword->name => $c = function(LT $token) {
-					$this->s->push(503);
-					$this->s->stay(701);
+
+
+			502 => ['name' => 'function value parameter return 1', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->result['parameter_name'] = $this->s->generated['parameter_name'];
+					$this->s->result['parameter'] = $this->s->generated['parameter_type'];
+					$this->s->result['return'] = $this->s->generated['return_type'];
+					$this->s->stay(503);
 				},
-				T::sequence_start->name => $c,
-				T::arithmetic_op_multiply->name => $c,
-				T::tuple_start->name => $c,
-				T::empty_tuple->name => $c,
-				T::empty_record->name => $c,
-				T::var_keyword->name => $vn = function(LT $token) {
-					$this->s->result['parameter_name'] = new VariableNameIdentifier($token->patternMatch->text);
-					$this->s->move(510);
-				},
-				T::default_match->name => function(LT $token) {
-					$this->s->move(512);
-				},
-				T::lambda_return->name => function(LT $token) {
-					$this->s->result['parameter'] = $this->nodeBuilder->nullType;
-					$this->s->push(505);
-					$this->s->move(701);
-				},
+			]],
+
+			503 => ['name' => 'function value parameter return 1', 'transitions' => [
 				T::dependency_marker->name => function(LT $token) {
-					$this->s->result['parameter'] = $this->nodeBuilder->nullType;
-					$this->s->result['return'] = $this->nodeBuilder->anyType;
 					$this->s->push(508);
 					$this->s->move(701);
 				},
 				T::function_body_marker->name => function(LT $token) {
-					$this->s->result['parameter'] = $this->nodeBuilder->nullType;
-					$this->s->result['return'] = $this->nodeBuilder->anyType;
 					$this->s->move(506);
 				}
 			]],
-			510 => ['name' => 'function value parameter name', 'transitions' => [
-				T::colon->name => 511,
-				T::lambda_return->name => function(LT $token) {
-					$this->s->result['parameter'] = $this->nodeBuilder->anyType;
-					$this->s->push(505);
-					$this->s->move(701);
-				},
-				T::dependency_marker->name => function(LT $token) {
-					$this->s->result['parameter'] = $this->nodeBuilder->anyType;
-					$this->s->result['return'] = $this->nodeBuilder->anyType;
-					$this->s->push(508);
-					$this->s->move(701);
-				},
-				T::function_body_marker->name => function(LT $token) {
-					$this->s->result['parameter'] = $this->nodeBuilder->anyType;
-					$this->s->result['return'] = $this->nodeBuilder->anyType;
-					$this->s->move(506);
-				}
-			]],
-			511 => ['name' => 'function value parameter type after name', 'transitions' => [
-				T::type_keyword->name => $c = function(LT $token) {
-					$this->s->push(503);
-					$this->s->stay(701);
-				},
-				T::arithmetic_op_multiply->name => $c,
-				T::type_proxy_keyword->name => $c,
-				T::sequence_start->name => $c,
-				T::tuple_start->name => $c,
-				T::empty_tuple->name => $c,
-				T::empty_record->name => $c,
-			]],
-			512 => ['name' => 'function value parameter type with name', 'transitions' => [
-				T::type_keyword->name => function(LT $token) {
-					$this->s->result['parameter_name'] = new VariableNameIdentifier(
-						lcfirst($token->patternMatch->text)
-					);
-					$this->s->push(503);
-					$this->s->stay(701);
-				}
-			]],
-			503 => ['name' => 'function value parameter return', 'transitions' => [
-				T::function_body_marker->name => function(LT $token) {
-					$this->s->result['parameter'] = $this->s->generated;
-					$this->s->result['return'] = $this->nodeBuilder->anyType;
-					$this->s->result['dependency'] = $this->nodeBuilder->nothingType;
-					$this->s->move(506);
-				},
-				T::dependency_marker->name => function(LT $token) {
-					$this->s->result['parameter'] = $this->s->generated;
-					$this->s->result['return'] = $this->nodeBuilder->anyType;
-					$this->s->push(508);
-					$this->s->move(701);
-				},
-				T::lambda_return->name => function(LT $token) {
-					$this->s->result['parameter'] = $this->s->generated;
-					$this->s->move(504);
-				}
-			]],
-			504 => ['name' => 'function value return type', 'transitions' => [
-				T::type_keyword->name => $c = function(LT $token) {
-					$this->s->push(505);
-					$this->s->stay(701);
-				},
-				T::sequence_start->name => $c, //Shape<T>
-				T::arithmetic_op_multiply->name => $c,
-				T::tuple_start->name => $c,
-				T::lambda_param->name => $c,
-			]],
-			505 => ['name' => 'function value return return', 'transitions' => [
-				T::dependency_marker->name => function(LT $token) {
-					$this->s->result['return'] = $this->s->generated;
-					$this->s->push(508);
-					$this->s->move(701);
-				},
-				T::function_body_marker->name => function(LT $token) {
-					$this->s->result['return'] = $this->s->generated;
-					$this->s->move(506);
-				}
-			]],
+
 			506 => ['name' => 'function value body return', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->push(507);
@@ -2236,6 +2032,131 @@ final readonly class ParserStateMachine {
 				}
 			]],
 
+			601 => ['name' => 'function value type', 'transitions' => [
+				T::lambda_param->name => function(LT $token) {
+					$this->s->push(603);
+					$this->s->move(611);
+				},
+			]],
+			602 => ['name' => 'method type', 'transitions' => [
+				T::lambda_param->name => function(LT $token) {
+					$this->s->push(603);
+					$this->s->move(611);
+				},
+				T::lambda_return->name => $c = function(LT $token) {
+					$this->s->result['parameter_name'] = null;
+					$this->s->result['parameter_type'] = $this->nodeBuilder->nullType;
+					$this->s->push(604);
+					$this->s->stay(621);
+				},
+				T::call_end->name => $c,
+			]],
+			603 => ['name' => 'function or method value type parameter', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->result['parameter_name'] = $this->s->generated['parameter_name'];
+					$this->s->result['parameter_type'] = $this->s->generated['parameter_type'];
+					$this->s->push(604);
+					$this->s->stay(621);
+				},
+			]],
+			604 => ['name' => 'function or method value type return', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = [
+						'parameter_name' => $this->s->result['parameter_name'],
+						'parameter_type' => $this->s->result['parameter_type'],
+						'return_type' => $this->s->generated
+					];
+					$this->s->pop();
+				},
+			]],
+
+			611 => ['name' => 'function value parameter type', 'transitions' => [
+				T::var_keyword->name => function(LT $token) {
+					$this->s->result['parameter_name'] = new VariableNameIdentifier($token->patternMatch->text);
+					$this->s->move(612);
+				},
+				T::default_match->name => function(LT $token) {
+					$this->s->move(614);
+				},
+				T::arithmetic_op_multiply->name => $c = function(LT $token) {
+					$this->s->result['parameter_name'] = null;
+					$this->s->push(615);
+					$this->s->stay(701);
+				},
+				T::type_proxy_keyword->name => $c,
+				T::type_keyword->name => $c,
+				T::sequence_start->name => $c,
+				T::empty_tuple->name => $c,
+				T::empty_record->name => $c,
+				T::call_start->name => $c,
+				T::tuple_start->name => $c,
+				'' => function(LT $token) {
+					$this->s->result['parameter_type'] = $this->nodeBuilder->nullType;
+					$this->s->stay(616);
+				},
+			]],
+
+			612 => ['name' => 'function value parameter name', 'transitions' => [
+				T::colon->name => 613,
+				'' => function(LT $token) {
+					$this->s->result['parameter_type'] = $this->nodeBuilder->anyType;
+					$this->s->stay(616);
+				}
+			]],
+			613 => ['name' => 'function value parameter type', 'transitions' => [
+				T::arithmetic_op_multiply->name => $c = function(LT $token) {
+					$this->s->push(615);
+					$this->s->stay(701);
+				},
+				T::type_proxy_keyword->name => $c,
+				T::type_keyword->name => $c,
+				T::sequence_start->name => $c,
+				T::empty_tuple->name => $c,
+				T::empty_record->name => $c,
+				T::call_start->name => $c,
+				T::tuple_start->name => $c,
+			]],
+			614 => ['name' => 'function value parameter name from type', 'transitions' => [
+				T::type_keyword->name => function(LT $token) {
+					$this->s->result['parameter_name'] = new VariableNameIdentifier(
+						lcfirst($token->patternMatch->text)
+					);
+					$this->s->push(615);
+					$this->s->stay(701);
+				},
+			]],
+			615 => ['name' => 'function value parameter return', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->result['parameter_type'] = $this->s->generated;
+					$this->s->stay(616);
+				},
+			]],
+			616 => ['name' => 'function value parameter exit', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = [
+						'parameter_name' => $this->s->result['parameter_name'] ?? null,
+						'parameter_type' => $this->s->result['parameter_type']
+					];
+					$this->s->pop();
+				},
+			]],
+
+			621 => ['name' => 'function or method value return', 'transitions' => [
+				T::lambda_return->name => function(LT $token) {
+					$this->s->push(622);
+					$this->s->move(701);
+				},
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->anyType;
+					$this->s->pop();
+				},
+			]],
+
+			622 => ['name' => 'function or method value return exit', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->pop();
+				},
+			]],
 
 			701 => ['name' => 'type adt start', 'transitions' => [
 				'' => function(LT $token) {
@@ -2981,7 +2902,7 @@ final readonly class ParserStateMachine {
 			]],
 
 			810 => ['name' => 'module level empty tuple', 'transitions' => [
-				'expression_separator' => function(LT $token) {
+				T::expression_separator->name => function(LT $token) {
 					$this->nodeBuilder->definition(
 						$this->s->generated = $this->nodeBuilder->addAlias(
 							new TypeNameIdentifier($this->s->result['typeName']),
@@ -2992,7 +2913,7 @@ final readonly class ParserStateMachine {
 				}
 			]],
 			811 => ['name' => 'module level empty record', 'transitions' => [
-				'expression_separator' => function(LT $token) {
+				T::expression_separator->name => function(LT $token) {
 					$this->nodeBuilder->definition(
 						$this->s->generated = $this->nodeBuilder->addAlias(
 							new TypeNameIdentifier($this->s->result['typeName']),
@@ -3013,17 +2934,17 @@ final readonly class ParserStateMachine {
 					);
 					$this->s->move(813);
 				},
-				'type_keyword' => $t = function(LT $token) {
+				T::type_keyword->name => $t = function(LT $token) {
 					$this->s->result['first_token'] = $token;
 					$this->s->move(813);
 				},
 				T::arithmetic_op_multiply->name => $t,
 				T::sequence_start->name => $t, //Shape<T>
-				'word' => $c = function(LT $token) {
+				T::word->name => $c = function(LT $token) {
 					$this->s->result['first_token'] = $token;
 					$this->s->move(814);
 				},
-				'var_keyword' => $c,
+				T::var_keyword->name => $c,
 				T::type->name => $c,
 				T::rest_type->name => 830,
 				T::default_match->name => 824,
