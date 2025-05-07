@@ -14,6 +14,7 @@ use Walnut\Lang\Blueprint\AST\Node\Expression\MatchTrueExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MatchTypeExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MatchValueExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MethodCallExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MultiVariableAssignmentExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MutableExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\NoErrorExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\NoExternalErrorExpressionNode;
@@ -195,13 +196,18 @@ final readonly class AstExpressionCompiler implements AstExpressionCompilerInter
 					$expressionNode->variableName,
 					$this->expression($expressionNode->assignedExpression)
 				),
+			$expressionNode instanceof MultiVariableAssignmentExpressionNode =>
+				$this->expressionRegistry->multiVariableAssignment(
+					$expressionNode->variableNames,
+					$this->expression($expressionNode->assignedExpression)
+				),
 			$expressionNode instanceof VariableNameExpressionNode =>
 				$this->expressionRegistry->variableName(
 					$expressionNode->variableName
 				),
 			true => throw new AstCompilationException(
 				$expressionNode,
-				"Unknown expression node type: " . get_class($expressionNode)
+				sprintf("Unknown expression node type: %s", get_class($expressionNode))
 			)
 		};
 	}

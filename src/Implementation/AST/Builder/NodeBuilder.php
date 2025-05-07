@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MatchExpressionDefaultNode as MatchExpressionDefaultNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MatchExpressionPairNode as MatchExpressionPairNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MethodCallExpressionNode as MethodCallExpressionNodeInterface;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MultiVariableAssignmentExpressionNode as MultiVariableAssignmentExpressionNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode as FunctionBodyNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\Module\ModuleDefinitionNode;
 use Walnut\Lang\Blueprint\AST\Node\SourceNode;
@@ -33,6 +34,7 @@ use Walnut\Lang\Implementation\AST\Node\Expression\MatchTrueExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\MatchTypeExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\MatchValueExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\MethodCallExpressionNode;
+use Walnut\Lang\Implementation\AST\Node\Expression\MultiVariableAssignmentExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\MutableExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\NoErrorExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\NoExternalErrorExpressionNode;
@@ -712,6 +714,15 @@ final class NodeBuilder implements NodeBuilderInterface {
 			$dependencyType,
 			$returnType,
 			$functionBody
+		);
+	}
+
+	/** @param array<VariableNameIdentifier> $variableNames */
+	public function multiVariableAssignment(array $variableNames, ExpressionNode $assignedExpression): MultiVariableAssignmentExpressionNodeInterface {
+		return new MultiVariableAssignmentExpressionNode(
+			$this->sourceLocator->getSourceLocation(),
+			$variableNames,
+			$assignedExpression
 		);
 	}
 

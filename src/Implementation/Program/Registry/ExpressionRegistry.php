@@ -22,6 +22,7 @@ use Walnut\Lang\Implementation\Code\Expression\MatchExpressionEquals;
 use Walnut\Lang\Implementation\Code\Expression\MatchExpressionIsSubtypeOf;
 use Walnut\Lang\Implementation\Code\Expression\MatchExpressionPair;
 use Walnut\Lang\Implementation\Code\Expression\MethodCallExpression;
+use Walnut\Lang\Implementation\Code\Expression\MultiVariableAssignmentExpression;
 use Walnut\Lang\Implementation\Code\Expression\MutableExpression;
 use Walnut\Lang\Implementation\Code\Expression\NoErrorExpression;
 use Walnut\Lang\Implementation\Code\Expression\NoExternalErrorExpression;
@@ -167,6 +168,17 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 	): VariableAssignmentExpression {
 		return new VariableAssignmentExpression(
 			$variableName,
+			$assignedExpression
+		);
+	}
+
+	/** @param array<VariableNameIdentifier> $variableNames */
+	public function multiVariableAssignment(
+		array $variableNames,
+		Expression $assignedExpression
+	): MultiVariableAssignmentExpression {
+		return new MultiVariableAssignmentExpression(
+			$variableNames,
 			$assignedExpression
 		);
 	}

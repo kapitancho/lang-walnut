@@ -44,6 +44,7 @@ enum Token: string {
 	case false = '\bfalse\b';
 	case null = '\bnull\b';
 	case type = '\btype\b';
+	case var = '\bvar\b';
 	case mutable = '\bmutable\b';
 	case no_error = '\?noError';
 	case no_external_error = '\?noExternalError';

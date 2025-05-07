@@ -889,6 +889,8 @@ final readonly class ParserStateMachine {
 				T::arithmetic_op->name => $u,
 				T::default_match->name => $u,
 
+				T::var->name => -631,
+
 				T::var_keyword->name => function(LT $token) {
 					$this->s->result = ['var_name' => $token->patternMatch->text];
 					$this->s->move(260);
@@ -2155,6 +2157,112 @@ final readonly class ParserStateMachine {
 			622 => ['name' => 'function or method value return exit', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->pop();
+				},
+			]],
+
+			631 => ['name' => 'var start', 'transitions' => [
+				T::sequence_start->name => 632
+			]],
+			632 => ['name' => 'var list or dict', 'transitions' => [
+				T::var_keyword->name => function(LT $token) {
+					$this->s->result['first_variable_name'] = $token->patternMatch->text;
+					$this->s->move(633);
+				},
+				T::default_match->name => function(LT $token) {
+					$this->s->result['variables'] = [];
+					$this->s->move(641);
+				},
+				T::string_value->name => function(LT $token) {
+					$this->s->result['next_variable_key'] = str_replace(['\`', '\n', '\\\\'], ["'", "\n", "\\"],
+						substr($token->patternMatch->text, 1, -1));
+					$this->s->move(644);
+				},
+				T::null->name => $c = function(LT $token) {
+					$this->s->result['next_variable_key'] = $token->patternMatch->text;
+					$this->s->move(644);
+				},
+				T::true->name => $c,
+				T::false->name => $c,
+				T::when_value_is->name => $c,
+				T::var->name => $c,
+				T::mutable->name => $c,
+				T::type->name => $c,
+			]],
+			633 => ['name' => 'var list separator', 'transitions' => [
+				T::value_separator->name => function(LT $token) {
+					$this->s->result['variables'] = [new VariableNameIdentifier($this->s->result['first_variable_name'])];
+					$this->s->move(638);
+				},
+				T::colon->name => function(LT $token) {
+					$this->s->result['next_variable_key'] = $this->s->result['first_variable_name'];
+					$this->s->move(645);
+				},
+				T::sequence_end->name => function(LT $token) {
+					$this->s->result['variables'] = [new VariableNameIdentifier($this->s->result['first_variable_name'])];
+					$this->s->move(639);
+				},
+			]],
+			637 => ['name' => 'var list separator', 'transitions' => [
+				T::value_separator->name => 638,
+				T::sequence_end->name => 639,
+			]],
+			638 => ['name' => 'var list next', 'transitions' => [
+				T::var_keyword->name => function(LT $token) {
+					$this->s->result['variables'][] = new VariableNameIdentifier($token->patternMatch->text);
+					$this->s->move(637);
+				},
+			]],
+			639 => ['name' => 'var list assign', 'transitions' => [
+				T::assign->name => function(LT $token) {
+					$this->s->push(640);
+					$this->s->move(201);
+				},
+			]],
+			640 => ['name' => 'var list end', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->multiVariableAssignment(
+						$this->s->result['variables'],
+						$this->s->generated
+					);
+					$this->s->pop();
+				},
+			]],
+			641 => ['name' => 'var list assign', 'transitions' => [
+				T::var_keyword->name => function(LT $token) {
+					$this->s->result['variables'][$token->patternMatch->text] = new VariableNameIdentifier($token->patternMatch->text);
+					$this->s->move(642);
+				},
+			]],
+			642 => ['name' => 'var dict separator', 'transitions' => [
+				T::value_separator->name => 643,
+				T::sequence_end->name => 639,
+			]],
+			643 => ['name' => 'var dict next', 'transitions' => [
+				T::var_keyword->name => $c = function(LT $token) {
+					$this->s->result['next_variable_key'] = $token->patternMatch->text;
+					$this->s->move(644);
+				},
+				T::true->name => $c,
+				T::false->name => $c,
+				T::null->name => $c,
+				T::type->name => $c,
+				T::var->name => $c,
+				T::mutable->name => $c,
+				T::when_value_is->name => $c,
+				T::string_value->name => function(LT $token) {
+					$this->s->result['next_variable_key'] = str_replace(['\`', '\n', '\\\\'], ["'", "\n", "\\"],
+						substr($token->patternMatch->text, 1, -1));
+					$this->s->move(644);
+				},
+				T::default_match->name => 641,
+			]],
+			644 => ['name' => 'var dict colon', 'transitions' => [
+				T::colon->name => 645,
+			]],
+			645 => ['name' => 'var dict key value', 'transitions' => [
+				T::var_keyword->name => function(LT $token) {
+					$this->s->result['variables'][$this->s->result['next_variable_key']] = new VariableNameIdentifier($token->patternMatch->text);
+					$this->s->move(642);
 				},
 			]],
 

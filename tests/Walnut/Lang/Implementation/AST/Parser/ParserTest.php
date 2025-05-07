@@ -16,6 +16,7 @@ use Walnut\Lang\Blueprint\AST\Node\Expression\MatchTrueExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MatchTypeExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MatchValueExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MethodCallExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MultiVariableAssignmentExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MutableExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\NoErrorExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\NoExternalErrorExpressionNode;
@@ -1004,6 +1005,124 @@ class ParserTest extends TestCase {
 			$e->pairs[1]->matchExpression instanceof VariableNameExpressionNode && $e->pairs[1]->matchExpression->variableName->equals(new VariableNameIdentifier('c')) &&
 			$e->pairs[1]->valueExpression instanceof VariableNameExpressionNode && $e->pairs[1]->valueExpression->variableName->equals(new VariableNameIdentifier('d')) &&
 			$e->pairs[2]->valueExpression instanceof VariableNameExpressionNode && $e->pairs[2]->valueExpression->variableName->equals(new VariableNameIdentifier('e'))
+		];
+
+		yield ['var{a} = y', MultiVariableAssignmentExpressionNode::class, fn(MultiVariableAssignmentExpressionNode $e) =>
+			count($e->variableNames) === 1 &&
+			$e->variableNames[0]->equals(new VariableNameIdentifier('a')) &&
+			$e->assignedExpression instanceof VariableNameExpressionNode && $e->assignedExpression->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ['var{a, b} = y', MultiVariableAssignmentExpressionNode::class, fn(MultiVariableAssignmentExpressionNode $e) =>
+			count($e->variableNames) === 2 &&
+			$e->variableNames[0]->equals(new VariableNameIdentifier('a')) &&
+			$e->variableNames[1]->equals(new VariableNameIdentifier('b')) &&
+			$e->assignedExpression instanceof VariableNameExpressionNode && $e->assignedExpression->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ['var{a, b, c} = y', MultiVariableAssignmentExpressionNode::class, fn(MultiVariableAssignmentExpressionNode $e) =>
+			count($e->variableNames) === 3 &&
+			$e->variableNames[0]->equals(new VariableNameIdentifier('a')) &&
+			$e->variableNames[1]->equals(new VariableNameIdentifier('b')) &&
+			$e->variableNames[2]->equals(new VariableNameIdentifier('c')) &&
+			$e->assignedExpression instanceof VariableNameExpressionNode && $e->assignedExpression->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ['var{~a} = y', MultiVariableAssignmentExpressionNode::class, fn(MultiVariableAssignmentExpressionNode $e) =>
+			count($e->variableNames) === 1 &&
+			$e->variableNames['a']->equals(new VariableNameIdentifier('a')) &&
+			$e->assignedExpression instanceof VariableNameExpressionNode && $e->assignedExpression->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ['var{a: x} = y', MultiVariableAssignmentExpressionNode::class, fn(MultiVariableAssignmentExpressionNode $e) =>
+			count($e->variableNames) === 1 &&
+			$e->variableNames['a']->equals(new VariableNameIdentifier('x')) &&
+			$e->assignedExpression instanceof VariableNameExpressionNode && $e->assignedExpression->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ["var{'a': x} = y", MultiVariableAssignmentExpressionNode::class, fn(MultiVariableAssignmentExpressionNode $e) =>
+			count($e->variableNames) === 1 &&
+			$e->variableNames['a']->equals(new VariableNameIdentifier('x')) &&
+			$e->assignedExpression instanceof VariableNameExpressionNode && $e->assignedExpression->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ["var{is: x} = y", MultiVariableAssignmentExpressionNode::class, fn(MultiVariableAssignmentExpressionNode $e) =>
+			count($e->variableNames) === 1 &&
+			$e->variableNames['is']->equals(new VariableNameIdentifier('x')) &&
+			$e->assignedExpression instanceof VariableNameExpressionNode && $e->assignedExpression->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ["var{true: x} = y", MultiVariableAssignmentExpressionNode::class, fn(MultiVariableAssignmentExpressionNode $e) =>
+			count($e->variableNames) === 1 &&
+			$e->variableNames['true']->equals(new VariableNameIdentifier('x')) &&
+			$e->assignedExpression instanceof VariableNameExpressionNode && $e->assignedExpression->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ["var{false: x} = y", MultiVariableAssignmentExpressionNode::class, fn(MultiVariableAssignmentExpressionNode $e) =>
+			count($e->variableNames) === 1 &&
+			$e->variableNames['false']->equals(new VariableNameIdentifier('x')) &&
+			$e->assignedExpression instanceof VariableNameExpressionNode && $e->assignedExpression->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ["var{null: x} = y", MultiVariableAssignmentExpressionNode::class, fn(MultiVariableAssignmentExpressionNode $e) =>
+			count($e->variableNames) === 1 &&
+			$e->variableNames['null']->equals(new VariableNameIdentifier('x')) &&
+			$e->assignedExpression instanceof VariableNameExpressionNode && $e->assignedExpression->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ["var{var: x} = y", MultiVariableAssignmentExpressionNode::class, fn(MultiVariableAssignmentExpressionNode $e) =>
+			count($e->variableNames) === 1 &&
+			$e->variableNames['var']->equals(new VariableNameIdentifier('x')) &&
+			$e->assignedExpression instanceof VariableNameExpressionNode && $e->assignedExpression->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ["var{type: x} = y", MultiVariableAssignmentExpressionNode::class, fn(MultiVariableAssignmentExpressionNode $e) =>
+			count($e->variableNames) === 1 &&
+			$e->variableNames['type']->equals(new VariableNameIdentifier('x')) &&
+			$e->assignedExpression instanceof VariableNameExpressionNode && $e->assignedExpression->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ["var{mutable: x} = y", MultiVariableAssignmentExpressionNode::class, fn(MultiVariableAssignmentExpressionNode $e) =>
+			count($e->variableNames) === 1 &&
+			$e->variableNames['mutable']->equals(new VariableNameIdentifier('x')) &&
+			$e->assignedExpression instanceof VariableNameExpressionNode && $e->assignedExpression->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ['var{~a, ~b} = y', MultiVariableAssignmentExpressionNode::class, fn(MultiVariableAssignmentExpressionNode $e) =>
+			count($e->variableNames) === 2 &&
+			$e->variableNames['a']->equals(new VariableNameIdentifier('a')) &&
+			$e->variableNames['b']->equals(new VariableNameIdentifier('b')) &&
+			$e->assignedExpression instanceof VariableNameExpressionNode && $e->assignedExpression->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ['var{a: x, ~b} = y', MultiVariableAssignmentExpressionNode::class, fn(MultiVariableAssignmentExpressionNode $e) =>
+			count($e->variableNames) === 2 &&
+			$e->variableNames['a']->equals(new VariableNameIdentifier('x')) &&
+			$e->variableNames['b']->equals(new VariableNameIdentifier('b')) &&
+			$e->assignedExpression instanceof VariableNameExpressionNode && $e->assignedExpression->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ['var{~a, b: z} = y', MultiVariableAssignmentExpressionNode::class, fn(MultiVariableAssignmentExpressionNode $e) =>
+			count($e->variableNames) === 2 &&
+			$e->variableNames['a']->equals(new VariableNameIdentifier('a')) &&
+			$e->variableNames['b']->equals(new VariableNameIdentifier('z')) &&
+			$e->assignedExpression instanceof VariableNameExpressionNode && $e->assignedExpression->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ['var{a: x, b: z} = y', MultiVariableAssignmentExpressionNode::class, fn(MultiVariableAssignmentExpressionNode $e) =>
+			count($e->variableNames) === 2 &&
+			$e->variableNames['a']->equals(new VariableNameIdentifier('x')) &&
+			$e->variableNames['b']->equals(new VariableNameIdentifier('z')) &&
+			$e->assignedExpression instanceof VariableNameExpressionNode && $e->assignedExpression->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ["var{'a': x, 'b': z} = y", MultiVariableAssignmentExpressionNode::class, fn(MultiVariableAssignmentExpressionNode $e) =>
+			count($e->variableNames) === 2 &&
+			$e->variableNames['a']->equals(new VariableNameIdentifier('x')) &&
+			$e->variableNames['b']->equals(new VariableNameIdentifier('z')) &&
+			$e->assignedExpression instanceof VariableNameExpressionNode && $e->assignedExpression->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ["var{'a': x, is: z, true: i, false: j, null: k, type: l, var: m, mutable: n} = y", MultiVariableAssignmentExpressionNode::class, fn(MultiVariableAssignmentExpressionNode $e) =>
+			count($e->variableNames) === 8 &&
+			$e->variableNames['a']->equals(new VariableNameIdentifier('x')) &&
+			$e->variableNames['is']->equals(new VariableNameIdentifier('z')) &&
+			$e->variableNames['true']->equals(new VariableNameIdentifier('i')) &&
+			$e->variableNames['false']->equals(new VariableNameIdentifier('j')) &&
+			$e->variableNames['null']->equals(new VariableNameIdentifier('k')) &&
+			$e->variableNames['type']->equals(new VariableNameIdentifier('l')) &&
+			$e->variableNames['var']->equals(new VariableNameIdentifier('m')) &&
+			$e->variableNames['mutable']->equals(new VariableNameIdentifier('n')) &&
+			$e->assignedExpression instanceof VariableNameExpressionNode && $e->assignedExpression->variableName->equals(new VariableNameIdentifier('y'))
+		];
+		yield ['var{~a, ~b, ~c} = y', MultiVariableAssignmentExpressionNode::class, fn(MultiVariableAssignmentExpressionNode $e) =>
+			count($e->variableNames) === 3 &&
+			$e->variableNames['a']->equals(new VariableNameIdentifier('a')) &&
+			$e->variableNames['b']->equals(new VariableNameIdentifier('b')) &&
+			$e->variableNames['c']->equals(new VariableNameIdentifier('c')) &&
+			$e->assignedExpression instanceof VariableNameExpressionNode && $e->assignedExpression->variableName->equals(new VariableNameIdentifier('y'))
 		];
 	}
 

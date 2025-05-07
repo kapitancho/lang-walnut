@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\Code\Expression\MatchExpression;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionDefault;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionPair;
 use Walnut\Lang\Blueprint\Code\Expression\MethodCallExpression;
+use Walnut\Lang\Blueprint\Code\Expression\MultiVariableAssignmentExpression;
 use Walnut\Lang\Blueprint\Code\Expression\MutableExpression;
 use Walnut\Lang\Blueprint\Code\Expression\NoErrorExpression;
 use Walnut\Lang\Blueprint\Code\Expression\NoExternalErrorExpression;
@@ -47,6 +48,11 @@ interface ExpressionRegistry {
 		VariableNameIdentifier $variableName,
 		Expression $assignedExpression
 	): VariableAssignmentExpression;
+	/** @param array<VariableNameIdentifier> $variableNames */
+	public function multiVariableAssignment(
+		array $variableNames,
+		Expression $assignedExpression
+	): MultiVariableAssignmentExpression;
 	public function matchPair(Expression $matchExpression, Expression $valueExpression): MatchExpressionPair;
 
 	public function matchDefault(Expression $valueExpression): MatchExpressionDefault;
