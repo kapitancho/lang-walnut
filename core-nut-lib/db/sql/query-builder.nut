@@ -55,13 +55,13 @@ SqlNotExpression = $[expression: !SqlExpression];
 SqlExpression = SqlRawExpression|SqlAndExpression|SqlOrExpression|SqlNotExpression|SqlFieldExpression;
 
 SqlFieldExpression ==> SqlString :: [
-    $fieldName->as(type{SqlString}),
-    $operation->as(type{SqlString}),
-    $value->as(type{SqlString})
+    $fieldName->as(`SqlString),
+    $operation->as(`SqlString),
+    $value->as(`SqlString)
 ]->combineAsString(' ');
 SqlRawExpression ==> SqlString :: $expression;
 SqlAndExpression ==> SqlString :: ?whenTypeOf($expressions) is {
-    type{Array<SqlExpression, 1..>}: [
+    `Array<SqlExpression, 1..>: [
         '(',
         $expressions->map(^SqlExpression => String :: #->asSqlString)->combineAsString(' AND '),
         ')'
@@ -69,7 +69,7 @@ SqlAndExpression ==> SqlString :: ?whenTypeOf($expressions) is {
     ~: '1'
 };
 SqlOrExpression ==> SqlString :: ?whenTypeOf($expressions) is {
-    type{Array<SqlExpression, 1..>}: [
+    `Array<SqlExpression, 1..>: [
         '(',
         $expressions->map(^SqlExpression => String :: #->asSqlString)->combineAsString(' OR '),
         ')'
@@ -141,8 +141,8 @@ SqlTableJoin ==> SqlString %% [~SqlQuoter] :: [
 SqlSelectFieldList = $[fields: Map<DatabaseFieldName|TableField|QueryValue>];
 SqlSelectFieldList ==> SqlString %% [~SqlQuoter] :: $fields->mapKeyValue(^[key: String, value: DatabaseFieldName|TableField|QueryValue] => String :: ''->concatList[
     ?whenTypeOf(#value) is {
-        type{DatabaseFieldName}: %sqlQuoter.quoteIdentifier(#value),
-        type{TableField|QueryValue}: #value->asSqlString
+        `DatabaseFieldName: %sqlQuoter.quoteIdentifier(#value),
+        `TableField|QueryValue: #value->asSqlString
     },
     ' AS ', %sqlQuoter.quoteIdentifier(#key)
 ])->values->combineAsString(', ');
@@ -161,11 +161,11 @@ SelectQuery ==> DatabaseSqlQuery %% [~SqlQuoter] :: [
     $joins->map(^SqlTableJoin => String :: #->asSqlString)->combineAsString(' '),
     'WHERE', $queryFilter->asSqlString,
     ?whenTypeOf($orderBy) is {
-        type{SqlOrderByFields}: $orderBy->asSqlString,
+        `SqlOrderByFields: $orderBy->asSqlString,
         ~: ''
     },
     ?whenTypeOf($limit) is {
-        type{SqlSelectLimit}: $limit->asSqlString,
+        `SqlSelectLimit: $limit->asSqlString,
         ~: ''
     }
 ]->combineAsString(' ');

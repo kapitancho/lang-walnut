@@ -123,7 +123,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 				new EnumValueIdentifier('ErrorWhileCreatingValue'),
 			]
 		);
-		$this->typeRegistryBuilder->addSealed(
+		$this->typeRegistryBuilder->addOpen(
 			new TypeNameIdentifier('DependencyContainerError'),
 			$this->typeRegistry->record([
 				'targetType' => $this->typeRegistry->type($this->typeRegistry->any),

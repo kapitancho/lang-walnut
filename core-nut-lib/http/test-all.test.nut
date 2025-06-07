@@ -4,7 +4,7 @@ module $http/test-all %% $test/runner, $http/bundle/autowire-router,
 /* to run this test file, use 'php -f cli/test.php ../core-nut-lib/http' */
 
 DependencyContainerError ==> HttpResponse %% [~ HttpResponseBuilder] ::
-    %httpResponseBuilder(500)->withBody('Dependency container error: ' + $->errorMessage + ': ' + $->targetType->asString);
+    %httpResponseBuilder(500)->withBody('Dependency container error: ' + $errorMessage + ': ' + $targetType->asString);
 
 UnableToRenderTemplate ==> HttpResponse %% [~ HttpResponseBuilder] ::
     %httpResponseBuilder(500)->withBody($->asString);
@@ -43,10 +43,10 @@ MyHandler = ^[p: String] => String;
 ==> MyHandler :: ^[p: String] => String :: #p->reverse;
 
 ==> HttpLookupRouterMapping :: [
-    [path: '/about', type: type{AboutHandler}, method: HttpRequestMethod.post],
-    [path: '/special', type: type{SpecialHandler}],
-    [path: '/index', type: type{IndexHandler}],
-    [path: '', type: type{HttpAutoWireRequestHandler}]
+    [path: '/about', type: `AboutHandler, method: HttpRequestMethod.post],
+    [path: '/special', type: `SpecialHandler],
+    [path: '/index', type: `IndexHandler],
+    [path: '', type: `HttpAutoWireRequestHandler]
 ];
 
 JJ = ^[j: JsonValue] => JsonValue;

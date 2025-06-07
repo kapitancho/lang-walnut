@@ -11,12 +11,12 @@ module $db/sql/quoter-mysql %% $db/sql/query-builder:
             identifier, # /*->replace...*/, identifier
         ]->combineAsString(''),
         quoteValue: ^String|Integer|Real|Boolean|Null => String :: ?whenTypeOf(#) is {
-            type{String}: [
+            `String: [
                 value, # /*->replace...*/, value
             ]->combineAsString(''),
-            type{Integer|Real}: #->asString,
-            type{Boolean}: ?whenValueOf(#) is { true: '1', false: '0' },
-            type{Null}: 'NULL'
+            `Integer|Real: #->asString,
+            `Boolean: ?whenValueOf(#) is { true: '1', false: '0' },
+            `Null: 'NULL'
         }
     ]
 };

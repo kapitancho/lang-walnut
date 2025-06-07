@@ -8,7 +8,7 @@ UnknownFieldTypes = :[];
 UnknownOrmModel = $[type: Type];
 OrmModel = #[table: DatabaseTableName, keyField: DatabaseFieldName, sequenceField: ?DatabaseFieldName];
 OrmModel->orderBy(=> SqlOrderByFields|Null) :: ?whenTypeOf($sequenceField) is {
-    type{String<1..>}: SqlOrderByFields[[SqlOrderByField[$sequenceField, SqlOrderByDirection.Asc]]]
+    `String<1..>: SqlOrderByFields[[SqlOrderByField[$sequenceField, SqlOrderByDirection.Asc]]]
 };
 OrmModel->filterByKeyField(=> SqlQueryFilter) :: SqlQueryFilter[SqlFieldExpression[
     TableField[$table, $keyField], SqlFieldExpressionOperation.Equals, PreparedValue[$keyField]
@@ -17,18 +17,18 @@ OrmModel->filterByKeyField(=> SqlQueryFilter) :: SqlQueryFilter[SqlFieldExpressi
 
 Ox = $[~OrmModel, ~FieldTypes];
 Ox[~Type] @ UnknownOrmModel|UnknownFieldTypes :: {
-    ormModel = #type->as(type{OrmModel});
+    ormModel = #type->as(`OrmModel);
     ormModel = ?whenTypeOf(ormModel) is {
-        type{OrmModel}: ormModel,
+        `OrmModel: ormModel,
         ~: => @UnknownOrmModel(#)
     };
 
     fieldTypesHelper = ^Type => Result<Map<Type>, UnknownFieldTypes> :: {
         ?whenTypeOf(#) is {
-            type{Type<Open>}: fieldTypesHelper=>invoke(#->valueType),
-            type{Type<Record>}: #->itemTypes,
-            type{Type<Alias>}: fieldTypesHelper=>invoke(#->aliasedType),
-            type{Type<Type>}: fieldTypesHelper=>invoke(#->refType),
+            `Type<Open>: fieldTypesHelper=>invoke(#->valueType),
+            `Type<Record>: #->itemTypes,
+            `Type<Alias>: fieldTypesHelper=>invoke(#->aliasedType),
+            `Type<Type>: fieldTypesHelper=>invoke(#->refType),
             ~: @UnknownFieldTypes()
         }
     };
@@ -39,14 +39,14 @@ Ox->keyField(=> DatabaseFieldName) :: $ormModel.keyField;
 
 FieldTypes->forSelect(^[table: DatabaseTableName] => SqlSelectFieldList) :: {
     fields = $->mapKeyValue(^[key: String, value: Any] => TableField|String<1..> :: ?whenTypeOf(#key) is {
-        type{DatabaseFieldName}: TableField[#table, #key],
+        `DatabaseFieldName: TableField[#table, #key],
         ~: '1'
     });
     SqlSelectFieldList[fields]
 };
 FieldTypes->forWrite(=> Map<QueryValue>) :: {
     $->mapKeyValue(^[key: String, value: Any] => QueryValue :: ?whenTypeOf(#key) is {
-        type{DatabaseFieldName}: PreparedValue[#key],
+        `DatabaseFieldName: PreparedValue[#key],
         ~: SqlValue['1']
     })
 };

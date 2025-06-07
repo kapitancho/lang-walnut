@@ -28,7 +28,7 @@ HttpLookupRouter ==> HttpMiddleware %% [~DependencyContainer, ~HttpResponseBuild
             }
         );
         ?whenTypeOf(kv) is {
-            type{HttpLookupRouterPath}: run[request: withUpdatedRequestPath(kv.path), type: kv.type],
+            `HttpLookupRouterPath: run[request: withUpdatedRequestPath(kv.path), type: kv.type],
             ~: #handler->shape(`HttpRequestHandler)(request)
         }
     }

@@ -12,22 +12,19 @@ MinusInfinity = :[];
 PlusInfinity = :[];
 InvalidRange = :[];
 IntegerRange = #[minValue: Integer|MinusInfinity, maxValue: Integer|PlusInfinity] @ InvalidRange ::
-    ?whenTypeOf(#) is { type[minValue: Integer, maxValue: Integer]:
+    ?whenTypeOf(#) is { `[minValue: Integer, maxValue: Integer]:
         ?when (#.minValue > #.maxValue) { => @InvalidRange() }};
 RealRange = #[minValue: Real|MinusInfinity, maxValue: Real|PlusInfinity] @ InvalidRange ::
-    ?whenTypeOf(#) is { type[minValue: Real, maxValue: Real]:
+    ?whenTypeOf(#) is { `[minValue: Real, maxValue: Real]:
         ?when (#.minValue > #.maxValue) { => @InvalidRange() }};
 LengthRange = #[minLength: Integer<0..>, maxLength: Integer<0..>|PlusInfinity] @ InvalidRange ::
-    ?whenTypeOf(#) is { type[minLength: Integer<0..>, maxLength: Integer<0..>]:
+    ?whenTypeOf(#) is { `[minLength: Integer<0..>, maxLength: Integer<0..>]:
         ?when (#.minLength > #.maxLength) { => @InvalidRange() }};
 
 /* dependency container */
 DependencyContainer = :[];
 DependencyContainerErrorType = :[CircularDependency, Ambiguous, NotFound, UnsupportedType, ErrorWhileCreatingValue];
-DependencyContainerError = $[targetType: Type, errorOnType: Type, errorMessage: String, errorType: DependencyContainerErrorType];
-DependencyContainerError->errorMessage(=> String) :: $errorMessage;
-DependencyContainerError->targetType(=> Type) :: $targetType;
-DependencyContainerError->errorType(=> DependencyContainerErrorType) :: $errorType;
+DependencyContainerError = #[targetType: Type, errorOnType: Type, errorMessage: String, errorType: DependencyContainerErrorType];
 
 /* json value */
 InvalidJsonString = #[value: String];

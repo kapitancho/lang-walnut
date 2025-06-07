@@ -37,7 +37,7 @@ final readonly class BinaryMultiply implements NativeMethod {
 				if ($targetType->range->minValue >= 0 && $parameterType->range->minValue >= 0) {
 				    $min = $targetType->range->minValue * $parameterType->range->minValue;
 				    $max = $targetType->range->maxValue === PlusInfinity::value ||
-				    $parameterType->range->maxValue === PlusInfinity::value   ? PlusInfinity::value :
+				    $parameterType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
 				        $targetType->range->maxValue * $parameterType->range->maxValue;
 				    return $programRegistry->typeRegistry->real($min, $max);
 				}

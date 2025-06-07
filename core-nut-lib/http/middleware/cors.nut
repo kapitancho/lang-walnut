@@ -13,7 +13,7 @@ HttpCorsMiddleware = :[];
 HttpCorsMiddleware ==> HttpMiddleware %% [~CorsAllowedOrigins, ~CorsAllowedHeaders, ~CorsAllowedMethods, ~CorsExposedHeaders] :: {
     applyHeader = ^[headerName: String, values: Array<String>, response: {HttpResponse}] => {HttpResponse} :: {
         ?whenTypeOf(#values) is {
-            type{Array<String, 1..>}: #response->shape(`HttpResponse)->withHeader[headerName: #headerName, values: [#values->combineAsString(', ')]],
+            `Array<String, 1..>: #response->shape(`HttpResponse)->withHeader[headerName: #headerName, values: [#values->combineAsString(', ')]],
             ~: #response
         }
     };

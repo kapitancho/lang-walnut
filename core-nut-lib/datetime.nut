@@ -6,20 +6,20 @@ InvalidTime = :[];
 InvalidDateAndTime = :[];
 
 Date = #[year: Integer, month: Integer<1..12>, day: Integer<1..31>] @ InvalidDate :: {
-    ?whenValueOf(#.day) is {
-        31: ?whenTypeOf(#.month) is {
-            type{Integer[2, 4, 6, 9, 11]}: => Error(InvalidDate()),
+    ?whenValueOf(#day) is {
+        31: ?whenTypeOf(#month) is {
+            `Integer[2, 4, 6, 9, 11]: => Error(InvalidDate()),
             ~: null
         },
-        30: ?whenTypeOf(#.month) is {
-            type{Integer[2]}: => Error(InvalidDate()),
+        30: ?whenTypeOf(#month) is {
+            `Integer[2]: => Error(InvalidDate()),
             ~: null
         },
-        29: ?whenTypeOf(#.month) is {
-            type{Integer[2]}: ?whenIsTrue {
-                {#.year % 4} > 0: => Error(InvalidDate()),
-                {#.year % 100} == 0: ?whenIsTrue {
-                    {#.year % 400} > 0: => Error(InvalidDate()),
+        29: ?whenTypeOf(#month) is {
+            `Integer[2]: ?whenIsTrue {
+                {#year % 4} > 0: => Error(InvalidDate()),
+                {#year % 100} == 0: ?whenIsTrue {
+                    {#year % 400} > 0: => Error(InvalidDate()),
                     ~: null
                 },
                 ~: null
@@ -40,9 +40,9 @@ Date ==> String :: [
 
 JsonValue ==> Date @ InvalidDate :: {
      ?whenTypeOf($) is {
-        type{String}: $->asDate,
-        type[Integer, Integer<1..12>, Integer<1..31>]: Date($),
-        type[year: Integer, month: Integer<1..12>, day: Integer<1..31>]: Date($),
+        `String: $->asDate,
+        `[Integer, Integer<1..12>, Integer<1..31>]: Date($),
+        `[year: Integer, month: Integer<1..12>, day: Integer<1..31>]: Date($),
         ~: @InvalidDate()
      }
 };
@@ -73,9 +73,9 @@ Time ==> String :: [
 
 JsonValue ==> Time @ InvalidTime :: {
      ?whenTypeOf($) is {
-        type{String}: $->asTime,
-        type[Integer<0..23>, Integer<0..59>, Integer<0..59>]: Time($),
-        type[hour: Integer<0..23>, minute: Integer<0..59>, second: Integer<0..59>]: Time($),
+        `String: $->asTime,
+        `[Integer<0..23>, Integer<0..59>, Integer<0..59>]: Time($),
+        `[hour: Integer<0..23>, minute: Integer<0..59>, second: Integer<0..59>]: Time($),
         ~: @InvalidTime()
      }
 };
@@ -102,10 +102,10 @@ DateAndTime ==> String :: [$date->asString, $time->asString]->combineAsString(' 
 
 JsonValue ==> DateAndTime @ InvalidDate|InvalidTime|InvalidDateAndTime :: {
     ?whenTypeOf($) is {
-        type{String}: $->asDateAndTime,
-        type[Integer, Integer<1..12>, Integer<1..31>, Integer<0..23>, Integer<0..59>, Integer<0..59>]:
+        `String: $->asDateAndTime,
+        `[Integer, Integer<1..12>, Integer<1..31>, Integer<0..23>, Integer<0..59>, Integer<0..59>]:
             DateAndTime[?noError(Date[$.0, $.1, $.2]), ?noError(Time[$.3, $.4, $.5])],
-        type[
+        `[
             year: Integer,
             month: Integer<1..12>,
             day: Integer<1..31>,

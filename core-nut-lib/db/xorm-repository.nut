@@ -28,7 +28,7 @@ OxRepository->one(^v: DatabaseValue => *Result<Any, EntryNotFound>) %% [~Databas
           ->map(^DatabaseQueryResultRow => Result<Any, HydrationError> :: #->hydrateAs($type))
           *> ('Failed to hydrate entries');
     ?whenTypeOf(entries) is {
-        type{Array<1..>}: entries.0,
+        `Array<1..>: entries.0,
         ~: @EntryNotFound[key: v]
     }
 };
@@ -39,7 +39,7 @@ OxRepository->insertOne(^v: Map<DatabaseValue> => *Null) %% [~DatabaseConnector]
     result = {%databaseConnector->execute[query: query, boundParameters: v]}
         *> ('Failed to insert entry into the database');
     ?whenTypeOf(result) is {
-        type{Integer<1..1>} : null,
+        `Integer<1..1> : null,
         ~: @ExternalError[
             errorType: 'insert error',
             originalError: result,
@@ -54,7 +54,7 @@ OxRepository->deleteOne(^v: DatabaseValue => *Result<Null, EntryNotFound>) %% [~
     result = {%databaseConnector->execute[query: query, boundParameters: [:]->withKeyValue[key: $ox->keyField, value: v]]}
         -> errorAsExternal('Failed to delete entry from the database');
     ?whenTypeOf(result) is {
-        type{Integer<1..1>} : null,
+        `Integer<1..1> : null,
         ~: @EntryNotFound[key: v]
     }
 };
@@ -66,7 +66,7 @@ OxRepository->updateOne(^v: Map<DatabaseValue> => *Result<Null, EntryNotFound>) 
     result = {%databaseConnector->execute[query: query, boundParameters: v]}
         *> ('Failed to update entry in the database');
     ?whenTypeOf(result) is {
-        type{Integer<1..1>} : null,
+        `Integer<1..1> : null,
         ~: @EntryNotFound[key: entryId]
     }
 };
