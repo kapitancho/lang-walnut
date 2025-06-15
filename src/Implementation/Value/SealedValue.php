@@ -3,6 +3,8 @@
 namespace Walnut\Lang\Implementation\Value;
 
 use JsonSerializable;
+use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
+use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\SealedType;
@@ -25,6 +27,25 @@ final class SealedValue implements SealedValueInterface, JsonSerializable {
 		return $other instanceof SealedValueInterface &&
 			$this->typeName->equals($other->type->name) &&
 			$this->value->equals($other->value);
+	}
+
+
+	/** @throws AnalyserException */
+	public function selfAnalyse(AnalyserContext $analyserContext): void {
+		$type = $this->typeRegistry->sealed($this->typeName);
+		// @coverage-ignore-start
+		if (!$this->value->type->isSubtypeOf($type->valueType)) {
+			throw new AnalyserException(
+				sprintf(
+					'The value of the sealed type %s should be a subtype of %s but got %s',
+					$this->typeName,
+					$type->valueType,
+					$this->value->type,
+				)
+			);
+		}
+		// @coverage-ignore-end
+		$this->value->selfAnalyse($analyserContext);
 	}
 
 	public function __toString(): string {

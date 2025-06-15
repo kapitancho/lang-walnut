@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Feature\Function;
 
+use Walnut\Lang\Blueprint\Compilation\AST\AstProgramCompilationException;
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 
 final class ConstructTest extends CodeExecutionTestHelper {
@@ -116,6 +117,30 @@ final class ConstructTest extends CodeExecutionTestHelper {
 	}
 
 
+
+	public function testDataOk(): void {
+		$result = $this->executeCodeSnippet("[A![a: 1, b: 'hi'], getA[a: 1, b: 'hi']];", <<<NUT
+		A := [a: Integer, b: String];
+		getA = ^p: [a: Integer, b: String] => A :: A!p;
+	NUT);
+		$this->assertEquals("[A![a: 1, b: 'hi'], A![a: 1, b: 'hi']]", $result);
+	}
+
+	public function testUnknownTypeConstructorError(): void {
+		$this->expectException(AstProgramCompilationException::class);
+		$this->executeCodeSnippet(
+			"A[a: 1, b: 'hi'];"
+		);
+	}
+
+	public function testDataConstructorError(): void {
+		$this->executeErrorCodeSnippet(
+			"Cannot construct a value of type: A",
+			"A[a: 1, b: 'hi'];",
+	<<<NUT
+		A := [a: Integer, b: String];
+	NUT);
+	}
 
 	public function testOpenWithoutConstructorCallOk(): void {
 		$result = $this->executeCodeSnippet("[A[a: 1, b: 'hi'], getA[a: 1, b: 'hi']];", <<<NUT

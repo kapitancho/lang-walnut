@@ -705,10 +705,7 @@ final readonly class ParserStateMachine {
 					);
 					$this->s->move(275);
 				},
-				T::call_start->name => /*function(LT $token) {
-					$this->s->push(272);
-					$this->s->move(201);
-				}*/ 271,
+				T::call_start->name => 271,
 				T::tuple_start->name => function(LT $token) {
 					$this->s->push(273);
 					$this->s->stay(201);
@@ -724,13 +721,6 @@ final readonly class ParserStateMachine {
 			]],
 			271 => ['name' => 'constructor call expression', 'transitions' => [
 				T::call_end->name => function(LT $token) {
-					/*$this->s->generated = $this->nodeBuilder->constant(
-						$this->nodeBuilder->atomValue(
-							new TypeNameIdentifier($this->s->result['type_name'])
-						)
-					);
-					$this->s->moveAndPop();*/
-
 					$this->s->generated = $this->nodeBuilder->constant(
 						$this->nodeBuilder->nullValue
 					);
@@ -2031,42 +2021,7 @@ final readonly class ParserStateMachine {
 					);
 					$this->s->pop();
 				},
-				//T::call_start->name => 490,
-				/*T::tuple_start->name => function(LT $token) {
-					$this->s->push(489);
-					$this->s->stay(401);
-				},*/
 			]],
-			/*489 => ['name' => 'value data record or tuple return', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->dataValue(
-						new TypeNameIdentifier($this->s->result['current_type_name']),
-						$this->s->generated
-					);
-					$this->s->pop();
-				},
-			]],*/
-			490 => ['name' => 'value atom or data', 'transitions' => [
-				T::call_end->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->atomValue(
-						new TypeNameIdentifier($this->s->result['current_type_name']),
-					);
-					$this->s->moveAndPop();
-				},
-				/*'' => function(LT $token) {
-					$this->s->push(491);
-					$this->s->stay(401);
-				},*/
-			]],
-			/*491 => ['name' => 'value data return', 'transitions' => [
-				T::call_end->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->dataValue(
-						new TypeNameIdentifier($this->s->result['current_type_name']),
-						$this->s->generated
-					);
-					$this->s->moveAndPop();
-				},
-			]],*/
 			492 => ['name' => 'value enum', 'transitions' => [
 				T::type_keyword->name => $c = function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->enumerationValue(

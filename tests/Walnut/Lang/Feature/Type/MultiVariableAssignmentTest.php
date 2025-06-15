@@ -8,9 +8,9 @@ final class MultiVariableAssignmentTest extends CodeExecutionTestHelper {
 
 	public function testAssignmentOk(): void {
 		$result = $this->executeCodeSnippet(
-			"var{a: x} = A(); x;",
+			"var{a: x} = A; x;",
 			<<<NUT
-				A = :[];
+				A := ();
 				A->item(^x: String) :: 'item-' + x;
 			NUT
 		);
@@ -20,9 +20,9 @@ final class MultiVariableAssignmentTest extends CodeExecutionTestHelper {
 	public function testAssignmentNoItemMethod(): void {
 		$this->executeErrorCodeSnippet(
 			"Cannot call method 'item' on type 'A'",
-			"var{a: x} = A(); x;",
+			"var{a: x} = A; x;",
 			<<<NUT
-				A = :[];
+				A := ();
 			NUT
 		);
 	}

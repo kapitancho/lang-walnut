@@ -3,6 +3,8 @@
 namespace Walnut\Lang\Implementation\Value;
 
 use JsonSerializable;
+use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
+use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\AtomType;
@@ -23,6 +25,9 @@ final class AtomValue implements AtomValueInterface, JsonSerializable {
 	public function equals(Value $other): bool {
 		return $other instanceof AtomValueInterface && $this->typeName->equals($other->type->name);
 	}
+
+	/** @throws AnalyserException */
+	public function selfAnalyse(AnalyserContext $analyserContext): void {}
 
 	public function __toString(): string {
 		return $this->typeName;

@@ -264,14 +264,13 @@ final readonly class Hydrator {
 		}
 	}
 
-	private function hydrateData(Value $value, OpenType $targetType, string $hydrationPath): Value {
+	private function hydrateData(Value $value, DataType $targetType, string $hydrationPath): Value {
 		return $this->tryJsonValueCast(
 			$targetType, $value, $hydrationPath,
-			"Open type hydration failed. Error: %s"
-		) ?? $this->constructValue(
-			$targetType,
-			$this->hydrate($value, $targetType->valueType, $hydrationPath),
-			$hydrationPath
+			"Data type hydration failed. Error: %s"
+		) ?? $this->programRegistry->valueRegistry->dataValue(
+			$targetType->name,
+			$this->hydrate($value, $targetType->valueType, $hydrationPath)
 		);
 	}
 

@@ -170,6 +170,7 @@ final class ToStringTest extends BaseProgramTestHelper {
 			'[0;]' => $er->set([$c0]),
 			'[0; x]' => $er->set([$c0, $x]),
 			'mutable{Integer, 0}' => $er->mutable($this->typeRegistry->integer(), $c0),
+			'A!0' => $er->data(new TypeNameIdentifier('A'), $c0),
 			'x' => $x,
 			'x = 0' => $er->variableAssignment(new VariableNameIdentifier('x'), $c0),
 			'var{x} = 0' => $er->multiVariableAssignment([new VariableNameIdentifier('x')], $c0),

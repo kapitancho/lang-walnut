@@ -11,8 +11,4 @@ interface MutableValue extends Value {
 	public MutableType $type { get; }
 	public Type $targetType { get; }
 	public Value $value { get; set; }
-
-	/** @throws AnalyserException */
-	public function selfAnalyse(AnalyserContext $analyserContext): void;
-
 }

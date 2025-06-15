@@ -3,6 +3,8 @@
 namespace Walnut\Lang\Implementation\Value;
 
 use JsonSerializable;
+use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
+use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\BooleanType;
@@ -25,6 +27,9 @@ final class BooleanValue implements BooleanValueInterface, JsonSerializable {
 	public BooleanType $enumeration {
         get => $this->typeRegistry->boolean;
     }
+
+	/** @throws AnalyserException */
+	public function selfAnalyse(AnalyserContext $analyserContext): void {}
 
 	public function equals(Value $other): bool {
 		return $other instanceof BooleanValueInterface && $this->literalValue === $other->literalValue;

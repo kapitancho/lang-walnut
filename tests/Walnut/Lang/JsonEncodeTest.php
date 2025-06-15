@@ -183,6 +183,7 @@ final class JsonEncodeTest extends BaseProgramTestHelper {
 			'{"expressionType":"Set","values":[]}' => $er->set([]),
 			'{"expressionType":"Set","values":[{"expressionType":"constant","value":{"valueType":"Integer","value":0}}]}' => $er->set([$c0]),
 			'{"expressionType":"Set","values":[{"expressionType":"constant","value":{"valueType":"Integer","value":0}},{"expressionType":"variableName","variableName":"x"}]}' => $er->set([$c0, $x]),
+			'{"expressionType":"Data","typeName":"A","value":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->data(new TypeNameIdentifier('A'), $c0),
 			'{"expressionType":"Mutable","type":{"type":"Integer","range":{"minValue":"-Infinity","maxValue":"+Infinity"}},"value":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->mutable($this->typeRegistry->integer(), $c0),
 			'{"expressionType":"variableName","variableName":"x"}' => $x,
 			'{"expressionType":"variableAssignment","variableName":"x","assignedExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->variableAssignment(new VariableNameIdentifier('x'), $c0),

@@ -4,6 +4,8 @@ namespace Walnut\Lang\Implementation\Value;
 
 use InvalidArgumentException;
 use JsonSerializable;
+use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
+use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -57,6 +59,13 @@ final class RecordValue implements RecordValueInterface, JsonSerializable {
 			}
 		}
 		return false;
+	}
+
+	/** @throws AnalyserException */
+	public function selfAnalyse(AnalyserContext $analyserContext): void {
+		foreach ($this->values as $value) {
+			$value->selfAnalyse($analyserContext);
+		}
 	}
 
 	public function asString(bool $multiline): string {

@@ -3,6 +3,8 @@
 namespace Walnut\Lang\Implementation\Value;
 
 use JsonSerializable;
+use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
+use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Value\StringValue as StringValueInterface;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -22,6 +24,9 @@ final class StringValue implements StringValueInterface, JsonSerializable {
 	public function equals(Value $other): bool {
 		return $other instanceof StringValueInterface && $this->literalValue === $other->literalValue;
 	}
+
+	/** @throws AnalyserException */
+	public function selfAnalyse(AnalyserContext $analyserContext): void {}
 
 	public function __toString(): string {
 		return "'" . str_replace(['\\', "\n", "'"], ['\\\\', '\n', '\`'], $this->literalValue) . "'";

@@ -3,6 +3,8 @@
 namespace Walnut\Lang\Implementation\Value;
 
 use JsonSerializable;
+use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
+use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\TypeType;
@@ -25,6 +27,9 @@ final class TypeValue implements TypeValueInterface, JsonSerializable {
 			$this->typeValue->isSubtypeOf($other->typeValue) &&
 			$other->typeValue->isSubtypeOf($this->typeValue);
 	}
+
+	/** @throws AnalyserException */
+	public function selfAnalyse(AnalyserContext $analyserContext): void {}
 
 	public function __toString(): string {
 		$val = (string)$this->typeValue;

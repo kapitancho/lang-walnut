@@ -36,6 +36,7 @@ final class DataValue implements DataValueInterface, JsonSerializable {
 				)
 			);
 		}
+		$this->value->selfAnalyse($analyserContext);
 	}
 
 	public function equals(Value $other): bool {

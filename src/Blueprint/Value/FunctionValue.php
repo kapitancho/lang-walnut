@@ -17,9 +17,6 @@ interface FunctionValue extends Value {
 
 	public function withVariableValueScope(VariableValueScope $variableValueScope): self;
 
-	/** @throws AnalyserException */
-	public function selfAnalyse(AnalyserContext $analyserContext): void;
-
 	/** @throws ExecutionException */
 	public function execute(ExecutionContext $executionContext, Value $parameterValue): Value;
 

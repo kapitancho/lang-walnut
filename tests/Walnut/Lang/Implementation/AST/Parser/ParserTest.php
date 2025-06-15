@@ -631,6 +631,8 @@ class ParserTest extends TestCase {
 
 		yield ['C', ConstantExpressionNode::class, fn(ConstantExpressionNode $e) => $e->value instanceof AtomValueNode &&
 			$e->value->name->equals(new TypeNameIdentifier('C'))];
+		yield ['C()', ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('C')) &&
+			$e->parameter instanceof ConstantExpressionNode && $e->parameter->value instanceof NullValueNode];
 		yield ['C(x)', ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('C')) &&
 			$e->parameter instanceof VariableNameExpressionNode && $e->parameter->variableName->equals(new VariableNameIdentifier('x'))];
 		yield ['C[]', ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('C')) &&

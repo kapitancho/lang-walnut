@@ -163,6 +163,68 @@ final class BinaryEqualTest extends BaseProgramTestHelper {
 		$this->callBinaryEqual($c, $c3, false);
 		$this->callBinaryEqual($c, $z, false);
 
+		$this->typeRegistryBuilder->addData(
+			new TypeNameIdentifier('DM'),
+			$this->typeRegistry->record(['a' => $this->typeRegistry->boolean]),
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->constant($this->valueRegistry->null)
+			),
+			$this->typeRegistry->nothing
+		);
+		$this->typeRegistryBuilder->addData(
+			new TypeNameIdentifier('DN'),
+			$this->typeRegistry->record(['a' => $this->typeRegistry->boolean]),
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->constant($this->valueRegistry->null)
+			),
+			$this->typeRegistry->nothing
+		);
+
+		$c1 = $this->valueRegistry->dataValue(new TypeNameIdentifier('DM'),
+			$this->valueRegistry->record(['a' => $this->valueRegistry->boolean(true)]));
+		$c2 = $this->valueRegistry->dataValue(new TypeNameIdentifier('DM'),
+			$this->valueRegistry->record(['a' => $this->valueRegistry->boolean(false)]));
+		$c3 = $this->valueRegistry->dataValue(new TypeNameIdentifier('DN'),
+			$this->valueRegistry->record(['a' => $this->valueRegistry->boolean(true)]));
+		$c = $this->valueRegistry->dataValue(new TypeNameIdentifier('DM'),
+			$this->valueRegistry->record(['a' => $this->valueRegistry->boolean(true)]));
+
+		$this->callBinaryEqual($c, $c1, true);
+		$this->callBinaryEqual($c, $c2, false);
+		$this->callBinaryEqual($c, $c3, false);
+		$this->callBinaryEqual($c, $z, false);
+
+		$this->typeRegistryBuilder->addOpen(
+			new TypeNameIdentifier('OM'),
+			$this->typeRegistry->record(['a' => $this->typeRegistry->boolean]),
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->constant($this->valueRegistry->null)
+			),
+			$this->typeRegistry->nothing
+		);
+		$this->typeRegistryBuilder->addOpen(
+			new TypeNameIdentifier('ON'),
+			$this->typeRegistry->record(['a' => $this->typeRegistry->boolean]),
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->constant($this->valueRegistry->null)
+			),
+			$this->typeRegistry->nothing
+		);
+
+		$c1 = $this->valueRegistry->openValue(new TypeNameIdentifier('OM'),
+			$this->valueRegistry->record(['a' => $this->valueRegistry->boolean(true)]));
+		$c2 = $this->valueRegistry->openValue(new TypeNameIdentifier('OM'),
+			$this->valueRegistry->record(['a' => $this->valueRegistry->boolean(false)]));
+		$c3 = $this->valueRegistry->openValue(new TypeNameIdentifier('ON'),
+			$this->valueRegistry->record(['a' => $this->valueRegistry->boolean(true)]));
+		$c = $this->valueRegistry->openValue(new TypeNameIdentifier('OM'),
+			$this->valueRegistry->record(['a' => $this->valueRegistry->boolean(true)]));
+
+		$this->callBinaryEqual($c, $c1, true);
+		$this->callBinaryEqual($c, $c2, false);
+		$this->callBinaryEqual($c, $c3, false);
+		$this->callBinaryEqual($c, $z, false);
+
 		$c1 = $this->valueRegistry->function(
 			$this->typeRegistry->boolean,
 			null,

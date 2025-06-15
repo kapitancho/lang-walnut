@@ -44,6 +44,7 @@ final readonly class DataExpression implements DataExpressionInterface, JsonSeri
 		$executionContext = $this->value->execute($executionContext);
 		$dataType = $executionContext->programRegistry->typeRegistry->data($this->typeName);
 		if (!$executionContext->value->type->isSubtypeOf($dataType->valueType)) {
+			// @codeCoverageIgnoreStart
 			throw new ExecutionException(
 				sprintf(
 					"The data type '%s' expected base value of type '%s', but got '%s'.",
@@ -52,6 +53,7 @@ final readonly class DataExpression implements DataExpressionInterface, JsonSeri
 					$executionContext->value
 				)
 			);
+			// @codeCoverageIgnoreEnd
 		}
 		return $executionContext->withValue(
 			$executionContext->programRegistry->valueRegistry->dataValue(
@@ -63,7 +65,7 @@ final readonly class DataExpression implements DataExpressionInterface, JsonSeri
 
 	public function __toString(): string {
 		return sprintf(
-			"%s.%s",
+			"%s!%s",
 			$this->typeName,
 			$this->value
 		);

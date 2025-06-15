@@ -109,8 +109,22 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			$this->typeRegistry->integer(1, 5)
 		);
 
+		$this->typeRegistry->addData(
+			new TypeNameIdentifier('MyData'),
+			$this->typeRegistry->record(['x' => $this->typeRegistry->integer()]),
+		);
+
+		$this->typeRegistry->addOpen(
+			new TypeNameIdentifier('MyOpen'),
+			$this->typeRegistry->record(['x' => $this->typeRegistry->integer()]),
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
+			),
+			null
+		);
+
 		$this->typeRegistry->addSealed(
-			new TypeNameIdentifier('MyState'),
+			new TypeNameIdentifier('MySealed'),
 			$this->typeRegistry->record(['x' => $this->typeRegistry->integer()]),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
@@ -657,9 +671,21 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 
 		//Type
 		$this->callHydrateAs(
-			$this->valueRegistry->string("MyState"),
+			$this->valueRegistry->string("MyData"),
 			$this->typeRegistry->type($this->typeRegistry->any),
-			$this->valueRegistry->type($this->typeRegistry->withName(new TypeNameIdentifier('MyState')))
+			$this->valueRegistry->type($this->typeRegistry->withName(new TypeNameIdentifier('MyData')))
+		);
+
+		$this->callHydrateAs(
+			$this->valueRegistry->string("MyOpen"),
+			$this->typeRegistry->type($this->typeRegistry->any),
+			$this->valueRegistry->type($this->typeRegistry->withName(new TypeNameIdentifier('MyOpen')))
+		);
+
+		$this->callHydrateAs(
+			$this->valueRegistry->string("MySealed"),
+			$this->typeRegistry->type($this->typeRegistry->any),
+			$this->valueRegistry->type($this->typeRegistry->withName(new TypeNameIdentifier('MySealed')))
 		);
 
 		$this->callHydrateAsError(
@@ -731,12 +757,32 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			$this->valueRegistry->enumerationValue(new TypeNameIdentifier('MyCustomEnum'), new EnumValueIdentifier('B')),
 		);
 
-		//State
+		//Data
 		$this->callHydrateAs(
 			$this->valueRegistry->record(['x' => $this->valueRegistry->integer(123)]),
-			$this->typeRegistry->withName(new TypeNameIdentifier('MyState')),
+			$this->typeRegistry->withName(new TypeNameIdentifier('MyData')),
+			$this->valueRegistry->dataValue(
+				new TypeNameIdentifier('MyData'),
+				$this->valueRegistry->record(['x' => $this->valueRegistry->integer(123)])
+			)
+		);
+
+		//Open
+		$this->callHydrateAs(
+			$this->valueRegistry->record(['x' => $this->valueRegistry->integer(123)]),
+			$this->typeRegistry->withName(new TypeNameIdentifier('MyOpen')),
+			$this->valueRegistry->openValue(
+				new TypeNameIdentifier('MyOpen'),
+				$this->valueRegistry->record(['x' => $this->valueRegistry->integer(123)])
+			)
+		);
+
+		//Sealed
+		$this->callHydrateAs(
+			$this->valueRegistry->record(['x' => $this->valueRegistry->integer(123)]),
+			$this->typeRegistry->withName(new TypeNameIdentifier('MySealed')),
 			$this->valueRegistry->sealedValue(
-				new TypeNameIdentifier('MyState'),
+				new TypeNameIdentifier('MySealed'),
 				$this->valueRegistry->record(['x' => $this->valueRegistry->integer(123)])
 			)
 		);
@@ -770,7 +816,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 					'a' => $this->typeRegistry->boolean,
 					'b' => $this->typeRegistry->integer(),
 					'c' => $this->typeRegistry->array($this->typeRegistry->withName(
-						new TypeNameIdentifier('MyState')
+						new TypeNameIdentifier('MySealed')
 					)),
 					'd' => $this->typeRegistry->record([
 						'x' => $this->typeRegistry->enumeration(new TypeNameIdentifier('MyCustomEnum')),
@@ -780,7 +826,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			))
 		)->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])));
 		$this->assertEquals(
-			"[\n\ta: true,\n\tb: 123,\n\tc: [MyState[x: 15], MyState[x: 20]],\n\td: [x: MyCustomEnum.B, y: MyAtom]\n]",
+			"[\n\ta: true,\n\tb: 123,\n\tc: [MySealed[x: 15], MySealed[x: 20]],\n\td: [x: MyCustomEnum.B, y: MyAtom]\n]",
 			(string)$result->value
 		);
 		$back = $this->expressionRegistry->methodCall(

@@ -52,6 +52,7 @@ getAllExpressions = ^Any => Any :: [
     variableName: variableName,
     methodCall: 'method call'->length,
     functionBody: ^Any => Any :: 'function body',
+    data: MyData!1,
     mutable: mutable{String, 'mutable'},
     matchTrue: ?whenIsTrue { 'then 1': 'then 1', 'then 2': 'then 2', ~: 'default' },
     matchType: ?whenTypeOf ('type') is { `String['type']: 'then 1', `String['other type']: 'then 2', ~: 'default' },

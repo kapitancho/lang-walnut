@@ -19,12 +19,7 @@ final readonly class ConstantExpression implements ConstantExpressionInterface, 
 	) {}
 
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
-		if ($this->value instanceof FunctionValue) {
-			$this->value->selfAnalyse($analyserContext);
-		}
-		if ($this->value instanceof DataValue || $this->value instanceof MutableValue) {
-			$this->value->selfAnalyse($analyserContext);
-		}
+		$this->value->selfAnalyse($analyserContext);
 		return $analyserContext->asAnalyserResult(
 			$this->value->type,
 			$analyserContext->programRegistry->typeRegistry->nothing
