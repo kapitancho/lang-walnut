@@ -374,15 +374,6 @@ final readonly class ParserStateMachine {
 					$this->s->move(102);
 				}
 			]],
-			128 => ['name' => 'method name close param', 'transitions' => [
-				T::call_end->name => function(LT $token) {
-					$this->s->result['parameter_type'] = $this->nodeBuilder->functionType(
-						$this->nodeBuilder->nullType,
-						$this->s->generated,
-					);
-					$this->s->move(126);
-				}
-			]],
 			129 => ['name' => 'cast error type return', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->result['error_type'] = $this->s->generated;

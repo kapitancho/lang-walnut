@@ -45,6 +45,8 @@ getAllExpressions = ^Any => Any :: [
     noError: ?noError('no error'),
     noExternalError: ?noExternalError('no external error'),
     variableAssignment: variableName = 'variable assignment',
+    multiVariableAssignmentList: var{ variableName1, variableName2 } = [1, 2],
+    multiVariableAssignmentDict: var{ key: variableName1, ~variableName2 } = [key: 1, variableName2: 2],
     variableName: variableName,
     methodCall: 'method call'->length,
     functionBody: ^Any => Any :: 'function body',
