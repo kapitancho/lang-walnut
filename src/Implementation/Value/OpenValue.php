@@ -32,7 +32,7 @@ final class OpenValue implements OpenValueInterface, JsonSerializable {
 	/** @throws AnalyserException */
 	public function selfAnalyse(AnalyserContext $analyserContext): void {
 		$type = $this->typeRegistry->open($this->typeName);
-		// @coverage-ignore-start
+		// @codeCoverageIgnoreStart
 		if (!$this->value->type->isSubtypeOf($type->valueType)) {
 			throw new AnalyserException(
 				sprintf(
@@ -43,7 +43,7 @@ final class OpenValue implements OpenValueInterface, JsonSerializable {
 				)
 			);
 		}
-		// @coverage-ignore-end
+		// @codeCoverageIgnoreEnd
 		$this->value->selfAnalyse($analyserContext);
 	}
 

@@ -33,7 +33,7 @@ final class SealedValue implements SealedValueInterface, JsonSerializable {
 	/** @throws AnalyserException */
 	public function selfAnalyse(AnalyserContext $analyserContext): void {
 		$type = $this->typeRegistry->sealed($this->typeName);
-		// @coverage-ignore-start
+		// @codeCoverageIgnoreStart
 		if (!$this->value->type->isSubtypeOf($type->valueType)) {
 			throw new AnalyserException(
 				sprintf(
@@ -44,7 +44,7 @@ final class SealedValue implements SealedValueInterface, JsonSerializable {
 				)
 			);
 		}
-		// @coverage-ignore-end
+		// @codeCoverageIgnoreEnd
 		$this->value->selfAnalyse($analyserContext);
 	}
 
