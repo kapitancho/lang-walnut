@@ -118,8 +118,8 @@ the shape of its building type. They have no constructors and can be treated as 
 - `GpsPoint := [latitude: Real<-90..90>, longitude: Real<-180..180>]` - data type definition based on a tuple type
 
 ### Values
-- `x = MyInteger:5` - data type value (`x->type` is `OddInteger`, `x->value` is `5`)
-- `p = GpsPoint:[51.5074, 0.1278]` - data type value (`p->type` is `GpsPoint`, `p.0` is `51.5074`)
+- `x = MyInteger!5` - data type value (`x->type` is `OddInteger`, `x->value` is `5`)
+- `p = GpsPoint![51.5074, 0.1278]` - data type value (`p->type` is `GpsPoint`, `p.0` is `51.5074`)
 
 
 ## Open
