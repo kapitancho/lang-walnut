@@ -44,7 +44,7 @@ final readonly class ValuesWithoutKey implements NativeMethod {
 						$targetType->range->maxLength === PlusInfinity::value ?
 							PlusInfinity::value : max($targetType->range->maxLength - 1, 0)
 					),
-					$programRegistry->typeRegistry->open(
+					$programRegistry->typeRegistry->data(
 						new TypeNameIdentifier("MapItemNotFound")
 					)
 				);
@@ -69,7 +69,7 @@ final readonly class ValuesWithoutKey implements NativeMethod {
 				$values = $targetValue->values;
 				if (!isset($values[$parameterValue->literalValue])) {
 					return ($programRegistry->valueRegistry->error(
-						$programRegistry->valueRegistry->openValue(
+						$programRegistry->valueRegistry->dataValue(
 							new TypeNameIdentifier('MapItemNotFound'),
 							$programRegistry->valueRegistry->record(['key' => $parameterValue])
 						)

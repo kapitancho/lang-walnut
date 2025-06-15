@@ -147,7 +147,7 @@ final readonly class ValueConstructor {
 				)
 			]);
 			if (!$parameterType->isSubtypeOf($matchType)) {
-				$errorType = $programRegistry->typeRegistry->open(
+				$errorType = $programRegistry->typeRegistry->data(
 					new TypeNameIdentifier('UnknownEnumerationValue')
 				);
 			}
@@ -177,7 +177,7 @@ final readonly class ValueConstructor {
 				) => $type,
 				default => $typeRegistry->result(
 					$type,
-					$typeRegistry->open(new TypeNameIdentifier('UnknownEnumerationValue'))
+					$typeRegistry->data(new TypeNameIdentifier('UnknownEnumerationValue'))
 				)
 			},
 			default => $type
@@ -203,7 +203,7 @@ final readonly class ValueConstructor {
 			} catch (UnknownEnumerationValue) {}
 
 			return $valueRegistry->error(
-				$valueRegistry->openValue(
+				$valueRegistry->dataValue(
 					new TypeNameIdentifier('UnknownEnumerationValue'),
 					$valueRegistry->record([
 						'enumeration' => $valueRegistry->type($type),
@@ -220,6 +220,9 @@ final readonly class ValueConstructor {
 		}
 		return (
 			match(true) {
+				/*$type instanceof DataType => $valueRegistry->dataValue(
+					$type->name, $parameterValue
+				),*/
 				$type instanceof OpenType => $valueRegistry->openValue(
 					$type->name, $parameterValue
 				),

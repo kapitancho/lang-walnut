@@ -8,7 +8,7 @@ final class ShiftTest extends CodeExecutionTestHelper {
 
 	public function testShiftEmpty(): void {
 		$result = $this->executeCodeSnippet("mutable{Array, []}->SHIFT;");
-		$this->assertEquals("@ItemNotFound()", $result);
+		$this->assertEquals("@ItemNotFound", $result);
 	}
 
 	public function testShiftNotEmpty(): void {

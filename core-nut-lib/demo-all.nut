@@ -6,21 +6,23 @@ module demo-all:
 MyAlias = Integer;
 
 /* Atoms */
-MyAtom = :[];
+MyAtom := ();
 
 /* Enumerations */
-MyEnum = :[Value1, Value2, Value3];
+MyEnum := (Value1, Value2, Value3);
+
+MyData := Integer;
 
 /* Sealed types */
-MyOpen = #[a: Integer, b: Integer] @ MyAtom :: null;
-MyOpen0 = #[a: Integer, b: Integer];
-MyOpen1 = #[a: Integer, b: Integer];
+MyOpen := #[a: Integer, b: Integer] @ MyAtom :: null;
+MyOpen0 := #[a: Integer, b: Integer];
+MyOpen1 := #[a: Integer, b: Integer];
 MyOpen1[a: Real, b: Real] :: [a: #a->asInteger, b: #b->asInteger];
 
 /* Sealed types */
-MySealed = $[a: Integer, b: Integer] @ MyAtom :: null;
-MySealed0 = $[a: Integer, b: Integer];
-MySealed1 = $[a: Integer, b: Integer];
+MySealed := $[a: Integer, b: Integer] @ MyAtom :: null;
+MySealed0 := $[a: Integer, b: Integer];
+MySealed1 := $[a: Integer, b: Integer];
 MySealed1[a: Real, b: Real] :: [a: #a->asInteger, b: #b->asInteger];
 
 /* Methods */
@@ -31,7 +33,7 @@ MyOpen[a: Real, b: Real] %% MyAtom :: [a: #a->asInteger, b: #b->asInteger];
 MySealed[a: Real, b: Real] %% MyAtom :: [a: #a->asInteger, b: #b->asInteger];
 
 functionName = ^Any => String :: 'function call result';
-TypeName = #String;
+TypeName := #String;
 
 getAllExpressions = ^Any => Any :: [
     constant: 'constant',
@@ -56,6 +58,7 @@ getAllExpressions = ^Any => Any :: [
     matchIfThen: ?when('condition') { 'then' },
     matchIsErrorElse: ?whenIsError('condition') { 'then' } ~ { 'else' },
     matchIsError: ?whenIsError('condition') { 'then' },
+    data: MyData!!!!!42,
     functionCall: functionName('parameter'),
     constructorCall: TypeName('parameter'),
     propertyAccess: [property: 'value'].property
@@ -71,6 +74,7 @@ AllTypes = [
     enumerationSubset: MyEnum[Value1, Value2],
     open: MyOpen0,
     sealed: MySealed0,
+    data: MyData,
     integer: Integer,
     integerRange: Integer<1..10>,
     integerSubset: Integer[2, 15],
@@ -124,6 +128,7 @@ AllTypes = [
     anyEnumerationSubset: Type<EnumerationSubset>,
     anyOpen: Type<Open>,
     anySealed: Type<Sealed>,
+    anyData: Type<Data>,
     anyNamed: Type<Named>,
     anyAlias: Type<Alias>,
     anyTuple: Type<Tuple>,
@@ -140,11 +145,12 @@ getMatchingValuesForAllTypes = ^Null => AllTypes :: [
     true: true,
     false: false,
     null: null,
-    atom: MyAtom(),
+    atom: MyAtom,
     enumeration: MyEnum.Value1,
     enumerationSubset: MyEnum.Value1,
     open: MyOpen0[a: 3, b: -2],
     sealed: MySealed0[a: 3, b: -2],
+    data: MyData!!!!!42,
     integer: 5,
     integerRange: 5,
     integerSubset: 2,
@@ -198,6 +204,7 @@ getMatchingValuesForAllTypes = ^Null => AllTypes :: [
     anyEnumerationSubset: `MyEnum[Value1, Value2],
     anyOpen: `MyOpen,
     anySealed: `MySealed,
+    anyData: `MyData,
     anyNamed: `MyAtom,
     anyAlias: `Alias,
     anyTuple: `[Integer, String],
@@ -208,12 +215,13 @@ getMatchingValuesForAllTypes = ^Null => AllTypes :: [
 ];
 
 getAllValues = ^Any => Any :: [
-    atom: MyAtom(),
+    atom: MyAtom,
     booleanTrue: true,
     booleanFalse: false,
     enumeration: MyEnum.Value1,
     open: MyOpen[a: 3, b: -2],
     sealed: MySealed[a: 3, b: -2],
+    data: MyData!!!!!42,
     integer: 42,
     real: 3.14,
     string: 'hi!',
@@ -231,7 +239,7 @@ getAllValues = ^Any => Any :: [
 ];
 
 allConstants = [
-    atom: MyAtom(),
+    atom: MyAtom,
     booleanTrue: true,
     booleanFalse: false,
     enumeration: MyEnum.Value1,
@@ -248,6 +256,7 @@ allConstants = [
     type: `String,
     mutable: mutable{String, 'mutable'},
     error: @'error',
+    data: MyData!!!!!42,
     function: ^Any => Any :: 'function body'
 ];
 

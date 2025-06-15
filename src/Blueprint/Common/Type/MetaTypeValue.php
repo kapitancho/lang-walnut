@@ -17,6 +17,7 @@ enum MetaTypeValue: string {
 	case RealSubset = 'RealSubset';
 	case StringSubset = 'StringSubset';
 	case Alias = 'Alias';
+	case Data = 'Data';
 	case Open = 'Open';
 	case Sealed = 'Sealed';
 	case Named = 'Named';

@@ -49,7 +49,7 @@ final readonly class WithoutByKey implements NativeMethod {
 				]);
 				return $programRegistry->typeRegistry->result(
 					$returnType,
-					$programRegistry->typeRegistry->open(
+					$programRegistry->typeRegistry->data(
 						new TypeNameIdentifier("MapItemNotFound")
 					)
 				);
@@ -74,7 +74,7 @@ final readonly class WithoutByKey implements NativeMethod {
 				$values = $targetValue->values;
 				if (!isset($values[$parameterValue->literalValue])) {
 					return ($programRegistry->valueRegistry->error(
-						$programRegistry->valueRegistry->openValue(
+						$programRegistry->valueRegistry->dataValue(
 							new TypeNameIdentifier('MapItemNotFound'),
 							$programRegistry->valueRegistry->record(['key' => $parameterValue])
 						)

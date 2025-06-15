@@ -8,12 +8,12 @@ final class WithoutTest extends CodeExecutionTestHelper {
 
 	public function testWithoutEmpty(): void {
 		$result = $this->executeCodeSnippet("[]->without(3);");
-		$this->assertEquals("@ItemNotFound()", $result);
+		$this->assertEquals("@ItemNotFound", $result);
 	}
 
 	public function testWithoutNotFound(): void {
 		$result = $this->executeCodeSnippet("[1, 2, 5, 10, 5]->without(3);");
-		$this->assertEquals("@ItemNotFound()", $result);
+		$this->assertEquals("@ItemNotFound", $result);
 	}
 
 	public function testWithoutNonEmpty(): void {

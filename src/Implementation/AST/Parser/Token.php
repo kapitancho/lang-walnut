@@ -15,8 +15,10 @@ enum Token: string {
 	case equals = '\=\=';
 	case expression_separator = '\;';
 	case value_separator = '\,';
-	case atom_type = '\:\[]';
-	case enum_type_start = '\:\[';
+	case atom_type = '\:\(\)';
+	case enum_type_start = '\:\(';
+	case named_type = '\:\=';
+	case temporary_token = '\!\!\!\!\!';
 	case colon = '\:';
 	case type_proxy_keyword = '\![A-Z][a-zA-Z0-9_]*';
 	case boolean_op_not = '\!';

@@ -3,6 +3,8 @@
 namespace Walnut\Lang\Implementation\Value;
 
 use JsonSerializable;
+use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
+use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\MutableValue as MutableValueInterface;
@@ -20,6 +22,19 @@ final class MutableValue implements MutableValueInterface, JsonSerializable {
 	public MutableType $type {
         get => $this->typeRegistry->mutable($this->targetType);
     }
+
+	/** @throws AnalyserException */
+	public function selfAnalyse(AnalyserContext $analyserContext): void {
+		if (!$this->value->type->isSubtypeOf($this->targetType)) {
+			throw new AnalyserException(
+				sprintf(
+					'The value of the mutable type should be a subtype of %s but got %s',
+					$this->targetType,
+					$this->value->type,
+				)
+			);
+		}
+	}
 
 	public function equals(Value $other): bool {
 		return $other instanceof MutableValueInterface &&

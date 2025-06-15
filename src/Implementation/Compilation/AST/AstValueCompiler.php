@@ -4,6 +4,7 @@ namespace Walnut\Lang\Implementation\Compilation\AST;
 
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\AtomValueNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\DataValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\EnumerationValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\ErrorValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\FalseValueNode;
@@ -59,6 +60,10 @@ final readonly class AstValueCompiler implements AstValueCompilerInterface {
 					$this->value($valueNode->value),
 				),
 				$valueNode instanceof AtomValueNode => $this->valueRegistry->atom($valueNode->name),
+				$valueNode instanceof DataValueNode => $this->valueRegistry->dataValue(
+					$valueNode->name,
+					$this->value($valueNode->value),
+				),
 				$valueNode instanceof EnumerationValueNode => $this->valueRegistry->enumerationValue(
 					$valueNode->name,
 					$valueNode->enumValue

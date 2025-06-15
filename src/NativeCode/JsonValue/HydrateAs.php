@@ -45,7 +45,7 @@ final readonly class HydrateAs implements NativeMethod {
 				)->hydrate($targetValue, $parameterValue->typeValue, 'value');
 			} catch (HydrationException $e) {
 				return ($programRegistry->valueRegistry->error(
-					$programRegistry->valueRegistry->openValue(
+					$programRegistry->valueRegistry->dataValue(
 						new TypeNameIdentifier("HydrationError"),
 						$programRegistry->valueRegistry->record([
 							'value' => $e->value,

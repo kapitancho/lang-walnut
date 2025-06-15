@@ -8,7 +8,7 @@ final class FindLastTest extends CodeExecutionTestHelper {
 
 	public function testFindLastEmpty(): void {
 		$result = $this->executeCodeSnippet("[]->findLast(^Any => Boolean :: true);");
-		$this->assertEquals("@ItemNotFound()", $result);
+		$this->assertEquals("@ItemNotFound", $result);
 	}
 
 	public function testFindLastNonEmpty(): void {

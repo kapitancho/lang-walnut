@@ -3,7 +3,7 @@ module $http/router %% $http/message, $http/middleware:
 HttpLookupRouterPath = [path: String, type: Type, method: ?HttpRequestMethod];
 HttpLookupRouterMapping = Array<HttpLookupRouterPath>;
 
-HttpLookupRouter = $[routerMapping: HttpLookupRouterMapping];
+HttpLookupRouter := $[routerMapping: HttpLookupRouterMapping];
 HttpLookupRouter ==> HttpMiddleware %% [~DependencyContainer, ~HttpResponseBuilder] :: {
     run = ^[request: {HttpRequest}, type: Type] => {HttpResponse} :: {
         handler = %dependencyContainer->valueOf(#type);

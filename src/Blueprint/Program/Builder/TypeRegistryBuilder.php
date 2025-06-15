@@ -7,6 +7,7 @@ use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AtomType;
+use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
 use Walnut\Lang\Blueprint\Type\OpenType;
@@ -23,6 +24,11 @@ interface TypeRegistryBuilder {
     public function addEnumeration(TypeNameIdentifier $name, array $values): EnumerationType;
 
 	public function addAlias(TypeNameIdentifier $name, Type $aliasedType): AliasType;
+
+	public function addData(
+		TypeNameIdentifier $name,
+		Type $valueType
+	): DataType;
 
 	public function addOpen(
 		TypeNameIdentifier $name,

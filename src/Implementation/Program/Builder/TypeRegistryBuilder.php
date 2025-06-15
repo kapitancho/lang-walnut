@@ -11,7 +11,6 @@ use Walnut\Lang\Blueprint\Common\Range\InvalidLengthRange;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
-use Walnut\Lang\Blueprint\Compilation\CompilationException;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder as CustomMethodRegistryBuilderInterface;
 use Walnut\Lang\Blueprint\Program\Builder\TypeRegistryBuilder as TypeRegistryBuilderInterface;
@@ -37,6 +36,7 @@ use Walnut\Lang\Implementation\Type\AnyType;
 use Walnut\Lang\Implementation\Type\ArrayType;
 use Walnut\Lang\Implementation\Type\AtomType;
 use Walnut\Lang\Implementation\Type\BooleanType;
+use Walnut\Lang\Implementation\Type\DataType;
 use Walnut\Lang\Implementation\Type\EnumerationType;
 use Walnut\Lang\Implementation\Type\FalseType;
 use Walnut\Lang\Implementation\Type\FunctionType;
@@ -86,6 +86,8 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
     private array $enumerationTypes;
 	/** @var array<string, AliasType> */
     private array $aliasTypes;
+	/** @var array<string, DataType> */
+    private array $dataTypes;
 	/** @var array<string, OpenType> */
     private array $openTypes;
 	/** @var array<string, SealedType> */
@@ -138,6 +140,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
         $this->false = $this->boolean->subsetType([$falseValue]);
         $this->enumerationTypes = $enumerationTypes;
 		$this->aliasTypes = [];
+	    $this->dataTypes = [];
 		$this->openTypes = [];
 		$this->sealedTypes = [];
 
@@ -270,6 +273,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		    'Atom' => $this->metaType(MetaTypeValue::Atom),
 		    'EnumerationValue' => $this->metaType(MetaTypeValue::EnumerationValue),
 		    'Record' => $this->metaType(MetaTypeValue::Record),
+		    'Data' => $this->metaType(MetaTypeValue::Data),
 		    'Open' => $this->metaType(MetaTypeValue::Open),
 		    'Sealed' => $this->metaType(MetaTypeValue::Sealed),
 		    'Tuple' => $this->metaType(MetaTypeValue::Tuple),
@@ -285,6 +289,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 	    return $this->atomTypes[$typeName->identifier] ??
             $this->enumerationTypes[$typeName->identifier] ??
             $this->aliasTypes[$typeName->identifier] ??
+            $this->dataTypes[$typeName->identifier] ??
             $this->openTypes[$typeName->identifier] ??
             $this->sealedTypes[$typeName->identifier] ??
             UnknownType::withName($typeName);
@@ -296,23 +301,28 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 	}
 
 	/** @throws UnknownType */
+	public function data(TypeNameIdentifier $typeName): DataType {
+		return $this->dataTypes[$typeName->identifier] ?? UnknownType::withName($typeName, 'data');
+	}
+
+	/** @throws UnknownType */
 	public function open(TypeNameIdentifier $typeName): OpenType {
-		return $this->openTypes[$typeName->identifier] ?? UnknownType::withName($typeName);
+		return $this->openTypes[$typeName->identifier] ?? UnknownType::withName($typeName, 'open');
 	}
 
 	/** @throws UnknownType */
 	public function sealed(TypeNameIdentifier $typeName): SealedType {
-		return $this->sealedTypes[$typeName->identifier] ?? UnknownType::withName($typeName);
+		return $this->sealedTypes[$typeName->identifier] ?? UnknownType::withName($typeName, 'sealed');
 	}
 
 	/** @throws UnknownType */
 	public function atom(TypeNameIdentifier $typeName): AtomTypeInterface {
-        return $this->atomTypes[$typeName->identifier] ?? UnknownType::withName($typeName);
+        return $this->atomTypes[$typeName->identifier] ?? UnknownType::withName($typeName, 'atom');
     }
 
 	/** @throws UnknownType */
 	public function enumeration(TypeNameIdentifier $typeName): EnumerationTypeInterface {
-        return $this->enumerationTypes[$typeName->identifier] ?? UnknownType::withName($typeName);
+        return $this->enumerationTypes[$typeName->identifier] ?? UnknownType::withName($typeName, 'enumeration');
     }
 
 	/**
@@ -456,6 +466,16 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		$result = new AliasType($this->methodFinder, $name, $aliasedType);
 		$this->aliasTypes[$name->identifier] = $result;
 		return $result;
+	}
+
+	public function addData(
+		TypeNameIdentifier $name,
+		Type $valueType
+	): DataType {
+		$result = new DataType($name, $valueType);
+		$this->dataTypes[$name->identifier] = $result;
+		return $result;
+
 	}
 
 	public function addOpen(

@@ -146,7 +146,7 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 			(string)$method->targetType === 'DependencyContainer'
 				=> sprintf("Error in the dependency builder of %s", substr($method->methodName, 2)),
 			(string)$method->targetType === 'Global'
-				=> sprintf("Error in global function %s", $method->methodName),
+				=> sprintf("Error in global value %s", $method->methodName),
 			str_starts_with($method->methodName->identifier, 'as')
 				=> sprintf("Error in the cast %s ==> %s", $method->targetType,
 					substr($method->methodName, 2)),

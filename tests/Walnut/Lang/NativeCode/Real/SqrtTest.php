@@ -23,6 +23,6 @@ final class SqrtTest extends CodeExecutionTestHelper {
 
 	public function testSqrtNegative(): void {
 		$result = $this->executeCodeSnippet("-4.14->sqrt;");
-		$this->assertEquals("@NotANumber()", $result);
+		$this->assertEquals("@NotANumber", $result);
 	}
 }

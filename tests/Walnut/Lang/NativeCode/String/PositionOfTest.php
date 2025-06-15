@@ -13,7 +13,7 @@ final class PositionOfTest extends CodeExecutionTestHelper {
 
 	public function testPositionOfNo(): void {
 		$result = $this->executeCodeSnippet("'hello'->positionOf('elo');");
-		$this->assertEquals('@SubstringNotInString()', $result);
+		$this->assertEquals('@SubstringNotInString', $result);
 	}
 
 	public function testPositionOfInvalidParameter(): void {

@@ -81,8 +81,8 @@ This is a unique feature of Walnut. There is a way to provide a validator functi
 error the value construction is rejected and the error is returned instead. It may again be used for both open and sealed types.
 Invariant validators and constructors can be used or omitted independently.
 ```walnut
-NotAnOddInteger = :[]; /* define an Atom type for the error */
-OddInteger = #Integer @ NotAnOddInteger :: ?whenValueOf(# % 2) is { 0: => Error(NotAnOddInteger[]) };
+NotAnOddInteger := (); /* define an Atom type for the error */
+OddInteger := #Integer @ NotAnOddInteger :: ?whenValueOf(# % 2) is { 0: => Error(NotAnOddInteger[]) };
 ```
 It is important to know that while the constructor can be bypassed by using the `JsonValue->hydrateAs` method, 
 the invariant validator is always executed. In case the validator returns an error, the `hydrateAs` method will return a `HydrationError`.

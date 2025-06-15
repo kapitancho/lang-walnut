@@ -6,6 +6,7 @@ use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddAliasTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddAtomTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddConstructorMethodNode;
+use Walnut\Lang\Blueprint\AST\Node\Module\AddDataTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddEnumerationTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddMethodNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddOpenTypeNode;
@@ -136,6 +137,11 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 					$this->type($moduleDefinition->returnType),
 					$this->functionBody($moduleDefinition->functionBody),
 				),
+				$moduleDefinition instanceof AddDataTypeNode =>
+				$this->programContext->typeRegistryBuilder->addData(
+					$moduleDefinition->name,
+					$this->type($moduleDefinition->valueType),
+				),
 				$moduleDefinition instanceof AddOpenTypeNode =>
 				$this->programContext->typeRegistryBuilder->addOpen(
 					$moduleDefinition->name,
@@ -165,8 +171,11 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 							new MethodNameIdentifier($moduleDefinition->name->identifier),
 							$moduleDefinition->value
 						) :
-						$this->value($moduleDefinition->value)),
-
+						$this->globalValue(
+							new MethodNameIdentifier($moduleDefinition->name->identifier),
+							$moduleDefinition->value
+						)
+				),
 				// @codeCoverageIgnoreStart
 				true => throw new AstCompilationException(
 					$moduleDefinition,
@@ -196,6 +205,27 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 	/** @throws AstCompilationException */
 	private function functionBody(FunctionBodyNode $functionBodyNode): FunctionBody {
 		return $this->astFunctionBodyCompiler->functionBody($functionBodyNode);
+	}
+
+	private function globalValue(MethodNameIdentifier $methodName, ValueNode $valueNode): Value {
+		$value = $this->value($valueNode);
+		$this->programContext->customMethodRegistryBuilder->addMethod(
+			$this->programContext->typeRegistry->typeByName(
+				new TypeNameIdentifier('Global')
+			),
+			$methodName,
+			$this->programContext->typeRegistry->null,
+			null,
+			$this->programContext->typeRegistry->nothing,
+			$value->type,
+			$this->programContext->expressionRegistry->functionBody(
+				/*$this->programContext->expressionRegistry->variableName(
+					new VariableNameIdentifier($methodName->identifier)
+				)*/
+				$this->programContext->expressionRegistry->constant($value)
+			),
+		);
+		return $value;
 	}
 
 	private function globalFunction(MethodNameIdentifier $methodName, FunctionValueNode $functionValueNode): FunctionValue {

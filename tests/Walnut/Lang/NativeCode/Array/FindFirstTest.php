@@ -8,7 +8,7 @@ final class FindFirstTest extends CodeExecutionTestHelper {
 
 	public function testFindFirstEmpty(): void {
 		$result = $this->executeCodeSnippet("[]->findFirst(^Any => Boolean :: true);");
-		$this->assertEquals("@ItemNotFound()", $result);
+		$this->assertEquals("@ItemNotFound", $result);
 	}
 
 	public function testFindFirstNonEmpty(): void {

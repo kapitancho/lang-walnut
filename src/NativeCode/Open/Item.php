@@ -69,7 +69,7 @@ final readonly class Item implements NativeMethod {
 					return $valueType->range->minLength > $parameterType->range->maxValue ? $returnType :
 						$programRegistry->typeRegistry->result(
 							$returnType,
-							$programRegistry->typeRegistry->open(
+							$programRegistry->typeRegistry->data(
 								new TypeNameIdentifier("IndexOutOfRange")
 							)
 						);
@@ -77,7 +77,7 @@ final readonly class Item implements NativeMethod {
 				throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 			}
 			$vType = $valueType instanceof RecordType ? $valueType->asMapType() : $valueType;
-			$mapItemNotFound = $programRegistry->typeRegistry->open(new TypeNameIdentifier("MapItemNotFound"));
+			$mapItemNotFound = $programRegistry->typeRegistry->data(new TypeNameIdentifier("MapItemNotFound"));
 			if ($vType instanceof MapType) {
 				$parameterType = $this->toBaseType($parameterType);
 				if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
@@ -129,7 +129,7 @@ final readonly class Item implements NativeMethod {
 					return $result;
 				}
 				return ($programRegistry->valueRegistry->error(
-					$programRegistry->valueRegistry->openValue(
+					$programRegistry->valueRegistry->dataValue(
 						new TypeNameIdentifier('IndexOutOfRange'),
 						$programRegistry->valueRegistry->record(['index' => $parameterValue])
 					)
@@ -148,7 +148,7 @@ final readonly class Item implements NativeMethod {
 					return ($result);
 				}
 				return ($programRegistry->valueRegistry->error(
-					$programRegistry->valueRegistry->openValue(
+					$programRegistry->valueRegistry->dataValue(
 						new TypeNameIdentifier('MapItemNotFound'),
 						$programRegistry->valueRegistry->record(['key' => $parameterValue])
 					)

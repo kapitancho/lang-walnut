@@ -40,7 +40,7 @@ final readonly class AsRegExp implements NativeMethod {
 				if ($mayBeInvalid) {
 					$resultType = $programRegistry->typeRegistry->result(
 						$resultType,
-						$programRegistry->typeRegistry->open(
+						$programRegistry->typeRegistry->data(
 							new TypeNameIdentifier('InvalidRegExp')
 						)
 					);
@@ -67,7 +67,7 @@ final readonly class AsRegExp implements NativeMethod {
 				}
 				return (
 					$programRegistry->valueRegistry->error(
-						$programRegistry->valueRegistry->openValue(
+						$programRegistry->valueRegistry->dataValue(
 							new TypeNameIdentifier('InvalidRegExp'),
 							$v
 						)

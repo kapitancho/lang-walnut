@@ -39,7 +39,7 @@ final class BinaryEqualTest extends CodeExecutionTestHelper {
 	public function testBinaryEqualOpenTrue(): void {
 		$result = $this->executeCodeSnippet(
 			"{MyOpen[1, 2, 5]} == MyOpen[1, 2, 5]",
-			"MyOpen = #Array<Integer>;"
+			"MyOpen := #Array<Integer>;"
 		);
 		$this->assertEquals("true", $result);
 	}
@@ -47,7 +47,7 @@ final class BinaryEqualTest extends CodeExecutionTestHelper {
 	public function testBinaryEqualOpenFalse(): void {
 		$result = $this->executeCodeSnippet(
 			"{MyOpen[1, 2, 5]} == MyOpen[1, 2, 6]",
-			"MyOpen = #Array<Integer>;"
+			"MyOpen := #Array<Integer>;"
 		);
 		$this->assertEquals("false", $result);
 	}
@@ -56,8 +56,8 @@ final class BinaryEqualTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet(
 			"{MyOpen[1, 2, 5]} == MyOtherOpen[1, 2, 5]",
 			"
-				MyOpen = #Array<Integer>;
-				MyOtherOpen = #Array<Integer>;
+				MyOpen := #Array<Integer>;
+				MyOtherOpen := #Array<Integer>;
 			"
 		);
 		$this->assertEquals("false", $result);

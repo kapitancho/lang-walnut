@@ -8,6 +8,8 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserResult;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\ConstantExpression as ConstantExpressionInterface;
+use Walnut\Lang\Blueprint\Value\DataValue;
+use Walnut\Lang\Blueprint\Value\MutableValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Value\FunctionValue;
 
@@ -18,6 +20,9 @@ final readonly class ConstantExpression implements ConstantExpressionInterface, 
 
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
 		if ($this->value instanceof FunctionValue) {
+			$this->value->selfAnalyse($analyserContext);
+		}
+		if ($this->value instanceof DataValue || $this->value instanceof MutableValue) {
 			$this->value->selfAnalyse($analyserContext);
 		}
 		return $analyserContext->asAnalyserResult(

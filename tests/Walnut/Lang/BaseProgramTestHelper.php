@@ -63,55 +63,43 @@ abstract class BaseProgramTestHelper extends TestCase {
 		$ef = fn() => $this->expressionRegistry->functionBody(
 			$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
 		);
-		$this->typeRegistry->addOpen(
+		$this->typeRegistry->addData(
 			new TypeNameIdentifier('IndexOutOfRange'),
 			$this->typeRegistry->record([
 				'index' => $this->typeRegistry->integer()
 			]),
-			$ef(),
-			$this->typeRegistry->nothing
 		);
-		$this->typeRegistry->addOpen(
+		$this->typeRegistry->addData(
 			new TypeNameIdentifier('CastNotAvailable'),
 			$this->typeRegistry->record([
 				'from' => $this->typeRegistry->type($this->typeRegistry->any),
 				'to' => $this->typeRegistry->type($this->typeRegistry->any),
 			]),
-			$ef(),
-			$this->typeRegistry->nothing
 		);
-		$this->typeRegistry->addOpen(
+		$this->typeRegistry->addData(
 			new TypeNameIdentifier('MapItemNotFound'),
 			$this->typeRegistry->record([
 				'key' => $this->typeRegistry->string()
 			]),
-			$ef(),
-			$this->typeRegistry->nothing
 		);
-		$this->typeRegistry->addOpen(
+		$this->typeRegistry->addData(
 			new TypeNameIdentifier('InvalidJsonValue'),
 			$this->typeRegistry->record([
 				'value' => $this->typeRegistry->any
 			]),
-			$ef(),
-			$this->typeRegistry->nothing
 		);
-		$this->typeRegistry->addOpen(
+		$this->typeRegistry->addData(
 			new TypeNameIdentifier('InvalidJsonString'),
 			$this->typeRegistry->record([
 				'value' => $this->typeRegistry->string()
 			]),
-			$ef(),
-			$this->typeRegistry->nothing
 		);
-		$this->typeRegistry->addOpen(
+		$this->typeRegistry->addData(
 			new TypeNameIdentifier('UnknownEnumerationValue'),
 			$this->typeRegistry->record([
 				'enumeration' => $this->typeRegistry->type($this->typeRegistry->any),
 				'value' => $this->typeRegistry->string(),
 			]),
-			$ef(),
-			$this->typeRegistry->nothing
 		);
 		$this->typeRegistryBuilder->addEnumeration(
 			new TypeNameIdentifier('DependencyContainerErrorType'),
@@ -123,7 +111,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 				new EnumValueIdentifier('ErrorWhileCreatingValue'),
 			]
 		);
-		$this->typeRegistryBuilder->addOpen(
+		$this->typeRegistryBuilder->addData(
 			new TypeNameIdentifier('DependencyContainerError'),
 			$this->typeRegistry->record([
 				'targetType' => $this->typeRegistry->type($this->typeRegistry->any),
@@ -133,18 +121,14 @@ abstract class BaseProgramTestHelper extends TestCase {
 					new TypeNameIdentifier('DependencyContainerErrorType')
 				)
 			]),
-			$ef(),
-			$this->typeRegistry->nothing
 		);
-		$this->typeRegistry->addOpen(
+		$this->typeRegistry->addData(
 			new TypeNameIdentifier('HydrationError'),
 			$this->typeRegistry->record([
 				'value' => $this->typeRegistry->any,
 				'hydrationPath' => $this->typeRegistry->string(),
 				'errorMessage' => $this->typeRegistry->string(),
 			]),
-			$ef(),
-			$this->typeRegistry->nothing
 		);
 
 		$j = $this->typeRegistry->proxyType(
@@ -166,13 +150,11 @@ abstract class BaseProgramTestHelper extends TestCase {
 			)
 		);
 
-		$this->typeRegistry->addOpen(
+		$this->typeRegistry->addData(
 			new TypeNameIdentifier('DatabaseConnection'),
 			$this->typeRegistry->record([
 				'dsn' => $this->typeRegistry->string()
 			]),
-			$ef(),
-			null
 		);
 		$this->typeRegistry->addAlias(
 			new TypeNameIdentifier('DatabaseValue'),
@@ -183,6 +165,14 @@ abstract class BaseProgramTestHelper extends TestCase {
 				$this->typeRegistry->null
 			])
 		);
+
+		$this->typeRegistry->addOpen(
+			new TypeNameIdentifier('Uuid'),
+			$this->typeRegistry->record([
+				'value' => $this->typeRegistry->string()
+			]),
+		);
+
 		$this->typeRegistry->addAlias(
 			new TypeNameIdentifier('DatabaseQueryBoundParameters'),
 			$this->typeRegistry->union([
@@ -223,7 +213,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 				)
 			)
 		);
-		$this->typeRegistry->addOpen(
+		$this->typeRegistry->addData(
 			new TypeNameIdentifier('DatabaseQueryFailure'),
 			$this->typeRegistry->record([
 				'query' => $this->typeRegistry->string(1),
@@ -232,13 +222,11 @@ abstract class BaseProgramTestHelper extends TestCase {
 				),
 				'error' => $this->typeRegistry->string(),
 			]),
-			$ef(),
-			$this->typeRegistry->nothing
 		);
 		$this->typeRegistry->addSealed(
 			new TypeNameIdentifier('DatabaseConnector'),
 			$this->typeRegistry->record([
-				'connection' => $this->typeRegistry->open(
+				'connection' => $this->typeRegistry->data(
 					new TypeNameIdentifier('DatabaseConnection')
 				)
 			]),
@@ -273,6 +261,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 		]);
 		$this->typeRegistryBuilder->addSealed($i('MySealed'), $this->typeRegistry->null);
 		$this->typeRegistryBuilder->addOpen($i('MyOpen'), $this->typeRegistry->null);
+		$this->typeRegistryBuilder->addData($i('MyData'), $this->typeRegistry->null);
 	}
 
 	/*

@@ -28,7 +28,7 @@ final class InvokeTest extends CodeExecutionTestHelper {
 			"Cannot call method 'invoke'",
 			"null;",
 		<<<NUT
-		R = #[b: String];
+		R := #[b: String];
 		T = Null;
 		fn = ^p: R&T => Real :: p(1);
 		NUT);

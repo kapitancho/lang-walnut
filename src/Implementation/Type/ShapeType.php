@@ -8,8 +8,8 @@ use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethod;
 use Walnut\Lang\Blueprint\Function\Method;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
-use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\ShapeType as ShapeTypeInterface;
+use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnionType;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
@@ -64,7 +64,7 @@ final class ShapeType implements ShapeTypeInterface, JsonSerializable {
 
 	public function isSupertypeOf(Type $ofType): bool {
 		return
-			($ofType instanceof OpenType && $ofType->valueType->isSubtypeOf($this)) ||
+			($ofType instanceof DataType && $ofType->valueType->isSubtypeOf($this)) ||
 			$ofType->isSubtypeOf($this->refType) ||
 			$this->isShapeOf($ofType);
 	}

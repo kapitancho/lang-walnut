@@ -4,16 +4,16 @@ SqlString = String;
 
 SqlQuoter = [quoteIdentifier: ^String => String, quoteValue: ^String|Integer|Real|Boolean|Null => String];
 
-SqlValue = $[value: String|Integer|Real|Boolean|Null];
+SqlValue := $[value: String|Integer|Real|Boolean|Null];
 SqlValue ==> SqlString %% [~SqlQuoter] :: %sqlQuoter.quoteValue($value);
-PreparedValue = $[parameterName: String];
+PreparedValue := $[parameterName: String];
 PreparedValue ==> SqlString :: ':'->concat($parameterName);
 QueryValue = SqlValue|PreparedValue;
 
 DatabaseTableName = String<1..>;
 DatabaseFieldName = String<1..>;
 
-InsertQuery = $[tableName: DatabaseTableName, values: Map<QueryValue>];
+InsertQuery := $[tableName: DatabaseTableName, values: Map<QueryValue>];
 InsertQuery ==> DatabaseSqlQuery %% [~SqlQuoter] :: 'INSERT INTO '
     ->concatList[
         $tableName,
@@ -24,12 +24,12 @@ InsertQuery ==> DatabaseSqlQuery %% [~SqlQuoter] :: 'INSERT INTO '
         ')'
     ];
 
-TableField = $[tableAlias: DatabaseTableName, fieldName: DatabaseFieldName];
+TableField := $[tableAlias: DatabaseTableName, fieldName: DatabaseFieldName];
 TableField ==> SqlString %% [~SqlQuoter] :: [
     %sqlQuoter.quoteIdentifier($tableAlias), %sqlQuoter.quoteIdentifier($fieldName)
 ]->combineAsString('.');
 
-SqlFieldExpressionOperation = :[Equals, NullSafeEquals, NotEquals, LessThan, LessOrEquals, GreaterThan, GreaterOrEquals, Like, NotLike, Regexp];
+SqlFieldExpressionOperation := (Equals, NullSafeEquals, NotEquals, LessThan, LessOrEquals, GreaterThan, GreaterOrEquals, Like, NotLike, Regexp);
 SqlFieldExpressionOperation ==> SqlString :: ?whenValueOf($) is {
 	SqlFieldExpressionOperation.Equals: '=',
 	SqlFieldExpressionOperation.NullSafeEquals: '<=>',
@@ -43,15 +43,15 @@ SqlFieldExpressionOperation ==> SqlString :: ?whenValueOf($) is {
 	SqlFieldExpressionOperation.Regexp: 'REGEXP'
 };
 
-SqlFieldExpression = $[
+SqlFieldExpression := $[
     fieldName: String|TableField,
     operation: SqlFieldExpressionOperation,
     value: String|TableField|QueryValue
 ];
-SqlRawExpression = $[expression: String];
-SqlAndExpression = $[expressions: Array<!SqlExpression>];
-SqlOrExpression = $[expressions: Array<!SqlExpression>];
-SqlNotExpression = $[expression: !SqlExpression];
+SqlRawExpression := $[expression: String];
+SqlAndExpression := $[expressions: Array<!SqlExpression>];
+SqlOrExpression := $[expressions: Array<!SqlExpression>];
+SqlNotExpression := $[expression: !SqlExpression];
 SqlExpression = SqlRawExpression|SqlAndExpression|SqlOrExpression|SqlNotExpression|SqlFieldExpression;
 
 SqlFieldExpression ==> SqlString :: [
@@ -78,10 +78,10 @@ SqlOrExpression ==> SqlString :: ?whenTypeOf($expressions) is {
 };
 SqlNotExpression ==> SqlString :: ['NOT (', $expression->asSqlString, ')']->combineAsString('');
 
-SqlQueryFilter = $[expression: SqlExpression];
+SqlQueryFilter := $[expression: SqlExpression];
 SqlQueryFilter ==> SqlString :: $expression->asSqlString;
 
-UpdateQuery = $[tableName: DatabaseTableName, values: Map<QueryValue>, queryFilter: SqlQueryFilter];
+UpdateQuery := $[tableName: DatabaseTableName, values: Map<QueryValue>, queryFilter: SqlQueryFilter];
 UpdateQuery ==> DatabaseSqlQuery %% [~SqlQuoter] :: 'UPDATE '
     ->concatList[
         $tableName,
@@ -93,7 +93,7 @@ UpdateQuery ==> DatabaseSqlQuery %% [~SqlQuoter] :: 'UPDATE '
         $queryFilter->asSqlString
     ];
 
-DeleteQuery = $[tableName: DatabaseTableName, queryFilter: SqlQueryFilter];
+DeleteQuery := $[tableName: DatabaseTableName, queryFilter: SqlQueryFilter];
 DeleteQuery ==> DatabaseSqlQuery %% [~SqlQuoter] :: 'DELETE FROM '
     ->concatList[
         $tableName,
@@ -101,32 +101,32 @@ DeleteQuery ==> DatabaseSqlQuery %% [~SqlQuoter] :: 'DELETE FROM '
         $queryFilter->asSqlString
     ];
 
-SqlSelectLimit = $[limit: Integer<1..>, offset: Integer<0..>];
+SqlSelectLimit := $[limit: Integer<1..>, offset: Integer<0..>];
 SqlSelectLimit ==> SqlString :: ['LIMIT', $limit->asString, 'OFFSET', $offset->asString]->combineAsString(' ');
 
-SqlOrderByDirection = :[Asc, Desc];
+SqlOrderByDirection := (Asc, Desc);
 SqlOrderByDirection ==> SqlString :: ?whenValueOf($) is {
     SqlOrderByDirection.Asc: 'ASC',
     SqlOrderByDirection.Desc: 'DESC'
 };
-SqlOrderByField = $[field: DatabaseFieldName, direction: SqlOrderByDirection];
+SqlOrderByField := $[field: DatabaseFieldName, direction: SqlOrderByDirection];
 SqlOrderByField ==> SqlString %% [~SqlQuoter] :: [
     %sqlQuoter.quoteIdentifier($field),
     $direction->asSqlString
 ]->combineAsString(' ');
-SqlOrderByFields = $[fields: Array<SqlOrderByField>];
+SqlOrderByFields := $[fields: Array<SqlOrderByField>];
 SqlOrderByFields ==> SqlString :: 'ORDER BY '->concat(
     $fields->map(^SqlOrderByField => String :: #->asSqlString)->combineAsString(', ')
 );
 
-SqlTableJoinType = :[Inner, Left, Right, Full];
+SqlTableJoinType := (Inner, Left, Right, Full);
 SqlTableJoinType ==> SqlString :: ?whenValueOf($) is {
     SqlTableJoinType.Inner: 'JOIN',
     SqlTableJoinType.Left: 'LEFT JOIN',
     SqlTableJoinType.Right: 'RIGHT JOIN',
     SqlTableJoinType.Full: 'FULL JOIN'
 };
-SqlTableJoin = $[
+SqlTableJoin := $[
     tableAlias: DatabaseTableName,
     tableName: DatabaseTableName,
     joinType: SqlTableJoinType,
@@ -138,7 +138,7 @@ SqlTableJoin ==> SqlString %% [~SqlQuoter] :: [
     ' ON ', $queryFilter->asSqlString
 ]->combineAsString(' ');
 
-SqlSelectFieldList = $[fields: Map<DatabaseFieldName|TableField|QueryValue>];
+SqlSelectFieldList := $[fields: Map<DatabaseFieldName|TableField|QueryValue>];
 SqlSelectFieldList ==> SqlString %% [~SqlQuoter] :: $fields->mapKeyValue(^[key: String, value: DatabaseFieldName|TableField|QueryValue] => String :: ''->concatList[
     ?whenTypeOf(#value) is {
         `DatabaseFieldName: %sqlQuoter.quoteIdentifier(#value),
@@ -146,7 +146,7 @@ SqlSelectFieldList ==> SqlString %% [~SqlQuoter] :: $fields->mapKeyValue(^[key: 
     },
     ' AS ', %sqlQuoter.quoteIdentifier(#key)
 ])->values->combineAsString(', ');
-SelectQuery = $[
+SelectQuery := $[
     tableName: DatabaseTableName,
     fields: SqlSelectFieldList,
     joins: Array<SqlTableJoin>,

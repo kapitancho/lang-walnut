@@ -3,11 +3,13 @@
 namespace Walnut\Lang\Implementation\Code\NativeCode;
 
 use Walnut\Lang\Blueprint\Code\NativeCode\NativeCodeTypeMapper as NativeCodeTypeMapperInterface;
+use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AnyType;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Type\BooleanType;
+use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
 use Walnut\Lang\Blueprint\Type\FalseType;
@@ -58,6 +60,7 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 			EnumerationType::class => ['Enumeration'],
 			EnumerationSubsetType::class => ['Enumeration'],
 			AtomType::class => ['Atom'],
+			DataType::class => ['Data'],
 			OpenType::class => ['Open'],
 			SealedType::class => ['Sealed'],
 			AliasType::class => ['Alias'],
@@ -105,6 +108,7 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 				'Union' => UnionType::class,
 				'Intersection' => IntersectionType::class,
 				'EnumerationValue' => EnumerationType::class,
+				'Data' => DataType::class,
 			][$type->value->value] ?? null;
 			return array_merge($baseIds,
 				$this->getTypeMapping()[$class] ?? []

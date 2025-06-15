@@ -9,7 +9,7 @@ CorsExposedHeaders = Array<String>;
 CorsAllowedMethods = Array<HttpRequestMethod>;
 ==> CorsAllowedMethods :: `HttpRequestMethod[options, get, head, post, put, patch, delete]->values;
 
-HttpCorsMiddleware = :[];
+HttpCorsMiddleware := ();
 HttpCorsMiddleware ==> HttpMiddleware %% [~CorsAllowedOrigins, ~CorsAllowedHeaders, ~CorsAllowedMethods, ~CorsExposedHeaders] :: {
     applyHeader = ^[headerName: String, values: Array<String>, response: {HttpResponse}] => {HttpResponse} :: {
         ?whenTypeOf(#values) is {

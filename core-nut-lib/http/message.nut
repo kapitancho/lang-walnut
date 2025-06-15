@@ -1,7 +1,7 @@
 module $http/message:
 
-HttpProtocolVersion = :[http_1_0, http_1_1, http_2, http_3];
-HttpRequestMethod = :[connect, delete, get, head, options, patch, post, put, trace];
+HttpProtocolVersion := (http_1_0, http_1_1, http_2, http_3);
+HttpRequestMethod := (connect, delete, get, head, options, patch, post, put, trace);
 HttpRequestTarget = String;
 HttpResponseStatusCode = Integer[
     100, 101, 102, 103,

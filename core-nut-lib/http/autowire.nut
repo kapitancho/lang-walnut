@@ -1,13 +1,13 @@
 module $http/autowire %% $http/message, $http/request-handler:
 
-RoutePattern = #String;
-RoutePatternDoesNotMatch = :[];
+RoutePattern := #String;
+RoutePatternDoesNotMatch := ();
 
 HttpAutoWireRequestBodyToParameter = ^{HttpRequest} => Result<Map<JsonValue>, Any>;
 HttpAutoWireResponseBodyFromParameter = ^Any => Result<{HttpResponse}, Any>;
 
-HttpAutoWireRouteDoesNotMatch = :[];
-HttpAutoWireRoute = $[
+HttpAutoWireRouteDoesNotMatch := ();
+HttpAutoWireRoute := $[
     method: HttpRequestMethod,
     pattern: RoutePattern,
     requestBody: {HttpAutoWireRequestBodyToParameter},
@@ -54,7 +54,7 @@ HttpAutoWireRoute->handleRequest(^request: {HttpRequest} => Result<{HttpResponse
     }
 };
 
-HttpAutoWireRequestHandler = $[routes: Array<HttpAutoWireRoute, 1..>];
+HttpAutoWireRequestHandler := $[routes: Array<HttpAutoWireRoute, 1..>];
 HttpAutoWireRequestHandler ==> HttpRequestHandler %% [~HttpResponseBuilder] :: {
     ^request: {HttpRequest} => {HttpResponse} :: {
         h = ^routes: Array<HttpAutoWireRoute, 1..> => Result<{HttpResponse}, HttpAutoWireRouteDoesNotMatch> :: {

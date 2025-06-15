@@ -8,7 +8,7 @@ final class WithoutLastTest extends CodeExecutionTestHelper {
 
 	public function testWithoutLastEmpty(): void {
 		$result = $this->executeCodeSnippet("[]->withoutLast;");
-		$this->assertEquals("@ItemNotFound()", $result);
+		$this->assertEquals("@ItemNotFound", $result);
 	}
 
 	public function testWithoutLastNonEmpty(): void {

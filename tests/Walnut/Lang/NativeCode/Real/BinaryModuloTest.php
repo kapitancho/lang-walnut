@@ -13,7 +13,7 @@ final class BinaryModuloTest extends CodeExecutionTestHelper {
 
 	public function testBinaryModuloZero(): void {
 		$result = $this->executeCodeSnippet("3.5 % 0;");
-		$this->assertEquals("@NotANumber()", $result);
+		$this->assertEquals("@NotANumber", $result);
 	}
 
 	public function testBinaryModuloReal(): void {

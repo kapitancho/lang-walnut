@@ -7,22 +7,22 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 final class ValuesTest extends CodeExecutionTestHelper {
 
 	public function testValuesEnumeration(): void {
-		$result = $this->executeCodeSnippet("type{MyEnumeration}->values;", "MyEnumeration = :[A, B];");
+		$result = $this->executeCodeSnippet("type{MyEnumeration}->values;", "MyEnumeration := (A, B);");
 		$this->assertEquals("[MyEnumeration.A, MyEnumeration.B]", $result);
 	}
 
 	public function testValuesEnumerationMetaType(): void {
-		$result = $this->executeCodeSnippet("getValues(type{MyEnumeration});", "MyEnumeration = :[A, B]; getValues = ^Type<Enumeration> => Array<1..> :: #->values;");
+		$result = $this->executeCodeSnippet("getValues(type{MyEnumeration});", "MyEnumeration := (A, B); getValues = ^Type<Enumeration> => Array<1..> :: #->values;");
 		$this->assertEquals("[MyEnumeration.A, MyEnumeration.B]", $result);
 	}
 
 	public function testValuesEnumerationSubset(): void {
-		$result = $this->executeCodeSnippet("type{MyEnumeration[A, C]}->values;", "MyEnumeration = :[A, B, C];");
+		$result = $this->executeCodeSnippet("type{MyEnumeration[A, C]}->values;", "MyEnumeration := (A, B, C);");
 		$this->assertEquals("[MyEnumeration.A, MyEnumeration.C]", $result);
 	}
 
 	public function testValuesEnumerationSubsetMetaType(): void {
-		$result = $this->executeCodeSnippet("getValues(type{MyEnumeration[A, C]});", "MyEnumeration = :[A, B, C]; getValues = ^Type<EnumerationSubset> => Array<1..> :: #->values;");
+		$result = $this->executeCodeSnippet("getValues(type{MyEnumeration[A, C]});", "MyEnumeration := (A, B, C); getValues = ^Type<EnumerationSubset> => Array<1..> :: #->values;");
 		$this->assertEquals("[MyEnumeration.A, MyEnumeration.C]", $result);
 	}
 

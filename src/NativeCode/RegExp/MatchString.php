@@ -24,7 +24,7 @@ final readonly class MatchString implements NativeMethod {
 		if ($targetType instanceof SealedType && $targetType->name->equals(new TypeNameIdentifier('RegExp'))) {
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
 				return $programRegistry->typeRegistry->result(
-					$programRegistry->typeRegistry->open(
+					$programRegistry->typeRegistry->data(
 						new TypeNameIdentifier('RegExpMatch')
 					),
 					$programRegistry->typeRegistry->atom(
@@ -54,7 +54,7 @@ final readonly class MatchString implements NativeMethod {
 				);
 				if ($result) {
 					return (
-						$programRegistry->valueRegistry->openValue(
+						$programRegistry->valueRegistry->dataValue(
 							new TypeNameIdentifier('RegExpMatch'),
 							$programRegistry->valueRegistry->record([
 								'match' => $programRegistry->valueRegistry->string($matches[0]),

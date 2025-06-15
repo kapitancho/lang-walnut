@@ -18,7 +18,7 @@ final class AsRealTest extends CodeExecutionTestHelper {
 
 	public function testAsRealInvalidInteger(): void {
 		$result = $this->executeCodeSnippet("'12 days'->asReal;");
-		$this->assertEquals("@NotANumber()", $result);
+		$this->assertEquals("@NotANumber", $result);
 	}
 
 }

@@ -4,8 +4,8 @@ module $db/orm %% $db/core, $db/sql/query-builder, $db/sql/quoter-mysql:
 
 DatabaseTableName = String<1..>;
 DatabaseFieldName = String<1..>;
-OrmModel = #[table: DatabaseTableName, keyField: DatabaseFieldName, sequenceField: ?DatabaseFieldName];
-UnknownOrmModel = $[type: Type];
+OrmModel := #[table: DatabaseTableName, keyField: DatabaseFieldName, sequenceField: ?DatabaseFieldName];
+UnknownOrmModel := $[type: Type];
 
 gTypes = ^Any => Map<Type> :: {
     ?whenTypeOf(#) is {

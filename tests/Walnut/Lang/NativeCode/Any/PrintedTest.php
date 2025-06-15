@@ -7,8 +7,8 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 final class PrintedTest extends CodeExecutionTestHelper {
 
 	public function testPrintedNonJson(): void {
-		$result = $this->executeCodeSnippet("MyAtom()->printed;", "MyAtom = :[];");
-		$this->assertEquals("'MyAtom()'", $result);
+		$result = $this->executeCodeSnippet("MyAtom->printed;", "MyAtom := ();");
+		$this->assertEquals("'MyAtom'", $result);
 	}
 
 	public function testPrintedNull(): void {

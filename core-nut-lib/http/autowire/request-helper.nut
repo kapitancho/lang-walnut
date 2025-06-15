@@ -1,10 +1,10 @@
 module $http/autowire/request-helper %% $http/autowire:
 
-EmptyRequestBody = :[];
+EmptyRequestBody := ();
 EmptyRequestBody ==> HttpAutoWireRequestBodyToParameter ::
     ^{HttpRequest} => Map<Nothing, 0..0> :: [:];
 
-JsonRequestBody = $[valueKey: String];
+JsonRequestBody := $[valueKey: String];
 JsonRequestBody ==> HttpAutoWireRequestBodyToParameter ::
     ^request: {HttpRequest} => Result<Map<JsonValue>, InvalidJsonString> :: {
         request = request->shape(`HttpRequest);

@@ -18,6 +18,7 @@ use Walnut\Lang\Blueprint\Type\AnyType;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Type\BooleanType;
+use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
@@ -140,9 +141,10 @@ interface TypeRegistry {
 	/** @throws UnknownType */
 	public function alias(TypeNameIdentifier $typeName): AliasType;
 	/** @throws UnknownType */
+	public function data(TypeNameIdentifier $typeName): DataType;
+	/** @throws UnknownType */
 	public function open(TypeNameIdentifier $typeName): OpenType;
 	public function sealed(TypeNameIdentifier $typeName): SealedType;
-	/** @throws UnknownType */
 	public function atom(TypeNameIdentifier $typeName): AtomType;
 	/** @throws UnknownType */
 	public function enumeration(TypeNameIdentifier $typeName): EnumerationType;

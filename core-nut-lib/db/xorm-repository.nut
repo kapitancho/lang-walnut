@@ -1,12 +1,12 @@
 module $db/xorm-repository %% $db/xorm:
 
-OxRepository = $[~Ox, ~Type];
+OxRepository := $[~Ox, ~Type];
 OxRepository[~Type, model: Type] @ ExternalError  :: [
     ox: {Ox[#model]} *> ('Failed to get orm model'),
     type: #type
 ];
 
-EntryNotFound = $[key: DatabaseValue];
+EntryNotFound := $[key: DatabaseValue];
 EntryNotFound->key(=> DatabaseValue) :: $key;
 
 OxRepository->all(=> *Array) %% [~DatabaseConnector] :: {

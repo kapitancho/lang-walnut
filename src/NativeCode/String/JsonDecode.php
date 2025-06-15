@@ -67,7 +67,7 @@ final readonly class JsonDecode implements NativeMethod {
 				return ($this->phpToValue($programRegistry, $value));
 			} catch (JsonException) {
 				return ($programRegistry->valueRegistry->error(
-					$programRegistry->valueRegistry->openValue(
+					$programRegistry->valueRegistry->dataValue(
 						new TypeNameIdentifier("InvalidJsonString"),
 						$programRegistry->valueRegistry->record(['value' => $targetValue])
 					)

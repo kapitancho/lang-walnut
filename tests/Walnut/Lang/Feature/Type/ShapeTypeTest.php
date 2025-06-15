@@ -37,7 +37,7 @@ final class ShapeTypeTest extends CodeExecutionTestHelper {
 	public function testAsStringShapeParamWithCast(): void {
 		$result = $this->executeCodeSnippet("getReal()->shape(`Real)->ceil;",
 			"
-				MyReal = #[value: Real];
+				MyReal := #[value: Real];
 				MyReal ==> Real :: \$value;
 				getValue = ^ r: Shape<Real> => Real :: r->shape(`Real);
 				getReal = ^ => Shape<Real> :: MyReal[3.14];

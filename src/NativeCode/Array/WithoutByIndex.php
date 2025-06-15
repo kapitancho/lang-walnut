@@ -42,7 +42,7 @@ final readonly class WithoutByIndex implements NativeMethod {
 				return $parameterType->range->minValue < $type->range->maxLength ? $returnType :
 					$programRegistry->typeRegistry->result(
 						$returnType,
-						$programRegistry->typeRegistry->open(
+						$programRegistry->typeRegistry->data(
 							new TypeNameIdentifier("IndexOutOfRange")
 						)
 					);
@@ -69,7 +69,7 @@ final readonly class WithoutByIndex implements NativeMethod {
 				if (!array_key_exists($p, $values)) {
 					return (
 						$programRegistry->valueRegistry->error(
-							$programRegistry->valueRegistry->openValue(
+							$programRegistry->valueRegistry->dataValue(
 								new TypeNameIdentifier('IndexOutOfRange'),
 								$programRegistry->valueRegistry->record(['index' => $parameterValue])
 							)

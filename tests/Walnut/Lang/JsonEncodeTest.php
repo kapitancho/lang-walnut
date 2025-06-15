@@ -28,6 +28,8 @@ final class JsonEncodeTest extends BaseProgramTestHelper {
 				=> $vr->sealedValue($i('MySealed'), $vr->null),
 			'{"valueType":"Open","typeName":"MyOpen","value":{"valueType":"Null"}}'
 				=> $vr->openValue($i('MyOpen'), $vr->null),
+			'{"valueType":"Data","typeName":"MyData","value":{"valueType":"Null"}}'
+				=> $vr->dataValue($i('MyData'), $vr->null),
 			'{"valueType":"Boolean","value":"true"}' => $vr->boolean(true),
 			'{"valueType":"Boolean","value":"false"}' => $vr->boolean(false),
 			'{"valueType":"Null"}' => $vr->null,
@@ -82,6 +84,7 @@ final class JsonEncodeTest extends BaseProgramTestHelper {
 			'{"type":"Sealed","name":"MySealed","valueType":{"type":"Null"}}'
 				=> $tr->sealed($i('MySealed')),
 			'{"type":"Open","name":"MyOpen","valueType":{"type":"Null"}}' => $tr->open($i('MyOpen')),
+			'{"type":"Data","name":"MyData","valueType":{"type":"Null"}}' => $tr->data($i('MyData')),
 			'{"type":"Boolean"}' => $tr->boolean,
 			'{"type":"True"}' => $tr->true,
 			'{"type":"False"}' => $tr->false,

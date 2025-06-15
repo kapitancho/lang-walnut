@@ -13,7 +13,7 @@ final class LastPositionOfTest extends CodeExecutionTestHelper {
 
 	public function testLastPositionOfNo(): void {
 		$result = $this->executeCodeSnippet("'hello'->lastPositionOf('elo');");
-		$this->assertEquals('@SubstringNotInString()', $result);
+		$this->assertEquals('@SubstringNotInString', $result);
 	}
 
 	public function testLastPositionOfInvalidParameter(): void {

@@ -52,7 +52,7 @@ final readonly class ValueOf implements NativeMethod {
 			}
 			return (
 				$programRegistry->valueRegistry->error(
-					$programRegistry->valueRegistry->openValue(
+					$programRegistry->valueRegistry->dataValue(
 						new TypeNameIdentifier('DependencyContainerError'),
 						$programRegistry->valueRegistry->record([
 							'targetType' => $programRegistry->valueRegistry->type($type),

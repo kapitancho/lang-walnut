@@ -18,7 +18,7 @@ final class InsertAtTest extends CodeExecutionTestHelper {
 
 	public function testInsertAtIndexOutOfRange(): void {
 		$result = $this->executeCodeSnippet("['a', 1, 2]->insertAt[value: 'b', index: 12];");
-		$this->assertEquals("@IndexOutOfRange[index: 12]", $result);
+		$this->assertEquals("@IndexOutOfRange!!!!![index: 12]", $result);
 	}
 
 	public function testInsertAtInvalidParameterValue(): void {

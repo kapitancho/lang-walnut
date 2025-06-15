@@ -14,6 +14,7 @@ use Walnut\Lang\Blueprint\Type\AnyType;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Type\BooleanType;
+use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
 use Walnut\Lang\Blueprint\Type\FalseType;
@@ -93,6 +94,7 @@ final readonly class Hydrator {
 			$targetType instanceof UnionType => $this->hydrateUnion(...),
 			$targetType instanceof AliasType => $this->hydrateAlias(...),
 			$targetType instanceof ResultType => $this->hydrateResult(...),
+			$targetType instanceof DataType => $this->hydrateData(...),
 			$targetType instanceof OpenType => $this->hydrateOpen(...),
 			$targetType instanceof SealedType => $this->hydrateSealed(...),
 			// @codeCoverageIgnoreStart
@@ -262,6 +264,17 @@ final readonly class Hydrator {
 		}
 	}
 
+	private function hydrateData(Value $value, OpenType $targetType, string $hydrationPath): Value {
+		return $this->tryJsonValueCast(
+			$targetType, $value, $hydrationPath,
+			"Open type hydration failed. Error: %s"
+		) ?? $this->constructValue(
+			$targetType,
+			$this->hydrate($value, $targetType->valueType, $hydrationPath),
+			$hydrationPath
+		);
+	}
+
 	private function hydrateOpen(Value $value, OpenType $targetType, string $hydrationPath): Value {
 		return $this->tryJsonValueCast(
 			$targetType, $value, $hydrationPath,
@@ -319,7 +332,7 @@ final readonly class Hydrator {
 		$result = new ValueConstructor()->executeValidator(
 			$this->programRegistry,
 			$targetType,
-			($baseValue)
+			$baseValue
 		);
 		$resultValue = $result;
 		if ($resultValue instanceof ErrorValue) {

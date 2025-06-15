@@ -18,12 +18,14 @@ use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AtomType;
+use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\NamedType;
 use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\DataValue;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\OpenValue;
 use Walnut\Lang\Blueprint\Value\SealedValue;
@@ -73,7 +75,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 					$sType
 				)
 			);
-			if ($result->value instanceof ErrorValue && $result->value->errorValue instanceof OpenValue &&
+			if ($result->value instanceof ErrorValue && $result->value->errorValue instanceof DataValue &&
 				$result->value->errorValue->type->name->equals(new TypeNameIdentifier('CastNotAvailable'))
 			) {
 				if ($type instanceof AliasType) {
@@ -147,6 +149,20 @@ final class DependencyContainer implements DependencyContainerInterface {
 			$found[$key] = $foundValue;
 		}
 		return ($this->programRegistry->valueRegistry->record($found));
+	}
+
+	private function findDataValue(DataType $type): Value|DependencyError {
+		$found = $this->findValueByNamedType($type);
+		if ($found instanceof DependencyError) {
+			$baseValue = $this->findValueByType($type->valueType);
+			if ($baseValue instanceof Value) {
+				return $this->programRegistry->valueRegistry->dataValue(
+					$type->name,
+					$baseValue
+				);
+			}
+		}
+		return $found;
 	}
 
 	private function findOpenValue(OpenType $type): Value|DependencyError {
@@ -226,6 +242,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 	private function findValueByType(Type $type): Value|DependencyError {
 		return match(true) {
 			$type instanceof AtomType => ($type->value),
+            $type instanceof DataType => $this->findDataValue($type),
             $type instanceof OpenType => $this->findOpenValue($type),
 			$type instanceof SealedType => $this->findSealedValue($type),
 			$type instanceof NamedType => $this->findValueByNamedType($type),

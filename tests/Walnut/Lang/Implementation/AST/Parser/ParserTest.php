@@ -166,24 +166,24 @@ class ParserTest extends TestCase {
 	}
 
 	public static function moduleLevelDefinitions(): iterable {
-		yield ['MyAtom = :[];', AddAtomTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MyAtom'))];
-		yield ['MyEnum = :[v1, v2];', AddEnumerationTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MyEnum')) &&
+		yield ['MyAtom := ();', AddAtomTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MyAtom'))];
+		yield ['MyEnum := (v1, v2);', AddEnumerationTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MyEnum')) &&
 			count($d->values) === 2 && $d->values[0]->equals(new EnumValueIdentifier('v1')) && $d->values[1]->equals(new EnumValueIdentifier('v2'))];
-		yield ['MyOpen = #Null;', AddOpenTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MyOpen')) &&
+		yield ['MyOpen := #Null;', AddOpenTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MyOpen')) &&
 			$d->valueType instanceOf NullTypeNode && $d->constructorBody === null && $d->errorType === null];
-		yield ['MyOpen = #Null :: null;', AddOpenTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MyOpen')) &&
+		yield ['MyOpen := #Null :: null;', AddOpenTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MyOpen')) &&
 			$d->valueType instanceOf NullTypeNode && $d->constructorBody !== null && $d->errorType === null];
-		yield ['MyOpen = #Null @ E :: null;', AddOpenTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MyOpen')) &&
+		yield ['MyOpen := #Null @ E :: null;', AddOpenTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MyOpen')) &&
 			$d->valueType instanceOf NullTypeNode && $d->constructorBody !== null && $d->errorType instanceof NamedTypeNode && $d->errorType->name->equals(new TypeNameIdentifier('E'))];
-		yield ['MyOpen = #[Real];', AddOpenTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MyOpen')) &&
+		yield ['MyOpen := #[Real];', AddOpenTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MyOpen')) &&
 			$d->valueType instanceOf TupleTypeNode && $d->constructorBody === null && $d->errorType === null];
-		yield ['MySealed = $Null;', AddSealedTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MySealed')) &&
+		yield ['MySealed := $Null;', AddSealedTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MySealed')) &&
 			$d->valueType instanceOf NullTypeNode && $d->constructorBody === null && $d->errorType === null];
-		yield ['MySealed = $Null :: null;', AddSealedTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MySealed')) &&
+		yield ['MySealed := $Null :: null;', AddSealedTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MySealed')) &&
 			$d->valueType instanceOf NullTypeNode && $d->constructorBody !== null && $d->errorType === null];
-		yield ['MySealed = $Null @ E :: null;', AddSealedTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MySealed')) &&
+		yield ['MySealed := $Null @ E :: null;', AddSealedTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MySealed')) &&
 			$d->valueType instanceOf NullTypeNode && $d->constructorBody !== null && $d->errorType instanceof NamedTypeNode && $d->errorType->name->equals(new TypeNameIdentifier('E'))];
-		yield ['MySealed = $[a: Integer];', AddSealedTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MySealed')) &&
+		yield ['MySealed := $[a: Integer];', AddSealedTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MySealed')) &&
 			$d->valueType instanceOf RecordTypeNode && $d->constructorBody === null && $d->errorType === null];
 		yield ['MyAlias = Null;', AddAliasTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MyAlias')) &&
 			$d->aliasedType instanceOf NullTypeNode];
@@ -629,8 +629,8 @@ class ParserTest extends TestCase {
 		yield ['@x', ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('Error')) &&
 			$e->parameter instanceof VariableNameExpressionNode && $e->parameter->variableName->equals(new VariableNameIdentifier('x'))];
 
-		yield ['C()', ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('C')) &&
-			$e->parameter instanceof ConstantExpressionNode && $e->parameter->value instanceof NullValueNode];
+		yield ['C', ConstantExpressionNode::class, fn(ConstantExpressionNode $e) => $e->value instanceof AtomValueNode &&
+			$e->value->name->equals(new TypeNameIdentifier('C'))];
 		yield ['C(x)', ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('C')) &&
 			$e->parameter instanceof VariableNameExpressionNode && $e->parameter->variableName->equals(new VariableNameIdentifier('x'))];
 		yield ['C[]', ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('C')) &&
@@ -1332,7 +1332,7 @@ class ParserTest extends TestCase {
 		yield ['`Any', TypeValueNode::class, fn($v) => $v->type instanceof AnyTypeNode];
 		yield ['`Atom', TypeValueNode::class, fn($v) => $v->type instanceof MetaTypeTypeNode && $v->type->value === MetaTypeValue::Atom];
 		yield ['`[Any]', TypeValueNode::class, fn($v) => $v->type instanceof TupleTypeNode && count($v->type->types) === 1 && $v->type->types[0] instanceof AnyTypeNode];
-		yield ['MyAtom()', AtomValueNode::class, fn($v) => $v->name->equals(new TypeNameIdentifier('MyAtom'))];
+		yield ['MyAtom', AtomValueNode::class, fn($v) => $v->name->equals(new TypeNameIdentifier('MyAtom'))];
 		yield ['MyEnum.Value', EnumerationValueNode::class, fn($v) => $v->name->equals(new TypeNameIdentifier('MyEnum')) && $v->enumValue->equals(new EnumValueIdentifier('Value'))];
 		yield ['^ :: null', FunctionValueNode::class, fn($v) => $v->parameterName === null && $v->parameterType instanceof NullTypeNode &&
 									$v->returnType instanceof AnyTypeNode && $v->dependencyType instanceof NothingTypeNode];

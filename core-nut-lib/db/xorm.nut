@@ -3,10 +3,10 @@ module $db/xorm %% $db/core, $db/sql/query-builder, $db/sql/quoter-mysql:
 ==> DatabaseConnection :: DatabaseConnection['sqlite:db.sqlite'];
 
 FieldTypes = Map<Type>;
-UnknownFieldTypes = :[];
+UnknownFieldTypes := ();
 
-UnknownOrmModel = $[type: Type];
-OrmModel = #[table: DatabaseTableName, keyField: DatabaseFieldName, sequenceField: ?DatabaseFieldName];
+UnknownOrmModel := $[type: Type];
+OrmModel := #[table: DatabaseTableName, keyField: DatabaseFieldName, sequenceField: ?DatabaseFieldName];
 OrmModel->orderBy(=> SqlOrderByFields|Null) :: ?whenTypeOf($sequenceField) is {
     `String<1..>: SqlOrderByFields[[SqlOrderByField[$sequenceField, SqlOrderByDirection.Asc]]]
 };
@@ -15,7 +15,7 @@ OrmModel->filterByKeyField(=> SqlQueryFilter) :: SqlQueryFilter[SqlFieldExpressi
 ]];
 
 
-Ox = $[~OrmModel, ~FieldTypes];
+Ox := $[~OrmModel, ~FieldTypes];
 Ox[~Type] @ UnknownOrmModel|UnknownFieldTypes :: {
     ormModel = #type->as(`OrmModel);
     ormModel = ?whenTypeOf(ormModel) is {

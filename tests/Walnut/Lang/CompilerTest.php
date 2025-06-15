@@ -65,12 +65,12 @@ final class CompilerTest extends TestCase {
 			'main' => <<<NUT
 				module main %% template, tpl:
 				myFn = ^Null => Result<String, Any> %% [~TemplateRenderer] :: {
-				    %templateRenderer => render(NotANumber())
+				    %templateRenderer => render(NotANumber)
 				};
 				main = ^Array<String> => String :: {
 				    x = myFn();
 				    ?whenTypeOf(x) is {
-				        type{String}: x,
+				        `String: x,
 				        ~: x->printed
 				    }
 				};		
@@ -146,7 +146,7 @@ final class CompilerTest extends TestCase {
 	public function testSuccessfulSafeCompilation(): void {
 		$compiler = $this->getSafeCompiler(<<<NUT
 			module main:
-			myFn = ^Null => NotANumber :: NotANumber();
+			myFn = ^Null => NotANumber :: NotANumber;
 		NUT);
 		$result = $compiler->safeCompile('main');
 		$this->assertInstanceOf(SuccessfulCompilationResult::class, $result);
@@ -181,7 +181,11 @@ final class CompilerTest extends TestCase {
 				//$this->assertNotEquals('', (string)$compilationResult->programContext);
 			}
 		} catch (AnalyserException $e) {
-			$this->assertStringContainsString('cannot be resolved', $e->getMessage());
+			$this->assertStringContainsString(
+				'cannot be resolved',
+				$e->getMessage(),
+				"Compilation of $source failed with: " . $e->getMessage()
+			);
 		}
 	}
 

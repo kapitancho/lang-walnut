@@ -79,6 +79,7 @@ final readonly class ParserStateMachine {
 				}
 			]],
 			104 => ['name' => 'module level type definition', 'transitions' => [
+				T::named_type->name => 115,
 				T::assign->name => 105,
 				T::cast_marker->name => 119,
 				T::method_marker->name => 122,
@@ -97,13 +98,12 @@ final readonly class ParserStateMachine {
 				T::tuple_start->name => 142,
 			]],
 			105 => ['name' => 'module level type assignment', 'transitions' => [
-				T::atom_type->name => 106,
-				T::enum_type_start->name => function(LT $token) {
+				//T::atom_type->name => 106,
+				/*T::enum_type_start->name => function(LT $token) {
 					$this->s->result['enumerationValues'] = [];
 					$this->s->move(107);
-				},
-				T::this_var->name => 110,
-				T::special_var_param->name => 111,
+				},*/
+				//T::colon->name => 112,
 				T::type_keyword->name => $c = function(LT $token) {
 					$this->s->push(131);
 					$this->s->stay(701);
@@ -137,7 +137,7 @@ final readonly class ParserStateMachine {
 			]],
 			108 => ['name' => 'module level enum separator', 'transitions' => [
 				T::value_separator->name => 107,
-				T::tuple_end->name => 109
+				T::call_end->name => 109
 			]],
 			109 => ['name' => 'module level enum end', 'transitions' => [
 				T::expression_separator->name => function(LT $token) {
@@ -173,6 +173,44 @@ final readonly class ParserStateMachine {
 				T::type_keyword->name => $c,
 				T::sequence_start->name => $c, //Shape<T>
 				T::lambda_param->name => $c,
+			]],
+			112 => ['name' => 'data type type', 'transitions' => [
+				T::tuple_start->name => $c = function(LT $token) {
+					$this->s->push(154);
+					$this->s->stay(701);
+				},
+				T::arithmetic_op_multiply->name => $c,
+				T::type_keyword->name => $c,
+				T::sequence_start->name => $c,
+				T::lambda_param->name => $c,
+			]],
+
+			115 => ['name' => 'module level named type creation', 'transitions' => [
+				T::call_start->name => 116,
+				T::special_var_param->name => 111,
+				T::this_var->name => 110,
+				'' => function(LT $token) {
+					$this->s->stay(112);
+				},
+			]],
+			116 => ['name' => 'module level atom or enum', 'transitions' => [
+				T::call_end->name => 106,
+				'' => function(LT $token) {
+					$this->s->result['enumerationValues'] = [];
+					$this->s->stay(107);
+				},
+			]],
+
+			154 => ['name' => 'data base type return', 'transitions' => [
+				T::expression_separator->name => function(LT $token) {
+					$this->nodeBuilder->definition(
+						$this->s->generated = $this->nodeBuilder->addData(
+							new TypeNameIdentifier($this->s->result['typeName']),
+							$this->s->generated,
+						)
+					);
+					$this->s->move(102);
+				}
 			]],
 
 			159 => ['name' => 'open base type return', 'transitions' => [
@@ -636,7 +674,24 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				}
 			]],
+
+
+			269 => ['name' => 'value data expression return', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->data(
+						new TypeNameIdentifier($this->s->result['type_name']),
+						$this->s->generated
+					);
+					$this->s->pop();
+				},
+			]],
+
+
 			270 => ['name' => 'type expression', 'transitions' => [
+				T::temporary_token->name => function (LT $token) {
+					$this->s->push(269);
+					$this->s->move(301);
+				},
 				T::property_accessor->name => function(LT $token) {
 					$this->s->push(274);
 					$this->s->back(401);
@@ -659,14 +714,32 @@ final readonly class ParserStateMachine {
 					);
 					$this->s->move(275);
 				},
-				T::call_start->name => 271,
+				T::call_start->name => /*function(LT $token) {
+					$this->s->push(272);
+					$this->s->move(201);
+				}*/ 271,
 				T::tuple_start->name => function(LT $token) {
 					$this->s->push(273);
 					$this->s->stay(201);
 				},
+				'' => function (LT $token) {
+					$this->s->generated = $this->nodeBuilder->constant(
+						$this->nodeBuilder->atomValue(
+							new TypeNameIdentifier($this->s->result['type_name'])
+						)
+					);
+					$this->s->pop();
+				}
 			]],
 			271 => ['name' => 'constructor call expression', 'transitions' => [
 				T::call_end->name => function(LT $token) {
+					/*$this->s->generated = $this->nodeBuilder->constant(
+						$this->nodeBuilder->atomValue(
+							new TypeNameIdentifier($this->s->result['type_name'])
+						)
+					);
+					$this->s->moveAndPop();*/
+
 					$this->s->generated = $this->nodeBuilder->constant(
 						$this->nodeBuilder->nullValue
 					);
@@ -727,7 +800,7 @@ final readonly class ParserStateMachine {
 					$this->s->move(281);
 				},
 				T::var_keyword->name => $c,
-				T::type_keyword->name => $c,
+				//YYY: T::type_keyword->name => $c,
 				T::null->name => $c,
 				T::true->name => $c,
 				T::false->name => $c,
@@ -1633,7 +1706,7 @@ final readonly class ParserStateMachine {
 				T::type_keyword->name => function(LT $token) {
 					$this->s->result['startPosition'] = $token->sourcePosition;
 					$this->s->result['current_type_name'] = $token->patternMatch->text;
-					$this->s->move(490);
+					$this->s->move(488);
 				},
 			]],
 
@@ -1768,7 +1841,7 @@ final readonly class ParserStateMachine {
 					$this->s->move(461);
 				},
 				T::var_keyword->name => $c,
-				T::type_keyword->name => $c,
+				//YYY: T::type_keyword->name => $c,
 				T::null->name => $c,
 				T::true->name => $c,
 				T::false->name => $c,
@@ -1955,19 +2028,54 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
-
-			490 => ['name' => 'value type name', 'transitions' => [
+			488 => ['name' => 'value type name', 'transitions' => [
 				T::property_accessor->name => 492,
-				T::call_start->name => 491,
+				T::temporary_token->name => function (LT $token) {
+					$this->s->push(493);
+					$this->s->move(401);
+				},
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->atomValue(
+						new TypeNameIdentifier($this->s->result['current_type_name']),
+					);
+					$this->s->pop();
+				},
+				//T::call_start->name => 490,
+				/*T::tuple_start->name => function(LT $token) {
+					$this->s->push(489);
+					$this->s->stay(401);
+				},*/
 			]],
-			491 => ['name' => 'value atom', 'transitions' => [
+			/*489 => ['name' => 'value data record or tuple return', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->dataValue(
+						new TypeNameIdentifier($this->s->result['current_type_name']),
+						$this->s->generated
+					);
+					$this->s->pop();
+				},
+			]],*/
+			490 => ['name' => 'value atom or data', 'transitions' => [
 				T::call_end->name => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->atomValue(
 						new TypeNameIdentifier($this->s->result['current_type_name']),
 					);
 					$this->s->moveAndPop();
-				}
+				},
+				/*'' => function(LT $token) {
+					$this->s->push(491);
+					$this->s->stay(401);
+				},*/
 			]],
+			/*491 => ['name' => 'value data return', 'transitions' => [
+				T::call_end->name => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->dataValue(
+						new TypeNameIdentifier($this->s->result['current_type_name']),
+						$this->s->generated
+					);
+					$this->s->moveAndPop();
+				},
+			]],*/
 			492 => ['name' => 'value enum', 'transitions' => [
 				T::type_keyword->name => $c = function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->enumerationValue(
@@ -1976,7 +2084,16 @@ final readonly class ParserStateMachine {
 					);
 					$this->s->moveAndPop();
 				},
-				T::var_keyword->name => $c
+				T::var_keyword->name => $c,
+			]],
+			493 => ['name' => 'value data return', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->dataValue(
+						new TypeNameIdentifier($this->s->result['current_type_name']),
+						$this->s->generated
+					);
+					$this->s->pop();
+				},
 			]],
 
 			501 => ['name' => 'function value start', 'transitions' => [
@@ -2781,7 +2898,7 @@ final readonly class ParserStateMachine {
 					if (in_array($token->patternMatch->text, [
 						'Function', 'Tuple', 'Record', 'Union', 'Intersection', 'Atom', 'Enumeration',
 						'EnumerationSubset', 'EnumerationValue', 'IntegerSubset', 'RealSubset', 'StringSubset',
-						'Sealed', 'Alias', 'Named', 'MutableValue'
+						'Data', 'Open', 'Sealed', 'Alias', 'Named', 'MutableValue'
 					], true)) {
 						$this->s->result['type'] = $this->nodeBuilder->metaTypeType(
 							MetaTypeValue::from($token->patternMatch->text)

@@ -8,7 +8,7 @@ final class KeyOfTest extends CodeExecutionTestHelper {
 
 	public function testKeyOfEmpty(): void {
 		$result = $this->executeCodeSnippet("[:]->keyOf(5);");
-		$this->assertEquals("@ItemNotFound()", $result);
+		$this->assertEquals("@ItemNotFound", $result);
 	}
 
 	public function testKeyOfNonEmpty(): void {

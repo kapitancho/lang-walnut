@@ -176,30 +176,30 @@ final class IsOfTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testIsOfTypeAtom(): void {
-		$result = $this->executeCodeSnippet("{MyAtom()}->isOfType(type{MyAtom});", "MyAtom = :[];");
+		$result = $this->executeCodeSnippet("{MyAtom}->isOfType(type{MyAtom});", "MyAtom := ();");
 		$this->assertEquals("true", $result);
 	}
 
 	public function testIsOfTypeEnumeration(): void {
 		$result = $this->executeCodeSnippet("{MyEnumeration.C}->isOfType(type{MyEnumeration});",
-			"MyEnumeration = :[A, B, C];");
+			"MyEnumeration := (A, B, C);");
 		$this->assertEquals("true", $result);
 	}
 
 	public function testIsOfTypeEnumerationSubsetInRange(): void {
 		$result = $this->executeCodeSnippet("{MyEnumeration.C}->isOfType(type{MyEnumeration[A, C]});",
-			"MyEnumeration = :[A, B, C];");
+			"MyEnumeration := (A, B, C);");
 		$this->assertEquals("true", $result);
 	}
 
 	public function testIsOfTypeEnumerationSubsetOutOfRange(): void {
 		$result = $this->executeCodeSnippet("{MyEnumeration.C}->isOfType(type{MyEnumeration[A, B]});",
-			"MyEnumeration = :[A, B, C];");
+			"MyEnumeration := (A, B, C);");
 		$this->assertEquals("false", $result);
 	}
 
 	public function testIsOfTypeSealed(): void {
-		$result = $this->executeCodeSnippet("{MySealed[a: 'value']}->isOfType(type{MySealed});", "MySealed = $[a: String];");
+		$result = $this->executeCodeSnippet("{MySealed[a: 'value']}->isOfType(type{MySealed});", "MySealed := $[a: String];");
 		$this->assertEquals("true", $result);
 	}
 

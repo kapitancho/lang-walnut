@@ -78,7 +78,7 @@ final readonly class Execute implements NativeMethod {
 					);
 				} catch (PDOException $ex) {
 					return ($programRegistry->valueRegistry->error(
-						$programRegistry->valueRegistry->openValue(
+						$programRegistry->valueRegistry->dataValue(
 							new TypeNameIdentifier('DatabaseQueryFailure'),
 							$programRegistry->valueRegistry->record([
 								'query' => $parameterValue->values['query'],

@@ -8,7 +8,7 @@ final class RemoveTest extends CodeExecutionTestHelper {
 
 	public function testRemoveNew(): void {
 		$result = $this->executeCodeSnippet("mutable{Set, [1; 2; 3]}->REMOVE(5);");
-		$this->assertEquals("@ItemNotFound()", $result);
+		$this->assertEquals("@ItemNotFound", $result);
 	}
 
 	public function testRemoveExisting(): void {

@@ -12,7 +12,7 @@ final class DuplicationInSubsetTest extends CodeExecutionTestHelper {
 			$this->executeCodeSnippet(
 				"null;",
 				<<<NUT
-					Dup = :[A, B, A, C, D];
+					Dup := (A, B, A, C, D);
 				NUT
 			);
 			$this->fail("Expected AstProgramCompilationException not thrown");
@@ -29,7 +29,7 @@ final class DuplicationInSubsetTest extends CodeExecutionTestHelper {
 			$this->executeCodeSnippet(
 				"null;",
 				<<<NUT
-					Dup = :[A, B, C, D];
+					Dup := (A, B, C, D);
 					DupSub = Dup[A, C, C];
 				NUT
 			);

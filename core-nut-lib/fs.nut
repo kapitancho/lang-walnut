@@ -1,9 +1,9 @@
 module $fs:
 
-File = $[path: String];
+File := $[path: String];
 File->path(=> String) :: $path;
 
-CannotReadFile = $[file: File];
+CannotReadFile := $[file: File];
 CannotReadFile->file(=> File) :: $file;
 CannotReadFile ==> String :: 'Cannot read from file: '->concat($file->path);
 CannotReadFile ==> ExternalError :: ExternalError[
@@ -12,7 +12,7 @@ CannotReadFile ==> ExternalError :: ExternalError[
     errorMessage: $->asString
 ];
 
-CannotWriteFile = $[file: File];
+CannotWriteFile := $[file: File];
 CannotWriteFile->file(=> File) :: $file;
 CannotWriteFile ==> String :: 'Cannot write to file: '->concat($file->path);
 CannotWriteFile ==> ExternalError :: ExternalError[

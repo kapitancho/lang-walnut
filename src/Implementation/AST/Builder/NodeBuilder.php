@@ -25,6 +25,7 @@ use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Implementation\AST\Node\Expression\ConstantExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\ConstructorCallExpressionNode;
+use Walnut\Lang\Implementation\AST\Node\Expression\DataExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\FunctionCallExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\MatchErrorExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\MatchExpressionDefaultNode;
@@ -50,6 +51,7 @@ use Walnut\Lang\Implementation\AST\Node\FunctionBodyNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddAliasTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddAtomTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddConstructorMethodNode;
+use Walnut\Lang\Implementation\AST\Node\Module\AddDataTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddEnumerationTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddMethodNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddOpenTypeNode;
@@ -88,6 +90,7 @@ use Walnut\Lang\Implementation\AST\Node\Type\TupleTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\TypeTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\UnionTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Value\AtomValueNode;
+use Walnut\Lang\Implementation\AST\Node\Value\DataValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\EnumerationValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\ErrorValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\FalseValueNode;
@@ -191,6 +194,10 @@ final class NodeBuilder implements NodeBuilderInterface {
 
 	public function constant(ValueNode $value): ConstantExpressionNode {
 		return new ConstantExpressionNode($this->getSourceLocation(), $value);
+	}
+
+	public function data(TypeNameIdentifier $typeName, ExpressionNode $value): DataExpressionNode {
+		return new DataExpressionNode($this->getSourceLocation(), $typeName, $value);
 	}
 
 	public function constructorCall(TypeNameIdentifier $typeName, ExpressionNode $parameter): ConstructorCallExpressionNode {
@@ -429,6 +436,17 @@ final class NodeBuilder implements NodeBuilderInterface {
 				$this->variableName(new VariableNameIdentifier('#'))
 			])
 		) : null;
+	}
+
+	public function addData(
+		TypeNameIdentifier $name,
+		TypeNode $valueType,
+	): AddDataTypeNode {
+		return new AddDataTypeNode(
+			$this->getSourceLocation(),
+			$name,
+			$valueType,
+		);
 	}
 
 	public function addOpen(
@@ -679,6 +697,10 @@ final class NodeBuilder implements NodeBuilderInterface {
 
 	public function atomValue(TypeNameIdentifier $name): AtomValueNodeInterface {
 		return new AtomValueNode($this->getSourceLocation(), $name);
+	}
+
+	public function dataValue(TypeNameIdentifier $name, ValueNode $value): DataValueNode {
+		return new DataValueNode($this->getSourceLocation(), $name, $value);
 	}
 
 	public function enumerationValue(TypeNameIdentifier $name, EnumValueIdentifier $enumValue): EnumerationValueNode {

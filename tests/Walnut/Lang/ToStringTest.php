@@ -19,10 +19,11 @@ final class ToStringTest extends BaseProgramTestHelper {
 		$ev = fn(string $name) => new EnumValueIdentifier($name);
 		$vr = $this->valueRegistry;
 		foreach([
-			'MyAtom()' => $vr->atom($i('MyAtom')),
+			'MyAtom' => $vr->atom($i('MyAtom')),
 			'MyEnum.A' => $vr->enumerationValue($i('MyEnum'), $ev('A')),
 			'MySealed{null}' => $vr->sealedValue($i('MySealed'), $vr->null),
 			'MyOpen{null}' => $vr->openValue($i('MyOpen'), $vr->null),
+			'MyData!!!!!null' => $vr->dataValue($i('MyData'), $vr->null),
 			'true' => $vr->boolean(true),
 			'false' => $vr->boolean(false),
 			'null' => $vr->null,
@@ -69,6 +70,7 @@ final class ToStringTest extends BaseProgramTestHelper {
 			'MyEnum[A, B]' => $tr->enumerationSubsetType($i('MyEnum'), [$ev('A'), $ev('B')]),
 			'MySealed' => $tr->sealed($i('MySealed')),
 			'MyOpen' => $tr->open($i('MyOpen')),
+			'MyData' => $tr->data($i('MyData')),
 			'Boolean' => $tr->boolean,
 			'True' => $tr->true,
 			'False' => $tr->false,

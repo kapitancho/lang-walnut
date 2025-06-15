@@ -88,22 +88,22 @@ final class AsBooleanTest extends CodeExecutionTestHelper {
 	}
 
 	public function testAsBooleanAtom(): void {
-		$result = $this->executeCodeSnippet("{MyAtom()}->asBoolean;", "MyAtom = :[];");
+		$result = $this->executeCodeSnippet("{MyAtom}->asBoolean;", "MyAtom := ();");
 		$this->assertEquals("true", $result);
 	}
 
 	public function testAsBooleanEnumeration(): void {
-		$result = $this->executeCodeSnippet("{MyEnumeration.C}->asBoolean;", "MyEnumeration = :[A, B, C];");
+		$result = $this->executeCodeSnippet("{MyEnumeration.C}->asBoolean;", "MyEnumeration := (A, B, C);");
 		$this->assertEquals("true", $result);
 	}
 
 	public function testAsBooleanOpen(): void {
-		$result = $this->executeCodeSnippet("{MyOpen('value')}->asBoolean;", "MyOpen = #String;");
+		$result = $this->executeCodeSnippet("{MyOpen('value')}->asBoolean;", "MyOpen := #String;");
 		$this->assertEquals("true", $result);
 	}
 
 	public function testAsBooleanSealed(): void {
-		$result = $this->executeCodeSnippet("{MySealed[a: 'value']}->asBoolean;", "MySealed = $[a: String];");
+		$result = $this->executeCodeSnippet("{MySealed[a: 'value']}->asBoolean;", "MySealed := $[a: String];");
 		$this->assertEquals("true", $result);
 	}
 

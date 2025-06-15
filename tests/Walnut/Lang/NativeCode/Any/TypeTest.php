@@ -57,22 +57,22 @@ final class TypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testTypeAtom(): void {
-		$result = $this->executeCodeSnippet("{MyAtom()}->type;", "MyAtom = :[];");
+		$result = $this->executeCodeSnippet("{MyAtom}->type;", "MyAtom := ();");
 		$this->assertEquals("type{MyAtom}", $result);
 	}
 
 	public function testTypeEnumeration(): void {
-		$result = $this->executeCodeSnippet("{MyEnumeration.C}->type;", "MyEnumeration = :[A, B, C];");
+		$result = $this->executeCodeSnippet("{MyEnumeration.C}->type;", "MyEnumeration := (A, B, C);");
 		$this->assertEquals("type{MyEnumeration[C]}", $result);
 	}
 
 	public function testTypeOpen(): void {
-		$result = $this->executeCodeSnippet("{MyOpen[a: 'value']}->type;", "MyOpen = #[a: String];");
+		$result = $this->executeCodeSnippet("{MyOpen[a: 'value']}->type;", "MyOpen := #[a: String];");
 		$this->assertEquals("type{MyOpen}", $result);
 	}
 
 	public function testTypeSealed(): void {
-		$result = $this->executeCodeSnippet("{MySealed[a: 'value']}->type;", "MySealed = $[a: String];");
+		$result = $this->executeCodeSnippet("{MySealed[a: 'value']}->type;", "MySealed := $[a: String];");
 		$this->assertEquals("type{MySealed}", $result);
 	}
 

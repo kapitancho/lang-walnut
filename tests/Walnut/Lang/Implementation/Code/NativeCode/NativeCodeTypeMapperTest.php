@@ -233,23 +233,32 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 		);
 	}
 
-	public function testOpen(): void {
+	public function testData(): void {
 		$this->assertEquals(
-			['DatabaseConnection', 'Open', 'Any'],
-			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->open(
+			['DatabaseConnection', 'Data', 'Any'],
+			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->data(
 				new TypeNameIdentifier('DatabaseConnection')
 			))
 		);
 	}
 
-	public function testSealed(): void {
+	public function testOpen(): void {
 		$this->assertEquals(
-			['HydrationError', 'Open', 'Any'],
+			['Uuid', 'Open', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->open(
-				new TypeNameIdentifier('HydrationError')
+				new TypeNameIdentifier('Uuid')
 			))
 		);
 	}
+
+	/*public function testSealed(): void {
+		$this->assertEquals(
+			['HydrationError', 'Open', 'Any'],
+			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->data(
+				new TypeNameIdentifier('HydrationError')
+			))
+		);
+	}*/
 
 	public function testAtom(): void {
 		$this->assertEquals(
@@ -401,6 +410,15 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 			[/*'Alias', */'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::Alias
+			))
+		);
+	}
+
+	public function testTypeData(): void {
+		$this->assertEquals(
+			['Data', 'Any'],
+			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
+				MetaTypeValue::Data
 			))
 		);
 	}

@@ -8,7 +8,7 @@ final class FindFirstKeyValueTest extends CodeExecutionTestHelper {
 
 	public function testFindFirstKeyValueEmpty(): void {
 		$result = $this->executeCodeSnippet("[:]->findFirstKeyValue(^Any => Boolean :: true);");
-		$this->assertEquals("@ItemNotFound()", $result);
+		$this->assertEquals("@ItemNotFound", $result);
 	}
 
 	public function testFindFirstKeyValueNonEmpty(): void {

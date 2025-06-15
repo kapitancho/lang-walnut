@@ -9,18 +9,18 @@ DependencyContainerError ==> HttpResponse %% [~ HttpResponseBuilder] ::
 UnableToRenderTemplate ==> HttpResponse %% [~ HttpResponseBuilder] ::
     %httpResponseBuilder(500)->withBody($->asString);
 
-IndexHandler = :[];
+IndexHandler := ();
 IndexHandler ==> HttpRequestHandler %% [~HttpResponseBuilder] :: ^request: {HttpRequest} => {HttpResponse} :: {
     %httpResponseBuilder(200)->withBody('<h1>Hello world</h1>' + request->shape(`HttpRequest).target)
 };
 
-AboutHandler = :[];
+AboutHandler := ();
 AboutHandler ==> HttpRequestHandler %% [~HttpResponseBuilder] :: ^request: {HttpRequest} => {HttpResponse} :: {
     %httpResponseBuilder(200)->withBody('<h1>About</h1>' + request->shape(`HttpRequest).body->asString)
 };
 
-SpecialService = :[];
-SpecialServiceError = $[message: String];
+SpecialService := ();
+SpecialServiceError := $[message: String];
 SpecialServiceError ==> HttpResponse %% [~HttpResponseBuilder] :: {
     %httpResponseBuilder(400)->withBody($message)
 };
@@ -29,7 +29,7 @@ SpecialService->invoke(^param: String => Result<String, SpecialServiceError>) ::
     ~: param->reverse
 };
 
-SpecialHandler = :[];
+SpecialHandler := ();
 SpecialHandler ==> HttpRequestHandler %% [~HttpResponseBuilder, ~SpecialService] :: ^request: {HttpRequest} => {HttpResponse} :: {
     message = %specialService(request->shape(`HttpRequest).body->asString);
     ?whenIsError(message) {
@@ -61,11 +61,11 @@ MyLister = ^[:] => String;
 MyRedirect = ^[:] => String;
 ==> MyRedirect :: ^[:] => String :: '/redirect-url';
 
-MyBrokenView = #String;
+MyBrokenView := #String;
 MyBrokenViewRenderer = ^[:] => MyBrokenView;
 ==> MyBrokenViewRenderer :: ^[:] => MyBrokenView :: MyBrokenView('Broken View Response');
 
-MyView = #String;
+MyView := #String;
 MyView ==> Template @ UnableToRenderTemplate :: ?whenValueOf($$) is {
     '': @UnableToRenderTemplate[$->type],
     ~: {

@@ -29,7 +29,7 @@ class CliEntryPointTest extends BaseProgramTestHelper {
 		$moduleLookupContext = $this->createMock(ModuleLookupContext::class);
 		$moduleLookupContext->method('sourceOf')
 			->willReturnCallback(fn(string $module) => match($module) {
-				'core/core' => 'module $core: Global = :[];',
+				'core/core' => 'module $core: Global := ();',
 				'test' => 'module test: main = ^args: Array<String> => String :: args->printed;',
 				default => ''
 			});

@@ -15,9 +15,9 @@ NonNegativeInteger = Integer<0..>;
 
 fibonacciHelper = ^num: NonNegativeInteger => [NonNegativeInteger, NonNegativeInteger] ::
     ?whenTypeOf(num) is {
-        type{Integer<1..>} : {
-            r = fibonacciHelper(num - 1);
-            [r.1, r.0 + r.1]
+        `Integer<1..> : {
+            var{i, j} = fibonacciHelper(num - 1);
+            [j, i + j]
         },
         ~ : [1, 1]
     };

@@ -18,7 +18,7 @@ it offers a wide range of types that can be used to model the domain of the prob
 The values could be numbers (integers and reals), strings, booleans, arrays, maps, functions, types, atoms, enumerations and more.
 New custom types can be built on top of every type, and they can be either open or sealed.
 ```walnut
-Percent = #Real<0..100>;
+Percent := #Real<0..100>;
 Percent->inverted(=> Percent) :: Percent(100 - $$); 
 
 Percent(22)->inverted; # the value will be Percent{78}
@@ -32,7 +32,7 @@ The values in Walnut are *immutable*. The only way to specify a mutable value is
 ### Encapsulation
 While functional in its core the language supports encapsulation. This is done by defining sealed types.
 ```walnut
-Product = $[id: Integer<1..>, name: String<1..100>, price: Real<0..>];
+Product := $[id: Integer<1..>, name: String<1..100>, price: Real<0..>];
 p = Product[1, 'Apple', 1.5];
 p.name /* Cannot access the properties from outside */
 

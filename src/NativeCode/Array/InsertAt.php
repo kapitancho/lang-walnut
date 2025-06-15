@@ -48,7 +48,7 @@ final readonly class InsertAt implements NativeMethod {
 					$parameterType->types['index']->range->maxValue >= 0 &&
 					$parameterType->types['index']->range->maxValue <= $targetType->range->minLength ?
 					$returnType : $programRegistry->typeRegistry->result($returnType,
-						$programRegistry->typeRegistry->open(new TypeNameIdentifier('IndexOutOfRange'))
+						$programRegistry->typeRegistry->data(new TypeNameIdentifier('IndexOutOfRange'))
 					);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -83,7 +83,7 @@ final readonly class InsertAt implements NativeMethod {
 						return ($programRegistry->valueRegistry->tuple($values));
 					}
 					return ($programRegistry->valueRegistry->error(
-						$programRegistry->valueRegistry->openValue(
+						$programRegistry->valueRegistry->dataValue(
 							new TypeNameIdentifier('IndexOutOfRange'),
 							$programRegistry->valueRegistry->record([
 								'index' => $index

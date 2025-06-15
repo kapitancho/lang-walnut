@@ -11,6 +11,8 @@ use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\BooleanType;
+use Walnut\Lang\Blueprint\Type\CompositeNamedType;
+use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\MutableType;
@@ -92,7 +94,7 @@ final readonly class CastAsJsonValue {
 				return true;
 			}
 		}
-		if ($type instanceof MutableType || $type instanceof OpenType || $type instanceof SealedType) {
+		if ($type instanceof MutableType || $type instanceof CompositeNamedType) {
 			return $this->isSafeToCastType($type->valueType);
 		}
 		return false;
@@ -140,7 +142,7 @@ final readonly class CastAsJsonValue {
 		}
 		throw new FunctionReturn((
 			$this->valueRegistry->error(
-				$this->valueRegistry->openValue(
+				$this->valueRegistry->dataValue(
 					new TypeNameIdentifier('InvalidJsonValue'),
 					$this->valueRegistry->record(['value' => $value])
 				)

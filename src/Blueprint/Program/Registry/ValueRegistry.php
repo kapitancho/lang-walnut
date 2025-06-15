@@ -12,6 +12,7 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnknownEnumerationValue;
 use Walnut\Lang\Blueprint\Value\AtomValue;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
+use Walnut\Lang\Blueprint\Value\DataValue;
 use Walnut\Lang\Blueprint\Value\EnumerationValue;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
@@ -67,6 +68,12 @@ interface ValueRegistry {
 		TypeNameIdentifier $typeName,
 		EnumValueIdentifier $valueIdentifier
 	): EnumerationValue;
+
+	/** @throws UnknownType */
+	public function dataValue(
+		TypeNameIdentifier $typeName,
+		Value $value
+	): DataValue;
 
 	/** @throws UnknownType */
 	public function openValue(

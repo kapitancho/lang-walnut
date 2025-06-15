@@ -15,6 +15,7 @@ use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Code\Expression\ConstantExpression;
+use Walnut\Lang\Implementation\Code\Expression\DataExpression;
 use Walnut\Lang\Implementation\Code\Expression\MatchErrorExpression;
 use Walnut\Lang\Implementation\Code\Expression\MatchExpression;
 use Walnut\Lang\Implementation\Code\Expression\MatchExpressionDefault;
@@ -90,6 +91,10 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 			),
 			new MatchExpressionDefault($else)
 		]);
+	}
+
+	public function data(TypeNameIdentifier $typeName, Expression $parameter): DataExpression {
+		return new DataExpression($typeName, $parameter);
 	}
 
 	public function matchError(Expression $condition, Expression $onError, Expression|null $else): MatchErrorExpression {

@@ -1,11 +1,11 @@
 module $http/autowire/response-helper %% $http/autowire, $tpl:
 
-NoResponseBody = $[statusCode: HttpResponseStatusCode];
+NoResponseBody := $[statusCode: HttpResponseStatusCode];
 NoResponseBody ==> HttpAutoWireResponseBodyFromParameter ::
     ^Any => HttpResponse %% [~HttpResponseBuilder] ::
         %httpResponseBuilder($statusCode);
 
-RedirectResponseBody = $[statusCode: HttpResponseStatusCode];
+RedirectResponseBody := $[statusCode: HttpResponseStatusCode];
 RedirectResponseBody ==> HttpAutoWireResponseBodyFromParameter ::
     ^result: Any => Result<HttpResponse, Any> %% [~HttpResponseBuilder] :: {
         redirectValue = result=>as(`String);
@@ -13,7 +13,7 @@ RedirectResponseBody ==> HttpAutoWireResponseBodyFromParameter ::
             ->withHeader[headerName: 'Location', values: [redirectValue]]
     };
 
-JsonResponseBody = $[statusCode: HttpResponseStatusCode];
+JsonResponseBody := $[statusCode: HttpResponseStatusCode];
 JsonResponseBody ==> HttpAutoWireResponseBodyFromParameter ::
     ^result: Any => Result<HttpResponse, Any> %% [~HttpResponseBuilder] :: {
         jsonValue = result->asJsonValue;
@@ -24,7 +24,7 @@ JsonResponseBody ==> HttpAutoWireResponseBodyFromParameter ::
         }
     };
 
-ContentResponseBody = $[statusCode: HttpResponseStatusCode, contentType: String];
+ContentResponseBody := $[statusCode: HttpResponseStatusCode, contentType: String];
 ContentResponseBody ==> HttpAutoWireResponseBodyFromParameter ::
     ^result: Any => Result<HttpResponse, Any> %% [~HttpResponseBuilder] ::
         {%httpResponseBuilder($statusCode)

@@ -8,12 +8,12 @@ final class ValuesWithoutKeyTest extends CodeExecutionTestHelper {
 
 	public function testValuesWithoutKeyEmpty(): void {
 		$result = $this->executeCodeSnippet("[:]->valuesWithoutKey('r');");
-		$this->assertEquals("@MapItemNotFound[key: 'r']", $result);
+		$this->assertEquals("@MapItemNotFound!!!!![key: 'r']", $result);
 	}
 
 	public function testValuesWithoutKeyNotFound(): void {
 		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 5, d: 10, e: 5]->valuesWithoutKey('r');");
-		$this->assertEquals("@MapItemNotFound[key: 'r']", $result);
+		$this->assertEquals("@MapItemNotFound!!!!![key: 'r']", $result);
 	}
 
 	public function testValuesWithoutKeyNonEmpty(): void {

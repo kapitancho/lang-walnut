@@ -4,6 +4,7 @@ namespace Walnut\Lang\Implementation\Compilation\AST;
 
 use Walnut\Lang\Blueprint\AST\Node\Expression\ConstantExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ConstructorCallExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\DataExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\FunctionCallExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MatchErrorExpressionNode;
@@ -103,6 +104,11 @@ final readonly class AstExpressionCompiler implements AstExpressionCompilerInter
 			$expressionNode instanceof ConstantExpressionNode =>
 				$this->expressionRegistry->constant(
 					$this->value($expressionNode->value)
+				),
+			$expressionNode instanceof DataExpressionNode =>
+				$this->expressionRegistry->data(
+					$expressionNode->typeName,
+					$this->expression($expressionNode->value)
 				),
 			$expressionNode instanceof ConstructorCallExpressionNode =>
 				$this->constructorCall($expressionNode),

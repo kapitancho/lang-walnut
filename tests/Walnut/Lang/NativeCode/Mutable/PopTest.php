@@ -9,7 +9,7 @@ final class PopTest extends CodeExecutionTestHelper {
 
 	public function testPopEmpty(): void {
 		$result = $this->executeCodeSnippet("mutable{Array, []}->POP;");
-		$this->assertEquals("@ItemNotFound()", $result);
+		$this->assertEquals("@ItemNotFound", $result);
 	}
 
 	public function testPopNotEmpty(): void {

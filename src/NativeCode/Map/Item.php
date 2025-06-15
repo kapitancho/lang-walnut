@@ -44,7 +44,7 @@ final readonly class Item implements NativeMethod {
 				$programRegistry->typeRegistry->any
 			);
 		}
-		$mapItemNotFound = $programRegistry->typeRegistry->open(new TypeNameIdentifier("MapItemNotFound"));
+		$mapItemNotFound = $programRegistry->typeRegistry->data(new TypeNameIdentifier("MapItemNotFound"));
 		if ($type instanceof MapType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
@@ -93,7 +93,7 @@ final readonly class Item implements NativeMethod {
 				return $result;
 			}
 			return ($programRegistry->valueRegistry->error(
-				$programRegistry->valueRegistry->openValue(
+				$programRegistry->valueRegistry->dataValue(
 					new TypeNameIdentifier('MapItemNotFound'),
 					$programRegistry->valueRegistry->record(['key' => $parameter])
 				)

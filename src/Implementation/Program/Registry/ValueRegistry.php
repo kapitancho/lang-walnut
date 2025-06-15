@@ -19,6 +19,7 @@ use Walnut\Lang\Blueprint\Value\NullValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Function\FunctionContextFiller;
 use Walnut\Lang\Implementation\Function\UserlandFunction;
+use Walnut\Lang\Implementation\Value\DataValue;
 use Walnut\Lang\Implementation\Value\ErrorValue;
 use Walnut\Lang\Implementation\Value\FunctionValue;
 use Walnut\Lang\Implementation\Value\IntegerValue;
@@ -148,6 +149,18 @@ final class ValueRegistry implements ValueRegistryInterface {
     ): EnumerationValueInterface {
 		return $this->typeRegistry->enumeration($typeName)
 			->value($valueIdentifier);
+	}
+
+	/** @throws UnknownType */
+	public function dataValue(
+		TypeNameIdentifier $typeName,
+		Value $value
+	): DataValue {
+		return new DataValue(
+			$this->typeRegistry,
+			$typeName,
+			$value
+		);
 	}
 
 	/** @throws UnknownType */

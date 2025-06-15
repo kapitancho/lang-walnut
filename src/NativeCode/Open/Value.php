@@ -43,7 +43,7 @@ final readonly class Value implements NativeMethod {
 		$targetValue = $target;
 
 		if ($targetValue instanceof OpenValue) {
-			return ($targetValue->value);
+			return $targetValue->value;
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

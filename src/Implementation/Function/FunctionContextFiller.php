@@ -9,7 +9,9 @@ use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\FunctionContextFiller as FunctionContextFillerInterface;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Type\CompositeNamedType;
 use Walnut\Lang\Blueprint\Type\CustomType;
+use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\OptionalKeyType;
@@ -20,6 +22,7 @@ use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnknownProperty;
 use Walnut\Lang\Blueprint\Value\CustomValue;
+use Walnut\Lang\Blueprint\Value\DataValue;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\OpenValue;
 use Walnut\Lang\Blueprint\Value\RecordValue;
@@ -34,8 +37,8 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 	use BaseType;
 	use TupleAsRecord;
 
-	private function getMapItemNotFound(TypeRegistry $typeRegistry): OpenType {
-		return $typeRegistry->open(new TypeNameIdentifier("MapItemNotFound"));
+	private function getMapItemNotFound(TypeRegistry $typeRegistry): DataType {
+		return $typeRegistry->data(new TypeNameIdentifier("MapItemNotFound"));
 	}
 
 	public function fillAnalyserContext(
@@ -51,7 +54,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 			)) :
 			$type;
 
-		if ($targetType instanceof CustomType) {
+		if ($targetType instanceof CompositeNamedType) {
 			$analyserContext = $analyserContext->withAddedVariableType(
 				new VariableNameIdentifier('$$'),
 				$targetType->valueType
@@ -70,7 +73,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 					$type
 				);
 				$type = $this->toBaseType($type);
-				$t = $type instanceof OpenType ? $type->valueType : $type;
+				$t = $type instanceof OpenType || $type instanceof DataType ? $type->valueType : $type;
 				if ($t instanceof TupleType) {
 					foreach($t->types as $index => $typeItem) {
 						$analyserContext = $analyserContext->withAddedVariableType(
@@ -137,7 +140,10 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 		Value|null $dependencyValue
 	): ExecutionContext {
 		$t = $this->toBaseType($targetType);
-		if ($t instanceof CustomType && $targetValue instanceof CustomValue) {
+		if (
+			($t instanceof CustomType && $targetValue instanceof CustomValue) ||
+			($t instanceof DataType && $targetValue instanceof DataValue)
+		) {
 			$executionContext = $executionContext->withAddedVariableValue(
 				new VariableNameIdentifier('$$'),
 				$targetValue->value
@@ -158,7 +164,9 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 				$executionContext = $executionContext->withAddedVariableValue(
 					new VariableNameIdentifier($variableName), $value);
 				$type = $this->toBaseType($xType);
-				[$t, $v] = $type instanceof OpenType && $value instanceof OpenValue ?
+				[$t, $v] =
+					($type instanceof OpenType && $value instanceof OpenValue) ||
+					($type instanceof DataType && $value instanceof DataValue) ?
 					[$type->valueType, $value->value] :
 					[$type, $value];
 				if ($t instanceof ResultType && !($v instanceof ErrorValue)) {
@@ -189,7 +197,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 						try {
 							$rValue = $values[$fieldName] ??
 								$executionContext->programRegistry->valueRegistry->error(
-									$executionContext->programRegistry->valueRegistry->openValue(
+									$executionContext->programRegistry->valueRegistry->dataValue(
 										new TypeNameIdentifier('MapItemNotFound'),
 										$executionContext->programRegistry->valueRegistry->record([
 											'key' => $executionContext->programRegistry->valueRegistry->string($fieldName)
@@ -223,7 +231,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 				unset($restValues[$fieldName]);
 				$value = $values[$fieldName] ??
 					$executionContext->programRegistry->valueRegistry->error(
-						$executionContext->programRegistry->valueRegistry->openValue(
+						$executionContext->programRegistry->valueRegistry->dataValue(
 							new TypeNameIdentifier('MapItemNotFound'),
 							$executionContext->programRegistry->valueRegistry->record([
 								'key' => $executionContext->programRegistry->valueRegistry->string($fieldName)

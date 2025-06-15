@@ -36,18 +36,18 @@ Atoms are types with a single value and `Null` is a special `Atom` type.
 
 ### Types
 - `Null` - built-in Atom type
-- `MyAtom = :[]` - Atom type definition
+- `MyAtom := ()` - Atom type definition
 
 ### Values
 - `null` - the value of the Null type (`null->type` is `Null`)
-- `MyAtom()` - the value of the `MyAtom` type (`MyAtom()->type` is `MyAtom`)
+- `MyAtom` - the value of the `MyAtom` type (`MyAtom->type` is `MyAtom`)
 
 ## Enumerations and Boolean
 
 Enumerations are types with a fixed set of values. The `Boolean` type is a special case of an enumeration.
 
 ### Types
-- `Suit = :[Clubs, Diamonds, Hearts, Spades]` - enumeration type definition
+- `Suit := [Clubs, Diamonds, Hearts, Spades]` - enumeration type definition
 - `BlackSuit = Suit[Clubs, Spades]` - enumeration subset type based on the `Suit` enumeration type
 - `Boolean` - built-in enumeration type
 - `True`, `False` - enumeration subset types based on `Boolean`
@@ -107,29 +107,49 @@ More about errors can be read [here](23-working-with-error-values.md)
 - `*Integer` = `Impure<Integer>` = `Result<Integer, ExternalError>`
 - `*Result<Integer, String>` = `Impure<Result<Integer, String>>` = `Result<Integer, ExternalError|String>`
 
-## Sealed
 
-Sealed types are used to encapsulate the data and behavior similarly to OOP. They must be defined based on a record type.
+## Data
+
+Data types are similar to structs and records in other languages. Their data is accessible and they can automatically take
+the shape of its building type. They have no constructors and can be treated as constants.
 
 ### Types
-- `Product = $[id: Integer<1..>, name: String<1..100>, price: Real<0..>]` - sealed type definition
+- `MyInteger := Integer` - data type definition
+- `GpsPoint := [latitude: Real<-90..90>, longitude: Real<-180..180>]` - data type definition based on a tuple type
+
+### Values
+- `x = MyInteger:5` - data type value (`x->type` is `OddInteger`, `x->value` is `5`)
+- `p = GpsPoint:[51.5074, 0.1278]` - data type value (`p->type` is `GpsPoint`, `p.0` is `51.5074`)
+
+
+## Open
+
+Open types are also similar to structs and records but unlike the data types, they may have constructors and
+invariant checkers. On the other hand, they are not automatically taking the shape of their building type and they
+are not constants.
+
+### Types
+- `OddInteger := #Integer @ NotAnOddInteger :: ?whenValueOf(# % 2) is { 0: Error(NotAnOddInteger[]) }` - open type definition
+- `GpsPoint := #[latitude: Real<-90..90>, longitude: Real<-180..180>]` - open type definition based on a tuple type
+
+### Values
+- `x = OddInteger(5)` - open type value (`x->type` is `OddInteger`, `x->value` is `5`)
+- `p = GpsPoint[51.5074, 0.1278]` - open type value (`p->type` is `GpsPoint`, `p.0` is `51.5074`)
+
+
+## Sealed
+
+Sealed types are used to encapsulate the data and behavior similarly to OOP. Like the open types, 
+they may have constructors and invariant checkers.
+
+### Types
+- `Product := $[id: Integer<1..>, name: String<1..100>, price: Real<0..>]` - sealed type definition
 
 ### Values
 - `p = Product[1, 'Apple', 1.5]` - sealed type value (`p->type` is `Product`)
 
 Check [Functions](03-functions.md#Constructors) for more information on how to define a constructor and an invariant checker.
 
-## Open
-
-Open types are similar to structs and records in other languages. Their data is accessible.
-
-### Types
-- `OddInteger = #Integer @ NotAnOddInteger :: ?whenValueOf(# % 2) is { 0: Error(NotAnOddInteger[]) }` - open type definition
-- `GpsPoint = [latitude: Real<-90..90>, longitude: Real<-180..180>]` - open type definition based on a tuple type
-
-### Values
-- `x = OddInteger(5)` - open type value (`x->type` is `OddInteger`, `x->value` is `5`)
-- `p = GpsPoint[51.5074, 0.1278]` - open type value (`p->type` is `GpsPoint`, `p.0` is `51.5074`)
 
 ## Function
 
@@ -168,7 +188,7 @@ The shape types define a common way to access different values which share a sim
 - `Shape<Integer>` (or in short syntax - `{Integer}`)
 - `Shape<[x: Real, y: Real, ...]>` (or in short syntax - `{x: Real, y: Real, ...}`) 
 
-A value `v` is of type `Shape<T>` if its type `V` is a subtype of `T` or `V` is an open type based on `T` or 
+A value `v` is of type `Shape<T>` if its type `V` is a subtype of `T` or `V` is a data type based on `T` or 
 there is a defined cast method `V ==> T` with no error return type.
 ```walnut
 getName = ^obj: {String} => String :: 'The name is: + obj->shape(`{String});

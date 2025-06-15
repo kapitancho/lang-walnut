@@ -7,36 +7,36 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 final class WithValuesTest extends CodeExecutionTestHelper {
 
 	public function testWithValuesEnumeration(): void {
-		$result = $this->executeCodeSnippet("type{MyEnumeration}->withValues[MyEnumeration.A, MyEnumeration.C];", "MyEnumeration = :[A, B, C];");
+		$result = $this->executeCodeSnippet("type{MyEnumeration}->withValues[MyEnumeration.A, MyEnumeration.C];", "MyEnumeration := (A, B, C);");
 		$this->assertEquals("type{MyEnumeration[A, C]}", $result);
 	}
 
 	public function testWithValuesEnumerationInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet("Invalid parameter type",
-			"type{MyEnumeration}->withValues[MyEnumeration.A, OtherEnum.X];", "OtherEnum = :[X]; MyEnumeration = :[A, B, C];");
+			"type{MyEnumeration}->withValues[MyEnumeration.A, OtherEnum.X];", "OtherEnum := (X); MyEnumeration := (A, B, C);");
 	}
 
 	public function testWithValuesEnumerationMetaType(): void {
 		$result = $this->executeCodeSnippet("getWithValues(type{MyEnumeration});",
-			"MyEnumeration = :[A, B, C]; getWithValues = ^Type<Enumeration> => Result<Type<EnumerationSubset>, UnknownEnumerationValue> :: #->withValues[MyEnumeration.A, MyEnumeration.C];");
+			"MyEnumeration := (A, B, C); getWithValues = ^Type<Enumeration> => Result<Type<EnumerationSubset>, UnknownEnumerationValue> :: #->withValues[MyEnumeration.A, MyEnumeration.C];");
 		$this->assertEquals("type{MyEnumeration[A, C]}", $result);
 	}
 
 	public function testWithValuesEnumerationMetaTypeUnknown(): void {
 		$result = $this->executeCodeSnippet("getWithValues(type{MyEnumeration});",
-			"OtherEnum = :[X]; MyEnumeration = :[A, B, C]; getWithValues = ^Type<Enumeration> => Result<Type<EnumerationSubset>, UnknownEnumerationValue> :: #->withValues[MyEnumeration.A, OtherEnum.X];");
-		$this->assertEquals("@UnknownEnumerationValue[\n\tenumeration: type{MyEnumeration},\n\tvalue: OtherEnum.X\n]", $result);
+			"OtherEnum := (X); MyEnumeration := (A, B, C); getWithValues = ^Type<Enumeration> => Result<Type<EnumerationSubset>, UnknownEnumerationValue> :: #->withValues[MyEnumeration.A, OtherEnum.X];");
+		$this->assertEquals("@UnknownEnumerationValue!!!!![\n\tenumeration: type{MyEnumeration},\n\tvalue: OtherEnum.X\n]", $result);
 	}
 
 	/*
 	public function testWithValuesEnumerationSubset(): void {
-		$result = $this->executeCodeSnippet("type{MyEnumeration[A, C]}->withValues[MyEnumeration.A];", "MyEnumeration = :[A, B, C];");
+		$result = $this->executeCodeSnippet("type{MyEnumeration[A, C]}->withValues[MyEnumeration.A];", "MyEnumeration := (A, B, C);");
 		$this->assertEquals("type{MyEnumeration[A]}", $result);
 	}*/
 
 	/*public function testWithValuesEnumerationSubsetMetaType(): void {
 		$result = $this->executeCodeSnippet("getWithValues(type{MyEnumeration[A, C]});",
-			"MyEnumeration = :[A, B, C]; getWithValues = ^Type<EnumerationSubset> => Result<Type<EnumerationSubset>, UnknownEnumerationValue> :: #->withValues[MyEnumeration.A];");
+			"MyEnumeration := (A, B, C); getWithValues = ^Type<EnumerationSubset> => Result<Type<EnumerationSubset>, UnknownEnumerationValue> :: #->withValues[MyEnumeration.A];");
 		$this->assertEquals("type{MyEnumeration[A]}", $result);
 	}*/
 

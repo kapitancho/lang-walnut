@@ -18,12 +18,12 @@ final class CodeExecutionTest extends CodeExecutionTestHelper {
 
 	public function testCodeExecutionCompilationValueUnknownType(): void {
 		$this->expectException(AstProgramCompilationException::class);
-		$this->executeCodeSnippet('MyAtom();');
+		$this->executeCodeSnippet('MyAtom;');
 	}
 
 	public function testCodeExecutionCompilationValueUnknownEnumerationValue(): void {
 		$this->expectException(AstProgramCompilationException::class);
-		$this->executeCodeSnippet('MyEnum.X;', 'MyEnum = :[A, B, C];');
+		$this->executeCodeSnippet('MyEnum.X;', 'MyEnum := (A, B, C);');
 	}
 
 	public function testCodeExecutionCompilationValueUnknownEnumerationType(): void {
@@ -33,7 +33,7 @@ final class CodeExecutionTest extends CodeExecutionTestHelper {
 
 	public function testCodeExecutionCompilationTypeUnknownEnumerationValue(): void {
 		$this->expectException(AstProgramCompilationException::class);
-		$this->executeCodeSnippet('type{MyEnum[X]};', 'MyEnum = :[A, B, C];');
+		$this->executeCodeSnippet('type{MyEnum[X]};', 'MyEnum := (A, B, C);');
 	}
 
 	public function testCodeExecutionCompilationUnknownType(): void {

@@ -8,7 +8,7 @@ final class WithTest extends CodeExecutionTestHelper {
 
 	public function testWithArrayArrayOk(): void {
 		$result = $this->executeCodeSnippet("{MyOpen[1,3,5]}->testWith[2,6];", <<<NUT
-			MyOpen = #Array<Integer, 2..5>;
+			MyOpen := #Array<Integer, 2..5>;
 			MyOpen->testWith(^param: Array<Integer, 1..3> => MyOpen) :: $->with(param);
 		NUT);
 		$this->assertEquals("MyOpen[2, 6, 5]", $result);
@@ -18,7 +18,7 @@ final class WithTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet(
 			"due to incompatible item type",
 			"{MyOpen[1,3,5]}->testWith[2,6];", <<<NUT
-			MyOpen = #Array<Integer, 2..5>;
+			MyOpen := #Array<Integer, 2..5>;
 			MyOpen->testWith(^param: Array<Real, 1..3> => MyOpen) :: $->with(param);
 		NUT);
 	}
@@ -27,14 +27,14 @@ final class WithTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet(
 			"due to incompatible length",
 			"{MyOpen[1,3,5]}->testWith[2,6];", <<<NUT
-			MyOpen = #Array<Integer, 2..5>;
+			MyOpen := #Array<Integer, 2..5>;
 			MyOpen->testWith(^param: Array<Integer, 1..10> => MyOpen) :: $->with(param);
 		NUT);
 	}
 
 	public function testWithArrayTupleOk(): void {
 		$result = $this->executeCodeSnippet("{MyOpen[1,3,5]}->testWith[2,6];", <<<NUT
-			MyOpen = #Array<Integer, 2..5>;
+			MyOpen := #Array<Integer, 2..5>;
 			MyOpen->testWith(^param: [Integer, Integer[1, 6]] => MyOpen) :: $->with(param);
 		NUT);
 		$this->assertEquals("MyOpen[2, 6, 5]", $result);
@@ -44,7 +44,7 @@ final class WithTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet(
 			"due to incompatible item type",
 			"{MyOpen[1,3,5]}->testWith[2,6];", <<<NUT
-			MyOpen = #Array<Integer, 2..5>;
+			MyOpen := #Array<Integer, 2..5>;
 			MyOpen->testWith(^param: [Integer, String] => MyOpen) :: $->with(param);
 		NUT);
 	}
@@ -53,7 +53,7 @@ final class WithTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet(
 			"due to incompatible length",
 			"{MyOpen[1,3,5]}->testWith[2,6];", <<<NUT
-			MyOpen = #Array<Integer, 2..5>;
+			MyOpen := #Array<Integer, 2..5>;
 			MyOpen->testWith(^param: [Integer, Integer, Integer, Integer, Integer, Integer] => MyOpen) :: $->with(param);
 		NUT);
 	}
@@ -62,14 +62,14 @@ final class WithTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet(
 			"due to incompatible length",
 			"{MyOpen[1,3,5]}->testWith[2,6];", <<<NUT
-			MyOpen = #Array<Integer, 2..5>;
+			MyOpen := #Array<Integer, 2..5>;
 			MyOpen->testWith(^param: [Integer, Integer, ...Integer] => MyOpen) :: $->with(param);
 		NUT);
 	}
 
 	public function testWithTupleArrayOk(): void {
 		$result = $this->executeCodeSnippet("{MyOpen[1,3.14,5,-0.7]}->testWith[2,6];", <<<NUT
-			MyOpen = #[Integer, Real, Integer, Real];
+			MyOpen := #[Integer, Real, Integer, Real];
 			MyOpen->testWith(^param: Array<Integer, 1..3> => MyOpen) :: $->with(param);
 		NUT);
 		$this->assertEquals("MyOpen[2, 6, 5, -0.7]", $result);
@@ -79,7 +79,7 @@ final class WithTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet(
 			"due to incompatible length",
 			"{MyOpen[1,3.14,5,-0.7]}->testWith[2,6];", <<<NUT
-			MyOpen = #[Integer, Real, Integer, Real];
+			MyOpen := #[Integer, Real, Integer, Real];
 			MyOpen->testWith(^param: Array<Integer, 1..5> => MyOpen) :: $->with(param);
 		NUT);
 	}
@@ -88,14 +88,14 @@ final class WithTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet(
 			"due to incompatible type at index 0",
 			"{MyOpen[1,3.14,5,-0.7]}->testWith[2,6];", <<<NUT
-			MyOpen = #[Integer, Real, Integer, Real];
+			MyOpen := #[Integer, Real, Integer, Real];
 			MyOpen->testWith(^param: Array<Real, 1..3> => MyOpen) :: $->with(param);
 		NUT);
 	}
 
 	public function testWithTupleTupleOk(): void {
 		$result = $this->executeCodeSnippet("{MyOpen[1,3.14,5,-0.7]}->testWith[2,6];", <<<NUT
-			MyOpen = #[Integer, Real, Integer, Real];
+			MyOpen := #[Integer, Real, Integer, Real];
 			MyOpen->testWith(^param: [Integer, Integer] => MyOpen) :: $->with(param);
 		NUT);
 		$this->assertEquals("MyOpen[2, 6, 5, -0.7]", $result);
@@ -105,7 +105,7 @@ final class WithTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet(
 			"due to incompatible length",
 			"{MyOpen[1,3.14,5,-0.7]}->testWith[2,6];", <<<NUT
-			MyOpen = #[Integer, Real, Integer, Real];
+			MyOpen := #[Integer, Real, Integer, Real];
 			MyOpen->testWith(^param: [Integer, Integer, Integer, Integer, Integer] => MyOpen) :: $->with(param);
 		NUT);
 	}
@@ -114,7 +114,7 @@ final class WithTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet(
 			"with a rest type",
 			"{MyOpen[1,3.14,5,-0.7]}->testWith[2,6];", <<<NUT
-			MyOpen = #[Integer, Real, Integer, Real];
+			MyOpen := #[Integer, Real, Integer, Real];
 			MyOpen->testWith(^param: [Integer, Integer, ... Integer] => MyOpen) :: $->with(param);
 		NUT);
 	}
@@ -123,7 +123,7 @@ final class WithTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet(
 			"due to incompatible type at index 0",
 			"{MyOpen[1,3.14,5,-0.7]}->testWith[2,6];", <<<NUT
-			MyOpen = #[Integer, Real, Integer, Real];
+			MyOpen := #[Integer, Real, Integer, Real];
 			MyOpen->testWith(^param: [Real, Real] => MyOpen) :: $->with(param);
 		NUT);
 	}
@@ -131,7 +131,7 @@ final class WithTest extends CodeExecutionTestHelper {
 
 	public function testWithMapMapOk(): void {
 		$result = $this->executeCodeSnippet("{MyOpen[a:1,b:3,c:5]}->testWith[c:2,d:6];", <<<NUT
-			MyOpen = #Map<Integer>;
+			MyOpen := #Map<Integer>;
 			MyOpen->testWith(^param: Map<Integer, 1..3> => MyOpen) :: $->with(param);
 		NUT);
 		$this->assertEquals("MyOpen[a: 1, b: 3, c: 2, d: 6]", $result);
@@ -141,7 +141,7 @@ final class WithTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet(
 			"due to incompatible item type",
 			"{MyOpen[a:1,b:3,c:5]}->testWith[c:2,d:6.28];", <<<NUT
-			MyOpen = #Map<Integer>;
+			MyOpen := #Map<Integer>;
 			MyOpen->testWith(^param: Map<Real, 1..3> => MyOpen) :: $->with(param);
 		NUT);
 	}
@@ -150,14 +150,14 @@ final class WithTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet(
 			"with a limited length",
 			"{MyOpen[a:1,b:3,c:5]}->testWith[c:2,d:6];", <<<NUT
-			MyOpen = #Map<Integer, ..5>;
+			MyOpen := #Map<Integer, ..5>;
 			MyOpen->testWith(^param: Map<Integer, 1..3> => MyOpen) :: $->with(param);
 		NUT);
 	}
 
 	public function testWithMapRecordOk(): void {
 		$result = $this->executeCodeSnippet("{MyOpen[a:1,b:3,c:5]}->testWith[c:2,d:6];", <<<NUT
-			MyOpen = #Map<Integer>;
+			MyOpen := #Map<Integer>;
 			MyOpen->testWith(^param: [c: Integer, d: Integer] => MyOpen) :: $->with(param);
 		NUT);
 		$this->assertEquals("MyOpen[a: 1, b: 3, c: 2, d: 6]", $result);
@@ -167,7 +167,7 @@ final class WithTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet(
 			"due to incompatible item type",
 			"{MyOpen[a:1,b:3,c:5]}->testWith[c:2,d:6.28];", <<<NUT
-			MyOpen = #Map<Integer>;
+			MyOpen := #Map<Integer>;
 			MyOpen->testWith(^param: [c: Real, d: Integer] => MyOpen) :: $->with(param);
 		NUT);
 	}
@@ -176,7 +176,7 @@ final class WithTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet(
 			"with a limited length",
 			"{MyOpen[a:1,b:3,c:5]}->testWith[c:2,d:6];", <<<NUT
-			MyOpen = #Map<Integer, ..5>;
+			MyOpen := #Map<Integer, ..5>;
 			MyOpen->testWith(^param: [c: Integer, d: Integer] => MyOpen) :: $->with(param);
 		NUT);
 	}
@@ -186,14 +186,14 @@ final class WithTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet(
 			"Cannot call 'with' on Record type MyOpen with a parameter of Map type Map<Integer, 1..3>",
 			"{MyOpen[a:1,b:3,c:5]}->testWith[c:2,d:6];", <<<NUT
-			MyOpen = #[a: Integer, b: Integer, c: Integer];
+			MyOpen := #[a: Integer, b: Integer, c: Integer];
 			MyOpen->testWith(^param: Map<Integer, 1..3> => MyOpen) :: $->with(param);
 		NUT);
 	}
 
 	public function testWithRecordRecordOk(): void {
 		$result = $this->executeCodeSnippet("{MyOpen[a:1,b:3,c:5]}->testWith[b:2,c:6];", <<<NUT
-			MyOpen = #[a: Integer, b: Integer, c: Integer];
+			MyOpen := #[a: Integer, b: Integer, c: Integer];
 			MyOpen->testWith(^param: [b: Integer, c: Integer] => MyOpen) :: $->with(param);
 		NUT);
 		$this->assertEquals("MyOpen[a: 1, b: 2, c: 6]", $result);
@@ -203,7 +203,7 @@ final class WithTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet(
 			"due to incompatible type at key c",
 			"{MyOpen[a:1,b:3,c:5]}->testWith[b:2,c:6];", <<<NUT
-			MyOpen = #[a: Integer, b: Integer, c: Integer];
+			MyOpen := #[a: Integer, b: Integer, c: Integer];
 			MyOpen->testWith(^param: [b: Integer, c: Real] => MyOpen) :: $->with(param);
 		NUT);
 	}
@@ -212,7 +212,7 @@ final class WithTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet(
 			"due to incompatible type at key d",
 			"{MyOpen[a:1,b:3,c:5]}->testWith[c:2,d:6];", <<<NUT
-			MyOpen = #[a: Integer, b: Integer, c: Integer];
+			MyOpen := #[a: Integer, b: Integer, c: Integer];
 			MyOpen->testWith(^param: [c: Integer, d: Integer] => MyOpen) :: $->with(param);
 		NUT);
 	}
@@ -221,7 +221,7 @@ final class WithTest extends CodeExecutionTestHelper {
 
 	public function testWithValidatorOk(): void {
 		$result = $this->executeCodeSnippet("{MyOpen[a:1,b:3,c:5]}->testWith[b:2,c:6];", <<<NUT
-			MyOpen = #[a: Integer, b: Integer, c: Integer] :: null;
+			MyOpen := #[a: Integer, b: Integer, c: Integer] :: null;
 			MyOpen->testWith(^param: [b: Integer, c: Integer] => MyOpen) :: $->with(param);
 		NUT);
 		$this->assertEquals("MyOpen[a: 1, b: 2, c: 6]", $result);
@@ -229,8 +229,8 @@ final class WithTest extends CodeExecutionTestHelper {
 
 	public function testWithValidatorWithErrorTypeOk(): void {
 		$result = $this->executeCodeSnippet("?noError(MyOpen[a:1,b:3,c:5])->testWith[b:2,c:6];", <<<NUT
-			MyError = :[];
-			MyOpen = #[a: Integer, b: Integer, c: Integer] @ MyError :: null;
+			MyError := ();
+			MyOpen := #[a: Integer, b: Integer, c: Integer] @ MyError :: null;
 			MyOpen->testWith(^param: [b: Integer, c: Integer] => Result<MyOpen, MyError>) :: $->with(param);
 		NUT);
 		$this->assertEquals("MyOpen[a: 1, b: 2, c: 6]", $result);
@@ -238,19 +238,19 @@ final class WithTest extends CodeExecutionTestHelper {
 
 	public function testWithValidatorWithErrorTypeReturnErrorValue(): void {
 		$result = $this->executeCodeSnippet("?noError(MyOpen[a:1,b:3,c:5])->testWith[b:2,c:6];", <<<NUT
-			MyError = :[];
-			MyOpen = #[a: Integer, b: Integer, c: Integer] @ MyError :: ?when(#b == 2) { => @MyError() };
+			MyError := ();
+			MyOpen := #[a: Integer, b: Integer, c: Integer] @ MyError :: ?when(#b == 2) { => @MyError };
 			MyOpen->testWith(^param: [b: Integer, c: Integer] => Result<MyOpen, MyError>) :: $->with(param);
 		NUT);
-		$this->assertEquals("@MyError()", $result);
+		$this->assertEquals("@MyError", $result);
 	}
 
 	public function testWithValidatorWithErrorTypeWrongReturnType(): void {
 		$this->executeErrorCodeSnippet(
 			"expected a return value of type MyOpen, got Result<MyOpen, MyError>",
 			"?noError(MyOpen[a:1,b:3,c:5])->testWith[b:2,c:6];", <<<NUT
-			MyError = :[];
-			MyOpen = #[a: Integer, b: Integer, c: Integer] @ MyError :: null;
+			MyError := ();
+			MyOpen := #[a: Integer, b: Integer, c: Integer] @ MyError :: null;
 			MyOpen->testWith(^param: [b: Integer, c: Integer] => MyOpen) :: $->with(param);
 		NUT);
 	}

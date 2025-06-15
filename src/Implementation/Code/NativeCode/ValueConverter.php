@@ -9,13 +9,11 @@ use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\Method;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
-use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\ResultType;
-use Walnut\Lang\Blueprint\Type\ShapeType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnionType;
+use Walnut\Lang\Blueprint\Value\DataValue;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
-use Walnut\Lang\Blueprint\Value\OpenValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
@@ -88,7 +86,7 @@ final readonly class ValueConverter {
 	private function isError(Value $result): bool {
 		return
 			$result instanceof ErrorValue &&
-			$result->errorValue instanceof OpenValue &&
+			$result->errorValue instanceof DataValue &&
 			$result->errorValue->type->name->equals(
 				new TypeNameIdentifier('CastNotAvailable')
 			);
@@ -103,7 +101,7 @@ final readonly class ValueConverter {
 			return $sourceValue;
 		}
 		$tv = $sourceValue;
-		while ($tv instanceof OpenValue) {
+		while ($tv instanceof DataValue) {
 			if ($tv->type->valueType->isSubtypeOf($targetType)) {
 				return $tv->value;
 			}
@@ -187,7 +185,7 @@ final readonly class ValueConverter {
 		} catch (IdentifierException) {}
 
 		return $programRegistry->valueRegistry->error(
-			$programRegistry->valueRegistry->openValue(
+			$programRegistry->valueRegistry->dataValue(
 				new TypeNameIdentifier('CastNotAvailable'),
 				$programRegistry->valueRegistry->record([
 					'from' => $programRegistry->valueRegistry->type($sourceValue->type),

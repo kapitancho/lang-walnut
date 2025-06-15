@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Blueprint\Program\Registry;
 
 use Walnut\Lang\Blueprint\Code\Expression\ConstantExpression;
+use Walnut\Lang\Blueprint\Code\Expression\DataExpression;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MatchErrorExpression;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpression;
@@ -74,6 +75,11 @@ interface ExpressionRegistry {
 	public function matchValue(Expression $condition, array $pairs): MatchExpression;
 	public function matchIf(Expression $condition, Expression $then, Expression $else): MatchExpression;
 	public function matchError(Expression $condition, Expression $onError, Expression|null $else): MatchErrorExpression;
+
+	public function data(
+		TypeNameIdentifier $typeName,
+		Expression $parameter
+	): DataExpression;
 
 	public function functionCall(Expression $target, Expression $parameter): MethodCallExpression;
 	public function constructorCall(

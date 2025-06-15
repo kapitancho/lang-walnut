@@ -13,7 +13,7 @@ There are five different kinds of custom types in Walnut:
 ### Short syntax (examples)
 ```walnut
 /* Atom type definition */
-UnknownProduct = :[];
+UnknownProduct := ();
 
 /* Atom value usage */
 myProduct = UnknownProduct(); 
@@ -43,7 +43,7 @@ title = myProduct->getProductTitle; /* 'n/a' */
 ### Short syntax (examples)
 ```walnut
 /* Enumeration type definition */
-Suit = :[Clubs, Diamonds, Hearts, Spades];
+Suit := [Clubs, Diamonds, Hearts, Spades];
 
 /* Enumeration value usage */
 mySuit = Suit.Spades;
@@ -112,7 +112,7 @@ s = p->asString; /* '(x: 3.3, y: 1.0)' */
 
 ### Short syntax (examples)
 ```walnut
-GpsPoint = #[latitude: Real<-90..90>, longitude: Real<-180..180>]
+GpsPoint := #[latitude: Real<-90..90>, longitude: Real<-180..180>]
 
 OddInteger #Integer @ NotAnOddInteger :: 
     ?when({# % 2} == 0) { => @NotAnOddInteger[] }
@@ -140,9 +140,9 @@ xIsNorth = isPointNorth[latitude: 51.5074, longitude: 0.1278]; /* true */
 
 ### Short syntax (examples)
 ```walnut
-Product = $[id: Integer<1..>, name: String<1..100>, price: Mutable<Real<0..>>];
+Product := $[id: Integer<1..>, name: String<1..100>, price: Mutable<Real<0..>>];
 
-Point = $[x: Real, y: Real];
+Point := $[x: Real, y: Real];
 ```
 
 ### Summary
@@ -192,8 +192,8 @@ This is a unique feature of Walnut. There is a way to provide a validator functi
 error the value construction is rejected and the error is returned instead. It may again be used for both subtypes and sealed types.
 Invariant validators and constructors can be used or omitted independently.
 ```walnut
-NotAnOddInteger = :[]; /* define an Atom type for the error */
-OddInteger = #Integer @ NotAnOddInteger :: ?whenValueOf(# % 2) is { 0: => Error(NotAnOddInteger[]) };
+NotAnOddInteger := (); /* define an Atom type for the error */
+OddInteger := #Integer @ NotAnOddInteger :: ?whenValueOf(# % 2) is { 0: => Error(NotAnOddInteger[]) };
 ```
 It is important to know that while the constructor can be bypassed by using the `JsonValue->hydrateAs` method,
 the invariant validator is always executed. In case the validator returns an error, the `hydrateAs` method will return a `HydrationError`.

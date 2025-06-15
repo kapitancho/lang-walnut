@@ -36,12 +36,15 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 		return <<<NUT
 			MyTuple = [String];
 			MyRecord = [a: Boolean, b: ?Integer, c: ?Integer];
-			MySealed = \$Real;
-			MySealedTuple = \$[Boolean, ... Integer];
-			MySealedRecord = \$[a: Real, b: ?String, c: ?String, ... Boolean];
-			MyOpen = #Integer;
-			MyOpenTuple = #[Boolean, ... String];
-			MyOpenRecord = #[a: Real, b: ?String, c: ?String, ... Integer];
+			MySealed := \$Real;
+			MySealedTuple := \$[Boolean, ... Integer];
+			MySealedRecord := \$[a: Real, b: ?String, c: ?String, ... Boolean];
+			MyOpen := #Integer;
+			MyOpenTuple := #[Boolean, ... String];
+			MyOpenRecord := #[a: Real, b: ?String, c: ?String, ... Integer];
+			MyData := #Integer;
+			MyDataTuple := #[Boolean, ... String];
+			MyDataRecord := #[a: Real, b: ?String, c: ?String, ... Integer];
 		NUT;
 	}
 
@@ -205,6 +208,38 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 		);
 	}
 
+
+	public function testAnalyseSpreadPart5(): void {
+		$analyserContext = $this->programContext->programRegistry->analyserContext;
+		$filledAnalyserContext = $this->functionContextFiller->fillAnalyserContext(
+			$analyserContext,
+			$this->programContext->typeRegistry->typeByName(new TypeNameIdentifier('MyData')),
+			$this->programContext->typeRegistry->typeByName(new TypeNameIdentifier('MyRecord')),
+			null,
+			$this->programContext->typeRegistry->typeByName(new TypeNameIdentifier('MyDataRecord')),
+		);
+		$this->assertCount(11, $filledAnalyserContext->variableScope->variables());
+		$this->assertInstanceOf(
+			IntegerType::class,
+			$filledAnalyserContext->variableScope->typeOf(new VariableNameIdentifier('$$'))
+		);
+		$this->assertInstanceOf(
+			BooleanType::class,
+			$filledAnalyserContext->variableScope->typeOf(new VariableNameIdentifier('#a'))
+		);
+		$this->assertInstanceOf(
+			RealType::class,
+			$filledAnalyserContext->variableScope->typeOf(new VariableNameIdentifier('%a'))
+		);
+		$this->assertInstanceOf(
+			MapType::class,
+			$filledAnalyserContext->variableScope->typeOf(new VariableNameIdentifier('%_'))
+		);
+		$this->assertInstanceOf(
+			IntegerType::class,
+			$filledAnalyserContext->variableScope->typeOf(new VariableNameIdentifier('%_'))->itemType,
+		);
+	}
 
 
 
@@ -467,6 +502,77 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 			),
 			($this->programContext->valueRegistry->openValue(
 				new TypeNameIdentifier('MyOpenRecord'),
+				$this->programContext->valueRegistry->record([
+					'a' => $this->programContext->valueRegistry->real(3.14),
+					'b' => $this->programContext->valueRegistry->string('str'),
+				]),
+			)),
+			null,
+			$this->programContext->typeRegistry->nothing,
+			null,
+		);
+		$this->assertCount(11, $filledExecutionContext->variableValueScope->variables());
+		$this->assertInstanceOf(
+			RecordValue::class,
+			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('$$'))
+		);
+		$this->assertInstanceOf(
+			OpenValue::class,
+			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('$'))
+		);
+		$this->assertInstanceOf(
+			RealValue::class,
+			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('$a'))
+		);
+		$this->assertInstanceOf(
+			StringValue::class,
+			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('$b'))
+		);
+		$this->assertInstanceOf(
+			RecordValue::class,
+			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('$_'))
+		);
+		$this->assertInstanceOf(
+			ErrorValue::class,
+			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('$c'))
+		);
+		$this->assertInstanceOf(
+			OpenValue::class,
+			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('#'))
+		);
+		$this->assertInstanceOf(
+			RealValue::class,
+			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('#a'))
+		);
+		$this->assertInstanceOf(
+			StringValue::class,
+			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('#b'))
+		);
+		$this->assertInstanceOf(
+			ErrorValue::class,
+			$filledExecutionContext->variableValueScope->valueOf(new VariableNameIdentifier('#c'))
+		);
+	}
+
+	public function testExecuteSpreadPart5(): void {
+		$executionContext = $this->programContext->programRegistry->executionContext;
+		$filledExecutionContext = $this->functionContextFiller->fillExecutionContext(
+			$executionContext,
+			$this->programContext->typeRegistry->open(
+				new TypeNameIdentifier('MyDataRecord')
+			),
+			($this->programContext->valueRegistry->openValue(
+				new TypeNameIdentifier('MyDataRecord'),
+				$this->programContext->valueRegistry->record([
+					'a' => $this->programContext->valueRegistry->real(3.14),
+					'b' => $this->programContext->valueRegistry->string('str'),
+				]),
+			)),
+			$this->programContext->typeRegistry->open(
+				new TypeNameIdentifier('MyDataRecord')
+			),
+			($this->programContext->valueRegistry->openValue(
+				new TypeNameIdentifier('MyDataRecord'),
 				$this->programContext->valueRegistry->record([
 					'a' => $this->programContext->valueRegistry->real(3.14),
 					'b' => $this->programContext->valueRegistry->string('str'),

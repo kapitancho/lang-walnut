@@ -5,6 +5,7 @@ namespace Walnut\Lang\Blueprint\AST\Builder;
 use BcMath\Number;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ConstantExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ConstructorCallExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\DataExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\FunctionCallExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MatchErrorExpressionNode;
@@ -31,6 +32,7 @@ use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddAliasTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddAtomTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddConstructorMethodNode;
+use Walnut\Lang\Blueprint\AST\Node\Module\AddDataTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddEnumerationTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddMethodNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddOpenTypeNode;
@@ -70,6 +72,7 @@ use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\UnionTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\AtomValueNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\DataValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\EnumerationValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\ErrorValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\FalseValueNode;
@@ -102,6 +105,8 @@ interface NodeBuilder {
 	public function build(): ModuleNode;
 
 	public function constant(ValueNode $value): ConstantExpressionNode;
+
+	public function data(TypeNameIdentifier $typeName, ExpressionNode $value): DataExpressionNode;
 
 	public function constructorCall(
 		TypeNameIdentifier $typeName,
@@ -184,6 +189,11 @@ interface NodeBuilder {
 	public function addEnumeration(TypeNameIdentifier $name, array $values): AddEnumerationTypeNode;
 
 	public function addAlias(TypeNameIdentifier $name, TypeNode $aliasedType): AddAliasTypeNode;
+
+	public function addData(
+		TypeNameIdentifier $name,
+		TypeNode $valueType,
+	): AddDataTypeNode;
 
 	public function addOpen(
 		TypeNameIdentifier $name,
@@ -274,6 +284,7 @@ interface NodeBuilder {
 	public function errorValue(ValueNode $value): ErrorValueNode;
 	public function mutableValue(TypeNode $type, ValueNode $value): MutableValueNode;
 	public function atomValue(TypeNameIdentifier $name): AtomValueNode;
+	public function dataValue(TypeNameIdentifier $name, ValueNode $value): DataValueNode;
 	public function enumerationValue(TypeNameIdentifier $name, EnumValueIdentifier $enumValue): EnumerationValueNode;
 	/** @param array<string, ValueNode> $values */
 	public function recordValue(array $values): RecordValueNode;

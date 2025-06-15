@@ -8,7 +8,7 @@ final class ItemTest extends CodeExecutionTestHelper {
 
 	public function testItemEmpty(): void {
 		$result = $this->executeCodeSnippet("[]->item(4);");
-		$this->assertEquals("@IndexOutOfRange[index: 4]", $result);
+		$this->assertEquals("@IndexOutOfRange!!!!![index: 4]", $result);
 	}
 
 	public function testItemNonEmpty(): void {
@@ -18,7 +18,7 @@ final class ItemTest extends CodeExecutionTestHelper {
 
 	public function testItemNonEmptyIndexOutOfRange(): void {
 		$result = $this->executeCodeSnippet("[1, 2, 5, 10, 5]->item(10);");
-		$this->assertEquals("@IndexOutOfRange[index: 10]", $result);
+		$this->assertEquals("@IndexOutOfRange!!!!![index: 10]", $result);
 	}
 
 	public function testItemInvalidParameterValue(): void {
