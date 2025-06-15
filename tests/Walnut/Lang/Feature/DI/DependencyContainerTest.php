@@ -93,11 +93,11 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 
 	public function testData(): void {
 		$result = $this->executeCodeSnippet("f();", <<<NUT
-		A := Integer; ==> A :: A!!!!!42;
+		A := Integer; ==> A :: A!42;
 		B := A;
 		f = ^ %% B :: %;
 		NUT);
-		$this->assertEquals("B!!!!!A!!!!!42", $result);
+		$this->assertEquals("B!A!42", $result);
 	}
 
 	public function testDataWithError(): void {
@@ -105,7 +105,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 			"error returned while creating value (type: B)",
 			"f();",
 		<<<NUT
-		A := Integer; ==> A :: A!!!!!42;
+		A := Integer; ==> A :: A!42;
 		B := #A @ Null :: => @null;
 		f = ^ %% B :: %;
 		NUT);

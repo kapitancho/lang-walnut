@@ -18,9 +18,8 @@ enum Token: string {
 	case atom_type = '\:\(\)';
 	case enum_type_start = '\:\(';
 	case named_type = '\:\=';
-	case temporary_token = '\!\!\!\!\!';
 	case colon = '\:';
-	case type_proxy_keyword = '\![A-Z][a-zA-Z0-9_]*';
+	case type_proxy_keyword = '\\\\[A-Z][a-zA-Z0-9_]*';
 	case boolean_op_not = '\!';
 	case boolean_op = '(&&|\|\||\^\^)';
 	case lambda_param = '\^';

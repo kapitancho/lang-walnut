@@ -11,7 +11,7 @@ final class CastAsStringTest extends CodeExecutionTestHelper {
 		A := #[a: Integer, b: String];
 		getStringA = ^p: A => Result<String, CastNotAvailable> :: p->as(type{String});
 	NUT);
-		$this->assertEquals("@CastNotAvailable!!!!![from: type{A}, to: type{String}]", $result);
+		$this->assertEquals("@CastNotAvailable![from: type{A}, to: type{String}]", $result);
 	}
 
 	public function testAsStringWithExistingCast(): void {

@@ -81,7 +81,7 @@ final class UnionCallTest extends CodeExecutionTestHelper {
 				ab = ^ val: A|B => Result<String, MapItemNotFound> :: val.b;
 			NUT
 		);
-		$this->assertEquals("['hello', @MapItemNotFound!!!!![key: 'b']]", $result);
+		$this->assertEquals("['hello', @MapItemNotFound![key: 'b']]", $result);
 	}
 
 	public function testUnionPropertyAccessPartialRest(): void {
@@ -115,7 +115,7 @@ final class UnionCallTest extends CodeExecutionTestHelper {
 				A->ab(^ prop: String['a', 'b', 'c'] => Result<Integer|String, MapItemNotFound>) :: $$->item(prop);
 			NUT
 		);
-		$this->assertEquals("[42, @MapItemNotFound!!!!![key: 'c']]", $result);
+		$this->assertEquals("[42, @MapItemNotFound![key: 'c']]", $result);
 	}
 
 	public function testUnionPropertyAccessSubsetMayBeMissingRest(): void {

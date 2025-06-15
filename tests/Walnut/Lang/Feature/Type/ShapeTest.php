@@ -12,7 +12,7 @@ final class ShapeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFullSupersetDirectWithShape(): void {
-		$result = $this->executeCodeSnippet("useIntPair(getIntPair(IntPairType!!!!![first: 1, second: 5]));", <<<NUT
+		$result = $this->executeCodeSnippet("useIntPair(getIntPair(IntPairType![first: 1, second: 5]));", <<<NUT
 			IntPairType := [first: Integer, second: Integer];
 			IntPair = [first: Integer, second: Integer];
 			getIntPair = ^p: IntPairType => Shape<IntPair> :: p;
@@ -22,7 +22,7 @@ final class ShapeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFullSupersetDirectWithShapeExplicit(): void {
-		$result = $this->executeCodeSnippet("useIntPair(getIntPair(IntPairType!!!!![first: 1, second: 5]));", <<<NUT
+		$result = $this->executeCodeSnippet("useIntPair(getIntPair(IntPairType![first: 1, second: 5]));", <<<NUT
 			IntPairType := [first: Integer, second: Integer];
 			IntPair = [first: Integer, second: Integer];
 			getIntPair = ^p: IntPairType => Shape<IntPair> :: p->shape(`IntPair);
@@ -32,7 +32,7 @@ final class ShapeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFullSupersetDirectNoShape(): void {
-		$result = $this->executeCodeSnippet("useIntPair(IntPairType!!!!![first: 1, second: 5]);", <<<NUT
+		$result = $this->executeCodeSnippet("useIntPair(IntPairType![first: 1, second: 5]);", <<<NUT
 			IntPairType := [first: Integer, second: Integer];
 			IntPair = [first: Integer, second: Integer];
 			useIntPair = ^p: IntPairType => Integer :: p->shape(`IntPair).first + p->shape(`IntPair).second;
@@ -51,7 +51,7 @@ final class ShapeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFullSupersetCastWithShape(): void {
-		$result = $this->executeCodeSnippet("useIntPair(getIntPair(IntPairType!!!!![a: 1, b: 5]));", <<<NUT
+		$result = $this->executeCodeSnippet("useIntPair(getIntPair(IntPairType![a: 1, b: 5]));", <<<NUT
 			IntPairType := [a: Integer, b: Integer];
 			IntPair = [first: Integer, second: Integer];
 			IntPairType ==> IntPair :: [first: \$a, second: \$b];
@@ -62,7 +62,7 @@ final class ShapeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFullSupersetCastNoShape(): void {
-		$result = $this->executeCodeSnippet("useIntPair(IntPairType!!!!![a: 1, b: 5]);", <<<NUT
+		$result = $this->executeCodeSnippet("useIntPair(IntPairType![a: 1, b: 5]);", <<<NUT
 			IntPairType := [a: Integer, b: Integer];
 			IntPair = [first: Integer, second: Integer];
 			IntPairType ==> IntPair :: [first: \$a, second: \$b];
@@ -73,7 +73,7 @@ final class ShapeTest extends CodeExecutionTestHelper {
 
 	public function testStrictSupersetCastOk(): void {
 		// The cast may return an error and therefore only explicit usage is allowed.
-		$result = $this->executeCodeSnippet("useIntPair(getIntPair=>invoke(IntPairType!!!!![a: 1, b: 5]));", <<<NUT
+		$result = $this->executeCodeSnippet("useIntPair(getIntPair=>invoke(IntPairType![a: 1, b: 5]));", <<<NUT
 			IntPairType := [a: Integer, b: Integer];
 			IntPair = [first: Integer, second: Integer];
 			Incompatible := ();

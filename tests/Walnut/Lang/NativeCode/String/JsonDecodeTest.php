@@ -13,7 +13,7 @@ final class JsonDecodeTest extends CodeExecutionTestHelper {
 
 	public function testJsonDecodeInvalidJson(): void {
 		$result = $this->executeCodeSnippet("'invalid json'->jsonDecode;");
-		$this->assertEquals("@InvalidJsonString!!!!![value: 'invalid json']", $result);
+		$this->assertEquals("@InvalidJsonString![value: 'invalid json']", $result);
 	}
 
 }

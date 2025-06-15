@@ -49,27 +49,27 @@ final class AsStringTest extends CodeExecutionTestHelper {
 
 	public function testAsStringTuple(): void {
 		$result = $this->executeCodeSnippet("[1, 2]->asString;");
-		$this->assertEquals("@CastNotAvailable!!!!![\n\tfrom: type[Integer[1], Integer[2]],\n\tto: type{String}\n]", $result);
+		$this->assertEquals("@CastNotAvailable![\n\tfrom: type[Integer[1], Integer[2]],\n\tto: type{String}\n]", $result);
 	}
 
 	public function testAsStringRecord(): void {
 		$result = $this->executeCodeSnippet("[a: 1, b: 2]->asString;");
-		$this->assertEquals("@CastNotAvailable!!!!![\n\tfrom: type[a: Integer[1], b: Integer[2]],\n\tto: type{String}\n]", $result);
+		$this->assertEquals("@CastNotAvailable![\n\tfrom: type[a: Integer[1], b: Integer[2]],\n\tto: type{String}\n]", $result);
 	}
 
 	public function testAsStringSet(): void {
 		$result = $this->executeCodeSnippet("[1; 2]->asString;");
-		$this->assertEquals("@CastNotAvailable!!!!![\n\tfrom: type{Set<Integer[1, 2], 2..2>},\n\tto: type{String}\n]", $result);
+		$this->assertEquals("@CastNotAvailable![\n\tfrom: type{Set<Integer[1, 2], 2..2>},\n\tto: type{String}\n]", $result);
 	}
 
 	public function testAsStringOpen(): void {
 		$result = $this->executeCodeSnippet("{MyOpen[a: 'value']}->asString;", "MyOpen := #[a: String];");
-		$this->assertEquals("@CastNotAvailable!!!!![from: type{MyOpen}, to: type{String}]", $result);
+		$this->assertEquals("@CastNotAvailable![from: type{MyOpen}, to: type{String}]", $result);
 	}
 
 	public function testAsStringSealed(): void {
 		$result = $this->executeCodeSnippet("{MySealed[a: 'value']}->asString;", "MySealed := $[a: String];");
-		$this->assertEquals("@CastNotAvailable!!!!![from: type{MySealed}, to: type{String}]", $result);
+		$this->assertEquals("@CastNotAvailable![from: type{MySealed}, to: type{String}]", $result);
 	}
 
 	public function testAsStringAlias(): void {

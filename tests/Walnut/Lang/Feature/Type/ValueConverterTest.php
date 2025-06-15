@@ -17,7 +17,7 @@ final class ValueConverterTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("f(1);", <<<NUT
 		f = ^p :: p->as(`[a: Integer]);
 	NUT);
-		$this->assertEquals("@CastNotAvailable!!!!![\n\tfrom: type{Integer[1]},\n\tto: type[a: Integer]\n]", $result);
+		$this->assertEquals("@CastNotAvailable![\n\tfrom: type{Integer[1]},\n\tto: type[a: Integer]\n]", $result);
 	}
 
 }

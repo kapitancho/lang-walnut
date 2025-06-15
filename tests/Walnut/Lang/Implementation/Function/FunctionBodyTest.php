@@ -35,7 +35,7 @@ final class FunctionBodyTest extends CodeExecutionTestHelper {
 			MyRecord := #[a: String, b: Integer, c: ?Real]; 
 			rec = ^MyRecord => Result<Real, MapItemNotFound> :: {#a->length} + {#b} + ?noError(#c);
 		NUT);
-		$this->assertEquals("@MapItemNotFound!!!!![key: 'c']", $result);
+		$this->assertEquals("@MapItemNotFound![key: 'c']", $result);
 	}
 
 	public function testFunctionBodyError(): void {

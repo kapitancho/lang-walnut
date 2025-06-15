@@ -218,12 +218,12 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		$this->callHydrateAsError(
 			$this->valueRegistry->integer(123),
 			$this->typeRegistry->integer(1, 100),
-			"@HydrationError!!!!![\n	value: 123,\n	hydrationPath: 'value',\n	errorMessage: 'The integer value should be in the range 1..100'\n]"
+			"@HydrationError![\n	value: 123,\n	hydrationPath: 'value',\n	errorMessage: 'The integer value should be in the range 1..100'\n]"
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->true,
 			$this->typeRegistry->integer(),
-			"@HydrationError!!!!![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be an integer in the range -Infinity..+Infinity'\n]"
+			"@HydrationError![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be an integer in the range -Infinity..+Infinity'\n]"
 		);
 		$this->callHydrateAs(
 			$this->valueRegistry->integer(123),
@@ -240,7 +240,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				new Number(1),
 				new Number(5),
 			]),
-			"@HydrationError!!!!![\n	value: 123,\n	hydrationPath: 'value',\n	errorMessage: 'The integer value should be among 1, 5'\n]"
+			"@HydrationError![\n	value: 123,\n	hydrationPath: 'value',\n	errorMessage: 'The integer value should be among 1, 5'\n]"
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->true,
@@ -248,7 +248,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				new Number(1),
 				new Number(5),
 			]),
-			"@HydrationError!!!!![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be an integer among 1, 5'\n]"
+			"@HydrationError![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be an integer among 1, 5'\n]"
 		);
 
 		//Real
@@ -265,12 +265,12 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		$this->callHydrateAsError(
 			$this->valueRegistry->real(12.3),
 			$this->typeRegistry->real(1, 9.99),
-			"@HydrationError!!!!![\n	value: 12.3,\n	hydrationPath: 'value',\n	errorMessage: 'The real value should be in the range 1..9.99'\n]"
+			"@HydrationError![\n	value: 12.3,\n	hydrationPath: 'value',\n	errorMessage: 'The real value should be in the range 1..9.99'\n]"
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->true,
 			$this->typeRegistry->real(),
-			"@HydrationError!!!!![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a real number in the range -Infinity..+Infinity'\n]"
+			"@HydrationError![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a real number in the range -Infinity..+Infinity'\n]"
 		);
 		$this->callHydrateAs(
 			$this->valueRegistry->real(12.3),
@@ -296,7 +296,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				new Number(1),
 				new Number('3.14'),
 			]),
-			"@HydrationError!!!!![\n	value: 12.3,\n	hydrationPath: 'value',\n	errorMessage: 'The real value should be among 1, 3.14'\n]"
+			"@HydrationError![\n	value: 12.3,\n	hydrationPath: 'value',\n	errorMessage: 'The real value should be among 1, 3.14'\n]"
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->true,
@@ -304,7 +304,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				new Number(1),
 				new Number('3.14'),
 			]),
-			"@HydrationError!!!!![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a real number among 1, 3.14'\n]"
+			"@HydrationError![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a real number among 1, 3.14'\n]"
 		);
 
 		//String
@@ -316,12 +316,12 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		$this->callHydrateAsError(
 			$this->valueRegistry->string('hello'),
 			$this->typeRegistry->string(10, 100),
-			"@HydrationError!!!!![\n	value: 'hello',\n	hydrationPath: 'value',\n	errorMessage: 'The string value should be with a length between 10 and 100'\n]"
+			"@HydrationError![\n	value: 'hello',\n	hydrationPath: 'value',\n	errorMessage: 'The string value should be with a length between 10 and 100'\n]"
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->true,
 			$this->typeRegistry->string(),
-			"@HydrationError!!!!![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a string with a length between 0 and +Infinity'\n]"
+			"@HydrationError![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a string with a length between 0 and +Infinity'\n]"
 		);
 		$this->callHydrateAs(
 			$this->valueRegistry->string('hi!'),
@@ -338,7 +338,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				'hello',
 				'world',
 			]),
-			"@HydrationError!!!!![\n	value: 'hi!',\n	hydrationPath: 'value',\n	errorMessage: 'The string value should be among hello, world'\n]"
+			"@HydrationError![\n	value: 'hi!',\n	hydrationPath: 'value',\n	errorMessage: 'The string value should be among hello, world'\n]"
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->true,
@@ -346,7 +346,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				'hello',
 				'world',
 			]),
-			"@HydrationError!!!!![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a string among hello, world'\n]"
+			"@HydrationError![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a string among hello, world'\n]"
 		);
 
 		//Boolean
@@ -358,7 +358,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		$this->callHydrateAsError(
 			$this->valueRegistry->string('hello'),
 			$this->typeRegistry->boolean,
-			"@HydrationError!!!!![\n	value: 'hello',\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a boolean'\n]"
+			"@HydrationError![\n	value: 'hello',\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a boolean'\n]"
 		);
 
 		//True
@@ -370,12 +370,12 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		$this->callHydrateAsError(
 			$this->valueRegistry->false,
 			$this->typeRegistry->true,
-			"@HydrationError!!!!![\n	value: false,\n	hydrationPath: 'value',\n	errorMessage: 'The boolean value should be true'\n]"
+			"@HydrationError![\n	value: false,\n	hydrationPath: 'value',\n	errorMessage: 'The boolean value should be true'\n]"
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->string('hello'),
 			$this->typeRegistry->true,
-			"@HydrationError!!!!![\n	value: 'hello',\n	hydrationPath: 'value',\n	errorMessage: 'The value should be \\`true\\`'\n]"
+			"@HydrationError![\n	value: 'hello',\n	hydrationPath: 'value',\n	errorMessage: 'The value should be \\`true\\`'\n]"
 		);
 
 		//False
@@ -387,12 +387,12 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		$this->callHydrateAsError(
 			$this->valueRegistry->true,
 			$this->typeRegistry->false,
-			"@HydrationError!!!!![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The boolean value should be false'\n]"
+			"@HydrationError![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The boolean value should be false'\n]"
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->string('hello'),
 			$this->typeRegistry->false,
-			"@HydrationError!!!!![\n	value: 'hello',\n	hydrationPath: 'value',\n	errorMessage: 'The value should be \\`false\\`'\n]"
+			"@HydrationError![\n	value: 'hello',\n	hydrationPath: 'value',\n	errorMessage: 'The value should be \\`false\\`'\n]"
 		);
 
 		//Null
@@ -404,7 +404,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		$this->callHydrateAsError(
 			$this->valueRegistry->string('hello'),
 			$this->typeRegistry->null,
-			"@HydrationError!!!!![\n	value: 'hello',\n	hydrationPath: 'value',\n	errorMessage: 'The value should be \\`null\\`'\n]"
+			"@HydrationError![\n	value: 'hello',\n	hydrationPath: 'value',\n	errorMessage: 'The value should be \\`null\\`'\n]"
 		);
 
 		//Array
@@ -425,12 +425,12 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				$this->valueRegistry->string("Hello"),
 			]),
 			$this->typeRegistry->array($this->typeRegistry->any, 10, 100),
-			"@HydrationError!!!!![\n	value: [42, 'Hello'],\n	hydrationPath: 'value',\n	errorMessage: 'The array value should be with a length between 10 and 100'\n]"
+			"@HydrationError![\n	value: [42, 'Hello'],\n	hydrationPath: 'value',\n	errorMessage: 'The array value should be with a length between 10 and 100'\n]"
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->true,
 			$this->typeRegistry->array(),
-			"@HydrationError!!!!![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be an array with a length between 0 and +Infinity'\n]"
+			"@HydrationError![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be an array with a length between 0 and +Infinity'\n]"
 		);
 		if (0) $this->callHydrateAsError(
 			$this->valueRegistry->tuple([
@@ -438,7 +438,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				$this->valueRegistry->string("Hello"),
 			]),
 			$this->typeRegistry->array($this->typeRegistry->integer()),
-			"@HydrationError!!!!![\n	value: 'Hello',\n	hydrationPath: 'value'[1],\n	errorMessage: 'The value should be an integer in the range -Infinity..+Infinity'\n]"
+			"@HydrationError![\n	value: 'Hello',\n	hydrationPath: 'value'[1],\n	errorMessage: 'The value should be an integer in the range -Infinity..+Infinity'\n]"
 		);
 
 		//Map
@@ -459,12 +459,12 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				'b' => $this->valueRegistry->string("Hello"),
 			]),
 			$this->typeRegistry->map($this->typeRegistry->any, 10, 100),
-			"@HydrationError!!!!![\n	value: [a: 42, b: 'Hello'],\n	hydrationPath: 'value',\n	errorMessage: 'The map value should be with a length between 10 and 100'\n]"
+			"@HydrationError![\n	value: [a: 42, b: 'Hello'],\n	hydrationPath: 'value',\n	errorMessage: 'The map value should be with a length between 10 and 100'\n]"
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->true,
 			$this->typeRegistry->map(),
-			"@HydrationError!!!!![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a map with a length between 0 and +Infinity'\n]"
+			"@HydrationError![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a map with a length between 0 and +Infinity'\n]"
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->record([
@@ -472,7 +472,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				'b' => $this->valueRegistry->string("Hello"),
 			]),
 			$this->typeRegistry->map($this->typeRegistry->integer()),
-			"@HydrationError!!!!![\n	value: 'Hello',\n	hydrationPath: 'value.b',\n	errorMessage: 'The value should be an integer in the range -Infinity..+Infinity'\n]"
+			"@HydrationError![\n	value: 'Hello',\n	hydrationPath: 'value.b',\n	errorMessage: 'The value should be an integer in the range -Infinity..+Infinity'\n]"
 		);
 
 		//Tuple
@@ -500,12 +500,12 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				$this->typeRegistry->string(),
 				$this->typeRegistry->boolean,
 			]),
-			"@HydrationError!!!!![\n	value: [42, 'Hello'],\n	hydrationPath: 'value',\n	errorMessage: 'The tuple value should be with 3 items'\n]"
+			"@HydrationError![\n	value: [42, 'Hello'],\n	hydrationPath: 'value',\n	errorMessage: 'The tuple value should be with 3 items'\n]"
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->true,
 			$this->typeRegistry->tuple([]),
-			"@HydrationError!!!!![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a tuple with 0 items'\n]"
+			"@HydrationError![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a tuple with 0 items'\n]"
 		);
 		if (0) $this->callHydrateAsError(
 			$this->valueRegistry->tuple([
@@ -516,7 +516,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				$this->typeRegistry->integer(),
 				$this->typeRegistry->string(10, 100),
 			]),
-			"@HydrationError!!!!![\n	value: 'Hello',\n	hydrationPath: 'value[1]',\n	errorMessage: 'The string value should be with a length between 10 and 100'\n]"
+			"@HydrationError![\n	value: 'Hello',\n	hydrationPath: 'value[1]',\n	errorMessage: 'The string value should be with a length between 10 and 100'\n]"
 		);
 
 		//Map
@@ -544,7 +544,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				'b' => $this->typeRegistry->string(),
 				'c' => $this->typeRegistry->boolean,
 			]),
-			"@HydrationError!!!!![\n	value: [a: 42, b: 'Hello'],\n	hydrationPath: 'value',\n	errorMessage: 'The record value should contain the key c'\n]"
+			"@HydrationError![\n	value: [a: 42, b: 'Hello'],\n	hydrationPath: 'value',\n	errorMessage: 'The record value should contain the key c'\n]"
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->record([
@@ -555,12 +555,12 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				'a' => $this->typeRegistry->any,
 				'c' => $this->typeRegistry->boolean,
 			]),
-			"@HydrationError!!!!![\n	value: [a: 42, b: 'Hello'],\n	hydrationPath: 'value',\n	errorMessage: 'The record value should contain the key c'\n]"
+			"@HydrationError![\n	value: [a: 42, b: 'Hello'],\n	hydrationPath: 'value',\n	errorMessage: 'The record value should contain the key c'\n]"
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->true,
 			$this->typeRegistry->record([]),
-			"@HydrationError!!!!![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a record with 0 items'\n]"
+			"@HydrationError![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a record with 0 items'\n]"
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->record([
@@ -571,7 +571,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				'a' => $this->typeRegistry->integer(),
 				'b' => $this->typeRegistry->string(10, 100),
 			]),
-			"@HydrationError!!!!![\n	value: 'Hello',\n	hydrationPath: 'value.b',\n	errorMessage: 'The string value should be with a length between 10 and 100'\n]"
+			"@HydrationError![\n	value: 'Hello',\n	hydrationPath: 'value.b',\n	errorMessage: 'The string value should be with a length between 10 and 100'\n]"
 		);
 
 		//Alias
@@ -583,7 +583,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		$this->callHydrateAsError(
 			$this->valueRegistry->integer(123),
 			$this->typeRegistry->withName(new TypeNameIdentifier('MyAlias')),
-			"@HydrationError!!!!![\n	value: 123,\n	hydrationPath: 'value',\n	errorMessage: 'The integer value should be in the range 1..5'\n]"
+			"@HydrationError![\n	value: 123,\n	hydrationPath: 'value',\n	errorMessage: 'The integer value should be in the range 1..5'\n]"
 		);
 
 		//Union
@@ -609,7 +609,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				$this->typeRegistry->string(),
 				$this->typeRegistry->integer(),
 			]),
-			"@HydrationError!!!!![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a string with a length between 0 and +Infinity'\n]"
+			"@HydrationError![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a string with a length between 0 and +Infinity'\n]"
 		);
 
 		//Intersection
@@ -620,7 +620,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				$this->typeRegistry->record(['a' => $this->typeRegistry->string()]),
 				$this->typeRegistry->record(['b' => $this->typeRegistry->integer()]),
 			]),
-			"@HydrationError!!!!![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a record with 1 items\n]"
+			"@HydrationError![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a record with 1 items\n]"
 		);*/
 
 		//Result
@@ -637,7 +637,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		$this->callHydrateAsError(
 			$this->valueRegistry->boolean(true),
 			$this->typeRegistry->result($this->typeRegistry->integer(), $this->typeRegistry->string()),
-			"@HydrationError!!!!![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be an integer in the range -Infinity..+Infinity'\n]"
+			"@HydrationError![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be an integer in the range -Infinity..+Infinity'\n]"
 		);
 
 		//Mutable
@@ -652,7 +652,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		$this->callHydrateAsError(
 			$this->valueRegistry->true,
 			$this->typeRegistry->mutable($this->typeRegistry->integer()),
-			"@HydrationError!!!!![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be an integer in the range -Infinity..+Infinity'\n]"
+			"@HydrationError![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be an integer in the range -Infinity..+Infinity'\n]"
 		);
 
 		//Type
@@ -665,7 +665,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		$this->callHydrateAsError(
 			$this->valueRegistry->integer(123),
 			$this->typeRegistry->type($this->typeRegistry->integer()),
-			"@HydrationError!!!!![\n	value: 123,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a string, containing a name of a valid type'\n]"
+			"@HydrationError![\n	value: 123,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a string, containing a name of a valid type'\n]"
 		);
 
 		//Atom
@@ -692,7 +692,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		$this->callHydrateAsError(
 			$this->valueRegistry->true,
 			$this->typeRegistry->enumeration(new TypeNameIdentifier('MyEnum')),
-			"@HydrationError!!!!![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a string with a value among MyEnum.A, MyEnum.B, MyEnum.C, MyEnum.D'\n]"
+			"@HydrationError![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a string with a value among MyEnum.A, MyEnum.B, MyEnum.C, MyEnum.D'\n]"
 		);
 		$this->callHydrateAs(
 			$this->valueRegistry->string('C'),
@@ -709,7 +709,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				new EnumValueIdentifier('A'),
 				new EnumValueIdentifier('B'),
 			]),
-			"@HydrationError!!!!![\n	value: 'C',\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a string with a value among MyEnum.A, MyEnum.B'\n]"
+			"@HydrationError![\n	value: 'C',\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a string with a value among MyEnum.A, MyEnum.B'\n]"
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->true,
@@ -717,7 +717,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				new EnumValueIdentifier('A'),
 				new EnumValueIdentifier('B'),
 			]),
-			"@HydrationError!!!!![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a string with a value among MyEnum.A, MyEnum.B'\n]"
+			"@HydrationError![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a string with a value among MyEnum.A, MyEnum.B'\n]"
 		);
 
 		$this->callHydrateAs(
@@ -808,7 +808,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		)->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])));
 
 		$this->assertEquals(
-			"@InvalidJsonString!!!!![value: 'invalid json']",
+			"@InvalidJsonString![value: 'invalid json']",
 			(string)$result->value
 		);
 

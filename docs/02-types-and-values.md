@@ -209,4 +209,4 @@ These are used to combine types. The union type `A|B` is a type that is either `
 
 ### Proxy 
 There is no real Proxy type but in some rare cases a type should be referenced before its definition. The only way to do this is by using a Proxy type.
-- ``NodeElement = [left: `Node, value: Integer, right: `Node]; Node = NodeElement|Null;`` - proxy type usage
+- ``NodeElement = [left: \Node, value: Integer, right: \Node]; Node = NodeElement|Null;`` - proxy type usage

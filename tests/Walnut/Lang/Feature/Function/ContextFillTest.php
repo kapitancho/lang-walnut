@@ -11,7 +11,7 @@ final class ContextFillTest extends CodeExecutionTestHelper {
 		MyAlias = [a: Integer, b: ?String, c: ?Boolean];
 		MyAlias->test() :: [\$a, \$b, \$c, \$];
 	NUT);
-		$this->assertEquals("[\n\t-9,\n\t'Hello',\n\t@MapItemNotFound!!!!![key: 'c'],\n\t[a: -9, b: 'Hello']\n]", $result);
+		$this->assertEquals("[\n\t-9,\n\t'Hello',\n\t@MapItemNotFound![key: 'c'],\n\t[a: -9, b: 'Hello']\n]", $result);
 	}
 
 	public function testAliasRecordAsParameter(): void {
@@ -19,7 +19,7 @@ final class ContextFillTest extends CodeExecutionTestHelper {
 		MyAlias = [a: Integer, b: ?String, c: ?Boolean];
 		test = ^o: MyAlias :: [#a, #b, #c, #];
 	NUT);
-		$this->assertEquals("[\n\t-9,\n\t'Hello',\n\t@MapItemNotFound!!!!![key: 'c'],\n\t[a: -9, b: 'Hello']\n]", $result);
+		$this->assertEquals("[\n\t-9,\n\t'Hello',\n\t@MapItemNotFound![key: 'c'],\n\t[a: -9, b: 'Hello']\n]", $result);
 	}
 
 	public function testOpenRecordAsTarget(): void {
@@ -27,7 +27,7 @@ final class ContextFillTest extends CodeExecutionTestHelper {
 		MyOpen := #[a: Integer, b: ?String, c: ?Boolean];
 		MyOpen->test() :: [\$a, \$b, \$c, \$\$];
 	NUT);
-		$this->assertEquals("[\n\t-9,\n\t'Hello',\n\t@MapItemNotFound!!!!![key: 'c'],\n\t[a: -9, b: 'Hello']\n]", $result);
+		$this->assertEquals("[\n\t-9,\n\t'Hello',\n\t@MapItemNotFound![key: 'c'],\n\t[a: -9, b: 'Hello']\n]", $result);
 	}
 
 	public function testOpenRecordAsParameter(): void {
@@ -35,7 +35,7 @@ final class ContextFillTest extends CodeExecutionTestHelper {
 		MyOpen := #[a: Integer, b: ?String, c: ?Boolean];
 		test = ^o: MyOpen :: [#a, #b, #c, #->value];
 	NUT);
-		$this->assertEquals("[\n\t-9,\n\t'Hello',\n\t@MapItemNotFound!!!!![key: 'c'],\n\t[a: -9, b: 'Hello']\n]", $result);
+		$this->assertEquals("[\n\t-9,\n\t'Hello',\n\t@MapItemNotFound![key: 'c'],\n\t[a: -9, b: 'Hello']\n]", $result);
 	}
 
 	public function testSealedRecordAsTarget(): void {
@@ -43,7 +43,7 @@ final class ContextFillTest extends CodeExecutionTestHelper {
 		MySealed := $[a: Integer, b: ?String, c: ?Boolean];
 		MySealed->test() :: [\$a, \$b, \$c, \$\$];
 	NUT);
-		$this->assertEquals("[\n\t-9,\n\t'Hello',\n\t@MapItemNotFound!!!!![key: 'c'],\n\t[a: -9, b: 'Hello']\n]", $result);
+		$this->assertEquals("[\n\t-9,\n\t'Hello',\n\t@MapItemNotFound![key: 'c'],\n\t[a: -9, b: 'Hello']\n]", $result);
 	}
 
 	public function testSealedRecordAsParameter(): void {

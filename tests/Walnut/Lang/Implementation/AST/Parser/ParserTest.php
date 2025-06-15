@@ -1140,24 +1140,24 @@ class ParserTest extends TestCase {
 
 	public static function types(): iterable {
 		yield ['Nothing', NothingTypeNode::class];
-		yield ['!Nothing', NothingTypeNode::class];
+		yield ['\\Nothing', NothingTypeNode::class];
 		yield ['True', TrueTypeNode::class];
-		yield ['!True', TrueTypeNode::class];
+		yield ['\\True', TrueTypeNode::class];
 		yield ['False', FalseTypeNode::class];
-		yield ['!False', FalseTypeNode::class];
+		yield ['\\False', FalseTypeNode::class];
 		yield ['Boolean', BooleanTypeNode::class];
-		yield ['!Boolean', BooleanTypeNode::class];
+		yield ['\\Boolean', BooleanTypeNode::class];
 		yield ['Any', AnyTypeNode::class];
-		yield ['!Any', AnyTypeNode::class];
+		yield ['\\Any', AnyTypeNode::class];
 		yield ['Integer', IntegerTypeNode::class, fn($t) => $t->minValue === MinusInfinity::value && $t->maxValue === PlusInfinity::value];
-		yield ['!Integer', IntegerTypeNode::class, fn($t) => $t->minValue === MinusInfinity::value && $t->maxValue === PlusInfinity::value];
+		yield ['\\Integer', IntegerTypeNode::class, fn($t) => $t->minValue === MinusInfinity::value && $t->maxValue === PlusInfinity::value];
 		yield ['Integer<5..>', IntegerTypeNode::class, fn($t) => $t->minValue == new Number('5') && $t->maxValue === PlusInfinity::value];
 		yield ['Integer<..-8>', IntegerTypeNode::class, fn($t) => $t->minValue === MinusInfinity::value && $t->maxValue == new Number('-8')];
 		yield ['Integer<-5..8>', IntegerTypeNode::class, fn($t) => $t->minValue == new Number('-5') && $t->maxValue == new Number('8')];
 		yield ['Integer[5]', IntegerSubsetTypeNode::class, fn($t) => count($t->values) === 1 && $t->values[0] == new Number('5')];
 		yield ['Integer[5, -8]', IntegerSubsetTypeNode::class, fn($t) => count($t->values) === 2 && $t->values[0] == new Number('5') && $t->values[1] == new Number('-8')];
 		yield ['Real', RealTypeNode::class, fn($t) => $t->minValue === MinusInfinity::value && $t->maxValue === PlusInfinity::value];
-		yield ['!Real', RealTypeNode::class, fn($t) => $t->minValue === MinusInfinity::value && $t->maxValue === PlusInfinity::value];
+		yield ['\\Real', RealTypeNode::class, fn($t) => $t->minValue === MinusInfinity::value && $t->maxValue === PlusInfinity::value];
 		yield ['Real<5..>', RealTypeNode::class, fn($t) => $t->minValue == new Number('5') && $t->maxValue === PlusInfinity::value];
 		yield ['Real<..-8>', RealTypeNode::class, fn($t) => $t->minValue === MinusInfinity::value && $t->maxValue == new Number('-8')];
 		yield ['Real<-5..8>', RealTypeNode::class, fn($t) => $t->minValue == new Number('-5') && $t->maxValue == new Number('8')];
@@ -1167,7 +1167,7 @@ class ParserTest extends TestCase {
 		yield ['Real[3.14]', RealSubsetTypeNode::class, fn($t) => count($t->values) === 1 && $t->values[0] == new Number('3.14')];
 		yield ['Real[3.14, -8]', RealSubsetTypeNode::class, fn($t) => count($t->values) === 2 && $t->values[0] == new Number('3.14') && $t->values[1] == new Number('-8')];
 		yield ['String', StringTypeNode::class, fn($t) => $t->minLength == new Number('0') && $t->maxLength === PlusInfinity::value];
-		yield ['!String', StringTypeNode::class, fn($t) => $t->minLength == new Number('0') && $t->maxLength === PlusInfinity::value];
+		yield ['\\String', StringTypeNode::class, fn($t) => $t->minLength == new Number('0') && $t->maxLength === PlusInfinity::value];
 		yield ['String<5..>', StringTypeNode::class, fn($t) => $t->minLength == new Number('5') && $t->maxLength === PlusInfinity::value];
 		yield ['String<..8>', StringTypeNode::class, fn($t) => $t->minLength == new Number('0') && $t->maxLength == new Number('8')];
 		yield ['String<5>', StringTypeNode::class, fn($t) => $t->minLength == new Number('5') && $t->maxLength == new Number('5')];
@@ -1175,7 +1175,7 @@ class ParserTest extends TestCase {
 		yield ["String['hello']", StringSubsetTypeNode::class, fn($t) => count($t->values) === 1 && $t->values[0] == 'hello'];
 		yield ["String['hello', 'world']", StringSubsetTypeNode::class, fn($t) => count($t->values) === 2 && $t->values[0] == 'hello' && $t->values[1] == 'world'];
 		yield ['Array', ArrayTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('0') && $t->maxLength === PlusInfinity::value];
-		yield ['!Array', ArrayTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('0') && $t->maxLength === PlusInfinity::value];
+		yield ['\\Array', ArrayTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('0') && $t->maxLength === PlusInfinity::value];
 		yield ['Array<5..>', ArrayTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('5') && $t->maxLength === PlusInfinity::value];
 		yield ['Array<..8>', ArrayTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('0') && $t->maxLength == new Number('8')];
 		yield ['Array<5..8>', ArrayTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('5') && $t->maxLength == new Number('8')];
@@ -1184,7 +1184,7 @@ class ParserTest extends TestCase {
 		yield ['Array<Boolean, ..8>', ArrayTypeNode::class, fn($t) => $t->itemType instanceOf BooleanTypeNode && $t->minLength == new Number('0') && $t->maxLength == new Number('8')];
 		yield ['Array<Boolean, 5..8>', ArrayTypeNode::class, fn($t) => $t->itemType instanceOf BooleanTypeNode && $t->minLength == new Number('5') && $t->maxLength == new Number('8')];
 		yield ['Map', MapTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('0') && $t->maxLength === PlusInfinity::value];
-		yield ['!Map', MapTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('0') && $t->maxLength === PlusInfinity::value];
+		yield ['\\Map', MapTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('0') && $t->maxLength === PlusInfinity::value];
 		yield ['Map<5..>', MapTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('5') && $t->maxLength === PlusInfinity::value];
 		yield ['Map<..8>', MapTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('0') && $t->maxLength == new Number('8')];
 		yield ['Map<5..8>', MapTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('5') && $t->maxLength == new Number('8')];
@@ -1193,7 +1193,7 @@ class ParserTest extends TestCase {
 		yield ['Map<Boolean, ..8>', MapTypeNode::class, fn($t) => $t->itemType instanceOf BooleanTypeNode && $t->minLength == new Number('0') && $t->maxLength == new Number('8')];
 		yield ['Map<Boolean, 5..8>', MapTypeNode::class, fn($t) => $t->itemType instanceOf BooleanTypeNode && $t->minLength == new Number('5') && $t->maxLength == new Number('8')];
 		yield ['Set', SetTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('0') && $t->maxLength === PlusInfinity::value];
-		yield ['!Set', SetTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('0') && $t->maxLength === PlusInfinity::value];
+		yield ['\\Set', SetTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('0') && $t->maxLength === PlusInfinity::value];
 		yield ['Set<5..>', SetTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('5') && $t->maxLength === PlusInfinity::value];
 		yield ['Set<..8>', SetTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('0') && $t->maxLength == new Number('8')];
 		yield ['Set<5..8>', SetTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('5') && $t->maxLength == new Number('8')];
@@ -1203,31 +1203,31 @@ class ParserTest extends TestCase {
 		yield ['Set<Boolean, 5..8>', SetTypeNode::class, fn($t) => $t->itemType instanceOf BooleanTypeNode && $t->minLength == new Number('5') && $t->maxLength == new Number('8')];
 
 		yield ['MyCustomType', NamedTypeNode::class, fn($t) => $t->name->equals(new TypeNameIdentifier('MyCustomType'))];
-		yield ['!MyProxyType', ProxyTypeNode::class, fn($t) => $t->name->equals(new TypeNameIdentifier('MyProxyType'))];
+		yield ['\\MyProxyType', ProxyTypeNode::class, fn($t) => $t->name->equals(new TypeNameIdentifier('MyProxyType'))];
 		yield ['Type', TypeTypeNode::class, fn($t) => $t->refType instanceOf AnyTypeNode];
-		yield ['!Type', TypeTypeNode::class, fn($t) => $t->refType instanceOf AnyTypeNode];
+		yield ['\\Type', TypeTypeNode::class, fn($t) => $t->refType instanceOf AnyTypeNode];
 		yield ['Type<Boolean>', TypeTypeNode::class, fn($t) => $t->refType instanceOf BooleanTypeNode];
 		yield ['Type<Tuple>', TypeTypeNode::class, fn($t) => $t->refType instanceOf MetaTypeTypeNode && $t->refType->value === MetaTypeValue::Tuple];
-		yield ['Type<!EnumerationValue>', TypeTypeNode::class, fn($t) => $t->refType instanceOf MetaTypeTypeNode && $t->refType->value === MetaTypeValue::EnumerationValue];
-		yield ['Type<!MutableValue>', TypeTypeNode::class, fn($t) => $t->refType instanceOf MetaTypeTypeNode && $t->refType->value === MetaTypeValue::MutableValue];
+		yield ['Type<\\EnumerationValue>', TypeTypeNode::class, fn($t) => $t->refType instanceOf MetaTypeTypeNode && $t->refType->value === MetaTypeValue::EnumerationValue];
+		yield ['Type<\\MutableValue>', TypeTypeNode::class, fn($t) => $t->refType instanceOf MetaTypeTypeNode && $t->refType->value === MetaTypeValue::MutableValue];
 		yield ['Type<Integer|Boolean>', TypeTypeNode::class, fn($t) => $t->refType instanceOf UnionTypeNode &&
 			$t->refType->left instanceOf IntegerTypeNode && $t->refType->right instanceOf BooleanTypeNode];
 		yield ['Mutable', MutableTypeNode::class, fn($t) => $t->valueType instanceOf AnyTypeNode];
-		yield ['!Mutable', MutableTypeNode::class, fn($t) => $t->valueType instanceOf AnyTypeNode];
+		yield ['\\Mutable', MutableTypeNode::class, fn($t) => $t->valueType instanceOf AnyTypeNode];
 		yield ['Mutable<Boolean>', MutableTypeNode::class, fn($t) => $t->valueType instanceOf BooleanTypeNode];
 		yield ['Shape', ShapeTypeNode::class, fn($t) => $t->refType instanceOf AnyTypeNode];
-		yield ['!Shape', ShapeTypeNode::class, fn($t) => $t->refType instanceOf AnyTypeNode];
+		yield ['\\Shape', ShapeTypeNode::class, fn($t) => $t->refType instanceOf AnyTypeNode];
 		yield ['Shape<Boolean>', ShapeTypeNode::class, fn($t) => $t->refType instanceOf BooleanTypeNode];
 		yield ['{Boolean}', ShapeTypeNode::class, fn($t) => $t->refType instanceOf BooleanTypeNode];
 		yield ['Result', ResultTypeNode::class, fn($t) => $t->returnType instanceOf AnyTypeNode && $t->errorType instanceOf AnyTypeNode];
-		yield ['!Result', ResultTypeNode::class, fn($t) => $t->returnType instanceOf AnyTypeNode && $t->errorType instanceOf AnyTypeNode];
+		yield ['\\Result', ResultTypeNode::class, fn($t) => $t->returnType instanceOf AnyTypeNode && $t->errorType instanceOf AnyTypeNode];
 		yield ['Result<Null>', ResultTypeNode::class, fn($t) => $t->returnType instanceOf NullTypeNode && $t->errorType instanceOf AnyTypeNode];
 		yield ['Result<Null, Boolean>', ResultTypeNode::class, fn($t) => $t->returnType instanceOf NullTypeNode && $t->errorType instanceOf BooleanTypeNode];
 		yield ['Error', ResultTypeNode::class, fn($t) => $t->returnType instanceOf NothingTypeNode && $t->errorType instanceOf AnyTypeNode];
-		yield ['!Error', ResultTypeNode::class, fn($t) => $t->returnType instanceOf NothingTypeNode && $t->errorType instanceOf AnyTypeNode];
+		yield ['\\Error', ResultTypeNode::class, fn($t) => $t->returnType instanceOf NothingTypeNode && $t->errorType instanceOf AnyTypeNode];
 		yield ['Error<Boolean>', ResultTypeNode::class, fn($t) => $t->returnType instanceOf NothingTypeNode && $t->errorType instanceOf BooleanTypeNode];
 		yield ['Impure', ImpureTypeNode::class, fn($t) => $t->valueType instanceOf AnyTypeNode];
-		yield ['!Impure', ImpureTypeNode::class, fn($t) => $t->valueType instanceOf AnyTypeNode];
+		yield ['\\Impure', ImpureTypeNode::class, fn($t) => $t->valueType instanceOf AnyTypeNode];
 		yield ['Impure<Boolean>', ImpureTypeNode::class, fn($t) => $t->valueType instanceOf BooleanTypeNode];
 		yield ['*Boolean', ImpureTypeNode::class, fn($t) => $t->valueType instanceOf BooleanTypeNode];
 		yield ['[]', TupleTypeNode::class, fn($t) => count($t->types) === 0 && $t->restType instanceOf NothingTypeNode];

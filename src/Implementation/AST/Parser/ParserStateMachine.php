@@ -688,7 +688,7 @@ final readonly class ParserStateMachine {
 
 
 			270 => ['name' => 'type expression', 'transitions' => [
-				T::temporary_token->name => function (LT $token) {
+				T::boolean_op_not->name => function (LT $token) {
 					$this->s->push(269);
 					$this->s->move(301);
 				},
@@ -800,7 +800,7 @@ final readonly class ParserStateMachine {
 					$this->s->move(281);
 				},
 				T::var_keyword->name => $c,
-				//YYY: T::type_keyword->name => $c,
+				T::type_keyword->name => $c,
 				T::null->name => $c,
 				T::true->name => $c,
 				T::false->name => $c,
@@ -1126,7 +1126,7 @@ final readonly class ParserStateMachine {
 
 				//binary operators start
 				T::boolean_op->name => $c,
-				T::boolean_op_not->name => $c,
+				//T::boolean_op_not->name => $c,
 				T::less_than_equal->name => $c,
 				T::greater_than_equal->name => $c,
 				T::intersection->name => $c,
@@ -1841,7 +1841,7 @@ final readonly class ParserStateMachine {
 					$this->s->move(461);
 				},
 				T::var_keyword->name => $c,
-				//YYY: T::type_keyword->name => $c,
+				T::type_keyword->name => $c,
 				T::null->name => $c,
 				T::true->name => $c,
 				T::false->name => $c,
@@ -2030,7 +2030,7 @@ final readonly class ParserStateMachine {
 			]],
 			488 => ['name' => 'value type name', 'transitions' => [
 				T::property_accessor->name => 492,
-				T::temporary_token->name => function (LT $token) {
+				T::boolean_op_not->name => function (LT $token) {
 					$this->s->push(493);
 					$this->s->move(401);
 				},

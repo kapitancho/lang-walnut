@@ -58,7 +58,7 @@ getAllExpressions = ^Any => Any :: [
     matchIfThen: ?when('condition') { 'then' },
     matchIsErrorElse: ?whenIsError('condition') { 'then' } ~ { 'else' },
     matchIsError: ?whenIsError('condition') { 'then' },
-    data: MyData!!!!!42,
+    data: MyData!42,
     functionCall: functionName('parameter'),
     constructorCall: TypeName('parameter'),
     propertyAccess: [property: 'value'].property
@@ -110,7 +110,7 @@ AllTypes = [
 
     shape: Shape<Integer>,
     shapeAny: Shape,
-    proxy: Array<!MyOpen0>,
+    proxy: Array<\MyOpen0>,
 
     any: Any,
     /* nothing: Nothing */
@@ -150,7 +150,7 @@ getMatchingValuesForAllTypes = ^Null => AllTypes :: [
     enumerationSubset: MyEnum.Value1,
     open: MyOpen0[a: 3, b: -2],
     sealed: MySealed0[a: 3, b: -2],
-    data: MyData!!!!!42,
+    data: MyData!42,
     integer: 5,
     integerRange: 5,
     integerSubset: 2,
@@ -221,7 +221,7 @@ getAllValues = ^Any => Any :: [
     enumeration: MyEnum.Value1,
     open: MyOpen[a: 3, b: -2],
     sealed: MySealed[a: 3, b: -2],
-    data: MyData!!!!!42,
+    data: MyData!42,
     integer: 42,
     real: 3.14,
     string: 'hi!',
@@ -256,7 +256,7 @@ allConstants = [
     type: `String,
     mutable: mutable{String, 'mutable'},
     error: @'error',
-    data: MyData!!!!!42,
+    data: MyData!42,
     function: ^Any => Any :: 'function body'
 ];
 

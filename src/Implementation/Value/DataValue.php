@@ -47,7 +47,7 @@ final class DataValue implements DataValueInterface, JsonSerializable {
 	public function __toString(): string {
 		$sv = (string)$this->value;
 		return sprintf(
-			"%s!!!!!%s",
+			"%s!%s",
 			$this->typeName,
 			$sv
 		);

@@ -58,7 +58,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 		Suit := (Spades, Hearts, Diamonds, Clubs);
 		getSuit = ^v: String => Result<Suit, UnknownEnumerationValue> :: Suit(v);
 	NUT);
-		$this->assertEquals("@UnknownEnumerationValue!!!!![enumeration: type{Suit}, value: 'King']", $result);
+		$this->assertEquals("@UnknownEnumerationValue![enumeration: type{Suit}, value: 'King']", $result);
 	}
 
 	public function testEnumWithConstructorWithEnumValues(): void {
@@ -112,7 +112,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 			5: 'King'
 		};
 	NUT);
-		$this->assertEquals("@UnknownEnumerationValue!!!!![enumeration: type{Suit}, value: 'King']", $result);
+		$this->assertEquals("@UnknownEnumerationValue![enumeration: type{Suit}, value: 'King']", $result);
 	}
 
 

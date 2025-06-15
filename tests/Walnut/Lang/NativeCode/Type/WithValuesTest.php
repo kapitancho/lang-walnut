@@ -25,7 +25,7 @@ final class WithValuesTest extends CodeExecutionTestHelper {
 	public function testWithValuesEnumerationMetaTypeUnknown(): void {
 		$result = $this->executeCodeSnippet("getWithValues(type{MyEnumeration});",
 			"OtherEnum := (X); MyEnumeration := (A, B, C); getWithValues = ^Type<Enumeration> => Result<Type<EnumerationSubset>, UnknownEnumerationValue> :: #->withValues[MyEnumeration.A, OtherEnum.X];");
-		$this->assertEquals("@UnknownEnumerationValue!!!!![\n\tenumeration: type{MyEnumeration},\n\tvalue: OtherEnum.X\n]", $result);
+		$this->assertEquals("@UnknownEnumerationValue![\n\tenumeration: type{MyEnumeration},\n\tvalue: OtherEnum.X\n]", $result);
 	}
 
 	/*

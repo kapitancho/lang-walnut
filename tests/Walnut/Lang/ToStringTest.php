@@ -23,7 +23,7 @@ final class ToStringTest extends BaseProgramTestHelper {
 			'MyEnum.A' => $vr->enumerationValue($i('MyEnum'), $ev('A')),
 			'MySealed{null}' => $vr->sealedValue($i('MySealed'), $vr->null),
 			'MyOpen{null}' => $vr->openValue($i('MyOpen'), $vr->null),
-			'MyData!!!!!null' => $vr->dataValue($i('MyData'), $vr->null),
+			'MyData!null' => $vr->dataValue($i('MyData'), $vr->null),
 			'true' => $vr->boolean(true),
 			'false' => $vr->boolean(false),
 			'null' => $vr->null,

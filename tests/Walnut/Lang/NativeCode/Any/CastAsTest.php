@@ -9,7 +9,7 @@ final class CastAsTest extends CodeExecutionTestHelper {
 	public function testCastAsNoCastAvailable(): void {
 		$result = $this->executeCodeSnippet("MyAtom->as(type{Integer})",
 			"MyAtom := ();");
-		$this->assertEquals("@CastNotAvailable!!!!![from: type{MyAtom}, to: type{Integer}]", $result);
+		$this->assertEquals("@CastNotAvailable![from: type{MyAtom}, to: type{Integer}]", $result);
 	}
 
 	public function testCastAsCastAvailable(): void {

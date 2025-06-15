@@ -8,7 +8,7 @@ final class JsonStringifyTest extends CodeExecutionTestHelper {
 
 	public function testJsonStringifyNonJson(): void {
 		$result = $this->executeCodeSnippet("MyAtom->jsonStringify;", "MyAtom := ();");
-		$this->assertEquals("@InvalidJsonValue!!!!![value: MyAtom]", $result);
+		$this->assertEquals("@InvalidJsonValue![value: MyAtom]", $result);
 	}
 
 	public function testJsonStringifyNull(): void {
