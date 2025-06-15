@@ -186,6 +186,8 @@ final class JsonEncodeTest extends BaseProgramTestHelper {
 			'{"expressionType":"Mutable","type":{"type":"Integer","range":{"minValue":"-Infinity","maxValue":"+Infinity"}},"value":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->mutable($this->typeRegistry->integer(), $c0),
 			'{"expressionType":"variableName","variableName":"x"}' => $x,
 			'{"expressionType":"variableAssignment","variableName":"x","assignedExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->variableAssignment(new VariableNameIdentifier('x'), $c0),
+			'{"expressionType":"multiVariableAssignment","variableNames":["x"],"assignedExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->multiVariableAssignment([new VariableNameIdentifier('x')], $c0),
+			'{"expressionType":"multiVariableAssignment","variableNames":{"a":"x"},"assignedExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->multiVariableAssignment(['a' => new VariableNameIdentifier('x')], $c0),
 			'{"expressionType":"return","returnedExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->return($c0),
 			'{"expressionType":"noError","targetExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->noError($c0),
 			'{"expressionType":"noExternalError","targetExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->noExternalError($c0),

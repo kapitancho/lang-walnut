@@ -66,6 +66,7 @@ final readonly class MultiVariableAssignmentExpression implements MultiVariableA
 			$val,
 			$methodName
 		);
+		// @codeCoverageIgnoreStart
 		if ($method instanceof UnknownMethod) {
 			throw new ExecutionException(
 				sprintf(
@@ -75,6 +76,7 @@ final readonly class MultiVariableAssignmentExpression implements MultiVariableA
 				)
 			);
 		}
+		// @codeCoverageIgnoreEnd
 
 		foreach ($this->variableNames as $key => $variableName) {
 			$ret = $ret->withAddedVariableValue(
@@ -114,8 +116,8 @@ final readonly class MultiVariableAssignmentExpression implements MultiVariableA
 
 	public function jsonSerialize(): array {
 		return [
-			'expressionType' => 'variableAssignment',
-			'variableName' => $this->variableNames,
+			'expressionType' => 'multiVariableAssignment',
+			'variableNames' => $this->variableNames,
 			'assignedExpression' => $this->assignedExpression
 		];
 	}

@@ -1266,6 +1266,7 @@ class ParserTest extends TestCase {
 		yield ['MyEnum[Value1, Value2]', EnumerationSubsetTypeNode::class, fn($v) => $v->name->equals(new TypeNameIdentifier('MyEnum')) && count($v->values) === 2 &&
 			$v->values[0]->equals(new EnumValueIdentifier('Value1')) && $v->values[1]->equals(new EnumValueIdentifier('Value2'))];
 		yield ['^Null => Any', FunctionTypeNode::class, fn($v) => $v->parameterType instanceOf NullTypeNode && $v->returnType instanceOf AnyTypeNode];
+		yield ['^Null', FunctionTypeNode::class, fn($v) => $v->parameterType instanceOf NullTypeNode && $v->returnType instanceOf AnyTypeNode];
 
 		yield ['Boolean|Null', UnionTypeNode::class, fn($t) => $t->left instanceof BooleanTypeNode && $t->right instanceof NullTypeNode];
 		yield ['(Boolean|Null)', UnionTypeNode::class, fn($t) => $t->left instanceof BooleanTypeNode && $t->right instanceof NullTypeNode];
