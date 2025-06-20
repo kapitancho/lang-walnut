@@ -156,8 +156,7 @@ final readonly class NumberInterval implements NumberIntervalInterface {
 	): MinusInfinity|NumberIntervalEndpointInterface {
 		return match(true) {
 			$start1 instanceof MinusInfinity, $start2 instanceof MinusInfinity => MinusInfinity::value,
-			$start1->value < $start2->value => $start1,
-			$start1->value > $start2->value => $start2,
+			$start1->value < $start2->value => $start1, $start1->value > $start2->value => $start2,
 			default => new NumberIntervalEndpoint($start1->value, $start1->inclusive || $start2->inclusive),
 		};
 	}
@@ -167,10 +166,8 @@ final readonly class NumberInterval implements NumberIntervalInterface {
 		MinusInfinity|NumberIntervalEndpointInterface $start2
 	): MinusInfinity|NumberIntervalEndpointInterface {
 		return match(true) {
-			$start1 instanceof MinusInfinity => $start2,
-			$start2 instanceof MinusInfinity => $start1,
-			$start1->value > $start2->value => $start1,
-			$start1->value < $start2->value => $start2,
+			$start1 instanceof MinusInfinity => $start2, $start2 instanceof MinusInfinity => $start1,
+			$start1->value > $start2->value => $start1, $start1->value < $start2->value => $start2,
 			default => new NumberIntervalEndpoint($start1->value, $start1->inclusive || $start2->inclusive),
 		};
 	}
@@ -180,10 +177,8 @@ final readonly class NumberInterval implements NumberIntervalInterface {
 		PlusInfinity|NumberIntervalEndpointInterface $end2
 	): PlusInfinity|NumberIntervalEndpointInterface {
 		return match(true) {
-			$end1 instanceof PlusInfinity => $end2,
-			$end2 instanceof PlusInfinity => $end1,
-			$end1->value < $end2->value => $end1,
-			$end1->value > $end2->value => $end2,
+			$end1 instanceof PlusInfinity => $end2, $end2 instanceof PlusInfinity => $end1,
+			$end1->value < $end2->value => $end1, $end1->value > $end2->value => $end2,
 			default => new NumberIntervalEndpoint($end1->value, $end1->inclusive || $end2->inclusive),
 		};
 	}
@@ -194,8 +189,7 @@ final readonly class NumberInterval implements NumberIntervalInterface {
 	): PlusInfinity|NumberIntervalEndpointInterface {
 		return match(true) {
 			$end1 instanceof PlusInfinity, $end2 instanceof PlusInfinity => PlusInfinity::value,
-			$end1->value > $end2->value => $end1,
-			$end1->value < $end2->value => $end2,
+			$end1->value > $end2->value => $end1, $end1->value < $end2->value => $end2,
 			default => new NumberIntervalEndpoint($end1->value, $end1->inclusive || $end2->inclusive),
 		};
 	}

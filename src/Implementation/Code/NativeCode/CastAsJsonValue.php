@@ -26,6 +26,7 @@ use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
+use Walnut\Lang\Blueprint\Value\DataValue;
 use Walnut\Lang\Blueprint\Value\EnumerationValue;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
 use Walnut\Lang\Blueprint\Value\MutableValue;
@@ -131,7 +132,7 @@ final readonly class CastAsJsonValue {
 				$this->valueRegistry->null
 			);
 		}
-		if ($value instanceof MutableValue || $value instanceof OpenValue || $value instanceof SealedValue) {
+		if ($value instanceof MutableValue || $value instanceof OpenValue || $value instanceof SealedValue || $value instanceof DataValue) {
 			return $this->getJsonValue($value->value);
 		}
 		if ($value instanceof EnumerationValue) {

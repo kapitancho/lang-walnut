@@ -18,7 +18,6 @@ use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
 use Walnut\Lang\Blueprint\Type\FalseType;
 use Walnut\Lang\Blueprint\Type\FunctionType;
-use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\IntersectionType;
 use Walnut\Lang\Blueprint\Type\MapType;
@@ -28,7 +27,6 @@ use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\NullType;
 use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\OptionalKeyType;
-use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\ResultType;
@@ -79,12 +77,10 @@ final readonly class Hydrator {
 			$targetType instanceof EnumerationType => $this->hydrateEnumeration(...),
 			$targetType instanceof EnumerationSubsetType => $this->hydrateEnumerationSubset(...),
 			$targetType instanceof IntegerType => $this->hydrateInteger(...),
-			$targetType instanceof IntegerSubsetType => $this->hydrateIntegerSubset(...),
 			$targetType instanceof IntersectionType => $this->hydrateIntersection(...),
 			$targetType instanceof MapType => $this->hydrateMap(...),
 			$targetType instanceof MutableType => $this->hydrateMutable(...),
 			$targetType instanceof RealType => $this->hydrateReal(...),
-			$targetType instanceof RealSubsetType => $this->hydrateRealSubset(...),
 			$targetType instanceof RecordType => $this->hydrateRecord(...),
 			$targetType instanceof StringType => $this->hydrateString(...),
 			$targetType instanceof StringSubsetType => $this->hydrateStringSubset(...),
@@ -150,8 +146,8 @@ final readonly class Hydrator {
 					'True' => $this->programRegistry->typeRegistry->true,
 					'False' => $this->programRegistry->typeRegistry->false,
 					'Boolean' => $this->programRegistry->typeRegistry->boolean,
-					'Integer' => $this->programRegistry->typeRegistry->integer(),
-					'Real' => $this->programRegistry->typeRegistry->real(),
+					'Integer' => $this->programRegistry->typeRegistry->integerFull(),
+					'Real' => $this->programRegistry->typeRegistry->realFull(),
 					'String' => $this->programRegistry->typeRegistry->string(),
 					default => $this->programRegistry->typeRegistry->withName(new TypeNameIdentifier($typeName)),
 				}				;
@@ -368,28 +364,6 @@ final readonly class Hydrator {
 			$hydrationPath,
 			sprintf("The value should be an integer in %s",
 				$targetType->numberRange,
-			)
-		);
-	}
-
-	private function hydrateIntegerSubset(Value $value, IntegerSubsetType $targetType, string $hydrationPath): IntegerValue {
-		if ($value instanceof IntegerValue) {
-			if ($targetType->contains($value)) {
-				return $value;
-			}
-			throw new HydrationException(
-				$value,
-				$hydrationPath,
-				sprintf("The integer value should be among %s",
-					implode(', ', $targetType->subsetValues)
-				)
-			);
-		}
-		throw new HydrationException(
-			$value,
-			$hydrationPath,
-			sprintf("The value should be an integer among %s",
-				implode(', ', $targetType->subsetValues)
 			)
 		);
 	}
@@ -708,31 +682,6 @@ final readonly class Hydrator {
 			$hydrationPath,
 			sprintf("The value should be a real number in %s",
 				$targetType->numberRange
-			)
-		);
-	}
-
-	private function hydrateRealSubset(Value $value, RealSubsetType $targetType, string $hydrationPath): RealValue {
-		if ($value instanceof IntegerValue) {
-			$value = $value->asRealValue();
-		}
-		if ($value instanceof RealValue) {
-			if ($targetType->contains($value)) {
-				return $value;
-			}
-			throw new HydrationException(
-				$value,
-				$hydrationPath,
-				sprintf("The real value should be among %s",
-					implode(', ', $targetType->subsetValues)
-				)
-			);
-		}
-		throw new HydrationException(
-			$value,
-			$hydrationPath,
-			sprintf("The value should be a real number among %s",
-				implode(', ', $targetType->subsetValues)
 			)
 		);
 	}
