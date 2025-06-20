@@ -45,8 +45,9 @@ final readonly class InsertAt implements NativeMethod {
 						PlusInfinity::value : $targetType->range->maxLength + 1
 				);
 				return
-					$parameterType->types['index']->range->maxValue >= 0 &&
-					$parameterType->types['index']->range->maxValue <= $targetType->range->minLength ?
+					$parameterType->types['index']->numberRange->max !== PlusInfinity::value &&
+					$parameterType->types['index']->numberRange->max->value >= 0 &&
+					$parameterType->types['index']->numberRange->max->value <= $targetType->range->minLength ?
 					$returnType : $programRegistry->typeRegistry->result($returnType,
 						$programRegistry->typeRegistry->data(new TypeNameIdentifier('IndexOutOfRange'))
 					);

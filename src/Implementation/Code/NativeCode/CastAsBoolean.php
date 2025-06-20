@@ -4,6 +4,7 @@ namespace Walnut\Lang\Implementation\Code\NativeCode;
 
 use BcMath\Number;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
+use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\ArrayType;
@@ -46,9 +47,9 @@ final readonly class CastAsBoolean {
 			$type instanceof NullType,
 				$type instanceof FalseType,
 			($type instanceof IntegerSubsetType && count($type->subsetValues) === 1 && (int)(string)$type->subsetValues[0] === 0),
-			($type instanceof IntegerType && $type->range->minValue instanceof Number && $type->range->maxValue instanceof Number && (int)(string)$type->range->minValue === 0 && (int)(string)$type->range->maxValue === 0),
+			($type instanceof IntegerType && $type->numberRange->min instanceof NumberIntervalEndpoint && $type->numberRange->max instanceof NumberIntervalEndpoint && (int)(string)$type->numberRange->min->value === 0 && (int)(string)$type->numberRange->max->value === 0),
 			($type instanceof RealSubsetType && count($type->subsetValues) === 1 && (float)(string)$type->subsetValues[0] === 0.0),
-			($type instanceof RealType && $type->range->minValue instanceof Number && $type->range->maxValue instanceof Number && (float)(string)$type->range->minValue === 0.0 && (float)(string)$type->range->maxValue === 0.0),
+			($type instanceof RealType && $type->numberRange->min instanceof NumberIntervalEndpoint && $type->numberRange->max instanceof NumberIntervalEndpoint && (float)(string)$type->numberRange->min->value === 0 && (float)(string)$type->numberRange->max->value === 0),
 			($type instanceof StringSubsetType && count($type->subsetValues) === 1 && $type->subsetValues[0] === ''),
 			($type instanceof StringType && $type->range->maxLength instanceof Number && (int)(string)$type->range->maxLength === 0),
 			($type instanceof RecordType && count($type->types) === 0),
@@ -59,11 +60,11 @@ final readonly class CastAsBoolean {
 			=> $false,
 			$type instanceof TrueType,
 			($type instanceof IntegerSubsetType && !in_array(0, array_map(fn(Number $v) => (int)(string)$v, $type->subsetValues))),
-			($type instanceof IntegerType && $type->range->minValue !== MinusInfinity::value && $type->range->minValue > 0),
-			($type instanceof IntegerType && $type->range->maxValue !== PlusInfinity::value && $type->range->maxValue < 0),
+			($type instanceof IntegerType && $type->numberRange->min !== MinusInfinity::value && $type->numberRange->min->value > 0),
+			($type instanceof IntegerType && $type->numberRange->max !== PlusInfinity::value && $type->numberRange->max->value < 0),
 			($type instanceof RealSubsetType && !in_array(0.0, array_map(fn(Number $v) => (float)(string)$v, $type->subsetValues))),
-			($type instanceof RealType && $type->range->minValue !== MinusInfinity::value && $type->range->minValue > 0),
-			($type instanceof RealType && $type->range->maxValue !== PlusInfinity::value && $type->range->maxValue < 0),
+			($type instanceof RealType && $type->numberRange->min !== MinusInfinity::value && $type->numberRange->min->value > 0),
+			($type instanceof RealType && $type->numberRange->max !== PlusInfinity::value && $type->numberRange->max->value < 0),
 			($type instanceof StringSubsetType && !in_array('', array_map(fn(string $v) => $v, $type->subsetValues))),
 			($type instanceof StringType && $type->range->minLength > 0),
 				/*$type instanceof SealedType,

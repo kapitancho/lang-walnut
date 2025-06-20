@@ -36,7 +36,7 @@ abstract class BaseProgramTestHelper extends \Walnut\Lang\Test\BaseProgramTestHe
     }
 
 	protected function testMethodCall(
-		Expression $target, string $methodName, Expression $parameter, Value $expectedValue
+		Expression $target, string $methodName, Expression $parameter, Value $expectedValue, $additionalMessage = ''
 	): void {
 		$call = $this->expressionRegistry->methodCall(
 			$target,
@@ -48,7 +48,7 @@ abstract class BaseProgramTestHelper extends \Walnut\Lang\Test\BaseProgramTestHe
 			($r = $call
 				->execute(new ExecutionContext($this->programRegistry, VariableValueScope::empty()))
 				->value)->equals($expectedValue),
-			sprintf("'%s' is not equal to '%s'", $r, $expectedValue)
+			sprintf("'%s' is not equal to '%s'; %s", $r, $expectedValue, $additionalMessage)
 		);
 	}
 }

@@ -6,7 +6,6 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
-use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
@@ -23,7 +22,7 @@ final readonly class UnaryPlus implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof RealType || $targetType instanceof RealSubsetType) {
+		if ($targetType instanceof RealType) {
 			return $targetType;
 		}
 		// @codeCoverageIgnoreStart

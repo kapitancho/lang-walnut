@@ -149,7 +149,7 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 
 	public function testHydrateAsIntegerFromOther(): void {
 		$result = $this->executeCodeSnippet("null->hydrateAs(type{Integer});");
-		$this->assertEquals("@HydrationError![\n\tvalue: null,\n\thydrationPath: 'value',\n\terrorMessage: 'The value should be an integer in the range -Infinity..+Infinity'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: null,\n\thydrationPath: 'value',\n\terrorMessage: 'The value should be an integer in (-Infinity..+Infinity)'\n]", $result);
 	}
 
 	public function testHydrateAsIntegerRangeFromIntegerInRange(): void {
@@ -159,7 +159,7 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 
 	public function testHydrateAsIntegerRangeFromIntegerOutOfRange(): void {
 		$result = $this->executeCodeSnippet("42->hydrateAs(type{Integer<12..34>});");
-		$this->assertEquals("@HydrationError![\n\tvalue: 42,\n\thydrationPath: 'value',\n\terrorMessage: 'The integer value should be in the range 12..34'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: 42,\n\thydrationPath: 'value',\n\terrorMessage: 'The integer value should be in [12..34]'\n]", $result);
 	}
 
 	public function testHydrateAsIntegerSubsetFromIntegerInSubset(): void {
@@ -169,12 +169,12 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 
 	public function testHydrateAsIntegerSubsetFromStringOutOfSubset(): void {
 		$result = $this->executeCodeSnippet("42->hydrateAs(type{Integer[15, 25, 35, 45]});");
-		$this->assertEquals("@HydrationError![\n\tvalue: 42,\n\thydrationPath: 'value',\n\terrorMessage: 'The integer value should be among 15, 25, 35, 45'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: 42,\n\thydrationPath: 'value',\n\terrorMessage: 'The integer value should be in 15, 25, 35, 45'\n]", $result);
 	}
 
 	public function testHydrateAsIntegerSubsetFromOther(): void {
 		$result = $this->executeCodeSnippet("null->hydrateAs(type{Integer[12, 22, 32, 42]});");
-		$this->assertEquals("@HydrationError![\n\tvalue: null,\n\thydrationPath: 'value',\n\terrorMessage: 'The value should be an integer among 12, 22, 32, 42'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: null,\n\thydrationPath: 'value',\n\terrorMessage: 'The value should be an integer in 12, 22, 32, 42'\n]", $result);
 	}
 
 
@@ -192,7 +192,7 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 
 	public function testHydrateAsRealFromOther(): void {
 		$result = $this->executeCodeSnippet("null->hydrateAs(type{Real});");
-		$this->assertEquals("@HydrationError![\n\tvalue: null,\n\thydrationPath: 'value',\n\terrorMessage: 'The value should be a real number in the range -Infinity..+Infinity'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: null,\n\thydrationPath: 'value',\n\terrorMessage: 'The value should be a real number in (-Infinity..+Infinity)'\n]", $result);
 	}
 
 	public function testHydrateAsRealRangeFromRealInRange(): void {
@@ -202,7 +202,7 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 
 	public function testHydrateAsRealRangeFromRealOutOfRange(): void {
 		$result = $this->executeCodeSnippet("3.14->hydrateAs(type{Real<12..34.7>});");
-		$this->assertEquals("@HydrationError![\n\tvalue: 3.14,\n\thydrationPath: 'value',\n\terrorMessage: 'The real value should be in the range 12..34.7'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: 3.14,\n\thydrationPath: 'value',\n\terrorMessage: 'The real value should be in [12..34.7]'\n]", $result);
 	}
 
 	public function testHydrateAsRealSubsetFromRealInSubset(): void {
@@ -217,12 +217,12 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 
 	public function testHydrateAsRealSubsetFromStringOutOfSubset(): void {
 		$result = $this->executeCodeSnippet("3.14->hydrateAs(type{Real[1.5, 2, 3.5]});");
-		$this->assertEquals("@HydrationError![\n\tvalue: 3.14,\n\thydrationPath: 'value',\n\terrorMessage: 'The real value should be among 1.5, 2, 3.5'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: 3.14,\n\thydrationPath: 'value',\n\terrorMessage: 'The real value should be in 1.5, 2, 3.5'\n]", $result);
 	}
 
 	public function testHydrateAsRealSubsetFromOther(): void {
 		$result = $this->executeCodeSnippet("null->hydrateAs(type{Real[1.5, 2, 3.5]});");
-		$this->assertEquals("@HydrationError![\n\tvalue: null,\n\thydrationPath: 'value',\n\terrorMessage: 'The value should be a real number among 1.5, 2, 3.5'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: null,\n\thydrationPath: 'value',\n\terrorMessage: 'The value should be a real number in 1.5, 2, 3.5'\n]", $result);
 	}
 
 
@@ -249,7 +249,7 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 
 	public function testHydrateAsArrayFromArrayItemTypeIncorrect(): void {
 		$result = $this->executeCodeSnippet("[1, 2, 'hello']->hydrateAs(type{Array<Integer>});");
-		$this->assertEquals("@HydrationError![\n\tvalue: 'hello',\n\thydrationPath: 'value[2]',\n\terrorMessage: 'The value should be an integer in the range -Infinity..+Infinity'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: 'hello',\n\thydrationPath: 'value[2]',\n\terrorMessage: 'The value should be an integer in (-Infinity..+Infinity)'\n]", $result);
 	}
 
 	public function testHydrateAsArrayFromArrayItemTypeAndLengthRange(): void {
@@ -291,7 +291,7 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 
 	public function testHydrateAsMapFromMapItemTypeIncorrect(): void {
 		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{Map<Integer>});");
-		$this->assertEquals("@HydrationError![\n\tvalue: 'hello',\n\thydrationPath: 'value.c',\n\terrorMessage: 'The value should be an integer in the range -Infinity..+Infinity'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: 'hello',\n\thydrationPath: 'value.c',\n\terrorMessage: 'The value should be an integer in (-Infinity..+Infinity)'\n]", $result);
 	}
 
 	public function testHydrateAsMapFromMapItemTypeAndLengthRange(): void {
@@ -333,7 +333,7 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 
 	public function testHydrateAsSetFromSetItemTypeIncorrect(): void {
 		$result = $this->executeCodeSnippet("[1; 2; 'hello']->hydrateAs(type{Set<Integer>});");
-		$this->assertEquals("@HydrationError![\n\tvalue: 'hello',\n\thydrationPath: 'value[2]',\n\terrorMessage: 'The value should be an integer in the range -Infinity..+Infinity'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: 'hello',\n\thydrationPath: 'value[2]',\n\terrorMessage: 'The value should be an integer in (-Infinity..+Infinity)'\n]", $result);
 	}
 
 	public function testHydrateAsSetFromSetItemTypeAndLengthRange(): void {
@@ -361,7 +361,7 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 
 	public function testHydrateAsRecordFromRecordWrongPropertyType(): void {
 		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type[a: Integer, b: Integer, c: Real]);");
-		$this->assertEquals("@HydrationError![\n\tvalue: 'hello',\n\thydrationPath: 'value.c',\n\terrorMessage: 'The value should be a real number in the range -Infinity..+Infinity'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: 'hello',\n\thydrationPath: 'value.c',\n\terrorMessage: 'The value should be a real number in (-Infinity..+Infinity)'\n]", $result);
 	}
 
 	public function testHydrateAsRecordFromRecordMissingProperty(): void {
@@ -408,7 +408,7 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 
 	public function testHydrateAsTupleFromTupleWrongPropertyType(): void {
 		$result = $this->executeCodeSnippet("[1, 2, 'hello']->hydrateAs(type[Integer, Integer, Real]);");
-		$this->assertEquals("@HydrationError![\n\tvalue: 'hello',\n\thydrationPath: 'value[2]',\n\terrorMessage: 'The value should be a real number in the range -Infinity..+Infinity'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: 'hello',\n\thydrationPath: 'value[2]',\n\terrorMessage: 'The value should be a real number in (-Infinity..+Infinity)'\n]", $result);
 	}
 
 	public function testHydrateAsTupleFromTupleMissingProperty(): void {
@@ -440,12 +440,12 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 
 	public function testHydrateAsMutableCorrectTypeOutOfRange(): void {
 		$result = $this->executeCodeSnippet("3.14->hydrateAs(type{Mutable<Real<1..2.5>>});");
-		$this->assertEquals("@HydrationError![\n\tvalue: 3.14,\n\thydrationPath: 'value',\n\terrorMessage: 'The real value should be in the range 1..2.5'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: 3.14,\n\thydrationPath: 'value',\n\terrorMessage: 'The real value should be in [1..2.5]'\n]", $result);
 	}
 
 	public function testHydrateAsMutableWrongType(): void {
 		$result = $this->executeCodeSnippet("3.14->hydrateAs(type{Mutable<Integer>});");
-		$this->assertEquals("@HydrationError![\n\tvalue: 3.14,\n\thydrationPath: 'value',\n\terrorMessage: 'The value should be an integer in the range -Infinity..+Infinity'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: 3.14,\n\thydrationPath: 'value',\n\terrorMessage: 'The value should be an integer in (-Infinity..+Infinity)'\n]", $result);
 	}
 
 
@@ -515,7 +515,7 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 
 	public function testHydrateAsAliasWithIncorrectValue(): void {
 		$result = $this->executeCodeSnippet("2->hydrateAs(type{MyInteger});", "MyInteger = Integer<5..100>;");
-		$this->assertEquals("@HydrationError![\n\tvalue: 2,\n\thydrationPath: 'value',\n\terrorMessage: 'The integer value should be in the range 5..100'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: 2,\n\thydrationPath: 'value',\n\terrorMessage: 'The integer value should be in [5..100]'\n]", $result);
 	}
 
 
@@ -576,7 +576,7 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 	public function testHydrateAsSealedFromRecordWrongPropertyType(): void {
 		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MySealed});",
 			"MySealed := $[a: Integer, b: Integer, c: Real];");
-		$this->assertEquals("@HydrationError![\n\tvalue: 'hello',\n\thydrationPath: 'value.c',\n\terrorMessage: 'The value should be a real number in the range -Infinity..+Infinity'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: 'hello',\n\thydrationPath: 'value.c',\n\terrorMessage: 'The value should be a real number in (-Infinity..+Infinity)'\n]", $result);
 	}
 
 	public function testHydrateAsSealedFromRecordWithValidatorPass(): void {
@@ -630,7 +630,7 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 	public function testHydrateAsDataFromRecordWrongPropertyType(): void {
 		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MyData});",
 			"MyData := #[a: Integer, b: Integer, c: Real];");
-		$this->assertEquals("@HydrationError![\n\tvalue: 'hello',\n\thydrationPath: 'value.c',\n\terrorMessage: 'The value should be a real number in the range -Infinity..+Infinity'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: 'hello',\n\thydrationPath: 'value.c',\n\terrorMessage: 'The value should be a real number in (-Infinity..+Infinity)'\n]", $result);
 	}
 
 	public function testHydrateAsOpenFromRecord(): void {
@@ -642,7 +642,7 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 	public function testHydrateAsOpenFromRecordWrongPropertyType(): void {
 		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type{MyOpen});",
 			"MyOpen := #[a: Integer, b: Integer, c: Real];");
-		$this->assertEquals("@HydrationError![\n\tvalue: 'hello',\n\thydrationPath: 'value.c',\n\terrorMessage: 'The value should be a real number in the range -Infinity..+Infinity'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: 'hello',\n\thydrationPath: 'value.c',\n\terrorMessage: 'The value should be a real number in (-Infinity..+Infinity)'\n]", $result);
 	}
 
 	public function testHydrateAsOpenFromRecordWithValidatorPass(): void {

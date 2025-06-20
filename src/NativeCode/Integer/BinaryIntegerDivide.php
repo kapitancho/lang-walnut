@@ -5,11 +5,8 @@ namespace Walnut\Lang\NativeCode\Integer;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
-use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
-use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -25,16 +22,15 @@ final readonly class BinaryIntegerDivide implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof IntegerType || $targetType instanceof IntegerSubsetType) {
+		if ($targetType instanceof IntegerType) {
 			$parameterType = $this->toBaseType($parameterType);
 
-			if ($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) {
-				return ($parameterType->range->minValue === MinusInfinity::value || $parameterType->range->minValue < 0) &&
-					($parameterType->range->maxValue === PlusInfinity::value || $parameterType->range->maxValue > 0) ?
-						$programRegistry->typeRegistry->result(
-							$programRegistry->typeRegistry->integer(),
-							$programRegistry->typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
-						) : $programRegistry->typeRegistry->integer();
+			if ($parameterType instanceof IntegerType) {
+				return $parameterType->contains($programRegistry->valueRegistry->integer(0)) ?
+					$programRegistry->typeRegistry->result(
+						$programRegistry->typeRegistry->integer(),
+						$programRegistry->typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
+					) : $programRegistry->typeRegistry->integer();
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}

@@ -29,13 +29,13 @@ final readonly class MaxValue implements NativeMethod {
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
-			if ($refType instanceof IntegerType || $refType instanceof IntegerSubsetType) {
+			if ($refType instanceof IntegerType) {
 				return $programRegistry->typeRegistry->union([
 					$programRegistry->typeRegistry->integer(),
 					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('PlusInfinity'))
 				]);
 			}
-			if ($refType instanceof RealType || $refType instanceof RealSubsetType) {
+			if ($refType instanceof RealType) {
 				return $programRegistry->typeRegistry->union([
 					$programRegistry->typeRegistry->real(),
 					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('PlusInfinity'))
@@ -55,17 +55,18 @@ final readonly class MaxValue implements NativeMethod {
 		$targetValue = $target;
 
 		if ($targetValue instanceof TypeValue) {
+			//TODO: yyy - open vs closed intervals
 			$typeValue = $this->toBaseType($targetValue->typeValue);
-			if ($typeValue instanceof IntegerType || $typeValue instanceof IntegerSubsetType) {
-				return ($typeValue->range->maxValue === PlusInfinity::value ?
+			if ($typeValue instanceof IntegerType) {
+				return ($typeValue->numberRange->max === PlusInfinity::value ?
 					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('PlusInfinity')) :
-					$programRegistry->valueRegistry->integer($typeValue->range->maxValue)
+					$programRegistry->valueRegistry->integer($typeValue->numberRange->max->value)
 				);
 			}
-			if ($typeValue instanceof RealType || $typeValue instanceof RealSubsetType) {
-				return ($typeValue->range->maxValue === PlusInfinity::value ?
+			if ($typeValue instanceof RealType) {
+				return ($typeValue->numberRange->max === PlusInfinity::value ?
 					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('PlusInfinity')) :
-					$programRegistry->valueRegistry->real($typeValue->range->maxValue)
+					$programRegistry->valueRegistry->real($typeValue->numberRange->max->value)
 				);
 			}
 		}

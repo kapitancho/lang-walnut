@@ -14,7 +14,6 @@ final readonly class FromRequestMapper {
 	) {}
 
 	public function mapFromRequest(HttpRequest $request): Value {
-		$tr = $this->entryPointProvider->typeRegistry;
 		$vr = $this->entryPointProvider->valueRegistry;
 		return $vr->record([
 			'protocolVersion' => $vr->enumerationValue(

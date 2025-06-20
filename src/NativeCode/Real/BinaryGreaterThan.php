@@ -6,9 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
-use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
-use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\RealValue;
@@ -25,14 +23,10 @@ final readonly class BinaryGreaterThan implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof RealType || $targetType instanceof RealSubsetType) {
+		if ($targetType instanceof RealType) {
 			$parameterType = $this->toBaseType($parameterType);
 
-			if ($parameterType instanceof IntegerType ||
-				$parameterType instanceof IntegerSubsetType ||
-				$parameterType instanceof RealType ||
-				$parameterType instanceof RealSubsetType
-			) {
+			if ($parameterType instanceof IntegerType || $parameterType instanceof RealType) {
 				return $programRegistry->typeRegistry->boolean;
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));

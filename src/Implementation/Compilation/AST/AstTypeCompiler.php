@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\AST\Node\Type\EnumerationSubsetTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\FalseTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\FunctionTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\ImpureTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\IntegerFullTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\IntegerSubsetTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\IntegerTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\IntersectionTypeNode;
@@ -18,8 +19,10 @@ use Walnut\Lang\Blueprint\AST\Node\Type\MutableTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\NamedTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\NothingTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\NullTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\NumberIntervalNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\OptionalKeyTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\ProxyTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\RealFullTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\RealSubsetTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\RealTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\RecordTypeNode;
@@ -33,9 +36,10 @@ use Walnut\Lang\Blueprint\AST\Node\Type\TupleTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\UnionTypeNode;
-use Walnut\Lang\Blueprint\Common\Range\InvalidIntegerRange;
 use Walnut\Lang\Blueprint\Common\Range\InvalidLengthRange;
-use Walnut\Lang\Blueprint\Common\Range\InvalidRealRange;
+use Walnut\Lang\Blueprint\Common\Range\InvalidNumberInterval;
+use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
+use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Compilation\AST\AstCompilationException;
 use Walnut\Lang\Blueprint\Compilation\AST\AstTypeCompiler as AstTypeCompilerInterface;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
@@ -43,6 +47,8 @@ use Walnut\Lang\Blueprint\Program\UnknownType;
 use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnknownEnumerationValue;
+use Walnut\Lang\Implementation\Common\Range\NumberInterval;
+use Walnut\Lang\Implementation\Common\Range\NumberIntervalEndpoint;
 
 final readonly class AstTypeCompiler implements AstTypeCompilerInterface {
 	public function __construct(
@@ -117,12 +123,41 @@ final readonly class AstTypeCompiler implements AstTypeCompilerInterface {
 					$this->type($typeNode->valueType)
 				),
 
-				$typeNode instanceof IntegerTypeNode => $this->typeRegistry->integer(
-					$typeNode->minValue, $typeNode->maxValue
+				$typeNode instanceof IntegerFullTypeNode => $this->typeRegistry->integerFull(...
+					array_map(
+						fn(NumberIntervalNode $interval) => new NumberInterval(
+							$interval->start,
+							$interval->end
+						),
+						$typeNode->intervals
+					)
+				),
+				$typeNode instanceof IntegerTypeNode => $this->typeRegistry->integerFull(
+					new NumberInterval(
+						$typeNode->minValue === MinusInfinity::value ? MinusInfinity::value :
+							new NumberIntervalEndpoint($typeNode->minValue, true),
+						$typeNode->maxValue === PlusInfinity::value ? PlusInfinity::value :
+							new NumberIntervalEndpoint($typeNode->maxValue, true)
+					)
+					//$typeNode->minValue, $typeNode->maxValue
 				),
 				$typeNode instanceof IntegerSubsetTypeNode => $this->typeRegistry->integerSubset($typeNode->values),
-				$typeNode instanceof RealTypeNode => $this->typeRegistry->real(
-					$typeNode->minValue, $typeNode->maxValue
+				$typeNode instanceof RealFullTypeNode => $this->typeRegistry->realFull(...
+					array_map(
+						fn(NumberIntervalNode $interval) => new NumberInterval(
+							$interval->start,
+							$interval->end
+						),
+						$typeNode->intervals
+					)
+				),
+				$typeNode instanceof RealTypeNode => $this->typeRegistry->realFull(
+					new NumberInterval(
+						$typeNode->minValue === MinusInfinity::value ? MinusInfinity::value :
+							new NumberIntervalEndpoint($typeNode->minValue, true),
+						$typeNode->maxValue === PlusInfinity::value ? PlusInfinity::value :
+							new NumberIntervalEndpoint($typeNode->maxValue, true)
+					)
 				),
 				$typeNode instanceof RealSubsetTypeNode => $this->typeRegistry->realSubset($typeNode->values),
 				$typeNode instanceof StringTypeNode => $this->typeRegistry->string(
@@ -146,7 +181,7 @@ final readonly class AstTypeCompiler implements AstTypeCompilerInterface {
 			throw new AstCompilationException($typeNode, "Duplication issue: " . $e->getMessage(), $e);
 		} catch (UnknownEnumerationValue $e) {
 			throw new AstCompilationException($typeNode, "Enumeration issue: " . $e->getMessage(), $e);
-		} catch (InvalidIntegerRange|InvalidRealRange|InvalidLengthRange $e) {
+		} catch (InvalidLengthRange|InvalidNumberInterval $e) {
 			throw new AstCompilationException($typeNode, "Range issue: " . $e->getMessage(), $e);
 		}
 	}

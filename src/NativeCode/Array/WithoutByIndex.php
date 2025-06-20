@@ -5,11 +5,11 @@ namespace Walnut\Lang\NativeCode\Array;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
-use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -29,7 +29,7 @@ final readonly class WithoutByIndex implements NativeMethod {
 		$targetType = $this->toBaseType($targetType);
 		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($type instanceof ArrayType) {
-			if ($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) {
+			if ($parameterType instanceof IntegerType) {
 				$returnType = $programRegistry->typeRegistry->record([
 					'element' => $type->itemType,
 					'array' => $programRegistry->typeRegistry->array(
@@ -39,12 +39,18 @@ final readonly class WithoutByIndex implements NativeMethod {
 							PlusInfinity::value : max($type->range->maxLength - 1, 0)
 					)
 				]);
-				return $parameterType->range->minValue < $type->range->maxLength ? $returnType :
-					$programRegistry->typeRegistry->result(
-						$returnType,
-						$programRegistry->typeRegistry->data(
-							new TypeNameIdentifier("IndexOutOfRange")
-						)
+				return
+					$parameterType->numberRange->min instanceof NumberIntervalEndpoint &&
+					($parameterType->numberRange->min->value + ($parameterType->numberRange->min->inclusive ? 0 : 1)) >= 0 &&
+					$parameterType->numberRange->max instanceof NumberIntervalEndpoint &&
+					($parameterType->numberRange->max->value - ($parameterType->numberRange->max->inclusive ? 0 : 1)) <
+						$type->range->maxLength ?
+						$returnType :
+						$programRegistry->typeRegistry->result(
+							$returnType,
+							$programRegistry->typeRegistry->data(
+								new TypeNameIdentifier("IndexOutOfRange")
+							)
 					);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));

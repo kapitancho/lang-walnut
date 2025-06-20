@@ -26,9 +26,7 @@ final readonly class AsReal implements NativeMethod {
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if (
-			$targetType instanceof RealSubsetType ||
 			$targetType instanceof RealType ||
-			$targetType instanceof IntegerSubsetType ||
 			$targetType instanceof IntegerType
 		) {
 			return $targetType;

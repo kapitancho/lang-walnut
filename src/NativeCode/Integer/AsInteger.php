@@ -22,7 +22,7 @@ final readonly class AsInteger implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof IntegerSubsetType || $targetType instanceof IntegerType) {
+		if ($targetType instanceof IntegerType) {
 			return $targetType;
 		}
 		// @codeCoverageIgnoreStart

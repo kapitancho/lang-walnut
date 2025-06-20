@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\RealSubsetType;
+use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\ShapeType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
@@ -80,32 +81,34 @@ final readonly class UnionTypeNormalizer {
 	                    array_splice($queue, $ql, 1);
 	                    $shapeType = $this->normalize($q->refType, $tx->refType);
 	                    $tx = $this->typeRegistry->shape($shapeType);
-                    } else if ($q instanceof IntegerType && $tx instanceof IntegerType) {
-                        $newRange = $q->range->tryRangeUnionWith($tx->range);
-                        if ($newRange) {
-                            array_splice($queue, $ql, 1);
-                            $tx = $this->typeRegistry->integer(
-                                $newRange->minValue, $newRange->maxValue
-                            );
-                        }
                     } else if ($q instanceof IntegerSubsetType && $tx instanceof IntegerSubsetType) {
-                        array_splice($queue, $ql, 1);
-                        $tx = $this->typeRegistry->integerSubset(
-                            array_values(
-                                array_unique(
-                                    array_merge($q->subsetValues, $tx->subsetValues)
-                                )
-                            )
-                        );
+	                    array_splice($queue, $ql, 1);
+	                    $tx = $this->typeRegistry->integerSubset(
+		                    array_values(
+			                    array_unique(
+				                    array_merge($q->subsetValues, $tx->subsetValues)
+			                    )
+		                    )
+	                    );
                     } else if ($q instanceof RealSubsetType && $tx instanceof RealSubsetType) {
+	                    array_splice($queue, $ql, 1);
+	                    $tx = $this->typeRegistry->realSubset(
+		                    array_values(
+			                    array_unique(
+				                    array_merge($q->subsetValues, $tx->subsetValues)
+			                    )
+		                    )
+	                    );
+                    } else if ($q instanceof IntegerType && $tx instanceof IntegerType) {
                         array_splice($queue, $ql, 1);
-                        $tx = $this->typeRegistry->realSubset(
-                            array_values(
-                                array_unique(
-                                    array_merge($q->subsetValues, $tx->subsetValues)
-                                )
-                            )
-                        );
+						$newRange = $q->numberRange->unionWith($tx->numberRange);
+						//todo - fix this ugly piece of code
+						$tx = $this->typeRegistry->integerFull(... $newRange->intervals);
+                    } else if ($q instanceof RealType && $tx instanceof RealType) {
+                        array_splice($queue, $ql, 1);
+						$newRange = $q->numberRange->unionWith($tx->numberRange);
+						//todo - fix this ugly piece of code
+						$tx = $this->typeRegistry->realFull(... $newRange->intervals);
                     } else if ($q instanceof StringSubsetType && $tx instanceof StringSubsetType) {
                         array_splice($queue, $ql, 1);
                         $tx = $this->typeRegistry->stringSubset(

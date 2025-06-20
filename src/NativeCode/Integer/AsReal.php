@@ -30,12 +30,9 @@ final readonly class AsReal implements NativeMethod {
 		if ($targetType instanceof IntegerSubsetType || $targetType instanceof RealSubsetType) {
 			return $programRegistry->typeRegistry->realSubset($targetType->subsetValues);
 		}
-		if ($targetType instanceof IntegerType || $targetType instanceof RealType) {
-			return $programRegistry->typeRegistry->real(
-				$targetType->range->minValue === MinusInfinity::value ? MinusInfinity::value :
-					(float)(string)$targetType->range->minValue,
-				$targetType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
-					(float)(string)$targetType->range->maxValue
+		if ($targetType instanceof RealType || $targetType instanceof IntegerType) {
+			return $programRegistry->typeRegistry->realFull(...
+				$targetType->numberRange->intervals
 			);
 		}
 		// @codeCoverageIgnoreStart

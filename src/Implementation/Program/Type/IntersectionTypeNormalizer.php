@@ -13,11 +13,13 @@ use Walnut\Lang\Blueprint\Type\IntersectionType as IntersectionTypeInterface;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\RealSubsetType;
+use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\ShapeType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\EnumerationValue;
+use Walnut\Lang\Implementation\Common\Range\NumberRange;
 use Walnut\Lang\Implementation\Type\IntersectionType;
 
 final readonly class IntersectionTypeNormalizer {
@@ -100,30 +102,37 @@ final readonly class IntersectionTypeNormalizer {
 	                    array_splice($queue, $ql, 1);
 	                    $shapeType = $this->normalize($q->refType, $tx->refType);
 						$tx = $this->typeRegistry->shape($shapeType);
-                    } else if ($q instanceof IntegerType && $tx instanceof IntegerType) {
-                        $newRange = $q->range->tryRangeIntersectionWith($tx->range);
-                        if ($newRange) {
-                            array_splice($queue, $ql, 1);
-                            $tx = $this->typeRegistry->integer(
-                                $newRange->minValue, $newRange->maxValue
-                            );
-                        }
                     } else if ($q instanceof IntegerSubsetType && $tx instanceof IntegerSubsetType) {
-                        array_splice($queue, $ql, 1);
-                        $intersectedValues = array_values(
-                            array_intersect($q->subsetValues, $tx->subsetValues)
-                        );
-                        $tx = $intersectedValues ? $this->typeRegistry->integerSubset(
-                            $intersectedValues
-                        ) : $this->typeRegistry->nothing;
+	                    array_splice($queue, $ql, 1);
+	                    $intersectedValues = array_values(
+		                    array_intersect($q->subsetValues, $tx->subsetValues)
+	                    );
+	                    $tx = $intersectedValues ? $this->typeRegistry->integerSubset(
+		                    $intersectedValues
+	                    ) : $this->typeRegistry->nothing;
                     } else if ($q instanceof RealSubsetType && $tx instanceof RealSubsetType) {
-                        array_splice($queue, $ql, 1);
-                        $intersectedValues = array_values(
-                            array_intersect($q->subsetValues, $tx->subsetValues)
-                        );
-                        $tx = $intersectedValues ? $this->typeRegistry->realSubset(
-                            $intersectedValues
-                        ) : $this->typeRegistry->nothing;
+	                    array_splice($queue, $ql, 1);
+	                    $intersectedValues = array_values(
+		                    array_intersect($q->subsetValues, $tx->subsetValues)
+	                    );
+	                    $tx = $intersectedValues ? $this->typeRegistry->realSubset(
+		                    $intersectedValues
+	                    ) : $this->typeRegistry->nothing;
+                    } else if (
+	                    ($q instanceof IntegerType || $q instanceof RealType) &&
+	                    ($tx instanceof IntegerType || $tx instanceof RealType)
+                    ) {
+						$targetIsInteger = $q instanceof IntegerType || $tx instanceof IntegerType;
+						$range1 = new NumberRange($targetIsInteger, ... $q->numberRange->intervals);
+						$range2 = new NumberRange($targetIsInteger, ... $tx->numberRange->intervals);
+	                    $newRange = $range1->intersectionWith($range2);
+	                    if ($newRange) {
+		                    array_splice($queue, $ql, 1);
+		                    //todo - fix this ugly piece of code
+		                    $tx = $targetIsInteger ?
+			                    $this->typeRegistry->integerFull(... $newRange->intervals) :
+			                    $this->typeRegistry->realFull(... $newRange->intervals);
+	                    }
                     } else if ($q instanceof StringSubsetType && $tx instanceof StringSubsetType) {
                         array_splice($queue, $ql, 1);
                         $intersectedValues = array_values(

@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Implementation\Code\NativeCode;
 
 use BcMath\Number;
+use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AtomType;
@@ -62,15 +63,17 @@ final readonly class CastAsString {
 			$targetType instanceof MutableType => $this->detectRangedType($targetType->valueType),
 			$targetType instanceof IntegerType => [
 				1,
-				$targetType->range->maxValue === PlusInfinity::value ? 1000 :
+				$targetType->numberRange->max === PlusInfinity::value ||
+				$targetType->numberRange->min === MinusInfinity::value ?
+					1000 :
 					max(1,
-						(int)ceil(log10(abs((string)$targetType->range->maxValue))),
-						(int)ceil(log10(abs((string)$targetType->range->minValue))) +
-						($targetType->range->minValue < 0 ? 1 : 0)
+						(int)ceil(log10(abs((string)$targetType->numberRange->max->value))),
+						(int)ceil(log10(abs((string)$targetType->numberRange->min->value))) +
+						($targetType->numberRange->min->value < 0 ? 1 : 0)
 					)
 
 			],
-			$targetType instanceof RealSubsetType, $targetType instanceof RealType => [1, 1000],
+			$targetType instanceof RealType => [1, 1000],
 			$targetType instanceof TypeType => [1, PlusInfinity::value],
 			default => null
 		};

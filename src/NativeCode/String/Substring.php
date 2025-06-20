@@ -34,7 +34,7 @@ final readonly class Substring implements NativeMethod {
 				$parameterType = $this->toBaseType($parameterType);
 				return $programRegistry->typeRegistry->string(0, min(
 					$targetType->range->maxLength,
-					$parameterType->types['length']->range->maxValue
+					$parameterType->types['length']->numberRange->max->value
 				));
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));

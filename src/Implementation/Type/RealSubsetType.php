@@ -5,16 +5,18 @@ namespace Walnut\Lang\Implementation\Type;
 use BcMath\Number;
 use InvalidArgumentException;
 use JsonSerializable;
+use Walnut\Lang\Blueprint\Common\Range\NumberRange as NumberRangeInterface;
 use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\RealSubsetType as RealSubsetTypeInterface;
-use Walnut\Lang\Blueprint\Type\RealType as RealTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\IntegerValue;
 use Walnut\Lang\Blueprint\Value\RealValue;
-use Walnut\Lang\Implementation\Common\Range\RealRange;
+use Walnut\Lang\Implementation\Common\Range\NumberInterval;
+use Walnut\Lang\Implementation\Common\Range\NumberRange;
 
 final class RealSubsetType implements RealSubsetTypeInterface, JsonSerializable {
 
-	private readonly RealRange $actualRange;
+	private readonly RealType $underlyingType;
 
     /** @param list<Number> $subsetValues */
     public function __construct(
@@ -47,29 +49,24 @@ final class RealSubsetType implements RealSubsetTypeInterface, JsonSerializable 
 		    }
 		    $selected[$vs] = true;
 	    }
+
+		$numberRange = new NumberRange(false,
+			...array_map(
+				fn(Number $number): NumberInterval => NumberInterval::singleNumber($number),
+				$subsetValues
+			)
+		);
+		$this->underlyingType = new RealType(
+			$numberRange
+		);
     }
 
     public function isSubtypeOf(Type $ofType): bool {
-        return match(true) {
-            $ofType instanceof RealTypeInterface =>
-                self::isInRange($this->subsetValues, $ofType->range),
-            $ofType instanceof RealSubsetTypeInterface =>
-                self::isSubset($this->subsetValues, $ofType->subsetValues),
-            $ofType instanceof SupertypeChecker => $ofType->isSupertypeOf($this),
-            default => false
-        };
+		return $this->underlyingType->isSubtypeOf($ofType) ||
+			($ofType instanceof SupertypeChecker && $ofType->isSupertypeOf($this));
     }
 
-	/** @param list<Number> $subsetValues */
-    private static function isInRange(array $subsetValues, RealRange $range): bool {
-	    return array_all($subsetValues, fn($value) => $range->contains($value));
-    }
-
-    private static function isSubset(array $subset, array $superset): bool {
-	    return array_all($subset, fn($value) => in_array($value, $superset));
-    }
-
-	public function contains(RealValue $value): bool {
+	public function contains(IntegerValue|RealValue $value): bool {
 		return in_array($value->literalValue, $this->subsetValues);
 	}
 
@@ -77,31 +74,16 @@ final class RealSubsetType implements RealSubsetTypeInterface, JsonSerializable 
 		return sprintf("Real[%s]", implode(', ', $this->subsetValues));
 	}
 
-
-	private function minValue(): Number {
-		return new Number(min(array_map(
-			static fn(Number $value) =>
-				$value, $this->subsetValues
-		)));
-	}
-
-	private function maxValue(): Number {
-		return new Number(max(array_map(
-			static fn(Number $value) =>
-				$value, $this->subsetValues
-		)));
-	}
-
-	public RealRange $range {
-		get => $this->actualRange ??= new RealRange(
-			$this->minValue(), $this->maxValue()
-		);
-	}
-
 	public function jsonSerialize(): array {
 		return [
 			'type' => 'RealSubset',
 			'values' => array_map(fn(Number $value): float => (float)(string)$value, $this->subsetValues)
 		];
+	}
+
+	public NumberRangeInterface $numberRange {
+		get {
+			return $this->underlyingType->numberRange;
+		}
 	}
 }

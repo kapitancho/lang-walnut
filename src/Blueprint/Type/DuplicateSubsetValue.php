@@ -5,7 +5,6 @@ namespace Walnut\Lang\Blueprint\Type;
 use BcMath\Number;
 use InvalidArgumentException;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 
 final class DuplicateSubsetValue extends InvalidArgumentException {
 	private const string enumerationType = 'Enumeration';

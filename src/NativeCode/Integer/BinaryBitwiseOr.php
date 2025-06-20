@@ -4,10 +4,10 @@ namespace Walnut\Lang\NativeCode\Integer;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
+use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
-use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -23,15 +23,22 @@ final readonly class BinaryBitwiseOr implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if (($targetType instanceof IntegerType || $targetType instanceof IntegerSubsetType) && $targetType->range->minValue >= 0) {
+		if (($targetType instanceof IntegerType) &&
+			$targetType->numberRange->min instanceof NumberIntervalEndpoint &&
+			$targetType->numberRange->min->value >= 0
+		) {
 			$parameterType = $this->toBaseType($parameterType);
 
-			if (($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) && $parameterType->range->minValue >= 0) {
-				$min = max($targetType->range->minValue, $parameterType->range->minValue);
-				$max = $targetType->range->maxValue === PlusInfinity::value ||
-					$parameterType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
-					2 * max($targetType->range->maxValue, $parameterType->range->maxValue);
+			if (($parameterType instanceof IntegerType) &&
+				$parameterType->numberRange->min instanceof NumberIntervalEndpoint &&
+				$parameterType->numberRange->min->value >= 0
+			) {
+				$min = max($targetType->numberRange->min->value, $parameterType->numberRange->min->value);
+				$max = $targetType->numberRange->max === PlusInfinity::value ||
+					$parameterType->numberRange->max === PlusInfinity::value ? PlusInfinity::value :
+					2 * max($targetType->numberRange->max->value, $parameterType->numberRange->max->value);
 
+				//TODO: yyy - type polish. It could be better
 				return $programRegistry->typeRegistry->integer($min, $max);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));

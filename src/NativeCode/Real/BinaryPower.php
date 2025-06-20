@@ -9,7 +9,6 @@ use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
-use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\RealValue;
@@ -26,7 +25,7 @@ final readonly class BinaryPower implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof RealType || $targetType instanceof RealSubsetType) {
+		if ($targetType instanceof RealType) {
 			$parameterType = $this->toBaseType($parameterType);
 
 			if ($parameterType instanceof IntegerSubsetType && array_all(
@@ -36,12 +35,12 @@ final readonly class BinaryPower implements NativeMethod {
 				return $programRegistry->typeRegistry->integer(0);
 			}
 
-			if ($parameterType instanceof IntegerType ||
-				$parameterType instanceof IntegerSubsetType ||
-				$parameterType instanceof RealType ||
-				$parameterType instanceof RealSubsetType
-			) {
-				return $programRegistry->typeRegistry->real();
+			if ($parameterType instanceof IntegerType || $parameterType instanceof RealType) {
+				$zero = $programRegistry->valueRegistry->integer(0);
+				$containsZero = $targetType->contains($zero);
+				return $containsZero ?
+					$programRegistry->typeRegistry->real() :
+					$programRegistry->typeRegistry->nonZeroReal() ;
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}

@@ -8,7 +8,6 @@ use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
-use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
@@ -25,12 +24,12 @@ final readonly class Floor implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof RealType || $targetType instanceof RealSubsetType) {
+		if ($targetType instanceof RealType) {
 			return $programRegistry->typeRegistry->integer(
-				$targetType->range->minValue === MinusInfinity::value ? MinusInfinity::value :
-					$targetType->range->minValue->floor(),
-				$targetType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
-					$targetType->range->maxValue->floor()
+				$targetType->numberRange->min === MinusInfinity::value ? MinusInfinity::value :
+					$targetType->numberRange->min->value->floor(),
+				$targetType->numberRange->max === PlusInfinity::value ? PlusInfinity::value :
+					$targetType->numberRange->max->value->floor()
 			);
 		}
 		// @codeCoverageIgnoreStart

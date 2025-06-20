@@ -54,6 +54,7 @@ final readonly class OpenApiSchema implements NativeMethod {
 	}
 
 	private function typeToOpenApiSchema(ProgramRegistry $programRegistry, Type $type): Value {
+		/** @noinspection PhpParamsInspection */
 		return match(true) {
 			$type instanceof AliasType && $type->name->equals(new TypeNameIdentifier('JsonValue')) =>
 				$programRegistry->valueRegistry->record([
@@ -67,13 +68,25 @@ final readonly class OpenApiSchema implements NativeMethod {
 			]),
 			$type instanceof RealType, $type instanceof RealSubsetType => $programRegistry->valueRegistry->record([
 				... ['type' => $programRegistry->valueRegistry->string('number')],
-				... (($min = $type->range->minValue) !== MinusInfinity::value ? ['minimum' => $programRegistry->valueRegistry->real($min)] : []),
-				... (($max = $type->range->maxValue) !== PlusInfinity::value ? ['maximum' => $programRegistry->valueRegistry->real($max)] : []),
+				... (($min = $type->numberRange->min) !== MinusInfinity::value ? [
+					'minimum' => $programRegistry->valueRegistry->real($min->value),
+					'exclusiveMinimum' => $programRegistry->valueRegistry->boolean(!$min->inclusive)
+				] : []),
+				... (($max = $type->numberRange->max) !== PlusInfinity::value ? [
+					'maximum' => $programRegistry->valueRegistry->real($max->value),
+					'exclusiveMaximum' => $programRegistry->valueRegistry->boolean(!$max->inclusive)
+				] : []),
 			]),
 			$type instanceof IntegerType, $type instanceof IntegerSubsetType => $programRegistry->valueRegistry->record([
 				... ['type' => $programRegistry->valueRegistry->string('integer')],
-				... (($min = $type->range->minValue) !== MinusInfinity::value ? ['minimum' => $programRegistry->valueRegistry->real($min)] : []),
-				... (($max = $type->range->maxValue) !== PlusInfinity::value ? ['maximum' => $programRegistry->valueRegistry->real($max)] : []),
+				... (($min = $type->numberRange->min) !== MinusInfinity::value ? [
+					'minimum' => $programRegistry->valueRegistry->real($min->value),
+					'exclusiveMinimum' => $programRegistry->valueRegistry->boolean(!$min->inclusive)
+				] : []),
+				... (($max = $type->numberRange->max) !== PlusInfinity::value ? [
+					'maximum' => $programRegistry->valueRegistry->real($max->value),
+					'exclusiveMaximum' => $programRegistry->valueRegistry->boolean(!$max->inclusive)
+				] : []),
 			]),
 			$type instanceof StringSubsetType => $programRegistry->valueRegistry->record([
 				'type' => $programRegistry->valueRegistry->string('string'),

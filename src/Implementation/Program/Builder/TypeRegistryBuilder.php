@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\InvalidLengthRange;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
+use Walnut\Lang\Blueprint\Common\Range\NumberInterval as NumberIntervalInterface;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
@@ -26,9 +27,10 @@ use Walnut\Lang\Blueprint\Type\NamedType as NamedTypeInterface;
 use Walnut\Lang\Blueprint\Type\ResultType as ResultTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnknownEnumerationValue;
-use Walnut\Lang\Implementation\Common\Range\IntegerRange;
 use Walnut\Lang\Implementation\Common\Range\LengthRange;
-use Walnut\Lang\Implementation\Common\Range\RealRange;
+use Walnut\Lang\Implementation\Common\Range\NumberInterval;
+use Walnut\Lang\Implementation\Common\Range\NumberIntervalEndpoint;
+use Walnut\Lang\Implementation\Common\Range\NumberRange;
 use Walnut\Lang\Implementation\Program\Type\IntersectionTypeNormalizer;
 use Walnut\Lang\Implementation\Program\Type\UnionTypeNormalizer;
 use Walnut\Lang\Implementation\Type\AliasType;
@@ -162,18 +164,44 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		);
     }
 
+	public function nonZeroInteger(): IntegerType {
+		return $this->integerFull(
+			new NumberInterval(MinusInfinity::value, new NumberIntervalEndpoint(new Number(0), false)),
+			new NumberInterval(new NumberIntervalEndpoint(new Number(0), false), PlusInfinity::value)
+		);
+	}
+
+	public function integerFull(
+		NumberIntervalInterface ... $intervals
+	): IntegerType {
+		$numberRange = new NumberRange(true, ...
+			count($intervals) === 0 ?
+				[new NumberInterval(MinusInfinity::value, PlusInfinity::value)] :
+				$intervals
+		);
+		return new IntegerType(
+			$numberRange
+		);
+	}
+
     public function integer(
 	    int|Number|MinusInfinity $min = MinusInfinity::value,
         int|Number|PlusInfinity $max = PlusInfinity::value
     ): IntegerType {
+	    $rangeMin = is_int($min) ? new Number($min) : $min;
+	    $rangeMax = is_int($max) ? new Number($max) : $max;
         return new IntegerType(
-			$this,
-			new IntegerRange(
-				is_int($min) ? new Number($min) : $min,
-				is_int($max) ? new Number($max) : $max
-			)
+	        new NumberRange(true,
+		        new NumberInterval(
+			        $rangeMin === MinusInfinity::value ? MinusInfinity::value :
+				        new NumberIntervalEndpoint($rangeMin, true),
+			        $rangeMax === PlusInfinity::value ? PlusInfinity::value :
+				        new NumberIntervalEndpoint($rangeMax, true)
+		        )
+	        )
         );
     }
+
 	/**
 	 * @param list<Number> $values
 	 * @throws DuplicateSubsetValue
@@ -182,16 +210,42 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		return new IntegerSubsetType($values);
 	}
 
-    public function real(
+	public function nonZeroReal(): RealType {
+		return $this->realFull(
+			new NumberInterval(MinusInfinity::value, new NumberIntervalEndpoint(new Number(0), false)),
+			new NumberInterval(new NumberIntervalEndpoint(new Number(0), false), PlusInfinity::value)
+		);
+	}
+
+	public function realFull(
+		NumberIntervalInterface ... $intervals
+	): RealType {
+		$numberRange = new NumberRange(false, ...
+			count($intervals) === 0 ?
+				[new NumberInterval(MinusInfinity::value, PlusInfinity::value)] :
+				$intervals
+		);
+		return new RealType(
+			$numberRange
+		);
+	}
+
+	public function real(
 	    float|Number|MinusInfinity $min = MinusInfinity::value,
 	    float|Number|PlusInfinity $max = PlusInfinity::value
     ): RealType {
+		$rangeMin = is_float($min) ? new Number((string)$min) : $min;
+		$rangeMax = is_float($max) ? new Number((string)$max) : $max;
         return new RealType(
-			new RealRange(
-				is_float($min) ? new Number((string)$min) : $min,
-				is_float($max) ? new Number((string)$max) : $max
-			)
-        );
+	        new NumberRange(false,
+		        new NumberInterval(
+			        $rangeMin === MinusInfinity::value ? MinusInfinity::value :
+				        new NumberIntervalEndpoint($rangeMin, true),
+			        $rangeMax === PlusInfinity::value ? PlusInfinity::value :
+				        new NumberIntervalEndpoint($rangeMax, true)
+		        )
+	        )
+		);
     }
 	/**
 	 * @param list<Number> $values

@@ -18,6 +18,7 @@ use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Implementation\AST\Node\SourceLocation;
 use Walnut\Lang\Implementation\AST\Parser\Token as T;
+use Walnut\Lang\Implementation\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lib\Walex\PatternMatch;
 use Walnut\Lib\Walex\Token as LT;
 
@@ -2539,10 +2540,32 @@ final readonly class ParserStateMachine {
 					$this->s->move(712);
 				},
 				T::integer_number->name => $c,
-				T::range_dots->name => 713
+				T::range_dots->name => 713,
+				T::call_start->name => $f = function(LT $token) {
+					$this->s->push(718);
+					$this->s->stay(850);
+				},
+				T::tuple_start->name => $f
 			]],
 			712 => ['name' => 'type integer range dots', 'transitions' => [
-				T::range_dots->name => 713
+				T::range_dots->name => 713,
+				'' => function(LT $token) {
+					$value = $this->s->result['minValue'];
+					$this->s->push(718);
+					$this->s->result['intervals'] = [
+						$this->nodeBuilder->numberInterval(
+							new NumberIntervalEndpoint(
+								new Number($value),
+								true,
+							),
+							new NumberIntervalEndpoint(
+								new Number($value),
+								true,
+							),
+						)
+					];
+					$this->s->stay(858);
+				}
 			]],
 			713 => ['name' => 'type integer range end', 'transitions' => [
 				T::positive_integer_number->name => $c = function(LT $token) {
@@ -2582,6 +2605,14 @@ final readonly class ParserStateMachine {
 				T::value_separator->name => 716,
 				T::tuple_end->name => 715
 			]],
+			718 => ['name' => 'type integer full return', 'transitions' => [
+				T::type_end->name => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->integerFullType(
+						$this->s->generated
+					);
+					$this->s->moveAndPop();
+				},
+			]],
 
 			720 => ['name' => 'type real', 'transitions' => [
 				T::type_start->name => 721,
@@ -2598,10 +2629,32 @@ final readonly class ParserStateMachine {
 				},
 				T::integer_number->name => $c,
 				T::real_number->name => $c,
-				T::range_dots->name => 723
+				T::range_dots->name => 723,
+				T::call_start->name => $f = function(LT $token) {
+					$this->s->push(728);
+					$this->s->stay(860);
+				},
+				T::tuple_start->name => $f
 			]],
 			722 => ['name' => 'type real range dots', 'transitions' => [
-				T::range_dots->name => 723
+				T::range_dots->name => 723,
+				'' => function(LT $token) {
+					$value = $this->s->result['minValue'];
+					$this->s->push(728);
+					$this->s->result['intervals'] = [
+						$this->nodeBuilder->numberInterval(
+							new NumberIntervalEndpoint(
+								new Number($value),
+								true,
+							),
+							new NumberIntervalEndpoint(
+								new Number($value),
+								true,
+							),
+						)
+					];
+					$this->s->stay(868);
+				}
 			]],
 			723 => ['name' => 'type real range end', 'transitions' => [
 				T::positive_integer_number->name => $c = function(LT $token) {
@@ -2642,6 +2695,14 @@ final readonly class ParserStateMachine {
 			727 => ['name' => 'type real subset separator', 'transitions' => [
 				T::value_separator->name => 726,
 				T::tuple_end->name => 725
+			]],
+			728 => ['name' => 'type real full return', 'transitions' => [
+				T::type_end->name => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->realFullType(
+						$this->s->generated
+					);
+					$this->s->moveAndPop();
+				},
 			]],
 
 			730 => ['name' => 'type string', 'transitions' => [
@@ -3325,6 +3386,189 @@ final readonly class ParserStateMachine {
 			]],
 			834 => ['name' => 'module level tuple value end', 'transitions' => [
 				T::rest_type->name => 820
+			]],
+
+
+			850 => ['name' => 'integer interval init', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->result['intervals'] = [];
+					$this->s->stay(851);
+				}
+			]],
+			851 => ['name' => 'integer interval start', 'transitions' => [
+				T::call_start->name => 852,
+				T::tuple_start->name => 853,
+				T::positive_integer_number->name => $c = function(LT $token) {
+					$this->s->result['intervalStart'] = $token->patternMatch->text;
+					$this->s->result['intervalStartIsInclusive'] = true;
+					$this->s->result['intervalEnd'] = $token->patternMatch->text;
+					$this->s->result['intervalEndIsInclusive'] = true;
+					$this->s->move(857);
+				},
+				T::integer_number->name => $c,
+			]],
+			852 => ['name' => 'integer interval open start', 'transitions' => [
+				T::positive_integer_number->name => $c = function(LT $token) {
+					$this->s->result['intervalStart'] = $token->patternMatch->text;
+					$this->s->result['intervalStartIsInclusive'] = false;
+					$this->s->move(854);
+				},
+				T::integer_number->name => $c,
+				T::range_dots->name => function(LT $token) {
+					$this->s->result['intervalStart'] = MinusInfinity::value;
+					$this->s->result['intervalStartIsInclusive'] = false;
+					$this->s->move(855);
+				},
+			]],
+			853 => ['name' => 'integer interval closed start', 'transitions' => [
+				T::positive_integer_number->name => $c = function(LT $token) {
+					$this->s->result['intervalStart'] = $token->patternMatch->text;
+					$this->s->result['intervalStartIsInclusive'] = true;
+					$this->s->move(854);
+				},
+				T::integer_number->name => $c,
+			]],
+			854 => ['name' => 'integer interval dots', 'transitions' => [
+				T::range_dots->name => 855
+			]],
+			855 => ['name' => 'integer interval end', 'transitions' => [
+				T::positive_integer_number->name => $c = function(LT $token) {
+					$this->s->result['intervalEnd'] = $token->patternMatch->text;
+					$this->s->move(856);
+				},
+				T::integer_number->name => $c,
+				T::call_end->name => function(LT $token) {
+					$this->s->result['intervalEnd'] = PlusInfinity::value;
+					$this->s->result['intervalEndIsInclusive'] = false;
+					$this->s->move(857);
+				},
+			]],
+			856 => ['name' => 'integer interval bracket', 'transitions' => [
+				T::call_end->name => function(LT $token) {
+					$this->s->result['intervalEndIsInclusive'] = false;
+					$this->s->move(857);
+				},
+				T::tuple_end->name => function(LT $token) {
+					$this->s->result['intervalEndIsInclusive'] = true;
+					$this->s->move(857);
+				},
+			]],
+			857 => ['name' => 'integer interval add', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->result['intervals'][] = $this->nodeBuilder->numberInterval(
+						$this->s->result['intervalStart'] === MinusInfinity::value ?
+							MinusInfinity::value : new NumberIntervalEndpoint(
+								new Number($this->s->result['intervalStart']),
+								$this->s->result['intervalStartIsInclusive'],
+							),
+						$this->s->result['intervalEnd'] === PlusInfinity::value ?
+							PlusInfinity::value : new NumberIntervalEndpoint(
+							new Number($this->s->result['intervalEnd']),
+								$this->s->result['intervalEndIsInclusive'],
+							),
+					);
+					$this->s->stay(858);
+				}
+			]],
+			858 => ['name' => 'integer interval separator', 'transitions' => [
+				T::value_separator->name => 851,
+				'' => function(LT $token) {
+					$this->s->generated = $this->s->result['intervals'];
+					$this->s->pop();
+				}
+			]],
+
+			860 => ['name' => 'real interval init', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->result['intervals'] = [];
+					$this->s->stay(861);
+				}
+			]],
+			861 => ['name' => 'real interval start', 'transitions' => [
+				T::call_start->name => 862,
+				T::tuple_start->name => 863,
+				T::positive_integer_number->name => $c = function(LT $token) {
+					$this->s->result['intervalStart'] = $token->patternMatch->text;
+					$this->s->result['intervalStartIsInclusive'] = true;
+					$this->s->result['intervalEnd'] = $token->patternMatch->text;
+					$this->s->result['intervalEndIsInclusive'] = true;
+					$this->s->move(867);
+				},
+				T::integer_number->name => $c,
+				T::real_number->name => $c,
+			]],
+			862 => ['name' => 'real interval open start', 'transitions' => [
+				T::positive_integer_number->name => $c = function(LT $token) {
+					$this->s->result['intervalStart'] = $token->patternMatch->text;
+					$this->s->result['intervalStartIsInclusive'] = false;
+					$this->s->move(864);
+				},
+				T::integer_number->name => $c,
+				T::real_number->name => $c,
+				T::range_dots->name => function(LT $token) {
+					$this->s->result['intervalStart'] = MinusInfinity::value;
+					$this->s->result['intervalStartIsInclusive'] = false;
+					$this->s->move(865);
+				},
+			]],
+			863 => ['name' => 'real interval closed start', 'transitions' => [
+				T::positive_integer_number->name => $c = function(LT $token) {
+					$this->s->result['intervalStart'] = $token->patternMatch->text;
+					$this->s->result['intervalStartIsInclusive'] = true;
+					$this->s->move(864);
+				},
+				T::integer_number->name => $c,
+				T::real_number->name => $c,
+			]],
+			864 => ['name' => 'real interval dots', 'transitions' => [
+				T::range_dots->name => 865
+			]],
+			865 => ['name' => 'real interval end', 'transitions' => [
+				T::positive_integer_number->name => $c = function(LT $token) {
+					$this->s->result['intervalEnd'] = $token->patternMatch->text;
+					$this->s->move(866);
+				},
+				T::integer_number->name => $c,
+				T::real_number->name => $c,
+				T::call_end->name => function(LT $token) {
+					$this->s->result['intervalEnd'] = PlusInfinity::value;
+					$this->s->result['intervalEndIsInclusive'] = false;
+					$this->s->move(867);
+				},
+			]],
+			866 => ['name' => 'real interval bracket', 'transitions' => [
+				T::call_end->name => function(LT $token) {
+					$this->s->result['intervalEndIsInclusive'] = false;
+					$this->s->move(867);
+				},
+				T::tuple_end->name => function(LT $token) {
+					$this->s->result['intervalEndIsInclusive'] = true;
+					$this->s->move(867);
+				},
+			]],
+			867 => ['name' => 'real interval add', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->result['intervals'][] = $this->nodeBuilder->numberInterval(
+						$this->s->result['intervalStart'] === MinusInfinity::value ?
+							MinusInfinity::value : new NumberIntervalEndpoint(
+								new Number($this->s->result['intervalStart']),
+								$this->s->result['intervalStartIsInclusive'],
+							),
+						$this->s->result['intervalEnd'] === PlusInfinity::value ?
+							PlusInfinity::value : new NumberIntervalEndpoint(
+							new Number($this->s->result['intervalEnd']),
+								$this->s->result['intervalEndIsInclusive'],
+							),
+					);
+					$this->s->stay(868);
+				}
+			]],
+			868 => ['name' => 'real interval separator', 'transitions' => [
+				T::value_separator->name => 861,
+				'' => function(LT $token) {
+					$this->s->generated = $this->s->result['intervals'];
+					$this->s->pop();
+				}
 			]],
 
 			930 => ['name' => 'type shape', 'transitions' => [

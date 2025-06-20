@@ -17,6 +17,8 @@ use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TupleValue;
+use Walnut\Lang\Implementation\Common\Range\NumberInterval;
+use Walnut\Lang\Implementation\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class Sum implements NativeMethod {
@@ -39,22 +41,40 @@ final readonly class Sum implements NativeMethod {
 					$programRegistry->typeRegistry->real()
 				])
 			)) {
-				if ($itemType instanceof RealType || $itemType instanceof RealSubsetType) {
-					return $programRegistry->typeRegistry->real(
-                        $itemType->range->minValue === MinusInfinity::value ? MinusInfinity::value :
-                            $itemType->range->minValue * $targetType->range->minLength,
-                        $itemType->range->maxValue === PlusInfinity::value ||
-                        $targetType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
-                            $itemType->range->maxValue * $targetType->range->maxLength
+				if ($itemType instanceof RealType) {
+					return $programRegistry->typeRegistry->realFull(
+						new NumberInterval(
+							$itemType->numberRange->min === MinusInfinity::value ? MinusInfinity::value :
+								new NumberIntervalEndpoint(
+									$itemType->numberRange->min->value->mul($targetType->range->minLength),
+									$itemType->numberRange->min->inclusive ||
+									(int)(string)$targetType->range->minLength === 0
+								),
+							$itemType->numberRange->max === PlusInfinity::value ||
+							$targetType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
+								new NumberIntervalEndpoint(
+									$itemType->numberRange->max->value->mul($targetType->range->maxLength),
+									$itemType->numberRange->max->inclusive
+								)
+						)
 					);
 				}
-				if ($itemType instanceof IntegerType || $itemType instanceof IntegerSubsetType) {
-					return $programRegistry->typeRegistry->integer(
-                        $itemType->range->minValue === MinusInfinity::value ? MinusInfinity::value :
-						    $itemType->range->minValue * $targetType->range->minLength,
-                        $itemType->range->maxValue === PlusInfinity::value ||
-                        $targetType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
-						    $itemType->range->maxValue * $targetType->range->maxLength
+				if ($itemType instanceof IntegerType) {
+					return $programRegistry->typeRegistry->integerFull(
+						new NumberInterval(
+							$itemType->numberRange->min === MinusInfinity::value ? MinusInfinity::value :
+								new NumberIntervalEndpoint(
+									$itemType->numberRange->min->value->mul($targetType->range->minLength),
+									$itemType->numberRange->min->inclusive ||
+									(int)(string)$targetType->range->minLength === 0
+								),
+								$itemType->numberRange->max === PlusInfinity::value ||
+								$targetType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
+								new NumberIntervalEndpoint(
+									$itemType->numberRange->max->value->mul($targetType->range->maxLength),
+									$itemType->numberRange->max->inclusive
+								)
+						)
 					);
 				}
 				return $programRegistry->typeRegistry->real();

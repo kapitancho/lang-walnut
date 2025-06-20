@@ -8,13 +8,13 @@ use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
-use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
-use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Implementation\Common\Range\NumberInterval;
+use Walnut\Lang\Implementation\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 use Walnut\Lang\Implementation\Value\IntegerValue;
 
@@ -27,22 +27,33 @@ final readonly class BinaryMinus implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof RealType || $targetType instanceof RealSubsetType) {
+		if ($targetType instanceof RealType) {
 			$parameterType = $this->toBaseType($parameterType);
 
-			if ($parameterType instanceof IntegerType ||
-				$parameterType instanceof IntegerSubsetType ||
-				$parameterType instanceof RealType ||
-				$parameterType instanceof RealSubsetType
-			) {
-				$min = $targetType->range->minValue === MinusInfinity::value ||
-					$parameterType->range->maxValue === PlusInfinity::value ? MinusInfinity::value :
-					$targetType->range->minValue - $parameterType->range->maxValue;
-				$max = $targetType->range->maxValue === PlusInfinity::value ||
-					$parameterType->range->minValue === MinusInfinity::value ? PlusInfinity::value :
-					$targetType->range->maxValue - $parameterType->range->minValue;
+			if ($parameterType instanceof IntegerType || $parameterType instanceof RealType) {
+				$min =
+					$targetType->numberRange->min === MinusInfinity::value ||
+					$parameterType->numberRange->max === PlusInfinity::value ?
+						MinusInfinity::value :
+						new NumberIntervalEndpoint(
+							$targetType->numberRange->min->value -
+							$parameterType->numberRange->max->value,
+							$targetType->numberRange->min->inclusive &&
+							$parameterType->numberRange->max->inclusive
+						);
+				$max =
+					$targetType->numberRange->max === PlusInfinity::value ||
+					$parameterType->numberRange->min === MinusInfinity::value ?
+						PlusInfinity::value :
+						new NumberIntervalEndpoint(
+							$targetType->numberRange->max->value -
+							$parameterType->numberRange->min->value,
+							$targetType->numberRange->max->inclusive &&
+							$parameterType->numberRange->min->inclusive
+						);
 
-				return $programRegistry->typeRegistry->real($min, $max);
+				$interval = new NumberInterval($min, $max);
+				return $programRegistry->typeRegistry->realFull($interval);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}

@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Implementation\Code\Scope;
 
-use JsonSerializable;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownContextVariable;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownVariable;
 use Walnut\Lang\Blueprint\Code\Scope\VariableScope as VariableScopeInterface;

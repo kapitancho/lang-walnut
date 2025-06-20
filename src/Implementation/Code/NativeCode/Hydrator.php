@@ -4,7 +4,6 @@ namespace Walnut\Lang\Implementation\Code\NativeCode;
 
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\Method;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -353,30 +352,22 @@ final readonly class Hydrator {
 
 	private function hydrateInteger(Value $value, IntegerType $targetType, string $hydrationPath): IntegerValue {
 		if ($value instanceof IntegerValue) {
-			if ((
-				$targetType->range->minValue === MinusInfinity::value ||
-				$targetType->range->minValue <= $value->literalValue
-			) && (
-					$targetType->range->maxValue === PlusInfinity::value ||
-					$targetType->range->maxValue >= $value->literalValue
-			)) {
+			if ($targetType->contains($value)) {
 				return $value;
 			}
 			throw new HydrationException(
 				$value,
 				$hydrationPath,
-				sprintf("The integer value should be in the range %s..%s",
-					$targetType->range->minValue === MinusInfinity::value ? "-Infinity" : $targetType->range->minValue,
-					$targetType->range->maxValue === PlusInfinity::value ? "+Infinity" : $targetType->range->maxValue,
+				sprintf("The integer value should be in %s",
+					$targetType->numberRange,
 				)
 			);
 		}
 		throw new HydrationException(
 			$value,
 			$hydrationPath,
-			sprintf("The value should be an integer in the range %s..%s",
-				$targetType->range->minValue === MinusInfinity::value ? "-Infinity" : $targetType->range->minValue,
-				$targetType->range->maxValue === PlusInfinity::value ? "+Infinity" : $targetType->range->maxValue,
+			sprintf("The value should be an integer in %s",
+				$targetType->numberRange,
 			)
 		);
 	}
@@ -701,30 +692,22 @@ final readonly class Hydrator {
 
 	private function hydrateReal(Value $value, RealType $targetType, string $hydrationPath): RealValue {
 		if ($value instanceof IntegerValue || $value instanceof RealValue) {
-			if ((
-				$targetType->range->minValue === MinusInfinity::value ||
-				$targetType->range->minValue <= $value->literalValue
-			) && (
-					$targetType->range->maxValue === PlusInfinity::value ||
-					$targetType->range->maxValue >= $value->literalValue
-			)) {
+			if ($targetType->contains($value)) {
 				return $this->programRegistry->valueRegistry->real((float)(string)$value->literalValue);
 			}
 			throw new HydrationException(
 				$value,
 				$hydrationPath,
-				sprintf("The real value should be in the range %s..%s",
-					$targetType->range->minValue === MinusInfinity::value ? "-Infinity" : $targetType->range->minValue,
-					$targetType->range->maxValue === PlusInfinity::value ? "+Infinity" : $targetType->range->maxValue,
+				sprintf("The real value should be in %s",
+					$targetType->numberRange
 				)
 			);
 		}
 		throw new HydrationException(
 			$value,
 			$hydrationPath,
-			sprintf("The value should be a real number in the range %s..%s",
-				$targetType->range->minValue === MinusInfinity::value ? "-Infinity" : $targetType->range->minValue,
-				$targetType->range->maxValue === PlusInfinity::value ? "+Infinity" : $targetType->range->maxValue,
+			sprintf("The value should be a real number in %s",
+				$targetType->numberRange
 			)
 		);
 	}

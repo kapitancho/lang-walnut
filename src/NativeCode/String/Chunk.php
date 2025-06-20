@@ -4,9 +4,9 @@ namespace Walnut\Lang\NativeCode\String;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
+use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
-use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
@@ -27,11 +27,12 @@ final readonly class Chunk implements NativeMethod {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) {
+			if ($parameterType instanceof IntegerType) {
 				return $programRegistry->typeRegistry->array(
 					$programRegistry->typeRegistry->string(
 						min(1, $targetType->range->minLength),
-						$parameterType->range->maxValue
+						$parameterType->numberRange->max === PlusInfinity::value ?
+							PlusInfinity::value : $parameterType->numberRange->max->value
 					),
 					$targetType->range->minLength > 0 ? 1 : 0,
 					$targetType->range->maxLength

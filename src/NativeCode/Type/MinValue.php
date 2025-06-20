@@ -29,13 +29,13 @@ final readonly class MinValue implements NativeMethod {
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
-			if ($refType instanceof IntegerType || $refType instanceof IntegerSubsetType) {
+			if ($refType instanceof IntegerType) {
 				return $programRegistry->typeRegistry->union([
 					$programRegistry->typeRegistry->integer(),
 					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('MinusInfinity'))
 				]);
 			}
-			if ($refType instanceof RealType || $refType instanceof RealSubsetType) {
+			if ($refType instanceof RealType) {
 				return $programRegistry->typeRegistry->union([
 					$programRegistry->typeRegistry->real(),
 					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('MinusInfinity'))
@@ -56,15 +56,15 @@ final readonly class MinValue implements NativeMethod {
 
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
-			if ($typeValue instanceof IntegerType || $typeValue instanceof IntegerSubsetType) {
-				return ($typeValue->range->minValue === MinusInfinity::value ?
+			if ($typeValue instanceof IntegerType) {
+				return ($typeValue->numberRange->min === MinusInfinity::value ?
 					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('MinusInfinity')) :
-					$programRegistry->valueRegistry->integer($typeValue->range->minValue));
+					$programRegistry->valueRegistry->integer($typeValue->numberRange->min->value));
 			}
-			if ($typeValue instanceof RealType || $typeValue instanceof RealSubsetType) {
-				return ($typeValue->range->minValue === MinusInfinity::value ?
+			if ($typeValue instanceof RealType) {
+				return ($typeValue->numberRange->min === MinusInfinity::value ?
 					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('MinusInfinity')) :
-					$programRegistry->valueRegistry->real($typeValue->range->minValue));
+					$programRegistry->valueRegistry->real($typeValue->numberRange->min->value));
 			}
 		}
 		// @codeCoverageIgnoreStart

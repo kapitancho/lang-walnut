@@ -6,10 +6,10 @@ use BcMath\Number;
 use InvalidArgumentException;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Common\Range\InvalidIntegerRange;
 use Walnut\Lang\Blueprint\Common\Range\InvalidLengthRange;
-use Walnut\Lang\Blueprint\Common\Range\InvalidRealRange;
+use Walnut\Lang\Blueprint\Common\Range\InvalidNumberRange;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
+use Walnut\Lang\Blueprint\Common\Range\NumberInterval;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Program\UnknownType;
@@ -59,7 +59,11 @@ interface TypeRegistry {
 	public TrueType $true { get; }
 	public FalseType $false { get; }
 
-	/** @throws InvalidIntegerRange */
+	public function integerFull(NumberInterval ... $intervals): IntegerType;
+
+	public function nonZeroInteger(): IntegerType;
+
+	/** @throws InvalidNumberRange */
 	public function integer(
 		int|Number|MinusInfinity $min = MinusInfinity::value,
 		int|Number|PlusInfinity $max = PlusInfinity::value
@@ -70,7 +74,10 @@ interface TypeRegistry {
 	 */
 	public function integerSubset(array $values): IntegerSubsetType;
 
-	/** @throws InvalidRealRange */
+	public function nonZeroReal(): RealType;
+
+	public function realFull(NumberInterval ... $intervals): RealType;
+	/** @throws InvalidNumberRange */
 	public function real(
 		float|Number|MinusInfinity $min = MinusInfinity::value,
 		float|Number|PlusInfinity $max = PlusInfinity::value

@@ -8,9 +8,7 @@ use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
-use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
-use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
@@ -27,12 +25,10 @@ final readonly class Sqrt implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof IntegerType || $targetType instanceof IntegerSubsetType ||
-			$targetType instanceof RealType || $targetType instanceof RealSubsetType
-		) {
+		if ($targetType instanceof IntegerType || $targetType instanceof RealType) {
 			$real = $programRegistry->typeRegistry->real(0);
-			$minValue = $targetType->range->minValue;
-			return $minValue === MinusInfinity::value || $minValue < 0 ?
+			$minValue = $targetType->numberRange->min;
+			return $minValue === MinusInfinity::value || $minValue->value < 0 ?
 				$programRegistry->typeRegistry->result(
 					$real,
 					$programRegistry->typeRegistry->atom(

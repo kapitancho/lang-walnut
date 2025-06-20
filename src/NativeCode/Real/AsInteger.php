@@ -17,6 +17,8 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
 use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Implementation\Common\Range\NumberInterval;
+use Walnut\Lang\Implementation\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class AsInteger implements NativeMethod {
@@ -35,11 +37,19 @@ final readonly class AsInteger implements NativeMethod {
 			);
 		}
 		if ($targetType instanceof IntegerType || $targetType instanceof RealType) {
-			return $programRegistry->typeRegistry->integer(
-				$targetType->range->minValue === MinusInfinity::value ? MinusInfinity::value :
-					(int)(string)$targetType->range->minValue,
-				$targetType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
-					(int)(string)$targetType->range->maxValue
+			return $programRegistry->typeRegistry->integerFull(
+				new NumberInterval(
+					$targetType->numberRange->min === MinusInfinity::value ? MinusInfinity::value :
+						new NumberIntervalEndpoint(
+							new Number((int)(string)$targetType->numberRange->min->value),
+							true // TODO: yyy - can this be false?
+						),
+					$targetType->numberRange->max === PlusInfinity::value ? PlusInfinity::value :
+						new NumberIntervalEndpoint(
+							new Number((int)(string)$targetType->numberRange->max->value),
+							$targetType->numberRange->max->inclusive // TODO: yyy - polish
+						),
+				)
 			);
 		}
 		// @codeCoverageIgnoreStart

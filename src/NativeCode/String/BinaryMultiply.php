@@ -8,7 +8,6 @@ use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
-use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
@@ -29,14 +28,15 @@ final readonly class BinaryMultiply implements NativeMethod {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) {
-				$minValue = $parameterType->range->minValue;
-				if ($minValue !== MinusInfinity::value && $minValue >= 0) {
+			if ($parameterType instanceof IntegerType) {
+				$minValue = $parameterType->numberRange->min;
+				if ($minValue !== MinusInfinity::value && $minValue->value >= 0) {
 					return $programRegistry->typeRegistry->string(
-						$targetType->range->minLength * $minValue,
+						$targetType->range->minLength * $minValue->value,
 						$targetType->range->maxLength === PlusInfinity::value ||
-							$parameterType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
-							$targetType->range->maxLength * $parameterType->range->maxValue
+							$parameterType->numberRange->max === PlusInfinity::value ?
+								PlusInfinity::value :
+								$targetType->range->maxLength * $parameterType->numberRange->max->value
 					);
 				}
 			}

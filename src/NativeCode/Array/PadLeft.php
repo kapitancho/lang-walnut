@@ -4,6 +4,7 @@ namespace Walnut\Lang\NativeCode\Array;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
+use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -35,16 +36,24 @@ final readonly class PadLeft implements NativeMethod {
 				$types = $parameterType->types;
 				$lengthType = $types['length'] ?? null;
 				$valueType = $types['value'] ?? null;
-				if ($lengthType instanceof IntegerType || $lengthType instanceof IntegerSubsetType) {
+				if ($lengthType instanceof IntegerType) {
 					return $programRegistry->typeRegistry->array(
 						$programRegistry->typeRegistry->union([
 							$type->itemType,
 							$valueType
 						]),
-						max((int)(string)$type->range->minLength, (int)(string)$lengthType->range->minValue),
+						max(
+							(int)(string)$type->range->minLength,
+							$lengthType->numberRange->min === MinusInfinity::value ?
+								0 : $lengthType->numberRange->min->value
+						),
 						$type->range->maxLength === PlusInfinity::value ||
-							$lengthType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
-							max((int)(string)$type->range->maxLength, (int)(string)$lengthType->range->maxValue),
+							$lengthType->numberRange->max === PlusInfinity::value ? PlusInfinity::value :
+							max(
+								(int)(string)$type->range->maxLength,
+								$lengthType->numberRange->max->value -
+								($lengthType->numberRange->max->inclusive ? 0 : 1)
+							),
 					);
 				}
 			}

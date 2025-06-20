@@ -6,7 +6,6 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
-use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
@@ -22,7 +21,7 @@ final readonly class UnaryBitwiseNot implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof IntegerType || $targetType instanceof IntegerSubsetType) {
+		if ($targetType instanceof IntegerType) {
 			return $programRegistry->typeRegistry->integer(0);
 		}
 		// @codeCoverageIgnoreStart

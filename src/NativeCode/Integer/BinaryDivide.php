@@ -2,20 +2,21 @@
 
 namespace Walnut\Lang\NativeCode\Integer;
 
+use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
+use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint as NumberIntervalEndpointInterface;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
-use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
-use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Implementation\Common\Range\NumberInterval;
+use Walnut\Lang\Implementation\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 use Walnut\Lang\Implementation\Value\IntegerValue;
 
@@ -28,30 +29,38 @@ final readonly class BinaryDivide implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof IntegerType || $targetType instanceof IntegerSubsetType) {
+		if ($targetType instanceof IntegerType) {
 			$parameterType = $this->toBaseType($parameterType);
 
-			if ($parameterType instanceof IntegerType ||
-				$parameterType instanceof IntegerSubsetType ||
-				$parameterType instanceof RealType ||
-				$parameterType instanceof RealSubsetType
-			) {
+			if ($parameterType instanceof IntegerType || $parameterType instanceof RealType) {
                 $real = $programRegistry->typeRegistry->real();
+				//TODO: yyy - add +/-, -/+ and -/- cases as well as "inclusive" improvement
                 if (
-                    $targetType->range->minValue >= 0 && $parameterType->range->minValue > 0
+                    $targetType->numberRange->min instanceof NumberIntervalEndpointInterface && $targetType->numberRange->min->value >= 0 &&
+                    $parameterType->numberRange->min instanceof NumberIntervalEndpointInterface && $parameterType->numberRange->min->value > 0
                 ) {
-                    $min = $parameterType->range->maxValue === PlusInfinity::value ? 0 :
-                        $targetType->range->minValue / $parameterType->range->maxValue;
-                    $max = $targetType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
-                        $targetType->range->maxValue / $parameterType->range->minValue;
-                    $real = $programRegistry->typeRegistry->real($min, $max);
+                    $min = $parameterType->numberRange->max === PlusInfinity::value ?
+	                    new NumberIntervalEndpoint(
+		                    new Number(0),
+		                    false
+	                    ):
+	                    new NumberIntervalEndpoint(
+	                        $targetType->numberRange->min->value->div($parameterType->numberRange->max->value),
+                            true
+	                    );
+                    $max = $targetType->numberRange->max === PlusInfinity::value ? PlusInfinity::value :
+                        new NumberIntervalEndpoint(
+							$targetType->numberRange->max->value->div($parameterType->numberRange->min->value),
+	                        true
+                        );
+					$interval = new NumberInterval($min, $max);
+                    $real = $programRegistry->typeRegistry->realFull($interval);
                 }
-				return ($parameterType->range->minValue === MinusInfinity::value || $parameterType->range->minValue < 0) &&
-					($parameterType->range->maxValue === PlusInfinity::value || $parameterType->range->maxValue > 0) ?
-						$programRegistry->typeRegistry->result(
-							$real,
-							$programRegistry->typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
-						) : $real;
+				return $parameterType->contains($programRegistry->valueRegistry->integer(0)) ?
+					$programRegistry->typeRegistry->result(
+						$real,
+						$programRegistry->typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
+					) : $real;
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}

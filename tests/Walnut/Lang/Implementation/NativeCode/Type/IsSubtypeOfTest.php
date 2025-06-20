@@ -20,7 +20,12 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 			$this->expressionRegistry->constant(
 				$this->valueRegistry->type($type2)
 			),
-			$this->valueRegistry->boolean($expected)
+			$this->valueRegistry->boolean($expected),
+			sprintf("Checking if %s is subtype of %s (should be %s)",
+				$type1,
+				$type2,
+				$expected ? 'true' : 'false'
+			)
 		);
 	}
 
@@ -62,9 +67,18 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 				 [1 => false, false, false, false, false, false,  true, true, false, false],
 				 [1 => false, false, false, false, false, false, false, true, false, false],
 		];
+		$this->callIsOfType(
+			$t1,
+			$t10,
+			true,
+		);
 		foreach($matrix as $f => $values) {
 			foreach($values as $o => $expected) {
-				$this->callIsOfType(${'t'.$f}, ${'t'.$o}, $expected);
+				$this->callIsOfType(
+					${'t'.$f},
+					${'t'.$o},
+					$expected,
+				);
 			}
 		}
 		$this->callIsOfType($t1, $a, true);

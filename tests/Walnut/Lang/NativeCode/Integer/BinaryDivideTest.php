@@ -25,4 +25,11 @@ final class BinaryDivideTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet('Invalid parameter type', "3 / 'hello';");
 	}
 
+	public function testBinaryDivideReturnTypeOk(): void {
+		$result = $this->executeCodeSnippet("div[3, 1.5];", <<<NUT
+			div = ^[a: Integer, b: Real<(..0), (0..)>] => Real :: #a / #b;
+		NUT);
+		$this->assertEquals("2", $result);
+	}
+
 }

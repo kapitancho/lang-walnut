@@ -35,10 +35,13 @@ final readonly class SubstringRange implements NativeMethod {
 				$parameterType = $this->toBaseType($parameterType);
 				$endType = $parameterType->types['end'];
 				return $programRegistry->typeRegistry->string(0,
-					$endType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
-					min($targetType->range->maxLength,
-					$endType->range->maxValue - $parameterType->types['start']->range->minValue
-				));
+					$endType->numberRange->max === PlusInfinity::value ? PlusInfinity::value :
+					min(
+						$targetType->range->maxLength,
+						$endType->numberRange->max->value -
+						$parameterType->types['start']->numberRange->min->value
+					)
+				);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}

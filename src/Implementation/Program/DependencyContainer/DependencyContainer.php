@@ -27,8 +27,6 @@ use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\DataValue;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
-use Walnut\Lang\Blueprint\Value\OpenValue;
-use Walnut\Lang\Blueprint\Value\SealedValue;
 use Walnut\Lang\Blueprint\Value\Value;
 
 final class DependencyContainer implements DependencyContainerInterface {

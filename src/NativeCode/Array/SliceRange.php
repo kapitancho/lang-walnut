@@ -4,6 +4,7 @@ namespace Walnut\Lang\NativeCode\Array;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
+use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -40,10 +41,14 @@ final readonly class SliceRange implements NativeMethod {
 				return $programRegistry->typeRegistry->array(
 					$targetType->itemType,
 					0,
-					$endType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
-					min($targetType->range->maxLength,
-					$endType->range->maxValue - $parameterType->types['start']->range->minValue
-				));
+					$endType->numberRange->max === PlusInfinity::value ? PlusInfinity::value :
+						min(
+							$targetType->range->maxLength,
+							$parameterType->types['start']->numberRange->min === MinusInfinity::value ?
+								$targetType->range->maxLength :
+								$endType->numberRange->max->value - $parameterType->types['start']->numberRange->min->value
+						)
+				);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}

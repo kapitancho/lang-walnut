@@ -9,10 +9,8 @@ use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
-use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Value\IntegerValue as IntegerValueAlias;
 use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
@@ -27,7 +25,7 @@ final readonly class BinaryPower implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof IntegerType || $targetType instanceof IntegerSubsetType) {
+		if ($targetType instanceof IntegerType) {
 			$parameterType = $this->toBaseType($parameterType);
 
 			if ($parameterType instanceof IntegerSubsetType && array_all(
@@ -36,11 +34,18 @@ final readonly class BinaryPower implements NativeMethod {
 				)) {
 				return $programRegistry->typeRegistry->integer(0);
 			}
-			if ($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) {
-				return $programRegistry->typeRegistry->integer();
+			$zero = $programRegistry->valueRegistry->integer(0);
+			$containsZero = $targetType->contains($zero);
+
+			if ($parameterType instanceof IntegerType) {
+				return $containsZero ?
+					$programRegistry->typeRegistry->integer() :
+					$programRegistry->typeRegistry->nonZeroInteger();
 			}
-			if ($parameterType instanceof RealType || $parameterType instanceof RealSubsetType) {
-				return $programRegistry->typeRegistry->real();
+			if ($parameterType instanceof RealType) {
+				return $containsZero ?
+					$programRegistry->typeRegistry->real() :
+					$programRegistry->typeRegistry->nonZeroReal() ;
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}

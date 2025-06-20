@@ -12,18 +12,15 @@ use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\BooleanType;
 use Walnut\Lang\Blueprint\Type\CompositeNamedType;
-use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\NullType;
-use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\ResultType;
-use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\TupleType;
@@ -72,8 +69,8 @@ final readonly class CastAsJsonValue {
 			)) ||
 			$type instanceof NullType ||
 			$type instanceof BooleanType ||
-			$type instanceof IntegerType || $type instanceof IntegerSubsetType ||
-			$type instanceof RealType || $type instanceof RealSubsetType ||
+			$type instanceof IntegerType ||
+			$type instanceof RealType ||
 			$type instanceof StringType || $type instanceof StringSubsetType ||
 			$type instanceof EnumerationValue
 		) {

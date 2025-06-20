@@ -124,13 +124,17 @@ final class UnionTypeNormalizerTest extends BaseProgramTestHelper {
     }
 
     public function testDisjointRanges(): void {
-        self::assertEquals("(Integer<1..10>|Integer<15..25>)", (string)$this->union(
+        self::assertEquals("Integer<[1..10], [15..25]>", (string)$this->union(
             $this->typeRegistry->integer(1, 10),
             $this->typeRegistry->integer(15, 25),
         ));
-        self::assertEquals("(Integer<15..25>|Integer<1..10>)", (string)$this->union(
+        self::assertEquals("Integer<[1..10], [15..25]>", (string)$this->union(
             $this->typeRegistry->integer(15, 25),
 	        $this->typeRegistry->integer(1, 10),
+        ));
+        self::assertEquals("Real<[1..10], [15..25]>", (string)$this->union(
+            $this->typeRegistry->real(15, 25),
+	        $this->typeRegistry->real(1, 10),
         ));
     }
 

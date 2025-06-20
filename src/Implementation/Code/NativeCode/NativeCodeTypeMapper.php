@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Implementation\Code\NativeCode;
 
 use Walnut\Lang\Blueprint\Code\NativeCode\NativeCodeTypeMapper as NativeCodeTypeMapperInterface;
-use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AnyType;
 use Walnut\Lang\Blueprint\Type\ArrayType;
@@ -123,8 +122,8 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 		$typeStr = (string)$type;
 		return match(true) {
 			$typeStr === '[:]', $typeStr === '[]' => true,
-			$type instanceof IntegerType, $type instanceof IntegerSubsetType,
-			$type instanceof RealType, $type instanceof RealSubsetType,
+			$type instanceof IntegerType,
+			$type instanceof RealType,
 			$type instanceof StringType, $type instanceof StringSubsetType,
 			$type instanceof BooleanType, $type instanceof TrueType,
 			$type instanceof FalseType, $type instanceof NullType => true,

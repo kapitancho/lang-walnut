@@ -47,6 +47,7 @@ use Walnut\Lang\Blueprint\AST\Node\Type\EnumerationSubsetTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\FalseTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\FunctionTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\ImpureTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\IntegerFullTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\IntegerSubsetTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\IntegerTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\IntersectionTypeNode;
@@ -56,8 +57,10 @@ use Walnut\Lang\Blueprint\AST\Node\Type\MutableTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\NamedTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\NothingTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\NullTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\NumberIntervalNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\OptionalKeyTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\ProxyTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\RealFullTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\RealSubsetTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\RealTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\RecordTypeNode;
@@ -93,6 +96,7 @@ use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
+use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 
@@ -229,6 +233,13 @@ interface NodeBuilder {
 	public function optionalKeyType(TypeNode $valueType): OptionalKeyTypeNode;
 	public function functionType(TypeNode $parameterType, TypeNode $returnType): FunctionTypeNode;
 
+	public function numberInterval(
+		MinusInfinity|NumberIntervalEndpoint $start,
+		PlusInfinity|NumberIntervalEndpoint $end
+	): NumberIntervalNode;
+
+	/** @param NumberIntervalNode[] $intervals */
+	public function integerFullType(array $intervals): IntegerFullTypeNode;
 	public function integerType(
 		Number|MinusInfinity $minValue = MinusInfinity::value,
 		Number|PlusInfinity $maxValue = PlusInfinity::value
@@ -236,6 +247,8 @@ interface NodeBuilder {
 	/** @param list<Number> $values */
 	public function integerSubsetType(array $values): IntegerSubsetTypeNode;
 
+	/** @param NumberIntervalNode[] $intervals */
+	public function realFullType(array $intervals): RealFullTypeNode;
 	public function realType(
 		Number|MinusInfinity $minValue = MinusInfinity::value,
 		Number|PlusInfinity $maxValue = PlusInfinity::value

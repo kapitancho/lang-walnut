@@ -5,13 +5,9 @@ namespace Walnut\Lang\NativeCode\Real;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
-use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
-use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
-use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\RealValue;
@@ -28,20 +24,15 @@ final readonly class BinaryModulo implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof RealType || $targetType instanceof RealSubsetType) {
+		if ($targetType instanceof RealType) {
 			$parameterType = $this->toBaseType($parameterType);
 
-			if ($parameterType instanceof IntegerType ||
-				$parameterType instanceof IntegerSubsetType ||
-				$parameterType instanceof RealType ||
-				$parameterType instanceof RealSubsetType
-			) {
-				return ($parameterType->range->minValue === MinusInfinity::value || $parameterType->range->minValue < 0) &&
-					($parameterType->range->maxValue === PlusInfinity::value || $parameterType->range->maxValue > 0) ?
-						$programRegistry->typeRegistry->result(
-							$programRegistry->typeRegistry->real(),
-							$programRegistry->typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
-						) : $programRegistry->typeRegistry->real();
+			if ($parameterType instanceof IntegerType || $parameterType instanceof RealType) {
+				return $parameterType->contains($programRegistry->valueRegistry->integer(0)) ?
+					$programRegistry->typeRegistry->result(
+						$programRegistry->typeRegistry->real(),
+						$programRegistry->typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
+					) : $programRegistry->typeRegistry->real();
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}

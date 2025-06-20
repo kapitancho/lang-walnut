@@ -185,7 +185,6 @@ final readonly class ValueConstructor {
 	}
 
 	private function getValidatorOutputValue(
-		TypeRegistry           $typeRegistry,
 		ValueRegistry          $valueRegistry,
 		Type                   $type,
 		Value $parameter
@@ -301,7 +300,6 @@ final readonly class ValueConstructor {
 			}
 		}
 		return $this->getValidatorOutputValue(
-			$programRegistry->typeRegistry,
 			$programRegistry->valueRegistry,
 			$resultType,
 			$parameter

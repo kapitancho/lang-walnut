@@ -2,18 +2,20 @@
 
 namespace Walnut\Lang\NativeCode\Real;
 
+use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
-use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
 use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Implementation\Common\Range\NumberInterval;
+use Walnut\Lang\Implementation\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class Abs implements NativeMethod {
@@ -25,13 +27,29 @@ final readonly class Abs implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof RealType || $targetType instanceof RealSubsetType) {
-			return $programRegistry->typeRegistry->real(
-				$targetType->range->minValue === MinusInfinity::value ||
-				$targetType->range->minValue < 0 ? 0 : $targetType->range->minValue,
-				$targetType->range->minValue === MinusInfinity::value ||
-				$targetType->range->maxValue === PlusInfinity::value ? PlusInfinity::value :
-				max(abs((string)$targetType->range->minValue), abs((string)$targetType->range->maxValue))
+		if ($targetType instanceof RealType) {
+			return $programRegistry->typeRegistry->realFull(
+				new NumberInterval(
+					$targetType->numberRange->min === MinusInfinity::value ||
+					$targetType->numberRange->min->value < 0 ?
+						new NumberIntervalEndpoint(new Number(0), true) :
+						$targetType->numberRange->min,
+					$targetType->numberRange->min === MinusInfinity::value ||
+					$targetType->numberRange->max === PlusInfinity::value ?
+						PlusInfinity::value :
+						new NumberIntervalEndpoint(
+							new Number(
+								(string)max(
+									abs((string)$targetType->numberRange->min->value),
+									abs((string)$targetType->numberRange->max->value)
+								)
+							),
+							abs((string)$targetType->numberRange->min->value) >
+							abs((string)$targetType->numberRange->max->value) ?
+								$targetType->numberRange->min->inclusive :
+								$targetType->numberRange->max->inclusive
+						)
+				)
 			);
 		}
 		// @codeCoverageIgnoreStart

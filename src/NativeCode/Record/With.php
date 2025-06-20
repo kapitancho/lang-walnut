@@ -23,7 +23,6 @@ final readonly class With implements NativeMethod {
 		Type $targetType,
 		Type $parameterType,
 	): Type {
-		$originalTargetType = $targetType;
 		$targetType = $this->toBaseType($targetType);
 		$parameterType = $this->toBaseType($parameterType);
 		if ($targetType instanceof RecordType && $parameterType instanceof RecordType) {

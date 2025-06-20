@@ -17,6 +17,7 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
 use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Implementation\Common\Range\NumberInterval;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 use Walnut\Lang\Implementation\Value\AtomValue;
 
@@ -36,19 +37,25 @@ final readonly class Integer implements NativeMethod {
 				$toType = $parameterType->types['max'] ?? null;
 
 				if (
-					($fromType instanceof IntegerType || $fromType instanceof IntegerSubsetType) &&
-					($toType instanceof IntegerType || $toType instanceof IntegerSubsetType)
+					($fromType instanceof IntegerType) &&
+					($toType instanceof IntegerType)
 				) {
-					$fromMax = $fromType->range->maxValue;
-					$toMin = $toType->range->minValue;
-					if ($fromMax === PlusInfinity::value || $toMin === MinusInfinity::value || $fromMax > $toMin) {
+					$fromMax = $fromType->numberRange->max;
+					$toMin = $toType->numberRange->min;
+					if (
+						$fromMax === PlusInfinity::value ||
+						$toMin === MinusInfinity::value ||
+						$fromMax->value > $toMin->value
+					) {
 						// @codeCoverageIgnoreStart
 						throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s - range is not compatible", __CLASS__, $parameterType));
 						// @codeCoverageIgnoreEnd
 					}
-					return $programRegistry->typeRegistry->integer(
-						$fromType->range->minValue,
-						$toType->range->maxValue
+					return $programRegistry->typeRegistry->integerFull(
+						new NumberInterval(
+							$fromType->numberRange->min,
+							$toType->numberRange->max
+						)
 					);
 				}
 			}

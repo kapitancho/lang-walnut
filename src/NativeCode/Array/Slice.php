@@ -41,7 +41,7 @@ final readonly class Slice implements NativeMethod {
 					0,
 					min(
 						$targetType->range->maxLength,
-						($l = $parameterType->types['length'] ?? null) ? $l->range->maxValue :
+						($l = $parameterType->types['length'] ?? null) ? $l->numberRange->max->value :
 							$targetType->range->maxLength
 					)
 				);

@@ -37,19 +37,7 @@ final readonly class Max implements NativeMethod {
 					$programRegistry->typeRegistry->real()
 				])
 			)) {
-				if ($itemType instanceof RealType || $itemType instanceof RealSubsetType) {
-					return $programRegistry->typeRegistry->real(
-						$itemType->range->minValue,
-						$itemType->range->maxValue
-					);
-				}
-				if ($itemType instanceof IntegerType || $itemType instanceof IntegerSubsetType) {
-					return $programRegistry->typeRegistry->integer(
-						$itemType->range->minValue,
-						$itemType->range->maxValue
-					);
-				}
-				return $programRegistry->typeRegistry->real();
+				return $itemType;
 			}
 		}
 		// @codeCoverageIgnoreStart

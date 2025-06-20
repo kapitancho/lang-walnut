@@ -11,9 +11,11 @@ use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
+use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\OpenType;
+use Walnut\Lang\Blueprint\Type\OptionalKeyType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
@@ -26,8 +28,6 @@ use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
-use Walnut\Lang\Implementation\Type\IntegerType;
-use Walnut\Lang\Implementation\Type\OptionalKeyType;
 
 final readonly class Item implements NativeMethod {
 	use BaseType;
@@ -42,12 +42,12 @@ final readonly class Item implements NativeMethod {
 			$valueType = $this->toBaseType($type->valueType);
 			$valueType = $valueType instanceof TupleType ? $valueType->asArrayType() : $valueType;
 			if ($valueType instanceof ArrayType) {
-				if ($parameterType instanceof IntegerType || $parameterType instanceof IntegerSubsetType) {
+				if ($parameterType instanceof IntegerType) {
 					$returnType = $valueType->itemType;
 					if ($targetType instanceof TupleType) {
-						$min = $parameterType->range->minValue;
-						$max = $parameterType->range->maxValue;
-						if ($min !== MinusInfinity::value && $min >= 0) {
+						$min = $parameterType->numberRange->min;
+						$max = $parameterType->numberRange->max;
+						if ($min !== MinusInfinity::value && $min->value >= 0) {
 							if ($parameterType instanceof IntegerSubsetType) {
 								$returnType = $programRegistry->typeRegistry->union(
 									array_map(
@@ -56,23 +56,25 @@ final readonly class Item implements NativeMethod {
 									)
 								);
 							} elseif ($parameterType instanceof IntegerType) {
-								$isWithinLimit = $max !== PlusInfinity::value && $max < count($targetType->types);
+								$isWithinLimit = $max !== PlusInfinity::value && $max->value < count($targetType->types);
 								$returnType = $programRegistry->typeRegistry->union(
 									$isWithinLimit ?
-										array_slice($targetType->types, (int)(string)$min, (int)(string)$max - (int)(string)$min + 1) :
-										[... array_slice($targetType->types, (int)(string)$min), $targetType->restType]
+										array_slice($targetType->types, (int)(string)$min->value, (int)(string)$max->value - (int)(string)$min->value + 1) :
+										[... array_slice($targetType->types, (int)(string)$min->value), $targetType->restType]
 								);
 							}
 						}
 					}
 
-					return $valueType->range->minLength > $parameterType->range->maxValue ? $returnType :
-						$programRegistry->typeRegistry->result(
-							$returnType,
-							$programRegistry->typeRegistry->data(
-								new TypeNameIdentifier("IndexOutOfRange")
-							)
-						);
+					return $parameterType->numberRange->max !== PlusInfinity::value &&
+						$valueType->range->minLength > $parameterType->numberRange->max->value ?
+							$returnType :
+							$programRegistry->typeRegistry->result(
+								$returnType,
+								$programRegistry->typeRegistry->data(
+									new TypeNameIdentifier("IndexOutOfRange")
+								)
+							);
 				}
 				throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 			}
@@ -139,13 +141,7 @@ final readonly class Item implements NativeMethod {
 				$values = $baseValue->values;
 				$result = $values[$parameterValue->literalValue] ?? null;
 				if ($result !== null) {
-					$targetType = $this->toBaseType($target->type);
-					$type = match(true) {
-						$targetType instanceof RecordType => ($targetType->types[$parameterValue->literalValue] ?? $targetType->restType),
-						$targetType instanceof MapType => $targetType->itemType,
-						default => $result->type
-					};
-					return ($result);
+					return $result;
 				}
 				return ($programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->dataValue(

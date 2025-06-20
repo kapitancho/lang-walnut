@@ -3,13 +3,9 @@
 namespace Walnut\Lang\Implementation\Type;
 
 use JsonSerializable;
-use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Function\CustomMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Type\AliasType as AliasTypeInterface;
-use Walnut\Lang\Blueprint\Type\NamedType;
-use Walnut\Lang\Blueprint\Type\ShapeType as ShapeTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
 
 final readonly class AliasType implements AliasTypeInterface, SupertypeChecker, JsonSerializable {

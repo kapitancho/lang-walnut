@@ -13,6 +13,7 @@ use Walnut\Lang\Blueprint\AST\Node\Expression\MultiVariableAssignmentExpressionN
 use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode as FunctionBodyNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\Module\ModuleDefinitionNode;
 use Walnut\Lang\Blueprint\AST\Node\SourceNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\NumberIntervalNode as NumberIntervalNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\AtomValueNode as AtomValueNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\Value\ValueNode;
@@ -21,6 +22,7 @@ use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
+use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Implementation\AST\Node\Expression\ConstantExpressionNode;
@@ -66,6 +68,7 @@ use Walnut\Lang\Implementation\AST\Node\Type\EnumerationSubsetTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\FalseTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\FunctionTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\ImpureTypeNode;
+use Walnut\Lang\Implementation\AST\Node\Type\IntegerFullTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\IntegerSubsetTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\IntegerTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\IntersectionTypeNode;
@@ -75,8 +78,10 @@ use Walnut\Lang\Implementation\AST\Node\Type\MutableTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\NamedTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\NothingTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\NullTypeNode;
+use Walnut\Lang\Implementation\AST\Node\Type\NumberIntervalNode;
 use Walnut\Lang\Implementation\AST\Node\Type\OptionalKeyTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\ProxyTypeNode;
+use Walnut\Lang\Implementation\AST\Node\Type\RealFullTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\RealSubsetTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\RealTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\RecordTypeNode;
@@ -602,12 +607,29 @@ final class NodeBuilder implements NodeBuilderInterface {
 		);
 	}
 
+	public function numberInterval(
+		MinusInfinity|NumberIntervalEndpoint $start,
+		PlusInfinity|NumberIntervalEndpoint $end
+	): NumberIntervalNodeInterface {
+		return new NumberIntervalNode($this->getSourceLocation(), $start, $end);
+	}
+
+	/** @param NumberIntervalNodeInterface[] $intervals */
+	public function integerFullType(array $intervals): IntegerFullTypeNode {
+		return new IntegerFullTypeNode($this->getSourceLocation(), $intervals);
+	}
+
 	public function integerType(Number|MinusInfinity $minValue = MinusInfinity::value, PlusInfinity|Number $maxValue = PlusInfinity::value): IntegerTypeNode {
 		return new IntegerTypeNode($this->getSourceLocation(), $minValue, $maxValue);
 	}
 
 	public function integerSubsetType(array $values): IntegerSubsetTypeNode {
 		return new IntegerSubsetTypeNode($this->getSourceLocation(), $values);
+	}
+
+	/** @param NumberIntervalNodeInterface[] $intervals */
+	public function realFullType(array $intervals): RealFullTypeNode {
+		return new RealFullTypeNode($this->getSourceLocation(), $intervals);
 	}
 
 	public function realType(

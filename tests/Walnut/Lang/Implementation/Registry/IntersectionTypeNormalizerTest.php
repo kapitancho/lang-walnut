@@ -174,6 +174,18 @@ final class IntersectionTypeNormalizerTest extends BaseProgramTestHelper {
             $this->typeRegistry->integer(1, 15),
             $this->typeRegistry->integer(10, 25),
         ));
+        self::assertEquals("Integer<10..15>", (string)$this->intersection(
+            $this->typeRegistry->integer(1, 15),
+            $this->typeRegistry->real(10, 25),
+        ));
+        self::assertEquals("Integer<10..15>", (string)$this->intersection(
+            $this->typeRegistry->real(1, 15),
+            $this->typeRegistry->integer(10, 25),
+        ));
+        self::assertEquals("Real<10..15>", (string)$this->intersection(
+            $this->typeRegistry->real(1, 15),
+            $this->typeRegistry->real(10, 25),
+        ));
     }
 
     public function testJointRangesInfinity(): void {
