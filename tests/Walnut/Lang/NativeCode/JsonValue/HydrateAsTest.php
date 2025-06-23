@@ -59,6 +59,12 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@HydrationError![\n\tvalue: null,\n\thydrationPath: 'value',\n\terrorMessage: 'Atom hydration failed. Error: \`error\`'\n]", $result);
 	}
 
+	public function testHydrateAsAtomUnion(): void {
+		$result = $this->executeCodeSnippet("[true->hydrateAs(`MyAtom|MyOtherAtom), false->hydrateAs(`MyAtom|MyOtherAtom)];",
+			"MyAtom := (); MyOtherAtom := (); JsonValue ==> MyAtom @ String :: ?whenValueOf($) is { true: MyAtom, ~ : @'error' };");
+		$this->assertEquals("[MyAtom, MyOtherAtom]", $result);
+	}
+
 	public function testHydrateAsTrueFromTrue(): void {
 		$result = $this->executeCodeSnippet("true->hydrateAs(`True);");
 		$this->assertEquals("true", $result);

@@ -41,7 +41,7 @@ final readonly class ValueConstructor {
 	private function getConstructingType(TypeRegistry $typeRegistry, Type $type, Type $parameterType): Type {
 		return match(true) {
 			$type instanceof CustomType => $type->valueType,
-			$type instanceof AtomType => $typeRegistry->null,
+			//$type instanceof AtomType => $typeRegistry->null,
 			$type instanceof AliasType => $type->aliasedType,
 			$type instanceof ResultType && $type->returnType instanceof NothingType => $parameterType,
 			$type instanceof EnumerationType => $typeRegistry->union([
@@ -228,7 +228,7 @@ final readonly class ValueConstructor {
 				$type instanceof SealedType => $valueRegistry->sealedValue(
 					$type->name, $parameterValue
 				),
-				$type instanceof AtomType => $type->value,
+				//$type instanceof AtomType => $type->value,
 				$type instanceof EnumerationType => $et($type, $parameterValue),
 				default => throw new ExecutionException(
 					sprintf("Cannot construct a value of type: %s", $type)

@@ -91,7 +91,7 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 			// @codeCoverageIgnoreStart
 			default => throw new AstCompilationException(
 				$moduleDefinition,
-				"Constructors are only allowed for open and sealed types",
+				"Constructors are only allowed for open and sealed types and for enumerations.",
 			)
 			// @codeCoverageIgnoreEnd
 		};

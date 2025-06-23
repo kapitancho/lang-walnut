@@ -21,11 +21,11 @@ LengthRange := #[minLength: Integer<0..>, maxLength: Integer<0..>|PlusInfinity] 
     ?whenTypeOf(#) is { `[minLength: Integer<0..>, maxLength: Integer<0..>]:
         ?when (#.minLength > #.maxLength) { => @InvalidRange }};
 
-PositiveInteger := Integer<(0..)>;
-NonNegativeInteger := Integer<[0..)>;
-NegativeInteger := Integer<(..0)>;
-NonPositiveInteger := Integer<(..0]>;
-NonZeroInteger := Integer<(..0), (0..)>;
+PositiveInteger = Integer<1..>;
+NonNegativeInteger = Integer<0..>;
+NegativeInteger = Integer<..-1>;
+NonPositiveInteger = Integer<..0>;
+NonZeroInteger = Integer<(..0), (0..)>;
 
 IntegerNumberIntervalEndpoint := [value: Integer, inclusive: Boolean];
 IntegerNumberInterval := #[
@@ -40,11 +40,11 @@ IntegerNumberInterval := #[
 };
 IntegerNumberRange := [intervals: Array<IntegerNumberInterval>];
 
-PositiveReal := Real<(0..)>;
-NonNegativeReal := Real<[0..)>;
-NegativeReal := Real<(..0)>;
-NonPositiveReal := Real<(..0]>;
-NonZeroReal := Real<(..0), (0..)>;
+PositiveReal = Real<(0..)>;
+NonNegativeReal = Real<[0..)>;
+NegativeReal = Real<(..0)>;
+NonPositiveReal = Real<(..0]>;
+NonZeroReal = Real<(..0), (0..)>;
 
 RealNumberIntervalEndpoint = [value: Real, inclusive: Boolean];
 RealNumberInterval := #[

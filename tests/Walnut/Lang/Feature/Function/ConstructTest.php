@@ -14,15 +14,6 @@ final class ConstructTest extends CodeExecutionTestHelper {
 		$this->assertEquals("A", $result);
 	}
 
-	public function testAtomWrongParameter(): void {
-		$this->executeErrorCodeSnippet(
-			"Invalid constructor value: Null is expected but Integer[2] is passed",
-			"A(2);",
-		<<<NUT
-			A := ();
-		NUT);
-	}
-
 	public function testEnumKnownValue(): void {
 		$result = $this->executeCodeSnippet("Suit('Spades');", <<<NUT
 		Suit := (Spades, Hearts, Diamonds, Clubs);
