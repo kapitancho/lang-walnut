@@ -26,12 +26,12 @@ final class RecordValue implements RecordValueInterface, JsonSerializable {
 	    public readonly array $values
     ) {
 	    foreach($this->values as $value) {
-	  			if (!$value instanceof Value) {
-	  				throw new InvalidArgumentException(
-	  					'RecordValue must be constructed with a list of Value instances'
-	  				);
-	  			}
-	  		}
+            if (!$value instanceof Value) {
+                throw new InvalidArgumentException(
+                    'RecordValue must be constructed with a list of Value instances'
+                );
+            }
+        }
     }
 
 	public RecordType $type {

@@ -63,6 +63,76 @@ abstract class BaseProgramTestHelper extends TestCase {
 		$ef = fn() => $this->expressionRegistry->functionBody(
 			$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
 		);
+
+		$this->typeRegistry->addData(
+			new TypeNameIdentifier('IntegerNumberIntervalEndpoint'),
+			$this->typeRegistry->record([
+				'value' => $this->typeRegistry->integer(),
+				'inclusive' => $this->typeRegistry->boolean
+			]),
+		);
+		$this->typeRegistry->addOpen(
+			new TypeNameIdentifier('IntegerNumberInterval'),
+			$this->typeRegistry->record([
+				'start' => $this->typeRegistry->union([
+					$this->typeRegistry->atom(new TypeNameIdentifier('MinusInfinity')),
+					$this->typeRegistry->data(
+						new TypeNameIdentifier('IntegerNumberIntervalEndpoint')
+					)
+				]),
+				'end' => $this->typeRegistry->union([
+					$this->typeRegistry->atom(new TypeNameIdentifier('PlusInfinity')),
+					$this->typeRegistry->data(
+						new TypeNameIdentifier('IntegerNumberIntervalEndpoint')
+					)
+				]),
+			]),
+		);
+		$this->typeRegistry->addData(
+			new TypeNameIdentifier('IntegerNumberRange'),
+			$this->typeRegistry->record(
+				['intervals' => $this->typeRegistry->array(
+					$this->typeRegistry->open(new TypeNameIdentifier('IntegerNumberInterval')),
+					1
+				)]
+			)
+		);
+		$this->typeRegistry->addData(
+			new TypeNameIdentifier('RealNumberIntervalEndpoint'),
+			$this->typeRegistry->record([
+				'value' => $this->typeRegistry->real(),
+				'inclusive' => $this->typeRegistry->boolean
+			]),
+		);
+		$this->typeRegistry->addOpen(
+			new TypeNameIdentifier('RealNumberInterval'),
+			$this->typeRegistry->record([
+				'start' => $this->typeRegistry->union([
+					$this->typeRegistry->atom(new TypeNameIdentifier('MinusInfinity')),
+					$this->typeRegistry->data(
+						new TypeNameIdentifier('RealNumberIntervalEndpoint')
+					)
+				]),
+				'end' => $this->typeRegistry->union([
+					$this->typeRegistry->atom(new TypeNameIdentifier('PlusInfinity')),
+					$this->typeRegistry->data(
+						new TypeNameIdentifier('RealNumberIntervalEndpoint')
+					)
+				]),
+			]),
+		);
+		$this->typeRegistry->addData(
+			new TypeNameIdentifier('RealNumberRange'),
+			$this->typeRegistry->record(
+				['intervals' => $this->typeRegistry->array(
+					$this->typeRegistry->open(new TypeNameIdentifier('RealNumberInterval')),
+					1
+				)]
+			)
+		);
+
+
+
 		$this->typeRegistry->addData(
 			new TypeNameIdentifier('IndexOutOfRange'),
 			$this->typeRegistry->record([

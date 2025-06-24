@@ -38,7 +38,7 @@ IntegerNumberInterval := #[
             {#.start.value == #.end.value && {!{#.start.inclusive} || !{#.end.inclusive}}}
         ) { => @InvalidRange }
 };
-IntegerNumberRange := [intervals: Array<IntegerNumberInterval>];
+IntegerNumberRange := [intervals: Array<IntegerNumberInterval, 1..>];
 
 PositiveReal = Real<(0..)>;
 NonNegativeReal = Real<[0..)>;
@@ -46,7 +46,7 @@ NegativeReal = Real<(..0)>;
 NonPositiveReal = Real<(..0]>;
 NonZeroReal = Real<(..0), (0..)>;
 
-RealNumberIntervalEndpoint = [value: Real, inclusive: Boolean];
+RealNumberIntervalEndpoint := [value: Real, inclusive: Boolean];
 RealNumberInterval := #[
     start: MinusInfinity|RealNumberIntervalEndpoint,
     end: PlusInfinity|RealNumberIntervalEndpoint
@@ -57,7 +57,7 @@ RealNumberInterval := #[
             {#.start.value == #.end.value && {!{#.start.inclusive} || !{#.end.inclusive}}}
         ) { => @InvalidRange }
 };
-RealNumberRange := [intervals: Array<RealNumberInterval>];
+RealNumberRange := [intervals: Array<RealNumberInterval, 1..>];
 
 /* dependency container */
 DependencyContainer := ();

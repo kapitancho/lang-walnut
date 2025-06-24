@@ -21,6 +21,7 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Value\AtomValue;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
+use Walnut\Lang\Blueprint\Value\DataValue;
 use Walnut\Lang\Blueprint\Value\EnumerationValue;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
 use Walnut\Lang\Blueprint\Value\MutableValue;
@@ -88,6 +89,7 @@ final readonly class CastAsString {
 			$value instanceof NullValue => 'null',
 			$value instanceof TypeValue => (string)$value->typeValue,
 			$value instanceof MutableValue => $this->evaluate($value->value),
+			$value instanceof DataValue => $this->evaluate($value->value),
 			$value instanceof AtomValue => $value->type->name,
 			$value instanceof EnumerationValue => $value->name,
 			//TODO: check for cast to jsonValue (+subtype as well)

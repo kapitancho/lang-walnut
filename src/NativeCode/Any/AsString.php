@@ -5,6 +5,7 @@ namespace Walnut\Lang\NativeCode\Any;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
@@ -32,7 +33,10 @@ final readonly class AsString implements NativeMethod {
 		if ($baseTargetType instanceof StringSubsetType || $baseTargetType instanceof StringType) {
 			return $baseTargetType;
 		}
-		if ($baseTargetType instanceof MutableType && (
+		if ((
+				$baseTargetType instanceof MutableType ||
+				$baseTargetType instanceof DataType
+			) && (
 				$baseTargetType->valueType instanceof StringType ||
 				$baseTargetType->valueType instanceof StringSubsetType
 			)) {

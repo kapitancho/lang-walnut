@@ -53,6 +53,52 @@ final readonly class OpenApiSchema implements NativeMethod {
 		// @codeCoverageIgnoreEnd
 	}
 
+	private function integerToOpenApiSchema(ProgramRegistry $programRegistry, IntegerType $type): Value {
+		$result = [];
+		foreach($type->numberRange->intervals as $interval) {
+			/** @noinspection PhpParamsInspection */
+			$result[] = $programRegistry->valueRegistry->record([
+				... ['type' => $programRegistry->valueRegistry->string('integer')],
+				... (($min = $interval->start) !== MinusInfinity::value ? [
+					'minimum' => $programRegistry->valueRegistry->integer($min->value),
+					'exclusiveMinimum' => $programRegistry->valueRegistry->boolean(!$min->inclusive)
+				] : []),
+				... (($max = $interval->end) !== PlusInfinity::value ? [
+					'maximum' => $programRegistry->valueRegistry->integer($max->value),
+					'exclusiveMaximum' => $programRegistry->valueRegistry->boolean(!$max->inclusive)
+				] : []),
+			]);
+		}
+
+		return count($result) > 1 ?
+			$programRegistry->valueRegistry->record([
+				'oneOf' => $programRegistry->valueRegistry->tuple($result)
+			]) : $result[0];
+	}
+
+	private function realToOpenApiSchema(ProgramRegistry $programRegistry, RealType $type): Value {
+		$result = [];
+		foreach($type->numberRange->intervals as $interval) {
+			/** @noinspection PhpParamsInspection */
+			$result[] = $programRegistry->valueRegistry->record([
+				... ['type' => $programRegistry->valueRegistry->string('number')],
+				... (($min = $interval->start) !== MinusInfinity::value ? [
+					'minimum' => $programRegistry->valueRegistry->real($min->value),
+					'exclusiveMinimum' => $programRegistry->valueRegistry->boolean(!$min->inclusive)
+				] : []),
+				... (($max = $interval->end) !== PlusInfinity::value ? [
+					'maximum' => $programRegistry->valueRegistry->real($max->value),
+					'exclusiveMaximum' => $programRegistry->valueRegistry->boolean(!$max->inclusive)
+				] : []),
+			]);
+		}
+
+		return count($result) > 1 ?
+			$programRegistry->valueRegistry->record([
+				'oneOf' => $programRegistry->valueRegistry->tuple($result)
+			]) : $result[0];
+	}
+
 	private function typeToOpenApiSchema(ProgramRegistry $programRegistry, Type $type): Value {
 		/** @noinspection PhpParamsInspection */
 		return match(true) {
@@ -66,28 +112,8 @@ final readonly class OpenApiSchema implements NativeMethod {
 			$type instanceof BooleanType => $programRegistry->valueRegistry->record([
 				'type' => $programRegistry->valueRegistry->string('boolean')
 			]),
-			$type instanceof RealType, $type instanceof RealSubsetType => $programRegistry->valueRegistry->record([
-				... ['type' => $programRegistry->valueRegistry->string('number')],
-				... (($min = $type->numberRange->min) !== MinusInfinity::value ? [
-					'minimum' => $programRegistry->valueRegistry->real($min->value),
-					'exclusiveMinimum' => $programRegistry->valueRegistry->boolean(!$min->inclusive)
-				] : []),
-				... (($max = $type->numberRange->max) !== PlusInfinity::value ? [
-					'maximum' => $programRegistry->valueRegistry->real($max->value),
-					'exclusiveMaximum' => $programRegistry->valueRegistry->boolean(!$max->inclusive)
-				] : []),
-			]),
-			$type instanceof IntegerType, $type instanceof IntegerSubsetType => $programRegistry->valueRegistry->record([
-				... ['type' => $programRegistry->valueRegistry->string('integer')],
-				... (($min = $type->numberRange->min) !== MinusInfinity::value ? [
-					'minimum' => $programRegistry->valueRegistry->real($min->value),
-					'exclusiveMinimum' => $programRegistry->valueRegistry->boolean(!$min->inclusive)
-				] : []),
-				... (($max = $type->numberRange->max) !== PlusInfinity::value ? [
-					'maximum' => $programRegistry->valueRegistry->real($max->value),
-					'exclusiveMaximum' => $programRegistry->valueRegistry->boolean(!$max->inclusive)
-				] : []),
-			]),
+			$type instanceof RealType => $this->realToOpenApiSchema($programRegistry, $type),
+			$type instanceof IntegerType => $this->integerToOpenApiSchema($programRegistry, $type),
 			$type instanceof StringSubsetType => $programRegistry->valueRegistry->record([
 				'type' => $programRegistry->valueRegistry->string('string'),
 				'enum' => $programRegistry->valueRegistry->tuple(
