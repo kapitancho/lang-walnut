@@ -503,6 +503,7 @@ final class NumberIntervalTest extends TestCase {
 			PlusInfinity::value
 		);
 		$this->assertEquals('[0.2..3.14]', (string)$i1->intersectionWith($i2, false));
+		$this->assertEquals('[0.2..3.14]', (string)$i2->intersectionWith($i1, false));
 		$this->assertEquals('(-15.4..+Infinity)', (string)$i1->unionWith($i2, false));
 	}
 

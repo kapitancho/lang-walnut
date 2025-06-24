@@ -36,18 +36,11 @@ final readonly class NumberRange implements NumberRangeInterface, JsonSerializab
 		$this->max = $lastValue->end;
 	}
 
-	public function w() {}
-
 	/** @param non-empty-array<NumberInterval> $intervals */
 	private static function adjustIntervals(bool $asIntegerRange, array $intervals): array {
-		usort($intervals, function(NumberInterval $a, NumberInterval $b) {
-			if ($a->start instanceof MinusInfinity) {
-				return -1;
-			}
-			if ($b->start instanceof MinusInfinity) {
-				return 1;
-			}
-			return $a->start->value <=> $b->start->value;
+		usort($intervals, fn(NumberInterval $a, NumberInterval $b) => match(true) {
+			$a->start instanceof MinusInfinity => -1, $b->start instanceof MinusInfinity => 1,
+			default => $a->start->value <=> $b->start->value
 		});
 		$adjusted = [];
 		$current = null;

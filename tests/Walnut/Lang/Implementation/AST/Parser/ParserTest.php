@@ -45,6 +45,7 @@ use Walnut\Lang\Blueprint\AST\Node\Type\EnumerationSubsetTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\FalseTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\FunctionTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\ImpureTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\IntegerFullTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\IntegerSubsetTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\IntegerTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\IntersectionTypeNode;
@@ -56,6 +57,7 @@ use Walnut\Lang\Blueprint\AST\Node\Type\NothingTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\NullTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\OptionalKeyTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\ProxyTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\RealFullTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\RealSubsetTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\RealTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\RecordTypeNode;
@@ -97,6 +99,7 @@ use Walnut\Lang\Implementation\AST\Parser\ParserState;
 use Walnut\Lang\Implementation\AST\Parser\ParserStateRunner;
 use Walnut\Lang\Implementation\AST\Parser\TransitionLogger;
 use Walnut\Lang\Implementation\AST\Parser\WalexLexerAdapter;
+use Walnut\Lang\Implementation\Common\Range\NumberIntervalEndpoint;
 
 class ParserTest extends TestCase {
 
@@ -1158,6 +1161,7 @@ class ParserTest extends TestCase {
 		yield ['Integer<-5..8>', IntegerTypeNode::class, fn($t) => $t->minValue == new Number('-5') && $t->maxValue == new Number('8')];
 		yield ['Integer[5]', IntegerSubsetTypeNode::class, fn($t) => count($t->values) === 1 && $t->values[0] == new Number('5')];
 		yield ['Integer[5, -8]', IntegerSubsetTypeNode::class, fn($t) => count($t->values) === 2 && $t->values[0] == new Number('5') && $t->values[1] == new Number('-8')];
+		yield ['Integer<[5..8], (..6)>', IntegerFullTypeNode::class, fn($t) => count($t->intervals) === 2 && $t->intervals[0]->start == new NumberIntervalEndpoint(new Number(5), true) && $t->intervals[0]->end == new NumberIntervalEndpoint(new Number(8), true) && $t->intervals[1]->start === MinusInfinity::value && $t->intervals[1]->end == new NumberIntervalEndpoint(new Number(6), false)];
 		yield ['Real', RealTypeNode::class, fn($t) => $t->minValue === MinusInfinity::value && $t->maxValue === PlusInfinity::value];
 		yield ['\\Real', RealTypeNode::class, fn($t) => $t->minValue === MinusInfinity::value && $t->maxValue === PlusInfinity::value];
 		yield ['Real<5..>', RealTypeNode::class, fn($t) => $t->minValue == new Number('5') && $t->maxValue === PlusInfinity::value];
@@ -1168,6 +1172,7 @@ class ParserTest extends TestCase {
 		yield ['Real<-5.14..8.14>', RealTypeNode::class, fn($t) => $t->minValue == new Number('-5.14') && $t->maxValue == new Number('8.14')];
 		yield ['Real[3.14]', RealSubsetTypeNode::class, fn($t) => count($t->values) === 1 && $t->values[0] == new Number('3.14')];
 		yield ['Real[3.14, -8]', RealSubsetTypeNode::class, fn($t) => count($t->values) === 2 && $t->values[0] == new Number('3.14') && $t->values[1] == new Number('-8')];
+		yield ['Real<[5.15..8], (..6)>', RealFullTypeNode::class, fn($t) => count($t->intervals) === 2 && $t->intervals[0]->start == new NumberIntervalEndpoint(new Number('5.15'), true) && $t->intervals[0]->end == new NumberIntervalEndpoint(new Number(8), true) && $t->intervals[1]->start === MinusInfinity::value && $t->intervals[1]->end == new NumberIntervalEndpoint(new Number(6), false)];
 		yield ['String', StringTypeNode::class, fn($t) => $t->minLength == new Number('0') && $t->maxLength === PlusInfinity::value];
 		yield ['\\String', StringTypeNode::class, fn($t) => $t->minLength == new Number('0') && $t->maxLength === PlusInfinity::value];
 		yield ['String<5..>', StringTypeNode::class, fn($t) => $t->minLength == new Number('5') && $t->maxLength === PlusInfinity::value];

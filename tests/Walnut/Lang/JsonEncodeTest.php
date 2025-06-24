@@ -8,7 +8,10 @@ use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
+use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
+use Walnut\Lang\Implementation\Common\Range\NumberInterval;
+use Walnut\Lang\Implementation\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Test\BaseProgramTestHelper;
 
 final class JsonEncodeTest extends BaseProgramTestHelper {
@@ -80,7 +83,7 @@ final class JsonEncodeTest extends BaseProgramTestHelper {
 			'{"type":"Enumeration","name":"MyEnum","values":{"A":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"A"},"B":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"B"},"C":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"C"}}}'
 				=> $tr->enumeration($i('MyEnum')),
 			'{"type":"EnumerationSubsetType","enumerationName":"MyEnum","subsetValues":{"A":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"A"},"B":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"B"}}}'
-				=> $tr->enumerationSubsetType($i('MyEnum'), [$ev('A'), $ev('B')]),
+			=> $tr->enumerationSubsetType($i('MyEnum'), [$ev('A'), $ev('B')]),
 			'{"type":"Sealed","name":"MySealed","valueType":{"type":"Null"}}'
 				=> $tr->sealed($i('MySealed')),
 			'{"type":"Open","name":"MyOpen","valueType":{"type":"Null"}}' => $tr->open($i('MyOpen')),
@@ -95,11 +98,16 @@ final class JsonEncodeTest extends BaseProgramTestHelper {
 			'{"type":"Integer","range":{"intervals":[{"start":{"value":{"value":"1","scale":0},"inclusive":true},"end":{"value":{"value":"5","scale":0},"inclusive":true}}]}}' => $tr->integer(1, 5),
 			'{"type":"Integer","range":{"intervals":[{"start":"MinusInfinity","end":{"value":{"value":"5","scale":0},"inclusive":true}}]}}' => $tr->integer(MinusInfinity::value, 5),
 			'{"type":"IntegerSubset","values":[1,-14]}' => $tr->integerSubset([new Number(1), new Number(-14)]),
+	        '{"type":"Integer","range":{"intervals":[{"start":{"value":{"value":"111","scale":0},"inclusive":false},"end":"PlusInfinity"}]}}' => $tr->integerFull(new NumberInterval(new NumberIntervalEndpoint(new Number(111), false), PlusInfinity::value)),
 	        '{"type":"Real","range":{"intervals":[{"start":"MinusInfinity","end":"PlusInfinity"}]}}' => $tr->real(),
 			'{"type":"Real","range":{"intervals":[{"start":{"value":{"value":"3.14","scale":2},"inclusive":true},"end":"PlusInfinity"}]}}' => $tr->real(3.14),
 			'{"type":"Real","range":{"intervals":[{"start":{"value":{"value":"3.14","scale":2},"inclusive":true},"end":{"value":{"value":"5","scale":0},"inclusive":true}}]}}' => $tr->real(3.14, 5),
 			'{"type":"Real","range":{"intervals":[{"start":"MinusInfinity","end":{"value":{"value":"5","scale":0},"inclusive":true}}]}}' => $tr->real(MinusInfinity::value, 5),
 	        '{"type":"RealSubset","values":[3.14,-14]}' => $tr->realSubset([new Number('3.14'), new Number(-14)]),
+	        '{"type":"Real","range":{"intervals":[{"start":"MinusInfinity","end":{"value":{"value":"-21","scale":0},"inclusive":true}},{"start":{"value":{"value":"11.1","scale":1},"inclusive":false},"end":"PlusInfinity"}]}}' => $tr->realFull(
+				new NumberInterval(MinusInfinity::value, new NumberIntervalEndpoint(new Number('-21'), true)),
+				new NumberInterval(new NumberIntervalEndpoint(new Number('11.1'), false), PlusInfinity::value)
+	        ),
 			'{"type":"String","range":{"minLength":0,"maxLength":"+Infinity"}}' => $tr->string(),
 			'{"type":"String","range":{"minLength":3,"maxLength":"+Infinity"}}' => $tr->string(3),
 			'{"type":"String","range":{"minLength":3,"maxLength":5}}' => $tr->string(3, 5),
