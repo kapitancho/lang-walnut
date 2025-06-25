@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Implementation\Type;
 
 use JsonSerializable;
+use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\ProxyNamedType;
 use Walnut\Lang\Blueprint\Type\ResultType as ResultTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -42,6 +43,12 @@ final class ResultType implements ResultTypeInterface, SupertypeChecker, JsonSer
     }
 
 	public function __toString(): string {
+		if ($this->returnType instanceof NothingType) {
+			return sprintf(
+				"Error<%s>",
+				$this->errorType
+			);
+		}
 		return sprintf(
 			"Result<%s, %s>",
 			$this->returnType,

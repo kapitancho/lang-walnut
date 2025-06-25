@@ -53,7 +53,7 @@ final class TypeTest extends CodeExecutionTestHelper {
 
 	public function testTypeError(): void {
 		$result = $this->executeCodeSnippet("{@'error'}->type;");
-		$this->assertEquals("type{Result<Nothing, String['error']>}", $result);
+		$this->assertEquals("type{Error<String['error']>}", $result);
 	}
 
 	public function testTypeAtom(): void {

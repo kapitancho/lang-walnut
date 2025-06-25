@@ -109,35 +109,35 @@ MyEmptyViewRenderer = ^[:] => MyView;
         HttpAutoWireRoute[
             method: HttpRequestMethod.get,
             pattern: RoutePattern('/abc'),
-            requestBody: EmptyRequestBody(),
+            requestBody: EmptyRequestBody,
             handler: `MyLister,
             response: ContentResponseBody[statusCode: 200, contentType: 'text/plain']
         ],
         HttpAutoWireRoute[
             method: HttpRequestMethod.get,
             pattern: RoutePattern('/redirect-me'),
-            requestBody: EmptyRequestBody(),
+            requestBody: EmptyRequestBody,
             handler: `MyRedirect,
             response: RedirectResponseBody[statusCode: 201]
         ],
         HttpAutoWireRoute[
             method: HttpRequestMethod.get,
             pattern: RoutePattern('/view/broken'),
-            requestBody: EmptyRequestBody(),
+            requestBody: EmptyRequestBody,
             handler: `MyBrokenViewRenderer,
             response: ViewResponseBody[statusCode: 200, contentType: 'text/html']
         ],
         HttpAutoWireRoute[
             method: HttpRequestMethod.get,
             pattern: RoutePattern('/view/abc/empty'),
-            requestBody: EmptyRequestBody(),
+            requestBody: EmptyRequestBody,
             handler: `MyEmptyViewRenderer,
             response: ViewResponseBody[statusCode: 200, contentType: 'text/html']
         ],
         HttpAutoWireRoute[
             method: HttpRequestMethod.get,
             pattern: RoutePattern('/view/abc'),
-            requestBody: EmptyRequestBody(),
+            requestBody: EmptyRequestBody,
             handler: `MyViewRenderer,
             response: ViewResponseBody[statusCode: 200, contentType: 'text/html']
         ]

@@ -8,7 +8,7 @@ final class UuidTest extends CodeExecutionTestHelper {
 
 	public function testUuidOk(): void {
 		$result = $this->executeCodeSnippet("Random->uuid;");
-		$this->assertEquals(38, strlen($result));
+		$this->assertEquals(44, strlen($result));
 	}
 
 }

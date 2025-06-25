@@ -40,10 +40,10 @@ HttpAutoWireRoute->handleRequest(^request: {HttpRequest} => Result<{HttpResponse
                         handlerResult = ?noError(handlerInstance(handlerParams));
                         $response->shape(`HttpAutoWireResponseBodyFromParameter)=>invoke(handlerResult)
                     },
-                    ~: @HttpAutoWireRouteDoesNotMatch()
+                    ~: @HttpAutoWireRouteDoesNotMatch
                 }
             },
-            ~: @HttpAutoWireRouteDoesNotMatch()
+            ~: @HttpAutoWireRouteDoesNotMatch
         }
     };
     runnerResult = runner(null);
