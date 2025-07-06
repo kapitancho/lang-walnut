@@ -12,6 +12,7 @@ use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Implementation\Code\NativeCode\ValueConverter;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class BinaryPlus implements NativeMethod {
@@ -33,7 +34,11 @@ final readonly class BinaryPlus implements NativeMethod {
 					$targetType->range->maxLength + $parameterType->range->maxLength
 				);
 			}
-			if ($parameterType->isSubtypeOf($programRegistry->typeRegistry->string())) {
+			if ($parameterType->isSubtypeOf(
+				$programRegistry->typeRegistry->shape(
+					$programRegistry->typeRegistry->string()
+				)
+			)) {
 				return $programRegistry->typeRegistry->string();
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -51,10 +56,17 @@ final readonly class BinaryPlus implements NativeMethod {
 		$targetValue = $target;
 		$parameterValue = $parameter;
 
-				if ($targetValue instanceof StringValue) {
-			if ($parameterValue instanceof StringValue) {
-				$result = $targetValue->literalValue . $parameterValue->literalValue;
-				return ($programRegistry->valueRegistry->string($result));
+		if ($targetValue instanceof StringValue) {
+			$value = $parameterValue instanceof StringValue ?
+				$parameterValue :
+				new ValueConverter()->convertValueToShape(
+					$programRegistry,
+					$parameterValue,
+					$programRegistry->typeRegistry->string()
+				);
+			if ($value instanceof StringValue) {
+				$result = $targetValue->literalValue . $value->literalValue;
+				return $programRegistry->valueRegistry->string($result);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

@@ -14,6 +14,8 @@ final readonly class PackageBasedModulePathFinder implements ModulePathFinder {
 	public function pathFor(string $moduleName): string {
 		if ($moduleName[0] === '$') {
 			$moduleName = 'core/' . substr($moduleName, 1);
+		} elseif ($moduleName[0] === '?') {
+			$moduleName = substr($moduleName, 1) . '-test';
 		}
 		foreach($this->packageRoots as $packageRoot => $path) {
 			if (str_starts_with($moduleName, $packageRoot . '/')) {

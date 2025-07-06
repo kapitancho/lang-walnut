@@ -1,4 +1,4 @@
-module $http/test-all %% $test/runner, $http/bundle/autowire-router,
+module $http/all-test %% $test/runner, $http/bundle/autowire-router,
     $http/autowire/request-helper, $http/autowire/response-helper, $http/autowire/view-response-helper:
 
 /* to run this test file, use 'php -f cli/test.php ../core-nut-lib/http' */
@@ -232,13 +232,13 @@ MyEmptyViewRenderer = ^[:] => MyView;
             name: 'Autowire Broken View response',
             expected: [
                 statusCode: 500,
-                body: 'Unable to render template of type MyBrokenView'
+                body: 'Unable to render template of type MyBrokenView; Reason: @CastNotAvailable![\n    from: type{MyBrokenView},\n     to: type{Template}\n]'
             ],
             actual = ^ :: call[HttpRequestMethod.get, '/view/broken', '']
         ],
         ^ => TestResult :: TestResult[
             name: 'Autowire View response not accepted',
-            expected: [statusCode: 500, body: 'Unable to render template of type MyView'],
+            expected: [statusCode: 500, body: 'Unable to render template of type MyView; Reason: @UnableToRenderTemplate[type: type{MyView}]'],
             actual = ^ :: call[HttpRequestMethod.get, '/view/abc/empty', '']
         ],
         ^ => TestResult :: TestResult[

@@ -18,12 +18,17 @@ final readonly class PackageBasedModuleLookupContext implements ModuleLookupCont
 	/** @throws ModuleDependencyException */
 	public function sourceOf(string $moduleName): string {
 		$sourcePath = $this->modulePathFinder->pathFor($moduleName);
-		foreach($this->precompilers as $extension => $precompiler) {
-			$fullSourcePath = $sourcePath . $extension;
-			if (file_exists($fullSourcePath) && is_readable($fullSourcePath)) {
+		foreach($this->precompilers as $precompiler) {
+			$fullSourcePath = $precompiler->determineSourcePath($sourcePath);
+			$sourceCode =
+				is_string($fullSourcePath) &&
+				file_exists($fullSourcePath) &&
+				is_readable($fullSourcePath) ?
+					file_get_contents($fullSourcePath) : null;
+			if (is_string($sourceCode)) {
 				return $precompiler->precompileSourceCode(
 					$moduleName,
-					file_get_contents($fullSourcePath)
+					$sourceCode
 				);
 			}
 		}

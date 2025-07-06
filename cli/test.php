@@ -14,7 +14,7 @@ $root = $sourceRoot . '/';
 foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . $folder)) as $file) {
 	$pathname = $file->getPathname();
 	if (str_ends_with($pathname, '.test.nut')) {
-		$source = substr($pathname, strlen($root), -9);
+		$source = substr($pathname, strlen($root), -9) . '-test';
 		echo PHP_EOL, "Executing ", $source, PHP_EOL;
 		try {
 			echo $epBuilder->build($source)->call(), PHP_EOL;

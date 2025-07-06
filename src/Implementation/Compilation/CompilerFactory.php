@@ -23,9 +23,9 @@ final readonly class CompilerFactory implements CompilerFactoryInterface {
 		$lookupContext = new PackageBasedModuleLookupContext(
 			$modulePathFinder,
 			[
-				'.nut' => new EmptyPrecompiler(),
-				'.nut.html' => new TemplatePrecompiler(),
-				'.test.nut' => new TestPrecompiler()
+				new TestPrecompiler(),
+				new EmptyPrecompiler(),
+				new TemplatePrecompiler(),
 			]
 		);
 		return new Compiler($lookupContext);

@@ -12,7 +12,8 @@ final class BinaryPlusTest extends CodeExecutionTestHelper {
 	}
 
 	public function testBinaryPlusInvalidParameter(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', "'hello' + 23;");
+		$this->executeErrorCodeSnippet('Invalid parameter type', "'hello' + A;",
+			"A := (); B := (); A ==> String @ B :: B;");
 	}
 
 }

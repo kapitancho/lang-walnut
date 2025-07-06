@@ -5,6 +5,11 @@ namespace Walnut\Lang\Implementation\Compilation\Module;
 use Walnut\Lang\Blueprint\Compilation\Module\CodePrecompiler;
 
 final readonly class TemplatePrecompiler implements CodePrecompiler {
+
+	public function determineSourcePath(string $sourcePath): string|null {
+		return $sourcePath . '.nut.html';
+	}
+
 	public function precompileSourceCode(string $moduleName, string $sourceCode): string {
 		$sourceCode = preg_replace('^<!-- (.*?) %% (.*?) -->^', <<<CODE
 		module $moduleName %% \$tpl, $2:

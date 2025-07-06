@@ -7,15 +7,20 @@ module $db/sql/quoter-mysql %% $db/sql/query-builder:
 	valueChars = ['\\', '\`', '\n'];
 	escapedValueChars = ['\\\\', '\\\`', '\\\n'];
     [
-        quoteIdentifier: ^String => String :: [
-            identifier, # /*->replace...*/, identifier
+        quoteIdentifier: ^s: String => String :: [
+            identifier, s->replace[match: '`', replacement: '``'], identifier
         ]->combineAsString(''),
-        quoteValue: ^String|Integer|Real|Boolean|Null => String :: ?whenTypeOf(#) is {
+        quoteValue: ^v: String|Integer|Real|Boolean|Null => String :: ?whenTypeOf(v) is {
             `String: [
-                value, # /*->replace...*/, value
+                value,
+                {{v
+                    ->replace[match: valueChars.0, replacement: escapedValueChars.0]}
+                    ->replace[match: valueChars.1, replacement: escapedValueChars.1]}
+                    ->replace[match: valueChars.2, replacement: escapedValueChars.2],
+                value
             ]->combineAsString(''),
-            `Integer|Real: #->asString,
-            `Boolean: ?whenValueOf(#) is { true: '1', false: '0' },
+            `Integer|Real: v->asString,
+            `Boolean: ?whenValueOf(v) is { true: '1', false: '0' },
             `Null: 'NULL'
         }
     ]
