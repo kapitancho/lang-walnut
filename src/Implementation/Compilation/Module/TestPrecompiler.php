@@ -15,10 +15,13 @@ final readonly class TestPrecompiler implements CodePrecompiler {
 
 	public function precompileSourceCode(string $moduleName, string $sourceCode): string {
 		$sourceCode = preg_replace(
-			['#^test (.*?):#', '#^test (.*?) %% (.*?):#'],
 			[
+				'#^test (.*?) %% (.*?):#',
+				'#^test (.*?):#',
+			],
+			[
+				'module $1-test %% $1, $2, \\$test/runner:',
 				'module $1-test %% $1, \\$test/runner:',
-				'module $1-test %% $1, $2, \\$test/runner:'
 			],
 			$sourceCode
 		);

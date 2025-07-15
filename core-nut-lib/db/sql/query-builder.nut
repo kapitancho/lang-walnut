@@ -154,18 +154,17 @@ SelectQuery := $[
     orderBy: SqlOrderByFields|Null,
     limit: SqlSelectLimit|Null
 ];
-SelectQuery ==> DatabaseSqlQuery %% [~SqlQuoter] :: [
-    'SELECT',
-    $fields->asSqlString,
-    'FROM', %sqlQuoter.quoteIdentifier($tableName),
-    $joins->map(^SqlTableJoin => String :: #->asSqlString)->combineAsString(' '),
-    'WHERE', $queryFilter->asSqlString,
+SelectQuery ==> DatabaseSqlQuery %% [~SqlQuoter] ::
+    'SELECT ' +
+    $fields->asSqlString +
+    ' FROM ' + %sqlQuoter.quoteIdentifier($tableName) +
+    $joins->map(^SqlTableJoin => String :: #->asSqlString)->combineAsString(' ') +
+    ' WHERE ' + $queryFilter->asSqlString +
     ?whenTypeOf($orderBy) is {
         `SqlOrderByFields: $orderBy->asSqlString,
         ~: ''
-    },
+    } +
     ?whenTypeOf($limit) is {
         `SqlSelectLimit: $limit->asSqlString,
         ~: ''
-    }
-]->combineAsString(' ');
+    };
