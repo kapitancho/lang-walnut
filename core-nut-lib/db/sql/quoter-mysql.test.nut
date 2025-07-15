@@ -1,7 +1,5 @@
 test $db/sql/quoter-mysql:
 
-==> DatabaseConnection :: DatabaseConnection![dsn: 'sqlite::memory:'];
-
 ==> TestCases :: {
     [
         ^ => TestResult :: TestResult[

@@ -1,8 +1,5 @@
 module $db/core:
 
-DatabaseConnection := [dsn: String];
-DatabaseConnector := $[connection: DatabaseConnection];
-
 DatabaseSqlQuery = String<1..>;
 DatabaseValue = String|Integer|Real|Boolean|Null;
 DatabaseQueryBoundParameters = Array<DatabaseValue>|Map<DatabaseValue>;
@@ -17,5 +14,3 @@ DatabaseQueryFailure ==> ExternalError :: ExternalError[
     originalError: $,
     errorMessage: $error
 ];
-
-==> DatabaseConnector %% DatabaseConnection :: DatabaseConnector[connection: %];

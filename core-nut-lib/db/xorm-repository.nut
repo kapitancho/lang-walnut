@@ -1,4 +1,4 @@
-module $db/xorm-repository %% $db/xorm:
+module $db/xorm-repository %% $db/xorm, $db/connection:
 
 OxRepository := $[~Ox, ~Type];
 OxRepository[~Type, model: Type] @ ExternalError  :: [

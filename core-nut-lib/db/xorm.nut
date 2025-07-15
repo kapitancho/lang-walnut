@@ -1,7 +1,5 @@
 module $db/xorm %% $db/core, $db/sql/query-builder, $db/sql/quoter-mysql:
 
-==> DatabaseConnection :: DatabaseConnection['sqlite:db.sqlite'];
-
 FieldTypes = Map<Type>;
 UnknownFieldTypes := ();
 
@@ -25,6 +23,7 @@ Ox[~Type] @ UnknownOrmModel|UnknownFieldTypes :: {
 
     fieldTypesHelper = ^Type => Result<Map<Type>, UnknownFieldTypes> :: {
         ?whenTypeOf(#) is {
+            `Type<Data>: fieldTypesHelper=>invoke(#->valueType),
             `Type<Open>: fieldTypesHelper=>invoke(#->valueType),
             `Type<Record>: #->itemTypes,
             `Type<Alias>: fieldTypesHelper=>invoke(#->aliasedType),
