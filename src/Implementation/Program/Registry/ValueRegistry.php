@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Implementation\Program\Registry;
 
 use BcMath\Number;
+use Walnut\Lang\Blueprint\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
@@ -39,6 +40,7 @@ final class ValueRegistry implements ValueRegistryInterface {
 
 	public function __construct(
 		private readonly TypeRegistry $typeRegistry,
+		private readonly EscapeCharHandler $escapeCharHandler,
 	) {
 		$this->contextFiller = new FunctionContextFiller();
 	}
@@ -70,7 +72,7 @@ final class ValueRegistry implements ValueRegistryInterface {
 	}
 
     public function string(string $value): StringValue {
-	    return new StringValue($this->typeRegistry, $value);
+	    return new StringValue($this->typeRegistry, $this->escapeCharHandler, $value);
 	}
 
 	/** @param list<Value> $values */

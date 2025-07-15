@@ -4,6 +4,7 @@ namespace Walnut\Lang\Implementation\Program\Builder;
 
 use BcMath\Number;
 use InvalidArgumentException;
+use Walnut\Lang\Blueprint\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
@@ -104,7 +105,8 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 
     public function __construct(
 		private readonly CustomMethodRegistryBuilderInterface $customMethodRegistryBuilder,
-	    private readonly MethodFinder $methodFinder
+	    private readonly MethodFinder $methodFinder,
+	    private readonly EscapeCharHandler $escapeCharHandler,
     ) {
         $this->unionTypeNormalizer = new UnionTypeNormalizer($this);
         $this->intersectionTypeNormalizer = new IntersectionTypeNormalizer($this);
@@ -269,7 +271,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 	 * @throws DuplicateSubsetValue
 	 */
 	public function stringSubset(array $values): StringSubsetType {
-		return new StringSubsetType($values);
+		return new StringSubsetType($this->escapeCharHandler, $values);
 	}
 
     public function optionalKey(Type $valueType): OptionalKeyType {

@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Implementation\Compilation;
 
 use Walnut\Lang\Blueprint\Compilation\CompilerFactory as CompilerFactoryInterface;
+use Walnut\Lang\Implementation\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Implementation\Compilation\Module\EmptyPrecompiler;
 use Walnut\Lang\Implementation\Compilation\Module\PackageBasedModuleLookupContext;
 use Walnut\Lang\Implementation\Compilation\Module\PackageBasedModulePathFinder;
@@ -25,7 +26,7 @@ final readonly class CompilerFactory implements CompilerFactoryInterface {
 			[
 				new TestPrecompiler(),
 				new EmptyPrecompiler(),
-				new TemplatePrecompiler(),
+				new TemplatePrecompiler(new EscapeCharHandler()),
 			]
 		);
 		return new Compiler($lookupContext);

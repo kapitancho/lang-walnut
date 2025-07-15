@@ -17,7 +17,11 @@ final readonly class ParserStateRunner implements ParserStateRunnerInterface {
 	public function run(SourceLocator $sourceLocator): ModuleNode {
 		$s = $sourceLocator->state;
 		$nodeBuilder = $this->nodeBuilderFactory->newBuilder($sourceLocator);
-		$stateMachine = new ParserStateMachine($s,$nodeBuilder);
+		$stateMachine = new ParserStateMachine(
+			$s,
+			$nodeBuilder,
+			new EscapeCharHandler()
+		);
 		$states = $stateMachine->getAllStates();
 
 		$tokens = $sourceLocator->tokens;

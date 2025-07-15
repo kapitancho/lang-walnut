@@ -5,6 +5,7 @@ namespace Walnut\Lang\Implementation\Type;
 use BcMath\Number;
 use InvalidArgumentException;
 use JsonSerializable;
+use Walnut\Lang\Blueprint\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\StringSubsetType as StringSubsetTypeInterface;
 use Walnut\Lang\Blueprint\Type\StringType as StringTypeInterface;
@@ -18,6 +19,7 @@ final class StringSubsetType implements StringSubsetTypeInterface, JsonSerializa
 
 	/** @param list<string> $subsetValues */
     public function __construct(
+		private readonly EscapeCharHandler $escapeCharHandler,
         public readonly array $subsetValues
     ) {
 	    if ($subsetValues === []) {
@@ -39,8 +41,7 @@ final class StringSubsetType implements StringSubsetTypeInterface, JsonSerializa
 				    sprintf("String[%s]",
 					    implode(', ',
 						    array_map(
-								fn(string $value) =>
-									"'" . str_replace(['\\', "\n", "'"], ['\\\\', '\n', '\`'], $value) . "'",
+								fn(string $value) => $this->escapeCharHandler->escape($value),
 							    $subsetValues
 						    ))),
 				    $value);
@@ -77,7 +78,7 @@ final class StringSubsetType implements StringSubsetTypeInterface, JsonSerializa
 
 	public function __toString(): string {
 		return sprintf("String[%s]", implode(', ', array_map(
-			fn(string $value): string => "'" . str_replace(['\\', "\n", "'"], ['\\\\', '\n', '\`'], $value) . "'",
+			fn(string $value): string => $this->escapeCharHandler->escape($value),
 			$this->subsetValues
 		)));
 	}

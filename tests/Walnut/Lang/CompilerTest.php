@@ -14,6 +14,7 @@ use Walnut\Lang\Blueprint\Compilation\Module\ModuleLookupContext;
 use Walnut\Lang\Blueprint\Compilation\SuccessfulCompilationResult;
 use Walnut\Lang\Blueprint\Program\Program;
 use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Implementation\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Implementation\Compilation\Compiler;
 use Walnut\Lang\Implementation\Compilation\Module\EmptyPrecompiler;
 use Walnut\Lang\Implementation\Compilation\Module\PackageBasedModuleLookupContext;
@@ -40,7 +41,7 @@ final class CompilerTest extends TestCase {
 				),
 				[
 					'.nut' => new EmptyPrecompiler(),
-					'.nut.html' => new TemplatePrecompiler(),
+					'.nut.html' => new TemplatePrecompiler(new EscapeCharHandler()),
 					'.test.nut' => new TestPrecompiler()
 				]
 			)
@@ -56,7 +57,7 @@ final class CompilerTest extends TestCase {
 			),
 			[
 				'.nut' => new EmptyPrecompiler(),
-				'.nut.html' => new TemplatePrecompiler(),
+				'.nut.html' => new TemplatePrecompiler(new EscapeCharHandler()),
 				'.test.nut' => new TestPrecompiler()
 			]
 		);
@@ -78,7 +79,7 @@ final class CompilerTest extends TestCase {
 			default => $original->sourceOf($source)
 		});
 
-		$tcx = new TemplatePrecompiler();
+		$tcx = new TemplatePrecompiler(new EscapeCharHandler());
 		$moduleLookupContext = new TemplatePrecompilerModuleLookupDecorator(
 			$tcx,
 			$l,
@@ -109,7 +110,7 @@ final class CompilerTest extends TestCase {
 			),
 			[
 				'.nut' => new EmptyPrecompiler(),
-				'.nut.html' => new TemplatePrecompiler(),
+				'.nut.html' => new TemplatePrecompiler(new EscapeCharHandler()),
 				'.test.nut' => new TestPrecompiler()
 			]
 		);

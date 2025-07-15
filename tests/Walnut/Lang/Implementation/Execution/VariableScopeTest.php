@@ -5,6 +5,7 @@ namespace Walnut\Lang\Test\Implementation\Execution;
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownContextVariable;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
+use Walnut\Lang\Implementation\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Implementation\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Implementation\Code\Scope\VariableScope;
 use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
@@ -25,7 +26,8 @@ final class VariableScopeTest extends TestCase {
 				new NativeCodeTypeMapper(),
 				new NestedMethodRegistry(),
 				[]
-			)
+			),
+			new EscapeCharHandler()
 		);
 		$this->variableScope = new VariableScope([
 			'x' => $this->typeRegistry->integer()

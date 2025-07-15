@@ -8,13 +8,13 @@ use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry as TypeRegistryInterface;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry as ValueRegistryInterface;
+use Walnut\Lang\Implementation\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Implementation\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Registry\MainMethodRegistry;
 use Walnut\Lang\Implementation\Program\Registry\NestedMethodRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
-use Walnut\Lang\Test\EmptyDependencyContainer;
 
 final class MegaTest extends TestCase {
 
@@ -30,11 +30,12 @@ final class MegaTest extends TestCase {
 				new NativeCodeTypeMapper(),
 				new NestedMethodRegistry(),
 				[]
-			)
+			),
+			$ech = new EscapeCharHandler()
 		);
 		$this->valueRegistry = new ValueRegistry(
 			$this->typeRegistry,
-			new EmptyDependencyContainer
+			$ech
 		);
 	}
 

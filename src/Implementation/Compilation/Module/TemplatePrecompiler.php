@@ -2,9 +2,14 @@
 
 namespace Walnut\Lang\Implementation\Compilation\Module;
 
+use Walnut\Lang\Blueprint\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Blueprint\Compilation\Module\CodePrecompiler;
 
 final readonly class TemplatePrecompiler implements CodePrecompiler {
+
+	public function __construct(
+		private EscapeCharHandler $escapeCharHandler,
+	) {}
 
 	public function determineSourcePath(string $sourcePath): string|null {
 		return $sourcePath . '.nut.html';
@@ -30,8 +35,8 @@ final readonly class TemplatePrecompiler implements CodePrecompiler {
 		$sourceCode = preg_replace('/<!--\{(.*?)}-->/s', "<!-- h({ $1 }->asString);\n -->", $sourceCode);
 		$sourceCode = preg_replace('/<!--%(.*?)%-->/s', "<!-- e(%templateRenderer=>render($1));\n -->", $sourceCode);
 		$sourceCode = preg_replace_callback('/-->(.*?)<!--/s', function($matches) {
-			$modifiedString = str_replace(['\\', "\n", "'"], ['\\\\', '\n', '\`'], $matches[1]);
-			return "e('$modifiedString');\n";
+			$modifiedString = $this->escapeCharHandler->escape($matches[1]);
+			return "e($modifiedString);\n";
 		}, $sourceCode);
 		return $sourceCode;
 	}

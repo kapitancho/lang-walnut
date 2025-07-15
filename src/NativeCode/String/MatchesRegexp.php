@@ -42,14 +42,14 @@ final readonly class MatchesRegexp implements NativeMethod {
 		$targetValue = $target;
 		$parameterValue = $parameter;
 		
-				if ($targetValue instanceof StringValue) {
+		if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof StringValue) {
-				return ($programRegistry->valueRegistry->boolean(
+				return $programRegistry->valueRegistry->boolean(
 					@preg_match(
 						'/' . $parameterValue->literalValue . '/',
 						$targetValue->literalValue,
 					)
-				));
+				);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

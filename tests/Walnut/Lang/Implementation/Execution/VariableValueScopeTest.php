@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownContextVariable;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownVariable;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
+use Walnut\Lang\Implementation\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Implementation\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
 use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
@@ -29,9 +30,10 @@ final class VariableValueScopeTest extends TestCase {
 				new NativeCodeTypeMapper(),
 				new NestedMethodRegistry(),
 				[]
-			)
+			),
+			$ech = new EscapeCharHandler()
 		);
-		$this->valueRegistry = new ValueRegistry($this->typeRegistry);
+		$this->valueRegistry = new ValueRegistry($this->typeRegistry, $ech);
 		$this->variableValueScope = new VariableValueScope([
 			'x' => (
 				$this->valueRegistry->integer(123)

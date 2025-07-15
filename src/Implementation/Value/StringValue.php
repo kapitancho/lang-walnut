@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Implementation\Value;
 
 use JsonSerializable;
+use Walnut\Lang\Blueprint\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
@@ -14,6 +15,7 @@ final class StringValue implements StringValueInterface, JsonSerializable {
 
     public function __construct(
 		private readonly TypeRegistry $typeRegistry,
+		private readonly EscapeCharHandler $escapeCharHandler,
 		public readonly string $literalValue
     ) {}
 
@@ -29,7 +31,7 @@ final class StringValue implements StringValueInterface, JsonSerializable {
 	public function selfAnalyse(AnalyserContext $analyserContext): void {}
 
 	public function __toString(): string {
-		return "'" . str_replace(['\\', "\n", "'"], ['\\\\', '\n', '\`'], $this->literalValue) . "'";
+		return $this->escapeCharHandler->escape($this->literalValue);
 	}
 
 	public function jsonSerialize(): array {

@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\AST\Builder\NodeBuilder;
 use Walnut\Lang\Blueprint\AST\Node\Expression\SequenceExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\IntersectionTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\UnionTypeNode;
+use Walnut\Lang\Blueprint\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
@@ -26,6 +27,7 @@ final readonly class ParserStateMachine {
 	public function __construct(
 		private ParserState $s,
 		private NodeBuilder $nodeBuilder,
+		private EscapeCharHandler $escapeCharHandler
 	) {}
 
 	public function getAllStates(): array {
@@ -771,7 +773,9 @@ final readonly class ParserStateMachine {
 					$this->s->result['first_token'] = new LT(
 						$token->rule,
 						new PatternMatch(
-							str_replace(['\`', '\n', '\\\\'], ["'", "\n", "\\"], substr($token->patternMatch->text, 1, -1))
+							$this->escapeCharHandler->unescape(
+								$token->patternMatch->text
+							)
 						),
 						$token->sourcePosition
 					);
@@ -824,8 +828,8 @@ final readonly class ParserStateMachine {
 			]],
 			286 => ['name' => 'dict expression dict expression key', 'transitions' => [
 				T::string_value->name => function(LT $token) {
-					$this->s->result['current_key'] = str_replace(['\`', '\n', '\\\\'], ["'", "\n", "\\"],
-						substr($token->patternMatch->text, 1, -1));
+					$this->s->result['current_key'] = $this->escapeCharHandler->unescape(
+						$token->patternMatch->text);
 					$this->s->move(281);
 				},
 				T::word->name => $c = function(LT $token) {
@@ -1133,7 +1137,7 @@ final readonly class ParserStateMachine {
 				T::string_value->name => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->propertyAccess(
 						$this->s->result['expression_left'],
-						str_replace(['\`', '\n', '\\\\'], ["'", "\n", "\\"], substr($token->patternMatch->text, 1, -1))
+						$this->escapeCharHandler->unescape( $token->patternMatch->text)
 					);
 					$this->s->move(304);
 				},
@@ -1732,7 +1736,7 @@ final readonly class ParserStateMachine {
 			420 => ['name' => 'string value', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->stringValue(
-						str_replace(['\`', '\n', '\\\\'], ["'", "\n", "\\"], substr($token->patternMatch->text, 1, -1))
+						$this->escapeCharHandler->unescape( $token->patternMatch->text)
 					);
 					$this->s->moveAndPop();
 				},
@@ -1812,7 +1816,7 @@ final readonly class ParserStateMachine {
 					$this->s->result['first_token'] = new LT(
 						$token->rule,
 						new PatternMatch(
-							str_replace(['\`', '\n', '\\\\'], ["'", "\n", "\\"], substr($token->patternMatch->text, 1, -1))
+							$this->escapeCharHandler->unescape( $token->patternMatch->text)
 						),
 						$token->sourcePosition
 					);
@@ -1865,8 +1869,8 @@ final readonly class ParserStateMachine {
 			]],
 			466 => ['name' => 'dict value dict value key', 'transitions' => [
 				T::string_value->name => function(LT $token) {
-					$this->s->result['current_key'] = str_replace(['\`', '\n', '\\\\'], ["'", "\n", "\\"],
-						substr($token->patternMatch->text, 1, -1));
+					$this->s->result['current_key'] = $this->escapeCharHandler->unescape(
+						$token->patternMatch->text);
 					$this->s->move(461);
 				},
 				T::word->name => $c = function(LT $token) {
@@ -2237,8 +2241,8 @@ final readonly class ParserStateMachine {
 					$this->s->move(641);
 				},
 				T::string_value->name => function(LT $token) {
-					$this->s->result['next_variable_key'] = str_replace(['\`', '\n', '\\\\'], ["'", "\n", "\\"],
-						substr($token->patternMatch->text, 1, -1));
+					$this->s->result['next_variable_key'] = $this->escapeCharHandler->unescape(
+						$token->patternMatch->text);
 					$this->s->move(644);
 				},
 				T::null->name => $c = function(LT $token) {
@@ -2314,8 +2318,8 @@ final readonly class ParserStateMachine {
 				T::mutable->name => $c,
 				T::when_value_is->name => $c,
 				T::string_value->name => function(LT $token) {
-					$this->s->result['next_variable_key'] = str_replace(['\`', '\n', '\\\\'], ["'", "\n", "\\"],
-						substr($token->patternMatch->text, 1, -1));
+					$this->s->result['next_variable_key'] = $this->escapeCharHandler->unescape(
+						$token->patternMatch->text);
 					$this->s->move(644);
 				},
 				T::default_match->name => 641,
@@ -2755,8 +2759,8 @@ final readonly class ParserStateMachine {
 			736 => ['name' => 'type string subset value', 'transitions' => [
 				T::string_value->name => function(LT $token) {
 					$this->s->result['subsetValues'] ??= [];
-					$this->s->result['subsetValues'][] = str_replace(['\`', '\n', '\\\\'], ["'", "\n", "\\"],
-						substr($token->patternMatch->text, 1, -1));
+					$this->s->result['subsetValues'][] = $this->escapeCharHandler->unescape(
+						$token->patternMatch->text);
 					$this->s->move(737);
 				},
 			]],
@@ -3160,7 +3164,7 @@ final readonly class ParserStateMachine {
 					$this->s->result['first_token'] = new LT(
 						$token->rule,
 						new PatternMatch(
-							str_replace(['\`', '\n', '\\\\'], ["'", "\n", "\\"], substr($token->patternMatch->text, 1, -1))
+							$this->escapeCharHandler->unescape( $token->patternMatch->text)
 						),
 						$token->sourcePosition
 					);
@@ -3274,7 +3278,7 @@ final readonly class ParserStateMachine {
 			]],
 			819 => ['name' => 'module level record key', 'transitions' => [
 				T::string_value->name => function(LT $token) {
-					$this->s->result['current_key'] = str_replace(['\`', '\n', '\\\\'], ["'", "\n", "\\"], substr($token->patternMatch->text, 1, -1));
+					$this->s->result['current_key'] = $this->escapeCharHandler->unescape( $token->patternMatch->text);
 					$this->s->move(814);
 				},
 				T::word->name => $c = function(LT $token) {

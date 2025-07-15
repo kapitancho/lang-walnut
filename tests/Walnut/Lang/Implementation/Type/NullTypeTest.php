@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Test\Implementation\Type;
 
 use PHPUnit\Framework\TestCase;
+use Walnut\Lang\Implementation\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Implementation\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
@@ -21,7 +22,8 @@ final class NullTypeTest extends TestCase {
 				new NativeCodeTypeMapper(),
 				new NestedMethodRegistry(),
 				[]
-			)
+			),
+			new EscapeCharHandler()
 		);
 	}
 	public function testNullType(): void {
