@@ -16,7 +16,7 @@ DatabaseFieldName = String<1..>;
 InsertQuery := $[tableName: DatabaseTableName, values: Map<QueryValue>];
 InsertQuery ==> DatabaseSqlQuery %% [~SqlQuoter] :: 'INSERT INTO '
     ->concatList[
-        $tableName,
+        %sqlQuoter.quoteIdentifier($tableName),
         ' (',
         $values->keys->map(^String => String :: %sqlQuoter.quoteIdentifier(#))->combineAsString(', '),
         ') VALUES (',
@@ -84,7 +84,7 @@ SqlQueryFilter ==> SqlString :: $expression->asSqlString;
 UpdateQuery := $[tableName: DatabaseTableName, values: Map<QueryValue>, queryFilter: SqlQueryFilter];
 UpdateQuery ==> DatabaseSqlQuery %% [~SqlQuoter] :: 'UPDATE '
     ->concatList[
-        $tableName,
+        %sqlQuoter.quoteIdentifier($tableName),
         ' SET ',
         $values->mapKeyValue(^[key: String, value: QueryValue] => String :: ''->concatList[
             %sqlQuoter.quoteIdentifier(#key), ' = ', #value->asSqlString
@@ -96,7 +96,7 @@ UpdateQuery ==> DatabaseSqlQuery %% [~SqlQuoter] :: 'UPDATE '
 DeleteQuery := $[tableName: DatabaseTableName, queryFilter: SqlQueryFilter];
 DeleteQuery ==> DatabaseSqlQuery %% [~SqlQuoter] :: 'DELETE FROM '
     ->concatList[
-        $tableName,
+        %sqlQuoter.quoteIdentifier($tableName),
         ' WHERE ',
         $queryFilter->asSqlString
     ];

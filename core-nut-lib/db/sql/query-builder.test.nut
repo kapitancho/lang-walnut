@@ -4,7 +4,7 @@ test $db/sql/query-builder %% $db/sql/quoter-mysql:
     [
         ^ => TestResult :: TestResult[
             name: 'Test Insert Query Builder',
-            expected: 'INSERT INTO products (`name`, `price`) VALUES (:name, 9.99)',
+            expected: 'INSERT INTO `products` (`name`, `price`) VALUES (:name, 9.99)',
             actual = ^ :: {
                 InsertQuery[
                     tableName: 'products',
@@ -14,7 +14,7 @@ test $db/sql/query-builder %% $db/sql/quoter-mysql:
         ],
         ^ => TestResult :: TestResult[
             name: 'Test Update Query Builder',
-            expected: 'UPDATE products SET `name` = :name, `price` = 9.99 WHERE id = 10',
+            expected: 'UPDATE `products` SET `name` = :name, `price` = 9.99 WHERE id = 10',
             actual = ^ :: {
                 UpdateQuery[
                     tableName: 'products',
@@ -27,7 +27,7 @@ test $db/sql/query-builder %% $db/sql/quoter-mysql:
         ],
         ^ => TestResult :: TestResult[
             name: 'Test Delete Query Builder',
-            expected: 'DELETE FROM products WHERE id = 10',
+            expected: 'DELETE FROM `products` WHERE id = 10',
             actual = ^ :: {
                 DeleteQuery[
                     tableName: 'products',

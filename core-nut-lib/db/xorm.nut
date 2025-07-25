@@ -28,7 +28,7 @@ Ox[~Type] @ UnknownOrmModel|UnknownFieldTypes :: {
             `Type<Record>: #->itemTypes,
             `Type<Alias>: fieldTypesHelper=>invoke(#->aliasedType),
             `Type<Type>: fieldTypesHelper=>invoke(#->refType),
-            ~: @UnknownFieldTypes()
+            ~: @UnknownFieldTypes
         }
     };
     fieldTypes = fieldTypesHelper=>invoke(#type);
