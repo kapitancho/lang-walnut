@@ -82,12 +82,16 @@ JsonValue ==> Time @ InvalidTime :: {
 
 String ==> Time @ InvalidTime :: {
      pieces = $->split(':');
+     dropZeroes = ^s: String => Result<Integer, NotANumber> :: ?whenValueOf(s) is {
+        '00': 0,
+        ~: s->trimLeft('0')->asInteger
+    };
      ?whenTypeOf(pieces) is {
         type[String<2>, String<2>, String<2>]: {
             timeValue = [
-                hour: pieces.0->trimLeft('0')->asInteger,
-                minute: pieces.1->trimLeft('0')->asInteger,
-                second: pieces.2->trimLeft('0')->asInteger
+                hour: dropZeroes(pieces.0),
+                minute: dropZeroes(pieces.1),
+                second: dropZeroes(pieces.2)
             ];
             ?whenTypeOf(timeValue) is {
                 type[hour: Integer<0..23>, minute: Integer<0..59>, second: Integer<0..59>]: Time(timeValue),

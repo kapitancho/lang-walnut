@@ -5,7 +5,7 @@ test $db/sql/query-builder %% $db/sql/quoter-mysql:
         ^ => TestResult :: TestResult[
             name: 'Test Insert Query Builder',
             expected: 'INSERT INTO `products` (`name`, `price`) VALUES (:name, 9.99)',
-            actual = ^ :: {
+            actual : ^ :: {
                 InsertQuery[
                     tableName: 'products',
                     values: [name: PreparedValue['name'], price: SqlValue[9.99]]
@@ -15,7 +15,7 @@ test $db/sql/query-builder %% $db/sql/quoter-mysql:
         ^ => TestResult :: TestResult[
             name: 'Test Update Query Builder',
             expected: 'UPDATE `products` SET `name` = :name, `price` = 9.99 WHERE id = 10',
-            actual = ^ :: {
+            actual : ^ :: {
                 UpdateQuery[
                     tableName: 'products',
                     values: [name: PreparedValue['name'], price: SqlValue[9.99]],
@@ -28,7 +28,7 @@ test $db/sql/query-builder %% $db/sql/quoter-mysql:
         ^ => TestResult :: TestResult[
             name: 'Test Delete Query Builder',
             expected: 'DELETE FROM `products` WHERE id = 10',
-            actual = ^ :: {
+            actual : ^ :: {
                 DeleteQuery[
                     tableName: 'products',
                     queryFilter: SqlQueryFilter[
@@ -40,7 +40,7 @@ test $db/sql/query-builder %% $db/sql/quoter-mysql:
         ^ => TestResult :: TestResult[
             name: 'Test Select Query Builder',
             expected: 'SELECT `name` AS `name`, `products`.`price` AS `price`, 1 AS `step` FROM `products` WHERE id = 10',
-            actual = ^ :: {
+            actual : ^ :: {
                 SelectQuery[
                     tableName: 'products',
                     fields: SqlSelectFieldList[

@@ -11,6 +11,10 @@ $folder = $argv[1] ?? '.';
 $epBuilder = (require __DIR__ . '/factory.inc.php')->entryPointBuilder;
 
 $root = $sourceRoot . '/';
+if (!file_exists($root . $folder)) {
+	echo "Folder $folder does not exist in $sourceRoot" . PHP_EOL;
+	exit(1);
+}
 foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . $folder)) as $file) {
 	$pathname = $file->getPathname();
 	if (str_ends_with($pathname, '.test.nut')) {

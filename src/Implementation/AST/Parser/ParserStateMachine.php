@@ -795,7 +795,7 @@ final readonly class ParserStateMachine {
 					$this->s->stay(287);
 				},
 			]],
-			281 => ['name' => 'dict expression separator', 'transitions' => [
+			281 => ['name' => 'list or dict expression separator', 'transitions' => [
 				T::colon->name => 282,
 				'' => function(LT $token) {
 					$this->s->back(287);
@@ -830,11 +830,11 @@ final readonly class ParserStateMachine {
 				T::string_value->name => function(LT $token) {
 					$this->s->result['current_key'] = $this->escapeCharHandler->unescape(
 						$token->patternMatch->text);
-					$this->s->move(281);
+					$this->s->move(299);
 				},
 				T::word->name => $c = function(LT $token) {
 					$this->s->result['current_key'] = $token->patternMatch->text;
-					$this->s->move(281);
+					$this->s->move(299);
 				},
 				T::var_keyword->name => $c,
 				T::type_keyword->name => $c,
@@ -914,6 +914,9 @@ final readonly class ParserStateMachine {
 					);
 					$this->s->pop();
 				},
+			]],
+			299 => ['name' => 'dict expression separator', 'transitions' => [
+				T::colon->name => 282
 			]],
 
 

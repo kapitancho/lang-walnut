@@ -1,4 +1,4 @@
-module $db/xorm %% $db/core, $db/sql/query-builder, $db/sql/quoter-mysql:
+module $db/orm/xorm %% $db/core, $db/sql/query-builder, $db/sql/quoter-mysql:
 
 FieldTypes = Map<Type>;
 UnknownFieldTypes := ();

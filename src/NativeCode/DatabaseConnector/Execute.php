@@ -16,7 +16,7 @@ use Walnut\Lang\Blueprint\Value\SealedValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
-final readonly class Execute implements NativeMethod {
+final readonly class Execute extends PdoMethod implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
@@ -65,8 +65,7 @@ final readonly class Execute implements NativeMethod {
 				$dsn = $targetValue->value->valueOf('connection')
 					->value->values['dsn']->literalValue;
 				try {
-					$pdo = new PDO($dsn);
-					$stmt = $pdo->prepare($parameterValue->values['query']->literalValue);
+					$stmt = $this->getPdo($dsn)->prepare($parameterValue->values['query']->literalValue);
 					$stmt->execute(array_map(fn(Value $value): string|float|int|null =>
 					($v = $value)->literalValue instanceof Number ? (string)$v->literalValue : $v->literalValue,
 						$parameterValue->values['boundParameters']->values

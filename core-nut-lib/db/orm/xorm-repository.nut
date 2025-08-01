@@ -1,4 +1,4 @@
-module $db/xorm-repository %% $db/xorm, $db/connection:
+module $db/orm/xorm-repository %% $db/orm/xorm, $db/connection:
 
 OxRepository := $[~Ox, ~Type];
 OxRepository[~Type, model: Type] @ ExternalError  :: [
@@ -33,10 +33,10 @@ OxRepository->one(^v: DatabaseValue => *Result<Any, EntryNotFound>) %% [~Databas
     }
 };
 
-OxRepository->insertOne(^v: Map<DatabaseValue> => *Null) %% [~DatabaseConnector] :: {
+OxRepository->insertOne(^v: {Map<DatabaseValue>} => *Null) %% [~DatabaseConnector] :: {
     query = $ox->insertQuery
         *> ('Failed to get query for orm model');
-    result = {%databaseConnector->execute[query: query, boundParameters: v]}
+    result = {%databaseConnector->execute[query: query, boundParameters: v->shape(`Map<DatabaseValue>)]}
         *> ('Failed to insert entry into the database');
     ?whenTypeOf(result) is {
         `Integer<1..1> : null,
@@ -59,8 +59,9 @@ OxRepository->deleteOne(^v: DatabaseValue => *Result<Null, EntryNotFound>) %% [~
     }
 };
 
-OxRepository->updateOne(^v: Map<DatabaseValue> => *Result<Null, EntryNotFound>) %% [~DatabaseConnector] :: {
-    entryId = #->item($ox->keyField) *> ('Failed to get entry key');
+OxRepository->updateOne(^v: {Map<DatabaseValue>} => *Result<Null, EntryNotFound>) %% [~DatabaseConnector] :: {
+    v = v->shape(`Map<DatabaseValue>);
+    entryId = v->item($ox->keyField) *> ('Failed to get entry key');
     query = $ox->updateQuery
         *> ('Failed to get query for orm model');
     result = {%databaseConnector->execute[query: query, boundParameters: v]}

@@ -55,7 +55,7 @@ enum Token: string {
 	case when_value_of = '\?whenValueOf\b';
 	case when = '\?when\b';
 	case when_value_is = '\bis\b';
-	case optional_key = '\?\b';
+	case optional_key = '\?';
 	case string_value = '\'.*?\'';
 	//TOOD: allow forward slash but not two consecutive forward slashes
 	case module_identifier = 'module \$?[a-z][a-z0-9_-]*(\/[a-z][a-z0-9_-]*)*(\s*\%\%\s+\$?[a-z][a-z0-9_-]*(\/[a-z][a-z0-9_-]*)*(\s*\,\s*\$?[a-z][a-z0-9_-]*(\/[a-z][a-z0-9_-]*)*)*)?\:';

@@ -67,7 +67,7 @@ final readonly class Fire implements NativeMethod {
 						throw new ExecutionException("Invalid listener");
 					}
 				}
-				return ($parameterValue);
+				return $parameterValue;
 			}
 		}
 		// @codeCoverageIgnoreStart

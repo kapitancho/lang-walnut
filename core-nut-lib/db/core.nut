@@ -1,6 +1,6 @@
 module $db/core:
 
-DatabaseSqlQuery = String<1..>;
+DatabaseSqlQuery = NonEmptyString;
 DatabaseValue = String|Integer|Real|Boolean|Null;
 DatabaseQueryBoundParameters = Array<DatabaseValue>|Map<DatabaseValue>;
 DatabaseQueryCommand = [query: DatabaseSqlQuery, boundParameters: DatabaseQueryBoundParameters];

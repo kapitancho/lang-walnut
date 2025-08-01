@@ -30,7 +30,23 @@ final readonly class TestPrecompiler implements CodePrecompiler {
 			main = ^args: Array<String> => String %% [~TestCases] :: {
 				%testCases->map(^ ~TestCase => String :: {
 					testResult = testCase->invoke;
+					before = testResult.before;
+					beforeResult = ?whenTypeOf(before) is {
+						`^Null => Any: before()
+					};
+					?whenIsError(beforeResult) {
+						=> '\033[1;31m' + 'ERROR: ' + testResult.name + ' (before hook failed: ' + 
+						beforeResult->printed + ')' + '\033[0m'
+					};
 					actualResult = testResult.actual();
+					after = testResult.after;
+					afterResult = ?whenTypeOf(after) is {
+						`^Null => Any: after()
+					};
+					?whenIsError(afterResult) {
+						=> '\033[1;31m' + 'ERROR: ' + testResult.name + ' (after hook failed: ' + 
+						afterResult->printed + ')' + '\033[0m'
+					};
 					resultMatches = actualResult == testResult.expected;
 					?when(resultMatches) {
 					    '\033[1;32m' + 'PASS: ' + testResult.name + '\033[0m'
