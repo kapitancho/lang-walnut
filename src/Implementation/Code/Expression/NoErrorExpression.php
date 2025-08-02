@@ -10,6 +10,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\NoErrorExpression as NoErrorExpressionInterface;
+use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
 
@@ -32,6 +33,11 @@ final readonly class NoErrorExpression implements NoErrorExpressionInterface, Js
 			);
 		}
 		return $ret;
+	}
+
+	/** @return list<string> */
+	public function analyseDependencyType(DependencyContainer $dependencyContainer): array {
+		return $this->targetExpression->analyseDependencyType($dependencyContainer);
 	}
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {

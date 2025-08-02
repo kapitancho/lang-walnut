@@ -12,6 +12,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\DataExpression as DataExpressionInterface;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 
 final readonly class DataExpression implements DataExpressionInterface, JsonSerializable {
 
@@ -38,6 +39,12 @@ final readonly class DataExpression implements DataExpressionInterface, JsonSeri
 				$this->typeName
 			)
 		);
+	}
+
+
+	/** @return list<string> */
+	public function analyseDependencyType(DependencyContainer $dependencyContainer): array {
+		return $this->value->analyseDependencyType($dependencyContainer);
 	}
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {

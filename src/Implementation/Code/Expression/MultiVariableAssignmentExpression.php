@@ -14,6 +14,7 @@ use Walnut\Lang\Blueprint\Code\Expression\MultiVariableAssignmentExpression as M
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
+use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 
 final readonly class MultiVariableAssignmentExpression implements MultiVariableAssignmentExpressionInterface, JsonSerializable {
 	/** @param array<VariableNameIdentifier> $variableNames */
@@ -54,6 +55,11 @@ final readonly class MultiVariableAssignmentExpression implements MultiVariableA
 			);
 		}
 		return $ret;
+	}
+
+	/** @return list<string> */
+	public function analyseDependencyType(DependencyContainer $dependencyContainer): array {
+		return $this->assignedExpression->analyseDependencyType($dependencyContainer);
 	}
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {

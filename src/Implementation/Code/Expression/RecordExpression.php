@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\RecordExpression as RecordExpressionInterface;
+use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 
 final readonly class RecordExpression implements RecordExpressionInterface, JsonSerializable {
 
@@ -29,6 +30,16 @@ final readonly class RecordExpression implements RecordExpressionInterface, Json
 			$analyserContext->programRegistry->typeRegistry->record($subtypes),
 			$analyserContext->programRegistry->typeRegistry->union($returnTypes),
 		);
+	}
+
+	/** @return list<string> */
+	public function analyseDependencyType(DependencyContainer $dependencyContainer): array {
+		return array_merge(... array_values(
+			array_map(
+				fn(Expression $expression) => $expression->analyseDependencyType($dependencyContainer),
+				$this->values
+			)
+		));
 	}
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {

@@ -8,8 +8,11 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserResult;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\ConstantExpression as ConstantExpressionInterface;
+use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
+use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyError;
+use Walnut\Lang\Blueprint\Type\NothingType;
+use Walnut\Lang\Blueprint\Value\FunctionValue;
 use Walnut\Lang\Blueprint\Value\Value;
-use Walnut\Lang\Implementation\Value\FunctionValue;
 
 final readonly class ConstantExpression implements ConstantExpressionInterface, JsonSerializable {
 	public function __construct(
@@ -22,6 +25,26 @@ final readonly class ConstantExpression implements ConstantExpressionInterface, 
 			$this->value->type,
 			$analyserContext->programRegistry->typeRegistry->nothing
 		);
+	}
+
+	/** @return list<string> */
+	public function analyseDependencyType(DependencyContainer $dependencyContainer): array {
+		$analyseErrors = [];
+		if ($this->value instanceof FunctionValue) {
+			$d = $this->value->function->dependencyType;
+			if (!($d instanceof NothingType)) {
+				$value = $dependencyContainer->valueByType($d);
+				if ($value instanceof DependencyError) {
+					$analyseErrors[] = sprintf("Error in %s: the dependency %s cannot be resolved: %s (type: %s)",
+						$this->value->function->displayName,
+						$d,
+						$value->unresolvableDependency->errorInfo(),
+						$value->type
+					);
+				}
+			}
+		}
+		return $analyseErrors;
 	}
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {

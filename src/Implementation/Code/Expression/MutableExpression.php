@@ -11,6 +11,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MutableExpression as MutableExpressionInterface;
+use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Type\Type;
 
 final readonly class MutableExpression implements MutableExpressionInterface, JsonSerializable {
@@ -36,6 +37,12 @@ final readonly class MutableExpression implements MutableExpressionInterface, Js
 			)
 		);
 	}
+
+	/** @return list<string> */
+	public function analyseDependencyType(DependencyContainer $dependencyContainer): array {
+		return $this->value->analyseDependencyType($dependencyContainer);
+	}
+
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
 		$executionContext = $this->value->execute($executionContext);

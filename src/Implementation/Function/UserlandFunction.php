@@ -13,6 +13,7 @@ use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Function\FunctionContextFiller;
 use Walnut\Lang\Blueprint\Function\UserlandFunction as UserlandFunctionInterface;
+use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyError;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\UnresolvableDependency;
 use Walnut\Lang\Blueprint\Type\NothingType;
@@ -74,6 +75,12 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 			);
 		}
 	}
+
+	/** @return list<string> */
+	public function analyseDependencyType(DependencyContainer $dependencyContainer): array {
+		return $this->functionBody->analyseDependencyType($dependencyContainer);
+	}
+
 
 	/** @throws AnalyserException */
 	public function analyse(

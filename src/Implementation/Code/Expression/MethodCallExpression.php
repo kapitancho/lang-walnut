@@ -13,6 +13,7 @@ use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MethodCallExpression as MethodCallExpressionInterface;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
+use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Implementation\Type\Helper\BaseTypeHelper;
 
 final readonly class MethodCallExpression implements MethodCallExpressionInterface, JsonSerializable {
@@ -60,6 +61,14 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 				$targetReturnType,
 				$parameterReturnType
 			])
+		);
+	}
+
+	/** @return list<string> */
+	public function analyseDependencyType(DependencyContainer $dependencyContainer): array {
+		return array_merge(
+			$this->target->analyseDependencyType($dependencyContainer),
+			$this->parameter->analyseDependencyType($dependencyContainer),
 		);
 	}
 

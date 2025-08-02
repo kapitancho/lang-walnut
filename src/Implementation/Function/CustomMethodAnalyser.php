@@ -64,8 +64,8 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 							$method->parameterType,
 						);
 						if (!$method->returnType->isSubtypeOf($baseReturnType)) {
-							$analyseErrors[] = sprintf("%s : the method %s is already defined for %s but its return type < %s > is not a subtype of < %s > when called with parameter of type %s ",
-								$this->getErrorMessageFor($method),
+							$analyseErrors[] = sprintf("Error in %s : the method %s is already defined for %s but its return type < %s > is not a subtype of < %s > when called with parameter of type %s ",
+								$method->methodInfo,
 								$methodName,
 								$customizedTypeCandidateType,
 								$method->returnType,
@@ -83,8 +83,8 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 				for ($j = 0; $j < $cnt; $j++) if ($k !== $j) {
 					if ($methodTargetTypes[$k]->isSubtypeOf($methodTargetTypes[$j]) &&
 						!$methodFnTypes[$k]->isSubtypeOf($methodFnTypes[$j])) {
-						$analyseErrors[] = sprintf("%s : the method %s is already defined for %s and therefore the signature %s should be a subtype of %s",
-							$this->getErrorMessageFor($methods[$k]),
+						$analyseErrors[] = sprintf("Error in %s : the method %s is already defined for %s and therefore the signature %s should be a subtype of %s",
+							$methods[$k]->methodInfo,
 							$methodName,
 							$methodTargetTypes[$j],
 							$methodFnTypes[$k],
@@ -102,7 +102,7 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 					);*/
 					$method->selfAnalyse($this->programRegistry);
 				} catch (AnalyserException $e) {
-					$analyseErrors[] = sprintf("%s : %s", $this->getErrorMessageFor($method), $e->getMessage());
+					$analyseErrors[] = sprintf("Error in %s : %s", $method->methodInfo, $e->getMessage());
 					continue;
 				}
 			}
@@ -110,45 +110,14 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 		if (count($analyseErrors) === 0) {
 			foreach ($registry->customMethods as $methods) {
 				foreach ($methods as $method) {
-					$d = $method->dependencyType;
-					if (!($d instanceof NothingType)) {
-						$value = $this->programRegistry->dependencyContainer->valueByType($method->dependencyType);
-						if ($value instanceof DependencyError) {
-							$analyseErrors[] = sprintf("%s : the dependency %s cannot be resolved: %s (type: %s)",
-								$this->getErrorMessageFor($method),
-								$method->dependencyType,
-								match ($value->unresolvableDependency) {
-									UnresolvableDependency::notFound => "no appropriate value found",
-									UnresolvableDependency::ambiguous => "ambiguity - multiple values found",
-									UnresolvableDependency::circularDependency => "circular dependency detected",
-									UnresolvableDependency::unsupportedType => "unsupported type found",
-									UnresolvableDependency::errorWhileCreatingValue => 'error returned while creating value',
-								},
-								$value->type
-							);
-						}
+					$errors = $method->analyseDependencyType($this->programRegistry->dependencyContainer);
+					if (count($errors) > 0) {
+						$analyseErrors = array_merge($analyseErrors, $errors);
 					}
 				}
 			}
 		}
 		return $analyseErrors;
-	}
-
-	private function getErrorMessageFor(CustomMethodInterface $method): string {
-		return match(true) {
-			(string)$method->targetType === 'Constructor' && str_starts_with($method->methodName->identifier, 'as')
-				=> sprintf("Error in the validator of %s", substr($method->methodName, 2)),
-			(string)$method->targetType === 'Constructor'
-				=> sprintf("Error in the constructor of %s", $method->methodName),
-			(string)$method->targetType === 'DependencyContainer'
-				=> sprintf("Error in the dependency builder of %s", substr($method->methodName, 2)),
-			(string)$method->targetType === 'Global'
-				=> sprintf("Error in global value %s", $method->methodName),
-			str_starts_with($method->methodName->identifier, 'as')
-				=> sprintf("Error in the cast %s ==> %s", $method->targetType,
-					substr($method->methodName, 2)),
-			default => sprintf("Error in method %s->%s", $method->targetType, $method->methodName)
-		};
 	}
 
 }

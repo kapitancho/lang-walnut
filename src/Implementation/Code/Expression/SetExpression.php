@@ -10,6 +10,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\ConstantExpression;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\SetExpression as SetExpressionInterface;
+use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 
 final readonly class SetExpression implements SetExpressionInterface, JsonSerializable {
 
@@ -43,6 +44,14 @@ final readonly class SetExpression implements SetExpressionInterface, JsonSerial
 			),
 			$analyserContext->programRegistry->typeRegistry->union($returnTypes)
 		);
+	}
+
+	/** @return list<string> */
+	public function analyseDependencyType(DependencyContainer $dependencyContainer): array {
+		return array_merge(... array_map(
+			fn(Expression $expression) => $expression->analyseDependencyType($dependencyContainer),
+			$this->values
+		));
 	}
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {

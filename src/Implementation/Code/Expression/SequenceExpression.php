@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\SequenceExpression as SequenceExpressionInterface;
+use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 
 final readonly class SequenceExpression implements SequenceExpressionInterface, JsonSerializable {
 
@@ -33,6 +34,14 @@ final readonly class SequenceExpression implements SequenceExpressionInterface, 
 			$expressionType,
 			$analyserContext->programRegistry->typeRegistry->union($returnTypes),
 		);
+	}
+
+	/** @return list<string> */
+	public function analyseDependencyType(DependencyContainer $dependencyContainer): array {
+		return array_merge(... array_map(
+			fn(Expression $expression) => $expression->analyseDependencyType($dependencyContainer),
+			$this->expressions
+		));
 	}
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {

@@ -6,6 +6,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
+use Walnut\Lang\Blueprint\Function\UserlandFunction;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 
 interface FunctionValue extends Value {
@@ -18,5 +19,7 @@ interface FunctionValue extends Value {
 	public function execute(ExecutionContext $executionContext, Value $parameterValue): Value;
 
 	public FunctionType $type { get ;}
+
+	public UserlandFunction $function { get ;}
 
 }

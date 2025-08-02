@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MatchErrorExpression as MatchErrorExpressionInterface;
+use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
@@ -76,6 +77,15 @@ final readonly class MatchErrorExpression implements MatchErrorExpressionInterfa
 				$elseExpressionType
 			]),
 			$analyserContext->programRegistry->typeRegistry->union($returnTypes)
+		);
+	}
+
+	/** @return list<string> */
+	public function analyseDependencyType(DependencyContainer $dependencyContainer): array {
+		return array_merge(
+			$this->target->analyseDependencyType($dependencyContainer),
+			$this->onError->analyseDependencyType($dependencyContainer),
+			$this->else ? $this->else->analyseDependencyType($dependencyContainer) : [],
 		);
 	}
 

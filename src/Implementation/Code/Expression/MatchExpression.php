@@ -14,6 +14,7 @@ use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionDefault;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionOperation;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionPair;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
+use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
 use Walnut\Lang\Blueprint\Value\NullValue;
@@ -98,6 +99,25 @@ final readonly class MatchExpression implements MatchExpressionInterface, JsonSe
 		return $retTarget->asAnalyserResult(
 			$analyserContext->programRegistry->typeRegistry->union($expressionTypes),
 			$analyserContext->programRegistry->typeRegistry->union($returnTypes)
+		);
+	}
+
+	/** @return list<string> */
+	public function analyseDependencyType(DependencyContainer $dependencyContainer): array {
+		return array_merge(
+			$this->target->analyseDependencyType($dependencyContainer),
+			... array_map(
+				fn(MatchExpressionPair|MatchExpressionDefault $pair) => match(true) {
+					$pair instanceof MatchExpressionPair =>
+					array_merge(
+						$pair->matchExpression->analyseDependencyType($dependencyContainer),
+						$pair->valueExpression->analyseDependencyType($dependencyContainer)
+					),
+					$pair instanceof MatchExpressionDefault =>
+					$pair->valueExpression->analyseDependencyType($dependencyContainer)
+				},
+				$this->pairs
+			)
 		);
 	}
 

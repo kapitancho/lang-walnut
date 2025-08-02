@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Function\FunctionBody as FunctionBodyInterface;
+use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 
@@ -28,6 +29,11 @@ final readonly class FunctionBody implements FunctionBodyInterface {
 			$analyserResult->expressionType,
 			$analyserResult->returnType
 		]);
+	}
+
+	/** @return list<string> */
+	public function analyseDependencyType(DependencyContainer $dependencyContainer): array {
+		return $this->expression->analyseDependencyType($dependencyContainer);
 	}
 
 	/** @throws ExecutionException */

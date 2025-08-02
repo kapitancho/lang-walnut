@@ -12,6 +12,7 @@ use Walnut\Lang\Blueprint\Code\Expression\ConstantExpression;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\VariableAssignmentExpression as VariableAssignmentExpressionInterface;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
+use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
 
 final readonly class VariableAssignmentExpression implements VariableAssignmentExpressionInterface, JsonSerializable {
@@ -50,6 +51,11 @@ final readonly class VariableAssignmentExpression implements VariableAssignmentE
 				)
 			) : $e;
 		}
+	}
+
+	/** @return list<string> */
+	public function analyseDependencyType(DependencyContainer $dependencyContainer): array {
+		return $this->assignedExpression->analyseDependencyType($dependencyContainer);
 	}
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {

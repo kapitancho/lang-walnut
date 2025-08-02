@@ -10,6 +10,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\ReturnExpression as ReturnExpressionInterface;
+use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 
 final readonly class ReturnExpression implements ReturnExpressionInterface, JsonSerializable {
 	public function __construct(
@@ -23,6 +24,11 @@ final readonly class ReturnExpression implements ReturnExpressionInterface, Json
 		)->withReturnType($analyserContext->programRegistry->typeRegistry->union(
 			[$ret->returnType, $ret->expressionType]
 		));
+	}
+
+	/** @return list<string> */
+	public function analyseDependencyType(DependencyContainer $dependencyContainer): array {
+		return $this->returnedExpression->analyseDependencyType($dependencyContainer);
 	}
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {

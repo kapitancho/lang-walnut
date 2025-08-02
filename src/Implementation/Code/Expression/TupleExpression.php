@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\TupleExpression as TupleExpressionInterface;
+use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 
 final readonly class TupleExpression implements TupleExpressionInterface, JsonSerializable {
 
@@ -29,6 +30,14 @@ final readonly class TupleExpression implements TupleExpressionInterface, JsonSe
 			$analyserContext->programRegistry->typeRegistry->tuple($subtypes),
 			$analyserContext->programRegistry->typeRegistry->union($returnTypes)
 		);
+	}
+
+	/** @return list<string> */
+	public function analyseDependencyType(DependencyContainer $dependencyContainer): array {
+		return array_merge(... array_map(
+			fn(Expression $expression) => $expression->analyseDependencyType($dependencyContainer),
+			$this->values
+		));
 	}
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
