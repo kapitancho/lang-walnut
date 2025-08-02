@@ -328,8 +328,7 @@ final readonly class ParserStateMachine {
 					$this->s->move(701);
 				},
 				T::dependency_marker->name => function(LT $token) {
-					$this->s->push(153);
-					$this->s->move(701);
+					$this->s->move(156);
 				},
 				T::function_body_marker->name => function(LT $token) {
 					$this->s->push(121);
@@ -423,8 +422,7 @@ final readonly class ParserStateMachine {
 			]],
 			130 => ['name' => 'cast error type return', 'transitions' => [
 				T::dependency_marker->name => function(LT $token) {
-					$this->s->push(153);
-					$this->s->move(701);
+					$this->s->move(156);
 				},
 				T::function_body_marker->name => function(LT $token) {
 					$this->s->push(121);
@@ -547,6 +545,40 @@ final readonly class ParserStateMachine {
 					$this->s->result['dependency_type'] = $this->s->generated;
 					$this->s->push(121);
 					$this->s->move(201);
+				}
+			]],
+			155 => ['name' => 'cast dependency result shortcut', 'transitions' => [
+				T::function_body_marker->name => function(LT $token) {
+					$this->s->result['dependency_type'] = $this->s->generated;
+					$this->s->push(121);
+					$this->s->move(201);
+				},
+				T::expression_separator->name => function(LT $token) {
+					$this->s->result['dependency_type'] = $this->s->generated;
+					$this->s->generated = $this->nodeBuilder->methodCall(
+						$this->nodeBuilder->variableName(
+							new VariableNameIdentifier('%')
+						),
+						new MethodNameIdentifier('as'),
+						$this->nodeBuilder->constant(
+							$this->nodeBuilder->typeValue(
+								$this->nodeBuilder->namedType(
+									new TypeNameIdentifier($this->s->result['castToTypeName'])
+								)
+							)
+						)
+					);
+					$this->s->stay(121);
+				},
+			]],
+			156 => ['name' => 'cast dependency type', 'transitions' => [
+				T::type_keyword->name => function(LT $token) {
+					$this->s->push(155);
+					$this->s->stay(701);
+				},
+				'' => function(LT $token) {
+					$this->s->push(153);
+					$this->s->stay(701);
 				},
 			]],
 

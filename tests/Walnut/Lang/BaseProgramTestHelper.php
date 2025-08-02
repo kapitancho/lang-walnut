@@ -268,7 +268,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 			])
 		);
 		$this->typeRegistry->addAlias(
-			new TypeNameIdentifier('DatabaseQueryResultRow'),
+			new TypeNameIdentifier('DatabaseQueryDataRow'),
 			$this->typeRegistry->map(
 				$this->typeRegistry->withName(
 					new TypeNameIdentifier('DatabaseValue')
@@ -279,7 +279,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 			new TypeNameIdentifier('DatabaseQueryResult'),
 			$this->typeRegistry->array(
 				$this->typeRegistry->withName(
-					new TypeNameIdentifier('DatabaseQueryResultRow')
+					new TypeNameIdentifier('DatabaseQueryDataRow')
 				)
 			)
 		);

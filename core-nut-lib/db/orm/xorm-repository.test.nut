@@ -69,10 +69,10 @@ ProductModel ==> OrmModel :: OrmModel[table: 'products', keyField: 'id'];
         ],
         ^ => TestResult :: TestResult[
             name: 'Test insert product duplicate id',
-            expected: `Error<ExternalError>,
+            expected: @DuplicateEntry[key: 1],
             actual : ^ :: {?noError(OxRepository[type: `Product, model: `Product])->insertOne(
                 Product![id: 1, name: 'Product 1', price: 10]
-            )}->type,
+            )},
             before: beforeFn,
             after: afterFn
         ],

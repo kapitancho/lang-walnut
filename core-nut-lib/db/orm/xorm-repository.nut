@@ -9,13 +9,16 @@ OxRepository[~Type, model: Type] @ ExternalError  :: [
 EntryNotFound := $[key: DatabaseValue];
 EntryNotFound->key(=> DatabaseValue) :: $key;
 
+DuplicateEntry := $[key: DatabaseValue];
+DuplicateEntry->key(=> DatabaseValue) :: $key;
+
 OxRepository->all(=> *Array) %% [~DatabaseConnector] :: {
     query = $ox->selectAllQuery /*'SELECT * FROM <table>'*/
         *> ('Failed to get query for orm model');
     {%databaseConnector
         -> query[query: query, boundParameters: []]}
         *> ('Failed to get entries from the database')
-        -> map(^DatabaseQueryResultRow => Result<Any, HydrationError> :: #->hydrateAs($type))
+        -> map(^DatabaseQueryDataRow => Result<Any, HydrationError> :: #->hydrateAs($type))
         *> ('Failed to hydrate entries')
 };
 
@@ -25,7 +28,7 @@ OxRepository->one(^v: DatabaseValue => *Result<Any, EntryNotFound>) %% [~Databas
     entries = {%databaseConnector
           -> query[query: query, boundParameters: [:]->withKeyValue[key: $ox->keyField, value: #]]
         } *> ('Failed to get entry from the database')
-          ->map(^DatabaseQueryResultRow => Result<Any, HydrationError> :: #->hydrateAs($type))
+          ->map(^DatabaseQueryDataRow => Result<Any, HydrationError> :: #->hydrateAs($type))
           *> ('Failed to hydrate entries');
     ?whenTypeOf(entries) is {
         `Array<1..>: entries.0,
@@ -33,16 +36,23 @@ OxRepository->one(^v: DatabaseValue => *Result<Any, EntryNotFound>) %% [~Databas
     }
 };
 
-OxRepository->insertOne(^v: {Map<DatabaseValue>} => *Null) %% [~DatabaseConnector] :: {
+OxRepository->insertOne(^v: {DatabaseQueryDataRow} => *Result<Null, DuplicateEntry>) %% [~DatabaseConnector] :: {
+    v = v->shape(`DatabaseQueryDataRow);
+    entryId = v->item($ox->keyField) *> ('Failed to get entry key');
     query = $ox->insertQuery
         *> ('Failed to get query for orm model');
-    result = {%databaseConnector->execute[query: query, boundParameters: v->shape(`Map<DatabaseValue>)]}
-        *> ('Failed to insert entry into the database');
+    result = {%databaseConnector->execute[query: query, boundParameters: v]}
+        /* *> ('Failed to insert entry into the database') */;
     ?whenTypeOf(result) is {
+        `Error<DatabaseQueryFailure> : ?whenIsTrue {
+            result->error.error->contains('SQLSTATE[23'): @DuplicateEntry[key: entryId],
+            ~: result *> ('Failed to insert entry into the database')
+        },
+        `Error: result *> ('Failed to insert entry into the database'),
         `Integer<1..1> : null,
         ~: @ExternalError[
-            errorType: 'insert error',
-            originalError: result,
+            errorType: 'xorm-insert',
+            originalError: null,
             errorMessage: 'Failed to insert entry into the database'
         ]
     }
@@ -59,8 +69,8 @@ OxRepository->deleteOne(^v: DatabaseValue => *Result<Null, EntryNotFound>) %% [~
     }
 };
 
-OxRepository->updateOne(^v: {Map<DatabaseValue>} => *Result<Null, EntryNotFound>) %% [~DatabaseConnector] :: {
-    v = v->shape(`Map<DatabaseValue>);
+OxRepository->updateOne(^v: {DatabaseQueryDataRow} => *Result<Null, EntryNotFound>) %% [~DatabaseConnector] :: {
+    v = v->shape(`DatabaseQueryDataRow);
     entryId = v->item($ox->keyField) *> ('Failed to get entry key');
     query = $ox->updateQuery
         *> ('Failed to get query for orm model');

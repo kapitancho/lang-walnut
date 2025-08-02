@@ -24,11 +24,11 @@ final class DatabaseTest extends BaseProgramTestHelper {
         $this->assertEquals(
 			'Map<DatabaseValue>',
 	        (string)$this->typeRegistry->alias(
-				new TypeNameIdentifier('DatabaseQueryResultRow')
+				new TypeNameIdentifier('DatabaseQueryDataRow')
 	        )->aliasedType
         );
         $this->assertEquals(
-			'Array<DatabaseQueryResultRow>',
+			'Array<DatabaseQueryDataRow>',
 	        (string)$this->typeRegistry->alias(
 				new TypeNameIdentifier('DatabaseQueryResult')
 	        )->aliasedType
