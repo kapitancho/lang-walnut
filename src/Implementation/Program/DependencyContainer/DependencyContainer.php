@@ -31,8 +31,8 @@ use Walnut\Lang\Blueprint\Value\Value;
 
 final class DependencyContainer implements DependencyContainerInterface {
 
-	/** @var SplObjectStorage<Type, Value|DependencyError> */
-	private SplObjectStorage $cache;
+	/** @var array<Type, Value|DependencyError> */
+	private array $cache;
 	/** @var SplObjectStorage<Type> */
 	private SplObjectStorage $visited;
 	private readonly MethodCallExpression $containerCastExpression;
@@ -43,7 +43,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 		private readonly MethodRegistry $methodRegistry,
 		private readonly ExpressionRegistry $expressionRegistry,
 	) {
-		$this->cache = new SplObjectStorage;
+		$this->cache = [];
 		$this->visited = new SplObjectStorage;
 	}
 
@@ -254,7 +254,8 @@ final class DependencyContainer implements DependencyContainerInterface {
 		if ($this->visited->contains($type)) {
 			return new DependencyError(UnresolvableDependency::circularDependency, $type);
 		}
-		$cached = $this->cache[$type] ?? null;
+		$typeStr = (string)$type;
+		$cached = $this->cache[$typeStr] ?? null;
 		if ($cached) {
 			return $cached;
 		}
@@ -267,7 +268,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 				sprintf("The value %s is not a subtype of %s", $result->type, $type)
 			);
 		}
-		$this->cache[$type] = $result;
+		$this->cache[$typeStr] = $result;
 		$this->visited->detach($type);
 		return $result;
 	}
