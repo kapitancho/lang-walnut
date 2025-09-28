@@ -474,12 +474,23 @@ class ParserTest extends TestCase {
 				$d->returnType->returnType instanceof NamedTypeNode && $d->returnType->returnType->name->equals(new TypeNameIdentifier('B')) &&
 				$d->returnType->errorType instanceof NamedTypeNode && $d->returnType->errorType->name->equals(new TypeNameIdentifier('C'))
 		];
+		yield ['==> B %% D;', AddMethodNode::class, fn(AddMethodNode $d) =>
+			$d->targetType instanceof NamedTypeNode && $d->targetType->name->equals(new TypeNameIdentifier('DependencyContainer')) &&
+			$d->methodName->equals(new MethodNameIdentifier('asB')) &&
+			$d->parameterType instanceof NullTypeNode && $d->parameterName === null &&
+			$d->dependencyType instanceof NamedTypeNode && $d->dependencyType->name->equals(new TypeNameIdentifier('D')) &&
+			$d->returnType instanceof NamedTypeNode && $d->returnType->name->equals(new TypeNameIdentifier('B')) &&
+			$d->functionBody->expression instanceof MethodCallExpressionNode
+		];
 		yield ['==> B %% D :: null;', AddMethodNode::class, fn(AddMethodNode $d) =>
 			$d->targetType instanceof NamedTypeNode && $d->targetType->name->equals(new TypeNameIdentifier('DependencyContainer')) &&
 			$d->methodName->equals(new MethodNameIdentifier('asB')) &&
 			$d->parameterType instanceof NullTypeNode && $d->parameterName === null &&
 			$d->dependencyType instanceof NamedTypeNode && $d->dependencyType->name->equals(new TypeNameIdentifier('D')) &&
-			$d->returnType instanceof NamedTypeNode && $d->returnType->name->equals(new TypeNameIdentifier('B'))];
+			$d->returnType instanceof NamedTypeNode && $d->returnType->name->equals(new TypeNameIdentifier('B')) &&
+			$d->functionBody->expression instanceof ConstantExpressionNode &&
+			$d->functionBody->expression->value instanceof NullValueNode
+		];
 		yield ['==> B @ C %% D :: null;', AddMethodNode::class, fn(AddMethodNode $d) =>
 			$d->targetType instanceof NamedTypeNode && $d->targetType->name->equals(new TypeNameIdentifier('DependencyContainer')) &&
 			$d->methodName->equals(new MethodNameIdentifier('asB')) &&

@@ -16,4 +16,12 @@ final class ConstantExpressionTest extends CodeExecutionTestHelper {
 		$this->assertEquals("^Null => Integer :: x", $result);
 	}
 
+	public function testWithDependencyError(): void {
+		$this->executeErrorCodeSnippet(
+			"the dependency T cannot be resolved",
+			"fn = ^Null => Integer %% T :: 1;",
+			"T :=  String;"
+		);
+	}
+
 }

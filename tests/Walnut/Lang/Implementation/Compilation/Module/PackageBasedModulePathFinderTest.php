@@ -25,6 +25,14 @@ class PackageBasedModulePathFinderTest extends TestCase {
 			'default/vvv',
 			$this->packageBasedModulePathFinder->pathFor('vvv')
 		);
+		$this->assertEquals(
+			'default/core/vvv',
+			$this->packageBasedModulePathFinder->pathFor('$vvv')
+		);
+		$this->assertEquals(
+			'default/vvv-test',
+			$this->packageBasedModulePathFinder->pathFor('?vvv')
+		);
 	}
 
 	public function testSimplePackage(): void {
