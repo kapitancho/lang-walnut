@@ -6,7 +6,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\AST\Node\RootNode;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
-use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Compilation\AST\AstProgramCompilationException;
 use Walnut\Lang\Blueprint\Compilation\CompilationResult;
 use Walnut\Lang\Blueprint\Compilation\Module\ModuleDependencyException;
@@ -68,7 +68,7 @@ final class CompilerTest extends TestCase {
 				myFn = ^Null => Result<String, Any> %% [~TemplateRenderer] :: {
 				    %templateRenderer => render(NotANumber)
 				};
-				main = ^Array<String> => String :: {
+				>>> {
 				    x = myFn();
 				    ?whenTypeOf(x) is {
 				        `String: x,
@@ -170,11 +170,12 @@ final class CompilerTest extends TestCase {
 				$program = $compilationResult->program;
 				$tr = $compilationResult->programContext->typeRegistry;
 				$vr = $compilationResult->programContext->valueRegistry;
-				$ep = $program->getEntryPoint(
+				$ep = $program->getEntryPointDependency(new TypeNameIdentifier('CliEntryPoint'));
+				/*$ep = $program->getEntryPoint(
 					new VariableNameIdentifier('main'),
 					$tr->array($tr->string()),
 					$tr->string()
-				);
+				);*/
 				$value = $ep->call($vr->tuple([]));
 				$this->assertInstanceOf(Value::class, $value);
 

@@ -55,6 +55,15 @@ final readonly class ParserStateMachine {
 				}
 			]],
 			102 => ['name' => 'module content start', 'transitions' => [
+				T::cli_entry_point->name => function(LT $token) {
+					$this->s->result['dependencyType'] = $this->nodeBuilder->nothingType;
+					$this->s->push(113);
+					$this->s->move(201);
+				},
+				T::dependency_marker->name => function(LT $token) {
+					$this->s->push(114);
+					$this->s->move(701);
+				},
 				T::var_keyword->name => function(LT $token) {
 					$this->s->result = [];
 					$this->s->result['startPosition'] = $token->sourcePosition;
@@ -188,6 +197,47 @@ final readonly class ParserStateMachine {
 				T::lambda_param->name => $c,
 			]],
 
+			113 => ['name' => 'module level cli entry point return', 'transitions' => [
+				T::expression_separator->name => function(LT $token) {
+					$this->nodeBuilder->definition(
+						$this->s->generated = $this->nodeBuilder->addMethod(
+							$this->nodeBuilder->namedType(
+								new TypeNameIdentifier('DependencyContainer')
+							),
+							new MethodNameIdentifier('asCliEntryPoint'),
+							$this->nodeBuilder->nullType,
+							null,
+							$this->nodeBuilder->nothingType,
+							$this->nodeBuilder->namedType(
+								new TypeNameIdentifier('CliEntryPoint')
+							),
+							$this->nodeBuilder->functionBody(
+								$this->nodeBuilder->constant(
+									$this->nodeBuilder->functionValue(
+										$this->nodeBuilder->arrayType(
+											$this->nodeBuilder->stringType()
+										),
+										new VariableNameIdentifier('args'),
+										$this->s->result['dependencyType'],
+										$this->nodeBuilder->stringType(),
+										$this->nodeBuilder->functionBody(
+											$this->s->generated
+										)
+									)
+								)
+							),
+						)
+					);
+					$this->s->move(102);
+				},
+			]],
+			114 => ['name' => 'module level cli entry point dependency type return', 'transitions' => [
+				T::cli_entry_point->name => function(LT $token) {
+					$this->s->result['dependencyType'] = $this->s->generated;
+					$this->s->push(113);
+					$this->s->move(201);
+				},
+			]],
 			115 => ['name' => 'module level named type creation', 'transitions' => [
 				T::call_start->name => 116,
 				T::special_var_param->name => 111,

@@ -106,3 +106,6 @@ Uuid := #String<36>;
 
 /* Password handling */
 PasswordString := #[value: String];
+
+/* CLI */
+CliEntryPoint = ^Array<String> => String;

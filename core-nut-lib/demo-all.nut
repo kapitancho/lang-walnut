@@ -272,7 +272,7 @@ a = 1;
 b = ^MyAlias => Integer :: # + a;
 c = `String;
 
-main = ^Array<String> => String :: [
+>>> [
     allExpressions: getAllExpressions(),
     allTypesAndSampleValues: getAllTypes(getMatchingValuesForAllTypes()),
     allTypes: `AllTypes,

@@ -4,6 +4,7 @@ namespace Walnut\Lang\Implementation\AST\Parser;
 
 enum Token: string {
 	case code_comment = '\/\*.*?\*\/';
+	case cli_entry_point = '\>\>\>';
 	case dependency_marker = '\%\%';
 	case function_body_marker = '\:\:';
 	case cast_marker = '\=\=\>';
