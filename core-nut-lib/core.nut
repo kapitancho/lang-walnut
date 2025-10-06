@@ -1,8 +1,5 @@
 module $core:
 
-/* global support */
-Global := ();
-
 /* constructor support */
 Constructor := ();
 

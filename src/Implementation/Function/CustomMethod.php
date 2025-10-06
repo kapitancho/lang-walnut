@@ -96,8 +96,6 @@ final class CustomMethod implements CustomMethodInterface {
 			=> sprintf("the constructor of %s", $this->methodName),
 			(string)$this->targetType === 'DependencyContainer'
 			=> sprintf("the dependency builder of %s", substr($this->methodName, 2)),
-			(string)$this->targetType === 'Global'
-			=> sprintf("global value %s", $this->methodName),
 			str_starts_with($this->methodName->identifier, 'as')
 			=> sprintf("the cast %s ==> %s", $this->targetType,
 				substr($this->methodName, 2)),

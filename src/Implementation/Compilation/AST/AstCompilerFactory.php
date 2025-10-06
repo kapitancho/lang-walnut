@@ -33,7 +33,6 @@ final readonly class AstCompilerFactory implements AstCompilerFactoryInterface, 
 		$astModuleCompiler = new AstModuleCompiler(
 			$programContext,
 			$astTypeCompiler,
-			$astValueCompiler,
 			$this->functionBodyCompiler,
 		);
 		$this->programCompiler = new AstProgramCompiler($astModuleCompiler);
