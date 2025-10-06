@@ -12,7 +12,8 @@ final class RefTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testRefTypeMetaType(): void {
-		$result = $this->executeCodeSnippet("getRefType(type{Type<String>});", "getRefType = ^Type<Type> => Type :: #->refType;");
+		$result = $this->executeCodeSnippet("getRefType(type{Type<String>});",
+			valueDeclarations: "getRefType = ^Type<Type> => Type :: #->refType;");
 		$this->assertEquals("type{String}", $result);
 	}
 

@@ -7,14 +7,14 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 final class UuidTest extends CodeExecutionTestHelper {
 
 	public function testUuidFromStringFixValid(): void {
-		$result = $this->executeCodeSnippet("getUuid();", <<<NUT
+		$result = $this->executeCodeSnippet("getUuid();", valueDeclarations: <<<NUT
 		getUuid = ^ => Uuid :: Uuid('00000000-0000-4000-9000-000000000000');
 	NUT);
 		$this->assertEquals("Uuid{'00000000-0000-4000-9000-000000000000'}", $result);
 	}
 
 	public function testUuidFromStringFixInvalid(): void {
-		$result = $this->executeCodeSnippet("getUuid();", <<<NUT
+		$result = $this->executeCodeSnippet("getUuid();", valueDeclarations: <<<NUT
 		getUuid = ^ => Result<Uuid, InvalidUuid> :: Uuid('00000000-0000-4000-0000-000000000000');
 	NUT);
 		$this->assertEquals("@InvalidUuid!'00000000-0000-4000-0000-000000000000'", $result);
@@ -29,14 +29,14 @@ final class UuidTest extends CodeExecutionTestHelper {
 	}
 
 	public function testUuidFromStringParamValid(): void {
-		$result = $this->executeCodeSnippet("getUuid('00000000-0000-4000-9000-000000000000');", <<<NUT
+		$result = $this->executeCodeSnippet("getUuid('00000000-0000-4000-9000-000000000000');", valueDeclarations: <<<NUT
 		getUuid = ^uuid: String<36> => Result<Uuid, InvalidUuid> :: Uuid(uuid);
 	NUT);
 		$this->assertEquals("Uuid{'00000000-0000-4000-9000-000000000000'}", $result);
 	}
 
 	public function testUuidFromStringParamInvalid(): void {
-		$result = $this->executeCodeSnippet("getUuid('00000000-0000-4000-0000-000000000000');", <<<NUT
+		$result = $this->executeCodeSnippet("getUuid('00000000-0000-4000-0000-000000000000');", valueDeclarations: <<<NUT
 		getUuid = ^uuid: String<36> => Result<Uuid, InvalidUuid> :: Uuid(uuid);
 	NUT);
 		$this->assertEquals("@InvalidUuid!'00000000-0000-4000-0000-000000000000'", $result);

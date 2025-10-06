@@ -8,7 +8,7 @@ final class ItemValuesTest extends CodeExecutionTestHelper {
 
 	public function testItemValues(): void {
 		$result = $this->executeCodeSnippet("getItemValues[a: 3, b: 'hello'];",
-			"getItemValues = ^Record => Map :: #->itemValues;");
+			valueDeclarations: "getItemValues = ^Record => Map :: #->itemValues;");
 		$this->assertEquals("[a: 3, b: 'hello']", $result);
 	}
 

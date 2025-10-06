@@ -13,13 +13,13 @@ final class VariableNameExpressionTest extends CodeExecutionTestHelper {
 
 	public function testVariableParameterNameTuple(): void {
 		$result = $this->executeCodeSnippet("recFn[1];",
-			"recFn = ^[Integer] => Integer :: #0;");
+			valueDeclarations: "recFn = ^[Integer] => Integer :: #0;");
 		$this->assertEquals("1", $result);
 	}
 
 	public function testVariableParameterNameRecord(): void {
 		$result = $this->executeCodeSnippet("recFn[a: 1];",
-			"recFn = ^[a: Integer] => Integer :: #a;");
+			valueDeclarations: "recFn = ^[a: Integer] => Integer :: #a;");
 		$this->assertEquals("1", $result);
 	}
 
@@ -37,13 +37,13 @@ final class VariableNameExpressionTest extends CodeExecutionTestHelper {
 
 	public function testVariableDependencyNameTuple(): void {
 		$result = $this->executeCodeSnippet("recFn();",
-			'A = Integer; ==> A :: 1; recFn = ^Null => Integer %% [A] :: %0;');
+			'A = Integer; ==> A :: 1;', 'recFn = ^Null => Integer %% [A] :: %0;');
 		$this->assertEquals("1", $result);
 	}
 
 	public function testVariableDependencyNameRecord(): void {
 		$result = $this->executeCodeSnippet("recFn();",
-			'A = Integer; ==> A :: 1; recFn = ^Null => Integer %% [~A] :: %a;');
+			'A = Integer; ==> A :: 1;', 'recFn = ^Null => Integer %% [~A] :: %a;');
 		$this->assertEquals("1", $result);
 	}
 

@@ -32,7 +32,9 @@ final class ProgramRegistry implements ProgramRegistryInterface {
 
 	public VariableValueScope $globalScope {
 		get {
-			return $this->variableValueScopeInstance ??= $this->globalScopeBuilder->build();
+			return $this->variableValueScopeInstance ??=
+				\Walnut\Lang\Implementation\Code\Scope\VariableValueScope::empty();
+				//$this->globalScopeBuilder->build();
 		}
 	}
 

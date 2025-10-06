@@ -32,40 +32,7 @@ MyAtom->myMethod(^String => Integer) %% MyAtom :: #->length;
 MyOpen[a: Real, b: Real] %% MyAtom :: [a: #a->asInteger, b: #b->asInteger];
 MySealed[a: Real, b: Real] %% MyAtom :: [a: #a->asInteger, b: #b->asInteger];
 
-functionName = ^Any => String :: 'function call result';
 TypeName := #String;
-
-getAllExpressions = ^Any => Any :: [
-    constant: 'constant',
-    tuple: ['tuple', 1, 2, 3],
-    record: [key: 'tuple', a: 1, b: 2, c: 3],
-    set: ['set'; 1; 2; 3],
-    sequence: {
-        'evaluated'; 'evaluated and used'
-    },
-    return: ?when(0) { => 'return' },
-    noError: ?noError('no error'),
-    noExternalError: ?noExternalError('no external error'),
-    variableAssignment: variableName = 'variable assignment',
-    multiVariableAssignmentList: var{ variableName1, variableName2 } = [1, 2],
-    multiVariableAssignmentDict: var{ key: variableName1, ~variableName2 } = [key: 1, variableName2: 2],
-    variableName: variableName,
-    methodCall: 'method call'->length,
-    functionBody: ^Any => Any :: 'function body',
-    data: MyData!1,
-    mutable: mutable{String, 'mutable'},
-    matchTrue: ?whenIsTrue { 'then 1': 'then 1', 'then 2': 'then 2', ~: 'default' },
-    matchType: ?whenTypeOf ('type') is { `String['type']: 'then 1', `String['other type']: 'then 2', ~: 'default' },
-    matchValue: ?whenValueOf ('value') is { 'value': 'then 1', 'other value': 'then 2', ~: 'default' },
-    matchIfThenElse: ?when('condition') { 'then' } ~ { 'else' },
-    matchIfThen: ?when('condition') { 'then' },
-    matchIsErrorElse: ?whenIsError('condition') { 'then' } ~ { 'else' },
-    matchIsError: ?whenIsError('condition') { 'then' },
-    data: MyData!42,
-    functionCall: functionName('parameter'),
-    constructorCall: TypeName('parameter'),
-    propertyAccess: [property: 'value'].property
-];
 
 AllTypes = [
     boolean: Boolean,
@@ -143,139 +110,177 @@ AllTypes = [
     anyUnion: Type<Union>
 ];
 
-getAllTypes = ^AllTypes => Any :: #;
+>>> {
 
-getMatchingValuesForAllTypes = ^Null => AllTypes :: [
-    boolean: true,
-    true: true,
-    false: false,
-    null: null,
-    atom: MyAtom,
-    enumeration: MyEnum.Value1,
-    enumerationSubset: MyEnum.Value1,
-    open: MyOpen0[a: 3, b: -2],
-    sealed: MySealed0[a: 3, b: -2],
-    data: MyData!42,
-    integer: 5,
-    integerRange: 5,
-    integerSubset: 2,
-    integerFull: 3,
-    real: -7.3,
-    realRange: 6.29,
-    realSubset: 10,
-    realFull: 3.27,
-    string: 'hello',
-    stringLengthRange: 'hello',
-    stringSubset: 'hello',
+    functionName = ^Any => String :: 'function call result';
 
-    array: [],
-    arrayWithType: [1, 5],
-    arrayWithLengthRange: [1, 'hello'],
-    arrayWithTypeAndLengthRange: ['hello', 'world'],
+    getAllExpressions = ^Any => Any :: [
+        constant: 'constant',
+        tuple: ['tuple', 1, 2, 3],
+        record: [key: 'tuple', a: 1, b: 2, c: 3],
+        set: ['set'; 1; 2; 3],
+        sequence: {
+            'evaluated'; 'evaluated and used'
+        },
+        return: ?when(0) { => 'return' },
+        noError: ?noError('no error'),
+        noExternalError: ?noExternalError('no external error'),
+        variableAssignment: variableName = 'variable assignment',
+        multiVariableAssignmentList: var{ variableName1, variableName2 } = [1, 2],
+        multiVariableAssignmentDict: var{ key: variableName1, ~variableName2 } = [key: 1, variableName2: 2],
+        variableName: variableName,
+        methodCall: 'method call'->length,
+        functionBody: ^Any => Any :: 'function body',
+        data: MyData!1,
+        mutable: mutable{String, 'mutable'},
+        matchTrue: ?whenIsTrue { 'then 1': 'then 1', 'then 2': 'then 2', ~: 'default' },
+        matchType: ?whenTypeOf ('type') is { `String['type']: 'then 1', `String['other type']: 'then 2', ~: 'default' },
+        matchValue: ?whenValueOf ('value') is { 'value': 'then 1', 'other value': 'then 2', ~: 'default' },
+        matchIfThenElse: ?when('condition') { 'then' } ~ { 'else' },
+        matchIfThen: ?when('condition') { 'then' },
+        matchIsErrorElse: ?whenIsError('condition') { 'then' } ~ { 'else' },
+        matchIsError: ?whenIsError('condition') { 'then' },
+        data: MyData!42,
+        functionCall: functionName('parameter'),
+        constructorCall: TypeName('parameter'),
+        propertyAccess: [property: 'value'].property
+    ];
 
-    map: [:],
-    mapWithType: [a: 3, b: 7],
-    mapWithLengthRange: [a: 3, b: 'hello'],
-    mapWithTypeAndLengthRange: [a: 'hello', b: 'world'],
+    getAllTypes = ^AllTypes => Any :: #;
 
-    set: [;],
-    setWithType: [5;],
-    setWithLengthRange: [1; 3; 5],
-    setWithTypeAndLengthRange: ['hello'; 'world'; 'hello'],
+    getMatchingValuesForAllTypes = ^Null => AllTypes :: [
+        boolean: true,
+        true: true,
+        false: false,
+        null: null,
+        atom: MyAtom,
+        enumeration: MyEnum.Value1,
+        enumerationSubset: MyEnum.Value1,
+        open: MyOpen0[a: 3, b: -2],
+        sealed: MySealed0[a: 3, b: -2],
+        data: MyData!42,
+        integer: 5,
+        integerRange: 5,
+        integerSubset: 2,
+        integerFull: 3,
+        real: -7.3,
+        realRange: 6.29,
+        realSubset: 10,
+        realFull: 3.27,
+        string: 'hello',
+        stringLengthRange: 'hello',
+        stringSubset: 'hello',
 
-    function: ^Any => Any :: 'any',
-    mutable: mutable{Any, 'hello'},
-    result: 'result',
-    resultWithType: @'error',
+        array: [],
+        arrayWithType: [1, 5],
+        arrayWithLengthRange: [1, 'hello'],
+        arrayWithTypeAndLengthRange: ['hello', 'world'],
 
-    impure: 'impure',
-    impureWithType: @ExternalError[errorType: 'Error', originalError: 'Error', errorMessage: 'Error'],
+        map: [:],
+        mapWithType: [a: 3, b: 7],
+        mapWithLengthRange: [a: 3, b: 'hello'],
+        mapWithTypeAndLengthRange: [a: 'hello', b: 'world'],
 
-    shape: 42,
-    shapeAny: null,
-    proxy: [MyOpen0[a: 3, b: -2]],
+        set: [;],
+        setWithType: [5;],
+        setWithLengthRange: [1; 3; 5],
+        setWithTypeAndLengthRange: ['hello'; 'world'; 'hello'],
 
-    any: -12,
-    /* nothing: Nothing */
-    /* optionalKeyType: ?Any,*/
+        function: ^Any => Any :: 'any',
+        mutable: mutable{Any, 'hello'},
+        result: 'result',
+        resultWithType: @'error',
 
-    anyType: `String,
-    anyReal: `Integer,
+        impure: 'impure',
+        impureWithType: @ExternalError[errorType: 'Error', originalError: 'Error', errorMessage: 'Error'],
 
-    anyIntegerSubset: `Integer[42, -2],
-    anyRealSubset: `Real[1, 3.14],
-    anyStringSubset: `String['a', ''],
-    anyFunction: `^String => Integer,
-    anyAtom: `MyAtom,
-    anyEnumeration: `MyEnum,
-    anyEnumerationSubset: `MyEnum[Value1, Value2],
-    anyOpen: `MyOpen,
-    anySealed: `MySealed,
-    anyData: `MyData,
-    anyNamed: `MyAtom,
-    anyAlias: `Alias,
-    anyTuple: `[Integer, String],
-    anyRecord: `[a: Integer, b: String],
-    anyMutable: `Mutable<Real>,
-    anyIntersection: `[a: String, ...] & [b: Integer, ... String],
-    anyUnion: `Integer|MyAtom
-];
+        shape: 42,
+        shapeAny: null,
+        proxy: [MyOpen0[a: 3, b: -2]],
 
-getAllValues = ^Any => Any :: [
-    atom: MyAtom,
-    booleanTrue: true,
-    booleanFalse: false,
-    enumeration: MyEnum.Value1,
-    open: MyOpen[a: 3, b: -2],
-    sealed: MySealed[a: 3, b: -2],
-    data: MyData!42,
-    integer: 42,
-    real: 3.14,
-    string: 'hi!',
-    null: null,
-    emptyTuple: [],
-    tuple: [1, 'hi!'],
-    emptyRecord: [:],
-    record: [a: 1, b: 'hi!'],
-    emptySet: [;],
-    set: [1; 'hi!'],
-    type: `String,
-    mutable: mutable{String, 'mutable'},
-    error: @'error',
-    function: ^Any => Any :: 'function body'
-];
+        any: -12,
+        /* nothing: Nothing */
+        /* optionalKeyType: ?Any,*/
 
-allConstants = [
-    atom: MyAtom,
-    booleanTrue: true,
-    booleanFalse: false,
-    enumeration: MyEnum.Value1,
-    integer: 42,
-    real: 3.14,
-    string: 'hi!',
-    null: null,
-    emptyTuple: [],
-    tuple: [1, 'hi!'],
-    emptyRecord: [:],
-    record: [a: 1, b: 'hi!'],
-    emptySet: [;],
-    set: [1; 'hi!'],
-    type: `String,
-    mutable: mutable{String, 'mutable'},
-    error: @'error',
-    data: MyData!42,
-    function: ^Any => Any :: 'function body'
-];
+        anyType: `String,
+        anyReal: `Integer,
 
-/* Variables */
-a = 1;
-b = ^MyAlias => Integer :: # + a;
-c = `String;
+        anyIntegerSubset: `Integer[42, -2],
+        anyRealSubset: `Real[1, 3.14],
+        anyStringSubset: `String['a', ''],
+        anyFunction: `^String => Integer,
+        anyAtom: `MyAtom,
+        anyEnumeration: `MyEnum,
+        anyEnumerationSubset: `MyEnum[Value1, Value2],
+        anyOpen: `MyOpen,
+        anySealed: `MySealed,
+        anyData: `MyData,
+        anyNamed: `MyAtom,
+        anyAlias: `Alias,
+        anyTuple: `[Integer, String],
+        anyRecord: `[a: Integer, b: String],
+        anyMutable: `Mutable<Real>,
+        anyIntersection: `[a: String, ...] & [b: Integer, ... String],
+        anyUnion: `Integer|MyAtom
+    ];
 
->>> [
-    allExpressions: getAllExpressions(),
-    allTypesAndSampleValues: getAllTypes(getMatchingValuesForAllTypes()),
-    allTypes: `AllTypes,
-    allValues: getAllValues(),
-    allConstants: allConstants
-]->printed;
+    getAllValues = ^Any => Any :: [
+        atom: MyAtom,
+        booleanTrue: true,
+        booleanFalse: false,
+        enumeration: MyEnum.Value1,
+        open: MyOpen[a: 3, b: -2],
+        sealed: MySealed[a: 3, b: -2],
+        data: MyData!42,
+        integer: 42,
+        real: 3.14,
+        string: 'hi!',
+        null: null,
+        emptyTuple: [],
+        tuple: [1, 'hi!'],
+        emptyRecord: [:],
+        record: [a: 1, b: 'hi!'],
+        emptySet: [;],
+        set: [1; 'hi!'],
+        type: `String,
+        mutable: mutable{String, 'mutable'},
+        error: @'error',
+        function: ^Any => Any :: 'function body'
+    ];
+
+    allConstants = [
+        atom: MyAtom,
+        booleanTrue: true,
+        booleanFalse: false,
+        enumeration: MyEnum.Value1,
+        integer: 42,
+        real: 3.14,
+        string: 'hi!',
+        null: null,
+        emptyTuple: [],
+        tuple: [1, 'hi!'],
+        emptyRecord: [:],
+        record: [a: 1, b: 'hi!'],
+        emptySet: [;],
+        set: [1; 'hi!'],
+        type: `String,
+        mutable: mutable{String, 'mutable'},
+        error: @'error',
+        data: MyData!42,
+        function: ^Any => Any :: 'function body'
+    ];
+
+    /* Variables */
+    a = 1;
+    b = ^MyAlias => Integer :: # + a;
+    c = `String;
+
+
+    [
+        allExpressions: getAllExpressions(),
+        allTypesAndSampleValues: getAllTypes(getMatchingValuesForAllTypes()),
+        allTypes: `AllTypes,
+        allValues: getAllValues(),
+        allConstants: allConstants
+    ]->printed
+};

@@ -24,6 +24,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 	public function testEnumKnownValueStringSubset(): void {
 		$result = $this->executeCodeSnippet("getSuit('Spades');", <<<NUT
 		Suit := (Spades, Hearts, Diamonds, Clubs);
+	NUT, <<<NUT
 		getSuit = ^v: String['Spades', 'Hearts', 'Diamonds', 'Clubs'] => Suit :: Suit(v);
 	NUT);
 		$this->assertEquals("Suit.Spades", $result);
@@ -32,6 +33,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 	public function testEnumKnownValueStringSubsetMissingValue(): void {
 		$result = $this->executeCodeSnippet("getSuit('Spades');", <<<NUT
 		Suit := (Spades, Hearts, Diamonds, Clubs);
+	NUT, <<<NUT
 		getSuit = ^v: String['Spades', 'Hearts', 'Diamonds', 'Clubs', 'Aces'] => Result<Suit, UnknownEnumerationValue> :: Suit(v);
 	NUT);
 		$this->assertEquals("Suit.Spades", $result);
@@ -40,6 +42,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 	public function testEnumKnownValueStringGeneral(): void {
 		$result = $this->executeCodeSnippet("getSuit('Spades');", <<<NUT
 		Suit := (Spades, Hearts, Diamonds, Clubs);
+	NUT, <<<NUT
 		getSuit = ^v: String => Result<Suit, UnknownEnumerationValue> :: Suit(v);
 	NUT);
 		$this->assertEquals("Suit.Spades", $result);
@@ -48,6 +51,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 	public function testEnumKnownValueStringGeneralWrongValue(): void {
 		$result = $this->executeCodeSnippet("getSuit('King');", <<<NUT
 		Suit := (Spades, Hearts, Diamonds, Clubs);
+	NUT, <<<NUT
 		getSuit = ^v: String => Result<Suit, UnknownEnumerationValue> :: Suit(v);
 	NUT);
 		$this->assertEquals("@UnknownEnumerationValue![enumeration: type{Suit}, value: 'King']", $result);
@@ -112,6 +116,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 	public function testDataOk(): void {
 		$result = $this->executeCodeSnippet("[A![a: 1, b: 'hi'], getA[a: 1, b: 'hi']];", <<<NUT
 		A := [a: Integer, b: String];
+	NUT, <<<NUT
 		getA = ^p: [a: Integer, b: String] => A :: A!p;
 	NUT);
 		$this->assertEquals("[A![a: 1, b: 'hi'], A![a: 1, b: 'hi']]", $result);
@@ -136,6 +141,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 	public function testOpenWithoutConstructorCallOk(): void {
 		$result = $this->executeCodeSnippet("[A[a: 1, b: 'hi'], getA[a: 1, b: 'hi']];", <<<NUT
 		A := #[a: Integer, b: String];
+	NUT, <<<NUT
 		getA = ^p: [a: Integer, b: String] => A :: A(p);
 	NUT);
 		$this->assertEquals("[A[a: 1, b: 'hi'], A[a: 1, b: 'hi']]", $result);
@@ -153,6 +159,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 	public function testOpenWithInvariantConstructorCallOk(): void {
 		$result = $this->executeCodeSnippet("[A[a: 1, b: 'hi'], getA[a: 1, b: 'hi']];", <<<NUT
 		A := #[a: Integer, b: String] @ Any :: null;
+	NUT, <<<NUT
 		getA = ^p: [a: Integer, b: String] => Result<A, Any> :: A(p);
 	NUT);
 		$this->assertEquals("[A[a: 1, b: 'hi'], A[a: 1, b: 'hi']]", $result);
@@ -164,6 +171,8 @@ final class ConstructTest extends CodeExecutionTestHelper {
 			"[A[a: 1, b: 'hi'], getA[a: 1, b: 'hi']];",
 		<<<NUT
 			A := #[a: Integer, b: String] @ Any :: null;
+		NUT,
+		<<<NUT
 			getA = ^p: [a: Integer, b: String] => A :: A(p);
 		NUT);
 	}
@@ -188,6 +197,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("[A[f: 'hi', e: 1], getA[f: 'hi', e: 1]];", <<<NUT
 		A := #[a: Integer, b: String];
 		A[f: String, e: Real] :: [a: #e->asInteger, b: #f];
+	NUT, <<<NUT
 		getA = ^p: [f: String, e: Real] => A :: A(p);
 	NUT);
 		$this->assertEquals("[A[a: 1, b: 'hi'], A[a: 1, b: 'hi']]", $result);
@@ -197,6 +207,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("[A[f: 'hi', e: 1], getA[f: 'hi', e: 1]];", <<<NUT
 		A := #[a: Integer, b: String];
 		A[f: String, e: Real] @ Any :: @'error';
+	NUT, <<<NUT
 		getA = ^p: [f: String, e: Real] => Result<A, Any> :: A(p);
 	NUT);
 		$this->assertEquals("[@'error', @'error']", $result);
@@ -219,6 +230,8 @@ final class ConstructTest extends CodeExecutionTestHelper {
 		<<<NUT
 			A := #[a: Integer, b: String];
 			A[f: String, e: Real] @ Any :: @'error';
+		NUT,
+		<<<NUT
 			getA = ^p: [f: String, e: Real] => A :: A(p);
 		NUT);
 	}
@@ -261,6 +274,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("[A[f: 'hi', e: 1], getA[f: 'hi', e: 1]];", <<<NUT
 		A := #[a: Integer, b: String] @ String['error 1'] :: @'error 1';
 		A[f: String, e: Real] @ String['error 2'] :: @'error 2';
+	NUT, <<<NUT
 		getA = ^p: [f: String, e: Real] => Result<A, String['error 1', 'error 2']> :: A(p);
 	NUT);
 		$this->assertEquals("[@'error 2', @'error 2']", $result);
@@ -273,6 +287,8 @@ final class ConstructTest extends CodeExecutionTestHelper {
 		<<<NUT
 			A := #[a: Integer, b: String] @ String['error 1'] :: @'error 1';
 			A[f: String, e: Real] @ String['error 2'] :: @'error 2';
+		NUT,
+		<<<NUT
 			getA = ^p: [f: String, e: Real] => A :: A(p);
 		NUT);
 	}

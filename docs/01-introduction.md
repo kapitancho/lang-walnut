@@ -100,12 +100,12 @@ with template-like syntax for generating HTML or other content.
 ```
 
 ### Entry Points
-The language can be used in both CLI and HTTP environments. In the CLI environment, the entry point is the 
-`main` function. In the HTTP environment, the entry point is the `handleHttpRequest` function.
+The language can be used in both CLI and HTTP environments. In the CLI environment, the entry point is easily defined
+using `>>>`. In the HTTP environment, the entry point is the `handleHttpRequest` function.
 
 ```walnut
 module hello-world:
-main = ^Array<String> => String :: 'Hello, World!';
+>>> 'Hello, World!';
 ```
 Additionally, there is an interface allowing calls to any global function. 
 

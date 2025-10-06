@@ -22,7 +22,7 @@ final readonly class Program implements ProgramInterface {
 	) {}
 
 	/** @throws InvalidEntryPointDependency */
-	public function getEntryPointDependency(TypeNameIdentifier $typeName): ProgramEntryPoint {
+	public function getEntryPoint(TypeNameIdentifier $typeName): ProgramEntryPoint {
 		try {
 			$value = $this->programRegistry->dependencyContainer->valueByType(
 				$this->programRegistry->typeRegistry->typeByName($typeName)
@@ -46,43 +46,4 @@ final readonly class Program implements ProgramInterface {
 		}
 	}
 
-	/** @throws InvalidEntryPoint */
-	public function getEntryPoint(
-		VariableNameIdentifier $functionName,
-		Type $expectedParameterType,
-		Type $expectedReturnType
-	): ProgramEntryPoint {
-		$typedValue = $this->programRegistry->globalScope->findTypedValueOf($functionName);
-
-		if($typedValue === UnknownVariable::value) {
-			InvalidEntryPoint::becauseFunctionIsNotDefined(
-				$functionName, $expectedParameterType, $expectedReturnType
-			);
-		}
-		$type = $typedValue->type;
-		$value = $typedValue;
-		if (!($type instanceof FunctionType) || !($value instanceof FunctionValue)) {
-			InvalidEntryPoint::becauseValueIsNotAFunction(
-				$functionName, $expectedParameterType, $expectedReturnType
-			);
-		}
-		if (!$expectedParameterType->isSubtypeOf($type->parameterType)) {
-			InvalidEntryPoint::becauseWrongParameterType(
-				$functionName,
-				$expectedParameterType,
-				$expectedReturnType,
-				$type->parameterType
-			);
-		}
-		if (!$type->returnType->isSubtypeOf($expectedReturnType)) {
-			InvalidEntryPoint::becauseWrongReturnType(
-				$functionName, $expectedParameterType, $expectedReturnType
-			);
-		}
-		return new ProgramEntryPoint(
-			$this->programRegistry,
-			$this->programRegistry->globalScope,
-			$value->withVariableValueScope($this->programRegistry->globalScope)
-		);
-	}
 }

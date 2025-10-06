@@ -4,6 +4,7 @@ namespace Walnut\Lang\Test;
 
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder;
@@ -15,6 +16,7 @@ use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Program\ProgramContextFactory;
 use Walnut\Lang\Implementation\Program\Type\UnionTypeNormalizer;
 use Walnut\Lang\Implementation\Type\UnionType;
@@ -55,6 +57,16 @@ abstract class BaseProgramTestHelper extends TestCase {
 	}
 
 	protected function addCoreToContext(): void {
+		$this->typeRegistryBuilder->addAlias(
+			new TypeNameIdentifier('CliEntryPoint'),
+			$this->typeRegistry->function(
+				$this->typeRegistry->array(
+					$this->typeRegistry->string()
+				),
+				$this->typeRegistry->string()
+			)
+		);
+
 		foreach(['NotANumber', 'MinusInfinity', 'PlusInfinity', 'DependencyContainer', 'Constructor'] as $atomType) {
 			$this->typeRegistry->addAtom(
 				new TypeNameIdentifier($atomType)
@@ -379,4 +391,20 @@ abstract class BaseProgramTestHelper extends TestCase {
 		);
 	}
 	*/
+
+
+	protected function addCliEntryPoint(Value $value): void {
+		$this->programContext->customMethodRegistryBuilder->addMethod(
+			$this->typeRegistry->typeByName(new TypeNameIdentifier('DependencyContainer')),
+			new MethodNameIdentifier('asCliEntryPoint'),
+			$this->typeRegistry->null,
+			null,
+			$this->typeRegistry->nothing,
+			$this->typeRegistry->typeByName(new TypeNameIdentifier('CliEntryPoint')),
+			$this->expressionRegistry->functionBody(
+				$this->expressionRegistry->constant($value)
+			),
+		);
+	}
+
 }

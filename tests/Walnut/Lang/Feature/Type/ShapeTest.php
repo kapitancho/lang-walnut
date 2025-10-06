@@ -15,6 +15,7 @@ final class ShapeTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("useIntPair(getIntPair(IntPairType![first: 1, second: 5]));", <<<NUT
 			IntPairType := [first: Integer, second: Integer];
 			IntPair = [first: Integer, second: Integer];
+		NUT, <<<NUT
 			getIntPair = ^p: IntPairType => Shape<IntPair> :: p;
 			useIntPair = ^p: Shape<IntPair> => Integer :: p->shape(`IntPair).first + p->shape(`IntPair).second;
 		NUT);
@@ -25,6 +26,7 @@ final class ShapeTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("useIntPair(getIntPair(IntPairType![first: 1, second: 5]));", <<<NUT
 			IntPairType := [first: Integer, second: Integer];
 			IntPair = [first: Integer, second: Integer];
+		NUT, <<<NUT
 			getIntPair = ^p: IntPairType => Shape<IntPair> :: p->shape(`IntPair);
 			useIntPair = ^p: Shape<IntPair> => Integer :: p->shape(`IntPair).first + p->shape(`IntPair).second;
 		NUT);
@@ -35,6 +37,7 @@ final class ShapeTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("useIntPair(IntPairType![first: 1, second: 5]);", <<<NUT
 			IntPairType := [first: Integer, second: Integer];
 			IntPair = [first: Integer, second: Integer];
+		NUT, <<<NUT
 			useIntPair = ^p: IntPairType => Integer :: p->shape(`IntPair).first + p->shape(`IntPair).second;
 		NUT);
 		$this->assertEquals("6", $result);
@@ -46,6 +49,7 @@ final class ShapeTest extends CodeExecutionTestHelper {
 			"useIntPair(IntPairType[1, 5]);", <<<NUT
 			IntPairType := #[first: Integer, second: Integer];
 			IntPair = [first: Integer, second: Integer];
+		NUT, <<<NUT
 			useIntPair = ^p: IntPairType => Integer :: p->shape(`IntPair).first + p->shape(`IntPair).second;
 		NUT);
 	}
@@ -55,6 +59,7 @@ final class ShapeTest extends CodeExecutionTestHelper {
 			IntPairType := [a: Integer, b: Integer];
 			IntPair = [first: Integer, second: Integer];
 			IntPairType ==> IntPair :: [first: \$a, second: \$b];
+		NUT, <<<NUT
 			getIntPair = ^p: IntPairType => Shape<IntPair> :: p;
 			useIntPair = ^p: Shape<IntPair> => Integer :: p->shape(`IntPair).first + p->shape(`IntPair).second;
 		NUT);
@@ -66,6 +71,7 @@ final class ShapeTest extends CodeExecutionTestHelper {
 			IntPairType := [a: Integer, b: Integer];
 			IntPair = [first: Integer, second: Integer];
 			IntPairType ==> IntPair :: [first: \$a, second: \$b];
+		NUT, <<<NUT
 			useIntPair = ^p: IntPairType => Integer :: p->shape(`IntPair).first + p->shape(`IntPair).second;
 		NUT);
 		$this->assertEquals("6", $result);
@@ -78,6 +84,7 @@ final class ShapeTest extends CodeExecutionTestHelper {
 			IntPair = [first: Integer, second: Integer];
 			Incompatible := ();
 			IntPairType ==> IntPair :: [first: \$a, second: \$b];
+		NUT, <<<NUT
 			getIntPair = ^p: IntPairType => Result<Shape<IntPair>, Incompatible> :: p=>as(`IntPair);
 			useIntPair = ^p: Shape<IntPair> => Integer :: p->shape(`IntPair).first + p->shape(`IntPair).second;
 		NUT);
@@ -94,6 +101,8 @@ final class ShapeTest extends CodeExecutionTestHelper {
 			IntPair = [first: Integer, second: Integer];
 			Incompatible := ();
 			IntPairType ==> IntPair @ Incompatible :: [first: \$a, second: \$b];
+		NUT,
+		<<<NUT
 			getIntPair = ^p: IntPairType => Shape<IntPair> :: p;
 			useIntPair = ^p: Shape<IntPair> => Integer :: p->shape.first + p->shape.second;
 		NUT);
@@ -109,6 +118,8 @@ final class ShapeTest extends CodeExecutionTestHelper {
 			IntPair = [first: Integer, second: Integer];
 			Incompatible := ();
 			IntPairType ==> IntPair @ Incompatible :: [first: \$a, second: \$b];
+		NUT,
+		<<<NUT
 			getIntPair = ^p: IntPairType => Shape<IntPair> :: p->shape(`IntPair);
 			useIntPair = ^p: Shape<IntPair> => Integer :: p->shape(`IntPair).first + p->shape(`IntPair).second;
 		NUT);

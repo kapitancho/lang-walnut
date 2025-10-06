@@ -26,7 +26,7 @@ final class BinaryDivideTest extends CodeExecutionTestHelper {
 	}
 
 	public function testBinaryDivideReturnTypeOk(): void {
-		$result = $this->executeCodeSnippet("div[3.6, 1.5];", <<<NUT
+		$result = $this->executeCodeSnippet("div[3.6, 1.5];", valueDeclarations: <<<NUT
 			div = ^[a: Real, b: Real<(..0), (0..)>] => Real :: #a / #b;
 		NUT);
 		$this->assertEquals("2.4", $result);

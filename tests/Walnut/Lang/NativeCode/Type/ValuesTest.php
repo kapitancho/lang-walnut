@@ -12,7 +12,11 @@ final class ValuesTest extends CodeExecutionTestHelper {
 	}
 
 	public function testValuesEnumerationMetaType(): void {
-		$result = $this->executeCodeSnippet("getValues(type{MyEnumeration});", "MyEnumeration := (A, B); getValues = ^Type<Enumeration> => Array<1..> :: #->values;");
+		$result = $this->executeCodeSnippet(
+			"getValues(type{MyEnumeration});",
+			"MyEnumeration := (A, B);",
+			"getValues = ^Type<Enumeration> => Array<1..> :: #->values;"
+		);
 		$this->assertEquals("[MyEnumeration.A, MyEnumeration.B]", $result);
 	}
 
@@ -22,7 +26,10 @@ final class ValuesTest extends CodeExecutionTestHelper {
 	}
 
 	public function testValuesEnumerationSubsetMetaType(): void {
-		$result = $this->executeCodeSnippet("getValues(type{MyEnumeration[A, C]});", "MyEnumeration := (A, B, C); getValues = ^Type<EnumerationSubset> => Array<1..> :: #->values;");
+		$result = $this->executeCodeSnippet(
+			"getValues(type{MyEnumeration[A, C]});",
+			"MyEnumeration := (A, B, C);",
+			"getValues = ^Type<EnumerationSubset> => Array<1..> :: #->values;");
 		$this->assertEquals("[MyEnumeration.A, MyEnumeration.C]", $result);
 	}
 
@@ -32,7 +39,10 @@ final class ValuesTest extends CodeExecutionTestHelper {
 	}
 
 	public function testValuesStringSubsetMetaType(): void {
-		$result = $this->executeCodeSnippet("getValues(type{String['A', 'C']});", "getValues = ^Type<StringSubset> => Array<String, 1..> :: #->values;");
+		$result = $this->executeCodeSnippet(
+			"getValues(type{String['A', 'C']});",
+			valueDeclarations: "getValues = ^Type<StringSubset> => Array<String, 1..> :: #->values;",
+		);
 		$this->assertEquals("['A', 'C']", $result);
 	}
 
@@ -42,7 +52,7 @@ final class ValuesTest extends CodeExecutionTestHelper {
 	}
 
 	public function testValuesRealSubsetMetaType(): void {
-		$result = $this->executeCodeSnippet("getValues(type{Real[3.14, -2]});", "getValues = ^Type<RealSubset> => Array<Real, 1..> :: #->values;");
+		$result = $this->executeCodeSnippet("getValues(type{Real[3.14, -2]});", valueDeclarations: "getValues = ^Type<RealSubset> => Array<Real, 1..> :: #->values;");
 		$this->assertEquals("[3.14, -2]", $result);
 	}
 
@@ -52,7 +62,7 @@ final class ValuesTest extends CodeExecutionTestHelper {
 	}
 
 	public function testValuesIntegerSubsetMetaType(): void {
-		$result = $this->executeCodeSnippet("getValues(type{Integer[42, -2]});", "getValues = ^Type<IntegerSubset> => Array<Integer, 1..> :: #->values;");
+		$result = $this->executeCodeSnippet("getValues(type{Integer[42, -2]});", valueDeclarations: "getValues = ^Type<IntegerSubset> => Array<Integer, 1..> :: #->values;");
 		$this->assertEquals("[42, -2]", $result);
 	}
 

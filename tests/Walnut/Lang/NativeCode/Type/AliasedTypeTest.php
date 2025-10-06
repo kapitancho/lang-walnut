@@ -12,7 +12,11 @@ final class AliasedTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testAliasedTypeMetaType(): void {
-		$result = $this->executeCodeSnippet("getAliasedType(type{MyAliasedType});", "MyAliasedType = String; getAliasedType = ^Type<Alias> => Type :: #->aliasedType;");
+		$result = $this->executeCodeSnippet(
+			"getAliasedType(type{MyAliasedType});",
+			"MyAliasedType = String;",
+			"getAliasedType = ^Type<Alias> => Type :: #->aliasedType;",
+		);
 		$this->assertEquals("type{String}", $result);
 	}
 

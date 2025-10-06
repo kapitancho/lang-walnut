@@ -15,7 +15,7 @@ final class NoErrorExpressionTest extends CodeExecutionTestHelper {
 		$declaration = <<<NUT
 			noError = ^Result<String, Boolean> => Result<Integer, Boolean> :: {?noError(#)}->length;
 		NUT;
-		$result = $this->executeCodeSnippet("noError('ok');", $declaration);
+		$result = $this->executeCodeSnippet("noError('ok');", valueDeclarations: $declaration);
 		$this->assertEquals("2", $result);
 	}
 
@@ -24,7 +24,7 @@ final class NoErrorExpressionTest extends CodeExecutionTestHelper {
 			noError = ^Result<String, Boolean> => Result<Integer, Boolean> :: {?noError(#)}->length;
 		NUT;
 
-		$result = $this->executeCodeSnippet("noError(@false);", $declaration);
+		$result = $this->executeCodeSnippet("noError(@false);", valueDeclarations: $declaration);
 		$this->assertEquals("@false", $result);
 	}
 }

@@ -65,10 +65,10 @@ final class CompilerTest extends TestCase {
 		$l->method('sourceOf')->willReturnCallback(fn(string $source) => match($source) {
 			'main' => <<<NUT
 				module main %% template, tpl:
-				myFn = ^Null => Result<String, Any> %% [~TemplateRenderer] :: {
-				    %templateRenderer => render(NotANumber)
-				};
 				>>> {
+					myFn = ^Null => Result<String, Any> %% [~TemplateRenderer] :: {
+					    %templateRenderer => render(NotANumber)
+					};
 				    x = myFn();
 				    ?whenTypeOf(x) is {
 				        `String: x,
@@ -170,7 +170,7 @@ final class CompilerTest extends TestCase {
 				$program = $compilationResult->program;
 				$tr = $compilationResult->programContext->typeRegistry;
 				$vr = $compilationResult->programContext->valueRegistry;
-				$ep = $program->getEntryPointDependency(new TypeNameIdentifier('CliEntryPoint'));
+				$ep = $program->getEntryPoint(new TypeNameIdentifier('CliEntryPoint'));
 				/*$ep = $program->getEntryPoint(
 					new VariableNameIdentifier('main'),
 					$tr->array($tr->string()),

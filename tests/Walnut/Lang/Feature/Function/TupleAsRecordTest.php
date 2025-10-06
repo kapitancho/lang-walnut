@@ -7,7 +7,7 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 final class TupleAsRecordTest  extends CodeExecutionTestHelper {
 
 	public function testGlobalFunctionCall(): void {
-		$result = $this->executeCodeSnippet("fn[1, 3.14, 'hi'];", <<<NUT
+		$result = $this->executeCodeSnippet("fn[1, 3.14, 'hi'];", valueDeclarations: <<<NUT
 		fn = ^[a: Integer, b: Real, c: String] => Real :: #a + #b + {#c->length};
 	NUT);
 		$this->assertEquals("6.14", $result);

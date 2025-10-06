@@ -18,13 +18,13 @@ final class WithItemTypesTest extends CodeExecutionTestHelper {
 
 	public function testWithItemTypesMetaTypeTuple(): void {
 		$result = $this->executeCodeSnippet("getWithItemTypes(type{[Integer, Real, ...String]});",
-			"getWithItemTypes = ^Type<Tuple> => Type<Tuple> :: #->withItemTypes[type{Integer}, type{Boolean}];");
+			valueDeclarations: "getWithItemTypes = ^Type<Tuple> => Type<Tuple> :: #->withItemTypes[type{Integer}, type{Boolean}];");
 		$this->assertEquals("type[Integer, Boolean, ... String]", $result);
 	}
 
 	public function testWithItemTypesMetaTypeRecord(): void {
 		$result = $this->executeCodeSnippet("getWithItemTypes(type{[a: Integer, b: Real, ...String]});",
-			"getWithItemTypes = ^Type<Record> => Type<Record> :: #->withItemTypes[a: type{Integer}, b: type{Boolean}];");
+			valueDeclarations: "getWithItemTypes = ^Type<Record> => Type<Record> :: #->withItemTypes[a: type{Integer}, b: type{Boolean}];");
 		$this->assertEquals("type[a: Integer, b: Boolean, ... String]", $result);
 	}
 

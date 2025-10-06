@@ -12,7 +12,8 @@ final class ReturnTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testReturnTypeResultMetaType(): void {
-		$result = $this->executeCodeSnippet("getReturnType(type{Result<String, Real>});", "getReturnType = ^Type<Result> => Type :: #->returnType;");
+		$result = $this->executeCodeSnippet("getReturnType(type{Result<String, Real>});",
+			valueDeclarations: "getReturnType = ^Type<Result> => Type :: #->returnType;");
 		$this->assertEquals("type{String}", $result);
 	}
 
@@ -22,7 +23,8 @@ final class ReturnTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testReturnTypeFunctionMetaType(): void {
-		$result = $this->executeCodeSnippet("getReturnType(type{^Real => String});", "getReturnType = ^Type<Function> => Type :: #->returnType;");
+		$result = $this->executeCodeSnippet("getReturnType(type{^Real => String});",
+			valueDeclarations: "getReturnType = ^Type<Function> => Type :: #->returnType;");
 		$this->assertEquals("type{String}", $result);
 	}
 

@@ -24,6 +24,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		A := #Integer; ==> A :: A(42);
 		B := #String; ==> B :: B('hello');
 		C = [~A, ~B];
+	NUT, <<<NUT
 		f = ^ %% C :: %a->value + {%b->value->length};
 	NUT);
 		$this->assertEquals("47", $result);
@@ -33,6 +34,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("f();", <<<NUT
 		A := #Integer; ==> A :: A(42);
 		B := #String; ==> B :: B('hello');
+	NUT, <<<NUT
 		f = ^ %% [~A, ~B] :: %a->value + {%b->value->length};
 	NUT);
 		$this->assertEquals("47", $result);
@@ -45,6 +47,8 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		<<<NUT
 		A := #Integer; ==> A :: A(42);
 		B := #String; ==> B @ Null :: @null;
+		NUT,
+		<<<NUT
 		f = ^ %% [~A, ~B] :: %a->value + {%b->value->length};
 		NUT);
 	}
@@ -56,6 +60,8 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		<<<NUT
 		A := #Integer; ==> A :: A(42);
 		B := #String;
+		NUT,
+		<<<NUT
 		f = ^ %% [~A, ~B] :: %a->value + {%b->value->length};
 		NUT);
 	}
@@ -64,6 +70,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("f();", <<<NUT
 		A := #Integer; ==> A :: A(42);
 		B := #String; ==> B :: B('hello');
+	NUT, <<<NUT
 		f = ^ %% [A, B] :: %0->value + {%1->value->length};
 	NUT);
 		$this->assertEquals("47", $result);
@@ -76,6 +83,8 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		<<<NUT
 		A := #Integer; ==> A :: A(42);
 		B := #String; ==> B @ Null :: @null;
+		NUT,
+		<<<NUT
 		f = ^ %% [A, B] :: %0->value + {%1->value->length};
 		NUT);
 	}
@@ -87,6 +96,8 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		<<<NUT
 		A := #Integer; ==> A :: A(42);
 		B := #String;
+		NUT,
+		<<<NUT
 		f = ^ %% [A, B] :: %0->value + {%1->value->length};
 		NUT);
 	}
@@ -95,6 +106,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("f();", <<<NUT
 		A := Integer; ==> A :: A!42;
 		B := A;
+		NUT, <<<NUT
 		f = ^ %% B :: %;
 		NUT);
 		$this->assertEquals("B!A!42", $result);
@@ -107,6 +119,8 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		<<<NUT
 		A := Integer; ==> A :: A!42;
 		B := #A @ Null :: => @null;
+		NUT,
+		<<<NUT
 		f = ^ %% B :: %;
 		NUT);
 	}
@@ -115,6 +129,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("f();", <<<NUT
 		A := #Integer; ==> A :: A(42);
 		B := #A;
+		NUT, <<<NUT
 		f = ^ %% B :: %;
 		NUT);
 		$this->assertEquals("B{A{42}}", $result);
@@ -127,6 +142,8 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		<<<NUT
 		A := #Integer; ==> A :: A(42);
 		B := #A @ Null :: => @null;
+		NUT,
+		<<<NUT
 		f = ^ %% B :: %;
 		NUT);
 	}
@@ -136,6 +153,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		A := #Integer; ==> A :: A(42);
 		B := #Integer;
 		B(v: A) :: v->value;
+		NUT, <<<NUT
 		f = ^ %% B :: %;
 		NUT);
 		$this->assertEquals("B{42}", $result);
@@ -149,6 +167,8 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		A := #Integer; ==> A :: A(42);
 		B := #Integer;
 		B(v: A) @ Null :: @null;
+		NUT,
+		<<<NUT
 		f = ^ %% B :: %;
 		NUT);
 	}
@@ -157,6 +177,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("f();", <<<NUT
 		A := \$Integer; ==> A :: A(42);
 		B := \$A;
+	NUT, <<<NUT
 		f = ^ %% B :: %;
 	NUT);
 		$this->assertEquals("B{A{42}}", $result);
@@ -169,6 +190,8 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		<<<NUT
 		A := \$Integer; ==> A :: A(42);
 		B := \$A @ Null :: => @null;
+		NUT,
+		<<<NUT
 		f = ^ %% B :: %;
 		NUT);
 	}
@@ -179,6 +202,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		A->value(=> Integer) :: $$;
 		B := \$Integer;
 		B(v: A) :: v->value;
+		NUT, <<<NUT
 		f = ^ %% B :: %;
 		NUT);
 		$this->assertEquals("B{42}", $result);
@@ -193,6 +217,8 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		A->value(=> Integer) :: $$;
 		B := \$Integer;
 		B(v: A) @ Null :: @null;
+		NUT,
+		<<<NUT
 		f = ^ %% B :: %;
 		NUT);
 	}

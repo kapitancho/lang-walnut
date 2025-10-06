@@ -13,7 +13,8 @@ final class EnumerationTest extends CodeExecutionTestHelper {
 
 	public function testEnumerationMetaTypeValue(): void {
 		$result = $this->executeCodeSnippet("getEnumeration(MyEnum.A);",
-			"MyEnum := (A, B, C); getEnumeration = ^EnumerationValue => Type<Enumeration> :: #->enumeration;");
+			"MyEnum := (A, B, C);",
+				"getEnumeration = ^EnumerationValue => Type<Enumeration> :: #->enumeration;");
 		$this->assertEquals("type{MyEnum}", $result);
 	}
 

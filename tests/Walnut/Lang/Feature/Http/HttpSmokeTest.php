@@ -15,7 +15,7 @@ final class HttpSmokeTest extends CodeExecutionTestHelper {
 			"{%httpResponseBuilder(200)->withHeader[
 				headerName: 'Content-Type',
 				values: ['application/json']
-			]}->withBody(request.body->asString->reverse);",
+			]}->withBody(request->shape(`HttpRequest).body->asString->reverse);",
 			<<<NUT
 				Type1 = (Integer|String)&Boolean;
 			NUT,

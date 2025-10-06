@@ -74,7 +74,8 @@ final class AsStringTest extends CodeExecutionTestHelper {
 
 	public function testAsStringAlias(): void {
 		$result = $this->executeCodeSnippet("getReal()->asString;",
-			"MyAlias = Real; getReal = ^ => MyAlias :: 3.14;");
+			"MyAlias = Real;",
+			"getReal = ^ => MyAlias :: 3.14;");
 		$this->assertEquals("'3.14'", $result);
 	}
 
@@ -85,7 +86,7 @@ final class AsStringTest extends CodeExecutionTestHelper {
 
 	public function testAsStringShape(): void {
 		$result = $this->executeCodeSnippet("getReal()->shape(`Real)->asString;",
-			"getReal = ^ => Shape<Real> :: 3.14;");
+			valueDeclarations: "getReal = ^ => Shape<Real> :: 3.14;");
 		$this->assertEquals("'3.14'", $result);
 	}
 

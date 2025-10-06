@@ -43,6 +43,10 @@ final readonly class ConstantExpression implements ConstantExpressionInterface, 
 					);
 				}
 			}
+			$functionErrors = $this->value->function->analyseDependencyType($dependencyContainer);
+			if (count($functionErrors) > 0) {
+				$analyseErrors = array_merge($analyseErrors, $functionErrors);
+			}
 		}
 		return $analyseErrors;
 	}

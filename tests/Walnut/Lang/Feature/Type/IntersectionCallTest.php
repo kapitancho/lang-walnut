@@ -13,6 +13,8 @@ final class IntersectionCallTest extends CodeExecutionTestHelper {
 				A = Map<Real, 1..5>;
 				B = Map<Integer, 3..7>;
 				C = A&B;
+			NUT,
+			<<<NUT
 				ab = ^val: C => Array :: val->values;
 			NUT
 		);
@@ -29,6 +31,8 @@ final class IntersectionCallTest extends CodeExecutionTestHelper {
 				B = [a: Integer, c: Real, ...];
 				B->myMethod(=> String) :: 'hello';
 				C = A&B;
+			NUT,
+			<<<NUT
 				ab = ^val: C => String :: val->myMethod;
 			NUT
 		);

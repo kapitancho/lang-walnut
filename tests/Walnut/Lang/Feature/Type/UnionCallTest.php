@@ -14,6 +14,8 @@ final class UnionCallTest extends CodeExecutionTestHelper {
 				A->methodCall(=> Integer) :: $$ + 1;
 				B := #String;
 				B->methodCall(=> String) :: $$->reverse;
+			NUT,
+			<<<NUT
 				ab = ^ val: A|B => Integer|String :: val->methodCall;
 			NUT
 		);
@@ -42,6 +44,8 @@ final class UnionCallTest extends CodeExecutionTestHelper {
 				A->methodCall(^p: Real => Real) :: $$ + p;
 				B := #String;
 				B->methodCall(^p: Integer => String) :: $$->reverse + {p->asString};
+			NUT,
+			<<<NUT
 				ab = ^ val: A|B => Real|String :: val->methodCall(2);
 			NUT
 		);
@@ -54,6 +58,8 @@ final class UnionCallTest extends CodeExecutionTestHelper {
 			<<<NUT
 				A := #[a: Integer, b: String];
 				B := #[a: String, c: Real];
+			NUT,
+			<<<NUT
 				ab = ^ val: A|B => Integer|String :: val.a;
 			NUT
 		);
@@ -78,6 +84,8 @@ final class UnionCallTest extends CodeExecutionTestHelper {
 			<<<NUT
 				A := #[a: Integer, b: String];
 				B := #[a: String, c: Real];
+			NUT,
+			<<<NUT
 				ab = ^ val: A|B => Result<String, MapItemNotFound> :: val.b;
 			NUT
 		);
@@ -90,6 +98,8 @@ final class UnionCallTest extends CodeExecutionTestHelper {
 			<<<NUT
 				A := #[a: Integer, b: String];
 				B := #[a: String, c: Real, ... Boolean];
+			NUT,
+			<<<NUT
 				ab = ^ val: A|B => Result<String|Boolean, MapItemNotFound> :: val.b;
 			NUT
 		);
@@ -135,6 +145,8 @@ final class UnionCallTest extends CodeExecutionTestHelper {
 			<<<NUT
 				A := #[a: Integer, b: String];
 				B := #[b: Real, c: String];
+			NUT,
+			<<<NUT
 				fn = ^[p: A|B, v: String['a', 'b']] => Result<(String|Real), MapItemNotFound> :: #p->item(#v);
 			NUT
 		);

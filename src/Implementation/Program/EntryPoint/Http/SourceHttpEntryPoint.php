@@ -21,10 +21,13 @@ final readonly class SourceHttpEntryPoint implements SourceHttpEntryPointInterfa
 			->mapFromRequest($httpRequest);
 		$tr = $this->entryPointProvider->typeRegistry;
 		$ep = $this->entryPointProvider->program->getEntryPoint(
+			new TypeNameIdentifier('HttpRequestHandler')
+		);
+		/*$ep = $this->entryPointProvider->program->getEntryPoint(
 			new VariableNameIdentifier('handleHttpRequest'),
 			$tr->withName(new TypeNameIdentifier('HttpRequest')),
 			$tr->withName(new TypeNameIdentifier('HttpResponse')),
-		);
+		);*/
 		$returnValue = $ep->call($requestValue);
 		return new ToResponseMapper()->mapToResponse($returnValue);
 	}

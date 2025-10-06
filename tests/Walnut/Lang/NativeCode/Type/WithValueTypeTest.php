@@ -13,7 +13,7 @@ final class WithValueTypeTest extends CodeExecutionTestHelper {
 
 	public function testWithValueTypeMutableMetaType(): void {
 		$result = $this->executeCodeSnippet("getWithValueType(type{Mutable<String>});",
-			"getWithValueType = ^Type<MutableValue> => Type<MutableValue> :: #->withValueType(type{Integer});");
+			valueDeclarations: "getWithValueType = ^Type<MutableValue> => Type<MutableValue> :: #->withValueType(type{Integer});");
 		$this->assertEquals("type{Mutable<Integer>}", $result);
 	}
 

@@ -13,7 +13,7 @@ final class WithParameterTypeTest extends CodeExecutionTestHelper {
 
 	public function testWithParameterTypeMetaType(): void {
 		$result = $this->executeCodeSnippet("getWithParameterType(type{^String => Real});",
-			"getWithParameterType = ^Type<Function> => Type<^Integer => Any> :: #->withParameterType(type{Integer});");
+			valueDeclarations: "getWithParameterType = ^Type<Function> => Type<^Integer => Any> :: #->withParameterType(type{Integer});");
 		$this->assertEquals("type{^Integer => Real}", $result);
 	}
 

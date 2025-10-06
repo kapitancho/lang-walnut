@@ -12,7 +12,7 @@ final class CodeExecutionTest extends CodeExecutionTestHelper {
 	}
 
 	public function testCodeExecutionContextOk(): void {
-		$result = $this->executeCodeSnippet('{#=>item(0)=>asInteger} + getConst();', 'getConst = ^Any => Integer :: 7;', [5]);
+		$result = $this->executeCodeSnippet('{#=>item(0)=>asInteger} + getConst();', valueDeclarations: 'getConst = ^Any => Integer :: 7;', parameters: [5]);
 		$this->assertEquals('12', $result);
 	}
 

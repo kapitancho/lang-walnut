@@ -17,12 +17,20 @@ final class ValueWithNameTest extends CodeExecutionTestHelper {
 	}
 
 	public function testValueWithNameEnumerationMetaType(): void {
-		$result = $this->executeCodeSnippet("getValueWithName(type{MyEnumeration});", "MyEnumeration := (A, B); getValueWithName = ^Type<Enumeration> => Result<Any, UnknownEnumerationValue> :: #->valueWithName('A');");
+		$result = $this->executeCodeSnippet(
+			"getValueWithName(type{MyEnumeration});",
+			"MyEnumeration := (A, B);",
+			"getValueWithName = ^Type<Enumeration> => Result<Any, UnknownEnumerationValue> :: #->valueWithName('A');"
+		);
 		$this->assertEquals("MyEnumeration.A", $result);
 	}
 
 	public function testValueWithNameEnumerationMetaTypeUnknown(): void {
-		$result = $this->executeCodeSnippet("getValueWithName(type{MyEnumeration});", "MyEnumeration := (A, B); getValueWithName = ^Type<Enumeration> => Result<Any, UnknownEnumerationValue> :: #->valueWithName('Q');");
+		$result = $this->executeCodeSnippet(
+			"getValueWithName(type{MyEnumeration});",
+			"MyEnumeration := (A, B);",
+			"getValueWithName = ^Type<Enumeration> => Result<Any, UnknownEnumerationValue> :: #->valueWithName('Q');"
+		);
 		$this->assertEquals("@UnknownEnumerationValue![\n\tenumeration: type{MyEnumeration},\n\tvalue: 'Q'\n]", $result);
 	}
 
@@ -37,12 +45,20 @@ final class ValueWithNameTest extends CodeExecutionTestHelper {
 	}
 
 	public function testValueWithNameEnumerationSubsetMetaType(): void {
-		$result = $this->executeCodeSnippet("getValueWithName(type{MyEnumeration[A, C]});", "MyEnumeration := (A, B, C); getValueWithName = ^Type<EnumerationSubset> => Result<Any, UnknownEnumerationValue> :: #->valueWithName('A');");
+		$result = $this->executeCodeSnippet(
+			"getValueWithName(type{MyEnumeration[A, C]});",
+			"MyEnumeration := (A, B, C); ",
+			"getValueWithName = ^Type<EnumerationSubset> => Result<Any, UnknownEnumerationValue> :: #->valueWithName('A');"
+		);
 		$this->assertEquals("MyEnumeration.A", $result);
 	}
 
 	public function testValueWithNameEnumerationSubsetMetaTypeUnknown(): void {
-		$result = $this->executeCodeSnippet("getValueWithName(type{MyEnumeration[A, C]});", "MyEnumeration := (A, B, C); getValueWithName = ^Type<EnumerationSubset> => Result<Any, UnknownEnumerationValue> :: #->valueWithName('B');");
+		$result = $this->executeCodeSnippet(
+			"getValueWithName(type{MyEnumeration[A, C]});",
+			"MyEnumeration := (A, B, C);",
+			"getValueWithName = ^Type<EnumerationSubset> => Result<Any, UnknownEnumerationValue> :: #->valueWithName('B');"
+		);
 		$this->assertEquals("@UnknownEnumerationValue![\n\tenumeration: type{MyEnumeration[A, C]},\n\tvalue: 'B'\n]", $result);
 	}
 

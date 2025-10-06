@@ -20,7 +20,7 @@ final class ItemTest extends CodeExecutionTestHelper {
 	}
 
 	public function testItemNonEmptyIndexOutOfRange(): void {
-		$result = $this->executeCodeSnippet("getItem('r');", "getItem = ^s: String :: [a: 1, b: 2, c: 5, d: 10, e: 5]->item(s);");
+		$result = $this->executeCodeSnippet("getItem('r');", valueDeclarations: "getItem = ^s: String :: [a: 1, b: 2, c: 5, d: 10, e: 5]->item(s);");
 		$this->assertEquals("@MapItemNotFound![key: 'r']", $result);
 	}
 

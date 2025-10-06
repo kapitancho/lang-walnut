@@ -12,14 +12,20 @@ final class EnumerationTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testEnumerationTypeMetaTypeSubset(): void {
-		$result = $this->executeCodeSnippet("getEnumerationType(type{MyEnumerationType[A, C]});",
-			"MyEnumerationType := (A, B, C); getEnumerationType = ^Type<EnumerationSubset> => Type :: #->enumerationType;");
+		$result = $this->executeCodeSnippet(
+			"getEnumerationType(type{MyEnumerationType[A, C]});",
+			"MyEnumerationType := (A, B, C);",
+			"getEnumerationType = ^Type<EnumerationSubset> => Type :: #->enumerationType;"
+		);
 		$this->assertEquals("type{MyEnumerationType}", $result);
 	}
 
 	public function testEnumerationTypeMetaTypeValue(): void {
-		$result = $this->executeCodeSnippet("getEnumerationType(MyEnumerationType.A->type);",
-			"MyEnumerationType := (A, B, C); getEnumerationType = ^Type<EnumerationValue> => Type :: #->enumerationType;");
+		$result = $this->executeCodeSnippet(
+			"getEnumerationType(MyEnumerationType.A->type);",
+			"MyEnumerationType := (A, B, C);",
+			"getEnumerationType = ^Type<EnumerationValue> => Type :: #->enumerationType;"
+		);
 		$this->assertEquals("type{MyEnumerationType}", $result);
 	}
 

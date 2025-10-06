@@ -109,13 +109,13 @@ final class AsBooleanTest extends CodeExecutionTestHelper {
 
 	public function testAsBooleanAliasFalse(): void {
 		$result = $this->executeCodeSnippet("{getMyAlias()}->asBoolean;",
-			"MyAlias = Integer; getMyAlias = ^Any => MyAlias :: 0;");
+			"MyAlias = Integer;", "getMyAlias = ^Any => MyAlias :: 0;");
 		$this->assertEquals("false", $result);
 	}
 
 	public function testAsBooleanAliasTrue(): void {
 		$result = $this->executeCodeSnippet("{getMyAlias()}->asBoolean;",
-			"MyAlias = Integer; getMyAlias = ^Any => MyAlias :: 1;");
+			"MyAlias = Integer;", "getMyAlias = ^Any => MyAlias :: 1;");
 		$this->assertEquals("true", $result);
 	}
 
@@ -136,13 +136,13 @@ final class AsBooleanTest extends CodeExecutionTestHelper {
 
 	public function testAsBooleanShapeFalse(): void {
 		$result = $this->executeCodeSnippet("getReal()->shape(`Real)->asBoolean;",
-			"getReal = ^ => Shape<Real> :: 0;");
+			valueDeclarations: "getReal = ^ => Shape<Real> :: 0;");
 		$this->assertEquals("false", $result);
 	}
 
 	public function testAsBooleanShapeTrue(): void {
 		$result = $this->executeCodeSnippet("getReal()->shape(`Real)->asBoolean;",
-			"getReal = ^ => Shape<Real> :: 3.14;");
+			valueDeclarations: "getReal = ^ => Shape<Real> :: 3.14;");
 		$this->assertEquals("true", $result);
 	}
 

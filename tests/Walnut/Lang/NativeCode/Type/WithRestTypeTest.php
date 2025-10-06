@@ -18,13 +18,13 @@ final class WithRestTypeTest extends CodeExecutionTestHelper {
 
 	public function testWithRestTypeMetaTypeTuple(): void {
 		$result = $this->executeCodeSnippet("getWithRestType(type{[Integer, Real, ...String]});",
-			"getWithRestType = ^Type<Tuple> => Type<Tuple> :: #->withRestType(type{Integer});");
+			valueDeclarations: "getWithRestType = ^Type<Tuple> => Type<Tuple> :: #->withRestType(type{Integer});");
 		$this->assertEquals("type[Integer, Real, ... Integer]", $result);
 	}
 
 	public function testWithRestTypeMetaTypeRecord(): void {
 		$result = $this->executeCodeSnippet("getWithRestType(type{[a: Integer, b: Real, ...String]});",
-			"getWithRestType = ^Type<Record> => Type<Record> :: #->withRestType(type{Integer});");
+			valueDeclarations: "getWithRestType = ^Type<Record> => Type<Record> :: #->withRestType(type{Integer});");
 		$this->assertEquals("type[a: Integer, b: Real, ... Integer]", $result);
 	}
 

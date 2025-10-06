@@ -63,7 +63,7 @@ final class JsonStringifyTest extends CodeExecutionTestHelper {
 
 	public function testJsonStringifyShape(): void {
 		$result = $this->executeCodeSnippet("getReal()->shape(`Real)->jsonStringify;",
-			"getReal = ^ => Shape<Real> :: 3.14;");
+			valueDeclarations: "getReal = ^ => Shape<Real> :: 3.14;");
 		$this->assertEquals("'3.14'", $result);
 	}
 

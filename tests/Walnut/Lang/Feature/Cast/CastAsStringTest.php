@@ -9,6 +9,7 @@ final class CastAsStringTest extends CodeExecutionTestHelper {
 	public function testAsStringWithoutExistingCast(): void {
 		$result = $this->executeCodeSnippet("getStringA(A[42, 'Hello']);", <<<NUT
 		A := #[a: Integer, b: String];
+	NUT, <<<NUT
 		getStringA = ^p: A => Result<String, CastNotAvailable> :: p->as(type{String});
 	NUT);
 		$this->assertEquals("@CastNotAvailable![from: type{A}, to: type{String}]", $result);
@@ -18,6 +19,7 @@ final class CastAsStringTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("getStringA(A[42, 'Hello']);", <<<NUT
 		A := #[a: Integer, b: String];
 		A ==> String :: \$b;
+	NUT, <<<NUT
 		getStringA = ^p: A => String :: p->as(type{String});
 	NUT);
 		$this->assertEquals("'Hello'", $result);

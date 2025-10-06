@@ -13,7 +13,7 @@ final class WithReturnTypeTest extends CodeExecutionTestHelper {
 
 	public function testWithReturnTypeResultMetaType(): void {
 		$result = $this->executeCodeSnippet("getWithReturnType(type{Result<String, Real>});",
-			"getWithReturnType = ^Type<Result> => Type<Result> :: #->withReturnType(type{Boolean});");
+			valueDeclarations: "getWithReturnType = ^Type<Result> => Type<Result> :: #->withReturnType(type{Boolean});");
 		$this->assertEquals("type{Result<Boolean, Real>}", $result);
 	}
 
@@ -24,7 +24,7 @@ final class WithReturnTypeTest extends CodeExecutionTestHelper {
 
 	public function testWithReturnTypeFunctionMetaType(): void {
 		$result = $this->executeCodeSnippet("getWithReturnType(type{^Real => String});",
-			"getWithReturnType = ^Type<Function> => Type<^Nothing => Boolean> :: #->withReturnType(type{Boolean});");
+			valueDeclarations: "getWithReturnType = ^Type<Function> => Type<^Nothing => Boolean> :: #->withReturnType(type{Boolean});");
 		$this->assertEquals("type{^Real => Boolean}", $result);
 	}
 

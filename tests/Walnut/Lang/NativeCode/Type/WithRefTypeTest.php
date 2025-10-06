@@ -13,7 +13,7 @@ final class WithRefTypeTest extends CodeExecutionTestHelper {
 
 	public function testWithRefTypeMetaType(): void {
 		$result = $this->executeCodeSnippet("getWithRefType(type{Type<String>});",
-			"getWithRefType = ^Type<Type> => Type :: #->withRefType(type{Integer});");
+			valueDeclarations: "getWithRefType = ^Type<Type> => Type :: #->withRefType(type{Integer});");
 		$this->assertEquals("type{Type<Integer>}", $result);
 	}
 

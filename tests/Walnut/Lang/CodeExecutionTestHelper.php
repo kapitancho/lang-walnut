@@ -47,7 +47,8 @@ class CodeExecutionTestHelper extends TestCase {
 			->willReturnCallback(fn(string $module) => match($module) {
 				'core/core' => file_get_contents(self::PATH . '/core.nut'),
 				'$http/message' => file_get_contents(self::PATH . '/http/message.nut'),
-				'test' => "module test %% \$http/message: $declarations handleHttpRequest = ^request: HttpRequest => HttpResponse %% [~HttpResponseBuilder] :: { $code };",
+				'$http/request-handler' => file_get_contents(self::PATH . '/http/request-handler.nut'),
+				'test' => "module test %% \$http/request-handler: $declarations ==> HttpRequestHandler :: ^request: {HttpRequest} => {HttpResponse} %% [~HttpResponseBuilder] :: { $code };",
 				default => ''
 			});
 		$programNode = $this->moduleImporter->importModules('test');
@@ -63,11 +64,12 @@ class CodeExecutionTestHelper extends TestCase {
 		)->call($httpRequest);
 	}
 
-	protected function executeCodeSnippet(string $code, string $declarations = '', array $parameters = []): string {
+	protected function executeCodeSnippet(string $code, string $typeDeclarations = '', string $valueDeclarations = '', array $parameters = []): string {
 		$this->moduleLookupContext->method('sourceOf')
 			->willReturnCallback(fn(string $module) => match($module) {
 				'core/core' => file_get_contents(self::PATH . '/core.nut'),
-				'test' => "module test: $declarations myFn = ^Array<String> => Any :: { $code }; >>> myFn(#)->printed;",
+				'test' => "module test: $typeDeclarations >>> { $valueDeclarations myFn = ^Array<String> => Any :: { $code }; myFn(#)->printed; };",
+				//'test' => "module test: $typeDeclarations $valueDeclarations >>> { myFn = ^Array<String> => Any :: { $code }; myFn(#)->printed; };",
 				default => ''
 			});
 		$programNode = $this->moduleImporter->importModules('test');
@@ -103,11 +105,12 @@ class CodeExecutionTestHelper extends TestCase {
 	protected function executeErrorCodeSnippet(
 		string $analyserMessage,
 		string $code,
-		string $declarations = '',
-		array $parameters = []
+		string $typeDeclarations = '',
+		string $valueDeclarations = '',
+		array  $parameters = []
 	): void {
 		try {
-			$this->executeCodeSnippet($code, $declarations, $parameters);
+			$this->executeCodeSnippet($code, $typeDeclarations, $valueDeclarations, $parameters);
 			self::fail('Expected exception not thrown');
 		} catch(AnalyserException $e) {
 			self::assertStringContainsString($analyserMessage, $e->getMessage());

@@ -23,5 +23,5 @@ fibonacciHelper = ^num: NonNegativeInteger => [NonNegativeInteger, NonNegativeIn
     };
 
 fibonacci = ^num: NonNegativeInteger => NonNegativeInteger :: fibonacciHelper(num).0;
-main = ^Array<String> => String :: 0->upTo(10)->map(fibonacci)->printed;
+>>> 0->upTo(10)->map(fibonacci)->printed;
 /* returns: [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89] */```

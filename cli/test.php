@@ -2,12 +2,15 @@
 
 use Walnut\Lang\Blueprint\AST\Parser\ParserException;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
+use Walnut\Lang\Blueprint\Program\EntryPoint\Cli\CliEntryPointBuilder as CliEntryPointBuilderInterface;
+use Walnut\Lang\Implementation\Program\EntryPoint\Cli\CliEntryPointFactory;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $folder = $argv[1] ?? '.';
 
 /** @var string $sourceRoot */
+/** @var CliEntryPointBuilderInterface $epBuilder */
 $epBuilder = (require __DIR__ . '/factory.inc.php')->entryPointBuilder;
 
 $root = $sourceRoot . '/';

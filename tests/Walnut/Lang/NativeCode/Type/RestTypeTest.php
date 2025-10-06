@@ -17,12 +17,14 @@ final class RestTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testRestTypeMetaTypeTuple(): void {
-		$result = $this->executeCodeSnippet("getRestType(type{[Integer, Real, ...String]});", "getRestType = ^Type<Tuple> => Type :: #->restType;");
+		$result = $this->executeCodeSnippet("getRestType(type{[Integer, Real, ...String]});",
+			valueDeclarations: "getRestType = ^Type<Tuple> => Type :: #->restType;");
 		$this->assertEquals("type{String}", $result);
 	}
 
 	public function testRestTypeMetaTypeRecord(): void {
-		$result = $this->executeCodeSnippet("getRestType(type{[a: Integer, b: Real, ...String]});", "getRestType = ^Type<Record> => Type :: #->restType;");
+		$result = $this->executeCodeSnippet("getRestType(type{[a: Integer, b: Real, ...String]});",
+			valueDeclarations: "getRestType = ^Type<Record> => Type :: #->restType;");
 		$this->assertEquals("type{String}", $result);
 	}
 

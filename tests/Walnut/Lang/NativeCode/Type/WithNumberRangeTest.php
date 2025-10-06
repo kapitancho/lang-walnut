@@ -31,7 +31,7 @@ final class WithNumberRangeTest extends CodeExecutionTestHelper {
 
 	public function testWithNumberRangeRealMetaType(): void {
 		$result = $this->executeCodeSnippet("getWithRange(type{Real});",
-			"getWithRange = ^Type<Real> => Result<Type<Real>, InvalidRange> :: #->withNumberRange(
+			valueDeclarations: "getWithRange = ^Type<Real> => Result<Type<Real>, InvalidRange> :: #->withNumberRange(
 				RealNumberRange![intervals: [
 					?noError(RealNumberInterval[
 						start: RealNumberIntervalEndpoint![value: 3.14, inclusive: true],
@@ -74,7 +74,7 @@ final class WithNumberRangeTest extends CodeExecutionTestHelper {
 
 	public function testWithNumberRangeIntegerSubsetMetaType(): void {
 		$result = $this->executeCodeSnippet("getWithRange(type{Integer});",
-			"getWithRange = ^Type<Integer> => Result<Type<Integer>, InvalidRange> :: #->withNumberRange(
+			valueDeclarations: "getWithRange = ^Type<Integer> => Result<Type<Integer>, InvalidRange> :: #->withNumberRange(
 			IntegerNumberRange![intervals: [
 				?noError(IntegerNumberInterval[
 					start: IntegerNumberIntervalEndpoint![value: -2, inclusive: true],

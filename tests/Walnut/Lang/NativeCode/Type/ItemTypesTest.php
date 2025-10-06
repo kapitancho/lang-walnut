@@ -17,12 +17,14 @@ final class ItemTypesTest extends CodeExecutionTestHelper {
 	}
 
 	public function testItemTypesMetaTypeTuple(): void {
-		$result = $this->executeCodeSnippet("getItemTypes(type{[Integer, Real, ...String]});", "getItemTypes = ^Type<Tuple> => Array<Type> :: #->itemTypes;");
+		$result = $this->executeCodeSnippet("getItemTypes(type{[Integer, Real, ...String]});",
+			valueDeclarations: "getItemTypes = ^Type<Tuple> => Array<Type> :: #->itemTypes;");
 		$this->assertEquals("[type{Integer}, type{Real}]", $result);
 	}
 
 	public function testItemTypesMetaTypeRecord(): void {
-		$result = $this->executeCodeSnippet("getItemTypes(type{[a: Integer, b: Real, ...String]});", "getItemTypes = ^Type<Record> => Map<Type> :: #->itemTypes;");
+		$result = $this->executeCodeSnippet("getItemTypes(type{[a: Integer, b: Real, ...String]});",
+			valueDeclarations: "getItemTypes = ^Type<Record> => Map<Type> :: #->itemTypes;");
 		$this->assertEquals("[a: type{Integer}, b: type{Real}]", $result);
 	}
 

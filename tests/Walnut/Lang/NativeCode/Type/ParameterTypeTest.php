@@ -12,7 +12,8 @@ final class ParameterTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testParameterTypeMetaType(): void {
-		$result = $this->executeCodeSnippet("getParameterType(type{^String => Real});", "getParameterType = ^Type<Function> => Type :: #->parameterType;");
+		$result = $this->executeCodeSnippet("getParameterType(type{^String => Real});",
+			valueDeclarations: "getParameterType = ^Type<Function> => Type :: #->parameterType;");
 		$this->assertEquals("type{String}", $result);
 	}
 

@@ -2,8 +2,9 @@
 
 namespace Walnut\Lang\Test\Implementation\Program;
 
-use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
-use Walnut\Lang\Blueprint\Program\InvalidEntryPoint;
+use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Program\InvalidEntryPointDependency;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Test\BaseProgramTestHelper;
 
@@ -15,17 +16,16 @@ final class ProgramTest extends BaseProgramTestHelper {
 
 	private function doCall(): Value {
 		return $this->program->getEntryPoint(
-			new VariableNameIdentifier('main'),
-			$this->typeRegistry->string(),
-			$this->typeRegistry->integer(),
+			new TypeNameIdentifier('CliEntryPoint')
 		)->call($this->valueRegistry->null);
 	}
 
 	public function testExecuteOk(): void {
-		$this->programContext->globalScopeBuilder->addVariable(
-			new VariableNameIdentifier('main'),
+		$this->addCliEntryPoint(
 			$this->valueRegistry->function(
-				$this->typeRegistry->string(),
+				$this->typeRegistry->array(
+					$this->typeRegistry->string()
+				),
 				null,
 				$this->typeRegistry->nothing,
 				$this->typeRegistry->string(),
@@ -37,74 +37,56 @@ final class ProgramTest extends BaseProgramTestHelper {
 			)
 		);
 		$result = $this->program->getEntryPoint(
-			new VariableNameIdentifier('main'),
-			$this->typeRegistry->string(),
-			$this->typeRegistry->string(),
-		)->call($this->valueRegistry->string(''));
+			new TypeNameIdentifier('CliEntryPoint')
+		)->call($this->valueRegistry->tuple([$this->valueRegistry->string('')]));
 		$this->assertEquals('42', (string)$result->literalValue);
 	}
 
-	public function testErrorFunctionIsNotDefined(): void {
+	public function testErrorTypeIsNotDefined(): void {
+		try {
+			$this->program->getEntryPoint(
+				new TypeNameIdentifier('UndefinedType')
+			);
+		} catch (InvalidEntryPointDependency $e) {
+			$this->assertEquals("type is not defined", $e->failReason);
+		}
+	}
+
+	public function testErrorDependencyCannotBeResolved(): void {
 		try {
 			$this->doCall();
-		} catch (InvalidEntryPoint $e) {
-			$this->assertEquals("function is not defined", $e->failReason);
+		} catch (InvalidEntryPointDependency $e) {
+			$this->assertEquals("dependency cannot be resolved", $e->failReason);
 		}
 	}
 
 	public function testErrorValueIsNotAFunction(): void {
-		$this->programContext->globalScopeBuilder->addVariable(
-			new VariableNameIdentifier('main'),
-			$this->valueRegistry->integer(42)
-		);
 		try {
-			$this->doCall();
-		} catch (InvalidEntryPoint $e) {
+			$this->typeRegistryBuilder->addData(
+				new TypeNameIdentifier('MyInt'),
+				$this->typeRegistry->integer()
+			);
+			$this->programContext->customMethodRegistryBuilder->addMethod(
+				$this->typeRegistry->typeByName(new TypeNameIdentifier('DependencyContainer')),
+				new MethodNameIdentifier('asMyInt'),
+				$this->typeRegistry->null,
+				null,
+				$this->typeRegistry->nothing,
+				$this->typeRegistry->typeByName(new TypeNameIdentifier('MyInt')),
+				$this->expressionRegistry->functionBody(
+					$this->expressionRegistry->constant(
+						$this->valueRegistry->dataValue(
+							new TypeNameIdentifier('MyInt'),
+							$this->valueRegistry->integer(42)
+						)
+					)
+				),
+			);
+			$this->program->getEntryPoint(
+				new TypeNameIdentifier('MyInt')
+			)->call($this->valueRegistry->null);
+		} catch (InvalidEntryPointDependency $e) {
 			$this->assertEquals("value is not a function", $e->failReason);
-		}
-	}
-
-	public function testErrorWrongParameterType(): void {
-		$this->programContext->globalScopeBuilder->addVariable(
-			new VariableNameIdentifier('main'),
-			$this->valueRegistry->function(
-				$this->typeRegistry->integer(),
-				null,
-				$this->typeRegistry->nothing,
-				$this->typeRegistry->integer(),
-				$this->expressionRegistry->functionBody(
-					$this->expressionRegistry->constant(
-						$this->valueRegistry->integer(42)
-					)
-				)
-			)
-		);
-		try {
-			$this->doCall();
-		} catch (InvalidEntryPoint $e) {
-			$this->assertEquals("wrong parameter type: String expected, Integer given", $e->failReason);
-		}
-	}
-
-	public function testErrorWrongReturnType(): void {
-		$this->programContext->globalScopeBuilder->addVariable(
-			new VariableNameIdentifier('main'),
-			$this->valueRegistry->function(
-				$this->typeRegistry->string(),
-				null,
-				$this->typeRegistry->nothing,
-				$this->typeRegistry->real(),
-				$this->expressionRegistry->functionBody(
-					$this->expressionRegistry->constant(
-						$this->valueRegistry->real(4.2)
-					)
-				)
-			)
-		);
-		try {
-			$this->doCall();
-		} catch (InvalidEntryPoint $e) {
-			$this->assertEquals("wrong return type", $e->failReason);
 		}
 	}
 }

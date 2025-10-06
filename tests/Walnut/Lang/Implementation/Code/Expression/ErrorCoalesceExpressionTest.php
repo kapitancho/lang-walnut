@@ -7,7 +7,7 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 final class ErrorCoalesceExpressionTest extends CodeExecutionTestHelper {
 
 	public function testErrorCoalesceWorkaround(): void {
-		$result = $this->executeCodeSnippet("[errorCoalesce(true), errorCoalesce(@'hello')];", <<<NUT
+		$result = $this->executeCodeSnippet("[errorCoalesce(true), errorCoalesce(@'hello')];", valueDeclarations: <<<NUT
 			errorCoalesce = ^Result<Boolean, String> => Boolean|Integer :: ?whenTypeOf(#) is {
 				type{Boolean}: #,
 				type{Error<String>}: #->error->length
@@ -17,7 +17,7 @@ final class ErrorCoalesceExpressionTest extends CodeExecutionTestHelper {
 	}
 
 	public function testErrorCoalesceExpression(): void {
-		$result = $this->executeCodeSnippet("[errorCoalesce(true), errorCoalesce(@'hello')];", <<<NUT
+		$result = $this->executeCodeSnippet("[errorCoalesce(true), errorCoalesce(@'hello')];", valueDeclarations: <<<NUT
 			errorCoalesce = ^Result<Boolean, String> => Boolean|Integer :: 
 				?whenIsError(#) {#->error->length};
 		NUT);
@@ -25,7 +25,7 @@ final class ErrorCoalesceExpressionTest extends CodeExecutionTestHelper {
 	}
 
 	public function testErrorCoalesceExpressionWithElse(): void {
-		$result = $this->executeCodeSnippet("[errorCoalesce(true), errorCoalesce(@'hello')];", <<<NUT
+		$result = $this->executeCodeSnippet("[errorCoalesce(true), errorCoalesce(@'hello')];", valueDeclarations: <<<NUT
 			errorCoalesce = ^Result<Boolean, String> => Boolean|Integer :: 
 				?whenIsError(#) {#->error->length} ~ {!#};
 		NUT);

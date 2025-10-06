@@ -33,13 +33,17 @@ class HttpEntryPointTest extends BaseProgramTestHelper {
 		$moduleLookupContext->method('sourceOf')
 			->willReturnCallback(fn(string $module) => match($module) {
 				'core/core' => file_get_contents(__DIR__ . '/../../../../../../core-nut-lib/core.nut'),
-				'http/message' => file_get_contents(__DIR__ . '/../../../../../../core-nut-lib/http/message.nut'),
-				'test' => 'module test %% http/message: handleHttpRequest = ^request: HttpRequest => HttpResponse :: [
-				    protocolVersion: request.protocolVersion,
-				    headers: request.headers,
-				    body: request.body,
-				    statusCode: 200
-				];',
+				'$http/message' => file_get_contents(__DIR__ . '/../../../../../../core-nut-lib/http/message.nut'),
+				'$http/request-handler' => file_get_contents(__DIR__ . '/../../../../../../core-nut-lib/http/request-handler.nut'),
+				'test' => 'module test %% $http/request-handler: ==> HttpRequestHandler :: ^request: {HttpRequest} => {HttpResponse} :: {
+					r = request->shape(`HttpRequest);
+					[
+					    protocolVersion: r.protocolVersion,
+					    headers: r.headers,
+					    body: r.body,
+					    statusCode: 200
+					]
+				};',
 				default => ''
 			});
 

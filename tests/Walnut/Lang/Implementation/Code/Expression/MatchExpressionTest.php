@@ -7,7 +7,7 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 final class MatchExpressionTest extends CodeExecutionTestHelper {
 
 	public function testMatchTrue(): void {
-		$result = $this->executeCodeSnippet("matchTrue(true);", <<<NUT
+		$result = $this->executeCodeSnippet("matchTrue(true);", valueDeclarations: <<<NUT
 			matchTrue = ^Any => String['true', 'false'] :: ?whenIsTrue {
 			    #: 'true',
 			    ~: 'false'
@@ -18,7 +18,7 @@ final class MatchExpressionTest extends CodeExecutionTestHelper {
 	}
 
 	public function testMatchTrueNoMatch(): void {
-		$result = $this->executeCodeSnippet("matchTrue(0);", <<<NUT
+		$result = $this->executeCodeSnippet("matchTrue(0);", valueDeclarations: <<<NUT
 			matchTrue = ^Any => Null|String['true'] :: ?whenIsTrue {
 			    #: 'true'
 			};
@@ -28,7 +28,7 @@ final class MatchExpressionTest extends CodeExecutionTestHelper {
 	}
 
 	public function testMatchType(): void {
-		$result = $this->executeCodeSnippet("matchType('str');", <<<NUT
+		$result = $this->executeCodeSnippet("matchType('str');", valueDeclarations: <<<NUT
 			matchType = ^Any => String :: ?whenTypeOf(#) is {
 			    type{String}: 'string',
 			    ~: 'not a string'
@@ -39,7 +39,7 @@ final class MatchExpressionTest extends CodeExecutionTestHelper {
 	}
 
 	public function testMatchTypeWithDynamicTypes(): void {
-		$result = $this->executeCodeSnippet("matchType('str');", <<<NUT
+		$result = $this->executeCodeSnippet("matchType('str');", valueDeclarations: <<<NUT
 			matchType = ^Any => String :: ?whenTypeOf(#) is {
 			    #->type: 'string',
 			    ~: 'not a string'
@@ -50,7 +50,7 @@ final class MatchExpressionTest extends CodeExecutionTestHelper {
 	}
 
 	public function testMatchValue(): void {
-		$result = $this->executeCodeSnippet("matchValue('hello');", <<<NUT
+		$result = $this->executeCodeSnippet("matchValue('hello');", valueDeclarations: <<<NUT
 			matchValue = ^Any => String :: ?whenValueOf(#) is {
 			    'hello': 'hello',
 			    ~: 'not hello'
@@ -61,7 +61,7 @@ final class MatchExpressionTest extends CodeExecutionTestHelper {
 	}
 
 	public function testMatchIf(): void {
-		$result = $this->executeCodeSnippet("matchIf('yes');", <<<NUT
+		$result = $this->executeCodeSnippet("matchIf('yes');", valueDeclarations: <<<NUT
 			matchIf = ^Any => String|Null :: ?when(#) {
 			    'true'
 			};
@@ -71,7 +71,7 @@ final class MatchExpressionTest extends CodeExecutionTestHelper {
 	}
 
 	public function testMatchIfNoMatch(): void {
-		$result = $this->executeCodeSnippet("matchIf('');", <<<NUT
+		$result = $this->executeCodeSnippet("matchIf('');", valueDeclarations: <<<NUT
 			matchIf = ^Any => String|Null :: ?when(#) {
 			    'true'
 			};
@@ -81,7 +81,7 @@ final class MatchExpressionTest extends CodeExecutionTestHelper {
 	}
 
 	public function testMatchIfWithElse(): void {
-		$result = $this->executeCodeSnippet("matchIfWithElse('');", <<<NUT
+		$result = $this->executeCodeSnippet("matchIfWithElse('');", valueDeclarations: <<<NUT
 			matchIfWithElse = ^Any => String|Null :: ?when(#) {
 			    'true'
 			} ~ {

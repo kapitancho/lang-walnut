@@ -17,14 +17,20 @@ final class WithValuesTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithValuesEnumerationMetaType(): void {
-		$result = $this->executeCodeSnippet("getWithValues(type{MyEnumeration});",
-			"MyEnumeration := (A, B, C); getWithValues = ^Type<Enumeration> => Result<Type<EnumerationSubset>, UnknownEnumerationValue> :: #->withValues[MyEnumeration.A, MyEnumeration.C];");
+		$result = $this->executeCodeSnippet(
+			"getWithValues(type{MyEnumeration});",
+			"MyEnumeration := (A, B, C);",
+			"getWithValues = ^Type<Enumeration> => Result<Type<EnumerationSubset>, UnknownEnumerationValue> :: #->withValues[MyEnumeration.A, MyEnumeration.C];"
+		);
 		$this->assertEquals("type{MyEnumeration[A, C]}", $result);
 	}
 
 	public function testWithValuesEnumerationMetaTypeUnknown(): void {
-		$result = $this->executeCodeSnippet("getWithValues(type{MyEnumeration});",
-			"OtherEnum := (X); MyEnumeration := (A, B, C); getWithValues = ^Type<Enumeration> => Result<Type<EnumerationSubset>, UnknownEnumerationValue> :: #->withValues[MyEnumeration.A, OtherEnum.X];");
+		$result = $this->executeCodeSnippet(
+			"getWithValues(type{MyEnumeration});",
+			"OtherEnum := (X); MyEnumeration := (A, B, C);",
+			"getWithValues = ^Type<Enumeration> => Result<Type<EnumerationSubset>, UnknownEnumerationValue> :: #->withValues[MyEnumeration.A, OtherEnum.X];"
+		);
 		$this->assertEquals("@UnknownEnumerationValue![\n\tenumeration: type{MyEnumeration},\n\tvalue: OtherEnum.X\n]", $result);
 	}
 
@@ -51,13 +57,13 @@ final class WithValuesTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithValuesStringMetaType(): void {
-		$result = $this->executeCodeSnippet("getWithValues(type{String});", "getWithValues = ^Type<String> => Type<StringSubset> :: #->withValues['A', 'C'];");
+		$result = $this->executeCodeSnippet("getWithValues(type{String});", valueDeclarations: "getWithValues = ^Type<String> => Type<StringSubset> :: #->withValues['A', 'C'];");
 		$this->assertEquals("type{String['A', 'C']}", $result);
 	}
 
 	public function testWithValuesStringMetaTypeInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet("Invalid parameter type",
-			"getWithValues(type{String});", "getWithValues = ^Type<String> => Type<StringSubset> :: #->withValues['A', 'C', 42];");
+			"getWithValues(type{String});", valueDeclarations: "getWithValues = ^Type<String> => Type<StringSubset> :: #->withValues['A', 'C', 42];");
 	}
 
 	public function testWithValuesReal(): void {
@@ -71,7 +77,7 @@ final class WithValuesTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithValuesRealMetaType(): void {
-		$result = $this->executeCodeSnippet("getWithValues(type{Real});", "getWithValues = ^Type<Real> => Type<RealSubset> :: #->withValues[3.14, -2];");
+		$result = $this->executeCodeSnippet("getWithValues(type{Real});", valueDeclarations: "getWithValues = ^Type<Real> => Type<RealSubset> :: #->withValues[3.14, -2];");
 		$this->assertEquals("type{Real[3.14, -2]}", $result);
 	}
 
@@ -91,7 +97,7 @@ final class WithValuesTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithValuesIntegerSubsetMetaType(): void {
-		$result = $this->executeCodeSnippet("getWithValues(type{Integer});", "getWithValues = ^Type<Integer> => Type<IntegerSubset> :: #->withValues[42, -2];");
+		$result = $this->executeCodeSnippet("getWithValues(type{Integer});", valueDeclarations: "getWithValues = ^Type<Integer> => Type<IntegerSubset> :: #->withValues[42, -2];");
 		$this->assertEquals("type{Integer[42, -2]}", $result);
 	}
 

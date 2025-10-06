@@ -19,6 +19,7 @@ final class AsJsonValueTest extends CodeExecutionTestHelper {
 	public function testAsJsonValueOpenSafe(): void {
 		$result = $this->executeCodeSnippet("getJson(MyOpen(3));", "
 			MyOpen := #Integer;
+		", "
 			getJson = ^value: MyOpen => JsonValue :: value->asJsonValue;
 		");
 		$this->assertEquals("3", $result);
@@ -27,6 +28,7 @@ final class AsJsonValueTest extends CodeExecutionTestHelper {
 	public function testAsJsonValueOpenSafeJson(): void {
 		$result = $this->executeCodeSnippet("getJson(MyOpen[a: 1, b: null]);", "
 			MyOpen := #[a: Integer, b: JsonValue];
+		", "
 			getJson = ^value: MyOpen => JsonValue :: value->asJsonValue;
 		");
 		$this->assertEquals("[a: 1, b: null]", $result);
@@ -46,6 +48,7 @@ final class AsJsonValueTest extends CodeExecutionTestHelper {
 			MyNested := #[x: ^Null => Any];
 			MyOpen := #[a: Integer, b: MyNested];
 			MyNested ==> JsonValue :: 1;
+		", "
 			getJson = ^value: MyOpen => JsonValue :: value->asJsonValue;
 		");
 		$this->assertEquals("[a: 1, b: 1]", $result);

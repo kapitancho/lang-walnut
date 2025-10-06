@@ -22,7 +22,7 @@ final class LnTest extends CodeExecutionTestHelper {
 	}
 
 	public function testLnZeroInTypeOpen(): void {
-		$result = $this->executeCodeSnippet("l(1);", <<<NUT
+		$result = $this->executeCodeSnippet("l(1);", valueDeclarations: <<<NUT
 			l = ^v: Real<(0..)> => Real :: v->ln;
 		NUT);
 		$this->assertEquals("0", $result);

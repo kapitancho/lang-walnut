@@ -12,7 +12,8 @@ final class WithErrorTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithErrorTypeMetaType(): void {
-		$result = $this->executeCodeSnippet("getWithErrorType(type{Result<Real, String>});", "getWithErrorType = ^Type<Result> => Type :: #->withErrorType(type{Integer});");
+		$result = $this->executeCodeSnippet("getWithErrorType(type{Result<Real, String>});",
+			valueDeclarations: "getWithErrorType = ^Type<Result> => Type :: #->withErrorType(type{Integer});");
 		$this->assertEquals("type{Result<Real, Integer>}", $result);
 	}
 

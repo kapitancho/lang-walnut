@@ -35,7 +35,7 @@ final class OperatorPriorityTest extends CodeExecutionTestHelper {
 		$this->assertEquals('2', $result);
 	}
 	public function test8(): void {
-		$result = $this->executeCodeSnippet("x.a + y.b->sqrt;", "x = [a: 1, b: 2]; y = [a: 3, b: 4];");
+		$result = $this->executeCodeSnippet("x.a + y.b->sqrt;", valueDeclarations: "x = [a: 1, b: 2]; y = [a: 3, b: 4];");
 		$this->assertEquals('3', $result);
 	}
 	public function test9(): void {
