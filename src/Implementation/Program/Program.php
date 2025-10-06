@@ -36,8 +36,7 @@ final readonly class Program implements ProgramInterface {
 			if ($value instanceof FunctionValue) {
 				return new ProgramEntryPoint(
 					$this->programRegistry,
-					$this->programRegistry->globalScope,
-					$value->withVariableValueScope($this->programRegistry->globalScope)
+					$value
 				);
 			}
 			InvalidEntryPointDependency::becauseValueIsNotAFunction($typeName);

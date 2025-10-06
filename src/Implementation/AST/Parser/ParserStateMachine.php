@@ -84,12 +84,6 @@ final readonly class ParserStateMachine {
 				},
 				'EOF' => -1
 			]],
-			103 => ['name' => 'module level var definition', 'transitions' => [
-				T::assign->name => function(LT $token) {
-					$this->s->push(133);
-					$this->s->move(401);
-				}
-			]],
 			104 => ['name' => 'module level type definition', 'transitions' => [
 				T::named_type->name => 115,
 				T::assign->name => 105,
@@ -495,17 +489,7 @@ final readonly class ParserStateMachine {
 				T::expression_separator->name => 102
 			]],
 
-			133 => ['name' => 'variable name end', 'transitions' => [
-				'' => function(LT $token) {
-					$this->nodeBuilder->definition(
-						$this->s->generated = $this->nodeBuilder->addVariable(
-							new VariableNameIdentifier($this->s->result['variableName']),
-							$this->s->generated
-						)
-					);
-					$this->s->stay(134);
-				},
-			]],
+
 			134 => ['name' => 'variable name separator', 'transitions' => [
 				T::expression_separator->name => 102
 			]],

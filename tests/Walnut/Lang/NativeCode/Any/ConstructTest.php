@@ -34,7 +34,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testConstructOpenConstructorAndValidatorOk(): void {
 		$result = $this->executeCodeSnippet("MyOpen(112);",
-			"MyOpen := #String @ Integer :: ?when ({#->length} > 10) { => @{#->length} };v=1;" .
+			"MyOpen := #String @ Integer :: ?when ({#->length} > 10) { => @{#->length} };" .
 			"MyOpen(Integer) :: #->asString;"
 		);
 		$this->assertEquals("MyOpen{'112'}", $result);

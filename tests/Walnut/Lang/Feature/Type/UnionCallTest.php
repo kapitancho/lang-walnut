@@ -31,6 +31,8 @@ final class UnionCallTest extends CodeExecutionTestHelper {
 				A->methodCall(=> Integer) :: $$ + 1;
 				B := #String;
 				B->methodCall(=> String) :: $$->reverse;
+			NUT,
+			<<<NUT
 				ab = ^ val: A|B => Boolean :: val->methodCall;
 			NUT
 		);
@@ -73,6 +75,8 @@ final class UnionCallTest extends CodeExecutionTestHelper {
 			<<<NUT
 				A := #[a: Integer, b: String];
 				B := #[a: String, c: Real];
+			NUT,
+			<<<NUT
 				ab = ^ val: A|B => Boolean :: val.a;
 			NUT
 		);

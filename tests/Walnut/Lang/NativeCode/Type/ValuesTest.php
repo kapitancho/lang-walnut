@@ -78,7 +78,7 @@ final class ValuesTest extends CodeExecutionTestHelper {
 
 	public function testValuesMetaTypeInvalidTargetType(): void {
 		$this->executeErrorCodeSnippet('Invalid target type',
-			"getValues(type[Integer]);", "getValues = ^Type<Tuple> => Array<Integer, 1..> :: #->values;");
+			"getValues(type[Integer]);", valueDeclarations:  "getValues = ^Type<Tuple> => Array<Integer, 1..> :: #->values;");
 	}
 
 }

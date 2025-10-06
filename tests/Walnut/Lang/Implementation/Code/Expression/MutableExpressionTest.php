@@ -16,7 +16,10 @@ final class MutableExpressionTest extends CodeExecutionTestHelper {
 	}
 
 	public function testMutableValueNotASubtype(): void {
-		$this->executeErrorCodeSnippet('should be a subtype of Integer', 'v', "v = mutable{Integer, 3.14};");
+		$this->executeErrorCodeSnippet(
+			'is not a subtype of Integer',
+			'v',
+			valueDeclarations:  "v = mutable{Integer, 3.14};");
 	}
 
 }

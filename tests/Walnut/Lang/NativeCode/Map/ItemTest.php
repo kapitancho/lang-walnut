@@ -10,7 +10,7 @@ final class ItemTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet(
 			"No property exists that matches the type",
 			"getItem('r');",
-			"getItem = ^s: String :: [:]->item(s);"
+			valueDeclarations:  "getItem = ^s: String :: [:]->item(s);"
 		);
 	}
 

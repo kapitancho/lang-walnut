@@ -54,6 +54,8 @@ final class ContextFillTest extends CodeExecutionTestHelper {
 			"test(MySealed[a: -9, b: 'Hello']);",
 		<<<NUT
 			MySealed := $[a: Integer, b: ?String, c: ?Boolean];
+		NUT,
+		<<<NUT
 			test = ^s: MySealed :: [#a];
 		NUT);
 	}

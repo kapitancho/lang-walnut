@@ -27,7 +27,6 @@ abstract class BaseProgramTestHelper extends TestCase {
 	protected ExpressionRegistry $expressionRegistry;
 	protected TypeRegistryBuilder $typeRegistryBuilder;
 	protected CustomMethodRegistryBuilder $customMethodRegistryBuilder;
-	protected ScopeBuilderInterface $globalScopeBuilder;
 	protected ProgramContextInterface $programContext;
 
 	private function getProgramContext(): ProgramContextInterface {
@@ -38,7 +37,6 @@ abstract class BaseProgramTestHelper extends TestCase {
 		parent::setUp();
 
 		$this->programContext = $programContext = $this->getProgramContext();
-		$this->globalScopeBuilder = $programContext->globalScopeBuilder;
 		$this->typeRegistry = $programContext->typeRegistry;
 		$this->typeRegistryBuilder = $programContext->typeRegistryBuilder;
 		$this->valueRegistry = $programContext->valueRegistry;

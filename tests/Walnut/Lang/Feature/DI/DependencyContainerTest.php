@@ -15,6 +15,8 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		B := #A;
 		 ==> A %% B :: A(42);
 		 ==> B %% A :: B(%);
+	NUT,
+		<<<NUT
 		f = ^ %% B :: null;
 	NUT);
 	}

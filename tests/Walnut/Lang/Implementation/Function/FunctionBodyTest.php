@@ -43,7 +43,9 @@ final class FunctionBodyTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFunctionBodyError(): void {
-		$this->executeErrorCodeSnippet("Unknown variable 'x' in function body", '', <<<NUT
+		$this->executeErrorCodeSnippet("Unknown variable 'x' in function body",
+			'',
+			valueDeclarations:  <<<NUT
 			noVar = ^Any => Any :: x;
 		NUT);
 	}

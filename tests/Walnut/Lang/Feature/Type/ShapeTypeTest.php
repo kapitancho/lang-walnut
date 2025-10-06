@@ -73,7 +73,7 @@ final class ShapeTypeTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet(
 			"Cannot convert value of type 'Shape<[a: Real]>' to shape '[a: Integer]'",
 			"useB(getA());",
-		<<<NUT
+		valueDeclarations:  <<<NUT
 			getA = ^ => [a: Real] :: [a: 3.14];	
 			useB = ^v: Shape<[a: Real]> => Real :: v->shape(`[a: Integer]).a;
 		NUT);

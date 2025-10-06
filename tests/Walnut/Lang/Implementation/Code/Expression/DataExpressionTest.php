@@ -16,7 +16,11 @@ final class DataExpressionTest extends CodeExecutionTestHelper {
 	}
 
 	public function testDataValueNotASubtype(): void {
-		$this->executeErrorCodeSnippet("should be a subtype of Integer", "v;", "MyData := Integer; v = MyData!3.14;");
+		$this->executeErrorCodeSnippet("expected base value of type 'Integer', but got 'Real[3.14]",
+			"v;",
+			"MyData := Integer;",
+			"v = MyData!3.14;"
+		);
 	}
 
 }

@@ -15,20 +15,6 @@ use Walnut\Lang\Test\BaseProgramTestHelper;
 class HttpEntryPointTest extends BaseProgramTestHelper {
 
 	public function testCall(): void {
-		$this->programContext->globalScopeBuilder->addVariable(
-			new VariableNameIdentifier('main'),
-			$this->valueRegistry->function(
-				$this->typeRegistry->string(),
-				new VariableNameIdentifier('args'),
-				$this->typeRegistry->nothing,
-				$this->typeRegistry->integer(),
-				$this->expressionRegistry->functionBody(
-					$this->expressionRegistry->constant(
-						$this->valueRegistry->integer(42)
-					)
-				)
-			)
-		);
 		$moduleLookupContext = $this->createMock(ModuleLookupContext::class);
 		$moduleLookupContext->method('sourceOf')
 			->willReturnCallback(fn(string $module) => match($module) {

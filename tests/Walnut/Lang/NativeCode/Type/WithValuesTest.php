@@ -83,7 +83,7 @@ final class WithValuesTest extends CodeExecutionTestHelper {
 
 	public function testWithValuesRealMetaTypeInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet("Invalid parameter type",
-			"getWithValues(type{Real});", "getWithValues = ^Type<Real> => Type<RealSubset> :: #->withValues[3.14, -2, 'x'];");
+			"getWithValues(type{Real});", valueDeclarations:  "getWithValues = ^Type<Real> => Type<RealSubset> :: #->withValues[3.14, -2, 'x'];");
 	}
 
 	public function testWithValuesInteger(): void {
@@ -103,7 +103,7 @@ final class WithValuesTest extends CodeExecutionTestHelper {
 
 	public function testWithValuesIntegerMetaTypeInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet("Invalid parameter type",
-			"getWithValues(type{Integer});", "getWithValues = ^Type<Integer> => Type<IntegerSubset> :: #->withValues[42, -2, 'x'];");
+			"getWithValues(type{Integer});", valueDeclarations:  "getWithValues = ^Type<Integer> => Type<IntegerSubset> :: #->withValues[42, -2, 'x'];");
 	}
 
 	public function testWithValuesInvalidTargetType(): void {
@@ -112,7 +112,7 @@ final class WithValuesTest extends CodeExecutionTestHelper {
 
 	public function testWithValuesMetaTypeInvalidTargetType(): void {
 		$this->executeErrorCodeSnippet('Invalid target type',
-			"getWithValues(type[Integer]);", "getWithValues = ^Type<Tuple> => Type :: #->withValues[1, 2];");
+			"getWithValues(type[Integer]);", valueDeclarations:  "getWithValues = ^Type<Tuple> => Type :: #->withValues[1, 2];");
 	}
 
 }

@@ -35,7 +35,7 @@ final class ProgramContextFactory implements ProgramContextFactoryInterface {
 			$valueRegistry = new ValueRegistry($typeRegistryBuilder, $ech),
 			new ExpressionRegistry($typeRegistryBuilder, $valueRegistry),
 			$methodFinder,
-			new ScopeBuilder(VariableValueScope::empty()),
+			VariableValueScope::empty(),
 			$nativeCodeTypeMapper
 		);
 	}

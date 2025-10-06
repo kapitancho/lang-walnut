@@ -19,6 +19,7 @@ final class InvokeTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("null;", <<<NUT
 		R = Shape<Real>;
 		T = ^Integer => Real;
+	NUT, <<<NUT
 		fn = ^p: R&T => Real :: p(1);
 	NUT);
 		$this->assertEquals("null", $result);
@@ -31,6 +32,8 @@ final class InvokeTest extends CodeExecutionTestHelper {
 		<<<NUT
 		R := #[b: String];
 		T = Null;
+		NUT,
+		<<<NUT
 		fn = ^p: R&T => Real :: p(1);
 		NUT);
 	}

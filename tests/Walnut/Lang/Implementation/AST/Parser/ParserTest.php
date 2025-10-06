@@ -35,7 +35,6 @@ use Walnut\Lang\Blueprint\AST\Node\Module\AddEnumerationTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddMethodNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddOpenTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddSealedTypeNode;
-use Walnut\Lang\Blueprint\AST\Node\Module\AddVariableNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\ModuleNode;
 use Walnut\Lang\Blueprint\AST\Node\Node;
 use Walnut\Lang\Blueprint\AST\Node\Type\AnyTypeNode;
@@ -194,8 +193,6 @@ class ParserTest extends TestCase {
 			$d->aliasedType instanceOf TupleTypeNode && count($d->aliasedType->types) === 0];
 		yield ['MyAlias = [:];', AddAliasTypeNode::class, fn($d) => $d->name->equals(new TypeNameIdentifier('MyAlias')) &&
 			$d->aliasedType instanceOf RecordTypeNode && count($d->aliasedType->types) === 0];
-		yield ['myVar = null;', AddVariableNode::class, fn($d) => $d->name->equals(new VariableNameIdentifier('myVar')) &&
-			$d->value instanceOf NullValueNode];
 
 		yield ['A(P) :: null;', AddConstructorMethodNode::class, fn(AddConstructorMethodNode $d) =>
 			$d->typeName->equals(new TypeNameIdentifier('A')) &&

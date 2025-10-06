@@ -23,7 +23,7 @@ final class UuidTest extends CodeExecutionTestHelper {
 	public function testUuidFromStringFixInvalidError(): void {
 		$this->executeErrorCodeSnippet(
 			"expected a return value of type Uuid, got Result<Uuid, InvalidUuid>",
-			"getUuid();", <<<NUT
+			"getUuid();", valueDeclarations:  <<<NUT
 				getUuid = ^ => Uuid :: Uuid('00000000-0000-0000-9000-000000000000');
 			NUT);
 	}

@@ -11,7 +11,6 @@ use Walnut\Lang\Blueprint\AST\Node\Module\AddEnumerationTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddMethodNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddOpenTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddSealedTypeNode;
-use Walnut\Lang\Blueprint\AST\Node\Module\AddVariableNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\ModuleDefinitionNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\ModuleNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
@@ -163,18 +162,6 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 						) : null,
 					$moduleDefinition->errorType ?
 						$this->type($moduleDefinition->errorType) : null
-				),
-				$moduleDefinition instanceof AddVariableNode =>
-				$this->programContext->globalScopeBuilder->addVariable($moduleDefinition->name,
-					$moduleDefinition->value instanceof FunctionValueNode ?
-						$this->globalFunction(
-							new MethodNameIdentifier($moduleDefinition->name->identifier),
-							$moduleDefinition->value
-						) :
-						$this->globalValue(
-							new MethodNameIdentifier($moduleDefinition->name->identifier),
-							$moduleDefinition->value
-						)
 				),
 				// @codeCoverageIgnoreStart
 				true => throw new AstCompilationException(

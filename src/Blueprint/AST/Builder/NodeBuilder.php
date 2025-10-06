@@ -37,7 +37,6 @@ use Walnut\Lang\Blueprint\AST\Node\Module\AddEnumerationTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddMethodNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddOpenTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddSealedTypeNode;
-use Walnut\Lang\Blueprint\AST\Node\Module\AddVariableNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\ModuleDefinitionNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\ModuleNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\AnyTypeNode;
@@ -184,8 +183,6 @@ interface NodeBuilder {
 		TypeNode|null $errorType,
 		FunctionBodyNode $functionBody,
 	): AddConstructorMethodNode;
-
-	public function addVariable(VariableNameIdentifier $name, ValueNode $value): AddVariableNode;
 
 	public function addAtom(TypeNameIdentifier $name): AddAtomTypeNode;
 

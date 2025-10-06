@@ -24,7 +24,7 @@ final class WithLengthRangeTest extends CodeExecutionTestHelper {
 
 	public function testWithLengthRangeStringMetaTypeInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet("Invalid parameter type",
-			"getWithLengthRange(type{String});", "getWithLengthRange = ^Type<String> => Type<String> :: #->withLengthRange(42);");
+			"getWithLengthRange(type{String});", valueDeclarations:  "getWithLengthRange = ^Type<String> => Type<String> :: #->withLengthRange(42);");
 	}
 
 	public function testWithLengthRangeArray(): void {
@@ -45,7 +45,7 @@ final class WithLengthRangeTest extends CodeExecutionTestHelper {
 
 	public function testWithLengthRangeArrayMetaTypeInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet("Invalid parameter type",
-			"getWithLengthRange(type{Array<Boolean>});", "getWithLengthRange = ^Type<Array> => Type<Array> :: #->withLengthRange(42);");
+			"getWithLengthRange(type{Array<Boolean>});", valueDeclarations:  "getWithLengthRange = ^Type<Array> => Type<Array> :: #->withLengthRange(42);");
 	}
 
 	public function testWithLengthRangeMap(): void {
@@ -66,7 +66,7 @@ final class WithLengthRangeTest extends CodeExecutionTestHelper {
 
 	public function testWithLengthRangeMapMetaTypeInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet("Invalid parameter type",
-			"getWithLengthRange(type{Map<Boolean>});", "getWithLengthRange = ^Type<Map> => Type<Map> :: #->withLengthRange(42);");
+			"getWithLengthRange(type{Map<Boolean>});", valueDeclarations:  "getWithLengthRange = ^Type<Map> => Type<Map> :: #->withLengthRange(42);");
 	}
 
 	public function testWithLengthRangeSet(): void {
@@ -87,7 +87,7 @@ final class WithLengthRangeTest extends CodeExecutionTestHelper {
 
 	public function testWithLengthRangeSetMetaTypeInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet("Invalid parameter type",
-			"getWithLengthRange(type{Set<Boolean>});", "getWithLengthRange = ^Type<Set> => Type<Set> :: #->withLengthRange(42);");
+			"getWithLengthRange(type{Set<Boolean>});", valueDeclarations:  "getWithLengthRange = ^Type<Set> => Type<Set> :: #->withLengthRange(42);");
 	}
 
 	public function testWithLengthRangeInvalidTargetType(): void {
@@ -96,7 +96,7 @@ final class WithLengthRangeTest extends CodeExecutionTestHelper {
 
 	public function testWithLengthRangeMetaTypeInvalidTargetType(): void {
 		$this->executeErrorCodeSnippet('Invalid target type',
-			"getWithLengthRange(type{Integer});", "getWithLengthRange = ^Type<Integer> => Type :: #->withLengthRange(?noError(LengthRange[2, 9]));");
+			"getWithLengthRange(type{Integer});", valueDeclarations:  "getWithLengthRange = ^Type<Integer> => Type :: #->withLengthRange(?noError(LengthRange[2, 9]));");
 	}
 
 }

@@ -21,7 +21,6 @@ interface ProgramContext {
 	public CustomMethodRegistryBuilder         $customMethodRegistryBuilder { get; }
 	public CustomMethodRegistry                $customMethodRegistry { get; }
 	public MethodRegistry                      $methodRegistry { get; }
-	public ScopeBuilder                        $globalScopeBuilder { get; }
 
 	public ProgramRegistry                     $programRegistry { get; }
 

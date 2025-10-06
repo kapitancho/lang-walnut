@@ -58,7 +58,6 @@ use Walnut\Lang\Implementation\AST\Node\Module\AddEnumerationTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddMethodNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddOpenTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddSealedTypeNode;
-use Walnut\Lang\Implementation\AST\Node\Module\AddVariableNode;
 use Walnut\Lang\Implementation\AST\Node\Module\ModuleNode;
 use Walnut\Lang\Implementation\AST\Node\SourceLocation;
 use Walnut\Lang\Implementation\AST\Node\Type\AnyTypeNode;
@@ -415,10 +414,6 @@ final class NodeBuilder implements NodeBuilderInterface {
 			$errorType ?? $this->nothingType,
 			$functionBody
 		);
-	}
-
-	public function addVariable(VariableNameIdentifier $name, ValueNode $value): AddVariableNode {
-		return new AddVariableNode($this->getSourceLocation(), $name, $value);
 	}
 
 	public function addAtom(TypeNameIdentifier $name): AddAtomTypeNode {

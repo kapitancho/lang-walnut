@@ -53,6 +53,7 @@ final class CustomMethodAnalyserTest extends CodeExecutionTestHelper {
 			"t();", <<<NUT
 			T = String;
 			==> T :: $->err;
+		NUT, <<<NUT
 			t = ^ %% [~T] :: null;
 		NUT);
 	}

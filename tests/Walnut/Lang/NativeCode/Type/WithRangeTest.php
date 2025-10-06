@@ -24,7 +24,7 @@ final class WithRangeTest extends CodeExecutionTestHelper {
 
 	public function testWithRangeRealMetaTypeInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet("Invalid parameter type",
-			"getWithRange(type{Real});", "getWithRange = ^Type<Real> => Type<Real> :: #->withRange(42);");
+			"getWithRange(type{Real});", valueDeclarations:  "getWithRange = ^Type<Real> => Type<Real> :: #->withRange(42);");
 	}
 
 	public function testWithRangeInteger(): void {
@@ -54,7 +54,7 @@ final class WithRangeTest extends CodeExecutionTestHelper {
 
 	public function testWithRangeMetaTypeInvalidTargetType(): void {
 		$this->executeErrorCodeSnippet('Invalid target type',
-			"getWithRange(type[Integer]);", "getWithRange = ^Type<Tuple> => Type :: #->withRange(?noError(IntegerRange[-2, 9]));");
+			"getWithRange(type[Integer]);", valueDeclarations:  "getWithRange = ^Type<Tuple> => Type :: #->withRange(?noError(IntegerRange[-2, 9]));");
 	}
 
 }
