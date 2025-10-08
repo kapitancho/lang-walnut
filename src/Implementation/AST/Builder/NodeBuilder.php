@@ -28,6 +28,7 @@ use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Implementation\AST\Node\Expression\ConstantExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\ConstructorCallExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\DataExpressionNode;
+use Walnut\Lang\Implementation\AST\Node\Expression\DirectExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\FunctionCallExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\MatchErrorExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\MatchExpressionDefaultNode;
@@ -233,6 +234,10 @@ final class NodeBuilder implements NodeBuilderInterface {
 
 	public function matchError(ExpressionNode $condition, ExpressionNode $then, ExpressionNode|null $else): MatchErrorExpressionNode {
 		return new MatchErrorExpressionNode($this->getSourceLocation(), $condition, $then, $else);
+	}
+
+	public function directExpression(ExpressionNode $targetExpression): DirectExpressionNode {
+		return new DirectExpressionNode($this->getSourceLocation(), $targetExpression);
 	}
 
 	public function mutable(TypeNode $type, ExpressionNode $value): MutableExpressionNode {

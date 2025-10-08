@@ -1012,6 +1012,8 @@ final readonly class ParserStateMachine {
 				T::no_error->name => -250,
 				T::no_external_error->name => -252,
 
+				T::function_body_marker->name => -351,
+
 				T::boolean_op->name => $u = function(LT $token) { $this->s->stay(361); },
 				T::boolean_op_not->name => $u,
 				T::arithmetic_op->name => $u,
@@ -1589,6 +1591,20 @@ final readonly class ParserStateMachine {
 					);
 					$this->s->pop();
 				}
+			]],
+
+			351 => ['name' => 'direct expression start', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(352);
+					$this->s->stay(201);
+				},
+			]],
+
+			352 => ['name' => 'direct expression end', 'transitions' => [
+				T::expression_separator->name => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->directExpression($this->s->generated);
+					$this->s->pop();
+				},
 			]],
 
 			354 => ['name' => 'error value value start', 'transitions' => [
