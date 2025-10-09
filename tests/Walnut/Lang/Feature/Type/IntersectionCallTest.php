@@ -15,7 +15,7 @@ final class IntersectionCallTest extends CodeExecutionTestHelper {
 				C = A&B;
 			NUT,
 			<<<NUT
-				ab = ^val: C => Array :: val->values;
+				ab = ^v: C => Array :: v->values;
 			NUT
 		);
 		$this->assertEquals("[2, 5, 7]", $result);
@@ -33,7 +33,7 @@ final class IntersectionCallTest extends CodeExecutionTestHelper {
 				C = A&B;
 			NUT,
 			<<<NUT
-				ab = ^val: C => String :: val->myMethod;
+				ab = ^v: C => String :: v->myMethod;
 			NUT
 		);
 		$this->assertEquals("'hello'", $result);

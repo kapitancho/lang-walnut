@@ -23,6 +23,7 @@ use Walnut\Lang\Blueprint\AST\Node\Expression\NoExternalErrorExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\PropertyAccessExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\RecordExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ReturnExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\ScopedExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\SequenceExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\SetExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\TupleExpressionNode;
@@ -351,6 +352,21 @@ class ParserTest extends TestCase {
 			$d->methodName->equals(new MethodNameIdentifier('asB')) &&
 			$d->parameter->type instanceof NamedTypeNode && $d->parameter->type->name->equals(new TypeNameIdentifier('P')) && $d->parameter->name->equals(new VariableNameIdentifier('p')) &&
 			$d->dependency->type instanceof NamedTypeNode && $d->dependency->type->name->equals(new TypeNameIdentifier('D')) &&
+			$d->dependency->name === null &&
+			$d->returnType instanceof NamedTypeNode && $d->returnType->name->equals(new TypeNameIdentifier('B'))];
+		yield ['A->asB(^p: P => B) %% ~D :: null;', AddMethodNode::class, fn(AddMethodNode $d) =>
+			$d->targetType instanceof NamedTypeNode && $d->targetType->name->equals(new TypeNameIdentifier('A')) &&
+			$d->methodName->equals(new MethodNameIdentifier('asB')) &&
+			$d->parameter->type instanceof NamedTypeNode && $d->parameter->type->name->equals(new TypeNameIdentifier('P')) && $d->parameter->name->equals(new VariableNameIdentifier('p')) &&
+			$d->dependency->type instanceof NamedTypeNode && $d->dependency->type->name->equals(new TypeNameIdentifier('D')) &&
+			$d->dependency->name->identifier === 'd' &&
+			$d->returnType instanceof NamedTypeNode && $d->returnType->name->equals(new TypeNameIdentifier('B'))];
+		yield ['A->asB(^p: P => B) %% d: D :: null;', AddMethodNode::class, fn(AddMethodNode $d) =>
+			$d->targetType instanceof NamedTypeNode && $d->targetType->name->equals(new TypeNameIdentifier('A')) &&
+			$d->methodName->equals(new MethodNameIdentifier('asB')) &&
+			$d->parameter->type instanceof NamedTypeNode && $d->parameter->type->name->equals(new TypeNameIdentifier('P')) && $d->parameter->name->equals(new VariableNameIdentifier('p')) &&
+			$d->dependency->type instanceof NamedTypeNode && $d->dependency->type->name->equals(new TypeNameIdentifier('D')) &&
+			$d->dependency->name->identifier === 'd' &&
 			$d->returnType instanceof NamedTypeNode && $d->returnType->name->equals(new TypeNameIdentifier('B'))];
 
 
@@ -497,6 +513,21 @@ class ParserTest extends TestCase {
 				$d->returnType->returnType instanceof NamedTypeNode && $d->returnType->returnType->name->equals(new TypeNameIdentifier('B')) &&
 				$d->returnType->errorType instanceof NamedTypeNode && $d->returnType->errorType->name->equals(new TypeNameIdentifier('C'))
 		];
+
+
+		yield ['>>> null;', AddMethodNode::class, fn(AddMethodNode $d) =>
+			$d->targetType instanceof NamedTypeNode && $d->targetType->name->equals(new TypeNameIdentifier('DependencyContainer')) &&
+			$d->methodName->equals(new MethodNameIdentifier('asCliEntryPoint')) &&
+			$d->parameter->type instanceof NullTypeNode && $d->parameter->name === null &&
+			$d->dependency->type instanceof NothingTypeNode &&
+			$d->returnType instanceof NamedTypeNode && $d->returnType->name->equals(new TypeNameIdentifier('CliEntryPoint'))];
+		yield ['%% D >>> null;', AddMethodNode::class, fn(AddMethodNode $d) =>
+			$d->targetType instanceof NamedTypeNode && $d->targetType->name->equals(new TypeNameIdentifier('DependencyContainer')) &&
+			$d->methodName->equals(new MethodNameIdentifier('asCliEntryPoint')) &&
+			$d->parameter->type instanceof NullTypeNode && $d->parameter->name === null &&
+			$d->returnType instanceof NamedTypeNode && $d->returnType->name->equals(new TypeNameIdentifier('CliEntryPoint'))
+		];
+
 	}
 
 	private function checkPosition(string $code, Node $node): void {
@@ -639,6 +670,8 @@ class ParserTest extends TestCase {
 		];
 		yield ['@x', ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameIdentifier('Error')) &&
 			$e->parameter instanceof VariableNameExpressionNode && $e->parameter->variableName->equals(new VariableNameIdentifier('x'))];
+		yield [':: x', ScopedExpressionNode::class, fn(ScopedExpressionNode $e) =>
+			$e->targetExpression instanceof VariableNameExpressionNode && $e->targetExpression->variableName->equals(new VariableNameIdentifier('x'))];
 
 		yield ['C', ConstantExpressionNode::class, fn(ConstantExpressionNode $e) => $e->value instanceof AtomValueNode &&
 			$e->value->name->equals(new TypeNameIdentifier('C'))];

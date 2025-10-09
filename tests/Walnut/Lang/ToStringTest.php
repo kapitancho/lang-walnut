@@ -183,6 +183,7 @@ final class ToStringTest extends BaseProgramTestHelper {
 			'var{a: x} = 0' => $er->multiVariableAssignment(['a' => new VariableNameIdentifier('x')], $c0),
 			'var{~x} = 0' => $er->multiVariableAssignment(['x' => new VariableNameIdentifier('x')], $c0),
 			'var{a: x, ~y} = 0' => $er->multiVariableAssignment(['a' => new VariableNameIdentifier('x'), 'y' => new VariableNameIdentifier('y')], $c0),
+			':: 0' => $er->scoped($c0),
 			'=> 0' => $er->return($c0),
 			'?noError(0)' => $er->noError($c0),
 			'?noExternalError(0)' => $er->noExternalError($c0),

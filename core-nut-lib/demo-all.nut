@@ -249,7 +249,7 @@ AllTypes = [
         function: ^Any => Any :: 'function body'
     ];
 
-    allConstants = [
+    allConstants = val[
         atom: MyAtom,
         booleanTrue: true,
         booleanFalse: false,
@@ -275,7 +275,8 @@ AllTypes = [
     a = 1;
     b = ^MyAlias => Integer :: # + a;
     c = `String;
-
+    d = val{false};
+    e = :: => 5;
 
     [
         allExpressions: getAllExpressions(),

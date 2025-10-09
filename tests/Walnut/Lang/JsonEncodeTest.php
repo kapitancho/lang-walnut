@@ -189,6 +189,7 @@ final class JsonEncodeTest extends BaseProgramTestHelper {
 
 		foreach([
 			'{"expressionType":"constant","value":{"valueType":"Integer","value":0}}' => $c0,
+			'{"expressionType":"Scoped","targetExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->scoped($c0),
 			'{"expressionType":"Record","values":[]}' => $er->record([]),
 			'{"expressionType":"Record","values":{"x":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}}' => $er->record(['x' => $c0]),
 			'{"expressionType":"Tuple","values":[]}' => $er->tuple([]),

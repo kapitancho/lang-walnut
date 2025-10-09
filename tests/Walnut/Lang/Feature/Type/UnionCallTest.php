@@ -16,7 +16,7 @@ final class UnionCallTest extends CodeExecutionTestHelper {
 				B->methodCall(=> String) :: $$->reverse;
 			NUT,
 			<<<NUT
-				ab = ^ val: A|B => Integer|String :: val->methodCall;
+				ab = ^ v: A|B => Integer|String :: v->methodCall;
 			NUT
 		);
 		$this->assertEquals("[4, 'olleh']", $result);
@@ -33,7 +33,7 @@ final class UnionCallTest extends CodeExecutionTestHelper {
 				B->methodCall(=> String) :: $$->reverse;
 			NUT,
 			<<<NUT
-				ab = ^ val: A|B => Boolean :: val->methodCall;
+				ab = ^ v: A|B => Boolean :: v->methodCall;
 			NUT
 		);
 	}
@@ -48,7 +48,7 @@ final class UnionCallTest extends CodeExecutionTestHelper {
 				B->methodCall(^p: Integer => String) :: $$->reverse + {p->asString};
 			NUT,
 			<<<NUT
-				ab = ^ val: A|B => Real|String :: val->methodCall(2);
+				ab = ^ v: A|B => Real|String :: v->methodCall(2);
 			NUT
 		);
 		$this->assertEquals("[5, 'olleh2']", $result);
@@ -62,7 +62,7 @@ final class UnionCallTest extends CodeExecutionTestHelper {
 				B := #[a: String, c: Real];
 			NUT,
 			<<<NUT
-				ab = ^ val: A|B => Integer|String :: val.a;
+				ab = ^ v: A|B => Integer|String :: v.a;
 			NUT
 		);
 		$this->assertEquals("[42, 'hello']", $result);
@@ -77,7 +77,7 @@ final class UnionCallTest extends CodeExecutionTestHelper {
 				B := #[a: String, c: Real];
 			NUT,
 			<<<NUT
-				ab = ^ val: A|B => Boolean :: val.a;
+				ab = ^ v: A|B => Boolean :: v.a;
 			NUT
 		);
 	}
@@ -90,7 +90,7 @@ final class UnionCallTest extends CodeExecutionTestHelper {
 				B := #[a: String, c: Real];
 			NUT,
 			<<<NUT
-				ab = ^ val: A|B => Result<String, MapItemNotFound> :: val.b;
+				ab = ^ v: A|B => Result<String, MapItemNotFound> :: v.b;
 			NUT
 		);
 		$this->assertEquals("['hello', @MapItemNotFound![key: 'b']]", $result);
@@ -104,7 +104,7 @@ final class UnionCallTest extends CodeExecutionTestHelper {
 				B := #[a: String, c: Real, ... Boolean];
 			NUT,
 			<<<NUT
-				ab = ^ val: A|B => Result<String|Boolean, MapItemNotFound> :: val.b;
+				ab = ^ v: A|B => Result<String|Boolean, MapItemNotFound> :: v.b;
 			NUT
 		);
 		$this->assertEquals("['hello', false]", $result);
