@@ -395,10 +395,14 @@ abstract class BaseProgramTestHelper extends TestCase {
 		$this->programContext->customMethodRegistryBuilder->addMethod(
 			$this->typeRegistry->typeByName(new TypeNameIdentifier('DependencyContainer')),
 			new MethodNameIdentifier('asCliEntryPoint'),
-			$this->typeRegistry->null,
-			null,
-			$this->typeRegistry->nothing,
-			null,
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->null,
+				null
+			),
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->nothing,
+				null
+			),
 			$this->typeRegistry->typeByName(new TypeNameIdentifier('CliEntryPoint')),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->constant($value)

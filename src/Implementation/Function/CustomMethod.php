@@ -60,7 +60,7 @@ final class CustomMethod implements CustomMethodInterface {
 			$targetType,
 			$this->adjustParameterType(
 				$programRegistry->typeRegistry,
-				$this->function->parameterType,
+				$this->function->parameter->type,
 				$parameterType
 			)
 		);
@@ -77,16 +77,16 @@ final class CustomMethod implements CustomMethodInterface {
 			$target,
 			$this->adjustParameterValue(
 				$programRegistry->valueRegistry,
-				$this->function->parameterType,
+				$this->function->parameter->type,
 				$parameter,
 			)
 		);
 	}
 
 	public Type $targetType { get => $this->function->targetType; }
-	public Type $parameterType { get => $this->function->parameterType; }
+	public Type $parameterType { get => $this->function->parameter->type; }
 	public Type $returnType { get => $this->function->returnType; }
-	public Type $dependencyType { get => $this->function->dependencyType; }
+	public Type $dependencyType { get => $this->function->dependency->type; }
 
 	public string $methodInfo {
 		get => match(true) {

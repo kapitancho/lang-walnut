@@ -3,18 +3,16 @@
 namespace Walnut\Lang\Implementation\AST\Node\Value;
 
 use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode;
+use Walnut\Lang\Blueprint\AST\Node\NameAndTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\SourceLocation;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\FunctionValueNode as FunctionValueNodeInterface;
-use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 
 final readonly class FunctionValueNode implements FunctionValueNodeInterface {
 	public function __construct(
 		public SourceLocation $sourceLocation,
-		public TypeNode $parameterType,
-		public VariableNameIdentifier|null $parameterName,
-		public TypeNode $dependencyType,
-		public VariableNameIdentifier|null $dependencyName,
+		public NameAndTypeNode $parameter,
+		public NameAndTypeNode $dependency,
 		public TypeNode $returnType,
 		public FunctionBodyNode $functionBody
 	) {}
@@ -24,10 +22,8 @@ final readonly class FunctionValueNode implements FunctionValueNodeInterface {
 			'sourceLocation' => $this->sourceLocation,
 			'nodeCategory' => 'Value',
 			'nodeName' => 'FunctionValue',
-			'parameterType' => $this->parameterType,
-			'parameterName' => $this->parameterName,
-			'dependencyType' => $this->dependencyType,
-			'dependencyName' => $this->dependencyName,
+			'parameter' => $this->parameter,
+			'dependency' => $this->dependency,
 			'returnType' => $this->returnType,
 			'functionBody' => $this->functionBody
 		];

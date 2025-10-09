@@ -226,20 +226,28 @@ final class BinaryEqualTest extends BaseProgramTestHelper {
 		$this->callBinaryEqual($c, $z, false);
 
 		$c1 = $this->valueRegistry->function(
-			$this->typeRegistry->boolean,
-			null,
-			$this->typeRegistry->nothing,
-			null,
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->boolean,
+				null
+			),
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->nothing,
+				null
+			),
 			$this->typeRegistry->boolean,
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->constant($this->valueRegistry->boolean(true))
 			)
 		);
 		$c2 = $this->valueRegistry->function(
-			$this->typeRegistry->boolean,
-			null,
-			$this->typeRegistry->nothing,
-			null,
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->boolean,
+				null
+			),
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->nothing,
+				null
+			),
 			$this->typeRegistry->boolean,
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->constant($this->valueRegistry->boolean(false))

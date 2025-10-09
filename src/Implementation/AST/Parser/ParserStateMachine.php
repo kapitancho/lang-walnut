@@ -199,22 +199,30 @@ final readonly class ParserStateMachine {
 								new TypeNameIdentifier('DependencyContainer')
 							),
 							new MethodNameIdentifier('asCliEntryPoint'),
-							$this->nodeBuilder->nullType,
-							null,
-							$this->nodeBuilder->nothingType,
-							null,
+							$this->nodeBuilder->nameAndType(
+								$this->nodeBuilder->nullType,
+								null,
+							),
+							$this->nodeBuilder->nameAndType(
+								$this->nodeBuilder->nothingType,
+								null
+							),
 							$this->nodeBuilder->namedType(
 								new TypeNameIdentifier('CliEntryPoint')
 							),
 							$this->nodeBuilder->functionBody(
 								$this->nodeBuilder->constant(
 									$this->nodeBuilder->functionValue(
-										$this->nodeBuilder->arrayType(
-											$this->nodeBuilder->stringType()
+										$this->nodeBuilder->nameAndType(
+											$this->nodeBuilder->arrayType(
+												$this->nodeBuilder->stringType()
+											),
+											new VariableNameIdentifier('args')
 										),
-										new VariableNameIdentifier('args'),
-										$this->s->result['dependencyType'],
-										$this->s->result['dependencyName'] ?? null,
+										$this->nodeBuilder->nameAndType(
+											$this->s->result['dependencyType'],
+											$this->s->result['dependencyName'] ?? null
+										),
 										$this->nodeBuilder->stringType(),
 										$this->nodeBuilder->functionBody(
 											$this->s->generated
@@ -396,11 +404,15 @@ final readonly class ParserStateMachine {
 								new TypeNameIdentifier($this->s->result['typeName'])
 							),
 							new MethodNameIdentifier('as' . $this->s->result['castToTypeName']),
-							$this->nodeBuilder->nullType,
-							null,
-							$this->s->result['dependency_type'] ??
-								$this->nodeBuilder->nothingType,
-							$this->s->result['dependency_name'] ?? null,
+							$this->nodeBuilder->nameAndType(
+								$this->nodeBuilder->nullType,
+								null
+							),
+							$this->nodeBuilder->nameAndType(
+								$this->s->result['dependency_type'] ??
+									$this->nodeBuilder->nothingType,
+								$this->s->result['dependency_name'] ?? null
+							),
 							$returnType,
 							$this->nodeBuilder->functionBody($this->s->generated),
 						)
@@ -450,11 +462,15 @@ final readonly class ParserStateMachine {
 								new TypeNameIdentifier($this->s->result['typeName'])
 							),
 							new MethodNameIdentifier($this->s->result['method_name']),
-							$this->s->result['parameter_type']->parameterType,
-							$this->s->result['parameter_name'] ?? null,
-							$this->s->result['dependency_type'] ??
-								$this->nodeBuilder->nothingType,
-							$this->s->result['dependency_name'] ?? null,
+							$this->nodeBuilder->nameAndType(
+								$this->s->result['parameter_type']->parameterType,
+								$this->s->result['parameter_name'] ?? null
+							),
+							$this->nodeBuilder->nameAndType(
+								$this->s->result['dependency_type'] ??
+									$this->nodeBuilder->nothingType,
+								$this->s->result['dependency_name'] ?? null
+							),
 							$this->s->result['parameter_type']->returnType,
 							$this->nodeBuilder->functionBody($this->s->generated),
 						)
@@ -531,11 +547,15 @@ final readonly class ParserStateMachine {
 					$this->nodeBuilder->definition(
 						$this->s->generated = $this->nodeBuilder->addConstructorMethod(
 							new TypeNameIdentifier($this->s->result['typeName']),
-							$this->s->result['parameter_type'],
-							$this->s->result['parameter_name'] ?? null,
-							$this->s->result['dependency_type'] ??
-								$this->nodeBuilder->nothingType,
-							$this->s->result['dependency_name'] ?? null,
+							$this->nodeBuilder->nameAndType(
+								$this->s->result['parameter_type'],
+								$this->s->result['parameter_name'] ?? null
+							),
+							$this->nodeBuilder->nameAndType(
+								$this->s->result['dependency_type'] ??
+									$this->nodeBuilder->nothingType,
+								$this->s->result['dependency_name'] ?? null
+							),
 							$this->s->result['error_type'] ?? null,
 							$this->nodeBuilder->functionBody($this->s->generated)
 						)
@@ -2179,10 +2199,14 @@ final readonly class ParserStateMachine {
 				'' => function(LT $token) {
 					$return = $this->s->generated;
 					$this->s->generated = $this->nodeBuilder->functionValue(
-						$this->s->result['parameter'] ?? $this->nodeBuilder->anyType,
-						$this->s->result['parameter_name'] ?? null,
-						$this->s->result['dependency'] ?? $this->nodeBuilder->nothingType,
-						$this->s->result['dependency_name'] ?? null,
+						$this->nodeBuilder->nameAndType(
+							$this->s->result['parameter'] ?? $this->nodeBuilder->anyType,
+							$this->s->result['parameter_name'] ?? null
+						),
+						$this->nodeBuilder->nameAndType(
+							$this->s->result['dependency'] ?? $this->nodeBuilder->nothingType,
+							$this->s->result['dependency_name'] ?? null
+						),
 						$this->s->result['return'] ?? $this->nodeBuilder->anyType,
 						$this->nodeBuilder->functionBody($return)
 					);

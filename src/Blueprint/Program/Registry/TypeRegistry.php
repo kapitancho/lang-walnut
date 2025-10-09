@@ -6,6 +6,7 @@ use BcMath\Number;
 use InvalidArgumentException;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\InvalidLengthRange;
 use Walnut\Lang\Blueprint\Common\Range\InvalidNumberRange;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
@@ -29,6 +30,7 @@ use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\MutableType;
+use Walnut\Lang\Blueprint\Type\NameAndType;
 use Walnut\Lang\Blueprint\Type\NamedType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\NullType;
@@ -58,6 +60,8 @@ interface TypeRegistry {
 	public BooleanType $boolean { get; }
 	public TrueType $true { get; }
 	public FalseType $false { get; }
+
+	public function nameAndType(Type $type, VariableNameIdentifier|null $name): NameAndType;
 
 	public function integerFull(NumberInterval ... $intervals): IntegerType;
 

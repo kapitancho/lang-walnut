@@ -8,6 +8,7 @@ use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Program\UnknownType;
+use Walnut\Lang\Blueprint\Type\NameAndType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnknownEnumerationValue;
 use Walnut\Lang\Blueprint\Value\AtomValue;
@@ -47,10 +48,8 @@ interface ValueRegistry {
 	public function set(array $values): SetValue;
 
 	public function function(
-		Type $parameterType,
-		VariableNameIdentifier|null $parameterName,
-		Type $dependencyType,
-		VariableNameIdentifier|null $dependencyName,
+		NameAndType $parameter,
+		NameAndType $dependency,
 		Type $returnType,
 		FunctionBody $body,
 		string $functionName = '(Unknown)'

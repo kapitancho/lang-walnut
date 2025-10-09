@@ -30,7 +30,7 @@ final readonly class FunctionValue implements FunctionValueInterface, JsonSerial
 	): self {
 		return new self(
 			$typeRegistry->function(
-				$function->parameterType,
+				$function->parameter->type,
 				$function->returnType
 			),
 			$function,
@@ -97,11 +97,11 @@ final readonly class FunctionValue implements FunctionValueInterface, JsonSerial
 	}
 
 	public function __toString(): string {
-		$dep = $this->function->dependencyType instanceof NothingType ?
-			'' : '%% ' . sprintf("%s ", $this->function->dependencyType);
+		$dep = $this->function->dependency->type instanceof NothingType ?
+			'' : '%% ' . sprintf("%s ", $this->function->dependency);
 		return sprintf(
 			"^%s => %s %s:: %s",
-			$this->function->parameterType,
+			$this->function->parameter,
 			$this->function->returnType,
 			$dep,
 			$this->function->functionBody
@@ -111,7 +111,8 @@ final readonly class FunctionValue implements FunctionValueInterface, JsonSerial
 	public function jsonSerialize(): array {
 		return [
 			'valueType' => 'Function',
-			'parameterType' => $this->function->parameterType,
+			'parameter' => $this->function->parameter,
+			'dependency' => $this->function->dependency,
 			'returnType' => $this->function->returnType,
 			'body' => $this->function->functionBody
 		];

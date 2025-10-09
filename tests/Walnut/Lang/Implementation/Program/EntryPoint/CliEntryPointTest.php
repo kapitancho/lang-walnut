@@ -14,10 +14,14 @@ class CliEntryPointTest extends BaseProgramTestHelper {
 	public function testCall(): void {
 		$this->addCliEntryPoint(
 			$this->valueRegistry->function(
-				$this->typeRegistry->string(),
-				new VariableNameIdentifier('args'),
-				$this->typeRegistry->nothing,
-				null,
+				$this->typeRegistry->nameAndType(
+					$this->typeRegistry->string(),
+					new VariableNameIdentifier('args')
+				),
+				$this->typeRegistry->nameAndType(
+					$this->typeRegistry->nothing,
+					null
+				),
 				$this->typeRegistry->integer(),
 				$this->expressionRegistry->functionBody(
 					$this->expressionRegistry->constant(

@@ -11,6 +11,7 @@ use Walnut\Lang\Blueprint\Function\UnknownMethod;
 use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder as CustomMethodRegistryBuilderInterface;
 use Walnut\Lang\Blueprint\Program\Registry\CustomMethodRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\MethodRegistry;
+use Walnut\Lang\Blueprint\Type\NameAndType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Implementation\Function\CustomMethod;
 use Walnut\Lang\Implementation\Function\FunctionContextFiller;
@@ -30,10 +31,8 @@ final class CustomMethodRegistryBuilder implements CustomMethodRegistryBuilderIn
 	public function addMethod(
 		Type $targetType,
 		MethodNameIdentifier $methodName,
-		Type $parameterType,
-		VariableNameIdentifier|null $parameterName,
-		Type $dependencyType,
-		VariableNameIdentifier|null $dependencyName,
+		NameAndType $parameter,
+		NameAndType $dependency,
 		Type $returnType,
 		FunctionBody $functionBody,
 	): CustomMethodInterface {
@@ -43,11 +42,9 @@ final class CustomMethodRegistryBuilder implements CustomMethodRegistryBuilderIn
 				$this->contextFiller,
 				sprintf('%s->%s', $targetType, $methodName->identifier),
 				$targetType,
-				$parameterType,
+				$parameter,
 				$returnType,
-				$parameterName,
-				$dependencyType,
-				$dependencyName,
+				$dependency,
 				$functionBody
 			),
 			$methodName,

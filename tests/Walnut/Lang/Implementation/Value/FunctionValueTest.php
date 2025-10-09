@@ -15,10 +15,14 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 	public function testReturnTypeOk(): void {
 		$this->expectNotToPerformAssertions();
 		$fn = $this->valueRegistry->function(
-			$this->typeRegistry->integer(10, 20),
-			null,
-			$this->typeRegistry->nothing,
-			null,
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->integer(10, 20),
+				null
+			),
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->nothing,
+				null
+			),
 			$this->typeRegistry->integer(),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
@@ -30,10 +34,14 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 	public function testReturnTypeWithContextOk(): void {
 		$this->expectNotToPerformAssertions();
 		$fn = $this->valueRegistry->function(
-			$this->typeRegistry->null,
-			null,
-			$this->typeRegistry->nothing,
-			null,
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->null,
+				null
+			),
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->nothing,
+				null
+			),
 			$this->typeRegistry->any,
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->tuple([
@@ -57,10 +65,14 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 
 	public function testReturnTypeWithContextExecuteOk(): void {
 		$fn = $this->valueRegistry->function(
-			$this->typeRegistry->null,
-			null,
-			$this->typeRegistry->nothing,
-			null,
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->null,
+				null
+			),
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->nothing,
+				null
+			),
 			$this->typeRegistry->any,
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->tuple([
@@ -86,10 +98,14 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 	public function testReturnTypeNotOk(): void {
 		$this->expectException(AnalyserException::class);
 		$fn = $this->valueRegistry->function(
-			$this->typeRegistry->integer(),
-			null,
-			$this->typeRegistry->nothing,
-			null,
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->integer(),
+				null
+			),
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->nothing,
+				null
+			),
 			$this->typeRegistry->integer(10, 20),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
@@ -100,10 +116,14 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 
 	public function testReturnValueOk(): void {
 		$fn = $this->valueRegistry->function(
-			$this->typeRegistry->integer(10, 20),
-			null,
-			$this->typeRegistry->nothing,
-			null,
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->integer(10, 20),
+				null
+			),
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->nothing,
+				null
+			),
 			$this->typeRegistry->integer(),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
@@ -118,10 +138,14 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 
 	public function testReturnValueDirectReturnOk(): void {
 		$fn = $this->valueRegistry->function(
-			$this->typeRegistry->integer(10, 20),
-			null,
-			$this->typeRegistry->nothing,
-			null,
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->integer(10, 20),
+				null
+			),
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->nothing,
+				null
+			),
 			$this->typeRegistry->integer(),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->return(

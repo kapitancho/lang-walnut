@@ -31,7 +31,7 @@ final readonly class ConstantExpression implements ConstantExpressionInterface, 
 	public function analyseDependencyType(DependencyContainer $dependencyContainer): array {
 		$analyseErrors = [];
 		if ($this->value instanceof FunctionValue) {
-			$d = $this->value->function->dependencyType;
+			$d = $this->value->function->dependency->type;
 			if (!($d instanceof NothingType)) {
 				$value = $dependencyContainer->valueByType($d);
 				if ($value instanceof DependencyError) {

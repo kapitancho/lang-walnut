@@ -11,6 +11,7 @@ use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry as ValueRegistryInterface;
 use Walnut\Lang\Blueprint\Program\UnknownType;
+use Walnut\Lang\Blueprint\Type\NameAndType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnknownEnumerationValue;
 use Walnut\Lang\Blueprint\Value\AtomValue as AtomValueInterface;
@@ -108,10 +109,8 @@ final class ValueRegistry implements ValueRegistryInterface {
 	}
 
 	public function function(
-		Type $parameterType,
-		VariableNameIdentifier|null $parameterName,
-		Type $dependencyType,
-		VariableNameIdentifier|null $dependencyName,
+		NameAndType $parameter,
+		NameAndType $dependency,
 		Type $returnType,
 		FunctionBody $body,
 		string $functionName = '(Unknown)'
@@ -122,11 +121,9 @@ final class ValueRegistry implements ValueRegistryInterface {
 				$this->contextFiller,
 				$functionName,
 				$this->typeRegistry->nothing,
-				$parameterType,
+				$parameter,
 				$returnType,
-				$parameterName,
-				$dependencyType,
-				$dependencyName,
+				$dependency,
 				$body,
 			)
 		);

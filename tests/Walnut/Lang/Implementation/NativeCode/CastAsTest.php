@@ -49,10 +49,14 @@ final class CastAsTest extends BaseProgramTestHelper {
 		$this->customMethodRegistryBuilder->addMethod(
 			$this->typeRegistry->enumeration(new TypeNameIdentifier('OrderStatus')),
 			new MethodNameIdentifier('asBoolean'),
-			$this->typeRegistry->null,
-			null,
-			$this->typeRegistry->nothing,
-			null,
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->null,
+				null
+			),
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->nothing,
+				null
+			),
 			$this->typeRegistry->boolean,
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->matchValue(
@@ -100,10 +104,14 @@ final class CastAsTest extends BaseProgramTestHelper {
 		$this->customMethodRegistryBuilder->addMethod(
 			$enumType = $this->typeRegistry->enumeration(new TypeNameIdentifier('OrderStatus')),
 			new MethodNameIdentifier('asInteger'),
-			$this->typeRegistry->null,
-			null,
-			$this->typeRegistry->nothing,
-			null,
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->null,
+				null
+			),
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->nothing,
+				null
+			),
 			$this->typeRegistry->integer(0, 2),
 			$toInt = $this->expressionRegistry->functionBody(
 				$this->expressionRegistry->matchValue(
@@ -177,10 +185,14 @@ final class CastAsTest extends BaseProgramTestHelper {
 		$this->customMethodRegistryBuilder->addMethod(
 			$this->typeRegistry->integer(),
 			new MethodNameIdentifier('as' . $enumType->name),
-			$this->typeRegistry->null,
-			null,
-			$this->typeRegistry->nothing,
-			null,
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->null,
+				null
+			),
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->nothing,
+				null
+			),
 			$enumType,
 			$fromInt = $this->expressionRegistry->functionBody(
 				$this->expressionRegistry->matchValue(
@@ -275,10 +287,14 @@ final class CastAsTest extends BaseProgramTestHelper {
 		$this->customMethodRegistryBuilder->addMethod(
 			$enumType,
 			new MethodNameIdentifier('asJsonValue'),
-			$this->typeRegistry->null,
-			null,
-			$this->typeRegistry->nothing,
-			null,
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->null,
+				null
+			),
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->nothing,
+				null
+			),
 			$this->typeRegistry->integer(0, 2),
 			$toInt
 		);
@@ -295,10 +311,14 @@ final class CastAsTest extends BaseProgramTestHelper {
 		$this->customMethodRegistryBuilder->addMethod(
 			$jv,
 			new MethodNameIdentifier('as' . $enumType->name),
-			$this->typeRegistry->null,
-			null,
-			$this->typeRegistry->nothing,
-			null,
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->null,
+				null
+			),
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->nothing,
+				null
+			),
 			$enumType,
 			$fromInt
 		);

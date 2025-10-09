@@ -40,6 +40,7 @@ use Walnut\Lang\Blueprint\AST\Node\Module\AddOpenTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddSealedTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\ModuleDefinitionNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\ModuleNode;
+use Walnut\Lang\Blueprint\AST\Node\NameAndTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\AnyTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\ArrayTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\BooleanTypeNode;
@@ -171,20 +172,16 @@ interface NodeBuilder {
 	public function addMethod(
 		TypeNode $targetType,
 		MethodNameIdentifier $methodName,
-		TypeNode $parameterType,
-		VariableNameIdentifier|null $parameterName,
-		TypeNode $dependencyType,
-		VariableNameIdentifier|null $dependencyName,
+		NameAndTypeNode $parameter,
+		NameAndTypeNode $dependency,
 		TypeNode $returnType,
 		FunctionBodyNode $functionBody,
 	): AddMethodNode;
 
 	public function addConstructorMethod(
 		TypeNameIdentifier $typeName,
-		TypeNode $parameterType,
-		VariableNameIdentifier|null $parameterName,
-		TypeNode $dependencyType,
-		VariableNameIdentifier|null $dependencyName,
+		NameAndTypeNode $parameter,
+		NameAndTypeNode $dependency,
 		TypeNode|null $errorType,
 		FunctionBodyNode $functionBody,
 	): AddConstructorMethodNode;
@@ -308,13 +305,13 @@ interface NodeBuilder {
 	/** @param list<ValueNode> $values */
 	public function setValue(array $values): SetValueNode;
 	public function functionValue(
-		TypeNode $parameterType,
-		VariableNameIdentifier|null $parameterName,
-		TypeNode $dependencyType,
-		VariableNameIdentifier|null $dependencyName,
+		NameAndTypeNode $parameter,
+		NameAndTypeNode $dependency,
 		TypeNode $returnType,
 		FunctionBodyNode $functionBody,
 	): FunctionValueNode;
+
+	public function nameAndType(TypeNode $type, VariableNameIdentifier|null $name): NameAndTypeNode;
 
 	/** @param array<VariableNameIdentifier> $variableNames */
 	public function multiVariableAssignment(array $variableNames, ExpressionNode $assignedExpression): MultiVariableAssignmentExpressionNode;

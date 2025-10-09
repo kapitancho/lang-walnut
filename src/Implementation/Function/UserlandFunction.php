@@ -9,13 +9,13 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownContextVariable;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Function\FunctionContextFiller;
 use Walnut\Lang\Blueprint\Function\UserlandFunction as UserlandFunctionInterface;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyError;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\UnresolvableDependency;
+use Walnut\Lang\Blueprint\Type\NameAndType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -26,11 +26,9 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 		private FunctionContextFiller      $functionContextFiller,
 		public string                      $displayName,
 		public Type                        $targetType,
-		public Type                        $parameterType,
+		public NameAndType                 $parameter,
 		public Type                        $returnType,
-		public VariableNameIdentifier|null $parameterName,
-		public Type                        $dependencyType,
-		public VariableNameIdentifier|null $dependencyName,
+		public NameAndType                 $dependency,
 		public FunctionBody                $functionBody
 	) {}
 
@@ -53,10 +51,8 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 		$analyserContext = $this->functionContextFiller->fillAnalyserContext(
 			$analyserContext,
 			$this->targetType,
-			$this->parameterType,
-			$this->parameterName,
-			$this->dependencyType,
-			$this->dependencyName
+			$this->parameter,
+			$this->dependency
 		);
 		try {
 			$returnType = $this->functionBody->analyse($analyserContext);
@@ -90,7 +86,7 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 		Type $parameterType
 	): Type {
 		$this->checkType('target', $targetType, $this->targetType);
-		$this->checkType('parameter', $parameterType, $this->parameterType);
+		$this->checkType('parameter', $parameterType, $this->parameter->type);
 		return $this->returnType;
 	}
 
@@ -119,10 +115,10 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 		if ($targetValue) {
 			$this->checkValueType('target', $targetValue, $this->targetType);
 		}
-		$this->checkValueType('parameter', $parameterValue, $this->parameterType);
+		$this->checkValueType('parameter', $parameterValue, $this->parameter->type);
 
-		$dependencyValue = $this->dependencyType instanceof NothingType ? null :
-			$executionContext->programRegistry->dependencyContainer->valueByType($this->dependencyType);
+		$dependencyValue = $this->dependency->type instanceof NothingType ? null :
+			$executionContext->programRegistry->dependencyContainer->valueByType($this->dependency->type);
 
 		if ($dependencyValue instanceof DependencyError) {
 			// @codeCoverageIgnoreStart
@@ -131,7 +127,7 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 				$vr->dataValue(
 					new TypeNameIdentifier('DependencyContainerError'),
 					$vr->record([
-						'targetType' => $vr->type($this->dependencyType),
+						'targetType' => $vr->type($this->dependency->type),
 						'errorOnType' => $vr->type($dependencyValue->type),
 						'errorMessage' => $vr->string(
 							match($dependencyValue->unresolvableDependency) {
@@ -156,12 +152,10 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 			$executionContext,
 			$this->targetType,
 			$targetValue,
-			$this->parameterType,
+			$this->parameter,
 			$parameterValue,
-			$this->parameterName,
-			$this->dependencyType,
+			$this->dependency,
 			$dependencyValue,
-			$this->dependencyName
 		);
 		try {
 			$returnValue = $this->functionBody->execute($executionContext);

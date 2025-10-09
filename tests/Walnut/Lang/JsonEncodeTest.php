@@ -52,12 +52,16 @@ final class JsonEncodeTest extends BaseProgramTestHelper {
 				=> $vr->mutable($this->typeRegistry->integer(), $vr->integer(42)),
 			'{"valueType":"Error","errorValue":{"valueType":"String","value":"error"}}' => $vr->error($vr->string('error')),
 			'{"valueType":"Type","value":{"type":"Boolean"}}' => $vr->type($this->typeRegistry->boolean),
-	        '{"valueType":"Function","parameterType":{"type":"Null"},"returnType":{"type":"Any"},"body":{"expression":{"expressionType":"constant","value":{"valueType":"Null"}}}}'
+	        '{"valueType":"Function","parameter":{"type":{"type":"Null"},"name":null},"dependency":{"type":{"type":"Integer","range":{"intervals":[{"start":"MinusInfinity","end":"PlusInfinity"}]}},"name":null},"returnType":{"type":"Any"},"body":{"expression":{"expressionType":"constant","value":{"valueType":"Null"}}}}'
 			        => $vr->function(
-				$this->typeRegistry->null,
-		        null,
-				$this->typeRegistry->integer(),
-				null,
+		        $this->typeRegistry->nameAndType(
+					$this->typeRegistry->null,
+			        null
+		        ),
+		        $this->typeRegistry->nameAndType(
+					$this->typeRegistry->integer(),
+					null
+		        ),
 				$this->typeRegistry->any,
 				$this->expressionRegistry->functionBody(
 					$this->expressionRegistry->constant(

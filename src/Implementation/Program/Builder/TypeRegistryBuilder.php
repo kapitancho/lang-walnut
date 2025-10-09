@@ -8,6 +8,7 @@ use Walnut\Lang\Blueprint\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\InvalidLengthRange;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\NumberInterval as NumberIntervalInterface;
@@ -24,6 +25,7 @@ use Walnut\Lang\Blueprint\Type\AtomType as AtomTypeInterface;
 use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\EnumerationType as EnumerationTypeInterface;
+use Walnut\Lang\Blueprint\Type\NameAndType as NameAndTypeInterface;
 use Walnut\Lang\Blueprint\Type\NamedType as NamedTypeInterface;
 use Walnut\Lang\Blueprint\Type\ResultType as ResultTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -49,6 +51,7 @@ use Walnut\Lang\Implementation\Type\IntersectionType;
 use Walnut\Lang\Implementation\Type\MapType;
 use Walnut\Lang\Implementation\Type\MetaType;
 use Walnut\Lang\Implementation\Type\MutableType;
+use Walnut\Lang\Implementation\Type\NameAndType;
 use Walnut\Lang\Implementation\Type\NothingType;
 use Walnut\Lang\Implementation\Type\NullType;
 use Walnut\Lang\Implementation\Type\OpenType;
@@ -171,6 +174,10 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 			new NumberInterval(MinusInfinity::value, new NumberIntervalEndpoint(new Number(0), false)),
 			new NumberInterval(new NumberIntervalEndpoint(new Number(0), false), PlusInfinity::value)
 		);
+	}
+
+	public function nameAndType(Type $type, VariableNameIdentifier|null $name): NameAndType {
+		return new NameAndType($type, $name);
 	}
 
 	public function integerFull(
@@ -571,10 +578,8 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		$this->customMethodRegistryBuilder->addMethod(
 			$this->atom(new TypeNameIdentifier('Constructor')),
 			new MethodNameIdentifier('as' . $name->identifier),
-			$fromType,
-			null,
-			$this->nothing,
-			null,
+			$this->nameAndType($fromType, null),
+			$this->nameAndType($this->nothing, null),
 			$errorType && !($errorType instanceof NothingType) ?
 				$this->result($fromType, $errorType) :
 				$fromType,

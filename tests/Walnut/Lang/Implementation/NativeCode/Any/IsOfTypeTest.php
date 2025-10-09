@@ -317,20 +317,28 @@ final class IsOfTypeTest extends BaseProgramTestHelper {
 		$this->callIsOfType($v1, $a, true);
 
 		$v1 = $this->valueRegistry->function(
-			$this->typeRegistry->integer(-50, 50),
-			null,
-			$this->typeRegistry->nothing,
-			null,
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->integer(-50, 50),
+				null
+			),
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->nothing,
+				null
+			),
 			$this->typeRegistry->real(0, 3.14),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->constant($this->valueRegistry->real(1))
 			)
 		);
 		$v2 = $this->valueRegistry->function(
-			$this->typeRegistry->any,
-			null,
-			$this->typeRegistry->nothing,
-			null,
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->any,
+				null
+			),
+			$this->typeRegistry->nameAndType(
+				$this->typeRegistry->nothing,
+				null
+			),
 			$this->typeRegistry->real(0, 3),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->constant($this->valueRegistry->real(2))

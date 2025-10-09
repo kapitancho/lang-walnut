@@ -17,6 +17,7 @@ final readonly class AstCompilerFactory implements AstCompilerFactoryInterface, 
 	) {
 		$astTypeCompiler = new AstTypeCompiler($programContext->typeRegistry);
 		$astValueCompiler = new AstValueCompiler(
+			$programContext->typeRegistry,
 			$programContext->valueRegistry,
 			$this,
 			$astTypeCompiler

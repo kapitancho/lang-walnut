@@ -60,10 +60,10 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 		AddConstructorMethodNode $moduleDefinition
 	): CustomMethod {
 		$typeName = $moduleDefinition->typeName;
-		$parameterType = $this->type($moduleDefinition->parameterType);
-		$parameterName = $moduleDefinition->parameterName;
-		$dependencyType = $this->type($moduleDefinition->dependencyType);
-		$dependencyName = $moduleDefinition->dependencyName;
+		$parameterType = $this->type($moduleDefinition->parameter->type);
+		$parameterName = $moduleDefinition->parameter->name;
+		$dependencyType = $this->type($moduleDefinition->dependency->type);
+		$dependencyName = $moduleDefinition->dependency->name;
 		$errorType = $this->type($moduleDefinition->errorType);
 		$functionBody = $this->functionBody($moduleDefinition->functionBody);
 
@@ -91,10 +91,14 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 		return $this->programContext->customMethodRegistryBuilder->addMethod(
 			$this->programContext->typeRegistry->typeByName(new TypeNameIdentifier('Constructor')),
 			new MethodNameIdentifier($typeName),
-			$parameterType,
-			$parameterName,
-			$dependencyType,
-			$dependencyName,
+			$this->programContext->typeRegistry->nameAndType(
+				$parameterType,
+				$parameterName,
+			),
+			$this->programContext->typeRegistry->nameAndType(
+				$dependencyType,
+				$dependencyName,
+			),
 			$errorType instanceof NothingType ? $returnType : $this->programContext->typeRegistry->result(
 				$returnType, $errorType
 			),
@@ -125,10 +129,14 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 				$this->programContext->customMethodRegistryBuilder->addMethod(
 					$this->type($moduleDefinition->targetType),
 					$moduleDefinition->methodName,
-					$this->type($moduleDefinition->parameterType),
-					$moduleDefinition->parameterName,
-					$this->type($moduleDefinition->dependencyType),
-					$moduleDefinition->dependencyName,
+					$this->programContext->typeRegistry->nameAndType(
+						$this->type($moduleDefinition->parameter->type),
+						$moduleDefinition->parameter->name
+					),
+					$this->programContext->typeRegistry->nameAndType(
+						$this->type($moduleDefinition->dependency->type),
+						$moduleDefinition->dependency->name
+					),
 					$this->type($moduleDefinition->returnType),
 					$this->functionBody($moduleDefinition->functionBody),
 				),

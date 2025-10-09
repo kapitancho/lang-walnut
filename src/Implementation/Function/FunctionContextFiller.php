@@ -12,6 +12,7 @@ use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\CompositeNamedType;
 use Walnut\Lang\Blueprint\Type\CustomType;
 use Walnut\Lang\Blueprint\Type\DataType;
+use Walnut\Lang\Blueprint\Type\NameAndType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\OptionalKeyType;
@@ -44,11 +45,12 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 	public function fillAnalyserContext(
 		AnalyserContext $analyserContext,
 		Type $targetType,
-		Type $parameterType,
-		VariableNameIdentifier|null $parameterName,
-		Type $dependencyType,
-		VariableNameIdentifier|null $dependencyName
+		NameAndType $parameter,
+		NameAndType $dependency,
 	): AnalyserContext {
+		$parameterType = $parameter->type;
+		$dependencyType = $dependency->type;
+
 		$tConv = fn(Type $type): Type => $type instanceof OptionalKeyType ?
 			$analyserContext->programRegistry->typeRegistry->result($type->valueType, $this->getMapItemNotFound(
 				$analyserContext->programRegistry->typeRegistry
@@ -61,13 +63,13 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 				$targetType->valueType
 			);
 		}
-		if ($parameterName && !($parameterType instanceof NothingType)) {
+		if (!($parameterType instanceof NothingType) && ($parameterName = $parameter->name)) {
 			$analyserContext = $analyserContext->withAddedVariableType(
 				$parameterName,
 				$parameterType
 			);
 		}
-		if ($dependencyName && !($dependencyType instanceof NothingType)) {
+		if (!($dependencyType instanceof NothingType) && ($dependencyName = $dependency->name)) {
 			$analyserContext = $analyserContext->withAddedVariableType(
 				$dependencyName,
 				$dependencyType
@@ -140,12 +142,10 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 		ExecutionContext $executionContext,
 		Type $targetType,
 		Value|null $targetValue,
-		Type $parameterType,
+		NameAndType $parameter,
 		Value|null $parameterValue,
-		VariableNameIdentifier|null $parameterName,
-		Type $dependencyType,
+		NameAndType $dependency,
 		Value|null $dependencyValue,
-		VariableNameIdentifier|null $dependencyName
 	): ExecutionContext {
 		$t = $this->toBaseType($targetType);
 		if (
@@ -157,13 +157,13 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 				$targetValue->value
 			);
 		}
-		if ($parameterValue && $parameterName) {
+		if ($parameterValue && ($parameterName = $parameter->name)) {
 			$executionContext = $executionContext->withAddedVariableValue(
 				$parameterName,
 				$parameterValue
 			);
 		}
-		if ($dependencyValue && $dependencyName) {
+		if ($dependencyValue && ($dependencyName = $dependency->name)) {
 			$executionContext = $executionContext->withAddedVariableValue(
 				$dependencyName,
 				$dependencyValue
@@ -171,8 +171,8 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 		}
 		foreach([
 			'$' => [$targetType, $targetValue],
-	        '#' => [$parameterType, $parameterValue],
-	        '%' => [$dependencyType, $dependencyValue]
+	        '#' => [$parameter->type, $parameterValue],
+	        '%' => [$dependency->type, $dependencyValue]
         ] as $variableName => [$xType, $value]) {
 			if ($value) {
 				$executionContext = $executionContext->withAddedVariableValue(

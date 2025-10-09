@@ -24,6 +24,7 @@ use Walnut\Lang\Blueprint\Compilation\AST\AstCompilationException;
 use Walnut\Lang\Blueprint\Compilation\AST\AstFunctionBodyCompiler;
 use Walnut\Lang\Blueprint\Compilation\AST\AstTypeCompiler;
 use Walnut\Lang\Blueprint\Compilation\AST\AstValueCompiler as AstValueCompilerInterface;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Program\UnknownType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -32,6 +33,7 @@ use Walnut\Lang\Blueprint\Value\Value;
 
 final readonly class AstValueCompiler implements AstValueCompilerInterface {
 	public function __construct(
+		private TypeRegistry $typeRegistry,
 		private ValueRegistry $valueRegistry,
 		private AstFunctionBodyCompiler $functionBodyCompiler,
 		private AstTypeCompiler $astTypeCompiler,
@@ -82,10 +84,14 @@ final readonly class AstValueCompiler implements AstValueCompilerInterface {
 				),
 				$valueNode instanceof FunctionValueNode =>
 					$this->valueRegistry->function(
-						$this->type($valueNode->parameterType),
-						$valueNode->parameterName,
-						$this->type($valueNode->dependencyType),
-						$valueNode->dependencyName,
+						$this->typeRegistry->nameAndType(
+							$this->type($valueNode->parameter->type),
+							$valueNode->parameter->name
+						),
+						$this->typeRegistry->nameAndType(
+							$this->type($valueNode->dependency->type),
+							$valueNode->dependency->name
+						),
 						$this->type($valueNode->returnType),
 						$this->functionBodyCompiler->functionBody($valueNode->functionBody),
 						(string)$valueNode->sourceLocation

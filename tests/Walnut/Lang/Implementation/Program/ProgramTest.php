@@ -23,12 +23,16 @@ final class ProgramTest extends BaseProgramTestHelper {
 	public function testExecuteOk(): void {
 		$this->addCliEntryPoint(
 			$this->valueRegistry->function(
-				$this->typeRegistry->array(
-					$this->typeRegistry->string()
+				$this->typeRegistry->nameAndType(
+					$this->typeRegistry->array(
+						$this->typeRegistry->string()
+					),
+					null
 				),
-				null,
-				$this->typeRegistry->nothing,
-				null,
+				$this->typeRegistry->nameAndType(
+					$this->typeRegistry->nothing,
+					null
+				),
 				$this->typeRegistry->string(),
 				$this->expressionRegistry->functionBody(
 					$this->expressionRegistry->constant(
@@ -70,10 +74,14 @@ final class ProgramTest extends BaseProgramTestHelper {
 			$this->programContext->customMethodRegistryBuilder->addMethod(
 				$this->typeRegistry->typeByName(new TypeNameIdentifier('DependencyContainer')),
 				new MethodNameIdentifier('asMyInt'),
-				$this->typeRegistry->null,
-				null,
-				$this->typeRegistry->nothing,
-				null,
+				$this->typeRegistry->nameAndType(
+					$this->typeRegistry->null,
+					null
+				),
+				$this->typeRegistry->nameAndType(
+					$this->typeRegistry->nothing,
+					null
+				),
 				$this->typeRegistry->typeByName(new TypeNameIdentifier('MyInt')),
 				$this->expressionRegistry->functionBody(
 					$this->expressionRegistry->constant(

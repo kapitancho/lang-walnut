@@ -12,6 +12,7 @@ use Walnut\Lang\Blueprint\AST\Node\Expression\MethodCallExpressionNode as Method
 use Walnut\Lang\Blueprint\AST\Node\Expression\MultiVariableAssignmentExpressionNode as MultiVariableAssignmentExpressionNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode as FunctionBodyNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\Module\ModuleDefinitionNode;
+use Walnut\Lang\Blueprint\AST\Node\NameAndTypeNode as NameAndTypeNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\SourceNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\NumberIntervalNode as NumberIntervalNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
@@ -60,6 +61,7 @@ use Walnut\Lang\Implementation\AST\Node\Module\AddMethodNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddOpenTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddSealedTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Module\ModuleNode;
+use Walnut\Lang\Implementation\AST\Node\NameAndTypeNode;
 use Walnut\Lang\Implementation\AST\Node\SourceLocation;
 use Walnut\Lang\Implementation\AST\Node\Type\AnyTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\ArrayTypeNode;
@@ -384,10 +386,8 @@ final class NodeBuilder implements NodeBuilderInterface {
 	public function addMethod(
 		TypeNode $targetType,
 		MethodNameIdentifier $methodName,
-		TypeNode $parameterType,
-		VariableNameIdentifier|null $parameterName,
-		TypeNode $dependencyType,
-		VariableNameIdentifier|null $dependencyName,
+		NameAndTypeNodeInterface $parameter,
+		NameAndTypeNodeInterface $dependency,
 		TypeNode $returnType,
 		FunctionBodyNodeInterface $functionBody
 	): AddMethodNode {
@@ -395,10 +395,8 @@ final class NodeBuilder implements NodeBuilderInterface {
 			$this->getSourceLocation(),
 			$targetType,
 			$methodName,
-			$parameterType,
-			$parameterName,
-			$dependencyType,
-			$dependencyName,
+			$parameter,
+			$dependency,
 			$returnType,
 			$functionBody
 		);
@@ -406,20 +404,16 @@ final class NodeBuilder implements NodeBuilderInterface {
 
 	public function addConstructorMethod(
 		TypeNameIdentifier $typeName,
-		TypeNode $parameterType,
-		VariableNameIdentifier|null $parameterName,
-		TypeNode $dependencyType,
-		VariableNameIdentifier|null $dependencyName,
+		NameAndTypeNodeInterface $parameter,
+		NameAndTypeNodeInterface $dependency,
 		TypeNode|null $errorType,
 		FunctionBodyNodeInterface $functionBody
 	): AddConstructorMethodNode {
 		return new AddConstructorMethodNode(
 			$this->getSourceLocation(),
 			$typeName,
-			$parameterType,
-			$parameterName,
-			$dependencyType,
-			$dependencyName,
+			$parameter,
+			$dependency,
 			$errorType ?? $this->nothingType,
 			$functionBody
 		);
@@ -749,23 +743,24 @@ final class NodeBuilder implements NodeBuilderInterface {
 	}
 
 	public function functionValue(
-		TypeNode $parameterType,
-		VariableNameIdentifier|null $parameterName,
-		TypeNode $dependencyType,
-		VariableNameIdentifier|null $dependencyName,
+		NameAndTypeNodeInterface $parameter,
+		NameAndTypeNodeInterface $dependency,
 		TypeNode $returnType,
 		FunctionBodyNodeInterface $functionBody
 	): FunctionValueNode {
 		return new FunctionValueNode(
 			$this->getSourceLocation(),
-			$parameterType,
-			$parameterName,
-			$dependencyType,
-			$dependencyName,
+			$parameter,
+			$dependency,
 			$returnType,
 			$functionBody
 		);
 	}
+
+	public function nameAndType(TypeNode $type, VariableNameIdentifier|null $name): NameAndTypeNode {
+		return new NameAndTypeNode($this->getSourceLocation(), $type, $name);
+	}
+
 
 	/** @param array<VariableNameIdentifier> $variableNames */
 	public function multiVariableAssignment(array $variableNames, ExpressionNode $assignedExpression): MultiVariableAssignmentExpressionNodeInterface {

@@ -5,6 +5,7 @@ namespace Walnut\Lang\Blueprint\Function;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
+use Walnut\Lang\Blueprint\Type\NameAndType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 
@@ -13,22 +14,18 @@ interface FunctionContextFiller {
 	public function fillAnalyserContext(
 		AnalyserContext $analyserContext,
 		Type $targetType,
-		Type $parameterType,
-		VariableNameIdentifier|null $parameterName,
-		Type $dependencyType,
-		VariableNameIdentifier|null $dependencyName
+		NameAndType $parameter,
+		NameAndType $dependency,
 	): AnalyserContext;
 
 	public function fillExecutionContext(
 		ExecutionContext $executionContext,
 		Type $targetType,
 		Value|null $targetValue,
-		Type $parameterType,
+		NameAndType $parameter,
 		Value|null $parameterValue,
-		VariableNameIdentifier|null $parameterName,
-		Type $dependencyType,
+		NameAndType $dependency,
 		Value|null $dependencyValue,
-		VariableNameIdentifier|null $dependencyName
 	): ExecutionContext;
 
 }
