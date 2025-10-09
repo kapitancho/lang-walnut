@@ -1621,16 +1621,16 @@ final readonly class ParserStateMachine {
 				}
 			]],
 
-			351 => ['name' => 'direct expression start', 'transitions' => [
+			351 => ['name' => 'scoped expression start', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->push(352);
 					$this->s->stay(201);
 				},
 			]],
 
-			352 => ['name' => 'direct expression end', 'transitions' => [
-				T::expression_separator->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->directExpression($this->s->generated);
+			352 => ['name' => 'scoped expression end', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->scoped($this->s->generated);
 					$this->s->pop();
 				},
 			]],

@@ -3,26 +3,26 @@ module $http/all-test %% $test/runner, $http/bundle/autowire-router,
 
 /* to run this test file, use 'php -f cli/test.php ../core-nut-lib/http' */
 
-DependencyContainerError ==> HttpResponse %% [~ HttpResponseBuilder] ::
-    %httpResponseBuilder(500)->withBody('Dependency container error: ' + $errorMessage + ': ' + $targetType->asString);
+DependencyContainerError ==> HttpResponse %% ~HttpResponseBuilder ::
+    httpResponseBuilder(500)->withBody('Dependency container error: ' + $errorMessage + ': ' + $targetType->asString);
 
-UnableToRenderTemplate ==> HttpResponse %% [~ HttpResponseBuilder] ::
-    %httpResponseBuilder(500)->withBody($->asString);
+UnableToRenderTemplate ==> HttpResponse %% ~HttpResponseBuilder ::
+    httpResponseBuilder(500)->withBody($->asString);
 
 IndexHandler := ();
-IndexHandler ==> HttpRequestHandler %% [~HttpResponseBuilder] :: ^request: {HttpRequest} => {HttpResponse} :: {
-    %httpResponseBuilder(200)->withBody('<h1>Hello world</h1>' + request->shape(`HttpRequest).target)
+IndexHandler ==> HttpRequestHandler %% ~HttpResponseBuilder :: ^request: {HttpRequest} => {HttpResponse} :: {
+    httpResponseBuilder(200)->withBody('<h1>Hello world</h1>' + request->shape(`HttpRequest).target)
 };
 
 AboutHandler := ();
-AboutHandler ==> HttpRequestHandler %% [~HttpResponseBuilder] :: ^request: {HttpRequest} => {HttpResponse} :: {
-    %httpResponseBuilder(200)->withBody('<h1>About</h1>' + request->shape(`HttpRequest).body->asString)
+AboutHandler ==> HttpRequestHandler %% ~HttpResponseBuilder :: ^request: {HttpRequest} => {HttpResponse} :: {
+    httpResponseBuilder(200)->withBody('<h1>About</h1>' + request->shape(`HttpRequest).body->asString)
 };
 
 SpecialService := ();
 SpecialServiceError := $[message: String];
-SpecialServiceError ==> HttpResponse %% [~HttpResponseBuilder] :: {
-    %httpResponseBuilder(400)->withBody($message)
+SpecialServiceError ==> HttpResponse %% ~HttpResponseBuilder :: {
+    httpResponseBuilder(400)->withBody($message)
 };
 SpecialService->invoke(^param: String => Result<String, SpecialServiceError>) :: ?whenValueOf(param) is {
     '': @SpecialServiceError['Empty string'],

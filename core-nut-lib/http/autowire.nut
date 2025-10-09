@@ -14,12 +14,12 @@ HttpAutoWireRoute := $[
     handler: Type<^Nothing => Any>,
     response: {HttpAutoWireResponseBodyFromParameter}
 ];
-HttpAutoWireRoute->handleRequest(^request: {HttpRequest} => Result<{HttpResponse}, HttpAutoWireRouteDoesNotMatch>) %% DependencyContainer :: {
-    err = ^result: Any => Result<{HttpResponse}, HttpAutoWireRouteDoesNotMatch> %% [~HttpResponseBuilder] :: {
+HttpAutoWireRoute->handleRequest(^request: {HttpRequest} => Result<{HttpResponse}, HttpAutoWireRouteDoesNotMatch>) %% ~DependencyContainer :: {
+    err = ^result => Result<{HttpResponse}, HttpAutoWireRouteDoesNotMatch> %% ~HttpResponseBuilder :: {
         httpResponse = result->as(`HttpResponse);
         ?whenTypeOf(httpResponse) is {
             `{HttpResponse}: httpResponse,
-            ~: %httpResponseBuilder(500)->withBody('Cannot handle error type: ' + #->type->asString)
+            ~: httpResponseBuilder(500)->withBody('Cannot handle error type: ' + #->type->asString)
         }
     };
     request = request->shape(`HttpRequest);
@@ -36,7 +36,7 @@ HttpAutoWireRoute->handleRequest(^request: {HttpRequest} => Result<{HttpResponse
                         handlerParameterType = handlerType->parameterType;
                         handlerReturnType = handlerType->returnType;
                         handlerParams = callParams=>hydrateAs(handlerParameterType);
-                        handlerInstance = %=>valueOf(handlerType);
+                        handlerInstance = dependencyContainer=>valueOf(handlerType);
                         handlerResult = ?noError(handlerInstance(handlerParams));
                         $response->shape(`HttpAutoWireResponseBodyFromParameter)=>invoke(handlerResult)
                     },
@@ -55,7 +55,7 @@ HttpAutoWireRoute->handleRequest(^request: {HttpRequest} => Result<{HttpResponse
 };
 
 HttpAutoWireRequestHandler := $[routes: Array<HttpAutoWireRoute, 1..>];
-HttpAutoWireRequestHandler ==> HttpRequestHandler %% [~HttpResponseBuilder] :: {
+HttpAutoWireRequestHandler ==> HttpRequestHandler %% ~HttpResponseBuilder :: {
     ^request: {HttpRequest} => {HttpResponse} :: {
         h = ^routes: Array<HttpAutoWireRoute, 1..> => Result<{HttpResponse}, HttpAutoWireRouteDoesNotMatch> :: {
             split = routes->withoutFirst;
@@ -77,7 +77,7 @@ HttpAutoWireRequestHandler ==> HttpRequestHandler %% [~HttpResponseBuilder] :: {
         resp = h($routes);
         ?whenTypeOf(resp) is {
             `{HttpResponse}: resp,
-            `Error<HttpAutoWireRouteDoesNotMatch>: %httpResponseBuilder(404)->withBody('Route not found: ' + request->shape(`HttpRequest).target)
+            `Error<HttpAutoWireRouteDoesNotMatch>: httpResponseBuilder(404)->withBody('Route not found: ' + request->shape(`HttpRequest).target)
         }
     }
 };

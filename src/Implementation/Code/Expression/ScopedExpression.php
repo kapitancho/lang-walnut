@@ -9,12 +9,12 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
-use Walnut\Lang\Blueprint\Code\Expression\DirectExpression as DirectExpressionInterface;
+use Walnut\Lang\Blueprint\Code\Expression\ScopedExpression as ScopedExpressionInterface;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
 
-final readonly class DirectExpression implements DirectExpressionInterface, JsonSerializable {
+final readonly class ScopedExpression implements ScopedExpressionInterface, JsonSerializable {
 	public function __construct(
 		public Expression $targetExpression
 	) {}
@@ -55,7 +55,7 @@ final readonly class DirectExpression implements DirectExpressionInterface, Json
 
 	public function jsonSerialize(): array {
 		return [
-			'expressionType' => 'Direct',
+			'expressionType' => 'Scoped',
 			'targetExpression' => $this->targetExpression
 		];
 	}

@@ -130,6 +130,7 @@ AllTypes = [
         multiVariableAssignmentDict: var{ key: variableName1, ~variableName2 } = [key: 1, variableName2: 2],
         variableName: variableName,
         methodCall: 'method call'->length,
+        scoped: :: 'scoped',
         functionBody: ^Any => Any :: 'function body',
         data: MyData!1,
         mutable: mutable{String, 'mutable'},

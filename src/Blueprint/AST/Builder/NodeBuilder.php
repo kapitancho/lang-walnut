@@ -6,7 +6,7 @@ use BcMath\Number;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ConstantExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ConstructorCallExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\DataExpressionNode;
-use Walnut\Lang\Blueprint\AST\Node\Expression\DirectExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\ScopedExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\FunctionCallExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\MatchErrorExpressionNode;
@@ -129,7 +129,7 @@ interface NodeBuilder {
 	public function matchIf(ExpressionNode $condition, ExpressionNode $then, ExpressionNode $else): MatchIfExpressionNode;
 	public function matchError(ExpressionNode $condition, ExpressionNode $then, ExpressionNode|null $else): MatchErrorExpressionNode;
 
-	public function directExpression(ExpressionNode $targetExpression): DirectExpressionNode;
+	public function scoped(ExpressionNode $targetExpression): ScopedExpressionNode;
 
 	public function mutable(TypeNode $type, ExpressionNode $value): MutableExpressionNode;
 

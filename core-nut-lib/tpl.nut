@@ -8,7 +8,7 @@ UnableToRenderTemplate ==> String ::
 Template := #Mutable<String>;
 
 TemplateRenderer := ();
-TemplateRenderer->render(^view: Any => Result<String, UnableToRenderTemplate>) :: {
+TemplateRenderer->render(^view => Result<String, UnableToRenderTemplate>) :: {
     tpl = view->as(`Template);
     ?whenTypeOf(tpl) is {
         `Template: tpl->value->value,

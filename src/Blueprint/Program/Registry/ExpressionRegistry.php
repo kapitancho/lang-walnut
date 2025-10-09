@@ -4,7 +4,7 @@ namespace Walnut\Lang\Blueprint\Program\Registry;
 
 use Walnut\Lang\Blueprint\Code\Expression\ConstantExpression;
 use Walnut\Lang\Blueprint\Code\Expression\DataExpression;
-use Walnut\Lang\Blueprint\Code\Expression\DirectExpression;
+use Walnut\Lang\Blueprint\Code\Expression\ScopedExpression;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MatchErrorExpression;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpression;
@@ -42,7 +42,7 @@ interface ExpressionRegistry {
 	/** @param list<Expression> $values */
 	public function sequence(array $values): SequenceExpression;
 
-	public function directExpression(Expression $targetExpression): DirectExpression;
+	public function scoped(Expression $targetExpression): ScopedExpression;
 
 	public function return(Expression $returnedExpression): ReturnExpression;
 	public function noError(Expression $targetExpression): NoErrorExpression;

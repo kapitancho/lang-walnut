@@ -2,6 +2,6 @@
 
 namespace Walnut\Lang\Blueprint\AST\Node\Expression;
 
-interface DirectExpressionNode extends ExpressionNode {
+interface ScopedExpressionNode extends ExpressionNode {
 	public ExpressionNode $targetExpression { get; }
 }

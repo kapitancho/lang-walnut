@@ -2,6 +2,6 @@
 
 namespace Walnut\Lang\Blueprint\Code\Expression;
 
-interface DirectExpression extends Expression {
+interface ScopedExpression extends Expression {
 	public Expression $targetExpression { get; }
 }

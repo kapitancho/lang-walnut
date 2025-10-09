@@ -16,7 +16,7 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Code\Expression\ConstantExpression;
 use Walnut\Lang\Implementation\Code\Expression\DataExpression;
-use Walnut\Lang\Implementation\Code\Expression\DirectExpression;
+use Walnut\Lang\Implementation\Code\Expression\ScopedExpression;
 use Walnut\Lang\Implementation\Code\Expression\MatchErrorExpression;
 use Walnut\Lang\Implementation\Code\Expression\MatchExpression;
 use Walnut\Lang\Implementation\Code\Expression\MatchExpressionDefault;
@@ -156,8 +156,8 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 		return new SequenceExpression($values);
 	}
 
-	public function directExpression(Expression $targetExpression): DirectExpression {
-		return new DirectExpression($targetExpression);
+	public function scoped(Expression $targetExpression): ScopedExpression {
+		return new ScopedExpression($targetExpression);
 	}
 
 	public function return(Expression $returnedExpression): ReturnExpression {
