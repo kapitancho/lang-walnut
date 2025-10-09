@@ -320,6 +320,7 @@ final class IsOfTypeTest extends BaseProgramTestHelper {
 			$this->typeRegistry->integer(-50, 50),
 			null,
 			$this->typeRegistry->nothing,
+			null,
 			$this->typeRegistry->real(0, 3.14),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->constant($this->valueRegistry->real(1))
@@ -329,6 +330,7 @@ final class IsOfTypeTest extends BaseProgramTestHelper {
 			$this->typeRegistry->any,
 			null,
 			$this->typeRegistry->nothing,
+			null,
 			$this->typeRegistry->real(0, 3),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->constant($this->valueRegistry->real(2))

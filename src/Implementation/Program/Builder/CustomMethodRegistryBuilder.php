@@ -33,6 +33,7 @@ final class CustomMethodRegistryBuilder implements CustomMethodRegistryBuilderIn
 		Type $parameterType,
 		VariableNameIdentifier|null $parameterName,
 		Type $dependencyType,
+		VariableNameIdentifier|null $dependencyName,
 		Type $returnType,
 		FunctionBody $functionBody,
 	): CustomMethodInterface {
@@ -46,6 +47,7 @@ final class CustomMethodRegistryBuilder implements CustomMethodRegistryBuilderIn
 				$returnType,
 				$parameterName,
 				$dependencyType,
+				$dependencyName,
 				$functionBody
 			),
 			$methodName,

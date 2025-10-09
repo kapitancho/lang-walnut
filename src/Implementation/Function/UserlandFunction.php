@@ -30,6 +30,7 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 		public Type                        $returnType,
 		public VariableNameIdentifier|null $parameterName,
 		public Type                        $dependencyType,
+		public VariableNameIdentifier|null $dependencyName,
 		public FunctionBody                $functionBody
 	) {}
 
@@ -54,7 +55,8 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 			$this->targetType,
 			$this->parameterType,
 			$this->parameterName,
-			$this->dependencyType
+			$this->dependencyType,
+			$this->dependencyName
 		);
 		try {
 			$returnType = $this->functionBody->analyse($analyserContext);
@@ -158,7 +160,8 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 			$parameterValue,
 			$this->parameterName,
 			$this->dependencyType,
-			$dependencyValue
+			$dependencyValue,
+			$this->dependencyName
 		);
 		try {
 			$returnValue = $this->functionBody->execute($executionContext);

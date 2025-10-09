@@ -50,6 +50,7 @@ interface ValueRegistry {
 		Type $parameterType,
 		VariableNameIdentifier|null $parameterName,
 		Type $dependencyType,
+		VariableNameIdentifier|null $dependencyName,
 		Type $returnType,
 		FunctionBody $body,
 		string $functionName = '(Unknown)'

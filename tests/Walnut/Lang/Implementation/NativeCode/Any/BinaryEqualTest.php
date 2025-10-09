@@ -229,6 +229,7 @@ final class BinaryEqualTest extends BaseProgramTestHelper {
 			$this->typeRegistry->boolean,
 			null,
 			$this->typeRegistry->nothing,
+			null,
 			$this->typeRegistry->boolean,
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->constant($this->valueRegistry->boolean(true))
@@ -238,6 +239,7 @@ final class BinaryEqualTest extends BaseProgramTestHelper {
 			$this->typeRegistry->boolean,
 			null,
 			$this->typeRegistry->nothing,
+			null,
 			$this->typeRegistry->boolean,
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->constant($this->valueRegistry->boolean(false))

@@ -398,6 +398,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 			$this->typeRegistry->null,
 			null,
 			$this->typeRegistry->nothing,
+			null,
 			$this->typeRegistry->typeByName(new TypeNameIdentifier('CliEntryPoint')),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->constant($value)

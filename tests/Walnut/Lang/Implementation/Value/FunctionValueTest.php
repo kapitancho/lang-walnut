@@ -18,6 +18,7 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 			$this->typeRegistry->integer(10, 20),
 			null,
 			$this->typeRegistry->nothing,
+			null,
 			$this->typeRegistry->integer(),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
@@ -32,6 +33,7 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 			$this->typeRegistry->null,
 			null,
 			$this->typeRegistry->nothing,
+			null,
 			$this->typeRegistry->any,
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->tuple([
@@ -58,6 +60,7 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 			$this->typeRegistry->null,
 			null,
 			$this->typeRegistry->nothing,
+			null,
 			$this->typeRegistry->any,
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->tuple([
@@ -86,6 +89,7 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 			$this->typeRegistry->integer(),
 			null,
 			$this->typeRegistry->nothing,
+			null,
 			$this->typeRegistry->integer(10, 20),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
@@ -99,6 +103,7 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 			$this->typeRegistry->integer(10, 20),
 			null,
 			$this->typeRegistry->nothing,
+			null,
 			$this->typeRegistry->integer(),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
@@ -116,6 +121,7 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 			$this->typeRegistry->integer(10, 20),
 			null,
 			$this->typeRegistry->nothing,
+			null,
 			$this->typeRegistry->integer(),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->return(

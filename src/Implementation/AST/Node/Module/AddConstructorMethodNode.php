@@ -16,6 +16,7 @@ final readonly class AddConstructorMethodNode implements AddConstructorMethodNod
 		public TypeNode $parameterType,
 		public VariableNameIdentifier|null $parameterName,
 		public TypeNode $dependencyType,
+		public VariableNameIdentifier|null $dependencyName,
 		public TypeNode $errorType,
 		public FunctionBodyNode $functionBody
 	) {}
@@ -29,6 +30,7 @@ final readonly class AddConstructorMethodNode implements AddConstructorMethodNod
 			'parameterType' => $this->parameterType,
 			'parameterName' => $this->parameterName,
 			'dependencyType' => $this->dependencyType,
+			'dependencyName' => $this->dependencyName,
 			'errorType' => $this->errorType,
 			'functionBody' => $this->functionBody
 		];

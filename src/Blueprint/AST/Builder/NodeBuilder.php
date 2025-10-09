@@ -174,6 +174,7 @@ interface NodeBuilder {
 		TypeNode $parameterType,
 		VariableNameIdentifier|null $parameterName,
 		TypeNode $dependencyType,
+		VariableNameIdentifier|null $dependencyName,
 		TypeNode $returnType,
 		FunctionBodyNode $functionBody,
 	): AddMethodNode;
@@ -183,6 +184,7 @@ interface NodeBuilder {
 		TypeNode $parameterType,
 		VariableNameIdentifier|null $parameterName,
 		TypeNode $dependencyType,
+		VariableNameIdentifier|null $dependencyName,
 		TypeNode|null $errorType,
 		FunctionBodyNode $functionBody,
 	): AddConstructorMethodNode;
@@ -309,6 +311,7 @@ interface NodeBuilder {
 		TypeNode $parameterType,
 		VariableNameIdentifier|null $parameterName,
 		TypeNode $dependencyType,
+		VariableNameIdentifier|null $dependencyName,
 		TypeNode $returnType,
 		FunctionBodyNode $functionBody,
 	): FunctionValueNode;

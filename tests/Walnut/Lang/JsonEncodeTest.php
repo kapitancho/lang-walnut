@@ -57,6 +57,7 @@ final class JsonEncodeTest extends BaseProgramTestHelper {
 				$this->typeRegistry->null,
 		        null,
 				$this->typeRegistry->integer(),
+				null,
 				$this->typeRegistry->any,
 				$this->expressionRegistry->functionBody(
 					$this->expressionRegistry->constant(

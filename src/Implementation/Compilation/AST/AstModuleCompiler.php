@@ -63,6 +63,7 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 		$parameterType = $this->type($moduleDefinition->parameterType);
 		$parameterName = $moduleDefinition->parameterName;
 		$dependencyType = $this->type($moduleDefinition->dependencyType);
+		$dependencyName = $moduleDefinition->dependencyName;
 		$errorType = $this->type($moduleDefinition->errorType);
 		$functionBody = $this->functionBody($moduleDefinition->functionBody);
 
@@ -93,6 +94,7 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 			$parameterType,
 			$parameterName,
 			$dependencyType,
+			$dependencyName,
 			$errorType instanceof NothingType ? $returnType : $this->programContext->typeRegistry->result(
 				$returnType, $errorType
 			),
@@ -126,6 +128,7 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 					$this->type($moduleDefinition->parameterType),
 					$moduleDefinition->parameterName,
 					$this->type($moduleDefinition->dependencyType),
+					$moduleDefinition->dependencyName,
 					$this->type($moduleDefinition->returnType),
 					$this->functionBody($moduleDefinition->functionBody),
 				),

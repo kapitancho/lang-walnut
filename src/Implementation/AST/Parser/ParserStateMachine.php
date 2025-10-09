@@ -202,6 +202,7 @@ final readonly class ParserStateMachine {
 							$this->nodeBuilder->nullType,
 							null,
 							$this->nodeBuilder->nothingType,
+							null,
 							$this->nodeBuilder->namedType(
 								new TypeNameIdentifier('CliEntryPoint')
 							),
@@ -213,6 +214,7 @@ final readonly class ParserStateMachine {
 										),
 										new VariableNameIdentifier('args'),
 										$this->s->result['dependencyType'],
+										$this->s->result['dependencyName'] ?? null,
 										$this->nodeBuilder->stringType(),
 										$this->nodeBuilder->functionBody(
 											$this->s->generated
@@ -398,6 +400,7 @@ final readonly class ParserStateMachine {
 							null,
 							$this->s->result['dependency_type'] ??
 								$this->nodeBuilder->nothingType,
+							$this->s->result['dependency_name'] ?? null,
 							$returnType,
 							$this->nodeBuilder->functionBody($this->s->generated),
 						)
@@ -432,7 +435,7 @@ final readonly class ParserStateMachine {
 			126 => ['name' => 'method name body', 'transitions' => [
 				T::dependency_marker->name => function(LT $token) {
 					$this->s->push(151);
-					$this->s->move(701);
+					$this->s->move(651);
 				},
 				T::function_body_marker->name => function(LT $token) {
 					$this->s->push(127);
@@ -451,6 +454,7 @@ final readonly class ParserStateMachine {
 							$this->s->result['parameter_name'] ?? null,
 							$this->s->result['dependency_type'] ??
 								$this->nodeBuilder->nothingType,
+							$this->s->result['dependency_name'] ?? null,
 							$this->s->result['parameter_type']->returnType,
 							$this->nodeBuilder->functionBody($this->s->generated),
 						)
@@ -515,7 +519,7 @@ final readonly class ParserStateMachine {
 				},
 				T::dependency_marker->name => function(LT $token) {
 					$this->s->push(152);
-					$this->s->move(701);
+					$this->s->move(651);
 				},
 				T::function_body_marker->name => function(LT $token) {
 					$this->s->push(145);
@@ -531,6 +535,7 @@ final readonly class ParserStateMachine {
 							$this->s->result['parameter_name'] ?? null,
 							$this->s->result['dependency_type'] ??
 								$this->nodeBuilder->nothingType,
+							$this->s->result['dependency_name'] ?? null,
 							$this->s->result['error_type'] ?? null,
 							$this->nodeBuilder->functionBody($this->s->generated)
 						)
@@ -553,7 +558,7 @@ final readonly class ParserStateMachine {
 			148 => ['name' => 'constructor method body after error type', 'transitions' => [
 				T::dependency_marker->name => function(LT $token) {
 					$this->s->push(152);
-					$this->s->move(701);
+					$this->s->move(651);
 				},
 				T::function_body_marker->name => function(LT $token) {
 					$this->s->push(145);
@@ -562,21 +567,24 @@ final readonly class ParserStateMachine {
 			]],
 			151 => ['name' => 'method dependency result', 'transitions' => [
 				T::function_body_marker->name => function(LT $token) {
-					$this->s->result['dependency_type'] = $this->s->generated;
+					$this->s->result['dependency_type'] = $this->s->generated['dependency_type'];
+					$this->s->result['dependency_name'] = $this->s->generated['dependency_name'];
 					$this->s->push(127);
 					$this->s->move(201);
 				},
 			]],
 			152 => ['name' => 'constructor dependency result', 'transitions' => [
 				T::function_body_marker->name => function(LT $token) {
-					$this->s->result['dependency_type'] = $this->s->generated;
+					$this->s->result['dependency_type'] = $this->s->generated['dependency_type'];
+					$this->s->result['dependency_name'] = $this->s->generated['dependency_name'];
 					$this->s->push(145);
 					$this->s->move(201);
 				},
 			]],
 			153 => ['name' => 'cast dependency result', 'transitions' => [
 				T::function_body_marker->name => function(LT $token) {
-					$this->s->result['dependency_type'] = $this->s->generated;
+					$this->s->result['dependency_type'] = $this->s->generated['dependency_type'];
+					$this->s->result['dependency_name'] = $this->s->generated['dependency_name'];
 					$this->s->push(121);
 					$this->s->move(201);
 				}
@@ -612,7 +620,7 @@ final readonly class ParserStateMachine {
 				},
 				'' => function(LT $token) {
 					$this->s->push(153);
-					$this->s->stay(701);
+					$this->s->stay(651);
 				},
 			]],
 
@@ -2154,7 +2162,7 @@ final readonly class ParserStateMachine {
 			503 => ['name' => 'function value parameter return 1', 'transitions' => [
 				T::dependency_marker->name => function(LT $token) {
 					$this->s->push(508);
-					$this->s->move(701);
+					$this->s->move(651);
 				},
 				T::function_body_marker->name => function(LT $token) {
 					$this->s->move(506);
@@ -2174,6 +2182,7 @@ final readonly class ParserStateMachine {
 						$this->s->result['parameter'] ?? $this->nodeBuilder->anyType,
 						$this->s->result['parameter_name'] ?? null,
 						$this->s->result['dependency'] ?? $this->nodeBuilder->nothingType,
+						$this->s->result['dependency_name'] ?? null,
 						$this->s->result['return'] ?? $this->nodeBuilder->anyType,
 						$this->nodeBuilder->functionBody($return)
 					);
@@ -2182,7 +2191,8 @@ final readonly class ParserStateMachine {
 			]],
 			508 => ['name' => 'function value dependency type', 'transitions' => [
 				T::function_body_marker->name => function(LT $token) {
-					$this->s->result['dependency'] = $this->s->generated;
+					$this->s->result['dependency'] = $this->s->generated['dependency_type'];
+					$this->s->result['dependency_name'] = $this->s->generated['dependency_name'];
 					$this->s->move(506);
 				}
 			]],
@@ -2418,6 +2428,70 @@ final readonly class ParserStateMachine {
 					$this->s->move(642);
 				},
 			]],
+
+
+			651 => ['name' => 'dependency parameter start', 'transitions' => [
+				T::var_keyword->name => function(LT $token) {
+					$this->s->result['dependency_name'] = new VariableNameIdentifier($token->patternMatch->text);
+					$this->s->move(652);
+				},
+				T::default_match->name => function(LT $token) {
+					$this->s->move(654);
+				},
+				'' => function(LT $token) {
+					$this->s->result['dependency_name'] = null;
+					$this->s->push(655);
+					$this->s->stay(701);
+				},
+			]],
+
+			652 => ['name' => 'dependency parameter name', 'transitions' => [
+				T::colon->name => 653,
+			]],
+			653 => ['name' => 'dependency parameter name type', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(655);
+					$this->s->stay(701);
+				},
+			]],
+			654 => ['name' => 'dependency parameter name from type', 'transitions' => [
+				T::type_keyword->name => function(LT $token) {
+					$this->s->result['dependency_name'] = new VariableNameIdentifier(
+						lcfirst($token->patternMatch->text)
+					);
+					$this->s->push(655);
+					$this->s->stay(701);
+				},
+			]],
+			655 => ['name' => 'function value parameter return', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->result['dependency_type'] = $this->s->generated;
+					$this->s->stay(656);
+				},
+			]],
+			656 => ['name' => 'function value parameter exit', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = [
+						'dependency_name' => $this->s->result['dependency_name'] ?? null,
+						'dependency_type' => $this->s->result['dependency_type']
+					];
+					$this->s->pop();
+				},
+			]],
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 			701 => ['name' => 'type adt start', 'transitions' => [
 				'' => function(LT $token) {

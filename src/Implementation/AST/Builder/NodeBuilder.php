@@ -387,6 +387,7 @@ final class NodeBuilder implements NodeBuilderInterface {
 		TypeNode $parameterType,
 		VariableNameIdentifier|null $parameterName,
 		TypeNode $dependencyType,
+		VariableNameIdentifier|null $dependencyName,
 		TypeNode $returnType,
 		FunctionBodyNodeInterface $functionBody
 	): AddMethodNode {
@@ -397,6 +398,7 @@ final class NodeBuilder implements NodeBuilderInterface {
 			$parameterType,
 			$parameterName,
 			$dependencyType,
+			$dependencyName,
 			$returnType,
 			$functionBody
 		);
@@ -407,6 +409,7 @@ final class NodeBuilder implements NodeBuilderInterface {
 		TypeNode $parameterType,
 		VariableNameIdentifier|null $parameterName,
 		TypeNode $dependencyType,
+		VariableNameIdentifier|null $dependencyName,
 		TypeNode|null $errorType,
 		FunctionBodyNodeInterface $functionBody
 	): AddConstructorMethodNode {
@@ -416,6 +419,7 @@ final class NodeBuilder implements NodeBuilderInterface {
 			$parameterType,
 			$parameterName,
 			$dependencyType,
+			$dependencyName,
 			$errorType ?? $this->nothingType,
 			$functionBody
 		);
@@ -748,6 +752,7 @@ final class NodeBuilder implements NodeBuilderInterface {
 		TypeNode $parameterType,
 		VariableNameIdentifier|null $parameterName,
 		TypeNode $dependencyType,
+		VariableNameIdentifier|null $dependencyName,
 		TypeNode $returnType,
 		FunctionBodyNodeInterface $functionBody
 	): FunctionValueNode {
@@ -756,6 +761,7 @@ final class NodeBuilder implements NodeBuilderInterface {
 			$parameterType,
 			$parameterName,
 			$dependencyType,
+			$dependencyName,
 			$returnType,
 			$functionBody
 		);

@@ -87,6 +87,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			$this->typeRegistry->null,
 			null,
 			$this->typeRegistry->nothing,
+			null,
 			$this->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->constant(
@@ -146,6 +147,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			$this->typeRegistry->null,
 			null,
 			$this->typeRegistry->nothing,
+			null,
 			$this->typeRegistry->enumeration(new TypeNameIdentifier('MyCustomEnum')),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->matchValue(
@@ -192,6 +194,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			$this->typeRegistry->null,
 			null,
 			$this->typeRegistry->nothing,
+			null,
 			$this->typeRegistry->sealed(new TypeNameIdentifier('MyCustomState')),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->matchValue(

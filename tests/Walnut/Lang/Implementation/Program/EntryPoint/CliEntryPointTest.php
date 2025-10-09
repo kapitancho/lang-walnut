@@ -17,6 +17,7 @@ class CliEntryPointTest extends BaseProgramTestHelper {
 				$this->typeRegistry->string(),
 				new VariableNameIdentifier('args'),
 				$this->typeRegistry->nothing,
+				null,
 				$this->typeRegistry->integer(),
 				$this->expressionRegistry->functionBody(
 					$this->expressionRegistry->constant(

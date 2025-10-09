@@ -46,7 +46,8 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 		Type $targetType,
 		Type $parameterType,
 		VariableNameIdentifier|null $parameterName,
-		Type $dependencyType
+		Type $dependencyType,
+		VariableNameIdentifier|null $dependencyName
 	): AnalyserContext {
 		$tConv = fn(Type $type): Type => $type instanceof OptionalKeyType ?
 			$analyserContext->programRegistry->typeRegistry->result($type->valueType, $this->getMapItemNotFound(
@@ -64,6 +65,12 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 			$analyserContext = $analyserContext->withAddedVariableType(
 				$parameterName,
 				$parameterType
+			);
+		}
+		if ($dependencyName && !($dependencyType instanceof NothingType)) {
+			$analyserContext = $analyserContext->withAddedVariableType(
+				$dependencyName,
+				$dependencyType
 			);
 		}
 		foreach(['$' => $targetType, '#' => $parameterType, '%' => $dependencyType] as $variableName => $type) {
@@ -137,7 +144,8 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 		Value|null $parameterValue,
 		VariableNameIdentifier|null $parameterName,
 		Type $dependencyType,
-		Value|null $dependencyValue
+		Value|null $dependencyValue,
+		VariableNameIdentifier|null $dependencyName
 	): ExecutionContext {
 		$t = $this->toBaseType($targetType);
 		if (
@@ -153,6 +161,12 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 			$executionContext = $executionContext->withAddedVariableValue(
 				$parameterName,
 				$parameterValue
+			);
+		}
+		if ($dependencyValue && $dependencyName) {
+			$executionContext = $executionContext->withAddedVariableValue(
+				$dependencyName,
+				$dependencyValue
 			);
 		}
 		foreach([

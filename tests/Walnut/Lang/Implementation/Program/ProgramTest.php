@@ -28,6 +28,7 @@ final class ProgramTest extends BaseProgramTestHelper {
 				),
 				null,
 				$this->typeRegistry->nothing,
+				null,
 				$this->typeRegistry->string(),
 				$this->expressionRegistry->functionBody(
 					$this->expressionRegistry->constant(
@@ -72,6 +73,7 @@ final class ProgramTest extends BaseProgramTestHelper {
 				$this->typeRegistry->null,
 				null,
 				$this->typeRegistry->nothing,
+				null,
 				$this->typeRegistry->typeByName(new TypeNameIdentifier('MyInt')),
 				$this->expressionRegistry->functionBody(
 					$this->expressionRegistry->constant(

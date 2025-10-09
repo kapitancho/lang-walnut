@@ -12,6 +12,7 @@ interface AddConstructorMethodNode extends ModuleDefinitionNode {
 	public TypeNode $parameterType { get; }
 	public VariableNameIdentifier|null $parameterName { get; }
 	public TypeNode $dependencyType { get; }
+	public VariableNameIdentifier|null $dependencyName { get; }
 	public TypeNode $errorType { get; }
 	public FunctionBodyNode $functionBody { get; }
 }

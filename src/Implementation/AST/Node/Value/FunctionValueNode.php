@@ -14,6 +14,7 @@ final readonly class FunctionValueNode implements FunctionValueNodeInterface {
 		public TypeNode $parameterType,
 		public VariableNameIdentifier|null $parameterName,
 		public TypeNode $dependencyType,
+		public VariableNameIdentifier|null $dependencyName,
 		public TypeNode $returnType,
 		public FunctionBodyNode $functionBody
 	) {}
@@ -26,6 +27,7 @@ final readonly class FunctionValueNode implements FunctionValueNodeInterface {
 			'parameterType' => $this->parameterType,
 			'parameterName' => $this->parameterName,
 			'dependencyType' => $this->dependencyType,
+			'dependencyName' => $this->dependencyName,
 			'returnType' => $this->returnType,
 			'functionBody' => $this->functionBody
 		];

@@ -10,6 +10,7 @@ interface FunctionValueNode extends ValueNode {
 	public TypeNode $parameterType { get; }
 	public VariableNameIdentifier|null $parameterName { get; }
 	public TypeNode $dependencyType { get; }
+	public VariableNameIdentifier|null $dependencyName { get; }
 	public TypeNode $returnType { get; }
 	public FunctionBodyNode $functionBody { get; }
 }

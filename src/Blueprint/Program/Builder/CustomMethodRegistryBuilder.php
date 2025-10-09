@@ -15,6 +15,7 @@ interface CustomMethodRegistryBuilder {
 		Type $parameterType,
 		VariableNameIdentifier|null $parameterName,
 		Type $dependencyType,
+		VariableNameIdentifier|null $dependencyName,
 		Type $returnType,
 		FunctionBody $functionBody
 	): CustomMethod;

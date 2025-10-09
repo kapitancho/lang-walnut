@@ -574,6 +574,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 			$fromType,
 			null,
 			$this->nothing,
+			null,
 			$errorType && !($errorType instanceof NothingType) ?
 				$this->result($fromType, $errorType) :
 				$fromType,

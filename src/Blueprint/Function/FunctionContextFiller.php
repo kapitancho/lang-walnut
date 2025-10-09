@@ -15,7 +15,8 @@ interface FunctionContextFiller {
 		Type $targetType,
 		Type $parameterType,
 		VariableNameIdentifier|null $parameterName,
-		Type $dependencyType
+		Type $dependencyType,
+		VariableNameIdentifier|null $dependencyName
 	): AnalyserContext;
 
 	public function fillExecutionContext(
@@ -26,7 +27,8 @@ interface FunctionContextFiller {
 		Value|null $parameterValue,
 		VariableNameIdentifier|null $parameterName,
 		Type $dependencyType,
-		Value|null $dependencyValue
+		Value|null $dependencyValue,
+		VariableNameIdentifier|null $dependencyName
 	): ExecutionContext;
 
 }

@@ -51,6 +51,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 			$this->typeRegistry->integer(),
 			null,
 			$this->typeRegistry->nothing,
+			null,
 			$this->typeRegistry->string(),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->constant(
@@ -62,6 +63,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 			$this->typeRegistry->integer(),
 			null,
 			$this->typeRegistry->nothing,
+			null,
 			$this->typeRegistry->string(),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->constant(

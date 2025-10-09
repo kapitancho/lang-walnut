@@ -111,6 +111,7 @@ final class ValueRegistry implements ValueRegistryInterface {
 		Type $parameterType,
 		VariableNameIdentifier|null $parameterName,
 		Type $dependencyType,
+		VariableNameIdentifier|null $dependencyName,
 		Type $returnType,
 		FunctionBody $body,
 		string $functionName = '(Unknown)'
@@ -125,6 +126,7 @@ final class ValueRegistry implements ValueRegistryInterface {
 				$returnType,
 				$parameterName,
 				$dependencyType,
+				$dependencyName,
 				$body,
 			)
 		);
