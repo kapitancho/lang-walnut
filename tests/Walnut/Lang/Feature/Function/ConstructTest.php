@@ -138,6 +138,15 @@ final class ConstructTest extends CodeExecutionTestHelper {
 	NUT);
 	}
 
+	public function testAliasConstructorError(): void {
+		$this->executeErrorCodeSnippet(
+			"Cannot construct a value of type: A",
+			"A[a: 1, b: 'hi'];",
+	<<<NUT
+		A = [a: Integer, b: String];
+	NUT);
+	}
+
 	public function testOpenWithoutConstructorCallOk(): void {
 		$result = $this->executeCodeSnippet("[A[a: 1, b: 'hi'], getA[a: 1, b: 'hi']];", <<<NUT
 		A := #[a: Integer, b: String];

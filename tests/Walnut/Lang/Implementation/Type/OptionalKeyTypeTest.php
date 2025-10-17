@@ -19,4 +19,20 @@ final class OptionalKeyTypeTest extends BaseProgramTestHelper {
 		));
 	}
 
+	public function testOptionalKeyTypeIsSubtypeOf2(): void {
+		$type = $this->typeRegistry->optionalKey(
+			$this->typeRegistry->real()
+		);
+		$this->assertFalse($type->isSubtypeOf(
+			$this->typeRegistry->real(),
+		));
+	}
+
+	public function testOptionalKeyTypeIsSubtypeOf3(): void {
+		$type = $this->typeRegistry->optionalKey(
+			$this->typeRegistry->real()
+		);
+		$this->assertTrue($this->typeRegistry->real()->isSubtypeOf($type));
+	}
+
 }

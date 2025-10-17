@@ -40,34 +40,34 @@ final readonly class Item implements NativeMethod {
 		$type = $this->toBaseType($targetType);
 		if ($type instanceof OpenType) {
 			$valueType = $this->toBaseType($type->valueType);
-			$valueType = $valueType instanceof TupleType ? $valueType->asArrayType() : $valueType;
-			if ($valueType instanceof ArrayType) {
+			$vType = $valueType instanceof TupleType ? $valueType->asArrayType() : $valueType;
+			if ($vType instanceof ArrayType) {
 				if ($parameterType instanceof IntegerType) {
-					$returnType = $valueType->itemType;
-					if ($targetType instanceof TupleType) {
+					$returnType = $vType->itemType;
+					if ($valueType instanceof TupleType) {
 						$min = $parameterType->numberRange->min;
 						$max = $parameterType->numberRange->max;
 						if ($min !== MinusInfinity::value && $min->value >= 0) {
 							if ($parameterType instanceof IntegerSubsetType) {
 								$returnType = $programRegistry->typeRegistry->union(
 									array_map(
-										static fn(Number $value) => $targetType->types[(string)$value] ?? $targetType->restType,
+										static fn(Number $value) => $valueType->types[(string)$value] ?? $valueType->restType,
 										$parameterType->subsetValues
 									)
 								);
 							} elseif ($parameterType instanceof IntegerType) {
-								$isWithinLimit = $max !== PlusInfinity::value && $max->value < count($targetType->types);
+								$isWithinLimit = $max !== PlusInfinity::value && $max->value < count($valueType->types);
 								$returnType = $programRegistry->typeRegistry->union(
 									$isWithinLimit ?
-										array_slice($targetType->types, (int)(string)$min->value, (int)(string)$max->value - (int)(string)$min->value + 1) :
-										[... array_slice($targetType->types, (int)(string)$min->value), $targetType->restType]
+										array_slice($valueType->types, (int)(string)$min->value, (int)(string)$max->value - (int)(string)$min->value + 1) :
+										[... array_slice($valueType->types, (int)(string)$min->value), $valueType->restType]
 								);
 							}
 						}
 					}
 
 					return $parameterType->numberRange->max !== PlusInfinity::value &&
-						$valueType->range->minLength > $parameterType->numberRange->max->value ?
+						$vType->range->minLength > $parameterType->numberRange->max->value ?
 							$returnType :
 							$programRegistry->typeRegistry->result(
 								$returnType,

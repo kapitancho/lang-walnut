@@ -42,7 +42,7 @@ final readonly class ValueConstructor {
 		return match(true) {
 			$type instanceof CustomType => $type->valueType,
 			//$type instanceof AtomType => $typeRegistry->null,
-			$type instanceof AliasType => $type->aliasedType,
+			//$type instanceof AliasType => $type->aliasedType,
 			$type instanceof ResultType && $type->returnType instanceof NothingType => $parameterType,
 			$type instanceof EnumerationType => $typeRegistry->union([
 				$typeRegistry->string(),

@@ -17,6 +17,9 @@ final readonly class PackageBasedModuleLookupContext implements ModuleLookupCont
 
 	/** @throws ModuleDependencyException */
 	public function sourceOf(string $moduleName): string {
+		if ($moduleName === '$') {
+			return file_get_contents('php://stdin') ?: '';
+		}
 		$sourcePath = $this->modulePathFinder->pathFor($moduleName);
 		foreach($this->precompilers as $precompiler) {
 			$fullSourcePath = $precompiler->determineSourcePath($sourcePath);

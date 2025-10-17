@@ -421,7 +421,8 @@ final readonly class ParserStateMachine {
 					$this->s->result['method_name'] = $token->patternMatch->text;
 					$this->s->move(123);
 				},
-				T::type_keyword->name => $c
+				T::type_keyword->name => $c,
+				T::val->name => $c,
 			]],
 
 			123 => ['name' => 'method name next', 'transitions' => [
@@ -1299,7 +1300,8 @@ final readonly class ParserStateMachine {
 					$this->s->move(306);
 				},
 				T::type_keyword->name => $c,
-				T::type->name => $c
+				T::type->name => $c,
+				T::val->name => $c,
 			]],
 			306 => ['name' => 'method name next', 'transitions' => [
 				T::call_start->name => function(LT $token) {
@@ -2205,7 +2207,7 @@ final readonly class ParserStateMachine {
 				},
 			]],
 
-			503 => ['name' => 'function value parameter return 1', 'transitions' => [
+			503 => ['name' => 'function value parameter return 2', 'transitions' => [
 				T::dependency_marker->name => function(LT $token) {
 					$this->s->push(508);
 					$this->s->move(651);
@@ -3905,6 +3907,10 @@ final readonly class ParserStateMachine {
 
 
 			901 => ['name' => 'function type parameter type', 'transitions' => [
+				T::lambda_return->name => function(LT $token) {
+					$this->s->result['parameter'] = $this->nodeBuilder->nullType;
+					$this->s->move(903);
+				},
 				T::type_keyword->name => $c = function(LT $token) {
 					$this->s->push(902);
 					$this->s->stay(701);

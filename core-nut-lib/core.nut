@@ -57,6 +57,7 @@ RealNumberInterval := #[
 RealNumberRange := [intervals: Array<RealNumberInterval, 1..>];
 
 NonEmptyString = String<1..>;
+CannotFormatString := [values: Array<{String}>|Map<{String}>, format: String];
 
 /* dependency container */
 DependencyContainer := ();

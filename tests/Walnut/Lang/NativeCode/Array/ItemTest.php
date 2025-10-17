@@ -25,4 +25,13 @@ final class ItemTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet("Invalid parameter type",
 			"['a', 1, 2]->item('b')");
 	}
+
+	public function testItemTypeWithRestSubset(): void {
+		$result = $this->executeCodeSnippet("getValue[6, true, false];",
+			"MyTuple = [Integer, ... Boolean];",
+			"getValue = ^t: MyTuple => Integer :: t.0;"
+		);
+		$this->assertEquals("6", $result);
+	}
+
 }
