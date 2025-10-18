@@ -3,7 +3,6 @@
 namespace Walnut\Lang\NativeCode\DatabaseConnector;
 
 use BcMath\Number;
-use PDO;
 use PDOException;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
@@ -61,7 +60,7 @@ final readonly class Execute extends PdoMethod implements NativeMethod {
 			new TypeNameIdentifier('DatabaseConnector')
 		)) {
 			if ($parameterValue->type->isSubtypeOf(
-				$typeRegistry->withName(
+				$programRegistry->typeRegistry->withName(
 					new TypeNameIdentifier('DatabaseQueryCommand')
 				)
 			)) {

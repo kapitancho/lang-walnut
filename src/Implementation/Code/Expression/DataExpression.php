@@ -13,6 +13,7 @@ use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\DataExpression as DataExpressionInterface;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
+use Walnut\Lang\Blueprint\Program\UnknownType;
 
 final readonly class DataExpression implements DataExpressionInterface, JsonSerializable {
 
@@ -23,7 +24,13 @@ final readonly class DataExpression implements DataExpressionInterface, JsonSeri
 
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
 		$analyserContext = $this->value->analyse($analyserContext);
-		$dataType = $analyserContext->programRegistry->typeRegistry->data($this->typeName);
+		try {
+			$dataType = $analyserContext->programRegistry->typeRegistry->data($this->typeName);
+		} catch (UnknownType) {
+			throw new AnalyserException(
+				sprintf("The data type '%s' is not defined.", $this->typeName)
+			);
+		}
 		if (!$analyserContext->expressionType->isSubtypeOf($dataType->valueType)) {
 			throw new AnalyserException(
 				sprintf(

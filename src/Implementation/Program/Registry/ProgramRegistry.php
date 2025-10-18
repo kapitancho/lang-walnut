@@ -6,13 +6,13 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext as AnalyserContextInterf
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext as ExecutionContextInterface;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope as VariableValueScopeInterface;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer as DependencyContainerInterface;
-use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry as ExpressionRegistryInterface;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry as ProgramRegistryInterface;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Implementation\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Implementation\Code\Execution\ExecutionContext;
+use Walnut\Lang\Implementation\Code\NativeCode\ValueConstructor;
 use Walnut\Lang\Implementation\Program\DependencyContainer\DependencyContainer;
 
 final class ProgramRegistry implements ProgramRegistryInterface {
@@ -25,7 +25,6 @@ final class ProgramRegistry implements ProgramRegistryInterface {
 		public readonly ValueRegistry                $valueRegistry,
 		public readonly MethodFinder                 $methodFinder,
 		private readonly VariableValueScopeInterface $variableValueScope,
-		private readonly ExpressionRegistryInterface $expressionRegistry,
 	) {}
 
 	public AnalyserContextInterface $analyserContext {
@@ -49,9 +48,8 @@ final class ProgramRegistry implements ProgramRegistryInterface {
 		get {
 			return $this->dependencyContainerInstance ??= new DependencyContainer(
 				$this,
-				$this->executionContext,
 				$this->methodFinder,
-				$this->expressionRegistry
+				new ValueConstructor()
 			);
 		}
 	}

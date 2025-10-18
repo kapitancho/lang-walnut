@@ -38,7 +38,7 @@ final class CustomMethodAnalyserTest extends CodeExecutionTestHelper {
 
 	public function testCustomMethodErrorCast(): void {
 		$this->executeErrorCodeSnippet(
-			"Error in the cast T1 ==> T2 : the dependency [~T3] cannot be resolved: error returned while creating value (type: String)",
+			"Error in the cast T1 ==> T2 : the dependency [~T3] cannot be resolved: error returned while creating value (type: T3)",
 			"{T1}->asT2;", <<<NUT
 			T1 := ();
 			T2 := ();

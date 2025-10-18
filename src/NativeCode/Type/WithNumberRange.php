@@ -20,7 +20,6 @@ use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Implementation\Common\Range\NumberInterval;
 use Walnut\Lang\Implementation\Common\Range\NumberIntervalEndpoint;
-use Walnut\Lang\Implementation\Common\Range\NumberRange;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class WithNumberRange implements NativeMethod {

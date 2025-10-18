@@ -58,8 +58,6 @@ final readonly class Format implements NativeMethod {
 				if ($parameterType instanceof StringSubsetType) {
 					$max = -1;
 					foreach ($parameterType->subsetValues as $subsetValue) {
-						// todo - grab all {\d+} placeholders and ensure they are within bounds of the array length
-						$str = $subsetValue;
 						if (preg_match_all('/\{(\d+)\}/', $subsetValue, $matches)) {
 							$max = max($max, count($matches[1]) ? (int)max($matches[1]) : -1);
 						}

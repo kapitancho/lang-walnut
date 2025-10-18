@@ -12,7 +12,6 @@ final readonly class SourceCliEntryPoint implements SourceCliEntryPointInterface
 	) {}
 
 	public function call(string ... $parameters): string {
-		$tr = $this->entryPointProvider->typeRegistry;
 		$vr = $this->entryPointProvider->valueRegistry;
 		$ep = $this->entryPointProvider->program->getEntryPoint(
 			new TypeNameIdentifier("CliEntryPoint")

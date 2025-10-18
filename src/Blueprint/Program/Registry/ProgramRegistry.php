@@ -4,7 +4,6 @@ namespace Walnut\Lang\Blueprint\Program\Registry;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
-use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 
 interface ProgramRegistry {

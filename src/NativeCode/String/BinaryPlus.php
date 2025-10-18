@@ -65,7 +65,7 @@ final readonly class BinaryPlus implements NativeMethod {
 				new ValueConverter()->convertValueToShape(
 					$programRegistry,
 					$parameterValue,
-					$typeRegistry->string()
+					$programRegistry->typeRegistry->string()
 				);
 			if ($value instanceof StringValue) {
 				$result = $targetValue->literalValue . $value->literalValue;

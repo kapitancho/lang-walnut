@@ -7,7 +7,6 @@ use Walnut\Lang\Implementation\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Implementation\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
 use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
-use Walnut\Lang\Implementation\Program\Builder\ScopeBuilder;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Registry\ExpressionRegistry;
 use Walnut\Lang\Implementation\Program\Registry\MainMethodRegistry;

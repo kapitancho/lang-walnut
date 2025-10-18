@@ -4,7 +4,6 @@ namespace Walnut\Lang\Blueprint\Program;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder;
-use Walnut\Lang\Blueprint\Program\Builder\ScopeBuilder;
 use Walnut\Lang\Blueprint\Program\Builder\TypeRegistryBuilder;
 use Walnut\Lang\Blueprint\Program\Registry\CustomMethodRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry;

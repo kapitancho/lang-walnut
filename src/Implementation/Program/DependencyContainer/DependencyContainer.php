@@ -4,15 +4,12 @@ namespace Walnut\Lang\Implementation\Program\DependencyContainer;
 
 use SplObjectStorage;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
-use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethod;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer as DependencyContainerInterface;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyError;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\UnresolvableDependency;
-use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\AliasType;
@@ -27,6 +24,7 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\DataValue;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Implementation\Code\NativeCode\ValueConstructor;
 
 final class DependencyContainer implements DependencyContainerInterface {
 
@@ -36,10 +34,9 @@ final class DependencyContainer implements DependencyContainerInterface {
 	private SplObjectStorage $visited;
 
 	public function __construct(
-		private readonly ProgramRegistry    $programRegistry,
-		private readonly ExecutionContext   $globalContext,
-		private readonly MethodFinder       $methodFinder,
-		private readonly ExpressionRegistry $expressionRegistry,
+		private readonly ProgramRegistry   $programRegistry,
+		private readonly MethodFinder      $methodFinder,
+		private readonly ValueConstructor  $valueConstructor,
 	) {
 		$this->cache = [];
 		$this->visited = new SplObjectStorage;
@@ -82,7 +79,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 			if ($foundValue instanceof DependencyError) {
 				return new DependencyError(
 					UnresolvableDependency::errorWhileCreatingValue,
-					$foundValue->type,
+					$type,
 					sprintf("Error while creating value for field %d", $index)
 				);
 			}
@@ -110,7 +107,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 			if ($foundValue instanceof DependencyError) {
 				return new DependencyError(
 					UnresolvableDependency::errorWhileCreatingValue,
-					$foundValue->type,
+					$field,
 					sprintf("Error while creating value for field %s", $key)
 				);
 			}
@@ -151,32 +148,26 @@ final class DependencyContainer implements DependencyContainerInterface {
 			$method = $this->methodFinder->methodForType($constructor->type,
 				new MethodNameIdentifier($type->name->identifier));
 			if ($method instanceof CustomMethod) {
-                $baseValue = $this->findValueByType($method->parameterType);
+				$baseValue = $this->findValueByType($method->parameterType);
 			} else {
 				$baseValue = $this->findValueByType($type->valueType);
 			}
 			if ($baseValue instanceof Value) {
-				$result = $this->expressionRegistry->methodCall(
-					$this->expressionRegistry->variableName(new VariableNameIdentifier('#')),
-					new MethodNameIdentifier('construct'),
-					$this->expressionRegistry->constant(
-						$this->programRegistry->valueRegistry->type($type)
-					)
-				)->execute(
-					$this->globalContext->withAddedVariableValue(
-						new VariableNameIdentifier('#'),
-						$baseValue
-					)
+				$result = $this->valueConstructor->executeConstructor(
+					$this->programRegistry,
+					$type,
+					$baseValue
 				);
-				if ($result->value instanceof ErrorValue) {
+				if ($result instanceof ErrorValue) {
 					return new DependencyError(
 						UnresolvableDependency::errorWhileCreatingValue,
 						$type,
 						sprintf("Error while creating value for open type %s", $type)
 					);
 				}
-				return $result->value;
+				return $result;
 			}
+			return $baseValue;
 		}
 		return $found;
 	}
@@ -188,32 +179,26 @@ final class DependencyContainer implements DependencyContainerInterface {
 			$method = $this->methodFinder->methodForType($constructor->type,
 				new MethodNameIdentifier($type->name->identifier));
 			if ($method instanceof CustomMethod) {
-                $baseValue = $this->findValueByType($method->parameterType);
+				$baseValue = $this->findValueByType($method->parameterType);
 			} else {
 				$baseValue = $this->findValueByType($type->valueType);
 			}
 			if ($baseValue instanceof Value) {
-				$result = $this->expressionRegistry->methodCall(
-					$this->expressionRegistry->variableName(new VariableNameIdentifier('#')),
-					new MethodNameIdentifier('construct'),
-					$this->expressionRegistry->constant(
-						$this->programRegistry->valueRegistry->type($type)
-					)
-				)->execute(
-					$this->globalContext->withAddedVariableValue(
-						new VariableNameIdentifier('#'),
-						$baseValue
-					)
+				$result = $this->valueConstructor->executeConstructor(
+					$this->programRegistry,
+					$type,
+					$baseValue
 				);
-				if ($result->value instanceof ErrorValue) {
+				if ($result instanceof ErrorValue) {
 					return new DependencyError(
 						UnresolvableDependency::errorWhileCreatingValue,
 						$type,
 						sprintf("Error while creating value for sealed type %s", $type)
 					);
 				}
-				return $result->value;
+				return $result;
 			}
+			return $baseValue;
 		}
 		return $found;
 	}

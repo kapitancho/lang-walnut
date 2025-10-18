@@ -35,13 +35,7 @@ final class NoExternalErrorExpressionTest extends TestCase {
 				'errorType' => $programContext->typeRegistry->string(),
 				'originalError' => $programContext->typeRegistry->null,
 				'errorMessage' => $programContext->typeRegistry->string(),
-			]),
-			$programContext->expressionRegistry->functionBody(
-				$programContext->expressionRegistry->variableName(
-					new VariableNameIdentifier('#')
-				)
-			),
-			null
+			])
 		);
 		$this->noErrorExpression = new NoExternalErrorExpression(
 			new ConstantExpression(
