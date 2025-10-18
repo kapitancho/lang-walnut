@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
@@ -20,18 +22,19 @@ final readonly class EnumerationType implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $targetType->refType;
 			if ($refType instanceof EnumerationSubsetType) {
-				return $programRegistry->typeRegistry->type($refType->enumeration);
+				return $typeRegistry->type($refType->enumeration);
 			}
 			if ($refType instanceof MetaType) {
 				if ($refType->value === MetaTypeValue::EnumerationSubset || $refType->value === MetaTypeValue::EnumerationValue) {
-					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->any);
+					return $typeRegistry->type($typeRegistry->any);
 				}
 			}
 		}

@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
@@ -20,7 +22,8 @@ final readonly class Chunk implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -28,8 +31,8 @@ final readonly class Chunk implements NativeMethod {
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof IntegerType) {
-				return $programRegistry->typeRegistry->array(
-					$programRegistry->typeRegistry->string(
+				return $typeRegistry->array(
+					$typeRegistry->string(
 						min(1, $targetType->range->minLength),
 						$parameterType->numberRange->max === PlusInfinity::value ?
 							PlusInfinity::value : $parameterType->numberRange->max->value

@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -19,7 +21,8 @@ final readonly class BinaryModulo implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -28,13 +31,13 @@ final readonly class BinaryModulo implements NativeMethod {
 			$parameterType = $this->toBaseType($parameterType);
 
 			if ($parameterType instanceof IntegerType || $parameterType instanceof RealType) {
-				$includesZero = $parameterType->contains($programRegistry->valueRegistry->integer(0));
+				$includesZero = $parameterType->contains(0);
 				$returnType = $parameterType instanceof IntegerType ?
-					$programRegistry->typeRegistry->integer() : $programRegistry->typeRegistry->real();
+					$typeRegistry->integer() : $typeRegistry->real();
 
-				return $includesZero ? $programRegistry->typeRegistry->result(
+				return $includesZero ? $typeRegistry->result(
 					$returnType,
-					$programRegistry->typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
+					$typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
 				) : $returnType;
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -55,13 +58,13 @@ final readonly class BinaryModulo implements NativeMethod {
 				if ($targetValue instanceof IntegerValue) {
 			if ($parameterValue instanceof IntegerValue) {
 				if ((int)(string)$parameterValue->literalValue === 0) {
-					return ($programRegistry->valueRegistry->error(
+					return $programRegistry->valueRegistry->error(
 						$programRegistry->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
-					));
+					);
 				}
-                return ($programRegistry->valueRegistry->integer(
+                return $programRegistry->valueRegistry->integer(
 	                $targetValue->literalValue % $parameterValue->literalValue
-                ));
+                );
 			}
 			if ($parameterValue instanceof RealValue) {
 				if ((float)(string)$parameterValue->literalValue === 0.0) {

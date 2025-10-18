@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\OptionalKeyType;
 use Walnut\Lang\Blueprint\Type\RecordType;
@@ -19,7 +21,8 @@ final readonly class With implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -31,23 +34,23 @@ final readonly class With implements NativeMethod {
 				$pType = $parameterType->types[$tKey] ?? null;
 				if ($tType instanceof OptionalKeyType) {
 					$recTypes[$tKey] = $pType instanceof OptionalKeyType ?
-						$programRegistry->typeRegistry->optionalKey(
-							$programRegistry->typeRegistry->union([
+						$typeRegistry->optionalKey(
+							$typeRegistry->union([
 								$tType->valueType,
 								$pType->valueType
 							])
-						) : $pType ?? $programRegistry->typeRegistry->optionalKey(
-							$programRegistry->typeRegistry->union([
+						) : $pType ?? $typeRegistry->optionalKey(
+							$typeRegistry->union([
 								$tType->valueType,
 								$parameterType->restType
 							])
 						);
 				} else {
 					$recTypes[$tKey] = $pType instanceof OptionalKeyType ?
-						$programRegistry->typeRegistry->union([
+						$typeRegistry->union([
 							$tType,
 							$pType->valueType
-						]): $pType ?? $programRegistry->typeRegistry->union([
+						]): $pType ?? $typeRegistry->union([
 						$tType,
 						$parameterType->restType
 					]);
@@ -56,8 +59,8 @@ final readonly class With implements NativeMethod {
 			foreach ($parameterType->types as $pKey => $pType) {
 				$recTypes[$pKey] ??= $pType;
 			}
-			return $programRegistry->typeRegistry->record($recTypes,
-				$programRegistry->typeRegistry->union([
+			return $typeRegistry->record($recTypes,
+				$typeRegistry->union([
 					$targetType->restType,
 					$parameterType->restType
 				])
@@ -68,8 +71,8 @@ final readonly class With implements NativeMethod {
 		}
 		if ($targetType instanceof MapType) {
 			if ($parameterType instanceof MapType) {
-				return $programRegistry->typeRegistry->map(
-					$programRegistry->typeRegistry->union([
+				return $typeRegistry->map(
+					$typeRegistry->union([
 						$targetType->itemType,
 						$parameterType->itemType
 					]),

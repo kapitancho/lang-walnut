@@ -7,7 +7,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntersectionType;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\MetaType;
@@ -26,34 +28,35 @@ final readonly class Item implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof IntersectionType) {
 			$types = array_map(
-				fn(Type $type) => $this->analyse($programRegistry, $type, $parameterType),
+				fn(Type $type) => $this->analyse($typeRegistry, $methodFinder, $type, $parameterType),
 				$targetType->types
 			);
-			return $programRegistry->typeRegistry->intersection($types);
+			return $typeRegistry->intersection($types);
 		}
 		$type = $targetType instanceof RecordType ? $targetType->asMapType() : $targetType;
 		if ($targetType instanceof MetaType && $targetType->value === MetaTypeValue::Record) {
-			$type = $programRegistry->typeRegistry->map(
-				$programRegistry->typeRegistry->any
+			$type = $typeRegistry->map(
+				$typeRegistry->any
 			);
 		}
-		$mapItemNotFound = $programRegistry->typeRegistry->data(new TypeNameIdentifier("MapItemNotFound"));
+		$mapItemNotFound = $typeRegistry->data(new TypeNameIdentifier("MapItemNotFound"));
 		if ($type instanceof MapType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
 				$returnType = $type->itemType;
 				if ($targetType instanceof RecordType && $parameterType instanceof StringSubsetType) {
 					$tConv = fn(Type $fType): Type => $fType instanceof OptionalKeyType ?
-						$programRegistry->typeRegistry->result($fType->valueType, $mapItemNotFound) :
+						$typeRegistry->result($fType->valueType, $mapItemNotFound) :
 						$fType;
-					$returnType = $programRegistry->typeRegistry->union(
+					$returnType = $typeRegistry->union(
 						array_map(
 							static fn(string $value) => $tConv(
 								$targetType->types[$value] ??
@@ -72,7 +75,7 @@ final readonly class Item implements NativeMethod {
 				if ($returnType instanceof NothingType) {
 					throw new AnalyserException(sprintf("[%s] No property exists that matches the type: %s", __CLASS__, $parameterType));
 				}
-				return $programRegistry->typeRegistry->result($returnType, $mapItemNotFound);
+				return $typeRegistry->result($returnType, $mapItemNotFound);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}

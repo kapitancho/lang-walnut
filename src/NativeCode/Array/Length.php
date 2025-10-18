@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Array;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -17,19 +19,20 @@ final readonly class Length implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof ArrayType) {
-			return $programRegistry->typeRegistry->integer(
+			return $typeRegistry->integer(
 				$targetType->range->minLength,
 				$targetType->range->maxLength
 			);
 		}
 		if ($targetType instanceof TupleType) {
-			return $programRegistry->typeRegistry->integer(
+			return $typeRegistry->integer(
 				$l = count($targetType->types),
 				$l
 			);

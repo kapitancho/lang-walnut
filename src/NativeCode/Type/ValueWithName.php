@@ -7,7 +7,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
@@ -23,7 +25,8 @@ final readonly class ValueWithName implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
@@ -31,9 +34,9 @@ final readonly class ValueWithName implements NativeMethod {
 			$refType = $targetType->refType;
 			if ($refType instanceof MetaType) {
 				if ($refType->value === MetaTypeValue::Enumeration || $refType->value === MetaTypeValue::EnumerationSubset) {
-					return $programRegistry->typeRegistry->result(
-						$programRegistry->typeRegistry->any,
-						$programRegistry->typeRegistry->data(
+					return $typeRegistry->result(
+						$typeRegistry->any,
+						$typeRegistry->data(
 							new TypeNameIdentifier('UnknownEnumerationValue'),
 						)
 					);
@@ -41,9 +44,9 @@ final readonly class ValueWithName implements NativeMethod {
 			}
 			if ($refType instanceof EnumerationSubsetType) {
 				if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-					return $programRegistry->typeRegistry->result(
-						$programRegistry->typeRegistry->enumeration($refType->enumeration->name),
-						$programRegistry->typeRegistry->data(
+					return $typeRegistry->result(
+						$typeRegistry->enumeration($refType->enumeration->name),
+						$typeRegistry->data(
 							new TypeNameIdentifier('UnknownEnumerationValue'),
 						)
 					);
@@ -70,7 +73,7 @@ final readonly class ValueWithName implements NativeMethod {
 			if ($targetValue instanceof TypeValue) {
 				$refType = $targetValue->typeValue;
 				if ($refType instanceof EnumerationSubsetType) {
-					return ($refType->subsetValues[$parameterValue->literalValue] ??
+					return $refType->subsetValues[$parameterValue->literalValue] ??
 						$programRegistry->valueRegistry->error(
 							$programRegistry->valueRegistry->dataValue(
 								new TypeNameIdentifier('UnknownEnumerationValue'),
@@ -79,8 +82,7 @@ final readonly class ValueWithName implements NativeMethod {
 									'value' => $parameterValue,
 								])
 							)
-						)
-					);
+						);
 				}
 			}
 			// @codeCoverageIgnoreStart

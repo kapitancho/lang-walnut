@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Type;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\SetType;
@@ -20,28 +22,29 @@ final readonly class WithItemType implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($parameterType->isSubtypeOf(
-				$programRegistry->typeRegistry->type(
-					$programRegistry->typeRegistry->any
+				$typeRegistry->type(
+					$typeRegistry->any
 				)
 			)) {
 				if ($refType instanceof ArrayType) {
-					return $programRegistry->typeRegistry->type(
-						$programRegistry->typeRegistry->array(
+					return $typeRegistry->type(
+						$typeRegistry->array(
 							$parameterType->refType,
 							$refType->range->minLength,
 							$refType->range->maxLength)
 					);
 				}
 				if ($refType instanceof MapType) {
-					return $programRegistry->typeRegistry->type(
-						$programRegistry->typeRegistry->map(
+					return $typeRegistry->type(
+						$typeRegistry->map(
 							$parameterType->refType,
 							$refType->range->minLength,
 							$refType->range->maxLength
@@ -49,8 +52,8 @@ final readonly class WithItemType implements NativeMethod {
 					);
 				}
 				if ($refType instanceof SetType) {
-					return $programRegistry->typeRegistry->type(
-						$programRegistry->typeRegistry->set(
+					return $typeRegistry->type(
+						$typeRegistry->set(
 							$parameterType->refType,
 							$refType->range->minLength,
 							$refType->range->maxLength)

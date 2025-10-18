@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\OpenValue;
@@ -18,13 +20,14 @@ final readonly class Hash implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof OpenType && $targetType->name->equals(new TypeNameIdentifier('PasswordString'))) {
-			return $programRegistry->typeRegistry->string(24, 255);
+			return $typeRegistry->string(24, 255);
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));

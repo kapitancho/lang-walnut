@@ -7,7 +7,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -18,7 +20,8 @@ final readonly class BinaryBitwiseAnd implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -37,7 +40,7 @@ final readonly class BinaryBitwiseAnd implements NativeMethod {
 					$parameterType->numberRange->max === PlusInfinity::value ? PlusInfinity::value :
 					min($targetType->numberRange->max->value, $parameterType->numberRange->max->value);
 
-				return $programRegistry->typeRegistry->integer(0, $max);
+				return $typeRegistry->integer(0, $max);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}

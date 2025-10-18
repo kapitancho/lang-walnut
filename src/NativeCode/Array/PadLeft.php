@@ -7,7 +7,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
@@ -24,7 +26,8 @@ final readonly class PadLeft implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -37,8 +40,8 @@ final readonly class PadLeft implements NativeMethod {
 				$lengthType = $types['length'] ?? null;
 				$valueType = $types['value'] ?? null;
 				if ($lengthType instanceof IntegerType) {
-					return $programRegistry->typeRegistry->array(
-						$programRegistry->typeRegistry->union([
+					return $typeRegistry->array(
+						$typeRegistry->union([
 							$type->itemType,
 							$valueType
 						]),

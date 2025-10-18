@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
@@ -20,18 +22,19 @@ final readonly class AliasedType implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $targetType->refType;
 			if ($refType instanceof AliasType) {
-				return $programRegistry->typeRegistry->type($refType->aliasedType);
+				return $typeRegistry->type($refType->aliasedType);
 			}
 			if ($refType instanceof MetaType) {
 				if ($refType->value === MetaTypeValue::Alias) {
-					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->any);
+					return $typeRegistry->type($typeRegistry->any);
 				}
 			}
 		}

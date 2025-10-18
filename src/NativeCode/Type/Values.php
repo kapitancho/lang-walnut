@@ -7,7 +7,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\MetaType;
@@ -26,7 +28,8 @@ use Walnut\Lang\Blueprint\Value\TypeValue;
 final readonly class Values implements NativeMethod {
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
@@ -38,14 +41,14 @@ final readonly class Values implements NativeMethod {
 						MetaTypeValue::EnumerationValue,
 						MetaTypeValue::Enumeration,
 						MetaTypeValue::EnumerationSubset
-							=> $programRegistry->typeRegistry->any,
-						MetaTypeValue::IntegerSubset => $programRegistry->typeRegistry->integer(),
-						MetaTypeValue::RealSubset => $programRegistry->typeRegistry->real(),
-						MetaTypeValue::StringSubset => $programRegistry->typeRegistry->string(),
+							=> $typeRegistry->any,
+						MetaTypeValue::IntegerSubset => $typeRegistry->integer(),
+						MetaTypeValue::RealSubset => $typeRegistry->real(),
+						MetaTypeValue::StringSubset => $typeRegistry->string(),
 						default => null
 					};
 					if ($t) {
-						return $programRegistry->typeRegistry->array($t, 1);
+						return $typeRegistry->array($t, 1);
 					}
 				}
 				if ($refType instanceof IntegerSubsetType ||
@@ -54,15 +57,15 @@ final readonly class Values implements NativeMethod {
 					$refType instanceof EnumerationSubsetType
 				) {
 					$t = match(true) {
-						$refType instanceof IntegerSubsetType => $programRegistry->typeRegistry->integer(),
-						$refType instanceof RealSubsetType => $programRegistry->typeRegistry->real(),
-						$refType instanceof StringSubsetType => $programRegistry->typeRegistry->string(),
-						$refType instanceof EnumerationSubsetType => $programRegistry->typeRegistry->enumeration(
+						$refType instanceof IntegerSubsetType => $typeRegistry->integer(),
+						$refType instanceof RealSubsetType => $typeRegistry->real(),
+						$refType instanceof StringSubsetType => $typeRegistry->string(),
+						$refType instanceof EnumerationSubsetType => $typeRegistry->enumeration(
 							$refType->enumeration->name,
 						),
 					};
 					$l = count($refType->subsetValues);
-					return $programRegistry->typeRegistry->array($t, $l, $l);
+					return $typeRegistry->array($t, $l, $l);
 				}
 			}
 			// @codeCoverageIgnoreStart

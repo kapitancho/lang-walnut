@@ -7,7 +7,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\RealSubsetType;
@@ -22,16 +24,17 @@ final readonly class AsReal implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof IntegerSubsetType || $targetType instanceof RealSubsetType) {
-			return $programRegistry->typeRegistry->realSubset($targetType->subsetValues);
+			return $typeRegistry->realSubset($targetType->subsetValues);
 		}
 		if ($targetType instanceof RealType || $targetType instanceof IntegerType) {
-			return $programRegistry->typeRegistry->realFull(...
+			return $typeRegistry->realFull(...
 				$targetType->numberRange->intervals
 			);
 		}

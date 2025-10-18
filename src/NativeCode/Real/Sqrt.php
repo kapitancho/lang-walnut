@@ -7,7 +7,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -20,18 +22,19 @@ final readonly class Sqrt implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof IntegerType || $targetType instanceof RealType) {
-			$real = $programRegistry->typeRegistry->real(0);
+			$real = $typeRegistry->real(0);
 			$minValue = $targetType->numberRange->min;
 			return $minValue === MinusInfinity::value || $minValue->value < 0 ?
-				$programRegistry->typeRegistry->result(
+				$typeRegistry->result(
 					$real,
-					$programRegistry->typeRegistry->atom(
+					$typeRegistry->atom(
 						new TypeNameIdentifier('NotANumber')
 					)
 				) :

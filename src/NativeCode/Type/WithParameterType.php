@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
@@ -20,30 +22,31 @@ final readonly class WithParameterType implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($parameterType->isSubtypeOf(
-				$programRegistry->typeRegistry->type(
-					$programRegistry->typeRegistry->any
+				$typeRegistry->type(
+					$typeRegistry->any
 				)
 			)) {
 				if ($refType instanceof FunctionType) {
-					return $programRegistry->typeRegistry->type(
-						$programRegistry->typeRegistry->function(
+					return $typeRegistry->type(
+						$typeRegistry->function(
 							$parameterType->refType,
 							$refType->returnType,
 						)
 					);
 				}
 				if ($refType instanceof MetaType && $refType->value === MetaTypeValue::Function) {
-					return $programRegistry->typeRegistry->type(
-						$programRegistry->typeRegistry->function(
+					return $typeRegistry->type(
+						$typeRegistry->function(
 							$parameterType->refType,
-							$programRegistry->typeRegistry->any
+							$typeRegistry->any
 						)
 					);
 				}

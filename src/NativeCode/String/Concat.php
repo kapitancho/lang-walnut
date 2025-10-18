@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -18,7 +20,8 @@ final readonly class Concat implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -26,15 +29,15 @@ final readonly class Concat implements NativeMethod {
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $programRegistry->typeRegistry->string(
+				return $typeRegistry->string(
 					$targetType->range->minLength + $parameterType->range->minLength,
 					$targetType->range->maxLength === PlusInfinity::value ||
 					$parameterType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
 					$targetType->range->maxLength + $parameterType->range->maxLength
 				);
 			}
-			if ($parameterType->isSubtypeOf($programRegistry->typeRegistry->string())) {
-				return $programRegistry->typeRegistry->string();
+			if ($parameterType->isSubtypeOf($typeRegistry->string())) {
+				return $typeRegistry->string();
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}
@@ -54,7 +57,7 @@ final readonly class Concat implements NativeMethod {
 				if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof StringValue) {
 				$result = $targetValue->literalValue . $parameterValue->literalValue;
-				return ($programRegistry->valueRegistry->string($result));
+				return $programRegistry->valueRegistry->string($result);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

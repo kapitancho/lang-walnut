@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Set;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\SetType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -18,16 +20,17 @@ final readonly class Filter implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$type = $this->toBaseType($targetType);
 		if ($type instanceof SetType) {
 			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf($programRegistry->typeRegistry->boolean)) {
+			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf($typeRegistry->boolean)) {
 				if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
-					return $programRegistry->typeRegistry->set(
+					return $typeRegistry->set(
 						$type->itemType,
 						0,
 						$type->range->maxLength

@@ -8,6 +8,7 @@ use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\Method;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
@@ -32,8 +33,8 @@ use Walnut\Lang\Implementation\Type\Helper\TupleAsRecord;
 final readonly class ValueConstructor {
 	use TupleAsRecord;
 
-	private function getConstructorType(ProgramRegistry $programRegistry): AtomType {
-		return $programRegistry->typeRegistry->atom(
+	private function getConstructorType(TypeRegistry $typeRegistry): AtomType {
+		return $typeRegistry->atom(
 			new TypeNameIdentifier('Constructor')
 		);
 	}
@@ -56,22 +57,24 @@ final readonly class ValueConstructor {
 
 	/** @throws AnalyserException */
 	public function analyseConstructor(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $resultType,
 		Type $parameterType
 	): Type {
-		$constructorType = $this->getConstructorType($programRegistry);
+		$constructorType = $this->getConstructorType($typeRegistry);
 
 		$errorType = null;
 		$validatorInputType = $parameterType;
 		if ($resultType instanceof NamedType) {
-			$constructorMethod = $programRegistry->methodFinder->methodForType(
-				$this->getConstructorType($programRegistry),
+			$constructorMethod = $methodFinder->methodForType(
+				$this->getConstructorType($typeRegistry),
 				new MethodNameIdentifier($resultType->name->identifier)
 			);
 			if ($constructorMethod instanceof Method) {
 				$constructorResult = $constructorMethod->analyse(
-					$programRegistry,
+					$typeRegistry,
+					$methodFinder,
 					$constructorType,
 					$parameterType
 				);
@@ -84,33 +87,35 @@ final readonly class ValueConstructor {
 			}
 		}
 		$validatorType = $this->analyseValidator(
-			$programRegistry,
+			$typeRegistry,
+			$methodFinder,
 			$resultType,
 			$validatorInputType
 		);
 
-		return $errorType ? $programRegistry->typeRegistry->result(
+		return $errorType ? $typeRegistry->result(
 			$validatorType,
 			$errorType
 		): $validatorType;
 	}
 
 	public function analyseValidator(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $resultType,
 		Type $parameterType
 	): Type {
 		// This is the expected input type on top of which the value will be constructed
 		$constructingType = $this->getConstructingType(
-			$programRegistry->typeRegistry,
+			$typeRegistry,
 			$resultType,
 			$parameterType
 		);
-		$constructorType = $this->getConstructorType($programRegistry);
+		$constructorType = $this->getConstructorType($typeRegistry);
 
 		// Convert tuples to records if needed
 		$aType = $this->adjustParameterType(
-			$programRegistry->typeRegistry,
+			$typeRegistry,
 			$constructingType,
 			$parameterType
 		);
@@ -125,14 +130,15 @@ final readonly class ValueConstructor {
 				)
 			);
 		}
-		$validatorMethod = $resultType instanceof NamedType ? $programRegistry->methodFinder->methodForType(
+		$validatorMethod = $resultType instanceof NamedType ? $methodFinder->methodForType(
 			$constructorType,
 			new MethodNameIdentifier('as' . $resultType->name->identifier)
 		) : null;
 		$errorType = null;
 		if ($validatorMethod instanceof Method) {
 			$validatorResult = $validatorMethod->analyse(
-				$programRegistry,
+				$typeRegistry,
+				$methodFinder,
 				$constructorType,
 				$parameterType
 			);
@@ -140,24 +146,24 @@ final readonly class ValueConstructor {
 				$errorType = $validatorResult->errorType;
 			}
 		} elseif ($resultType instanceof EnumerationType) {
-			$matchType = $programRegistry->typeRegistry->union([
+			$matchType = $typeRegistry->union([
 				$resultType,
-				$programRegistry->typeRegistry->stringSubset(
+				$typeRegistry->stringSubset(
 					array_keys($resultType->values)
 				)
 			]);
 			if (!$parameterType->isSubtypeOf($matchType)) {
-				$errorType = $programRegistry->typeRegistry->data(
+				$errorType = $typeRegistry->data(
 					new TypeNameIdentifier('UnknownEnumerationValue')
 				);
 			}
 		}
 		$outputType = $this->getValidatorOutputType(
-			$programRegistry->typeRegistry,
+			$typeRegistry,
 			$resultType,
 			$parameterType
 		);
-		return $errorType ? $programRegistry->typeRegistry->result(
+		return $errorType ? $typeRegistry->result(
 			$outputType,
 			$errorType
 		): $outputType;
@@ -242,7 +248,7 @@ final readonly class ValueConstructor {
 		Type                   $resultType,
 		Value $parameter
 	): Value {
-		$constructorType = $this->getConstructorType($programRegistry);
+		$constructorType = $this->getConstructorType($programRegistry->typeRegistry);
 		$constructorMethod = $resultType instanceof NamedType ? $programRegistry->methodFinder->methodForType(
 			$constructorType,
 			new MethodNameIdentifier($resultType->name->identifier)
@@ -276,7 +282,7 @@ final readonly class ValueConstructor {
 			$resultType,
 			$parameter->type
 		);
-		$constructorType = $this->getConstructorType($programRegistry);
+		$constructorType = $this->getConstructorType($programRegistry->typeRegistry);
 		$validatorMethod = $resultType instanceof NamedType ? $programRegistry->methodFinder->methodForType(
 			$constructorType,
 			new MethodNameIdentifier('as' . $resultType->name->identifier)

@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Type;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\SetType;
@@ -22,7 +24,8 @@ final readonly class MinLength implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
@@ -30,7 +33,7 @@ final readonly class MinLength implements NativeMethod {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof StringType || $refType instanceof StringSubsetType ||
 				$refType instanceof ArrayType || $refType instanceof MapType || $refType instanceof SetType) {
-				return $programRegistry->typeRegistry->integer(0);
+				return $typeRegistry->integer(0);
 			}
 		}
 		// @codeCoverageIgnoreStart

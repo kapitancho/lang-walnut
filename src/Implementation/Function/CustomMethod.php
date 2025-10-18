@@ -9,7 +9,9 @@ use Walnut\Lang\Blueprint\Function\CustomMethod as CustomMethodInterface;
 use Walnut\Lang\Blueprint\Function\UserlandFunction;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyError;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -52,14 +54,15 @@ final class CustomMethod implements CustomMethodInterface {
 
 	/** @throws AnalyserException */
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType
 	): Type {
 		return $this->function->analyse(
 			$targetType,
 			$this->adjustParameterType(
-				$programRegistry->typeRegistry,
+				$typeRegistry,
 				$this->function->parameter->type,
 				$parameterType
 			)

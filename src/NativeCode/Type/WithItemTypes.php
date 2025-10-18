@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\TupleType;
@@ -21,24 +23,25 @@ final readonly class WithItemTypes implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($parameterType->isSubtypeOf(
-				$programRegistry->typeRegistry->array(
-					$programRegistry->typeRegistry->type(
-						$programRegistry->typeRegistry->any
+				$typeRegistry->array(
+					$typeRegistry->type(
+						$typeRegistry->any
 					)
 				)
 			)) {
 				if ($refType instanceof TupleType || (
 					$refType instanceof MetaType && $refType->value === MetaTypeValue::Tuple
 				)) {
-					return $programRegistry->typeRegistry->type(
-						$programRegistry->typeRegistry->metaType(
+					return $typeRegistry->type(
+						$typeRegistry->metaType(
 							MetaTypeValue::Tuple
 						)
 					);
@@ -48,17 +51,17 @@ final readonly class WithItemTypes implements NativeMethod {
 				// @codeCoverageIgnoreEnd
 			}
 			if ($parameterType->isSubtypeOf(
-				$programRegistry->typeRegistry->map(
-					$programRegistry->typeRegistry->type(
-						$programRegistry->typeRegistry->any
+				$typeRegistry->map(
+					$typeRegistry->type(
+						$typeRegistry->any
 					)
 				)
 			)) {
 				if ($refType instanceof RecordType || (
 					$refType instanceof MetaType && $refType->value === MetaTypeValue::Record
 				)) {
-					return $programRegistry->typeRegistry->type(
-						$programRegistry->typeRegistry->metaType(
+					return $typeRegistry->type(
+						$typeRegistry->metaType(
 							MetaTypeValue::Record
 						)
 					);

@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\String;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -17,13 +19,14 @@ final readonly class HtmlEscape implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
-			return $programRegistry->typeRegistry->string();
+			return $typeRegistry->string();
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -38,7 +41,7 @@ final readonly class HtmlEscape implements NativeMethod {
 		$targetValue = $target;
 
 		if ($targetValue instanceof StringValue) {
-			return ($programRegistry->valueRegistry->string(htmlspecialchars($targetValue->literalValue)));
+			return $programRegistry->valueRegistry->string(htmlspecialchars($targetValue->literalValue));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

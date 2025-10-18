@@ -9,7 +9,9 @@ use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
@@ -33,7 +35,8 @@ final readonly class Item implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType
 	): Type {
@@ -49,7 +52,7 @@ final readonly class Item implements NativeMethod {
 						$max = $parameterType->numberRange->max;
 						if ($min !== MinusInfinity::value && $min->value >= 0) {
 							if ($parameterType instanceof IntegerSubsetType) {
-								$returnType = $programRegistry->typeRegistry->union(
+								$returnType = $typeRegistry->union(
 									array_map(
 										static fn(Number $value) => $valueType->types[(string)$value] ?? $valueType->restType,
 										$parameterType->subsetValues
@@ -57,7 +60,7 @@ final readonly class Item implements NativeMethod {
 								);
 							} elseif ($parameterType instanceof IntegerType) {
 								$isWithinLimit = $max !== PlusInfinity::value && $max->value < count($valueType->types);
-								$returnType = $programRegistry->typeRegistry->union(
+								$returnType = $typeRegistry->union(
 									$isWithinLimit ?
 										array_slice($valueType->types, (int)(string)$min->value, (int)(string)$max->value - (int)(string)$min->value + 1) :
 										[... array_slice($valueType->types, (int)(string)$min->value), $valueType->restType]
@@ -69,9 +72,9 @@ final readonly class Item implements NativeMethod {
 					return $parameterType->numberRange->max !== PlusInfinity::value &&
 						$vType->range->minLength > $parameterType->numberRange->max->value ?
 							$returnType :
-							$programRegistry->typeRegistry->result(
+							$typeRegistry->result(
 								$returnType,
-								$programRegistry->typeRegistry->data(
+								$typeRegistry->data(
 									new TypeNameIdentifier("IndexOutOfRange")
 								)
 							);
@@ -79,16 +82,16 @@ final readonly class Item implements NativeMethod {
 				throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 			}
 			$vType = $valueType instanceof RecordType ? $valueType->asMapType() : $valueType;
-			$mapItemNotFound = $programRegistry->typeRegistry->data(new TypeNameIdentifier("MapItemNotFound"));
+			$mapItemNotFound = $typeRegistry->data(new TypeNameIdentifier("MapItemNotFound"));
 			if ($vType instanceof MapType) {
 				$parameterType = $this->toBaseType($parameterType);
 				if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
 					$returnType = $vType->itemType;
 					if ($valueType instanceof RecordType && $parameterType instanceof StringSubsetType) {
 						$tConv = fn(Type $type): Type => $type instanceof OptionalKeyType ?
-							$programRegistry->typeRegistry->result($type->valueType, $mapItemNotFound) :
+							$typeRegistry->result($type->valueType, $mapItemNotFound) :
 							$type;
-						$returnType = $programRegistry->typeRegistry->union(
+						$returnType = $typeRegistry->union(
 							array_map(
 								static fn(string $value) => $tConv(
 									$valueType->types[$value] ??
@@ -104,7 +107,7 @@ final readonly class Item implements NativeMethod {
 							return $returnType;
 						}
 					}
-					return $programRegistry->typeRegistry->result($returnType, $mapItemNotFound);
+					return $typeRegistry->result($returnType, $mapItemNotFound);
 				}
 				throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 			}

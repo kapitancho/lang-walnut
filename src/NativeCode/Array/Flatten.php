@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -18,7 +20,8 @@ final readonly class Flatten implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -26,9 +29,9 @@ final readonly class Flatten implements NativeMethod {
 		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($type instanceof ArrayType) {
             $itemType = $type->itemType;
-            if ($itemType->isSubtypeOf($programRegistry->typeRegistry->array())) {
+            if ($itemType->isSubtypeOf($typeRegistry->array())) {
 				if ($itemType instanceof ArrayType) {
-	                return $programRegistry->typeRegistry->array(
+	                return $typeRegistry->array(
 	                    $itemType->itemType,
 		                ((int)(string)$type->range->minLength) * ((int)(string)$itemType->range->minLength),
 	                    $type->range->maxLength === PlusInfinity::value ||
@@ -37,7 +40,7 @@ final readonly class Flatten implements NativeMethod {
 		                    ((int)(string)$type->range->maxLength) * ((int)(string)$itemType->range->maxLength),
 	                );
 				}
-				return $programRegistry->typeRegistry->array();
+				return $typeRegistry->array();
             }
 		}
 		// @codeCoverageIgnoreStart

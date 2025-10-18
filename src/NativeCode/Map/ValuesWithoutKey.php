@@ -7,7 +7,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
@@ -22,7 +24,8 @@ final readonly class ValuesWithoutKey implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -32,8 +35,8 @@ final readonly class ValuesWithoutKey implements NativeMethod {
 		}
 		if ($targetType instanceof MapType) {
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $programRegistry->typeRegistry->result(
-					$programRegistry->typeRegistry->map(
+				return $typeRegistry->result(
+					$typeRegistry->map(
 						$targetType->itemType,
 						$targetType->range->maxLength === PlusInfinity::value ?
 							$targetType->range->minLength : max(0,
@@ -44,7 +47,7 @@ final readonly class ValuesWithoutKey implements NativeMethod {
 						$targetType->range->maxLength === PlusInfinity::value ?
 							PlusInfinity::value : max($targetType->range->maxLength - 1, 0)
 					),
-					$programRegistry->typeRegistry->data(
+					$typeRegistry->data(
 						new TypeNameIdentifier("MapItemNotFound")
 					)
 				);

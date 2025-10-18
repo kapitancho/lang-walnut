@@ -5,6 +5,7 @@ namespace Walnut\Lang\NativeCode\Any;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ResultType;
@@ -26,20 +27,21 @@ final readonly class ErrorAsExternal implements NativeMethod {
 	}
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$target = $this->toBaseType($targetType);
 		if ($parameterType->isSubtypeOf(
-			$programRegistry->typeRegistry->union([
-				$programRegistry->typeRegistry->null,
-				$programRegistry->typeRegistry->string(),
+			$typeRegistry->union([
+				$typeRegistry->null,
+				$typeRegistry->string(),
 			])
 		)) {
 			return $target instanceof ResultType ?
-				$programRegistry->typeRegistry->result($target->returnType, $this->externalErrorType(
-					$programRegistry->typeRegistry
+				$typeRegistry->result($target->returnType, $this->externalErrorType(
+					$typeRegistry
 				)) :
 				$target;
 		}

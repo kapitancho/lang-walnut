@@ -6,7 +6,9 @@ use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\RealType;
@@ -20,7 +22,8 @@ final readonly class BinaryPower implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -32,15 +35,14 @@ final readonly class BinaryPower implements NativeMethod {
 					$parameterType->subsetValues, fn(Number $value)
 				=> (int)(string)$value % 2 === 0
 				)) {
-				return $programRegistry->typeRegistry->integer(0);
+				return $typeRegistry->integer(0);
 			}
 
 			if ($parameterType instanceof IntegerType || $parameterType instanceof RealType) {
-				$zero = $programRegistry->valueRegistry->integer(0);
-				$containsZero = $targetType->contains($zero);
+				$containsZero = $targetType->contains(0);
 				return $containsZero ?
-					$programRegistry->typeRegistry->real() :
-					$programRegistry->typeRegistry->nonZeroReal() ;
+					$typeRegistry->real() :
+					$typeRegistry->nonZeroReal() ;
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}

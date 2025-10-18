@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\String;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -19,20 +21,21 @@ final readonly class Substring implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
-			$pInt = $programRegistry->typeRegistry->integer(0);
-			$pType = $programRegistry->typeRegistry->record([
+			$pInt = $typeRegistry->integer(0);
+			$pType = $typeRegistry->record([
 				"start" => $pInt,
 				"length" => $pInt
 			]);
 			if ($parameterType->isSubtypeOf($pType)) {
 				$parameterType = $this->toBaseType($parameterType);
-				return $programRegistry->typeRegistry->string(0, min(
+				return $typeRegistry->string(0, min(
 					$targetType->range->maxLength,
 					$parameterType->types['length']->numberRange->max->value
 				));

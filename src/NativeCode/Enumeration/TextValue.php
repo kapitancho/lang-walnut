@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\NullType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
@@ -19,12 +21,13 @@ use Walnut\Lang\Implementation\Type\EnumerationType;
 final readonly class TextValue implements NativeMethod {
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof MetaType && $targetType->value === MetaTypeValue::EnumerationValue) {
-			return $programRegistry->typeRegistry->string(1, 999999);
+			return $typeRegistry->string(1, 999999);
 		}
 		if ($targetType instanceof EnumerationType || $targetType instanceof EnumerationSubsetType) {
 			if ($parameterType instanceof NullType) {
@@ -35,7 +38,7 @@ final readonly class TextValue implements NativeMethod {
 					$min = min($min, $l);
 					$max = max($max, $l);
 				}
-				return $programRegistry->typeRegistry->string($min, $max);
+				return $typeRegistry->string($min, $max);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}

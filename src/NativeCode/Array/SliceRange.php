@@ -7,7 +7,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -21,7 +23,8 @@ final readonly class SliceRange implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -30,15 +33,15 @@ final readonly class SliceRange implements NativeMethod {
 			$targetType = $targetType->asArrayType();
 		}
 		if ($targetType instanceof ArrayType) {
-			$pInt = $programRegistry->typeRegistry->integer(0);
-			$pType = $programRegistry->typeRegistry->record([
+			$pInt = $typeRegistry->integer(0);
+			$pType = $typeRegistry->record([
 				"start" => $pInt,
 				"end" => $pInt
 			]);
 			if ($parameterType->isSubtypeOf($pType)) {
 				$parameterType = $this->toBaseType($parameterType);
 				$endType = $parameterType->types['end'];
-				return $programRegistry->typeRegistry->array(
+				return $typeRegistry->array(
 					$targetType->itemType,
 					0,
 					$endType->numberRange->max === PlusInfinity::value ? PlusInfinity::value :

@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\NamedType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
@@ -20,7 +22,8 @@ final readonly class TypeName implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
@@ -36,11 +39,11 @@ final readonly class TypeName implements NativeMethod {
 					MetaTypeValue::Open,
 					MetaTypeValue::Sealed,
 				], true)) {
-					return $programRegistry->typeRegistry->string(1);
+					return $typeRegistry->string(1);
 				}
 			}
 			if ($refType instanceof NamedType) {
-				return $programRegistry->typeRegistry->stringSubset([
+				return $typeRegistry->stringSubset([
 					$refType->name->identifier
 				]);
 			}

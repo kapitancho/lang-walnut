@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Array;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\TupleType;
@@ -19,7 +21,8 @@ final readonly class Filter implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -27,9 +30,9 @@ final readonly class Filter implements NativeMethod {
 		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($type instanceof ArrayType) {
 			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf($programRegistry->typeRegistry->boolean)) {
+			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf($typeRegistry->boolean)) {
 				if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
-					return $programRegistry->typeRegistry->array(
+					return $typeRegistry->array(
 						$type->itemType,
 						0,
 						$type->range->maxLength

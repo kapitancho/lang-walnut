@@ -7,7 +7,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\Method;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\MutableValue;
@@ -18,19 +20,20 @@ final readonly class AsInteger implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof MutableType) {
 			$valueType = $targetType->valueType;
-			$method = $programRegistry->methodFinder->methodForType(
+			$method = $methodFinder->methodForType(
 				$valueType,
 				new MethodNameIdentifier('asInteger')
 			);
 			if ($method instanceof Method) {
-				return $method->analyse($programRegistry, $valueType, $parameterType);
+				return $method->analyse($typeRegistry, $methodFinder, $valueType, $parameterType);
 			}
 		}
 		// @codeCoverageIgnoreStart

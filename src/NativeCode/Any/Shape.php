@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Any;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntersectionType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\TypeType;
@@ -18,7 +20,8 @@ final readonly class Shape implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -26,14 +29,15 @@ final readonly class Shape implements NativeMethod {
 		if ($targetType instanceof IntersectionType) {
 			foreach($targetType->types as $type) {
 				try {
-					return $this->analyse($programRegistry, $type, $parameterType);
+					return $this->analyse($typeRegistry, $methodFinder, $type, $parameterType);
 				} catch (AnalyserException) {}
 			}
 		}
 		$parameterType = $this->toBaseType($parameterType);
 		if ($parameterType instanceof TypeType) {
 			return new ValueConverter()->analyseConvertValueToShape(
-				$programRegistry,
+				$typeRegistry,
+				$methodFinder,
 				$targetType,
 				$parameterType->refType
 			);

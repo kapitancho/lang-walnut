@@ -7,7 +7,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -19,16 +21,17 @@ final readonly class WithoutFirst implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($type instanceof ArrayType) {
-			$returnType = $programRegistry->typeRegistry->record([
+			$returnType = $typeRegistry->record([
 				'element' => $type->itemType,
-				'array' => $programRegistry->typeRegistry->array(
+				'array' => $typeRegistry->array(
 					$type->itemType,
 					max(0, $type->range->minLength - 1),
 					$type->range->maxLength === PlusInfinity::value ?
@@ -36,8 +39,8 @@ final readonly class WithoutFirst implements NativeMethod {
 				)
 			]);
 			return $type->range->minLength > 0 ? $returnType :
-				$programRegistry->typeRegistry->result($returnType,
-					$programRegistry->typeRegistry->atom(
+				$typeRegistry->result($returnType,
+					$typeRegistry->atom(
 						new TypeNameIdentifier("ItemNotFound")
 					)
 				);

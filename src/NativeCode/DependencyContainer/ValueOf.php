@@ -8,7 +8,9 @@ use Walnut\Lang\Blueprint\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\UnresolvableDependency;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -22,14 +24,15 @@ final readonly class ValueOf implements NativeMethod {
 	) {}
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($parameterType instanceof TypeType) {
-			return $programRegistry->typeRegistry->result(
+			return $typeRegistry->result(
 				$parameterType->refType,
-				$programRegistry->typeRegistry->withName(
+				$typeRegistry->withName(
 					new TypeNameIdentifier('DependencyContainerError')
 				)
 			);

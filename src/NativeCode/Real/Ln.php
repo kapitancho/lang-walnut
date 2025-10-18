@@ -7,7 +7,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -21,7 +23,8 @@ final readonly class Ln implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -29,12 +32,12 @@ final readonly class Ln implements NativeMethod {
         if ($targetType instanceof RealType || $targetType instanceof IntegerType) {
 	        $min = $targetType->numberRange->min;
 			$max = $targetType->numberRange->max;
-            $real = $programRegistry->typeRegistry->real(max: $max === PlusInfinity::value ? PlusInfinity::value : $max->value);
+            $real = $typeRegistry->real(max: $max === PlusInfinity::value ? PlusInfinity::value : $max->value);
             return $min instanceof NumberIntervalEndpoint && ($min->value > 0 || ($min->value == 0 && !$min->inclusive)) ?
 	            $real :
-                $programRegistry->typeRegistry->result(
+                $typeRegistry->result(
                     $real,
-                    $programRegistry->typeRegistry->atom(
+                    $typeRegistry->atom(
                         new TypeNameIdentifier('NotANumber')
                     )
                 );

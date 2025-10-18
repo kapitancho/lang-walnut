@@ -51,7 +51,8 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 			);
 		}
 		$retReturnType = $method->analyse(
-			$analyserContext->programRegistry,
+			$analyserContext->programRegistry->typeRegistry,
+			$analyserContext->programRegistry->methodFinder,
 			$retTargetType,
 			$retParameterType
 		);

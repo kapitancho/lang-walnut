@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Boolean;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\BooleanType;
 use Walnut\Lang\Blueprint\Type\FalseType;
 use Walnut\Lang\Blueprint\Type\TrueType;
@@ -18,7 +20,8 @@ final readonly class BinaryAnd implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -27,8 +30,8 @@ final readonly class BinaryAnd implements NativeMethod {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof BooleanType || $parameterType instanceof TrueType || $parameterType instanceof FalseType) {
 				return $targetType instanceof FalseType || $parameterType instanceof FalseType ?
-					$programRegistry->typeRegistry->false :
-					$programRegistry->typeRegistry->boolean;
+					$typeRegistry->false :
+					$typeRegistry->boolean;
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}

@@ -7,7 +7,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
@@ -29,7 +31,8 @@ final readonly class Format implements NativeMethod {
 	}
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -39,7 +42,7 @@ final readonly class Format implements NativeMethod {
 
 			// Check that item type is convertible to String (Shape<String>)
 			$itemType = $t->itemType;
-			$stringShape = $programRegistry->typeRegistry->shape($programRegistry->typeRegistry->string());
+			$stringShape = $typeRegistry->shape($typeRegistry->string());
 			if (!$itemType->isSubtypeOf($stringShape)) {
 				throw new AnalyserException(sprintf(
 					"[%s] Invalid target type: map item type %s is not a subtype of Shape<String>",
@@ -65,10 +68,10 @@ final readonly class Format implements NativeMethod {
 						}
 					}
 				}
-				$returnType = $programRegistry->typeRegistry->string();
-				return $isSafe ? $returnType : $programRegistry->typeRegistry->result(
+				$returnType = $typeRegistry->string();
+				return $isSafe ? $returnType : $typeRegistry->result(
 					$returnType,
-					$programRegistry->typeRegistry->data(new TypeNameIdentifier("CannotFormatString"))
+					$typeRegistry->data(new TypeNameIdentifier("CannotFormatString"))
 				);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));

@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\RecordType;
@@ -20,7 +22,8 @@ final readonly class FindFirst implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -28,11 +31,11 @@ final readonly class FindFirst implements NativeMethod {
 		$type = $targetType instanceof RecordType ? $targetType->asMapType() : $targetType;
 		if ($type instanceof MapType) {
 			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf($programRegistry->typeRegistry->boolean)) {
+			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf($typeRegistry->boolean)) {
 				if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
-					return $programRegistry->typeRegistry->result(
+					return $typeRegistry->result(
 						$type->itemType,
-						$programRegistry->typeRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
+						$typeRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
 					);
 				}
 				throw new AnalyserException(

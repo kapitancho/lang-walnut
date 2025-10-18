@@ -8,7 +8,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -23,7 +25,8 @@ final readonly class Square implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -52,7 +55,7 @@ final readonly class Square implements NativeMethod {
 				$minValue->value * $minValue->value > $maxValue->value * $maxValue->value) {
 				$maxInclusive = $minInclusive;
 			}
-			return $programRegistry->typeRegistry->realFull(
+			return $typeRegistry->realFull(
 				new NumberInterval(
 					new NumberIntervalEndpoint($min, $minInclusive),
 					$max === PlusInfinity::value ? PlusInfinity::value : new NumberIntervalEndpoint($max, $maxInclusive)

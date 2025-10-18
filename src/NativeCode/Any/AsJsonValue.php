@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Any;
 use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Code\NativeCode\CastAsJsonValue;
@@ -13,16 +15,17 @@ use Walnut\Lang\Implementation\Code\NativeCode\CastAsJsonValue;
 final readonly class AsJsonValue implements NativeMethod {
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType
 	): Type {
-		$resultType = $programRegistry->typeRegistry->alias(new TypeNameIdentifier('JsonValue'));
-		return new CastAsJsonValue($programRegistry)->isSafeToCastType(
+		$resultType = $typeRegistry->alias(new TypeNameIdentifier('JsonValue'));
+		return new CastAsJsonValue($typeRegistry, $methodFinder)->isSafeToCastType(
 			$targetType
-		) ? $resultType : $programRegistry->typeRegistry->result(
+		) ? $resultType : $typeRegistry->result(
 			$resultType,
-			$programRegistry->typeRegistry->withName(new TypeNameIdentifier('InvalidJsonValue'))
+			$typeRegistry->withName(new TypeNameIdentifier('InvalidJsonValue'))
 		);
 	}
 
@@ -34,8 +37,10 @@ final readonly class AsJsonValue implements NativeMethod {
 		$targetValue = $target;
 
 		try {
-			$result = new CastAsJsonValue($programRegistry)
-				->getJsonValue($targetValue);
+			$result = new CastAsJsonValue(
+				$programRegistry->typeRegistry,
+				$programRegistry->methodFinder
+			)->getJsonValue($programRegistry, $targetValue);
 		} catch (FunctionReturn $return) {
 			return $return->typedValue;
 		}

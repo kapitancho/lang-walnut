@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\CompositeNamedType;
 use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\MetaType;
@@ -24,14 +26,15 @@ final readonly class ValueType implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType, true);
 			if ($refType instanceof CompositeNamedType || $refType instanceof MutableType) {
-				return $programRegistry->typeRegistry->type($refType->valueType);
+				return $typeRegistry->type($refType->valueType);
 			}
 			if ($refType instanceof MetaType) {
 				if ($refType->value === MetaTypeValue::Data ||
@@ -39,7 +42,7 @@ final readonly class ValueType implements NativeMethod {
 					$refType->value === MetaTypeValue::Sealed ||
 					$refType->value === MetaTypeValue::MutableValue
 				) {
-					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->any);
+					return $typeRegistry->type($typeRegistry->any);
 				}
 			}
 		}

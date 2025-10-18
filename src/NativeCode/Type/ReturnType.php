@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
@@ -21,17 +23,18 @@ final readonly class ReturnType implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof FunctionType || $refType instanceof ResultType) {
-				return $programRegistry->typeRegistry->type($refType->returnType);
+				return $typeRegistry->type($refType->returnType);
 			}
 			if ($refType instanceof MetaType && $refType->value === MetaTypeValue::Function) {
-				return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->any);
+				return $typeRegistry->type($typeRegistry->any);
 			}
 		}
 		// @codeCoverageIgnoreStart

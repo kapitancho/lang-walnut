@@ -7,7 +7,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
@@ -25,7 +27,8 @@ final readonly class Sum implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -36,13 +39,13 @@ final readonly class Sum implements NativeMethod {
 		if ($targetType instanceof ArrayType) {
 			$itemType = $targetType->itemType;
 			if ($itemType->isSubtypeOf(
-				$programRegistry->typeRegistry->union([
-					$programRegistry->typeRegistry->integer(),
-					$programRegistry->typeRegistry->real()
+				$typeRegistry->union([
+					$typeRegistry->integer(),
+					$typeRegistry->real()
 				])
 			)) {
 				if ($itemType instanceof RealType) {
-					return $programRegistry->typeRegistry->realFull(
+					return $typeRegistry->realFull(
 						new NumberInterval(
 							$itemType->numberRange->min === MinusInfinity::value ? MinusInfinity::value :
 								new NumberIntervalEndpoint(
@@ -60,7 +63,7 @@ final readonly class Sum implements NativeMethod {
 					);
 				}
 				if ($itemType instanceof IntegerType) {
-					return $programRegistry->typeRegistry->integerFull(
+					return $typeRegistry->integerFull(
 						new NumberInterval(
 							$itemType->numberRange->min === MinusInfinity::value ? MinusInfinity::value :
 								new NumberIntervalEndpoint(
@@ -77,7 +80,7 @@ final readonly class Sum implements NativeMethod {
 						)
 					);
 				}
-				return $programRegistry->typeRegistry->real();
+				return $typeRegistry->real();
 			}
 		}
 		// @codeCoverageIgnoreStart

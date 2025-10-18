@@ -7,7 +7,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -18,7 +20,8 @@ final readonly class UpTo implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -41,15 +44,15 @@ final readonly class UpTo implements NativeMethod {
 						$pMax->value - ($pMax->inclusive ? 0 : 1) -
 						$tMin->value + ($tMin->inclusive ? 0 : 1));
 
-				return $programRegistry->typeRegistry->array(
+				return $typeRegistry->array(
 					$maxLength === PlusInfinity::value || $maxLength > 0 ?
-						$programRegistry->typeRegistry->integer(
+						$typeRegistry->integer(
 							$tMin === MinusInfinity::value ? MinusInfinity::value :
 								$tMin->value + ($tMin->inclusive ? 0 : 1),
 							$pMax === PlusInfinity::value ? PlusInfinity::value :
 								$pMax->value - ($pMax->inclusive ? 0 : 1)
 						) :
-						$programRegistry->typeRegistry->nothing,
+						$typeRegistry->nothing,
 					$maxLength === PlusInfinity::value ? $minLength : min($maxLength, $minLength),
 					$maxLength
 				);
@@ -71,13 +74,13 @@ final readonly class UpTo implements NativeMethod {
 		
 		if ($targetValue instanceof IntegerValue) {
 			if ($parameterValue instanceof IntegerValue) {
-	            return ($programRegistry->valueRegistry->tuple(
+	            return $programRegistry->valueRegistry->tuple(
 					$targetValue->literalValue < $parameterValue->literalValue  ?
 						array_map(fn(int $i): IntegerValue =>
 							$programRegistry->valueRegistry->integer($i),
 							range($targetValue->literalValue, $parameterValue->literalValue)
 						) : []
-	            ));
+	            );
 			}
 		}
 		// @codeCoverageIgnoreStart

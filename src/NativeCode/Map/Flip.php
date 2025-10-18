@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Map;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -18,7 +20,8 @@ final readonly class Flip implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -28,9 +31,9 @@ final readonly class Flip implements NativeMethod {
 		}
 		if ($targetType instanceof MapType) {
 			$itemType = $targetType->itemType;
-			if ($itemType->isSubtypeOf($programRegistry->typeRegistry->string())) {
-				return $programRegistry->typeRegistry->map(
-					$programRegistry->typeRegistry->string(),
+			if ($itemType->isSubtypeOf($typeRegistry->string())) {
+				return $typeRegistry->map(
+					$typeRegistry->string(),
 					min(1, $targetType->range->minLength),
 					$targetType->range->maxLength,
 				);

@@ -9,8 +9,6 @@ use Walnut\Lang\Blueprint\Common\Range\NumberRange as NumberRangeInterface;
 use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\RealSubsetType as RealSubsetTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Value\IntegerValue;
-use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Implementation\Common\Range\NumberInterval;
 use Walnut\Lang\Implementation\Common\Range\NumberRange;
 
@@ -66,10 +64,18 @@ final class RealSubsetType implements RealSubsetTypeInterface, JsonSerializable 
 			($ofType instanceof SupertypeChecker && $ofType->isSupertypeOf($this));
     }
 
-	public function contains(IntegerValue|RealValue $value): bool {
-		return in_array($value->literalValue, $this->subsetValues);
+	public function contains(int|float|Number $value): bool {
+		if (is_int($value)) {
+			$value = new Number($value);
+		} elseif (is_float($value)) {
+			$value = new Number((string)$value);
+		}
+		return in_array(	
+			$value,
+			$this->subsetValues
+		);
 	}
-
+	
 	public function __toString(): string {
 		return sprintf("Real[%s]", implode(', ', $this->subsetValues));
 	}

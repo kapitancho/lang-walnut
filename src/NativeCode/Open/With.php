@@ -9,7 +9,9 @@ use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\NothingType;
@@ -29,7 +31,8 @@ final readonly class With implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType
 	): Type {
@@ -37,22 +40,23 @@ final readonly class With implements NativeMethod {
 		if ($type instanceof OpenType) {
 			$valueType = $this->toBaseType($type->valueType);
 
-			$alignTypeWithValidator = function() use ($programRegistry, $targetType, $valueType) {
-				$constructorType = $programRegistry->typeRegistry->atom(
+			$alignTypeWithValidator = function() use ($typeRegistry, $methodFinder, $targetType, $valueType) {
+				$constructorType = $typeRegistry->atom(
 					new TypeNameIdentifier('Constructor')
 				);
-				$validatorMethod = $programRegistry->methodFinder->methodForType(
+				$validatorMethod = $methodFinder->methodForType(
 					$constructorType,
 					new MethodNameIdentifier('as' . $targetType->name->identifier)
 				);
 				if ($validatorMethod !== UnknownMethod::value) {
 					$validatorResultType = $validatorMethod->analyse(
-						$programRegistry,
+						$typeRegistry,
+						$methodFinder,
 						$constructorType,
 						$valueType
 					);
 					if ($validatorResultType instanceof ResultType) {
-						return $programRegistry->typeRegistry->result(
+						return $typeRegistry->result(
 							$targetType, $validatorResultType->errorType
 						);
 					}

@@ -4,7 +4,9 @@ namespace Walnut\Lang\NativeCode\Any;
 
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\ResultType;
@@ -25,7 +27,8 @@ final readonly class AsString implements NativeMethod {
 	}
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType
 	): StringType|StringSubsetType|ResultType {
@@ -44,17 +47,17 @@ final readonly class AsString implements NativeMethod {
 		}
 		$subsetValues = $this->castAsString->detectSubsetType($targetType);
 		if (is_array($subsetValues)) {
-			return $programRegistry->typeRegistry->stringSubset($subsetValues);
+			return $typeRegistry->stringSubset($subsetValues);
 		}
 		$range = $this->castAsString->detectRangedType($targetType);
 		if (is_array($range)) {
 			[$minLength, $maxLength] = $range;
-			return $programRegistry->typeRegistry->string($minLength, $maxLength);
+			return $typeRegistry->string($minLength, $maxLength);
 		}
 		/** @var ResultType */
-		return $programRegistry->typeRegistry->result(
-			$programRegistry->typeRegistry->string(),
-			$programRegistry->typeRegistry->data(new TypeNameIdentifier("CastNotAvailable"))
+		return $typeRegistry->result(
+			$typeRegistry->string(),
+			$typeRegistry->data(new TypeNameIdentifier("CastNotAvailable"))
 		);
 	}
 

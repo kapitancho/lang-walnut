@@ -8,7 +8,9 @@ use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
@@ -24,7 +26,8 @@ final readonly class WithRange implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
@@ -32,9 +35,9 @@ final readonly class WithRange implements NativeMethod {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof IntegerType) {
 				if ($parameterType->isSubtypeOf(
-					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('IntegerRange'))
+					$typeRegistry->withName(new TypeNameIdentifier('IntegerRange'))
 				)) {
-					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->integer());
+					return $typeRegistry->type($typeRegistry->integer());
 				}
 				// @codeCoverageIgnoreStart
 				throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -42,9 +45,9 @@ final readonly class WithRange implements NativeMethod {
 			}
 			if ($refType instanceof RealType) {
 				if ($parameterType->isSubtypeOf(
-					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('RealRange'))
+					$typeRegistry->withName(new TypeNameIdentifier('RealRange'))
 				)) {
-					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->real());
+					return $typeRegistry->type($typeRegistry->real());
 				}
 				// @codeCoverageIgnoreStart
 				throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -76,7 +79,7 @@ final readonly class WithRange implements NativeMethod {
 						$minValue instanceof IntegerValue ? $minValue->literalValue : MinusInfinity::value,
 						$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
 					);
-					return ($programRegistry->valueRegistry->type($result));
+					return $programRegistry->valueRegistry->type($result);
 				}
 			}
 			if ($typeValue instanceof RealType) {

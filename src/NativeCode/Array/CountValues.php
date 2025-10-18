@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Array;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -19,7 +21,8 @@ final readonly class CountValues implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -29,11 +32,11 @@ final readonly class CountValues implements NativeMethod {
 		}
 		if ($targetType instanceof ArrayType) {
 			$itemType = $targetType->itemType;
-			if ($itemType->isSubtypeOf($programRegistry->typeRegistry->string()) ||
-				$itemType->isSubtypeOf($programRegistry->typeRegistry->integer())
+			if ($itemType->isSubtypeOf($typeRegistry->string()) ||
+				$itemType->isSubtypeOf($typeRegistry->integer())
 			) {
-				return $programRegistry->typeRegistry->map(
-					$programRegistry->typeRegistry->integer(
+				return $typeRegistry->map(
+					$typeRegistry->integer(
 						1, max(1, $targetType->range->maxLength)
 					),
 					min(1, $targetType->range->minLength),

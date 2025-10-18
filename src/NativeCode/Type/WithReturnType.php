@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\ResultType;
@@ -21,37 +23,38 @@ final readonly class WithReturnType implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($parameterType->isSubtypeOf(
-				$programRegistry->typeRegistry->type(
-					$programRegistry->typeRegistry->any
+				$typeRegistry->type(
+					$typeRegistry->any
 				)
 			)) {
 				if ($refType instanceof ResultType) {
-					return $programRegistry->typeRegistry->type(
-						$programRegistry->typeRegistry->result(
+					return $typeRegistry->type(
+						$typeRegistry->result(
 							$parameterType->refType,
 							$refType->errorType,
 						)
 					);
 				}
 				if ($refType instanceof FunctionType) {
-					return $programRegistry->typeRegistry->type(
-						$programRegistry->typeRegistry->function(
+					return $typeRegistry->type(
+						$typeRegistry->function(
 							$refType->parameterType,
 							$parameterType->refType
 						)
 					);
 				}
 				if ($refType instanceof MetaType && $refType->value === MetaTypeValue::Function) {
-					return $programRegistry->typeRegistry->type(
-						$programRegistry->typeRegistry->function(
-							$programRegistry->typeRegistry->nothing,
+					return $typeRegistry->type(
+						$typeRegistry->function(
+							$typeRegistry->nothing,
 							$parameterType->refType
 						)
 					);
@@ -93,7 +96,7 @@ final readonly class WithReturnType implements NativeMethod {
 						$typeValue->parameterType,
 						$parameter->typeValue,
 					);
-					return ($programRegistry->valueRegistry->type($result));
+					return $programRegistry->valueRegistry->type($result);
 				}
 			}
 		}

@@ -348,7 +348,7 @@ final readonly class Hydrator {
 
 	private function hydrateInteger(Value $value, IntegerType $targetType, string $hydrationPath): IntegerValue {
 		if ($value instanceof IntegerValue) {
-			if ($targetType->contains($value)) {
+			if ($targetType->contains($value->literalValue)) {
 				return $value;
 			}
 			throw new HydrationException(
@@ -666,7 +666,7 @@ final readonly class Hydrator {
 
 	private function hydrateReal(Value $value, RealType $targetType, string $hydrationPath): RealValue {
 		if ($value instanceof IntegerValue || $value instanceof RealValue) {
-			if ($targetType->contains($value)) {
+			if ($targetType->contains($value->literalValue)) {
 				return $this->programRegistry->valueRegistry->real((float)(string)$value->literalValue);
 			}
 			throw new HydrationException(

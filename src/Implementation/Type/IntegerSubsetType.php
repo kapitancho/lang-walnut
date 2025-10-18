@@ -9,7 +9,6 @@ use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType as IntegerSubsetTypeInterface;
 use Walnut\Lang\Blueprint\Type\IntegerType as IntegerTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Value\IntegerValue;
 use Walnut\Lang\Implementation\Common\Range\NumberInterval;
 use Walnut\Lang\Implementation\Common\Range\NumberRange;
 
@@ -63,10 +62,13 @@ final class IntegerSubsetType implements IntegerSubsetTypeInterface, JsonSeriali
 			($ofType instanceof SupertypeChecker && $ofType->isSupertypeOf($this));
 	}
 
-	public function contains(IntegerValue $value): bool {
-		return in_array($value->literalValue, $this->subsetValues);
+	public function contains(int|Number $value): bool {
+		if (is_int($value)) {
+			$value = new Number($value);
+		}
+		return in_array($value, $this->subsetValues);
 	}
-
+	
 	public function __toString(): string {
 		return sprintf("Integer[%s]", implode(', ', $this->subsetValues));
 	}

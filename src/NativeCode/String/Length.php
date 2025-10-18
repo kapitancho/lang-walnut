@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\String;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -17,13 +19,14 @@ final readonly class Length implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
-			return $programRegistry->typeRegistry->integer(
+			return $typeRegistry->integer(
 				$targetType->range->minLength,
 				$targetType->range->maxLength,
 			);
@@ -39,9 +42,9 @@ final readonly class Length implements NativeMethod {
 		Value $parameter
 	): Value {
 		if ($target instanceof StringValue) {
-			return ($programRegistry->valueRegistry->integer(
+			return $programRegistry->valueRegistry->integer(
 				mb_strlen($target->literalValue)
-			));
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

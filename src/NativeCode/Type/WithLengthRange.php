@@ -7,7 +7,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\SetType;
@@ -24,26 +26,27 @@ final readonly class WithLengthRange implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($parameterType->isSubtypeOf(
-				$programRegistry->typeRegistry->withName(new TypeNameIdentifier('LengthRange'))
+				$typeRegistry->withName(new TypeNameIdentifier('LengthRange'))
 			)) {
 				if ($refType instanceof StringType) {
-					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->string());
+					return $typeRegistry->type($typeRegistry->string());
 				}
 				if ($refType instanceof ArrayType) {
-					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->array($refType->itemType));
+					return $typeRegistry->type($typeRegistry->array($refType->itemType));
 				}
 				if ($refType instanceof MapType) {
-					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->map($refType->itemType));
+					return $typeRegistry->type($typeRegistry->map($refType->itemType));
 				}
 				if ($refType instanceof SetType) {
-					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->set($refType->itemType));
+					return $typeRegistry->type($typeRegistry->set($refType->itemType));
 				}
 				// @codeCoverageIgnoreStart
 				throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));

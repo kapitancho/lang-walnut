@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
@@ -19,16 +21,17 @@ final readonly class Fire implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof SealedType && $targetType->name->equals(
 			new TypeNameIdentifier('EventBus')
 		)) {
-			return $programRegistry->typeRegistry->result(
+			return $typeRegistry->result(
 				$parameterType,
-				$programRegistry->typeRegistry->withName(new TypeNameIdentifier('ExternalError'))
+				$typeRegistry->withName(new TypeNameIdentifier('ExternalError'))
 			);
 		}
 		// @codeCoverageIgnoreStart

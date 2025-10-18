@@ -2,12 +2,12 @@
 
 namespace Walnut\Lang\Implementation\Type;
 
+use BcMath\Number;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Common\Range\NumberRange as NumberRangeInterface;
 use Walnut\Lang\Blueprint\Type\IntegerType as IntegerTypeInterface;
 use Walnut\Lang\Blueprint\Type\RealType as RealTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Value\IntegerValue;
 
 final readonly class IntegerType implements IntegerTypeInterface, JsonSerializable {
     public function __construct(
@@ -23,8 +23,11 @@ final readonly class IntegerType implements IntegerTypeInterface, JsonSerializab
         };
     }
 
-	public function contains(IntegerValue $value): bool {
-		return $this->numberRange->contains($value->literalValue);
+	public function contains(int|Number $value): bool {
+		if (is_int($value)) {
+			$value = new Number($value);
+		}
+		return $this->numberRange->contains($value);
 	}
 
 	public function __toString(): string {

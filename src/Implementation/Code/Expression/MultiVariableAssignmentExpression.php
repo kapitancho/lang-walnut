@@ -45,7 +45,8 @@ final readonly class MultiVariableAssignmentExpression implements MultiVariableA
 			$ret = $ret->withAddedVariableType(
 				$variableName,
 				$method->analyse(
-					$analyserContext->programRegistry,
+					$analyserContext->programRegistry->typeRegistry,
+					$analyserContext->programRegistry->methodFinder,
 					$retType,
 					($isList ?
 						$analyserContext->programRegistry->valueRegistry->integer($key) :

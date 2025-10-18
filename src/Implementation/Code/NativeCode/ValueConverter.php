@@ -8,7 +8,9 @@ use Walnut\Lang\Blueprint\Common\Identifier\IdentifierException;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\Method;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnionType;
@@ -21,11 +23,12 @@ final readonly class ValueConverter {
 	use BaseType;
 
 	public function analyseConvertValueToShape(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $sourceType,
 		Type $targetType,
 	): Type {
-		$shapeTargetType = $programRegistry->typeRegistry->shape($targetType);
+		$shapeTargetType = $typeRegistry->shape($targetType);
 
 		if ($sourceType->isSubtypeOf($shapeTargetType)) {
 			return $targetType;
@@ -34,12 +37,13 @@ final readonly class ValueConverter {
 		//TODO - consider dropping this completely
 		try {
 			$methodName = new MethodNameIdentifier(sprintf('as%s',$targetType));
-			$method = $programRegistry->methodFinder->methodForType($sourceType, $methodName);
+			$method = $methodFinder->methodForType($sourceType, $methodName);
 			if ($method instanceof Method) {
 				$returnType = $method->analyse(
-					$programRegistry,
+					$typeRegistry,
+					$methodFinder,
 					$sourceType,
-					$programRegistry->typeRegistry->null
+					$typeRegistry->null
 				);
 				if ($returnType instanceof ResultType) {
 					throw new AnalyserException(
@@ -123,7 +127,8 @@ final readonly class ValueConverter {
 	}
 
 	public function analyseConvertValueToType(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $sourceType,
 		Type $targetType,
 	): Type {
@@ -132,13 +137,14 @@ final readonly class ValueConverter {
 		}
 		try {
 			$methodName = new MethodNameIdentifier(sprintf('as%s',$targetType));
-			$method = $programRegistry->methodFinder->methodForType($sourceType, $methodName);
+			$method = $methodFinder->methodForType($sourceType, $methodName);
 
 			if ($method instanceof Method) {
 				$returnType = $method->analyse(
-					$programRegistry,
+					$typeRegistry,
+					$methodFinder,
 					$sourceType,
-					$programRegistry->typeRegistry->null
+					$typeRegistry->null
 				);
 				$errorType = $returnType instanceof ResultType ? $returnType->errorType : null;
 				$returnType = $returnType instanceof ResultType ? $returnType->returnType : $returnType;
@@ -152,14 +158,14 @@ final readonly class ValueConverter {
 					));
 					// @codeCoverageIgnoreEnd
 				}
-				return $errorType ? $programRegistry->typeRegistry->result($targetType, $errorType) : $targetType;
+				return $errorType ? $typeRegistry->result($targetType, $errorType) : $targetType;
 			}
 		} catch (IdentifierException) {}
 
-		return $programRegistry->typeRegistry->result(
+		return $typeRegistry->result(
 			$targetType,
-			$programRegistry->typeRegistry->any
-			//$programRegistry->typeRegistry->withName(new TypeNameIdentifier('CastNotAvailable'))
+			$typeRegistry->any
+			//$typeRegistry->withName(new TypeNameIdentifier('CastNotAvailable'))
 		);
 	}
 

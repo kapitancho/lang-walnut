@@ -6,6 +6,7 @@ use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -15,14 +16,15 @@ use Walnut\Lang\Blueprint\Value\Value;
 final readonly class JsonStringify implements NativeMethod {
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
-		$resultType = $programRegistry->typeRegistry->string();
-		return $this->isSafeConversion($programRegistry->typeRegistry, $targetType) ? $resultType : $programRegistry->typeRegistry->result(
+		$resultType = $typeRegistry->string();
+		return $this->isSafeConversion($typeRegistry, $targetType) ? $resultType : $typeRegistry->result(
 			$resultType,
-			$programRegistry->typeRegistry->withName(new TypeNameIdentifier('InvalidJsonValue'))
+			$typeRegistry->withName(new TypeNameIdentifier('InvalidJsonValue'))
 		);
 	}
 

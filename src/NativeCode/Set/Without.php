@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Set;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\SetType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\SetValue;
@@ -16,13 +18,14 @@ final readonly class Without implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof SetType) {
-			return $programRegistry->typeRegistry->map(
+			return $typeRegistry->map(
 				$targetType->itemType,
 				max(0, $targetType->range->minLength - 1),
 				$targetType->range->maxLength
@@ -47,7 +50,7 @@ final readonly class Without implements NativeMethod {
 			if (array_key_exists($key, $values)) {
 				unset($values[$key]);
 			}
-			return ($programRegistry->valueRegistry->set($values));
+			return $programRegistry->valueRegistry->set($values);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

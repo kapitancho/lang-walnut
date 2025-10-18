@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Array;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\ResultType;
@@ -22,7 +24,8 @@ final readonly class FlipMap implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -30,19 +33,19 @@ final readonly class FlipMap implements NativeMethod {
         $type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($type instanceof ArrayType) {
 			$itemType = $type->itemType;
-			if ($itemType->isSubtypeOf($programRegistry->typeRegistry->string())) {
+			if ($itemType->isSubtypeOf($typeRegistry->string())) {
                 $parameterType = $this->toBaseType($parameterType);
                 if ($parameterType instanceof FunctionType) {
                     if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
                         $r = $parameterType->returnType;
                         $errorType = $r instanceof ResultType ? $r->errorType : null;
                         $returnType = $r instanceof ResultType ? $r->returnType : $r;
-                        $t = $programRegistry->typeRegistry->map(
+                        $t = $typeRegistry->map(
                             $returnType,
                             min(1, $type->range->minLength),
                             $type->range->maxLength,
                         );
-                        return $errorType ? $programRegistry->typeRegistry->result($t, $errorType) : $t;
+                        return $errorType ? $typeRegistry->result($t, $errorType) : $t;
                     }
                     throw new AnalyserException(
 						sprintf(

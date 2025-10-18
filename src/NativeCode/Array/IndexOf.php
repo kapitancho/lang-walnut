@@ -7,7 +7,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -19,7 +21,8 @@ final readonly class IndexOf implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -29,11 +32,11 @@ final readonly class IndexOf implements NativeMethod {
 		}
 		if ($targetType instanceof ArrayType) {
 			$maxLength = $targetType->range->maxLength;
-			$returnType = $programRegistry->typeRegistry->integer(0,
+			$returnType = $typeRegistry->integer(0,
 				$maxLength === PlusInfinity::value ? $maxLength : max($maxLength - 1, 0));
-			return $programRegistry->typeRegistry->result(
+			return $typeRegistry->result(
 				$returnType,
-				$programRegistry->typeRegistry->atom(
+				$typeRegistry->atom(
 					new TypeNameIdentifier("ItemNotFound")
 				)
 			);

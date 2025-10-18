@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Set;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\SetType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -17,14 +19,15 @@ final readonly class BinaryBitwiseAnd implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		if ($targetType instanceof SetType) {
 			if ($parameterType instanceof SetType) {
-				return $programRegistry->typeRegistry->set(
-					$t = $programRegistry->typeRegistry->intersection([
+				return $typeRegistry->set(
+					$t = $typeRegistry->intersection([
 						$targetType->itemType,
 						$parameterType->itemType
 					]),

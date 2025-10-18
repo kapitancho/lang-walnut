@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Array;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -18,7 +20,8 @@ final readonly class Flip implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -26,9 +29,9 @@ final readonly class Flip implements NativeMethod {
 		$targetType = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($targetType instanceof ArrayType) {
 			$itemType = $targetType->itemType;
-			if ($itemType->isSubtypeOf($programRegistry->typeRegistry->string())) {
-				return $programRegistry->typeRegistry->map(
-					$programRegistry->typeRegistry->integer(
+			if ($itemType->isSubtypeOf($typeRegistry->string())) {
+				return $typeRegistry->map(
+					$typeRegistry->integer(
 						0, $targetType->range->maxLength
 					),
 					min(1, $targetType->range->minLength),

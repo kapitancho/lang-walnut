@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Type;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -17,20 +19,21 @@ final readonly class WithRefType implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($parameterType->isSubtypeOf(
-				$programRegistry->typeRegistry->type(
-					$programRegistry->typeRegistry->any
+				$typeRegistry->type(
+					$typeRegistry->any
 				)
 			)) {
 				if ($refType instanceof TypeType) {
-					return $programRegistry->typeRegistry->type(
-						$programRegistry->typeRegistry->type(
+					return $typeRegistry->type(
+						$typeRegistry->type(
 							$parameterType->refType
 						)
 					);

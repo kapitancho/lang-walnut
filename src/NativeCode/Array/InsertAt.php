@@ -7,7 +7,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -21,22 +23,23 @@ final readonly class InsertAt implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		$targetType = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($targetType instanceof ArrayType) {
-			$pInt = $programRegistry->typeRegistry->integer(0);
-			$pType = $programRegistry->typeRegistry->record([
-				"value" => $programRegistry->typeRegistry->any,
+			$pInt = $typeRegistry->integer(0);
+			$pType = $typeRegistry->record([
+				"value" => $typeRegistry->any,
 				"index" => $pInt
 			]);
 			if ($parameterType->isSubtypeOf($pType)) {
 				$parameterType = $this->toBaseType($parameterType);
-				$returnType = $programRegistry->typeRegistry->array(
-					$programRegistry->typeRegistry->union([
+				$returnType = $typeRegistry->array(
+					$typeRegistry->union([
 						$targetType->itemType,
 						$parameterType->types['value']
 					]),
@@ -48,8 +51,8 @@ final readonly class InsertAt implements NativeMethod {
 					$parameterType->types['index']->numberRange->max !== PlusInfinity::value &&
 					$parameterType->types['index']->numberRange->max->value >= 0 &&
 					$parameterType->types['index']->numberRange->max->value <= $targetType->range->minLength ?
-					$returnType : $programRegistry->typeRegistry->result($returnType,
-						$programRegistry->typeRegistry->data(new TypeNameIdentifier('IndexOutOfRange'))
+					$returnType : $typeRegistry->result($returnType,
+						$typeRegistry->data(new TypeNameIdentifier('IndexOutOfRange'))
 					);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));

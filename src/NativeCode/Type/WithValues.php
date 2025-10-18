@@ -8,7 +8,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\MetaType;
@@ -29,7 +31,8 @@ final readonly class WithValues implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
@@ -37,13 +40,13 @@ final readonly class WithValues implements NativeMethod {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof IntegerType) {
 				if ($parameterType->isSubtypeOf(
-					$programRegistry->typeRegistry->array(
-						$programRegistry->typeRegistry->integer(),
+					$typeRegistry->array(
+						$typeRegistry->integer(),
 						1
 					)
 				)) {
-					return $programRegistry->typeRegistry->type(
-						$programRegistry->typeRegistry->metaType(MetaTypeValue::IntegerSubset)
+					return $typeRegistry->type(
+						$typeRegistry->metaType(MetaTypeValue::IntegerSubset)
 					);
 				}
 				// @codeCoverageIgnoreStart
@@ -52,13 +55,13 @@ final readonly class WithValues implements NativeMethod {
 			}
 			if ($refType instanceof RealType) {
 				if ($parameterType->isSubtypeOf(
-					$programRegistry->typeRegistry->array(
-						$programRegistry->typeRegistry->real(),
+					$typeRegistry->array(
+						$typeRegistry->real(),
 						1
 					)
 				)) {
-					return $programRegistry->typeRegistry->type(
-						$programRegistry->typeRegistry->metaType(MetaTypeValue::RealSubset)
+					return $typeRegistry->type(
+						$typeRegistry->metaType(MetaTypeValue::RealSubset)
 					);
 				}
 				// @codeCoverageIgnoreStart
@@ -67,13 +70,13 @@ final readonly class WithValues implements NativeMethod {
 			}
 			if ($refType instanceof StringType) {
 				if ($parameterType->isSubtypeOf(
-					$programRegistry->typeRegistry->array(
-						$programRegistry->typeRegistry->string(),
+					$typeRegistry->array(
+						$typeRegistry->string(),
 						1
 					)
 				)) {
-					return $programRegistry->typeRegistry->type(
-						$programRegistry->typeRegistry->metaType(MetaTypeValue::StringSubset)
+					return $typeRegistry->type(
+						$typeRegistry->metaType(MetaTypeValue::StringSubset)
 					);
 				}
 				// @codeCoverageIgnoreStart
@@ -82,12 +85,12 @@ final readonly class WithValues implements NativeMethod {
 			}
 			if ($refType instanceof EnumerationType) {
 				if ($parameterType->isSubtypeOf(
-					$programRegistry->typeRegistry->array(
+					$typeRegistry->array(
 						$refType,
 						1
 					)
 				)) {
-					return $programRegistry->typeRegistry->type($refType);
+					return $typeRegistry->type($refType);
 				}
 				// @codeCoverageIgnoreStart
 				throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -98,16 +101,16 @@ final readonly class WithValues implements NativeMethod {
 				$refType->value === MetaTypeValue::EnumerationSubset*/
 			)) {
 				if ($parameterType->isSubtypeOf(
-					$programRegistry->typeRegistry->array(
-						$programRegistry->typeRegistry->any,
+					$typeRegistry->array(
+						$typeRegistry->any,
 						1
 					)
 				)) {
-					return $programRegistry->typeRegistry->result(
-						$programRegistry->typeRegistry->type(
-							$programRegistry->typeRegistry->metaType(MetaTypeValue::EnumerationSubset)
+					return $typeRegistry->result(
+						$typeRegistry->type(
+							$typeRegistry->metaType(MetaTypeValue::EnumerationSubset)
 						),
-						$programRegistry->typeRegistry->withName(
+						$typeRegistry->withName(
 							new TypeNameIdentifier('UnknownEnumerationValue')
 						)
 					);

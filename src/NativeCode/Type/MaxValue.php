@@ -7,7 +7,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\RealSubsetType;
@@ -23,22 +25,23 @@ final readonly class MaxValue implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof IntegerType) {
-				return $programRegistry->typeRegistry->union([
-					$programRegistry->typeRegistry->integerFull(),
-					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('PlusInfinity'))
+				return $typeRegistry->union([
+					$typeRegistry->integerFull(),
+					$typeRegistry->withName(new TypeNameIdentifier('PlusInfinity'))
 				]);
 			}
 			if ($refType instanceof RealType) {
-				return $programRegistry->typeRegistry->union([
-					$programRegistry->typeRegistry->real(),
-					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('PlusInfinity'))
+				return $typeRegistry->union([
+					$typeRegistry->real(),
+					$typeRegistry->withName(new TypeNameIdentifier('PlusInfinity'))
 				]);
 			}
 		}

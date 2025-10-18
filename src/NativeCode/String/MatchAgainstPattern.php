@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\String;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -21,7 +23,8 @@ final readonly class MatchAgainstPattern implements NativeMethod {
 	private const string REPLACE_PATTERN = '(.+?)';
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -29,11 +32,11 @@ final readonly class MatchAgainstPattern implements NativeMethod {
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $programRegistry->typeRegistry->union([
-					$programRegistry->typeRegistry->map(
-						$programRegistry->typeRegistry->string(),
+				return $typeRegistry->union([
+					$typeRegistry->map(
+						$typeRegistry->string(),
 					),
-					$programRegistry->typeRegistry->false
+					$typeRegistry->false
 				]);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -65,7 +68,7 @@ final readonly class MatchAgainstPattern implements NativeMethod {
 				}
 				$path = strtolower($path);
 				if (!preg_match('#' . $path . '#', $target, $matches)) {
-					return ($programRegistry->valueRegistry->false);
+					return $programRegistry->valueRegistry->false;
 				}
 				return (is_array($pathArgs) ?
 					$programRegistry->valueRegistry->record(

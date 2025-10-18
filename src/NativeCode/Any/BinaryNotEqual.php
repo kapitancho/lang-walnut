@@ -3,7 +3,9 @@
 namespace Walnut\Lang\NativeCode\Any;
 
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\BooleanType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -11,11 +13,12 @@ use Walnut\Lang\Blueprint\Value\Value;
 final readonly class BinaryNotEqual implements NativeMethod {
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): BooleanType {
-		return $programRegistry->typeRegistry->boolean;
+		return $typeRegistry->boolean;
 	}
 
 	public function execute(

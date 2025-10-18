@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Array;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -17,7 +19,8 @@ final readonly class Contains implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -26,7 +29,7 @@ final readonly class Contains implements NativeMethod {
 			$targetType = $targetType->asArrayType();
 		}
 		if ($targetType instanceof ArrayType) {
-			return $programRegistry->typeRegistry->boolean;
+			return $typeRegistry->boolean;
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -45,10 +48,10 @@ final readonly class Contains implements NativeMethod {
 			$values = $targetValue->values;
 			foreach ($values as $value) {
 				if ($value->equals($parameterValue)) {
-					return ($programRegistry->valueRegistry->true);
+					return $programRegistry->valueRegistry->true;
 				}
 			}
-			return ($programRegistry->valueRegistry->false);
+			return $programRegistry->valueRegistry->false;
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

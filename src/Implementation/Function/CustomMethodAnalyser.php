@@ -59,7 +59,8 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 					}
 					if ($baseMethod instanceof NativeMethod && !array_key_exists($baseMethod::class, $usedMethods)) {
 						$baseReturnType = $baseMethod->analyse(
-							$this->programRegistry,
+							$this->programRegistry->typeRegistry,
+							$this->programRegistry->methodFinder,
 							$methodTargetType,
 							$method->parameterType,
 						);

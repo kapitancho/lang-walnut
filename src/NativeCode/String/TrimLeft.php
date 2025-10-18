@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\String;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\NullType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
@@ -18,7 +20,8 @@ final readonly class TrimLeft implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -26,7 +29,7 @@ final readonly class TrimLeft implements NativeMethod {
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof NullType || $parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $programRegistry->typeRegistry->string(0, $targetType->range->maxLength);
+				return $typeRegistry->string(0, $targetType->range->maxLength);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}
@@ -44,10 +47,10 @@ final readonly class TrimLeft implements NativeMethod {
 		$parameterValue = $parameter;
 
 		if ($targetValue instanceof StringValue) {
-			return ($parameterValue instanceof StringValue ?
+			return $parameterValue instanceof StringValue ?
 				$programRegistry->valueRegistry->string(ltrim($targetValue->literalValue, $parameterValue->literalValue)) :
 				$programRegistry->valueRegistry->string(ltrim($targetValue->literalValue))
-			);
+			;
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

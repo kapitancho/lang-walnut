@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
@@ -20,22 +22,23 @@ final readonly class WithValueType implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($parameterType->isSubtypeOf(
-				$programRegistry->typeRegistry->type(
-					$programRegistry->typeRegistry->any
+				$typeRegistry->type(
+					$typeRegistry->any
 				)
 			)) {
 				if ($refType instanceof MutableType || (
 					$refType instanceof MetaType && $refType->value === MetaTypeValue::MutableValue
 				)) {
-					return $programRegistry->typeRegistry->type(
-						$programRegistry->typeRegistry->metaType(MetaTypeValue::MutableValue)
+					return $typeRegistry->type(
+						$typeRegistry->metaType(MetaTypeValue::MutableValue)
 					);
 				}
 				// @codeCoverageIgnoreStart
@@ -67,7 +70,7 @@ final readonly class WithValueType implements NativeMethod {
 					$result = $programRegistry->typeRegistry->mutable(
 						$parameter->typeValue,
 					);
-					return ($programRegistry->valueRegistry->type($result));
+					return $programRegistry->valueRegistry->type($result);
 				}
 			}
 		}

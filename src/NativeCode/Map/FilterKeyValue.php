@@ -5,6 +5,7 @@ namespace Walnut\Lang\NativeCode\Map;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\MapType;
@@ -29,7 +30,8 @@ final readonly class FilterKeyValue implements NativeMethod {
 	}
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -38,10 +40,10 @@ final readonly class FilterKeyValue implements NativeMethod {
 			$targetType = $targetType->asMapType();
 		}
 		if ($targetType instanceof MapType) {
-			$expectedType = $this->getExpectedType($programRegistry->typeRegistry, $targetType->itemType);
+			$expectedType = $this->getExpectedType($typeRegistry, $targetType->itemType);
 			if ($parameterType->isSubtypeOf($expectedType)) {
 				//if ($targetType->itemType()->isSubtypeOf($parameterType->parameterType())) {
-					return $programRegistry->typeRegistry->map(
+					return $typeRegistry->map(
 						$targetType->itemType,
 						0,
 						$targetType->range->maxLength

@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\Function\CustomMethod;
 use Walnut\Lang\Blueprint\Function\Method;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ShapeType as ShapeTypeInterface;
 use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -22,6 +23,7 @@ final class ShapeType implements ShapeTypeInterface, JsonSerializable {
 	private readonly Type $realValueType;
 
     public function __construct(
+		private readonly TypeRegistry $typeRegistry,
 		private readonly MethodFinder $methodFinder,
 		public readonly Type $declaredValueType,
     ) {}
@@ -56,7 +58,13 @@ final class ShapeType implements ShapeTypeInterface, JsonSerializable {
 						return true;
 					}
 				} elseif ($method instanceof NativeMethod) {
-					return true;
+					$detectedType = $method->analyse(
+						$this->typeRegistry,
+						$this->methodFinder,
+						$ofType,
+						$this->typeRegistry->null,
+					);
+					return $detectedType->isSubtypeOf($this->refType);
 				}
 			} catch (IdentifierException) {}
 		}

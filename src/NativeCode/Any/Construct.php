@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Any;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -17,14 +19,16 @@ final readonly class Construct implements NativeMethod {
 	use TupleAsRecord;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType
 	): Type {
 		if ($parameterType instanceof TypeType) {
 			$t = $parameterType->refType;
 			return new ValueConstructor()->analyseConstructor(
-				$programRegistry,
+				$typeRegistry,
+				$methodFinder,
 				$t,
 				$targetType
 			);

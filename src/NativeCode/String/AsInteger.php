@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -18,15 +20,16 @@ final readonly class AsInteger implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
-			return $programRegistry->typeRegistry->result(
-				$programRegistry->typeRegistry->integer(),
-				$programRegistry->typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
+			return $typeRegistry->result(
+				$typeRegistry->integer(),
+				$typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
 			);
 		}
 		// @codeCoverageIgnoreStart

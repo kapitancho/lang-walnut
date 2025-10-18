@@ -43,17 +43,10 @@ use Walnut\Lang\NativeCode\Any\AsJsonValue;
 
 final readonly class CastAsJsonValue {
 
-	private TypeRegistry $typeRegistry;
-	private ValueRegistry $valueRegistry;
-	private MethodFinder $methodFinder;
-
 	public function __construct(
-		private ProgramRegistry $programRegistry,
-	) {
-		$this->typeRegistry = $programRegistry->typeRegistry;
-		$this->valueRegistry = $programRegistry->valueRegistry;
-		$this->methodFinder = $programRegistry->methodFinder;
-	}
+		private TypeRegistry $typeRegistry,
+		private MethodFinder $methodFinder,
+	) {}
 
 	public function isSafeToCastType(Type $type): bool {
 		if ($type instanceof TupleType || $type instanceof RecordType) {
@@ -84,7 +77,8 @@ final readonly class CastAsJsonValue {
 		);
 		if ($method instanceof Method && !($method instanceof AsJsonValue)) {
 			$result = $method->analyse(
-				$this->programRegistry,
+				$this->typeRegistry,
+				$this->methodFinder,
 				$type,
 				$this->typeRegistry->null
 			);
@@ -98,20 +92,20 @@ final readonly class CastAsJsonValue {
 		return false;
 	}
 
-	public function getJsonValue(Value $value): Value {
+	public function getJsonValue(ProgramRegistry $programRegistry, Value $value): Value {
 		if ($value instanceof TupleValue) {
 			$items = [];
 			foreach($value->values as $item) {
-				$items[] = $this->getJsonValue($item);
+				$items[] = $this->getJsonValue($programRegistry, $item);
 			}
-			return $this->valueRegistry->tuple($items);
+			return $programRegistry->valueRegistry->tuple($items);
 		}
 		if ($value instanceof RecordValue) {
 			$items = [];
 			foreach($value->values as $key => $item) {
-				$items[$key] = $this->getJsonValue($item);
+				$items[$key] = $this->getJsonValue($programRegistry, $item);
 			}
-			return $this->valueRegistry->record($items);
+			return $programRegistry->valueRegistry->record($items);
 		}
 		if ($value instanceof NullValue ||
 			$value instanceof BooleanValue ||
@@ -127,22 +121,22 @@ final readonly class CastAsJsonValue {
 		);
 		if ($method instanceof Method && !($method instanceof AsJsonValue)) {
 			return $method->execute(
-				$this->programRegistry,
+				$programRegistry,
 				$value,
-				$this->valueRegistry->null
+				$programRegistry->valueRegistry->null
 			);
 		}
 		if ($value instanceof MutableValue || $value instanceof OpenValue || $value instanceof SealedValue || $value instanceof DataValue) {
-			return $this->getJsonValue($value->value);
+			return $this->getJsonValue($programRegistry, $value->value);
 		}
 		if ($value instanceof EnumerationValue) {
-			return $this->valueRegistry->string($value->name->identifier);
+			return $programRegistry->valueRegistry->string($value->name->identifier);
 		}
 		throw new FunctionReturn((
-			$this->valueRegistry->error(
-				$this->valueRegistry->dataValue(
+		$programRegistry->valueRegistry->error(
+			$programRegistry->valueRegistry->dataValue(
 					new TypeNameIdentifier('InvalidJsonValue'),
-					$this->valueRegistry->record(['value' => $value])
+				$programRegistry->valueRegistry->record(['value' => $value])
 				)
 			)
 		));

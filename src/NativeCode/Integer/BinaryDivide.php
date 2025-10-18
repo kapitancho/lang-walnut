@@ -9,7 +9,9 @@ use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint as NumberIntervalEndpointInterface;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -24,7 +26,8 @@ final readonly class BinaryDivide implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -33,7 +36,7 @@ final readonly class BinaryDivide implements NativeMethod {
 			$parameterType = $this->toBaseType($parameterType);
 
 			if ($parameterType instanceof IntegerType || $parameterType instanceof RealType) {
-                $real = $programRegistry->typeRegistry->real();
+                $real = $typeRegistry->real();
 				//TODO: yyy - add +/-, -/+ and -/- cases as well as "inclusive" improvement
                 if (
                     $targetType->numberRange->min instanceof NumberIntervalEndpointInterface && $targetType->numberRange->min->value >= 0 &&
@@ -54,12 +57,12 @@ final readonly class BinaryDivide implements NativeMethod {
 	                        true
                         );
 					$interval = new NumberInterval($min, $max);
-                    $real = $programRegistry->typeRegistry->realFull($interval);
+                    $real = $typeRegistry->realFull($interval);
                 }
-				return $parameterType->contains($programRegistry->valueRegistry->integer(0)) ?
-					$programRegistry->typeRegistry->result(
+				return $parameterType->contains(0) ?
+					$typeRegistry->result(
 						$real,
-						$programRegistry->typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
+						$typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
 					) : $real;
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));

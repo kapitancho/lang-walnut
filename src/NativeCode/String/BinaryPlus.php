@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -19,7 +21,8 @@ final readonly class BinaryPlus implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -27,7 +30,7 @@ final readonly class BinaryPlus implements NativeMethod {
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $programRegistry->typeRegistry->string(
+				return $typeRegistry->string(
 					$targetType->range->minLength + $parameterType->range->minLength,
 					$targetType->range->maxLength === PlusInfinity::value ||
 					$parameterType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
@@ -35,11 +38,11 @@ final readonly class BinaryPlus implements NativeMethod {
 				);
 			}
 			if ($parameterType->isSubtypeOf(
-				$programRegistry->typeRegistry->shape(
-					$programRegistry->typeRegistry->string()
+				$typeRegistry->shape(
+					$typeRegistry->string()
 				)
 			)) {
-				return $programRegistry->typeRegistry->string();
+				return $typeRegistry->string();
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}
@@ -62,7 +65,7 @@ final readonly class BinaryPlus implements NativeMethod {
 				new ValueConverter()->convertValueToShape(
 					$programRegistry,
 					$parameterValue,
-					$programRegistry->typeRegistry->string()
+					$typeRegistry->string()
 				);
 			if ($value instanceof StringValue) {
 				$result = $targetValue->literalValue . $value->literalValue;

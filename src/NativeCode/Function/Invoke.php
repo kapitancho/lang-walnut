@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
@@ -19,10 +21,10 @@ final readonly class Invoke implements NativeMethod {
 	use BaseTypeHelper;
 	use TupleAsRecord;
 
-	public function analyse(ProgramRegistry $programRegistry, Type $targetType, Type $parameterType): Type {
+	public function analyse(TypeRegistry $typeRegistry, MethodFinder $methodFinder, Type $targetType, Type $parameterType): Type {
 		$baseTargetType = $this->toTargetBaseType(
 			$targetType,
-			$programRegistry->typeRegistry->metaType(MetaTypeValue::Function)
+			$typeRegistry->metaType(MetaTypeValue::Function)
 		);
 		if (!$baseTargetType) {
 			throw new AnalyserException(
@@ -30,7 +32,7 @@ final readonly class Invoke implements NativeMethod {
 		}
 		$p = $baseTargetType->parameterType;
 		$parameterType = $this->adjustParameterType(
-			$programRegistry->typeRegistry,
+			$typeRegistry,
 			$p,
 			$parameterType,
 		);

@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Any;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -14,13 +16,15 @@ use Walnut\Lang\Implementation\Code\NativeCode\ValueConverter;
 
 final readonly class CastAs implements NativeMethod {
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType
 	): Type {
 		if ($parameterType instanceof TypeType) {
 			return new ValueConverter()->analyseConvertValueToType(
-				$programRegistry,
+				$typeRegistry,
+				$methodFinder,
 				$targetType,
 				$parameterType->refType
 			);

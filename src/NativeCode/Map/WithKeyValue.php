@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
@@ -20,23 +22,24 @@ final readonly class WithKeyValue implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof RecordType || $targetType instanceof MapType) {
 			if ($parameterType->isSubtypeOf(
-				$programRegistry->typeRegistry->record([
-					'key' => $programRegistry->typeRegistry->string(),
-					'value' => $programRegistry->typeRegistry->any
+				$typeRegistry->record([
+					'key' => $typeRegistry->string(),
+					'value' => $typeRegistry->any
 				])
 			)) {
 				$keyType = $parameterType->types['key'] ?? null;
 				if ($targetType instanceof RecordType) {
 					if ($keyType instanceof StringSubsetType && count($keyType->subsetValues) === 1) {
 						$keyValue = $keyType->subsetValues[0];
-						return $programRegistry->typeRegistry->record(
+						return $typeRegistry->record(
 							$targetType->types + [
 								$keyValue => $parameterType->types['value']
 							]
@@ -45,8 +48,8 @@ final readonly class WithKeyValue implements NativeMethod {
 					$targetType = $targetType->asMapType();
 				}
 				$valueType = $parameterType->types['value'] ?? null;
-				return $programRegistry->typeRegistry->map(
-					$programRegistry->typeRegistry->union([
+				return $typeRegistry->map(
+					$typeRegistry->union([
 						$targetType->itemType,
 						$valueType
 					]),

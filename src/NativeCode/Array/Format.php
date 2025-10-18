@@ -7,7 +7,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
@@ -29,7 +31,8 @@ final readonly class Format implements NativeMethod {
 	}
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -40,7 +43,7 @@ final readonly class Format implements NativeMethod {
 		if ($targetType instanceof ArrayType) {
 			// Check that item type is convertible to String (Shape<String>)
 			$itemType = $targetType->itemType;
-			$stringShape = $programRegistry->typeRegistry->shape($programRegistry->typeRegistry->string());
+			$stringShape = $typeRegistry->shape($typeRegistry->string());
 			if (!$itemType->isSubtypeOf($stringShape)) {
 				throw new AnalyserException(sprintf(
 					"[%s] Invalid target type: array item type %s is not a subtype of Shape<String>",
@@ -64,10 +67,10 @@ final readonly class Format implements NativeMethod {
 					$isSafe = $targetType->range->minLength > $max;
 				}
 
-				$returnType = $programRegistry->typeRegistry->string();
-				return $isSafe ? $returnType : $programRegistry->typeRegistry->result(
+				$returnType = $typeRegistry->string();
+				return $isSafe ? $returnType : $typeRegistry->result(
 					$returnType,
-					$programRegistry->typeRegistry->data(new TypeNameIdentifier("CannotFormatString"))
+					$typeRegistry->data(new TypeNameIdentifier("CannotFormatString"))
 				);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));

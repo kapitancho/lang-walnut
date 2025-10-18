@@ -8,7 +8,9 @@ use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\TupleType;
@@ -22,7 +24,8 @@ final readonly class WithoutByIndex implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -30,9 +33,9 @@ final readonly class WithoutByIndex implements NativeMethod {
 		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($type instanceof ArrayType) {
 			if ($parameterType instanceof IntegerType) {
-				$returnType = $programRegistry->typeRegistry->record([
+				$returnType = $typeRegistry->record([
 					'element' => $type->itemType,
-					'array' => $programRegistry->typeRegistry->array(
+					'array' => $typeRegistry->array(
 						$type->itemType,
 						max(0, $type->range->minLength - 1),
 						$type->range->maxLength === PlusInfinity::value ?
@@ -46,9 +49,9 @@ final readonly class WithoutByIndex implements NativeMethod {
 					($parameterType->numberRange->max->value - ($parameterType->numberRange->max->inclusive ? 0 : 1)) <
 						$type->range->maxLength ?
 						$returnType :
-						$programRegistry->typeRegistry->result(
+						$typeRegistry->result(
 							$returnType,
-							$programRegistry->typeRegistry->data(
+							$typeRegistry->data(
 								new TypeNameIdentifier("IndexOutOfRange")
 							)
 					);

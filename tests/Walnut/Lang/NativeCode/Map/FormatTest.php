@@ -120,7 +120,6 @@ final class FormatTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFormatInvalidTargetType(): void {
-		self::markTestSkipped();
 		$this->executeErrorCodeSnippet('is not a subtype of Shape<String>', "[data: [1, 2, 3]]->format('Test {data}');");
 	}
 

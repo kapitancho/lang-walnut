@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Boolean;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\BooleanType;
 use Walnut\Lang\Blueprint\Type\FalseType;
 use Walnut\Lang\Blueprint\Type\TrueType;
@@ -18,7 +20,8 @@ final readonly class BinaryXor implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -28,10 +31,10 @@ final readonly class BinaryXor implements NativeMethod {
 			if ($parameterType instanceof BooleanType || $parameterType instanceof TrueType || $parameterType instanceof FalseType) {
 				return match(true) {
 					($targetType instanceof FalseType && $parameterType instanceof FalseType) ||
-					($targetType instanceof TrueType && $parameterType instanceof TrueType) => $programRegistry->typeRegistry->false,
+					($targetType instanceof TrueType && $parameterType instanceof TrueType) => $typeRegistry->false,
 					($targetType instanceof FalseType && $parameterType instanceof TrueType) ||
-					($targetType instanceof TrueType && $parameterType instanceof FalseType) => $programRegistry->typeRegistry->true,
-					default => $programRegistry->typeRegistry->boolean
+					($targetType instanceof TrueType && $parameterType instanceof FalseType) => $typeRegistry->true,
+					default => $typeRegistry->boolean
 				};
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));

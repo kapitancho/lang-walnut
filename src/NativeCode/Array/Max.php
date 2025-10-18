@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Array;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
@@ -21,7 +23,8 @@ final readonly class Max implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -32,9 +35,9 @@ final readonly class Max implements NativeMethod {
 		if ($targetType instanceof ArrayType && $targetType->range->minLength > 0) {
 			$itemType = $targetType->itemType;
 			if ($itemType->isSubtypeOf(
-				$programRegistry->typeRegistry->union([
-					$programRegistry->typeRegistry->integer(),
-					$programRegistry->typeRegistry->real()
+				$typeRegistry->union([
+					$typeRegistry->integer(),
+					$typeRegistry->real()
 				])
 			)) {
 				return $itemType;

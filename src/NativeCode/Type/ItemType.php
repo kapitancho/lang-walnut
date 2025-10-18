@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Type;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\SetType;
@@ -20,14 +22,15 @@ final readonly class ItemType implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof ArrayType || $refType instanceof MapType || $refType instanceof SetType) {
-				return $programRegistry->typeRegistry->type($refType->itemType);
+				return $typeRegistry->type($refType->itemType);
 			}
 		}
 		// @codeCoverageIgnoreStart
@@ -45,7 +48,7 @@ final readonly class ItemType implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof ArrayType || $typeValue instanceof MapType || $typeValue instanceof SetType) {
-				return ($programRegistry->valueRegistry->type($typeValue->itemType));
+				return $programRegistry->valueRegistry->type($typeValue->itemType);
 			}
 		}
 		// @codeCoverageIgnoreStart

@@ -8,7 +8,9 @@ use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
@@ -25,7 +27,8 @@ final readonly class Integer implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -51,7 +54,7 @@ final readonly class Integer implements NativeMethod {
 						throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s - range is not compatible", __CLASS__, $parameterType));
 						// @codeCoverageIgnoreEnd
 					}
-					return $programRegistry->typeRegistry->integerFull(
+					return $typeRegistry->integerFull(
 						new NumberInterval(
 							$fromType->numberRange->min,
 							$toType->numberRange->max

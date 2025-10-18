@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Set;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\SetType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\SetValue;
@@ -16,7 +18,8 @@ final readonly class Contains implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -24,8 +27,8 @@ final readonly class Contains implements NativeMethod {
 		if ($targetType instanceof SetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			return $parameterType->isSubtypeOf($targetType->itemType) ?
-				$programRegistry->typeRegistry->boolean :
-				$programRegistry->typeRegistry->false;
+				$typeRegistry->boolean :
+				$typeRegistry->false;
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));

@@ -8,7 +8,9 @@ use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
@@ -26,7 +28,8 @@ final readonly class WithNumberRange implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
@@ -34,9 +37,9 @@ final readonly class WithNumberRange implements NativeMethod {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof IntegerType) {
 				if ($parameterType->isSubtypeOf(
-					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('IntegerNumberRange'))
+					$typeRegistry->withName(new TypeNameIdentifier('IntegerNumberRange'))
 				)) {
-					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->integer());
+					return $typeRegistry->type($typeRegistry->integer());
 				}
 				// @codeCoverageIgnoreStart
 				throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -44,9 +47,9 @@ final readonly class WithNumberRange implements NativeMethod {
 			}
 			if ($refType instanceof RealType) {
 				if ($parameterType->isSubtypeOf(
-					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('RealNumberRange'))
+					$typeRegistry->withName(new TypeNameIdentifier('RealNumberRange'))
 				)) {
-					return $programRegistry->typeRegistry->type($programRegistry->typeRegistry->real());
+					return $typeRegistry->type($typeRegistry->real());
 				}
 				// @codeCoverageIgnoreStart
 				throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));

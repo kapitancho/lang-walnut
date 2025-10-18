@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntersectionType;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\RecordType;
@@ -23,31 +25,32 @@ final readonly class ItemTypes implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof IntersectionType) {
 			foreach($targetType->types as $type) {
 				try {
-					return $this->analyse($programRegistry, $type, $parameterType);
+					return $this->analyse($typeRegistry, $methodFinder, $type, $parameterType);
 				} catch (AnalyserException) {}
 			}
 		}
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof TupleType) {
-				return $programRegistry->typeRegistry->tuple(
+				return $typeRegistry->tuple(
 					array_map(
-						fn(TypeInterface $type) => $programRegistry->typeRegistry->type($type),
+						fn(TypeInterface $type) => $typeRegistry->type($type),
 						$refType->types,
 					)
 				);
 			}
 			if ($refType instanceof RecordType) {
-				return $programRegistry->typeRegistry->record(
+				return $typeRegistry->record(
 					array_map(
-						fn(TypeInterface $type) => $programRegistry->typeRegistry->type($type),
+						fn(TypeInterface $type) => $typeRegistry->type($type),
 						$refType->types,
 					)
 				);
@@ -56,16 +59,16 @@ final readonly class ItemTypes implements NativeMethod {
 				if (in_array($refType->value, [
 					MetaTypeValue::Tuple, MetaTypeValue::Union, MetaTypeValue::Intersection
 				], true)) {
-					return $programRegistry->typeRegistry->array(
-						$programRegistry->typeRegistry->type(
-							$programRegistry->typeRegistry->any
+					return $typeRegistry->array(
+						$typeRegistry->type(
+							$typeRegistry->any
 						)
 					);
 				}
 				if ($refType->value === MetaTypeValue::Record) {
-					return $programRegistry->typeRegistry->map(
-						$programRegistry->typeRegistry->type(
-							$programRegistry->typeRegistry->any
+					return $typeRegistry->map(
+						$typeRegistry->type(
+							$typeRegistry->any
 						)
 					);
 				}

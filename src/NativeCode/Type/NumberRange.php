@@ -10,7 +10,9 @@ use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\RealSubsetType;
@@ -26,19 +28,20 @@ final readonly class NumberRange implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof IntegerType) {
-				return $programRegistry->typeRegistry->data(
+				return $typeRegistry->data(
 					new TypeNameIdentifier('IntegerNumberRange')
 				);
 			}
 			if ($refType instanceof RealType) {
-				return $programRegistry->typeRegistry->data(
+				return $typeRegistry->data(
 					new TypeNameIdentifier('RealNumberRange')
 				);
 			}

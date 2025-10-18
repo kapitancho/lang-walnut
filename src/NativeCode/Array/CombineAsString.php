@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Array;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
@@ -20,7 +22,8 @@ final readonly class CombineAsString implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -30,9 +33,9 @@ final readonly class CombineAsString implements NativeMethod {
 		}
 		if ($targetType instanceof ArrayType) {
 			$itemType = $targetType->itemType;
-			if ($itemType->isSubtypeOf($programRegistry->typeRegistry->string())) {
+			if ($itemType->isSubtypeOf($typeRegistry->string())) {
 				if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-					return $programRegistry->typeRegistry->string(
+					return $typeRegistry->string(
 						$parameterType->range->minLength * max(0, $targetType->range->minLength - 1), /* +
 						$itemType->range->minLength * $targetType->range->minLength,
 						$parameterType->range->maxLength === PlusInfinity::value ||
@@ -72,7 +75,7 @@ final readonly class CombineAsString implements NativeMethod {
 					}
 				}
 				$result = implode($parameterValue->literalValue, $result);
-				return ($programRegistry->valueRegistry->string($result));
+				return $programRegistry->valueRegistry->string($result);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

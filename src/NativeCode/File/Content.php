@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\SealedValue;
@@ -17,16 +19,17 @@ final readonly class Content implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		if ($targetType instanceof SealedType && $targetType->name->equals(
 			new TypeNameIdentifier('File')
 		)) {
-			return $programRegistry->typeRegistry->result(
-				$programRegistry->typeRegistry->string(),
-				$programRegistry->typeRegistry->withName(
+			return $typeRegistry->result(
+				$typeRegistry->string(),
+				$typeRegistry->withName(
 					new TypeNameIdentifier('CannotReadFile')
 				)
 			);

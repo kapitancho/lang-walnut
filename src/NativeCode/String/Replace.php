@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -20,22 +22,23 @@ final readonly class Replace implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			if ($parameterType->isSubtypeOf(
-				$programRegistry->typeRegistry->record([
-					'match' => $programRegistry->typeRegistry->union([
-						$programRegistry->typeRegistry->string(),
-						$programRegistry->typeRegistry->sealed(new TypeNameIdentifier('RegExp'))
+				$typeRegistry->record([
+					'match' => $typeRegistry->union([
+						$typeRegistry->string(),
+						$typeRegistry->sealed(new TypeNameIdentifier('RegExp'))
 					]),
-					'replacement' => $programRegistry->typeRegistry->string()
+					'replacement' => $typeRegistry->string()
 				])
 			)) {
-				return $programRegistry->typeRegistry->string();
+				return $typeRegistry->string();
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}

@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\String;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -17,7 +19,8 @@ final readonly class Split implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -25,7 +28,7 @@ final readonly class Split implements NativeMethod {
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
-				return $programRegistry->typeRegistry->array(
+				return $typeRegistry->array(
 					$targetType,
 					$targetType->range->minLength > 0 ? 1 : 0,
 					$targetType->range->maxLength
@@ -49,10 +52,10 @@ final readonly class Split implements NativeMethod {
 				if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof StringValue) {
 				$result = explode($parameterValue->literalValue, $targetValue->literalValue);
-				return ($programRegistry->valueRegistry->tuple(
+				return $programRegistry->valueRegistry->tuple(
 					array_map(fn(string $piece): StringValue =>
 						$programRegistry->valueRegistry->string($piece), $result)
-				));
+				);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

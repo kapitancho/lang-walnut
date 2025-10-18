@@ -5,7 +5,9 @@ namespace Walnut\Lang\NativeCode\Map;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -17,14 +19,15 @@ final readonly class WithoutAll implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		$targetType = $targetType instanceof RecordType ? $targetType->asMapType() : $targetType;
 		if ($targetType instanceof MapType) {
-			return $programRegistry->typeRegistry->map(
+			return $typeRegistry->map(
 				$targetType->itemType,
 				0,
 				$targetType->range->maxLength

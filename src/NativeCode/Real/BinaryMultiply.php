@@ -9,7 +9,9 @@ use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint as NumberIntervalEndpointInterface;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -24,7 +26,8 @@ final readonly class BinaryMultiply implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -50,13 +53,12 @@ final readonly class BinaryMultiply implements NativeMethod {
 								$targetType->numberRange->max->inclusive && $parameterType->numberRange->max->inclusive
 							);
 					$interval = new NumberInterval($min, $max);
-					return $programRegistry->typeRegistry->realFull($interval);
+					return $typeRegistry->realFull($interval);
 				}
-				$zero = $programRegistry->valueRegistry->integer(0);
-				$containsZero = $targetType->contains($zero) || $parameterType->contains($zero);
+				$containsZero = $targetType->contains(0) || $parameterType->contains(0);
 				return $containsZero ?
-					$programRegistry->typeRegistry->real() :
-					$programRegistry->typeRegistry->nonZeroReal();
+					$typeRegistry->real() :
+					$typeRegistry->nonZeroReal();
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}

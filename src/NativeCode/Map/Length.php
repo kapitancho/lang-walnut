@@ -6,7 +6,9 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\RecordType;
@@ -19,19 +21,20 @@ final readonly class Length implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof MapType) {
-			return $programRegistry->typeRegistry->integer(
+			return $typeRegistry->integer(
 				$targetType->range->minLength,
 				$targetType->range->maxLength
 			);
 		}
 		if ($targetType instanceof RecordType) {
-			return $programRegistry->typeRegistry->integer(
+			return $typeRegistry->integer(
 				$l = count($targetType->types),
 				$targetType->restType instanceof NothingType ? $l : PlusInfinity::value
 			);

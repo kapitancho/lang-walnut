@@ -4,7 +4,9 @@ namespace Walnut\Lang\NativeCode\JsonValue;
 
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
@@ -24,11 +26,12 @@ final readonly class Stringify implements NativeMethod {
 	) {}
 
 	public function analyse(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType
 	): StringType {
-		return $programRegistry->typeRegistry->string();
+		return $typeRegistry->string();
 	}
 
 	private function doStringify(Value $value): string|int|float|bool|null|array|object {

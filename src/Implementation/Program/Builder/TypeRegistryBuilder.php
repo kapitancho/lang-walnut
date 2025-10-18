@@ -25,7 +25,6 @@ use Walnut\Lang\Blueprint\Type\AtomType as AtomTypeInterface;
 use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\EnumerationType as EnumerationTypeInterface;
-use Walnut\Lang\Blueprint\Type\NameAndType as NameAndTypeInterface;
 use Walnut\Lang\Blueprint\Type\NamedType as NamedTypeInterface;
 use Walnut\Lang\Blueprint\Type\ResultType as ResultTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -300,7 +299,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
     }
 
 	public function shape(Type $refType): ShapeType {
-		return new ShapeType($this->methodFinder, $refType);
+		return new ShapeType($this, $this->methodFinder, $refType);
 	}
 
 	public function type(Type $refType): TypeType {
