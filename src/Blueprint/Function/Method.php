@@ -18,7 +18,7 @@ interface Method {
 
 	/** @throws ExecutionException */
 	public function execute(
-		ProgramRegistry        $programRegistry,
+		ProgramRegistry $programRegistry,
 		Value $target,
 		Value $parameter
 	): Value;

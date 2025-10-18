@@ -65,7 +65,7 @@ final readonly class BinaryPlus implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry        $programRegistry,
+		ProgramRegistry $programRegistry,
 		Value $target,
 		Value $parameter
 	): Value {

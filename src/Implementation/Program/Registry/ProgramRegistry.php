@@ -13,8 +13,6 @@ use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Implementation\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Implementation\Code\Execution\ExecutionContext;
-use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
-use Walnut\Lang\Implementation\Program\Builder\ScopeBuilder;
 use Walnut\Lang\Implementation\Program\DependencyContainer\DependencyContainer;
 
 final class ProgramRegistry implements ProgramRegistryInterface {

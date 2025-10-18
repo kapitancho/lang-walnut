@@ -42,7 +42,7 @@ final readonly class BinaryModulo implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry        $programRegistry,
+		ProgramRegistry $programRegistry,
 		Value $target,
 		Value $parameter
 	): Value {

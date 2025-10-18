@@ -38,7 +38,7 @@ final readonly class BinaryAnd implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry        $programRegistry,
+		ProgramRegistry $programRegistry,
 		Value $target,
 		Value $parameter
 	): Value {

@@ -75,7 +75,7 @@ final readonly class WithItemTypes implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry        $programRegistry,
+		ProgramRegistry $programRegistry,
 		Value $target,
 		Value $parameter
 	): Value {

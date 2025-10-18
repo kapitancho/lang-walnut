@@ -61,7 +61,7 @@ final readonly class WithoutByIndex implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry        $programRegistry,
+		ProgramRegistry $programRegistry,
 		Value $target,
 		Value $parameter
 	): Value {

@@ -7,6 +7,7 @@ use Walnut\Lang\Blueprint\Common\Identifier\IdentifierException;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethod;
 use Walnut\Lang\Blueprint\Function\Method;
+use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Type\ShapeType as ShapeTypeInterface;
 use Walnut\Lang\Blueprint\Type\DataType;
@@ -54,7 +55,7 @@ final class ShapeType implements ShapeTypeInterface, JsonSerializable {
 					if ($method->returnType->isSubtypeOf($this->refType)) {
 						return true;
 					}
-				} elseif ($method instanceof Method) {
+				} elseif ($method instanceof NativeMethod) {
 					return true;
 				}
 			} catch (IdentifierException) {}

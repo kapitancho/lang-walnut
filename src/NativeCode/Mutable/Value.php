@@ -35,7 +35,7 @@ final readonly class Value implements NativeMethod {
 	}
 
 	public function execute(
-		ProgramRegistry        $programRegistry,
+		ProgramRegistry $programRegistry,
 		ValueInterface $target,
 		ValueInterface $parameter
 	): ValueInterface {

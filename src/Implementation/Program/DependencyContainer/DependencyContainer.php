@@ -59,7 +59,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 
 	private function findValueByNamedType(NamedType $type): Value|DependencyError {
 		try {
-			$sType = ($this->programRegistry->valueRegistry->type($type));
+			$sType = $this->programRegistry->valueRegistry->type($type);
 			$containerCastExpression = $this->containerCastExpression();
 			$containerCastExpression->analyse(
 				$this->programRegistry->analyserContext->withAddedVariableType(

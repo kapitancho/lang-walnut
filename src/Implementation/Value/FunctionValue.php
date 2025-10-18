@@ -86,7 +86,7 @@ final readonly class FunctionValue implements FunctionValueInterface, JsonSerial
 		if ($this->selfReferAs) {
 			$executionContext = $executionContext->withAddedVariableValue(
 				$this->selfReferAs,
-				($this)
+				$this
 			);
 		}
 		return $this->function->execute($executionContext, null, $parameterValue);

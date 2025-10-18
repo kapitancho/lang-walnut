@@ -98,6 +98,20 @@ Any->DUMPNL(Null => Null)
 'Hello'->DUMPNL;  /* Outputs: Hello\n */
 ```
 
+**`DUMPHTMLNL`** - Print to stdout with HTML escaping and line break
+```walnut
+Any->DUMPHTMLNL(Null => Any)
+
+'<div>Hello</div>'->DUMPHTMLNL;  /* Outputs: &lt;div&gt;Hello&lt;/div&gt;<br/>\n */
+```
+
+**`LOGDEBUG`** - Log to debug file
+```walnut
+Any->LOGDEBUG(Null => Any)
+
+'Debug message'->LOGDEBUG;  /* Writes to log/nut.log */
+```
+
 ### 16.1.5 Error Conversion
 
 **`errorAsExternal`** - Convert error to external error
@@ -137,6 +151,14 @@ Any->asJsonValue(Null => JsonValue)
 
 x = [a: 1, b: 'hello'];
 json = x->asJsonValue;
+```
+
+**`asMutableOfType`** - Cast to mutable of given type
+```walnut
+Any->asMutableOfType(Type<T> => Result<Mutable<T>, CastNotAvailable>)
+
+x = 42;
+mut = x->asMutableOfType(`Integer);  /* Mutable<Integer> */
 ```
 
 ## 16.2 Integer Methods
@@ -412,6 +434,21 @@ Real->asInteger(Null => Integer)
 
 ### 16.4.1 Basic Properties
 
+**`binaryPlus` (+)** - Concatenate strings
+```walnut
+String->binaryPlus(String => String)
+
+'Hello' + ' ' + 'World';  /* 'Hello World' */
+```
+
+**`binaryMultiply` (*)** - Repeat string
+```walnut
+String->binaryMultiply(Integer<0..> => String)
+
+'ab' * 3;  /* 'ababab' */
+'-' * 10;  /* '----------' */
+```
+
 **`length`** - Get string length
 ```walnut
 String->length(Null => Integer<0..>)
@@ -427,7 +464,38 @@ String->reverse(Null => String)
 'hello'->reverse;  /* 'olleh' */
 ```
 
-### 16.4.2 Case Conversion
+### 16.4.2 Comparison
+
+**`binaryGreaterThan` (>)** - Greater than (lexicographic)
+```walnut
+String->binaryGreaterThan(String => Boolean)
+
+'b' > 'a';      /* true */
+'abc' > 'ab';   /* true */
+```
+
+**`binaryGreaterThanEqual` (>=)** - Greater than or equal (lexicographic)
+```walnut
+String->binaryGreaterThanEqual(String => Boolean)
+
+'b' >= 'b';     /* true */
+```
+
+**`binaryLessThan` (<)** - Less than (lexicographic)
+```walnut
+String->binaryLessThan(String => Boolean)
+
+'a' < 'b';      /* true */
+```
+
+**`binaryLessThanEqual` (<=)** - Less than or equal (lexicographic)
+```walnut
+String->binaryLessThanEqual(String => Boolean)
+
+'a' <= 'a';     /* true */
+```
+
+### 16.4.3 Case Conversion
 
 **`toLowerCase`** - Convert to lowercase
 ```walnut
@@ -443,7 +511,30 @@ String->toUpperCase(Null => String)
 'hello'->toUpperCase;  /* 'HELLO' */
 ```
 
-### 16.4.3 Trimming
+### 16.4.4 HTML and Encoding
+
+**`htmlEscape`** - HTML escape string
+```walnut
+String->htmlEscape(Null => String)
+
+'<div>Hello</div>'->htmlEscape;  /* '&lt;div&gt;Hello&lt;/div&gt;' */
+```
+
+**`OUT_HTML`** - Output HTML-escaped string with nl2br
+```walnut
+String->OUT_HTML(Null => String)
+
+'Line1\nLine2'->OUT_HTML;  /* Outputs: Line1<br/>Line2 (HTML-escaped) */
+```
+
+**`OUT_TXT`** - Output plain text string
+```walnut
+String->OUT_TXT(Null => String)
+
+'Hello World'->OUT_TXT;  /* Outputs: Hello World */
+```
+
+### 16.4.5 Trimming
 
 **`trim`** - Trim whitespace from both ends
 ```walnut
@@ -741,6 +832,13 @@ Array<T>->findLast(^T => Boolean => Result<T, ItemNotFound>)
 
 ### 16.6.3 Adding Elements
 
+**`binaryPlus` (+)** - Concatenate arrays
+```walnut
+Array<T>->binaryPlus(Array<R> => Array<T|R>)
+
+[1, 2] + [3, 4];  /* [1, 2, 3, 4] */
+```
+
 **`insertFirst`** - Insert at beginning
 ```walnut
 Array<T>->insertFirst(T => Array<T>)
@@ -997,6 +1095,14 @@ Array<T <: String>->flip(Null => Map<Integer>)
 ['a', 'b', 'c']->flip;  /* [0: 'a', 1: 'b', 2: 'c'] */
 ```
 
+**`format`** - Format array using template string
+```walnut
+Array<T>->format(String => Result<String, CannotFormatString>)
+
+['Alice', 25]->format('Name: {0}, Age: {1}');  /* 'Name: Alice, Age: 25' */
+[1, 2, 3]->format('{0} + {1} = {2}');  /* '1 + 2 = 3' */
+```
+
 ## 16.7 Map Methods
 
 All Map methods return new Maps (immutable operations).
@@ -1082,6 +1188,13 @@ Map<T>->findFirstKeyValue(^[key: String, value: T] => Boolean
 
 ### 16.7.3 Modification
 
+**`binaryPlus` (+)** - Merge maps
+```walnut
+Map<T>->binaryPlus(Map<R> => Map<T|R>)
+
+[a: 1, b: 2] + [c: 3, d: 4];  /* [a: 1, b: 2, c: 3, d: 4] */
+```
+
 **`withKeyValue`** - Add or update key-value pair
 ```walnut
 Map<T>->withKeyValue([key: String, value: T] => Map<T>)
@@ -1164,6 +1277,14 @@ Map<T>->filterKeyValue(^[key: String, value: T] => Boolean => Map<T>)
 Map<String>->flip(Null => Map<String>)
 
 [a: 'x', b: 'y']->flip;  /* [x: 'a', y: 'b'] */
+```
+
+**`format`** - Format map using template string
+```walnut
+Map<T>->format(String => Result<String, CannotFormatString>)
+
+[name: 'Alice', age: 25]->format('Name: {name}, Age: {age}');
+/* 'Name: Alice, Age: 25' */
 ```
 
 ## 16.8 Set Methods
@@ -1343,7 +1464,23 @@ Record->itemValues(Null => Map)
 [a: 1, b: 'hello']->itemValues;  /* [a: 1, b: 'hello'] */
 ```
 
-## 16.11 Mutable Methods
+## 16.11 Null Methods
+
+**`asInteger`** - Convert Null to Integer
+```walnut
+Null->asInteger(Null => Integer)
+
+null->asInteger;  /* 0 */
+```
+
+**`asReal`** - Convert Null to Real
+```walnut
+Null->asReal(Null => Real)
+
+null->asReal;  /* 0.0 */
+```
+
+## 16.12 Mutable Methods
 
 **`value`** - Get current value
 ```walnut
@@ -1362,7 +1499,31 @@ x->SET(100);
 x->value;  /* 100 */
 ```
 
-## 16.12 Function Methods
+**`APPEND`** - Append to mutable collection
+```walnut
+Mutable<Map<T>|Array<T>>->APPEND(T => Null)
+
+arr = mutable{Array<Integer>, [1, 2, 3]};
+arr->APPEND(4);  /* arr->value = [1, 2, 3, 4] */
+```
+
+**`asInteger`** - Get mutable value as integer (for Mutable<Integer>)
+```walnut
+Mutable<Integer>->asInteger(Null => Integer)
+
+x = mutable{Integer, 42};
+x->asInteger;  /* 42 */
+```
+
+**`asReal`** - Get mutable value as real (for Mutable<Integer|Real>)
+```walnut
+Mutable<Integer|Real>->asReal(Null => Real)
+
+x = mutable{Real, 3.14};
+x->asReal;  /* 3.14 */
+```
+
+## 16.13 Function Methods
 
 **`invoke`** - Invoke function
 ```walnut
@@ -1450,6 +1611,147 @@ result = json => hydrateAs(type[a: Integer, b: String]);
 JsonValue->stringify(Null => String)
 
 json->stringify;  /* '{"a":1,"b":"hello"}' */
+```
+
+## 16.17 Type Methods
+
+Methods for introspecting and working with Type values:
+
+**`isSubtypeOf`** - Check subtype relationship
+```walnut
+Type->isSubtypeOf(Type => Boolean)
+
+`Integer->isSubtypeOf(`Real);  /* true */
+```
+
+**`typeName`**, **`minValue`**, **`maxValue`**, **`minLength`**, **`maxLength`**, **`itemType`**, **`itemTypes`**, **`parameterType`**, **`returnType`**, **`errorType`**, **`refType`**, **`restType`**, **`valueType`**, **`values`**, **`aliasedType`**, **`enumerationType`** - Type introspection methods
+
+**`withNumberRange`**, **`withLengthRange`**, **`withItemType`**, **`withItemTypes`**, **`withParameterType`**, **`withReturnType`**, **`withErrorType`**, **`withRefType`**, **`withRestType`**, **`withValueType`**, **`withValues`**, **`withRange`** - Type construction methods
+
+**`numberRange`**, **`valueWithName`**, **`openApiSchema`** - Additional type utilities
+
+## 16.18 RegExp Methods
+
+**`matchString`** - Match string against regular expression
+```walnut
+RegExp->matchString(String => Result<Array<String>, NoMatch>)
+
+pattern = RegExp('/([a-z]+)([0-9]+)/');
+result = pattern->matchString('hello123');  /* ['hello123', 'hello', '123'] */
+```
+
+## 16.19 Clock Methods
+
+**`now`** - Get current timestamp
+```walnut
+Clock->now(Null => Real)
+
+%clock->now;  /* Current Unix timestamp */
+```
+
+## 16.20 Random Methods
+
+**`integer`** - Generate random integer in range
+```walnut
+Random->integer([min: Integer, max: Integer] => Integer)
+
+%random->integer[min: 1, max: 100];  /* Random integer 1-100 */
+```
+
+**`uuid`** - Generate UUID
+```walnut
+Random->uuid(Null => String)
+
+%random->uuid;  /* e.g., '550e8400-e29b-41d4-a716-446655440000' */
+```
+
+## 16.21 PasswordString Methods
+
+**`hash`** - Hash password
+```walnut
+PasswordString->hash(Null => String)
+
+pwd = 'secret123';
+hashed = pwd->hash;  /* Bcrypt hash */
+```
+
+**`verify`** - Verify password against hash
+```walnut
+PasswordString->verify(String => Boolean)
+
+pwd = 'secret123';
+isValid = pwd->verify(hashedPassword);  /* true/false */
+```
+
+## 16.22 DatabaseConnector Methods
+
+**`query`** - Execute database query
+```walnut
+DatabaseConnector->query([sql: String, params: Array] => Array<Map>)
+```
+
+**`execute`** - Execute database command
+```walnut
+DatabaseConnector->execute([sql: String, params: Array] => Integer)
+```
+
+## 16.23 File Methods
+
+**`content`** - Read file content
+```walnut
+File->content(Null => Result<String, FileNotFound>)
+```
+
+**`replaceContent`** - Replace file content
+```walnut
+File->replaceContent(String => Null)
+```
+
+**`appendContent`** - Append to file
+```walnut
+File->appendContent(String => Null)
+```
+
+**`createIfMissing`** - Create file if it doesn't exist
+```walnut
+File->createIfMissing(Null => Null)
+```
+
+## 16.24 RoutePattern Methods
+
+**`matchAgainst`** - Match URL against route pattern
+```walnut
+RoutePattern->matchAgainst(String => Result<Map<String>, NoMatch>)
+```
+
+## 16.25 DependencyContainer Methods
+
+**`valueOf`** - Get value from dependency container
+```walnut
+DependencyContainer->valueOf(Type => Any)
+```
+
+## 16.26 EventBus Methods
+
+**`fire`** - Fire event on event bus
+```walnut
+EventBus->fire(Any => Null)
+```
+
+## 16.27 Constructor Methods
+
+**`asRegExp`** - Construct RegExp from string
+```walnut
+String->asRegExp(Null => RegExp)
+
+'/[a-z]+/'->asRegExp;  /* RegExp */
+```
+
+**`asUuid`** - Construct UUID from string
+```walnut
+String->asUuid(Null => Result<Uuid, InvalidUuid>)
+
+'550e8400-e29b-41d4-a716-446655440000'->asUuid;  /* Uuid */
 ```
 
 ## Summary

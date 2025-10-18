@@ -68,7 +68,7 @@ final class CustomMethod implements CustomMethodInterface {
 
 	/** @throws ExecutionException */
 	public function execute(
-		ProgramRegistry        $programRegistry,
+		ProgramRegistry $programRegistry,
 		Value $target,
 		Value $parameter
 	): Value {

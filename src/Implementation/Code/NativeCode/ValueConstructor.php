@@ -238,7 +238,7 @@ final readonly class ValueConstructor {
 	}
 
 	public function executeConstructor(
-		ProgramRegistry        $programRegistry,
+		ProgramRegistry $programRegistry,
 		Type                   $resultType,
 		Value $parameter
 	): Value {
@@ -267,7 +267,7 @@ final readonly class ValueConstructor {
 	}
 
 	public function executeValidator(
-		ProgramRegistry        $programRegistry,
+		ProgramRegistry $programRegistry,
 		Type                   $resultType,
 		Value $parameter
 	): Value {
