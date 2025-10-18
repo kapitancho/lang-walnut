@@ -85,12 +85,12 @@ final readonly class UniqueSet implements NativeMethod {
 				)));
 			}
 			$rawValues = array_unique($rawValues, SORT_NUMERIC);
-			return ($programRegistry->valueRegistry->set(array_map(
+			return $programRegistry->valueRegistry->set(array_map(
 				fn($value) => str_contains($value, '.') ?
 					$programRegistry->valueRegistry->real($value) :
 					$programRegistry->valueRegistry->integer($value),
 				$rawValues
-			)));
+			));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

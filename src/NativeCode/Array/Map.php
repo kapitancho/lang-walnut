@@ -70,7 +70,7 @@ final readonly class Map implements NativeMethod {
 			foreach($values as $value) {
 				$r = $parameterValue->execute($programRegistry->executionContext, $value);
 				if ($r instanceof ErrorValue) {
-					return ($r);
+					return $r;
 				}
 				$result[] = $r;
 			}

@@ -83,7 +83,7 @@ final readonly class MapIndexValue implements NativeMethod {
 					])
 				);
 				if ($r instanceof ErrorValue) {
-					return ($r);
+					return $r;
 				}
 				$result[] = $r;
 			}

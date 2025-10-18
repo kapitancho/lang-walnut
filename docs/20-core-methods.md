@@ -856,6 +856,12 @@ Array<T>->mapIndexValue(^[index: Integer, value: T] => R => Array<R>)
 );  /* ['0: a', '1: b'] */
 ```
 
+**`flipMap`** - Convert to Map
+```walnut
+Array<T <: String>->flipMap(^T => R => Map<R>)
+['a', 'bcd', 'ef']->flipMap(^String => Integer :: #->length); /* [a: 1, bcd: 3, ef: 2] */
+```
+
 **`filter`** - Filter elements
 ```walnut
 Array<T>->filter(^T => Boolean => Array<T>)
@@ -865,7 +871,7 @@ Array<T>->filter(^T => Boolean => Array<T>)
 
 **`chainInvoke`** - Chain function calls
 ```walnut
-Array<^T => T>->chainInvoke(T => T)
+Array<^T => T>->chainInvoke(T)
 
 /* Apply array of functions to a value */
 ```
@@ -897,6 +903,13 @@ Array<T>->shuffle(Null => Array<T>)
 Array<T>->unique(Null => Array<T>)
 
 [1, 2, 2, 3, 1]->unique;  /* [1, 2, 3] */
+```
+
+**`uniqueSet`** - Convert to set
+```walnut
+Array<T>->uniqueSeq(Null => Set<T>)
+
+[1, 2, 2, 3, 1]->unique;  /* [1; 2; 3] */
 ```
 
 ### 16.6.6 Slicing and Padding
@@ -933,21 +946,21 @@ Array<T>->padRight([length: Integer<0..>, value: T] => Array<T>)
 
 **`min`** - Find minimum
 ```walnut
-Array<T>->min(Null => T)
+Array<T <: Real, 1..>->min(Null => T)
 
 [3, 1, 4, 1, 5]->min;  /* 1 */
 ```
 
 **`max`** - Find maximum
 ```walnut
-Array<T>->max(Null => T)
+Array<T <: Real, 1..>->max(Null => T)
 
 [3, 1, 4, 1, 5]->max;  /* 5 */
 ```
 
 **`sum`** - Sum elements (for numeric arrays)
 ```walnut
-Array<Numeric>->sum(Null => Numeric)
+Array<T <: Real>->sum(Null => T)
 
 [1, 2, 3, 4, 5]->sum;  /* 15 */
 [1.5, 2.5, 3.0]->sum;  /* 7.0 */
@@ -956,6 +969,7 @@ Array<Numeric>->sum(Null => Numeric)
 **`countValues`** - Count occurrences
 ```walnut
 Array<T>->countValues(Null => Map<Integer>)
+T <: String or T <: Integer
 
 [1, 2, 2, 3, 1]->countValues;  /* [1: 2, 2: 2, 3: 1] */
 ```
@@ -978,16 +992,9 @@ Array<Array<T>>->flatten(Null => Array<T>)
 
 **`flip`** - Convert to Map with indices as keys
 ```walnut
-Array<T>->flip(Null => Map<Integer>)
+Array<T <: String>->flip(Null => Map<Integer>)
 
 ['a', 'b', 'c']->flip;  /* [0: 'a', 1: 'b', 2: 'c'] */
-```
-
-**`flipMap`** - Convert to Map using element values
-```walnut
-Array<T>->flipMap(Null => Map<T>)
-
-/* Create map from array elements */
 ```
 
 ## 16.7 Map Methods
@@ -1008,6 +1015,13 @@ Map->length(Null => Integer<0..>)
 Map->keys(Null => Array<String>)
 
 [a: 1, b: 2, c: 3]->keys;  /* ['a', 'b', 'c'] */
+```
+
+**`keysSet`** - Get all keys as Set
+```walnut
+Map->keys(Null => Set<String>)
+
+[a: 1, b: 2, c: 3]->keysSet;  /* ['a'; 'b'; 'c'] */
 ```
 
 **`values`** - Get all values
@@ -1077,7 +1091,7 @@ Map<T>->withKeyValue([key: String, value: T] => Map<T>)
 
 **`mergeWith`** - Merge with another map
 ```walnut
-Map<T>->mergeWith(Map<T> => Map<T>)
+Map<T>->mergeWith(Map<R> => Map<T|R>)
 
 [a: 1, b: 2]->mergeWith[c: 3, d: 4];  /* [a: 1, b: 2, c: 3, d: 4] */
 ```
@@ -1098,10 +1112,10 @@ Map<T>->withoutAll(T => Map<T>)
 
 **`withoutByKey`** - Remove by key
 ```walnut
-Map<T>->withoutByKey(String => Result<[key: String, value: T, map: Map<T>], KeyNotFound>)
+Map<T>->withoutByKey(String => Result<[element: T, map: Map<T>], KeyNotFound>)
 
 [a: 1, b: 2]->withoutByKey('a');
-/* [key: 'a', value: 1, map: [b: 2]] */
+/* [element: 1, map: [b: 2]] */
 ```
 
 **`valuesWithoutKey`** - Get all values except for key
@@ -1147,7 +1161,7 @@ Map<T>->filterKeyValue(^[key: String, value: T] => Boolean => Map<T>)
 
 **`flip`** - Swap keys and values
 ```walnut
-Map->flip(Null => Map)
+Map<String>->flip(Null => Map<String>)
 
 [a: 'x', b: 'y']->flip;  /* [x: 'a', y: 'b'] */
 ```
@@ -1183,7 +1197,7 @@ Set->contains(Any => Boolean)
 
 **`insert`** - Insert element
 ```walnut
-Set<T>->insert(T => Set<T>)
+Set<T>->insert(R => Set<T|R>)
 
 [1; 2]->insert(3);  /* [1; 2; 3] */
 [1; 2]->insert(1);  /* [1; 2] (no duplicates) */
@@ -1232,28 +1246,28 @@ s->CLEAR;  /* s->value = [;] */
 
 **`binaryBitwiseAnd` (&)** - Intersection
 ```walnut
-Set<T>->binaryBitwiseAnd(Set<T> => Set<T>)
+Set<T>->binaryBitwiseAnd(Set<R> => Set<T&R>)
 
 [1; 2; 3] & [2; 3; 4];  /* [2; 3] */
 ```
 
 **`binaryBitwiseXor` (^)** - Symmetric difference
 ```walnut
-Set<T>->binaryBitwiseXor(Set<T> => Set<T>)
+Set<T>->binaryBitwiseXor(Set<R> => Set<T|R>)
 
 [1; 2; 3] ^ [2; 3; 4];  /* [1; 4] */
 ```
 
 **`binaryPlus` (+)** - Union
 ```walnut
-Set<T>->binaryPlus(Set<T> => Set<T>)
+Set<T>->binaryPlus(Set<R> => Set<T|R>)
 
 [1; 2] + [2; 3];  /* [1; 2; 3] */
 ```
 
 **`binaryMinus` (-)** - Difference
 ```walnut
-Set<T>->binaryMinus(Set<T> => Set<T>)
+Set<T>->binaryMinus(Set => Set<T>)
 
 [1; 2; 3] - [2; 3];  /* [1] */
 ```
@@ -1291,18 +1305,17 @@ Set<T>->map(^T => R => Set<R>)
 [1; 2; 3]->map(^x => Integer :: x * 2);  /* [2; 4; 6] */
 ```
 
+**`flipMap`** - Convert to Map using element values
+```walnut
+Set<T <: String>->flipMap(^T => R => Map<R>)
+['a'; 'bcd'; 'ef']->flipMap(^String => Integer :: #->length); /* [a: 1, bcd: 3, ef: 2] */
+```
+
 **`filter`** - Filter elements
 ```walnut
 Set<T>->filter(^T => Boolean => Set<T>)
 
 [1; 2; 3; 4; 5]->filter(^x => Boolean :: x > 2);  /* [3; 4; 5] */
-```
-
-**`flipMap`** - Convert to map
-```walnut
-Set<T>->flipMap(Null => Map<T>)
-
-/* Convert set to map */
 ```
 
 ## 16.9 Tuple Methods
@@ -1323,11 +1336,11 @@ Record->with([key: String, value: Any] => Record)
 [a: 1, b: 2]->with[key: 'c', value: 3];  /* [a: 1, b: 2, c: 3] */
 ```
 
-**`itemValues`** - Get record values as array
+**`itemValues`** - Get record values as map
 ```walnut
-Record->itemValues(Null => Array)
+Record->itemValues(Null => Map)
 
-[a: 1, b: 'hello']->itemValues;  /* [1, 'hello'] */
+[a: 1, b: 'hello']->itemValues;  /* [a: 1, b: 'hello'] */
 ```
 
 ## 16.11 Mutable Methods

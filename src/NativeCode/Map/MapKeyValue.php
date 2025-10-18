@@ -79,7 +79,7 @@ final readonly class MapKeyValue implements NativeMethod {
 					])
 				);
 				if ($r instanceof ErrorValue) {
-					return ($r);
+					return $r;
 				}
 				$result[$key] = $r;
 			}

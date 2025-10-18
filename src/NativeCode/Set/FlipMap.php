@@ -78,7 +78,7 @@ final readonly class FlipMap implements NativeMethod {
                 }
                 $r = $parameterValue->execute($programRegistry->executionContext, $value);
 	            if ($r instanceof ErrorValue) {
-                    return ($r);
+                    return $r;
                 }
                 $result[$value->literalValue] = $r;
             }
