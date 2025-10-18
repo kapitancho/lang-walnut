@@ -2,15 +2,15 @@
 
 namespace Walnut\Lang\Blueprint\Function;
 
+use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 
 interface CustomMethod extends Method {
 	/** @throws AnalyserException */
-	public function selfAnalyse(ProgramRegistry $programRegistry): void;
+	public function selfAnalyse(AnalyserContext $analyserContext): void;
 
 	/** @return list<string> */
 	public function analyseDependencyType(DependencyContainer $dependencyContainer): array;

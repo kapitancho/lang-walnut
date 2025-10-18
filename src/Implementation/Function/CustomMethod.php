@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Function;
 
+use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
@@ -26,8 +27,8 @@ final class CustomMethod implements CustomMethodInterface {
 	) {}
 
 	/** @throws AnalyserException */
-	public function selfAnalyse(ProgramRegistry $programRegistry): void {
-		$this->function->selfAnalyse($programRegistry->analyserContext);
+	public function selfAnalyse(AnalyserContext $analyserContext): void {
+		$this->function->selfAnalyse($analyserContext);
 	}
 
 	/** @return list<string> */

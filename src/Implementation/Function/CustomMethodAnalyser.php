@@ -94,6 +94,8 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 					}
 				}
 			}
+
+			$analyserContext = $this->programRegistry->analyserContext;
 			foreach ($methods as $method) {
 				try {
 					/*$sub = $method->targetType;
@@ -101,7 +103,7 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 						$method->parameterType,
 						$method->returnType
 					);*/
-					$method->selfAnalyse($this->programRegistry);
+					$method->selfAnalyse($analyserContext);
 				} catch (AnalyserException $e) {
 					$analyseErrors[] = sprintf("Error in %s : %s", $method->methodInfo, $e->getMessage());
 					continue;

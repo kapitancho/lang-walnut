@@ -44,18 +44,16 @@ use Walnut\Lang\NativeCode\Any\AsJsonValue;
 final readonly class CastAsJsonValue {
 
 	public function __construct(
-		private TypeRegistry $typeRegistry,
-		private MethodFinder $methodFinder,
 	) {}
 
-	public function isSafeToCastType(Type $type): bool {
+	public function isSafeToCastType(TypeRegistry $typeRegistry, MethodFinder $methodFinder, Type $type): bool {
 		if ($type instanceof TupleType || $type instanceof RecordType) {
 			foreach($type->types as $item) {
-				if (!$this->isSafeToCastType($item)) {
+				if (!$this->isSafeToCastType($typeRegistry, $methodFinder, $item)) {
 					return false;
 				}
 			}
-			return $type->restType instanceof NothingType || $this->isSafeToCastType($type->restType);
+			return $type->restType instanceof NothingType || $this->isSafeToCastType($typeRegistry, $methodFinder, $type->restType);
 		}
 		if (
 			($type instanceof AliasType && $type->name->equals(
@@ -71,23 +69,23 @@ final readonly class CastAsJsonValue {
 			return true;
 		}
 
-		$method = $this->methodFinder->methodForType(
+		$method = $methodFinder->methodForType(
 			$type,
 			new MethodNameIdentifier('asJsonValue')
 		);
 		if ($method instanceof Method && !($method instanceof AsJsonValue)) {
 			$result = $method->analyse(
-				$this->typeRegistry,
-				$this->methodFinder,
+				$typeRegistry,
+				$methodFinder,
 				$type,
-				$this->typeRegistry->null
+				$typeRegistry->null
 			);
 			if (!$result instanceof ResultType) {
 				return true;
 			}
 		}
 		if ($type instanceof MutableType || $type instanceof CompositeNamedType) {
-			return $this->isSafeToCastType($type->valueType);
+			return $this->isSafeToCastType($typeRegistry, $methodFinder, $type->valueType);
 		}
 		return false;
 	}
@@ -115,7 +113,7 @@ final readonly class CastAsJsonValue {
 		) {
 			return $value;
 		}
-		$method = $this->methodFinder->methodForType(
+		$method = $programRegistry->methodFinder->methodForType(
 			$value->type,
 			new MethodNameIdentifier('asJsonValue')
 		);

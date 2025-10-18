@@ -14,6 +14,12 @@ use Walnut\Lang\Implementation\Code\NativeCode\CastAsJsonValue;
 
 final readonly class AsJsonValue implements NativeMethod {
 
+	private CastAsJsonValue $castAsJsonValue;
+
+	public function __construct() {
+		$this->castAsJsonValue = new CastAsJsonValue();
+	}
+
 	public function analyse(
 		TypeRegistry $typeRegistry,
 		MethodFinder $methodFinder,
@@ -21,7 +27,9 @@ final readonly class AsJsonValue implements NativeMethod {
 		Type $parameterType
 	): Type {
 		$resultType = $typeRegistry->alias(new TypeNameIdentifier('JsonValue'));
-		return new CastAsJsonValue($typeRegistry, $methodFinder)->isSafeToCastType(
+		return $this->castAsJsonValue->isSafeToCastType(
+			$typeRegistry,
+			$methodFinder,
 			$targetType
 		) ? $resultType : $typeRegistry->result(
 			$resultType,
@@ -37,10 +45,7 @@ final readonly class AsJsonValue implements NativeMethod {
 		$targetValue = $target;
 
 		try {
-			$result = new CastAsJsonValue(
-				$programRegistry->typeRegistry,
-				$programRegistry->methodFinder
-			)->getJsonValue($programRegistry, $targetValue);
+			$result = $this->castAsJsonValue->getJsonValue($programRegistry, $targetValue);
 		} catch (FunctionReturn $return) {
 			return $return->typedValue;
 		}
