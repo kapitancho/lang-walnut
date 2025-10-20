@@ -9,8 +9,12 @@ final readonly class MethodNameIdentifier implements JsonSerializable {
 	public function __construct(
 		public string $identifier
 	) {
-		preg_match('/^(\w+)$/', $identifier) ||
+		self::isValidIdentifier($this->identifier) ||
 			IdentifierException::invalidMethodNameIdentifier($identifier);
+	}
+
+	public static function isValidIdentifier(string $identifier): bool {
+		return preg_match('/^(\w+)$/', $identifier) === 1;
 	}
 
 	public function equals(MethodNameIdentifier $identifier): bool {

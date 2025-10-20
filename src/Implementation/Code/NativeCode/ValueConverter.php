@@ -4,7 +4,6 @@ namespace Walnut\Lang\Implementation\Code\NativeCode;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\IdentifierException;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\Method;
@@ -34,9 +33,10 @@ final readonly class ValueConverter {
 			return $targetType;
 		}
 
-		//TODO - consider dropping this completely
-		try {
-			$methodName = new MethodNameIdentifier(sprintf('as%s',$targetType));
+		$methodNameString = sprintf('as%s',$targetType);
+		if (MethodNameIdentifier::isValidIdentifier($methodNameString)) {
+			//TODO - consider dropping this completely
+			$methodName = new MethodNameIdentifier($methodNameString);
 			$method = $methodFinder->methodForType($sourceType, $methodName);
 			if ($method instanceof Method) {
 				$returnType = $method->analyse(
@@ -67,7 +67,7 @@ final readonly class ValueConverter {
 				return $returnType;
 				// @codeCoverageIgnoreEnd
 			}
-		} catch (IdentifierException) {}
+		}
 
 		/*
 		$bType = $this->toBaseType($sourceType);
@@ -135,8 +135,9 @@ final readonly class ValueConverter {
 		if ($sourceType->isSubtypeOf($targetType)) {
 			return $sourceType;
 		}
-		try {
-			$methodName = new MethodNameIdentifier(sprintf('as%s',$targetType));
+		$methodNameString = sprintf('as%s',$targetType);
+		if (MethodNameIdentifier::isValidIdentifier($methodNameString)) {
+			$methodName = new MethodNameIdentifier($methodNameString);
 			$method = $methodFinder->methodForType($sourceType, $methodName);
 
 			if ($method instanceof Method) {
@@ -160,7 +161,7 @@ final readonly class ValueConverter {
 				}
 				return $errorType ? $typeRegistry->result($targetType, $errorType) : $targetType;
 			}
-		} catch (IdentifierException) {}
+		}
 
 		return $typeRegistry->result(
 			$targetType,
@@ -177,8 +178,9 @@ final readonly class ValueConverter {
 		if ($sourceValue->type->isSubtypeOf($targetType)) {
 			return $sourceValue;
 		}
-		try {
-			$methodName = new MethodNameIdentifier(sprintf('as%s',$targetType));
+		$methodNameString = sprintf('as%s',$targetType);
+		if (MethodNameIdentifier::isValidIdentifier($methodNameString)) {
+			$methodName = new MethodNameIdentifier($methodNameString);
 			$method = $programRegistry->methodFinder->methodForValue($sourceValue, $methodName);
 
 			if ($method instanceof Method) {
@@ -188,7 +190,7 @@ final readonly class ValueConverter {
 					$programRegistry->valueRegistry->null
 				);
 			}
-		} catch (IdentifierException) {}
+		}
 
 		return $programRegistry->valueRegistry->error(
 			$programRegistry->valueRegistry->dataValue(
