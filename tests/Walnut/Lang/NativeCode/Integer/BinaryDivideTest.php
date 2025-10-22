@@ -32,4 +32,25 @@ final class BinaryDivideTest extends CodeExecutionTestHelper {
 		$this->assertEquals("2", $result);
 	}
 
+	public function testBinaryDivideByOneReturnsInteger(): void {
+		$result = $this->executeCodeSnippet("divByOne(42);", valueDeclarations: <<<NUT
+			divByOne = ^x: Integer => Integer :: x / 1;
+		NUT);
+		$this->assertEquals("42", $result);
+	}
+
+	public function testBinaryDivideByOnePreservesRange(): void {
+		$result = $this->executeCodeSnippet("divByOne(50);", valueDeclarations: <<<NUT
+			divByOne = ^x: Integer<1..100> => Integer<1..100> :: x / 1;
+		NUT);
+		$this->assertEquals("50", $result);
+	}
+
+	public function testBinaryDivideByOnePreservesRangeSubset(): void {
+		$result = $this->executeCodeSnippet("divByOne[5, 1];", valueDeclarations: <<<NUT
+			divByOne = ^[x: Integer[3, 5, 8], y: Integer[1]] => Integer[3, 5, 8] :: #x / #y;
+		NUT);
+		$this->assertEquals("5", $result);
+	}
+
 }

@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\NativeCode\Integer;
 
+use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint as NumberIntervalEndpointInterface;
@@ -33,6 +34,19 @@ final readonly class BinaryMultiply implements NativeMethod {
 		if ($targetType instanceof IntegerType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof IntegerType || $parameterType instanceof RealType) {
+				if ((string)$parameterType->numberRange === '1') {
+					return $targetType;
+				}
+				if ((string)$targetType->numberRange === '1') {
+					return $parameterType;
+				}
+				if ((string)$parameterType->numberRange === '0') {
+					return $typeRegistry->integerSubset([new Number(0)]);
+				}
+				if ((string)$targetType->numberRange === '0') {
+					return $typeRegistry->integerSubset([new Number(0)]);
+				}
+
 				if (
 					$targetType->numberRange->min instanceof NumberIntervalEndpointInterface && $targetType->numberRange->min->value >= 0 &&
 					$parameterType->numberRange->min instanceof NumberIntervalEndpointInterface && $parameterType->numberRange->min->value >= 0

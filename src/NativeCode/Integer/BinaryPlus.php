@@ -5,6 +5,7 @@ namespace Walnut\Lang\NativeCode\Integer;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
+use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint as NumberIntervalEndpointInterface;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
@@ -34,6 +35,13 @@ final readonly class BinaryPlus implements NativeMethod {
 			$parameterType = $this->toBaseType($parameterType);
 
 			if ($parameterType instanceof IntegerType || $parameterType instanceof RealType) {
+				if ((string)$parameterType->numberRange === '0') {
+					return $targetType;
+				}
+				if ((string)$targetType->numberRange === '0') {
+					return $parameterType;
+				}
+
 				$min =
 					$targetType->numberRange->min === MinusInfinity::value ||
 					$parameterType->numberRange->min === MinusInfinity::value ?

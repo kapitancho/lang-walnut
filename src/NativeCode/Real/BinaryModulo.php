@@ -31,11 +31,13 @@ final readonly class BinaryModulo implements NativeMethod {
 			$parameterType = $this->toBaseType($parameterType);
 
 			if ($parameterType instanceof IntegerType || $parameterType instanceof RealType) {
-				return $parameterType->contains(0) ?
-					$typeRegistry->result(
-						$typeRegistry->real(),
-						$typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
-					) : $typeRegistry->real();
+				$includesZero = $parameterType->contains(0);
+				$returnType = $typeRegistry->real();
+
+				return $includesZero ? $typeRegistry->result(
+					$returnType,
+					$typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
+				) : $returnType;
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}

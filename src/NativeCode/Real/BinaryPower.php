@@ -31,14 +31,21 @@ final readonly class BinaryPower implements NativeMethod {
 		if ($targetType instanceof RealType) {
 			$parameterType = $this->toBaseType($parameterType);
 
-			if ($parameterType instanceof IntegerSubsetType && array_all(
-					$parameterType->subsetValues, fn(Number $value)
-				=> (int)(string)$value % 2 === 0
-				)) {
-				return $typeRegistry->integer(0);
-			}
-
 			if ($parameterType instanceof IntegerType || $parameterType instanceof RealType) {
+				if ((string)$parameterType->numberRange === '1') {
+					return $targetType;
+				}
+				if ((string)$parameterType->numberRange === '0') {
+					return $typeRegistry->integerSubset([new Number(1)]);
+				}
+
+				if ($parameterType instanceof IntegerSubsetType && array_all(
+						$parameterType->subsetValues, fn(Number $value)
+					=> (int)(string)$value % 2 === 0
+				)) {
+					return $typeRegistry->integer(0);
+				}
+
 				$containsZero = $targetType->contains(0);
 				return $containsZero ?
 					$typeRegistry->real() :

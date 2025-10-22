@@ -29,6 +29,10 @@ final readonly class BinaryIntegerDivide implements NativeMethod {
 			$parameterType = $this->toBaseType($parameterType);
 
 			if ($parameterType instanceof IntegerType) {
+				if ((string)$parameterType->numberRange === '1') {
+					return $targetType;
+				}
+
 				return $parameterType->contains(0) ?
 					$typeRegistry->result(
 						$typeRegistry->integer(),

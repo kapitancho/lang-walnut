@@ -36,6 +36,10 @@ final readonly class BinaryDivide implements NativeMethod {
 			$parameterType = $this->toBaseType($parameterType);
 
 			if ($parameterType instanceof IntegerType || $parameterType instanceof RealType) {
+				if ($parameterType instanceof IntegerType && (string)$parameterType->numberRange === '1') {
+					return $targetType;
+				}
+
                 $real = $typeRegistry->real();
 				//TODO: yyy - add +/-, -/+ and -/- cases as well as "inclusive" improvement
                 if (
@@ -79,7 +83,7 @@ final readonly class BinaryDivide implements NativeMethod {
 	): Value {
 		$targetValue = $target;
 		$parameterValue = $parameter;
-		
+
 
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			if ($parameterValue instanceof IntegerValue || $parameterValue instanceof RealValue) {
@@ -87,6 +91,14 @@ final readonly class BinaryDivide implements NativeMethod {
 					return ($programRegistry->valueRegistry->error(
 						$programRegistry->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
 					));
+				}
+				// Special case: Integer / 1 = Integer
+				if (
+					$targetValue instanceof IntegerValue &&
+					$parameterValue instanceof IntegerValue &&
+					(string)$parameterValue->literalValue === '1'
+				) {
+					return $targetValue;
 				}
                 return ($programRegistry->valueRegistry->real(
 	                fdiv((string)$targetValue->literalValue, (string)$parameterValue->literalValue)

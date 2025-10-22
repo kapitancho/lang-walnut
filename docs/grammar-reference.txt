@@ -1,0 +1,629 @@
+# WALNUT LANGUAGE GRAMMAR
+================================================================================
+
+This grammar was refined based on ParserTest cases, real .nut examples,
+and detailed user corrections.
+
+Notation:
+  ::= definition
+  |   alternative
+  ?   optional
+  *   zero or more
+  +   one or more
+  ()  grouping
+
+
+================================================================================
+## HIGH-LEVEL STRUCTURE
+================================================================================
+
+Program ::= Module+
+
+Module ::= 'module' ModuleName ('%' '%' DependencyList)? ':' ModuleBody
+
+ModuleName ::= Identifier ('/' Identifier)*   // path/to/module
+             | '$' (Identifier ('/' Identifier)*)?   // $ or $datetime or $a/b/c
+
+DependencyList ::= Identifier (',' Identifier)*
+
+ModuleBody ::= ModuleDefinition*
+
+ModuleDefinition ::= TypeDefinition
+                   | ConstructorDefinition
+                   | MethodDefinition
+                   | CastDefinition
+                   | CliEntryPoint
+
+================================================================================
+## TYPE DEFINITIONS
+================================================================================
+
+TypeDefinition ::= TypeName ':=' '(' ')'                              // Atom type
+                 | TypeName ':=' '(' EnumValues ')'                   // Enum type
+                 | TypeName ':=' TypeExpr                             // Data type
+                 | TypeName ':=' SealedOrOpen TypeExpr ('@' ErrorType)? ('::' Expression)?
+                 | TypeName '=' TypeExpr                              // Type alias
+
+SealedOrOpen ::= '$'  // Sealed type
+               | '#'  // Open type
+
+EnumValues ::= EnumValue (',' EnumValue)*
+
+EnumValue ::= Identifier
+
+Examples:
+  Clock := ()                                          // Atom type
+  Color := (red, green, blue)                         // Enum type
+  ProductId := Integer<1..>                           // Data type
+  Product := $[id: ProductId, name: String]           // Sealed type
+  Product := $[...] @ InvalidProduct :: {...}         // Sealed with error and constructor
+  Result := #Integer                                  // Open type
+  ProductList = Array<Product>                        // Type alias
+
+================================================================================
+## CONSTRUCTOR DEFINITIONS
+================================================================================
+
+ConstructorDefinition ::= TypeName ParameterSpec ('@' ErrorType)? ('%' '%' DependencySpec)? '::' Expression
+
+ParameterSpec ::= '(' TypeExpr ')'                   // Type only
+                | '(' '~' TypeName ')'               // Inferred variable name
+                | '(' VarName ':' TypeExpr ')'       // Explicit name and type
+                | '(' VarName ')'                    // Variable name with Any type
+                | '(' ')'                            // Null parameter
+                | TupleTypeExpr                      // Tuple parameter
+                | RecordTypeExpr                     // Record parameter
+
+DependencySpec ::= TypeExpr                          // Type only
+                 | '~' TypeName                      // Inferred variable name
+                 | VarName ':' TypeExpr              // Explicit name and type
+
+Examples:
+  A(P) :: null                                      // Type parameter
+  A(P) @ C :: null                                  // With error type
+  A(P) %% D :: null                                 // With dependency
+  A(P) @ C %% D :: null                            // Full signature
+  A(~P) :: null                                     // Inferred variable name 'p'
+  A(p: P) :: null                                   // Explicit variable name
+  A(p) :: null                                      // Any type parameter
+  A() :: null                                       // Null parameter
+  A[] :: null                                       // Empty tuple
+  A[P] :: null                                      // Single element tuple
+  A[P, Q] :: null                                   // Multi-element tuple
+  A[:] :: null                                      // Empty record
+  A[a: P, b: Q] :: null                            // Record
+  A(P) @ C %% ~D :: null                           // All combinations work
+
+================================================================================
+## METHOD DEFINITIONS
+================================================================================
+
+MethodDefinition ::= TypeName '-' '>' MethodName MethodParamSpec ('@' ErrorType)? ('%' '%' DependencySpec)? '::' Expression
+
+MethodParamSpec ::= '(' '^' ParamSpec ('=>' ReturnType)? ')'
+                  | '(' '=>' ReturnType ')'
+                  | '(' ')'
+
+ParamSpec ::= TypeExpr                               // Type only
+            | '~' TypeName                           // Inferred variable name
+            | VarName ':' TypeExpr                   // Explicit name and type
+            | VarName                                // Variable name with Any type
+            |  ε                                     // Null parameter
+
+DependencySpec ::= TypeExpr                          // Type only
+                 | '~' TypeName                      // Inferred variable name
+                 | VarName ':' TypeExpr              // Explicit name and type
+
+Examples:
+  A->asB(^P) :: null                                // Method with param
+  A->asB(^P %% D) :: null                           // With dependency
+  A->asB(^p: P => B) :: null                        // With return type
+  A->asB(^p: P => B) %% d: D :: null               // Full signature
+  A->asB(^p: P => B) @ E %% d: D :: null           // With error type
+  A->asB(=> B) :: null                              // No param method
+  A->asB() :: null                                  // No param, no return type
+  A->asB(^~P) :: null                               // Inferred var name
+
+================================================================================
+## CAST DEFINITIONS
+================================================================================
+
+CastDefinition ::= SourceType '=' '=' '>' TargetType ('@' ErrorType)? ('%' '%' DependencySpec)? (';' | '::' Expression)
+
+SourceType ::= TypeExpr
+             |  ε   // DependencyContainer
+
+Examples:
+  Date ==> String :: [...]->combineAsString('-')    // Cast method
+  String ==> Date @ InvalidDate :: {...}            // Cast with error
+  JsonValue ==> Date @ InvalidDate :: {...}         // Cast with error
+  ==> B :: null                                     // DependencyContainer
+  ==> B %% D;                                       // Auto-wired dependency
+  ==> B %% D :: null                                // With explicit body
+  ==> B @ C %% D :: null                            // Full signature
+
+================================================================================
+## CLI ENTRY POINTS
+================================================================================
+
+CliEntryPoint ::= ('%' '%' DependencyList)? '>' '>' '>' Expression
+
+Examples:
+  >>> null
+  %% D >>> null
+
+================================================================================
+## EXPRESSIONS
+================================================================================
+
+Expression ::= ConstantExpression
+             | VariableName
+             | VariableAssignment
+             | MultiVariableAssignment
+             | TupleExpression
+             | RecordExpression
+             | SetExpression
+             | SequenceExpression
+             | ScopedExpression
+             | ReturnExpression
+             | ConstructorCall
+             | FunctionCall
+             | MethodCall
+             | PropertyAccess
+             | MatchExpression
+             | MutableExpression
+
+ConstantExpression ::= Literal
+                     | TupleConstant
+                     | RecordConstant
+                     | SetConstant
+                     | EnumValueLiteral
+                     | AtomValueLiteral
+                     | DataConstant
+                     | FunctionValue
+                     | TypeValue
+
+Literal ::= IntegerLiteral
+          | RealLiteral
+          | StringLiteral
+          | BooleanLiteral
+          | NullLiteral
+
+IntegerLiteral ::= '-'? [0-9]+
+
+RealLiteral ::= '-'? [0-9]+ '.' [0-9]+
+
+StringLiteral ::= "'" Characters "'"
+
+BooleanLiteral ::= 'true' | 'false'
+
+NullLiteral ::= 'null'
+
+TupleConstant ::= '[' ']'  // Empty tuple constant
+                | '[' ConstantExpression (',' ConstantExpression)+ ']'
+
+SetConstant ::= '[' ';' ']'  // Empty set constant
+              | '[' ConstantExpression ';' (ConstantExpression ';')* ']'
+
+RecordConstant ::= '[' ':' ']'  // Empty record constant
+                 | '[' RecordConstantItem (',' RecordConstantItem)* ']'
+
+RecordConstantItem ::= FieldName ':' ConstantExpression
+                     | StringLiteral ':' ConstantExpression
+
+EnumValueLiteral ::= TypeName '.' EnumValue
+
+AtomValueLiteral ::= TypeName  // For atom types
+
+DataConstant ::= TypeName '!' Expression   // Data type constant
+
+VariableName ::= Identifier
+               | '$'
+               | '$' Identifier
+               | '#' Identifier
+               | '%' Identifier
+               | '$' IntegerLiteral
+               | '#' IntegerLiteral
+               | '%' IntegerLiteral
+               | '$' '$'
+
+VariableAssignment ::= VarName '=' Expression
+
+MultiVariableAssignment ::= 'var' '{' MultiVarItems '}' '=' Expression
+
+MultiVarItems ::= TupleVarItems | RecordVarItems
+
+TupleVarItems ::= VarName (',' VarName)*          // Positional: var{a, b, c}
+
+RecordVarItems ::= RecordVarItem (',' RecordVarItem)*
+
+RecordVarItem ::= '~' VarName                     // Named (inferred): var{~a, ~b}
+                | FieldName ':' VarName           // Named explicit: var{a: x, b: y}
+                | StringLiteral ':' VarName       // Named with string: var{'a': x}
+
+TupleExpression ::= '[' ']'  // Empty tuple
+                  | '[' Expression (',' Expression)+ ']'  // Multi-element
+
+SetExpression ::= '[' ';' ']'  // Empty set
+                | '[' Expression ';' (Expression ';')* ']'
+
+RecordExpression ::= '[' ':' ']'  // Empty record
+                   | '[' RecordItem (',' RecordItem)* ']'
+
+RecordItem ::= FieldName ':' Expression
+             | StringLiteral ':' Expression
+
+SequenceExpression ::= '{' (Expression (';' Expression)* ';'?)? '}'
+
+ScopedExpression ::= ':' ':' Expression
+
+ReturnExpression ::= '=' '>' Expression
+
+ConstructorCall ::= TypeName '(' Expression? ')'
+                  | TypeName TupleExpression
+                  | TypeName SetExpression
+                  | TypeName RecordExpression
+                  | '@' Expression  // Error constructor (sugar for Error(...))
+
+FunctionCall ::= Expression '(' Expression? ')'
+               | Expression TupleExpression
+               | Expression SetExpression
+               | Expression RecordExpression
+
+MethodCall ::= Expression MethodOp MethodName MethodArgs?
+
+MethodOp ::= '-' '>'   // Regular method call
+           | '=' '>'   // noError method call
+           | '|' '>'   // noExternalError method call
+
+MethodArgs ::= '(' Expression ')'
+             | TupleExpression
+             | SetExpression
+             | RecordExpression
+
+PropertyAccess ::= Expression '.' PropertyName
+                 | Expression '.' IntegerLiteral
+                 | Expression '.' StringLiteral
+
+MutableExpression ::= 'mutable' '{' TypeExpr ',' Expression '}'
+
+FunctionValue ::= '^' ParameterSpec ('=>' ReturnType)? ('@' ErrorType)? ('%' '%' DependencySpec)? '::' Expression
+
+TypeValue ::= 'type' '{' TypeExpr '}'      // Type value
+            | 'type' TupleTypeExpr          // Type tuple
+            | 'type' RecordTypeExpr         // Type record
+            | '`' TypeExpr                  // Type literal
+
+Examples:
+  42                                   // Integer literal
+  -3.14                                // Real literal
+  'text'                               // String literal
+  true                                 // Boolean literal
+  null                                 // Null literal
+  []                                   // Empty tuple constant
+  [1, 2, 3]                            // Tuple constant
+  [;]                                  // Empty set constant
+  [1; 2; 3;]                           // Set constant
+  [:]                                  // Empty record constant
+  [a: 1, b: 2]                         // Record constant
+  Color.red                            // Enum value
+  Clock                                // Atom value
+  Color!red                            // Data constant
+  x                                    // Variable
+  $                                    // Dependency variable
+  $identifier                          // Named dependency
+  #param                               // Parameter reference
+  %contextVar                          // Context variable
+  $0                                   // Indexed dependency
+  #1                                   // Indexed parameter
+  $$                                   // Double dollar
+  x = y                                // Assignment
+  var{a, b, c} = tuple                 // Multi-variable assignment (tuple-style)
+  var{~a, ~b} = record                 // Multi-variable assignment (record inferred)
+  var{a: x, b: y} = record             // Multi-variable assignment (record explicit)
+  var{~a, b: y} = record               // Multi-variable assignment (record mixed)
+  var{'a': x, is: y, true: z} = rec    // Multi-variable with string and keywords
+  [x, y]                               // Tuple expression
+  [x; y;]                              // Set expression
+  [a: x, b: y]                         // Record expression
+  {x; y}                               // Sequence
+  {}                                   // Empty sequence
+  :: x                                 // Scoped
+  => x                                 // Return
+  C()                                  // Constructor
+  C(x)                                 // Constructor with param
+  C[x, y]                              // Constructor with tuple
+  @x                                   // Error (sugar for Error(x))
+  f(x)                                 // Function call
+  f[x, y]                              // Function call with tuple
+  x->method                            // Method call no params
+  x->method(y)                         // Method with param
+  x->method[a, b]                      // Method with tuple param
+  x=>method                            // noError method call
+  x=>method[a, b]                      // noError with tuple
+  x|>method                            // noExternalError
+  x|>method[a, b]                      // noExternalError with tuple
+  x.y                                  // Property access
+  x.0                                  // Tuple index
+  x.'name'                             // Property with string
+  mutable{A, x}                        // Mutable value
+  ^x: Integer => String :: x->asString    // Function value
+  type{Integer}                        // Type value
+  type[Integer, String]                // Type tuple
+  type[a: Integer, b: String]          // Type record
+  `String                              // Type literal
+
+================================================================================
+## MATCH EXPRESSIONS
+================================================================================
+
+MatchExpression ::= MatchIf | MatchError | MatchValue | MatchType | MatchTrue
+
+MatchIf ::= '?when' '(' Expression ')' '{' Expression '}' ('~' '{' Expression '}')?
+
+MatchError ::= '?whenIsError' '(' Expression ')' '{' Expression '}' ('~' '{' Expression '}')?
+
+MatchValue ::= '?whenValueOf' '(' Expression ')' 'is' '{' MatchPairs '}'
+
+MatchType ::= '?whenTypeOf' '(' Expression ')' 'is' '{' MatchPairs '}'
+
+MatchTrue ::= '?whenIsTrue' '{' MatchPairs '}'
+
+MatchPairs ::= Expression ':' Expression (',' Expression ':' Expression)* (',' '~' ':' Expression)?
+             | '~' ':' Expression
+
+Examples:
+  ?when(x) { y }                                   // If without else
+  ?when(x) { y } ~ { z }                          // If with else
+  ?whenIsError(x) { y }                           // Error match
+  ?whenIsError(x) { y } ~ { z }                   // Error with else
+  ?whenValueOf(#day) is { 31: ..., ~: null }      // Value match
+  ?whenTypeOf($) is { `String: ..., ~: @InvalidDate }  // Type match with type literal
+  ?whenTypeOf($) is { type[Integer, String]: ..., ~: ... }  // Type match with type tuple
+  ?whenIsTrue { x > 0: ..., ~: null }             // Boolean match
+
+================================================================================
+## BINARY AND UNARY OPERATIONS
+================================================================================
+
+BinaryOperation ::= Expression BinaryOp Expression
+
+BinaryOp ::= '+'     // binaryPlus
+           | '-'     // binaryMinus
+           | '*'     // binaryMultiply
+           | '/'     // binaryDivide
+           | '/''/'  // binaryIntegerDivide
+           | '%'     // binaryModulo
+           | '*''*'  // binaryPower
+           | '&'     // binaryBitwiseAnd
+           | '|'     // binaryBitwiseOr
+           | '^'     // binaryBitwiseXor
+           | '<'     // binaryLessThan
+           | '<''='  // binaryLessThanEqual
+           | '>'     // binaryGreaterThan
+           | '>''='  // binaryGreaterThanEqual
+           | '!''='  // binaryNotEqual
+           | '=''='  // binaryEqual
+           | '|''|'  // binaryOr
+           | '&''&'  // binaryAnd
+           | '^''^'  // binaryXor
+
+UnaryOperation ::= UnaryOp Expression
+
+UnaryOp ::= '+'  // unaryPlus
+          | '-'  // unaryMinus
+          | '~'  // unaryBitwiseNot
+          | '!'  // unaryNot
+
+Note: Binary and unary operations are converted to method calls during parsing.
+  a + b  becomes  a->binaryPlus(b)
+  -a     becomes  a->unaryMinus()
+
+The operators '=>' and '|>' are special method call operators (see MethodCall).
+The operator '*>' is for errorAsExternal:
+  a *> (expr)  becomes  ?noError(a->errorAsExternal(expr))
+
+================================================================================
+## TYPE SYSTEM
+================================================================================
+
+TypeExpr ::= BasicType
+           | CompositeType
+           | UnionType
+           | IntersectionType
+           | FunctionType
+           | ConstrainedType
+           | GenericType
+           | ImpureType
+           | ShapeType
+           | '(' TypeExpr ')'   // Parenthesized for precedence
+
+BasicType ::= 'Integer' | 'Real' | 'String' | 'Boolean'
+            | 'Null' | 'Nothing' | 'Any'
+            | 'JsonValue' | 'NotANumber'
+            | TypeName
+
+CompositeType ::= TupleTypeExpr
+                | RecordTypeExpr
+                | 'Array' ('<' TypeAndLengthSpec '>')?
+                | 'Map' ('<' TypeAndLengthSpec '>')?
+                | 'Set' ('<' TypeAndLengthSpec '>')?
+
+TypeAndLengthSpec ::= TypeExpr (',' LengthRange)?
+                    | LengthRange
+
+LengthRange ::= (PositiveInteger)? '..' (PositiveInteger)?
+
+TupleTypeExpr ::= '[' '...'? ']'  // Empty tuple type or just rest
+                | '[' TypeExpr (',' TypeExpr)+ (',' '...')? ']'  // Tuple with optional rest
+
+RecordTypeExpr ::= '[' ':' '...'? ']'  // Empty record type or just rest
+                 | '[' RecordTypeItem (',' RecordTypeItem)* (',' '...')? ']'  // Record with optional rest
+
+RecordTypeItem ::= FieldName ':' '?'? TypeExpr
+
+GenericType ::= 'Type' '<' TypeExpr '>'
+              | 'Result' '<' OkType ',' ErrorType '>'
+              | 'Error' '<' TypeExpr '>'
+              | 'Mutable' '<' TypeExpr '>'
+              | 'OptionalKey' '<' TypeExpr '>'
+
+ConstrainedType ::= 'Integer' '<' IntegerConstraint '>'
+                  | 'Integer' '[' IntegerSubset ']'
+                  | 'Real' '<' RealConstraint '>'
+                  | 'Real' '[' RealSubset ']'
+                  | 'String' '<' StringConstraint '>'
+                  | 'String' '[' StringSubset ']'
+
+IntegerConstraint ::= IntegerRangeConstraint
+                    | IntegerIntervalList
+
+IntegerRangeConstraint ::= (Integer)? '..' (Integer)?
+
+IntegerIntervalList ::= IntegerInterval ('|' IntegerInterval)*
+
+IntegerInterval ::= '[' Integer '..' Integer ']'       // Closed
+                  | '(' (Integer)? '..' (Integer)? ')' // Open
+                  | '[' Integer '..' (Integer)? ')'    // Half-open
+                  | '(' (Integer)? '..' Integer ']'    // Half-open
+
+IntegerSubset ::= Integer (',' Integer)*
+
+RealConstraint ::= RealRangeConstraint
+                 | RealIntervalList
+
+RealRangeConstraint ::= (Real)? '..' (Real)?
+
+RealIntervalList ::= RealInterval ('|' RealInterval)*
+
+RealInterval ::= '[' Real '..' Real ']'       // Closed
+               | '(' (Real)? '..' (Real)? ')' // Open
+               | '[' Real '..' (Real)? ')'    // Half-open
+               | '(' (Real)? '..' Real ']'    // Half-open
+
+RealSubset ::= Real (',' Real)*
+
+StringConstraint ::= (PositiveInteger)? '..' (PositiveInteger)?
+
+StringSubset ::= StringLiteral (',' StringLiteral)*
+
+UnionType ::= TypeExpr '|' TypeExpr ('|' TypeExpr)*
+
+IntersectionType ::= TypeExpr '&' TypeExpr ('&' TypeExpr)*
+
+FunctionType ::= '^' TypeExpr '=' '>' TypeExpr
+               | '^' '=' '>' TypeExpr   // Parameter optional
+
+ImpureType ::= '*' TypeExpr   // Shorthand for Impure<TypeExpr>
+
+ShapeType ::= '{' TypeExpr '}'   // Shorthand for Shape<TypeExpr>
+
+Examples:
+  Integer                                          // Basic type
+  Integer<1..100>                                  // Range constraint
+  Integer<1..>                                     // Min only (+infinity max)
+  Integer<..100>                                   // Max only (-infinity min)
+  Integer[2, 4, 10]                                // Integer subset
+  String<1..50>                                    // Length constraint
+  String<1..>                                      // Min length 1, no max
+  String<..50>                                     // Max length 50, min is 0
+  String['hello', '', 'world']                     // String subset
+  Real<[0..1) | [2..3]>                           // Interval union
+  Real<0.5..2.5>                                   // Real range
+  Real[3.14, -2, 1.15]                            // Real subset
+  [Integer, String]                                // Tuple type
+  [Integer, String, ...]                           // Tuple with rest
+  [id: Integer, name: String]                      // Record type
+  [id: Integer, name?: String]                     // Record with optional key (?T = OptionalKey<T>)
+  [id: Integer, name: String, ...]                 // Record with rest
+  Array                                            // Array (item type Any, no length limit)
+  Array<Product>                                   // Array of Product, no length limit
+  Array<Integer, 1..>                              // Array of Integer, min length 1
+  Array<1..5>                                      // Array of Any, length 1 to 5
+  Array<Product, 1..10>                            // Array of Product, length 1 to 10
+  Map<Product>                                     // Map of Product, no size limit
+  Map<Integer, 1..>                                // Map with min size 1
+  Set<String>                                      // Set of String
+  Set<1..100>                                      // Set of Any, size 1 to 100
+  Type<Integer>                                    // Type type
+  Result<Integer, String>                          // Result type
+  Error<String>                                    // Error type
+  Mutable<Integer>                                 // Mutable type
+  OptionalKey<String>                              // Optional key type
+  ^Integer => String                               // Function type
+  ^=> String                                       // Function with no param
+  Integer | Null                                   // Union type
+  (Integer & Real) | String                        // Parenthesized for precedence
+  *Array<Product>                                  // Impure<Array<Product>>
+  {Product}                                        // Shape<Product>
+
+
+================================================================================
+## CRITICAL CORRECTIONS
+================================================================================
+
+1. CONSTANTS vs EXPRESSIONS:
+   - TupleConstant/RecordConstant/SetConstant are for constant values
+   - TupleExpression/RecordExpression/SetExpression are expressions
+   - Both exist as separate branches
+
+2. DATA CONSTANTS:
+   - Syntax: TypeName '!' Expression (not just EnumValue)
+   - Example: Color!red
+
+3. VARIABLE NAMES:
+   - Identifier, $, $identifier, #identifier, %identifier
+   - $0, #1, %2 (indexed)
+   - $$
+
+4. MULTI-VARIABLE ASSIGNMENT:
+   - var{a, b} = tuple (tuple-style positional)
+   - var{~a, ~b} = record (record-style inferred)
+   - var{a: x, b: y} = record (record-style explicit)
+
+5. OPTIONAL KEY in record types:
+   - Syntax: fieldName?: TypeExpr
+   - Example: [a: Integer, b?: String]
+   - ?T is short for OptionalKey<T>
+   - This is NOT TypeExpr? (which doesn't exist)
+
+6. METHOD CALL OPERATORS:
+   - Three operators: ->, =>, |>
+   - Four argument styles: (), tuple, set, record
+
+7. TYPE VALUE:
+   - type{T}, type[T1, T2], type[a: T1], `T
+
+8. MATCH TRUE:
+   - Is a branch of MatchExpression
+
+9. MATCH PAIRS:
+   - Must have at least one pair or default
+   - Pattern is Expression (can be type literals, type tuples, etc.)
+
+10. GENERIC TYPES:
+    - Type<T>, Result<T, E>, Error<E>, Mutable<T>, OptionalKey<T>
+
+11. SUBSET CONSTRAINTS:
+    - Integer[2, 4, 10] (not Integer<2, 4, 10>)
+    - Real[3.14, -2, 1.15]
+    - String['hello', '', 'world']
+
+12. SHORTHAND SYNTAX:
+    - *T for Impure<T>
+    - {T} for Shape<T>
+    - No shorthand for Mutable (use Mutable<T>)
+
+13. TUPLE/RECORD TYPES with REST:
+    - [T1, T2, ...]
+    - [a: T1, b: T2, ...]
+
+14. EMPTY PRODUCTIONS:
+    - Use ε for BNF-compliant empty productions
+    - Example: IntegerMin ::= Integer | ε
+
+
+================================================================================
+GRAMMAR GENERATION COMPLETE
+================================================================================
+This grammar incorporates all corrections and should be fully accurate.

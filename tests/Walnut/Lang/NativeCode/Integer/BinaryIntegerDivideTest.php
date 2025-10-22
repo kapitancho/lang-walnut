@@ -20,4 +20,25 @@ final class BinaryIntegerDivideTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet('Invalid parameter type', "3 // 1.4;");
 	}
 
+	public function testBinaryIntegerDivideByOneReturnsInteger(): void {
+		$result = $this->executeCodeSnippet("divOne(42);", valueDeclarations: <<<NUT
+			divOne = ^x: Integer => Integer :: x // 1;
+		NUT);
+		$this->assertEquals("42", $result);
+	}
+
+	public function testBinaryIntegerDivideByOnePreservesRange(): void {
+		$result = $this->executeCodeSnippet("divOne(50);", valueDeclarations: <<<NUT
+			divOne = ^x: Integer<1..100> => Integer<1..100> :: x // 1;
+		NUT);
+		$this->assertEquals("50", $result);
+	}
+
+	public function testBinaryIntegerDivideByOnePreservesRangeSubset(): void {
+		$result = $this->executeCodeSnippet("divOne[5, 1];", valueDeclarations: <<<NUT
+			divOne = ^[x: Integer[3, 5, 8], y: Integer[1]] => Integer[3, 5, 8] :: #x // #y;
+		NUT);
+		$this->assertEquals("5", $result);
+	}
+
 }
