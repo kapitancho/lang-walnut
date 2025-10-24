@@ -44,11 +44,6 @@ final readonly class VariableValueScope implements VariableValueScopeInterface {
 		return $this->variables[$variableName->identifier] ?? UnknownVariable::value;
 	}
 
-	public function findValueOf(VariableNameIdentifier $variableName): Value|UnknownVariable {
-		$var = $this->findTypedValueOf($variableName);
-		return $var instanceof UnknownVariable ? $var : $var;
-	}
-
 	public function typedValueOf(VariableNameIdentifier $variableName): Value {
 		return $this->variables[$variableName->identifier] ??
 			UnknownContextVariable::withName($variableName);

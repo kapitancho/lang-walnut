@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Compilation\Module;
+namespace Walnut\Lang\Implementation\Compilation\Module\Precompiler;
 
 use Walnut\Lang\Blueprint\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Blueprint\Compilation\Module\CodePrecompiler;

@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Implementation\Compilation\AST;
 
 use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode;
+use Walnut\Lang\Blueprint\Compilation\AST\AstCodeMapper;
 use Walnut\Lang\Blueprint\Compilation\AST\AstCompilationException;
 use Walnut\Lang\Blueprint\Compilation\AST\AstExpressionCompiler;
 use Walnut\Lang\Blueprint\Compilation\AST\AstFunctionBodyCompiler as AstFunctionBodyCompilerInterface;
@@ -14,12 +15,15 @@ final readonly class AstFunctionBodyCompiler implements AstFunctionBodyCompilerI
 	public function __construct(
 		private AstExpressionCompiler $astExpressionCompiler,
 		private ExpressionRegistry $expressionRegistry,
+		private AstCodeMapper $astCodeMapper,
 	) {}
 
 	/** @throws AstCompilationException */
 	public function functionBody(FunctionBodyNode $functionBodyNode): FunctionBody {
-		return $this->expressionRegistry->functionBody(
+		$result = $this->expressionRegistry->functionBody(
 			$this->astExpressionCompiler->expression($functionBodyNode->expression)
 		);
+		$this->astCodeMapper->mapNode($functionBodyNode, $result);
+		return $result;
 	}
 }

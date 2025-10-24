@@ -34,7 +34,8 @@ final readonly class MutableExpression implements MutableExpressionInterface, Js
 				__CLASS__,
 				$analyserResult->expressionType,
 				$this->type
-			)
+			),
+			$this
 		);
 	}
 

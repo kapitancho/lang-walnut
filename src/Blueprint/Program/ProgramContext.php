@@ -23,6 +23,6 @@ interface ProgramContext {
 
 	public ProgramRegistry                     $programRegistry { get; }
 
-	/** @throws AnalyserException */
+	/** @throws ProgramAnalyserException */
 	public function analyseAndBuildProgram(): Program;
 }

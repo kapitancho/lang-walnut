@@ -7,6 +7,7 @@ use Walnut\Lang\Blueprint\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethodAnalyser as CustomMethodAnalyserInterface;
+use Walnut\Lang\Blueprint\Function\CustomMethodAnalyserException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\CustomMethodRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -54,20 +55,33 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 						continue;
 					}
 					if ($baseMethod instanceof NativeMethod && !array_key_exists($baseMethod::class, $usedMethods)) {
-						$baseReturnType = $baseMethod->analyse(
-							$this->programRegistry->typeRegistry,
-							$this->programRegistry->methodFinder,
-							$methodTargetType,
-							$method->parameterType,
-						);
+						try {
+							$baseReturnType = $baseMethod->analyse(
+								$this->programRegistry->typeRegistry,
+								$this->programRegistry->methodFinder,
+								$methodTargetType,
+								$method->parameterType,
+							);
+						} catch (AnalyserException $e) {
+							$analyseErrors[] = new CustomMethodAnalyserException(
+								sprintf("Error in %s", $method->methodInfo),
+								$e,
+								$method
+							);
+							continue 2;
+						}
 						if (!$method->returnType->isSubtypeOf($baseReturnType)) {
-							$analyseErrors[] = sprintf("Error in %s : the method %s is already defined for %s but its return type < %s > is not a subtype of < %s > when called with parameter of type %s ",
-								$method->methodInfo,
-								$methodName,
-								$customizedTypeCandidateType,
-								$method->returnType,
-								$baseReturnType,
-								$method->parameterType
+							$analyseErrors[] = new CustomMethodAnalyserException(
+								sprintf("Error in %s", $method->methodInfo),
+								sprintf(
+									"the method %s is already defined for %s but its return type < %s > is not a subtype of < %s > when called with parameter of type %s ",
+									$methodName,
+									$customizedTypeCandidateType,
+									$method->returnType,
+									$baseReturnType,
+									$method->parameterType
+								),
+								$method
 							);
 						}
 					}
@@ -80,12 +94,17 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 				for ($j = 0; $j < $cnt; $j++) if ($k !== $j) {
 					if ($methodTargetTypes[$k]->isSubtypeOf($methodTargetTypes[$j]) &&
 						!$methodFnTypes[$k]->isSubtypeOf($methodFnTypes[$j])) {
-						$analyseErrors[] = sprintf("Error in %s : the method %s is already defined for %s and therefore the signature %s should be a subtype of %s",
-							$methods[$k]->methodInfo,
-							$methodName,
-							$methodTargetTypes[$j],
-							$methodFnTypes[$k],
-							$methodFnTypes[$j]
+
+						$analyseErrors[] = new CustomMethodAnalyserException(
+							sprintf("Error in %s", $methods[$k]->methodInfo),
+							sprintf(
+								"the method %s is already defined for %s and therefore the signature %s should be a subtype of %s",
+								$methodName,
+								$methodTargetTypes[$j],
+								$methodFnTypes[$k],
+								$methodFnTypes[$j]
+							),
+							$methods[$k]
 						);
 					}
 				}
@@ -101,7 +120,12 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 					);*/
 					$method->selfAnalyse($analyserContext);
 				} catch (AnalyserException $e) {
-					$analyseErrors[] = sprintf("Error in %s : %s", $method->methodInfo, $e->getMessage());
+					$analyseErrors[] =
+						new CustomMethodAnalyserException(
+							sprintf("Error in %s", $method->methodInfo),
+							$e,
+							$method
+						);
 					continue;
 				}
 			}
@@ -111,7 +135,17 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 				foreach ($methods as $method) {
 					$errors = $method->analyseDependencyType($this->programRegistry->dependencyContainer);
 					if (count($errors) > 0) {
-						$analyseErrors = array_merge($analyseErrors, $errors);
+						$analyseErrors = array_merge(
+							$analyseErrors,
+							array_map(
+								fn(string $error) => new CustomMethodAnalyserException(
+									sprintf("Error in %s", $method->methodInfo),
+									$error,
+									$method
+								),
+								$errors
+							)
+						);
 					}
 				}
 			}

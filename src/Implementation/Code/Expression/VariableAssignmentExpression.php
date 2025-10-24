@@ -48,7 +48,8 @@ final readonly class VariableAssignmentExpression implements VariableAssignmentE
 					"Error in function assigned to variable '%s': %s",
 					$this->variableName,
 					$e->getMessage()
-				)
+				),
+				$e->target ?? $this
 			) : $e;
 		}
 	}

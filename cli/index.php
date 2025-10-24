@@ -2,6 +2,12 @@
 
 use Walnut\Lang\Blueprint\Compilation\Module\ModuleDependencyException;
 use Walnut\Lang\Blueprint\Program\InvalidEntryPointDependency;
+use Walnut\Lang\Implementation\Compilation\CompilerFactory;
+use Walnut\Lang\Implementation\Compilation\Module\SourceFinder\CallbackSourceFinder;
+use Walnut\Lang\Implementation\Compilation\Module\SourceFinder\CompositeSourceFinder;
+use Walnut\Lang\Implementation\Compilation\Module\SourceFinder\PackageBasedSourceFinder;
+use Walnut\Lang\Implementation\Program\EntryPoint\Cli\CliEntryPoint;
+use Walnut\Lang\Implementation\Program\EntryPoint\Cli\CliEntryPointBuilder;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -15,7 +21,25 @@ if (!isset($source)) {
 }
 
 try {
-	$content = (require __DIR__ . '/factory.inc.php')->entryPoint->call($source, ... $input);
+	$cfg = @json_decode(@file_get_contents(__DIR__ . '/../nutcfg.json') ?? '{}', true);
+	$sourceRoot = __DIR__ . ($cfg['sourceRoot'] ? '/../' . $cfg['sourceRoot'] : __DIR__ . '/../walnut-src');
+	$packages = $cfg['packages'] ?
+		array_map(fn(string $path) => __DIR__ . '/../' . $path, $cfg['packages']) :
+		['core' => __DIR__ . '/../core-nut-lib'];
+
+	$compiler = new CompilerFactory()->customCompiler(
+		new CompositeSourceFinder(
+			new CallbackSourceFinder([
+				'stdin.nut' => fn() => file_get_contents('php://stdin')
+			]),
+			new PackageBasedSourceFinder(
+				$sourceRoot,
+				$packages
+			)
+		)
+	);
+	$ep = new CliEntryPoint(new CliEntryPointBuilder($compiler));
+	$content = $ep->call($source, ... $input);
 	echo $content, PHP_EOL;
 } catch (ModuleDependencyException $m) {
 	echo "Error: ", $m->getMessage(), PHP_EOL;

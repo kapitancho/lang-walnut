@@ -40,6 +40,7 @@ use Walnut\Lang\Blueprint\Common\Range\InvalidLengthRange;
 use Walnut\Lang\Blueprint\Common\Range\InvalidNumberInterval;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
+use Walnut\Lang\Blueprint\Compilation\AST\AstCodeMapper;
 use Walnut\Lang\Blueprint\Compilation\AST\AstCompilationException;
 use Walnut\Lang\Blueprint\Compilation\AST\AstTypeCompiler as AstTypeCompilerInterface;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
@@ -53,12 +54,13 @@ use Walnut\Lang\Implementation\Common\Range\NumberIntervalEndpoint;
 final readonly class AstTypeCompiler implements AstTypeCompilerInterface {
 	public function __construct(
 		private TypeRegistry $typeRegistry,
+		private AstCodeMapper $astCodeMapper,
 	) {}
 
 	/** @throws AstCompilationException */
 	public function type(TypeNode $typeNode): Type {
 		try {
-			return match(true) {
+			$result = match(true) {
 				$typeNode instanceof AnyTypeNode => $this->typeRegistry->any,
 				$typeNode instanceof NothingTypeNode => $this->typeRegistry->nothing,
 				$typeNode instanceof TrueTypeNode => $this->typeRegistry->true,
@@ -175,6 +177,8 @@ final readonly class AstTypeCompiler implements AstTypeCompilerInterface {
 					"Unknown type node type: " . get_class($typeNode)
 				)
 			};
+			$this->astCodeMapper->mapNode($typeNode, $result);
+			return $result;
 		} catch (UnknownType $e) {
 			throw new AstCompilationException($typeNode, "Type issue: " . $e->getMessage(), $e);
 		} catch (DuplicateSubsetValue $e) {

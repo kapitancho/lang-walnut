@@ -4,17 +4,20 @@ namespace Walnut\Lang\Implementation\Compilation;
 
 use Walnut\Lang\Blueprint\AST\Parser\ParserException;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
+use Walnut\Lang\Blueprint\Compilation\AST\AstCodeMapper;
 use Walnut\Lang\Blueprint\Compilation\AST\AstProgramCompilationException;
 use Walnut\Lang\Blueprint\Compilation\CompilationResult as CompilationResultInterface;
 use Walnut\Lang\Blueprint\Compilation\Compiler as CompilerInterface;
 use Walnut\Lang\Blueprint\Compilation\Module\ModuleDependencyException;
 use Walnut\Lang\Blueprint\Compilation\Module\ModuleLookupContext;
+use Walnut\Lang\Blueprint\Program\ProgramAnalyserException;
 use Walnut\Lang\Blueprint\Program\ProgramContext as ProgramContextInterface;
 use Walnut\Lang\Implementation\AST\Builder\NodeBuilderFactory;
 use Walnut\Lang\Implementation\AST\Parser\NodeImporter;
 use Walnut\Lang\Implementation\AST\Parser\TransitionLogger;
 use Walnut\Lang\Implementation\Compilation\AST\AstCompilerFactory;
 use Walnut\Lang\Implementation\Compilation\AST\AstProgramCompiler;
+use Walnut\Lang\Implementation\Compilation\AST\NoopAstCodeMapper;
 use Walnut\Lang\Implementation\Program\ProgramContextFactory;
 
 final readonly class Compiler implements CompilerInterface {
@@ -23,6 +26,7 @@ final readonly class Compiler implements CompilerInterface {
 	public TransitionLogger $transitionLogger;
 	public function __construct(
 		private ModuleLookupContext $moduleLookupContext,
+		private AstCodeMapper|null $astCodeMapper = null,
 	) {
 		$this->nodeImporter = new NodeImporter(
 			$this->transitionLogger = new TransitionLogger(),
@@ -32,7 +36,7 @@ final readonly class Compiler implements CompilerInterface {
 	}
 
 	private function getAstCompiler(ProgramContextInterface $programContext): AstProgramCompiler {
-		return new AstCompilerFactory($programContext)->programCompiler;
+		return new AstCompilerFactory($programContext, $this->astCodeMapper ?? new NoopAstCodeMapper())->programCompiler;
 	}
 
 	public function safeCompile(string $source): CompilationResultInterface {
@@ -62,7 +66,7 @@ final readonly class Compiler implements CompilerInterface {
 		}
 		try {
 			$program = $programContext->analyseAndBuildProgram();
-		} catch (AnalyserException $e) {
+		} catch (ProgramAnalyserException $e) {
 			return new CompilationResult(
 				$rootNode,
 				$e,

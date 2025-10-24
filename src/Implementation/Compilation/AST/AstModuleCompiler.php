@@ -16,6 +16,7 @@ use Walnut\Lang\Blueprint\AST\Node\Module\ModuleNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Compilation\AST\AstCodeMapper;
 use Walnut\Lang\Blueprint\Compilation\AST\AstCompilationException;
 use Walnut\Lang\Blueprint\Compilation\AST\AstFunctionBodyCompiler;
 use Walnut\Lang\Blueprint\Compilation\AST\AstModuleCompilationException;
@@ -37,6 +38,7 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 		private ProgramContext          $programContext,
 		private AstTypeCompiler         $astTypeCompiler,
 		private AstFunctionBodyCompiler $astFunctionBodyCompiler,
+		private AstCodeMapper           $astCodeMapper,
 	) {}
 
 	/** @throws AstModuleCompilationException */
@@ -110,7 +112,7 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 	/** @throws AstCompilationException */
 	private function compileModuleDefinition(ModuleDefinitionNode $moduleDefinition): void {
 		try {
-			match(true) {
+			$result = match(true) {
 				$moduleDefinition instanceof AddAliasTypeNode =>
 				$this->programContext->typeRegistryBuilder->addAlias(
 					$moduleDefinition->name,
@@ -174,6 +176,12 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 				)
 				// @codeCoverageIgnoreEnd
 			};
+			if ($result instanceof CustomMethod) {
+				$this->astCodeMapper->mapNode(
+					$moduleDefinition,
+					$result
+				);
+			}
 		} catch (DuplicateSubsetValue $e) {
 			throw new AstCompilationException(
 				$moduleDefinition,

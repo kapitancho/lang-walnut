@@ -41,7 +41,8 @@ final class SealedValue implements SealedValueInterface, JsonSerializable {
 					$this->typeName,
 					$type->valueType,
 					$this->value->type,
-				)
+				),
+				$this
 			);
 		}
 		// @codeCoverageIgnoreEnd

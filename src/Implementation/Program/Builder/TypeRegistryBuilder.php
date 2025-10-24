@@ -151,7 +151,6 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		$this->sealedTypes = [];
 
 		$this->aliasTypes['JsonValue'] = new AliasType(
-			$this->methodFinder,
 			new TypeNameIdentifier('JsonValue'),
 			$this->union([
 				$this->null,
@@ -525,7 +524,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 	}
 
 	public function addAlias(TypeNameIdentifier $name, Type $aliasedType): AliasType {
-		$result = new AliasType($this->methodFinder, $name, $aliasedType);
+		$result = new AliasType($name, $aliasedType);
 		$this->aliasTypes[$name->identifier] = $result;
 		return $result;
 	}

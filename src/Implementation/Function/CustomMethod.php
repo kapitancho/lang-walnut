@@ -28,7 +28,14 @@ final class CustomMethod implements CustomMethodInterface {
 
 	/** @throws AnalyserException */
 	public function selfAnalyse(AnalyserContext $analyserContext): void {
-		$this->function->selfAnalyse($analyserContext);
+		try {
+			$this->function->selfAnalyse($analyserContext);
+		} catch (AnalyserException $e) {
+			if (!$e->target) {
+				$e = $e->withTarget($this);
+			}
+			throw $e;
+		}
 	}
 
 	/** @return list<string> */

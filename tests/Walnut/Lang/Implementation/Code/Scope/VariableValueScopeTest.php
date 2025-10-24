@@ -20,7 +20,6 @@ class VariableValueScopeTest extends BaseProgramTestHelper {
 
 		$this->assertEquals(['a'], $scope->variables());
 		$this->assertTrue($scope->findTypeOf(new VariableNameIdentifier('a'))->isSubtypeOf($tr->string()));
-		$this->assertTrue($scope->findValueOf(new VariableNameIdentifier('a'))->equals($vr->string('hi')));
 		$this->assertEquals(UnknownVariable::value, $scope->findTypeOf(new VariableNameIdentifier('x')));
 
 		foreach($scope->allTypes() as $var => $type) {

@@ -40,7 +40,8 @@ final class OpenValue implements OpenValueInterface, JsonSerializable {
 					$this->typeName,
 					$type->valueType,
 					$this->value->type,
-				)
+				),
+				$this
 			);
 		}
 		// @codeCoverageIgnoreEnd

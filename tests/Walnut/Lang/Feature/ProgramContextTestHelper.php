@@ -12,6 +12,7 @@ use Walnut\Lang\Implementation\AST\Parser\ParserStateRunner;
 use Walnut\Lang\Implementation\AST\Parser\TransitionLogger;
 use Walnut\Lang\Implementation\AST\Parser\WalexLexerAdapter;
 use Walnut\Lang\Implementation\Compilation\AST\AstCompilerFactory;
+use Walnut\Lang\Implementation\Compilation\AST\NoopAstCodeMapper;
 use Walnut\Lang\Implementation\Compilation\Module\ModuleImporter;
 use Walnut\Lang\Implementation\Program\Program;
 use Walnut\Lang\Implementation\Program\ProgramContextFactory;
@@ -45,7 +46,7 @@ class ProgramContextTestHelper extends TestCase {
 			new Parser(new ParserStateRunner(new TransitionLogger(), new NodeBuilderFactory())),
 		);
 		$this->programContext = new ProgramContextFactory()->programContext;
-		$this->programCompiler = new AstCompilerFactory($this->programContext)->programCompiler;
+		$this->programCompiler = new AstCompilerFactory($this->programContext, new NoopAstCodeMapper())->programCompiler;
 
 		$programNode = $this->moduleImporter->importModules('test');
 		$this->programCompiler->compileProgram($programNode);

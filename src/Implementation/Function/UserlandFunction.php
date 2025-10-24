@@ -54,22 +54,14 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 			$this->parameter,
 			$this->dependency
 		);
-		try {
-			$returnType = $this->functionBody->analyse($analyserContext);
-			if (!$returnType->isSubtypeOf($this->returnType)) {
-				throw new AnalyserException(
-					sprintf(
-						"Error in %s: expected a return value of type %s, got %s",
-						$this->displayName, $this->returnType, $returnType
-					)
-				);
-			}
-		} catch (UnknownContextVariable $e) {
+		$returnType = $this->functionBody->analyse($analyserContext);
+		if (!$returnType->isSubtypeOf($this->returnType)) {
 			throw new AnalyserException(
 				sprintf(
-					"Unknown variable '%s' in function body",
-					$e->variableName
-				)
+					"Error in %s: expected a return value of type %s, got %s",
+					$this->displayName, $this->returnType, $returnType
+				),
+				$this->functionBody
 			);
 		}
 	}
