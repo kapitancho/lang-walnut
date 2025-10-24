@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Implementation\Compilation\Module;
 
 use PHPUnit\Framework\TestCase;
+use Walnut\Lang\Implementation\Compilation\Module\Precompiler\TestPrecompiler;
 
 final class TestPrecompilerTest extends TestCase {
 

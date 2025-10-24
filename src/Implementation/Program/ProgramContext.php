@@ -7,6 +7,7 @@ use Walnut\Lang\Blueprint\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope;
 use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder as CustomMethodRegistryBuilderInterface;
 use Walnut\Lang\Blueprint\Program\Builder\TypeRegistryBuilder as TypeRegistryBuilderInterface;
+use Walnut\Lang\Blueprint\Program\ProgramAnalyserException;
 use Walnut\Lang\Blueprint\Program\ProgramContext as ProgramContextInterface;
 use Walnut\Lang\Blueprint\Program\Registry\CustomMethodRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry as ExpressionRegistryInterface;
@@ -39,7 +40,7 @@ final readonly class ProgramContext implements ProgramContextInterface {
 		);
 	}
 
-	/** @throws AnalyserException */
+	/** @throws ProgramAnalyserException */
 	public function analyseAndBuildProgram(): Program {
 		$customMethodAnalyser = new CustomMethodAnalyser(
 			$this->programRegistry,
@@ -47,7 +48,7 @@ final readonly class ProgramContext implements ProgramContextInterface {
 		);
 		$analyseErrors = $customMethodAnalyser->analyse($this->customMethodRegistry);
 		if (count($analyseErrors) > 0) {
-			throw new AnalyserException(implode("\n", $analyseErrors));
+			throw new ProgramAnalyserException(... $analyseErrors);
 		}
 		return new Program(
 			$this->programRegistry,

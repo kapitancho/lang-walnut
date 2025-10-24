@@ -4,10 +4,12 @@ namespace Walnut\Lang\Implementation\Code\Expression;
 
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
+use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserResult;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\VariableNameExpression as VariableNameExpressionInterface;
+use Walnut\Lang\Blueprint\Code\Scope\UnknownContextVariable;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 
@@ -17,7 +19,17 @@ final readonly class VariableNameExpression implements VariableNameExpressionInt
 	) {}
 
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
-		$type = $analyserContext->variableScope->typeOf($this->variableName);
+		try {
+			$type = $analyserContext->variableScope->typeOf($this->variableName);
+		} catch (UnknownContextVariable $e) {
+			throw new AnalyserException(
+				sprintf(
+					"Unknown variable '%s'",
+					$this->variableName
+				),
+				$this
+			);
+		}
 		return $analyserContext->asAnalyserResult($type, $analyserContext->programRegistry->typeRegistry->nothing);
 	}
 

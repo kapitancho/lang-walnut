@@ -20,6 +20,7 @@ use Walnut\Lang\Blueprint\AST\Node\Value\TrueValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\TupleValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\TypeValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\ValueNode;
+use Walnut\Lang\Blueprint\Compilation\AST\AstCodeMapper;
 use Walnut\Lang\Blueprint\Compilation\AST\AstCompilationException;
 use Walnut\Lang\Blueprint\Compilation\AST\AstFunctionBodyCompiler;
 use Walnut\Lang\Blueprint\Compilation\AST\AstTypeCompiler;
@@ -37,6 +38,7 @@ final readonly class AstValueCompiler implements AstValueCompilerInterface {
 		private ValueRegistry $valueRegistry,
 		private AstFunctionBodyCompiler $functionBodyCompiler,
 		private AstTypeCompiler $astTypeCompiler,
+		private AstCodeMapper $astCodeMapper,
 	) {}
 
 	/** @throws AstCompilationException */
@@ -47,7 +49,7 @@ final readonly class AstValueCompiler implements AstValueCompilerInterface {
 	/** @throws AstCompilationException */
 	public function value(ValueNode $valueNode): Value {
 		try {
-			return match(true) {
+			$result = match(true) {
 				$valueNode instanceof NullValueNode => $this->valueRegistry->null,
 				$valueNode instanceof TrueValueNode => $this->valueRegistry->true,
 				$valueNode instanceof FalseValueNode => $this->valueRegistry->false,
@@ -101,6 +103,8 @@ final readonly class AstValueCompiler implements AstValueCompilerInterface {
 					"Unknown value node type: " . get_class($valueNode)
 				)
 			};
+			$this->astCodeMapper->mapNode($valueNode, $result);
+			return $result;
 		} catch (UnknownType $e) {
 			throw new AstCompilationException($valueNode, "Type issue: " . $e->getMessage(), $e);
 		} catch (UnknownEnumerationValue $e) {

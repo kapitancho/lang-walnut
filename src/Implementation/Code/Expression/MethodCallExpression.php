@@ -28,41 +28,48 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 
 	/** @throws AnalyserException */
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
-		$analyserContext = $this->target->analyse($analyserContext);
-		$retTargetType = $analyserContext->expressionType;
-		$targetReturnType = $analyserContext->returnType;
+		try {
+			$analyserContext = $this->target->analyse($analyserContext);
+			$retTargetType = $analyserContext->expressionType;
+			$targetReturnType = $analyserContext->returnType;
 
-		$analyserContext = $this->parameter->analyse($analyserContext);
-		$retParameterType = $analyserContext->expressionType;
-		$parameterReturnType = $analyserContext->returnType;
+			$analyserContext = $this->parameter->analyse($analyserContext);
+			$retParameterType = $analyserContext->expressionType;
+			$parameterReturnType = $analyserContext->returnType;
 
-		$method = $analyserContext->programRegistry->methodFinder->methodForType(
-			$retTargetType,
-			$this->methodName
-		);
-		if ($method instanceof UnknownMethod) {
-			throw new AnalyserException(
-				sprintf(
-					"Cannot call method '%s' on type '%s'",
-					$this->methodName,
-					$retTargetType,
-
-				)
+			$method = $analyserContext->programRegistry->methodFinder->methodForType(
+				$retTargetType,
+				$this->methodName
 			);
+			if ($method instanceof UnknownMethod) {
+				throw new AnalyserException(
+					sprintf(
+						"Cannot call method '%s' on type '%s'",
+						$this->methodName,
+						$retTargetType,
+					),
+					$this
+				);
+			}
+			$retReturnType = $method->analyse(
+				$analyserContext->programRegistry->typeRegistry,
+				$analyserContext->programRegistry->methodFinder,
+				$retTargetType,
+				$retParameterType
+			);
+			return $analyserContext->asAnalyserResult(
+				$retReturnType,
+				$analyserContext->programRegistry->typeRegistry->union([
+					$targetReturnType,
+					$parameterReturnType
+				])
+			);
+		} catch (AnalyserException $e) {
+			if ($e->target === null) {
+				$e = $e->withTarget($this);
+			}
+			throw $e;
 		}
-		$retReturnType = $method->analyse(
-			$analyserContext->programRegistry->typeRegistry,
-			$analyserContext->programRegistry->methodFinder,
-			$retTargetType,
-			$retParameterType
-		);
-		return $analyserContext->asAnalyserResult(
-			$retReturnType,
-			$analyserContext->programRegistry->typeRegistry->union([
-				$targetReturnType,
-				$parameterReturnType
-			])
-		);
 	}
 
 	/** @return list<string> */

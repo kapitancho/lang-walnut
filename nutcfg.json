@@ -3,5 +3,6 @@
   "packages": {
     "core": "core-nut-lib",
     "shopping-cart": "walnut-src/shopping-cart"
-  }
+  },
+  "httpModule": "server"
 }

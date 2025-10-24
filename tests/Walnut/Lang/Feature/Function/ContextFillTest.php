@@ -50,7 +50,7 @@ final class ContextFillTest extends CodeExecutionTestHelper {
 
 	public function testSealedRecordAsParameter(): void {
 		$this->executeErrorCodeSnippet(
-			"Unknown variable '#a' in function body",
+			"Unknown variable '#a'",
 			"test(MySealed[a: -9, b: 'Hello']);",
 		<<<NUT
 			MySealed := $[a: Integer, b: ?String, c: ?Boolean];

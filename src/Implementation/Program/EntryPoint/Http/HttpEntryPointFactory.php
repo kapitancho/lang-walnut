@@ -16,7 +16,7 @@ final class HttpEntryPointFactory {
 
 	public HttpEntryPointBuilderInterface $entryPointBuilder {
 		get => new HttpEntryPointBuilder(
-			new CompilerFactory()->compiler(
+			new CompilerFactory()->defaultCompiler(
 				$this->defaultRoot,
 				$this->packageRoots
 			)

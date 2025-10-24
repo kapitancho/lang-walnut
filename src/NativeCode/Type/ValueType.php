@@ -32,7 +32,7 @@ final readonly class ValueType implements NativeMethod {
 		TypeInterface $parameterType,
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
-			$refType = $this->toBaseType($targetType->refType, true);
+			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof CompositeNamedType || $refType instanceof MutableType) {
 				return $typeRegistry->type($refType->valueType);
 			}
@@ -59,7 +59,7 @@ final readonly class ValueType implements NativeMethod {
 		$targetValue = $target;
 
 		if ($targetValue instanceof TypeValue) {
-			$typeValue = $this->toBaseType($targetValue->typeValue, true);
+			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof DataType ||
 				$typeValue instanceof OpenType ||
 				$typeValue instanceof SealedType ||

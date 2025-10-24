@@ -16,7 +16,7 @@ final class CliEntryPointFactory {
 
 	public CliEntryPointBuilderInterface $entryPointBuilder {
 		get => new CliEntryPointBuilder(
-			new CompilerFactory()->compiler(
+			new CompilerFactory()->defaultCompiler(
 				$this->defaultRoot,
 				$this->packageRoots
 			)

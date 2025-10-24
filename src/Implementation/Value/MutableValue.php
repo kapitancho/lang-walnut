@@ -31,7 +31,8 @@ final class MutableValue implements MutableValueInterface, JsonSerializable {
 					'The value of the mutable type should be a subtype of %s but got %s',
 					$this->targetType,
 					$this->value->type,
-				)
+				),
+				$this
 			);
 		}
 		$this->value->selfAnalyse($analyserContext);

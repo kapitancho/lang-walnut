@@ -33,6 +33,7 @@ use Walnut\Lang\Blueprint\AST\Node\Value\ValueNode;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionDefault;
 use Walnut\Lang\Blueprint\Code\Expression\MatchExpressionPair;
+use Walnut\Lang\Blueprint\Compilation\AST\AstCodeMapper;
 use Walnut\Lang\Blueprint\Compilation\AST\AstCompilationException;
 use Walnut\Lang\Blueprint\Compilation\AST\AstExpressionCompiler as AstExpressionCompilerInterface;
 use Walnut\Lang\Blueprint\Compilation\AST\AstTypeCompiler;
@@ -47,6 +48,7 @@ final readonly class AstExpressionCompiler implements AstExpressionCompilerInter
 		private AstTypeCompiler    $astTypeCompiler,
 		private AstValueCompiler   $astValueCompiler,
 		private ExpressionRegistry $expressionRegistry,
+		private AstCodeMapper $astCodeMapper,
 	) {}
 
 	/** @throws AstCompilationException */
@@ -101,7 +103,7 @@ final readonly class AstExpressionCompiler implements AstExpressionCompilerInter
 
 	/** @throws AstCompilationException */
 	public function expression(ExpressionNode $expressionNode): Expression {
-		return match(true) {
+		$result = match(true) {
 			$expressionNode instanceof ConstantExpressionNode =>
 				$this->expressionRegistry->constant(
 					$this->value($expressionNode->value)
@@ -221,5 +223,7 @@ final readonly class AstExpressionCompiler implements AstExpressionCompilerInter
 				sprintf("Unknown expression node type: %s", get_class($expressionNode))
 			)
 		};
+		$this->astCodeMapper->mapNode($expressionNode, $result);
+		return $result;
 	}
 }

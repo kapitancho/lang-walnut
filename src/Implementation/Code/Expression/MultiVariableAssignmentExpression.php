@@ -37,7 +37,8 @@ final readonly class MultiVariableAssignmentExpression implements MultiVariableA
 					"Cannot call method '%s' on type '%s'",
 					$methodName,
 					$retType,
-				)
+				),
+				$this
 			);
 		}
 		$isList = array_is_list($this->variableNames);

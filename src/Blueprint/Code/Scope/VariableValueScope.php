@@ -7,7 +7,6 @@ use Walnut\Lang\Blueprint\Value\Value;
 
 interface VariableValueScope extends VariableScope {
 	public function findTypedValueOf(VariableNameIdentifier $variableName): Value|UnknownVariable;
-	public function findValueOf(VariableNameIdentifier $variableName): Value|UnknownVariable;
 
 	/** @throws UnknownContextVariable */
 	public function typedValueOf(VariableNameIdentifier $variableName): Value;

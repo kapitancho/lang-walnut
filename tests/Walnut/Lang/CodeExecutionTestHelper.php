@@ -8,6 +8,7 @@ use Walnut\Lang\Blueprint\Compilation\AST\AstProgramCompiler;
 use Walnut\Lang\Blueprint\Compilation\Module\ModuleLookupContext;
 use Walnut\Lang\Blueprint\Program\EntryPoint\Http\Message\HttpRequest;
 use Walnut\Lang\Blueprint\Program\EntryPoint\Http\Message\HttpResponse;
+use Walnut\Lang\Blueprint\Program\ProgramAnalyserException;
 use Walnut\Lang\Blueprint\Program\ProgramContext;
 use Walnut\Lang\Implementation\AST\Builder\NodeBuilderFactory;
 use Walnut\Lang\Implementation\AST\Parser\Parser;
@@ -15,6 +16,7 @@ use Walnut\Lang\Implementation\AST\Parser\ParserStateRunner;
 use Walnut\Lang\Implementation\AST\Parser\TransitionLogger;
 use Walnut\Lang\Implementation\AST\Parser\WalexLexerAdapter;
 use Walnut\Lang\Implementation\Compilation\AST\AstCompilerFactory;
+use Walnut\Lang\Implementation\Compilation\AST\NoopAstCodeMapper;
 use Walnut\Lang\Implementation\Compilation\Module\ModuleImporter;
 use Walnut\Lang\Implementation\Program\EntryPoint\Cli\SourceCliEntryPoint;
 use Walnut\Lang\Implementation\Program\EntryPoint\EntryPointProvider;
@@ -39,7 +41,7 @@ class CodeExecutionTestHelper extends TestCase {
 			new Parser(new ParserStateRunner(new TransitionLogger(), new NodeBuilderFactory())),
 		);
 		$this->programContext = new ProgramContextFactory()->programContext;
-		$this->programCompiler = new AstCompilerFactory($this->programContext)->programCompiler;
+		$this->programCompiler = new AstCompilerFactory($this->programContext, new NoopAstCodeMapper())->programCompiler;
 	}
 
 	protected function executeCodeSnippetAsHttp(string $code, string $declarations, HttpRequest $httpRequest): HttpResponse {
@@ -112,7 +114,7 @@ class CodeExecutionTestHelper extends TestCase {
 		try {
 			$this->executeCodeSnippet($code, $typeDeclarations, $valueDeclarations, $parameters);
 			self::fail('Expected exception not thrown');
-		} catch(AnalyserException $e) {
+		} catch(ProgramAnalyserException $e) {
 			self::assertStringContainsString($analyserMessage, $e->getMessage());
 		}
 	}

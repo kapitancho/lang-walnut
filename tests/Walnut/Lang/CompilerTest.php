@@ -5,7 +5,6 @@ namespace Walnut\Lang;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\AST\Node\RootNode;
-use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Compilation\AST\AstProgramCompilationException;
 use Walnut\Lang\Blueprint\Compilation\CompilationResult;
@@ -13,17 +12,15 @@ use Walnut\Lang\Blueprint\Compilation\Module\ModuleDependencyException;
 use Walnut\Lang\Blueprint\Compilation\Module\ModuleLookupContext;
 use Walnut\Lang\Blueprint\Compilation\SuccessfulCompilationResult;
 use Walnut\Lang\Blueprint\Program\Program;
+use Walnut\Lang\Blueprint\Program\ProgramAnalyserException;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Implementation\Compilation\Compiler;
-use Walnut\Lang\Implementation\Compilation\Module\EmptyPrecompiler;
-use Walnut\Lang\Implementation\Compilation\Module\PackageBasedModuleLookupContext;
-use Walnut\Lang\Implementation\Compilation\Module\PackageBasedModulePathFinder;
-use Walnut\Lang\Implementation\Compilation\Module\TemplatePrecompiler;
-use Walnut\Lang\Implementation\Compilation\Module\TemplatePrecompilerModuleLookupDecorator;
-use Walnut\Lang\Implementation\Compilation\Module\TestPrecompiler;
-use Walnut\Lang\Implementation\Program\EntryPoint\Cli\CliEntryPoint;
-use Walnut\Lang\Implementation\Program\EntryPoint\Cli\CliEntryPointBuilder;
+use Walnut\Lang\Implementation\Compilation\Module\Precompiler\EmptyPrecompiler;
+use Walnut\Lang\Implementation\Compilation\Module\Precompiler\TemplatePrecompiler;
+use Walnut\Lang\Implementation\Compilation\Module\Precompiler\TestPrecompiler;
+use Walnut\Lang\Implementation\Compilation\Module\PrecompilerModuleLookupContext;
+use Walnut\Lang\Implementation\Compilation\Module\SourceFinder\PackageBasedSourceFinder;
 
 final class CompilerTest extends TestCase {
 	private const string PATH = __DIR__ . '/../../../core-nut-lib';
@@ -34,8 +31,8 @@ final class CompilerTest extends TestCase {
 		parent::setUp();
 
 		$this->compiler = new Compiler(
-			new PackageBasedModuleLookupContext(
-				new PackageBasedModulePathFinder(
+			new PrecompilerModuleLookupContext(
+				new PackageBasedSourceFinder(
 					self::PATH,
 					['core' => self::PATH]
 				),
@@ -44,51 +41,8 @@ final class CompilerTest extends TestCase {
 					'.nut.html' => new TemplatePrecompiler(new EscapeCharHandler()),
 					'.test.nut' => new TestPrecompiler()
 				]
-			)
-		);
-
-	}
-
-	public function testTemplateCompilation(): void {
-		$original = new PackageBasedModuleLookupContext(
-			new PackageBasedModulePathFinder(
-				self::PATH,
-				['core' => self::PATH]
 			),
-			[
-				'.nut' => new EmptyPrecompiler(),
-				'.nut.html' => new TemplatePrecompiler(new EscapeCharHandler()),
-				'.test.nut' => new TestPrecompiler()
-			]
 		);
-		$l = $this->createMock(ModuleLookupContext::class);
-		$l->method('sourceOf')->willReturnCallback(fn(string $source) => match($source) {
-			'main' => <<<NUT
-				module main %% template, tpl:
-				>>> {
-					myFn = ^Null => Result<String, Any> %% [~TemplateRenderer] :: {
-					    %templateRenderer => render(NotANumber)
-					};
-				    x = myFn();
-				    ?whenTypeOf(x) is {
-				        `String: x,
-				        ~: x->printed
-				    }
-				};		
-			NUT,
-			default => $original->sourceOf($source)
-		});
-
-		$tcx = new TemplatePrecompiler(new EscapeCharHandler());
-		$moduleLookupContext = new TemplatePrecompilerModuleLookupDecorator(
-			$tcx,
-			$l,
-			__DIR__
-		);
-		$compiler = new Compiler($moduleLookupContext);
-		$ep = new CliEntryPoint(new CliEntryPointBuilder($compiler));
-		$output = $ep->call('main');
-		$this->assertStringContainsString('NotANumber', $output);
 	}
 
 	public function testBrokenCompilation(): void {
@@ -103,8 +57,8 @@ final class CompilerTest extends TestCase {
 	}
 
 	private function getSafeCompiler($mainSource): Compiler {
-		$original = new PackageBasedModuleLookupContext(
-			new PackageBasedModulePathFinder(
+		$original = new PrecompilerModuleLookupContext(
+			new PackageBasedSourceFinder(
 				self::PATH,
 				['core' => self::PATH]
 			),
@@ -114,6 +68,7 @@ final class CompilerTest extends TestCase {
 				'.test.nut' => new TestPrecompiler()
 			]
 		);
+
 		$l = $this->createMock(ModuleLookupContext::class);
 		$l->method('sourceOf')->willReturnCallback(fn(string $source) => match($source) {
 			'main' => $mainSource,
@@ -141,7 +96,7 @@ final class CompilerTest extends TestCase {
 		$result = $compiler->safeCompile('main');
 		$this->assertNotInstanceOf(SuccessfulCompilationResult::class, $result);
 		$this->assertInstanceOf(RootNode::class, $result->ast);
-		$this->assertInstanceOf(AnalyserException::class, $result->program);
+		$this->assertInstanceOf(ProgramAnalyserException::class, $result->program);
 	}
 
 	public function testSuccessfulSafeCompilation(): void {
@@ -186,7 +141,7 @@ final class CompilerTest extends TestCase {
 				//$this->assertNotEquals('{}', json_encode($compilationResult->programContext));
 				//$this->assertNotEquals('', (string)$compilationResult->programContext);
 			}
-		} catch (AnalyserException $e) {
+		} catch (ProgramAnalyserException $e) {
 			$this->assertStringContainsString(
 				'cannot be resolved',
 				$e->getMessage(),

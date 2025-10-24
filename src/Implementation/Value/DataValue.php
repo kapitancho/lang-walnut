@@ -33,7 +33,8 @@ final class DataValue implements DataValueInterface, JsonSerializable {
 					$this->typeName,
 					$type->valueType,
 					$this->value->type,
-				)
+				),
+				$this
 			);
 		}
 		$this->value->selfAnalyse($analyserContext);
