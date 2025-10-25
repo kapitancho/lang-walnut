@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\Boolean;
+namespace Walnut\Lang\Test\NativeCode\Boolean;
 
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 

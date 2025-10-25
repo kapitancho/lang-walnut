@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\PasswordString;
+namespace Walnut\Lang\Test\NativeCode\PasswordString;
 
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 

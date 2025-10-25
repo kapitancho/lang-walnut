@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Feature\Type;
+namespace Walnut\Lang\Test\Feature\Type;
 
 use Walnut\Lang\Blueprint\Compilation\AST\AstProgramCompilationException;
 use Walnut\Lang\Test\CodeExecutionTestHelper;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Code\Expression;
+namespace Walnut\Lang\Test\Implementation\Code\Expression;
 
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 

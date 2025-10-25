@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Compilation\Module;
+namespace Walnut\Lang\Test\Implementation\Compilation\Module;
 
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Implementation\Compilation\Module\Precompiler\TestPrecompiler;

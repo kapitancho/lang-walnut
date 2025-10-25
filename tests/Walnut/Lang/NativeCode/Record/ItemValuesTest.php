@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\Record;
+namespace Walnut\Lang\Test\NativeCode\Record;
 
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 

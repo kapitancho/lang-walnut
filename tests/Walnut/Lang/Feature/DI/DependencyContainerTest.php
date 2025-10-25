@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Feature\DI;
+namespace Walnut\Lang\Test\Feature\DI;
 
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 

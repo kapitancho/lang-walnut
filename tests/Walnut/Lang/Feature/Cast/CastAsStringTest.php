@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Feature\Cast;
+namespace Walnut\Lang\Test\Feature\Cast;
 
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 

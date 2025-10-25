@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Feature\Function;
+namespace Walnut\Lang\Test\Feature\Function;
 
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;

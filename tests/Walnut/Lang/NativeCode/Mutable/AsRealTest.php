@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\Mutable;
+namespace Walnut\Lang\Test\NativeCode\Mutable;
 
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 

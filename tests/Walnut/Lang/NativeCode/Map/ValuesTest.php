@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\Map;
+namespace Walnut\Lang\Test\NativeCode\Map;
 
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 

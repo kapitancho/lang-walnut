@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\Random;
+namespace Walnut\Lang\Test\NativeCode\Random;
 
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 

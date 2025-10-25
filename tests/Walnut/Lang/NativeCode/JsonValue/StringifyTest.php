@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\JsonValue;
+namespace Walnut\Lang\Test\NativeCode\JsonValue;
 
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 

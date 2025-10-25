@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\Enumeration;
+namespace Walnut\Lang\Test\NativeCode\Enumeration;
 
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 

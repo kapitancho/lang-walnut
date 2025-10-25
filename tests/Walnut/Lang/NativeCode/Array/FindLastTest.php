@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\Array;
+namespace Walnut\Lang\Test\NativeCode\Array;
 
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 

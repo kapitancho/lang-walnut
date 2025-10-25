@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Type;
+namespace Walnut\Lang\Test\Implementation\Type;
 
 use Walnut\Lang\Test\Implementation\BaseProgramTestHelper;
 

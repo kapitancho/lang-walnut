@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\RoutePattern;
+namespace Walnut\Lang\Test\NativeCode\RoutePattern;
 
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 

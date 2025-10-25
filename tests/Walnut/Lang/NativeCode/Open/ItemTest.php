@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\Open;
+namespace Walnut\Lang\Test\NativeCode\Open;
 
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang;
+namespace Walnut\Lang\Test;
 
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;

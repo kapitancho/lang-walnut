@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang;
+namespace Walnut\Lang\Test;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

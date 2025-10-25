@@ -1,10 +1,11 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Code\Scope;
+namespace Walnut\Lang\Test\Implementation\Code\Scope;
 
 use Walnut\Lang\Blueprint\Code\Scope\UnknownContextVariable;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownVariable;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
+use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
 use Walnut\Lang\Test\BaseProgramTestHelper;
 
 class VariableValueScopeTest extends BaseProgramTestHelper {

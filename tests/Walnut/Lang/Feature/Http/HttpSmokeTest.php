@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Feature\Http;
+namespace Walnut\Lang\Test\Feature\Http;
 
 use Walnut\Lang\Blueprint\Program\EntryPoint\Http\Message\HttpProtocolVersion;
 use Walnut\Lang\Blueprint\Program\EntryPoint\Http\Message\HttpRequestMethod;

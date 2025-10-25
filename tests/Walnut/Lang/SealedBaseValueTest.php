@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang;
+namespace Walnut\Lang\Test;
 
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\Data;
+namespace Walnut\Lang\Test\NativeCode\Data;
 
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 

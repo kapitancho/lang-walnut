@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\Integer;
+namespace Walnut\Lang\Test\NativeCode\Integer;
 
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 

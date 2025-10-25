@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\Tuple;
+namespace Walnut\Lang\Test\NativeCode\Tuple;
 
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut;
+namespace Walnut\Lang\Test;
 
 use InvalidArgumentException;
 use Walnut\Lang\Test\BaseProgramTestHelper;

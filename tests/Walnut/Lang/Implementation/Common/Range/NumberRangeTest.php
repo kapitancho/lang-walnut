@@ -1,11 +1,14 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Common\Range;
+namespace Walnut\Lang\Test\Implementation\Common\Range;
 
 use BcMath\Number;
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Common\Range\InvalidNumberRange;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
+use Walnut\Lang\Implementation\Common\Range\NumberInterval;
+use Walnut\Lang\Implementation\Common\Range\NumberIntervalEndpoint;
+use Walnut\Lang\Implementation\Common\Range\NumberRange;
 
 final class NumberRangeTest extends TestCase {
 
