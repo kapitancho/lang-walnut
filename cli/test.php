@@ -3,6 +3,7 @@
 use Walnut\Lang\Blueprint\AST\Parser\ParserException;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Program\EntryPoint\Cli\CliEntryPointBuilder as CliEntryPointBuilderInterface;
+use Walnut\Lang\Implementation\Compilation\Module\PackageConfiguration\JsonFilePackageConfigurationProvider;
 use Walnut\Lang\Implementation\Program\EntryPoint\Cli\CliEntryPointFactory;
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -10,9 +11,11 @@ require_once __DIR__ . '/../vendor/autoload.php';
 $folder = $argv[1] ?? '.';
 
 /** @var string $sourceRoot */
-/** @var CliEntryPointBuilderInterface $epBuilder */
-$epBuilder = (require __DIR__ . '/factory.inc.php')->entryPointBuilder;
+$epBuilder = new CliEntryPointFactory(
+	$cfg = new JsonFilePackageConfigurationProvider('nutcfg.json')
+)->entryPointBuilder;
 
+$sourceRoot = $cfg->packageConfiguration->defaultRoot;
 $root = $sourceRoot . '/';
 if (!file_exists($root . $folder)) {
 	echo "Folder $folder does not exist in $sourceRoot" . PHP_EOL;

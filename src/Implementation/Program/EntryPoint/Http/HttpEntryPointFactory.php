@@ -2,24 +2,20 @@
 
 namespace Walnut\Lang\Implementation\Program\EntryPoint\Http;
 
+use Walnut\Lang\Blueprint\Compilation\Module\PackageConfigurationProvider;
 use Walnut\Lang\Blueprint\Program\EntryPoint\Http\HttpEntryPoint as HttpEntryPointInterface;
 use Walnut\Lang\Blueprint\Program\EntryPoint\Http\HttpEntryPointBuilder as HttpEntryPointBuilderInterface;
 use Walnut\Lang\Implementation\Compilation\CompilerFactory;
 
 final class HttpEntryPointFactory {
 
-	/** @param array<string, string> $packageRoots */
 	public function __construct(
-		private readonly string $defaultRoot,
-		private readonly array $packageRoots,
+		private readonly PackageConfigurationProvider $packageConfiguration
 	) {}
 
 	public HttpEntryPointBuilderInterface $entryPointBuilder {
 		get => new HttpEntryPointBuilder(
-			new CompilerFactory()->defaultCompiler(
-				$this->defaultRoot,
-				$this->packageRoots
-			)
+			new CompilerFactory()->defaultCompiler($this->packageConfiguration)
 		);
 	}
 

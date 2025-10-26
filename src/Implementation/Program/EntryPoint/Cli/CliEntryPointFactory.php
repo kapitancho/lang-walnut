@@ -2,24 +2,20 @@
 
 namespace Walnut\Lang\Implementation\Program\EntryPoint\Cli;
 
+use Walnut\Lang\Blueprint\Compilation\Module\PackageConfigurationProvider;
 use Walnut\Lang\Blueprint\Program\EntryPoint\Cli\CliEntryPoint as CliEntryPointInterface;
 use Walnut\Lang\Blueprint\Program\EntryPoint\Cli\CliEntryPointBuilder as CliEntryPointBuilderInterface;
 use Walnut\Lang\Implementation\Compilation\CompilerFactory;
 
 final class CliEntryPointFactory {
 
-	/** @param array<string, string> $packageRoots */
 	public function __construct(
-		private readonly string $defaultRoot,
-		private readonly array $packageRoots,
+		private readonly PackageConfigurationProvider $packageConfiguration
 	) {}
 
 	public CliEntryPointBuilderInterface $entryPointBuilder {
 		get => new CliEntryPointBuilder(
-			new CompilerFactory()->defaultCompiler(
-				$this->defaultRoot,
-				$this->packageRoots
-			)
+			new CompilerFactory()->defaultCompiler($this->packageConfiguration)
 		);
 	}
 
