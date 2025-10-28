@@ -16,6 +16,8 @@ use Walnut\Lang\Blueprint\Program\ProgramAnalyserException;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Implementation\Compilation\Compiler;
+use Walnut\Lang\Implementation\Compilation\Module\PackageConfiguration\JsonFilePackageConfigurationProvider;
+use Walnut\Lang\Implementation\Compilation\Module\PackageConfiguration\PackageConfiguration;
 use Walnut\Lang\Implementation\Compilation\Module\Precompiler\EmptyPrecompiler;
 use Walnut\Lang\Implementation\Compilation\Module\Precompiler\TemplatePrecompiler;
 use Walnut\Lang\Implementation\Compilation\Module\Precompiler\TestPrecompiler;
@@ -33,8 +35,10 @@ final class CompilerTest extends TestCase {
 		$this->compiler = new Compiler(
 			new PrecompilerModuleLookupContext(
 				new PackageBasedSourceFinder(
-					self::PATH,
-					['core' => self::PATH]
+					new PackageConfiguration(
+						self::PATH,
+						['core' => self::PATH]
+					)
 				),
 				[
 					'.nut' => new EmptyPrecompiler(),
@@ -59,8 +63,10 @@ final class CompilerTest extends TestCase {
 	private function getSafeCompiler($mainSource): Compiler {
 		$original = new PrecompilerModuleLookupContext(
 			new PackageBasedSourceFinder(
-				self::PATH,
-				['core' => self::PATH]
+				new PackageConfiguration(
+					self::PATH,
+					['core' => self::PATH]
+				)
 			),
 			[
 				'.nut' => new EmptyPrecompiler(),

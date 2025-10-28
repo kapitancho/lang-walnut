@@ -9,7 +9,8 @@ final readonly class CallbackSourceFinder implements SourceFinder {
 	public function __construct(private array $callableMap) {}
 
 	public function sourceExists(string $sourceName): bool {
-		return array_key_exists($sourceName, $this->callableMap);
+		return array_key_exists($sourceName, $this->callableMap) &&
+			$this->callableMap[$sourceName]($sourceName) !== null;
 	}
 	public function readSource(string $sourceName): string|null {
 		$fn = $this->callableMap[$sourceName] ?? null;

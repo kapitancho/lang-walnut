@@ -172,10 +172,12 @@ final readonly class AstTypeCompiler implements AstTypeCompilerInterface {
 				$typeNode instanceof EnumerationSubsetTypeNode =>
 					$this->typeRegistry->enumerationSubsetType($typeNode->name, $typeNode->values),
 
+				// @codeCoverageIgnoreStart
 				true => throw new AstCompilationException(
 					$typeNode,
 					"Unknown type node type: " . get_class($typeNode)
 				)
+				// @codeCoverageIgnoreEnd
 			};
 			$this->astCodeMapper->mapNode($typeNode, $result);
 			return $result;

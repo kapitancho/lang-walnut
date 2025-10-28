@@ -24,6 +24,15 @@ final class CustomMethodAnalyserTest extends CodeExecutionTestHelper {
 		NUT);
 	}
 
+	public function testCustomMethodSignatureMismatchNative(): void {
+		$this->executeErrorCodeSnippet(
+			"Invalid target type: Integer<0..100>",
+			"null;", <<<NUT
+			T1 = Integer<0..100>;
+			T1->binaryPlus(^String => Integer) :: 3;
+		NUT);
+	}
+
 	public function testCustomMethodSignatureMismatchCustom(): void {
 		$this->executeErrorCodeSnippet(
 			"Error in method T1->x : the method x is already defined for T2 and therefore the signature ^Null => Real should be a subtype of ^Null => Integer",

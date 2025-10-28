@@ -4,6 +4,7 @@ namespace Walnut\Lang\Test;
 
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
+use Walnut\Lang\Blueprint\Compilation\AST\AstProgramCompilationException;
 use Walnut\Lang\Blueprint\Compilation\AST\AstProgramCompiler;
 use Walnut\Lang\Blueprint\Compilation\Module\ModuleLookupContext;
 use Walnut\Lang\Blueprint\Program\EntryPoint\Http\Message\HttpRequest;
@@ -114,7 +115,7 @@ class CodeExecutionTestHelper extends TestCase {
 		try {
 			$this->executeCodeSnippet($code, $typeDeclarations, $valueDeclarations, $parameters);
 			self::fail('Expected exception not thrown');
-		} catch(ProgramAnalyserException $e) {
+		} catch(ProgramAnalyserException|AstProgramCompilationException $e) {
 			self::assertStringContainsString($analyserMessage, $e->getMessage());
 		}
 	}

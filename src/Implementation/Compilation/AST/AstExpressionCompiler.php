@@ -218,10 +218,12 @@ final readonly class AstExpressionCompiler implements AstExpressionCompilerInter
 				$this->expressionRegistry->variableName(
 					$expressionNode->variableName
 				),
+			// @codeCoverageIgnoreStart
 			true => throw new AstCompilationException(
 				$expressionNode,
 				sprintf("Unknown expression node type: %s", get_class($expressionNode))
 			)
+			// @codeCoverageIgnoreEnd
 		};
 		$this->astCodeMapper->mapNode($expressionNode, $result);
 		return $result;

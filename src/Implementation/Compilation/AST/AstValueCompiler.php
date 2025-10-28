@@ -98,10 +98,12 @@ final readonly class AstValueCompiler implements AstValueCompilerInterface {
 						$this->functionBodyCompiler->functionBody($valueNode->functionBody),
 						(string)$valueNode->sourceLocation
 					),
+				// @codeCoverageIgnoreStart
 				true => throw new AstCompilationException(
 					$valueNode,
 					"Unknown value node type: " . get_class($valueNode)
 				)
+				// @codeCoverageIgnoreEnd
 			};
 			$this->astCodeMapper->mapNode($valueNode, $result);
 			return $result;

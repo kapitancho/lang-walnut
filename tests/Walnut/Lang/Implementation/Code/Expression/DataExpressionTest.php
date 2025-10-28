@@ -15,6 +15,14 @@ final class DataExpressionTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet("expected base value of type 'Integer'", "MyData!3.14;", "MyData := Integer;");
 	}
 
+	public function testDataUnknownType(): void {
+		$this->executeErrorCodeSnippet("Type issue: Unknown type: 'UnknownType'", "MyData!3.14;", "MyData := UnknownType;");
+	}
+
+	public function testDataUnknownDataType(): void {
+		$this->executeErrorCodeSnippet("The data type 'OtherData' is not defined", "OtherData!3.14;", "MyData := Integer;");
+	}
+
 	public function testDataValueNotASubtype(): void {
 		$this->executeErrorCodeSnippet("expected base value of type 'Integer', but got 'Real[3.14]",
 			"v;",

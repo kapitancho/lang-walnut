@@ -31,9 +31,11 @@ final class CustomMethod implements CustomMethodInterface {
 		try {
 			$this->function->selfAnalyse($analyserContext);
 		} catch (AnalyserException $e) {
+			// @codeCoverageIgnoreStart
 			if (!$e->target) {
 				$e = $e->withTarget($this);
 			}
+			// @codeCoverageIgnoreEnd
 			throw $e;
 		}
 	}

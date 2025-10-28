@@ -185,6 +185,18 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		$this->assertEquals("B{A{42}}", $result);
 	}
 
+	public function testSealedWithNoDependency(): void {
+		$this->executeErrorCodeSnippet(
+			"the dependency A cannot be resolved: unsupported type found",
+			"f();",
+		<<<NUT
+		A := \$Integer;
+		NUT,
+		<<<NUT
+		f = ^ %% A :: %;
+		NUT);
+	}
+
 	public function testSealedWithError(): void {
 		$this->executeErrorCodeSnippet(
 			"error returned while creating value (type: B)",

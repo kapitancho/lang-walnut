@@ -14,14 +14,6 @@ use Walnut\Lang\Implementation\Compilation\Module\SourceFinder\PackageBasedSourc
 
 final readonly class CompilerFactory implements CompilerFactoryInterface {
 
-	public function compiler(
-		PackageConfigurationProvider $packageConfigurationProvider
-	): Compiler {
-		return $this->customCompiler(
-			new PackageBasedSourceFinder($packageConfigurationProvider)
-		);
-	}
-
 	public function defaultCompiler(
 		PackageConfigurationProvider $packageConfigurationProvider
 	): Compiler {
