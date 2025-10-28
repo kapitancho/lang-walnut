@@ -4,11 +4,6 @@
   "directories": ["src", "vendor", "cli", "http"],
   "files": ["composer.json", "VERSION"],
   "exclude-dev-files": true,
-  "exclude-files": [
-    "vendor/spiral/**",
-    "vendor/nyholm/**",
-    "http/walnut_worker.php"
-  ],
   "compression": "GZ",
   "chmod": "0755",
   "check-requirements": false
