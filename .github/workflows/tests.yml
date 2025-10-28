@@ -137,15 +137,17 @@ jobs:
           # Also save the percentage to a file for easy access
           echo "$COVERAGE" > .badges/coverage.txt
 
-      - name: Commit badge
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add .badges/coverage.svg .badges/coverage.txt
-          git commit -m "chore: update coverage badge [skip ci]" || echo "No changes to commit"
-
-      - name: Push badge
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
+      # Badge auto-update disabled due to permissions
+      # The coverage badge will be updated manually or via separate workflow with proper permissions
+      # - name: Commit badge
+      #   run: |
+      #     git config --local user.email "action@github.com"
+      #     git config --local user.name "GitHub Action"
+      #     git add .badges/coverage.svg .badges/coverage.txt
+      #     git commit -m "chore: update coverage badge [skip ci]" || echo "No changes to commit"
+      #
+      # - name: Push badge
+      #   uses: ad-m/github-push-action@master
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     branch: main
