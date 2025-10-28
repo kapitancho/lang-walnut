@@ -1,11 +1,9 @@
-#!/usr/bin/env php
 <?php
 
 // Default configuration
 $host = '0.0.0.0';
-$port = 8080;
+$port = 8084;  // RoadRunner default port
 $docroot = getcwd();
-$router = __DIR__ . '/http/http-router.php';
 
 // Parse command line arguments
 $args = $argv;
@@ -33,11 +31,11 @@ if ($showHelp) {
 	echo <<<HELP
 Walnut HTTP Server
 
-Usage: walnut-http [options]
+Usage: walnut serve [options]
 
 Options:
   --host, -h <host>       Host to bind to (default: 0.0.0.0)
-  --port, -p <port>       Port to listen on (default: 8080)
+  --port, -p <port>       Port to listen on (default: 8084)
   --docroot, -d <path>    Document root directory (default: current directory)
   --help                  Show this help message
 
@@ -46,7 +44,7 @@ Configuration:
   You can specify:
     - sourceRoot: Root directory for Walnut modules
     - packages: Package mappings
-    - httpModule: Entry point module name (default: "main")
+    - httpModule: Entry point module name (default: "server")
 
 Example nutcfg.json:
 {
@@ -54,16 +52,23 @@ Example nutcfg.json:
   "packages": {
     "core": "./core-nut-lib"
   },
-  "httpModule": "main"
+  "httpModule": "server"
 }
 
 Example:
-  walnut-http --port 3000
-  walnut-http --host localhost --port 8080 --docroot /path/to/project
+  walnut serve --port 3000
+  walnut serve --host localhost --port 8080 --docroot /path/to/project
 
 HELP;
 	exit($showHelp && !isset($arg) ? 0 : 1);
 }
+
+// Determine router file path
+$isInPhar = str_starts_with(__FILE__, 'phar://');
+if ($isInPhar && !is_dir($docroot)) {
+	$docroot = getcwd();
+}
+$router = __DIR__ . '/http-router.php';
 
 // Validate router file exists
 if (!file_exists($router)) {
