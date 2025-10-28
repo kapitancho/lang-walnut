@@ -1,0 +1,38 @@
+name: Build Walnut PHAR
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, bcmath
+          tools: composer, box
+
+      - name: Install dependencies (without dev - walnut.phar is pure CLI)
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Build PHAR (pure CLI, no RoadRunner)
+        run: box compile
+
+      - name: Test PHAR
+        run: |
+          php build/walnut.phar stdin <<< 'module test: >>> 42->asString;'
+
+      - name: Upload PHAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: walnut-phar
+          path: build/walnut.phar
+          retention-days: 30

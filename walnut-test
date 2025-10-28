@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Walnut test runner shortcut
+# Usage: walnut-test [folder]
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PHAR_PATH="$SCRIPT_DIR/build/walnut.phar"
+
+if [ ! -f "$PHAR_PATH" ]; then
+    echo "Error: PHAR file not found at $PHAR_PATH"
+    echo "Please run: box compile"
+    exit 1
+fi
+
+php "$PHAR_PATH" test "$@"

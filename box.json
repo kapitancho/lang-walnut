@@ -1,0 +1,8 @@
+{
+  "output": "build/walnut.phar",
+  "stub": "phar/stub.php",
+  "directories": ["src", "vendor", "cli", "http"],
+  "files": ["composer.json"],
+  "compression": "GZ",
+  "check-requirements": false
+}

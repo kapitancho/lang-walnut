@@ -2,8 +2,11 @@
 
 **A strongly-typed, functional programming language for modeling and executing business logic with precision and clarity**
 
-[![Version](https://img.shields.io/badge/version-2.0-blue.svg)](https://github.com/kapitancho/walnut-lang)
+[![Tests](https://github.com/walnut-lang/walnut/actions/workflows/tests.yml/badge.svg)](https://github.com/walnut-lang/walnut/actions/workflows/tests.yml)
+[![codecov](https://codecov.io/gh/walnut-lang/walnut/graph/badge.svg)](https://codecov.io/gh/walnut-lang/walnut)
+[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/walnut-lang/walnut/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![PHP](https://img.shields.io/badge/php-%3E%3D8.4-purple.svg)](https://www.php.net/)
 
 ## Overview
 
