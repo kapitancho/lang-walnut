@@ -65,6 +65,9 @@ jobs:
 
           if [[ "$RR_FILE" == *.zip ]]; then
             unzip -o "$RR_FILE" -d rr-bin
+            # Move binary from subdirectory to rr-bin root
+            mv rr-bin/roadrunner-*/rr rr-bin/rr
+            rm -rf rr-bin/roadrunner-*
             rm "$RR_FILE"
           else
             tar -xzf "$RR_FILE" -C rr-bin --strip-components=1
