@@ -36,9 +36,15 @@ jobs:
         run: |
           php build/walnut.phar stdin <<< 'module test: >>> 42->asString;'
 
+      - name: Copy assets (not inside PHAR)
+        run: |
+          cp -r core-nut-lib build/core-nut-lib
+          cp -r empty-src build/walnut-src
+          cp nutcfg.json build/
+
       - name: Upload PHAR artifact
         uses: actions/upload-artifact@v4
         with:
           name: walnut-phar
-          path: build/walnut.phar
+          path: build/
           retention-days: 30
