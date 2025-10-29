@@ -49,17 +49,28 @@ jobs:
           case "${{ matrix.target }}" in
             linux-amd64)
               RR_URL="https://github.com/roadrunner-server/roadrunner/releases/download/v2025.1.4/roadrunner-2025.1.4-linux-amd64.tar.gz"
+              RR_FILE="rr-bin/roadrunner.tar.gz"
               ;;
             darwin-amd64)
-              RR_URL="https://github.com/roadrunner-server/roadrunner/releases/download/v2025.1.4/roadrunner-2025.1.4-darwin-amd64.tar.gz"
+              RR_URL="https://github.com/roadrunner-server/roadrunner/releases/download/v2025.1.4/roadrunner-2025.1.4-darwin-amd64.zip"
+              RR_FILE="rr-bin/roadrunner.zip"
               ;;
             darwin-arm64)
               RR_URL="https://github.com/roadrunner-server/roadrunner/releases/download/v2025.1.4/roadrunner-2025.1.4-darwin-arm64.tar.gz"
+              RR_FILE="rr-bin/roadrunner.tar.gz"
               ;;
           esac
 
-          curl -L -o rr-bin/roadrunner.tar.gz "$RR_URL"
-          tar -xzf rr-bin/roadrunner.tar.gz -C rr-bin --strip-components=1
+          curl -L -o "$RR_FILE" "$RR_URL"
+
+          if [[ "$RR_FILE" == *.zip ]]; then
+            unzip -o "$RR_FILE" -d rr-bin
+            rm "$RR_FILE"
+          else
+            tar -xzf "$RR_FILE" -C rr-bin --strip-components=1
+            rm "$RR_FILE"
+          fi
+
           chmod +x rr-bin/rr
 
       - name: Create walnut-roadrunner distribution
