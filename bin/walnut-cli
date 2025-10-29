@@ -11,7 +11,7 @@ use Walnut\Lang\Implementation\Compilation\Module\SourceFinder\PackageBasedSourc
 use Walnut\Lang\Implementation\Program\EntryPoint\Cli\CliEntryPoint;
 use Walnut\Lang\Implementation\Program\EntryPoint\Cli\CliEntryPointBuilder;
 
-require_once dirname(__DIR__) . '/vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 $input = $argv;
 array_shift($input);
