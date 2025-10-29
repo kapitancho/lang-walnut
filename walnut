@@ -1,5 +1,0 @@
-#!/usr/bin/env php
-<?php
-
-$scriptDir = dirname(__FILE__);
-require_once "$scriptDir/cli/index.php";

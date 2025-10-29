@@ -1,4 +1,45 @@
 #!/usr/bin/env php
 <?php
+
+use Walnut\Lang\Blueprint\Compilation\Module\ModuleDependencyException;
+use Walnut\Lang\Blueprint\Program\InvalidEntryPointDependency;
+use Walnut\Lang\Implementation\Compilation\CompilerFactory;
+use Walnut\Lang\Implementation\Compilation\Module\PackageConfiguration\JsonFilePackageConfigurationProvider;
+use Walnut\Lang\Implementation\Compilation\Module\SourceFinder\CallbackSourceFinder;
+use Walnut\Lang\Implementation\Compilation\Module\SourceFinder\CompositeSourceFinder;
+use Walnut\Lang\Implementation\Compilation\Module\SourceFinder\PackageBasedSourceFinder;
+use Walnut\Lang\Implementation\Program\EntryPoint\Cli\CliEntryPoint;
+use Walnut\Lang\Implementation\Program\EntryPoint\Cli\CliEntryPointBuilder;
+
 require_once dirname(__DIR__) . '/vendor/autoload.php';
-require_once dirname(__DIR__) . '/cli/index.php';
+
+$input = $argv;
+array_shift($input);
+$source = array_shift($input);
+
+if (!isset($source)) {
+    echo "Usage: walnut-cli <source> [<args>]\n";
+    exit(1);
+}
+
+try {
+    $compiler = new CompilerFactory()->customCompiler(
+        new CompositeSourceFinder(
+            new CallbackSourceFinder([
+                'stdin.nut' => fn() => file_get_contents('php://stdin')
+            ]),
+            new PackageBasedSourceFinder(
+                new JsonFilePackageConfigurationProvider('nutcfg.json')
+            )
+        )
+    );
+    $ep = new CliEntryPoint(new CliEntryPointBuilder($compiler));
+    $content = $ep->call($source, ... $input);
+    echo $content, PHP_EOL;
+} catch (ModuleDependencyException $m) {
+    echo "Error: ", $m->getMessage(), PHP_EOL;
+    exit(1);
+} catch (InvalidEntryPointDependency $d) {
+    echo "Error: ", $d->getMessage(), PHP_EOL;
+    exit(1);
+}

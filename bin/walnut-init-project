@@ -1,0 +1,4 @@
+#!/bin/bash
+mkdir walnut-src
+cp vendor/walnut/lang/empty-src/* walnut-src
+echo '{"sourceRoot": "walnut-src", "packages": {"core": "vendor/walnut/lang/core-nut-lib"}}' > nutcfg.json
