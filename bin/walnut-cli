@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use Walnut\Lang\Blueprint\Compilation\Module\ModuleDependencyException;
 use Walnut\Lang\Blueprint\Program\InvalidEntryPointDependency;
@@ -10,8 +11,6 @@ use Walnut\Lang\Implementation\Compilation\Module\SourceFinder\CompositeSourceFi
 use Walnut\Lang\Implementation\Compilation\Module\SourceFinder\PackageBasedSourceFinder;
 use Walnut\Lang\Implementation\Program\EntryPoint\Cli\CliEntryPoint;
 use Walnut\Lang\Implementation\Program\EntryPoint\Cli\CliEntryPointBuilder;
-
-require __DIR__ . '/../vendor/autoload.php';
 
 $input = $argv;
 array_shift($input);

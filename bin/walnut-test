@@ -1,13 +1,12 @@
 #!/usr/bin/env php
 <?php
+require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 use Walnut\Lang\Blueprint\AST\Parser\ParserException;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Program\EntryPoint\Cli\CliEntryPointBuilder as CliEntryPointBuilderInterface;
 use Walnut\Lang\Implementation\Compilation\Module\PackageConfiguration\JsonFilePackageConfigurationProvider;
 use Walnut\Lang\Implementation\Program\EntryPoint\Cli\CliEntryPointFactory;
-
-require __DIR__ . '/../vendor/autoload.php';
 
 $folder = $argv[1] ?? '.';
 
