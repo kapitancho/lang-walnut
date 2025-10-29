@@ -95,6 +95,41 @@ jobs:
       - name: Generate coverage report
         run: vendor/bin/phpunit --coverage-clover=coverage.xml
 
+      - name: Extract coverage percentage
+        id: coverage
+        run: |
+          COVERAGE=$(php -r "
+            \$xml = new SimpleXMLElement(file_get_contents('coverage.xml'));
+            \$metrics = \$xml->xpath('/coverage/project/metrics')[0];
+            \$covered = (int)\$metrics['coveredstatements'];
+            \$total = (int)\$metrics['statements'];
+            echo round((\$covered / \$total) * 100);
+          ")
+          echo "percent=\$COVERAGE" >> \$GITHUB_OUTPUT
+          echo "Coverage: \$COVERAGE%"
+
+      - name: Create coverage badge
+        run: |
+          COVERAGE=\${{ steps.coverage.outputs.percent }}
+
+          # Determine color based on coverage
+          if [ \$COVERAGE -ge 90 ]; then
+            COLOR="brightgreen"
+          elif [ \$COVERAGE -ge 70 ]; then
+            COLOR="yellow"
+          elif [ \$COVERAGE -ge 50 ]; then
+            COLOR="orange"
+          else
+            COLOR="red"
+          fi
+
+          # Create SVG badge
+          mkdir -p .badges
+          curl -s "https://img.shields.io/badge/coverage-\${COVERAGE}%25-\${COLOR}" -o .badges/coverage.svg
+
+          # Also save the percentage to a file for easy access
+          echo "\$COVERAGE" > .badges/coverage.txt
+
       - name: Upload coverage artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -103,4 +138,5 @@ jobs:
           path: |
             coverage.xml
             coverage-report/
+            .badges/
           retention-days: 30
