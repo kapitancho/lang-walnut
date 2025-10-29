@@ -106,6 +106,9 @@ jobs:
           name: release-${{ matrix.target }}
           path: |
             build/walnut.phar
+            build/core-nut-lib
+            build/nutcfg.json
+            build/walnut-src
             walnut-roadrunner-${{ matrix.target }}.tar.gz
           retention-days: 7
 
@@ -127,6 +130,11 @@ jobs:
 
           # Collect CLI PHAR (single copy from any target, they're all identical)
           cp artifacts/release-linux-amd64/build/walnut.phar release-assets/walnut.phar
+
+          # Collect assets (core-nut-lib, nutcfg.json, walnut-src)
+          cp -r artifacts/release-linux-amd64/build/core-nut-lib release-assets/
+          cp artifacts/release-linux-amd64/build/nutcfg.json release-assets/
+          cp -r artifacts/release-linux-amd64/build/walnut-src release-assets/
 
           # Collect all RoadRunner bundles
           cp artifacts/release-linux-amd64/walnut-roadrunner-linux-amd64.tar.gz release-assets/
@@ -178,6 +186,9 @@ jobs:
             - **walnut.phar** (3.0 MB) - Standalone CLI executable
               - For: Development, testing, scripts
               - Commands: `walnut mymodule`, `walnut test`, `walnut serve`
+            - **core-nut-lib/** - Bundled core library (required with walnut.phar)
+            - **nutcfg.json** - Default configuration file
+            - **walnut-src/** - Empty template directory for user modules
 
             ### Server (with RoadRunner)
             - **walnut-roadrunner-linux-amd64.tar.gz** (18 MB)
@@ -190,7 +201,11 @@ jobs:
 
             ### Standalone CLI
             ```bash
+            # Download the release files
             wget https://github.com/walnut-lang/walnut/releases/download/${{ github.ref_name }}/walnut.phar
+            wget https://github.com/walnut-lang/walnut/releases/download/${{ github.ref_name }}/nutcfg.json
+            # Download core-nut-lib directory (from release assets)
+
             chmod +x walnut.phar
             ./walnut.phar mymodule arg1 arg2
             ```
