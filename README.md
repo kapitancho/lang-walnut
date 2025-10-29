@@ -33,9 +33,13 @@ Choose your installation method:
 
 Download the latest **CLI bundle** (includes everything needed):
 
-[Download walnut-cli.zip](https://github.com/kapitancho/lang-walnut/releases/latest/download/walnut-cli.zip)
+[Download walnut-cli.tar.gz](https://github.com/kapitancho/lang-walnut/releases/latest/download/walnut-cli.tar.gz)
 
+Extract and run:
 ```bash
+tar -xzf walnut-cli.tar.gz
+cd walnut-cli-bundle
+
 ./walnut.phar hello-world
 ```
 

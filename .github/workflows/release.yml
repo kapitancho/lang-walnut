@@ -161,8 +161,12 @@ jobs:
           cp -r artifacts/release-linux-amd64/build/walnut-src release-assets/
           cp -r artifacts/release-linux-amd64/build/walnut-src walnut-cli-bundle/
 
-          # Create CLI bundle zip
-          zip -r "release-assets/walnut-cli.zip" walnut-cli-bundle/
+          # Ensure walnut.phar is executable before tarring
+          chmod +x walnut-cli-bundle/walnut.phar
+          chmod +x release-assets/walnut.phar
+
+          # Create CLI bundle tar.gz
+          tar -czf "release-assets/walnut-cli.tar.gz" walnut-cli-bundle/
           rm -rf walnut-cli-bundle
 
           # Collect all RoadRunner bundles
