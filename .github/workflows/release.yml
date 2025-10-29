@@ -39,6 +39,12 @@ jobs:
       - name: Build CLI PHAR (walnut.phar - pure CLI, no RoadRunner)
         run: box compile
 
+      - name: Copy assets (not inside PHAR)
+        run: |
+          cp -r core-nut-lib build/core-nut-lib
+          cp -r empty-src build/walnut-src
+          cp nutcfg.json build/
+
       - name: Install dev dependencies (for walnut-roadrunner)
         run: composer install --optimize-autoloader
 
