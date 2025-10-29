@@ -27,10 +27,44 @@ Walnut is a modern functional programming language that combines powerful type s
 
 ### Installation
 
-Install Walnut via Composer:
+Choose your installation method:
+
+#### Option 1: Standalone CLI (Recommended for Development)
+
+Download the latest `walnut.phar`:
+
+```bash
+wget https://github.com/walnut-lang/walnut/releases/download/latest/walnut.phar
+chmod +x walnut.phar
+./walnut.phar mymodule
+```
+
+#### Option 2: Via Composer (For PHP Projects)
 
 ```bash
 composer require walnut/lang
+./vendor/bin/walnut mymodule
+```
+
+#### Option 3: Production HTTP Server with RoadRunner
+
+Download the server bundle for your platform:
+
+```bash
+# Linux
+tar -xzf walnut-roadrunner-linux-amd64.tar.gz
+cd walnut-roadrunner-linux-amd64
+./walnut-roadrunner --port 8084
+
+# macOS (Intel)
+tar -xzf walnut-roadrunner-darwin-amd64.tar.gz
+cd walnut-roadrunner-darwin-amd64
+./walnut-roadrunner --port 8084
+
+# macOS (Apple Silicon)
+tar -xzf walnut-roadrunner-darwin-arm64.tar.gz
+cd walnut-roadrunner-darwin-arm64
+./walnut-roadrunner --port 8084
 ```
 
 ### Hello World
@@ -43,10 +77,17 @@ module hello:
 >>> 'Hello, World!';
 ```
 
-Run it from PHP:
+Run it:
 
 ```bash
-php -f cli/index.php hello
+# Using standalone phar
+./walnut.phar hello
+
+# Using composer installation
+./vendor/bin/walnut hello
+
+# Development server with live reload
+./walnut.phar serve --port 3000
 ```
 
 ## Language Highlights
@@ -340,6 +381,33 @@ Walnut is designed around several core principles:
 3. **Explicit Over Implicit** - Clear intent and dependencies
 4. **Business Logic Focus** - Express domain models precisely
 5. **Developer Ergonomics** - Concise syntax without sacrificing clarity
+
+## Distribution Models
+
+Walnut is available in two independent distributions:
+
+### walnut.phar (Pure CLI)
+- **Size:** 3.0 MB
+- **For:** Development, testing, scripts
+- **Features:** CLI execution, testing framework, development HTTP server
+- **Download:** From [GitHub Releases](https://github.com/walnut-lang/walnut/releases)
+
+### walnut-roadrunner (Production Server)
+- **Size:** 18-19 MB (platform-specific)
+- **For:** Production HTTP servers
+- **Features:** High-performance RoadRunner server, multiple workers
+- **Platforms:** Linux x86-64, macOS Intel, macOS Apple Silicon
+- **Download:** From [GitHub Releases](https://github.com/walnut-lang/walnut/releases)
+
+**Why separate?** The CLI doesn't need RoadRunner code, so we keep it lightweight. The server bundle is self-contained and ready to deploy.
+
+## Documentation
+
+- **[DISTRIBUTION_ARCHITECTURE.md](DISTRIBUTION_ARCHITECTURE.md)** - Two-tier distribution model explained
+- **[CLI_GUIDE.md](CLI_GUIDE.md)** - Command-line usage reference
+- **[VERSIONING.md](VERSIONING.md)** - Version management and git tag strategy
+- **[CI_CD_SETUP.md](CI_CD_SETUP.md)** - Testing, code coverage, and CI/CD pipeline
+- **[RELEASES_AND_CI.md](RELEASES_AND_CI.md)** - Release process and artifacts
 
 ## Contributing
 

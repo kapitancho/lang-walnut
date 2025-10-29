@@ -99,21 +99,33 @@ jobs:
         run: |
           COVERAGE=$(php -r "
             \$xml = new SimpleXMLElement(file_get_contents('coverage.xml'));
-            \$metrics = \$xml->xpath('/coverage/metrics')[0] ?? null;
-            if (\$metrics === null) {
-              echo '0';
+
+            // Try to find the project metrics (most recent PHPUnit format)
+            \$projectMetrics = \$xml->xpath('//project/metrics')[0] ?? null;
+            if (\$projectMetrics !== null) {
+              \$covered = (int)\$projectMetrics['coveredlines'];
+              \$total = (int)\$projectMetrics['lines'];
             } else {
-              \$covered = (int)\$metrics['covered'];
-              \$total = (int)\$metrics['elements'];
-              if (\$total === 0) {
-                echo '0';
+              // Fallback: try coverage/metrics
+              \$metrics = \$xml->xpath('/coverage/metrics')[0] ?? null;
+              if (\$metrics !== null) {
+                \$covered = (int)\$metrics['covered'];
+                \$total = (int)\$metrics['elements'];
               } else {
-                echo round((\$covered / \$total) * 100);
+                // Fallback: check coverage element attributes (older format)
+                \$covered = (int)\$xml['lines-covered'];
+                \$total = (int)\$xml['lines-valid'];
               }
             }
+
+            if (\$total === 0) {
+              echo '0';
+            } else {
+              echo round((\$covered / \$total) * 100);
+            }
           ")
-          echo "percent=$COVERAGE" >> $GITHUB_OUTPUT
-          echo "Coverage: $COVERAGE%"
+          echo "percent=\$COVERAGE" >> \$GITHUB_OUTPUT
+          echo "Coverage: \$COVERAGE%"
 
       - name: Create coverage badge
         run: |
