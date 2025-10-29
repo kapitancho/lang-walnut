@@ -127,14 +127,23 @@ jobs:
       - name: Organize artifacts
         run: |
           mkdir -p release-assets
+          mkdir -p walnut-cli-bundle
 
           # Collect CLI PHAR (single copy from any target, they're all identical)
           cp artifacts/release-linux-amd64/build/walnut.phar release-assets/walnut.phar
+          cp artifacts/release-linux-amd64/build/walnut.phar walnut-cli-bundle/walnut.phar
 
           # Collect assets (core-nut-lib, nutcfg.json, walnut-src)
           cp -r artifacts/release-linux-amd64/build/core-nut-lib release-assets/
+          cp -r artifacts/release-linux-amd64/build/core-nut-lib walnut-cli-bundle/
           cp artifacts/release-linux-amd64/build/nutcfg.json release-assets/
+          cp artifacts/release-linux-amd64/build/nutcfg.json walnut-cli-bundle/
           cp -r artifacts/release-linux-amd64/build/walnut-src release-assets/
+          cp -r artifacts/release-linux-amd64/build/walnut-src walnut-cli-bundle/
+
+          # Create CLI bundle zip
+          zip -r "release-assets/walnut-cli.zip" walnut-cli-bundle/
+          rm -rf walnut-cli-bundle
 
           # Collect all RoadRunner bundles
           cp artifacts/release-linux-amd64/walnut-roadrunner-linux-amd64.tar.gz release-assets/

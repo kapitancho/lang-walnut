@@ -29,21 +29,21 @@ Walnut is a modern functional programming language that combines powerful type s
 
 Choose your installation method:
 
-#### Option 1: Standalone CLI (Recommended for Development)
+#### Option 1: Standalone CLI (Recommended for Development, requires PHP 8.4+ installed)
 
-Download the latest `walnut.phar`:
+Download the latest **CLI bundle** (includes everything needed):
+
+[Download walnut-cli.zip](https://github.com/YOUR_ORG/YOUR_REPO/releases/latest/download/walnut-cli.zip)
 
 ```bash
-wget https://github.com/walnut-lang/walnut/releases/download/latest/walnut.phar
-chmod +x walnut.phar
-./walnut.phar mymodule
+./walnut.phar hello-world
 ```
 
 #### Option 2: Via Composer (For PHP Projects)
 
 ```bash
 composer require walnut/lang
-./vendor/bin/walnut mymodule
+./vendor/bin/walnut hello-world
 ```
 
 #### Option 3: Production HTTP Server with RoadRunner
