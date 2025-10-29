@@ -67,16 +67,15 @@ $phar_path = __FILE__;
 // Route to appropriate entry point
 switch ($command) {
     case 'test':
-        require 'phar://' . $phar_path . '/cli/test.php';
+        require 'phar://' . $phar_path . '/bin/walnut-test';
         break;
 
     case 'serve':
-        require 'phar://' . $phar_path . '/http/http.php';
+        require 'phar://' . $phar_path . '/bin/walnut-http';
         break;
 
-    case 'exec':
     default:
-        require 'phar://' . $phar_path . '/cli/index.php';
+        require 'phar://' . $phar_path . '/bin/walnut-cli';
         break;
 }
 
