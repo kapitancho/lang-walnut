@@ -8,8 +8,6 @@ use Walnut\Lang\Implementation\Compilation\Module\PackageConfiguration\JsonFileP
 use Walnut\Lang\Implementation\Program\EntryPoint\Http\HttpEntryPointFactory;
 use Walnut\Lang\Implementation\Program\EntryPoint\Http\Message\HttpRequest;
 
-require_once __DIR__ . '/../vendor/autoload.php';
-
 // Load configuration
 $httpModule = 'server';
 
