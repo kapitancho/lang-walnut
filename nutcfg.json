@@ -1,5 +1,5 @@
 {
-  "sourceRoot": "empty-src",
+  "sourceRoot": "walnut-src",
   "packages": {
     "core": "core-nut-lib",
     "shopping-cart": "walnut-src/shopping-cart"
