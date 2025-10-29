@@ -401,14 +401,6 @@ Walnut is available in two independent distributions:
 
 **Why separate?** The CLI doesn't need RoadRunner code, so we keep it lightweight. The server bundle is self-contained and ready to deploy.
 
-## Documentation
-
-- **[DISTRIBUTION_ARCHITECTURE.md](DISTRIBUTION_ARCHITECTURE.md)** - Two-tier distribution model explained
-- **[CLI_GUIDE.md](CLI_GUIDE.md)** - Command-line usage reference
-- **[VERSIONING.md](VERSIONING.md)** - Version management and git tag strategy
-- **[CI_CD_SETUP.md](CI_CD_SETUP.md)** - Testing, code coverage, and CI/CD pipeline
-- **[RELEASES_AND_CI.md](RELEASES_AND_CI.md)** - Release process and artifacts
-
 ## Contributing
 
 Contributions are welcome! Please feel free to submit pull requests, report bugs, or suggest features through the issue tracker.
