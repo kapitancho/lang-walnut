@@ -48,13 +48,13 @@ jobs:
 
           case "${{ matrix.target }}" in
             linux-amd64)
-              RR_URL="https://github.com/roadrunner-server/roadrunner/releases/download/v2025.1.0/roadrunner-2025.1.0-linux-amd64.tar.gz"
+              RR_URL="https://github.com/roadrunner-server/roadrunner/releases/download/v2025.1.4/roadrunner-2025.1.4-linux-amd64.tar.gz"
               ;;
             darwin-amd64)
-              RR_URL="https://github.com/roadrunner-server/roadrunner/releases/download/v2025.1.0/roadrunner-2025.1.0-darwin-amd64.tar.gz"
+              RR_URL="https://github.com/roadrunner-server/roadrunner/releases/download/v2025.1.4/roadrunner-2025.1.4-darwin-amd64.tar.gz"
               ;;
             darwin-arm64)
-              RR_URL="https://github.com/roadrunner-server/roadrunner/releases/download/v2025.1.0/roadrunner-2025.1.0-darwin-arm64.tar.gz"
+              RR_URL="https://github.com/roadrunner-server/roadrunner/releases/download/v2025.1.4/roadrunner-2025.1.4-darwin-arm64.tar.gz"
               ;;
           esac
 
