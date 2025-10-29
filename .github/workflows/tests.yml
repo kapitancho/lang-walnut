@@ -105,19 +105,19 @@ jobs:
             \$total = (int)\$metrics['statements'];
             echo round((\$covered / \$total) * 100);
           ")
-          echo "percent=\$COVERAGE" >> \$GITHUB_OUTPUT
-          echo "Coverage: \$COVERAGE%"
+          echo "percent=$COVERAGE" >> $GITHUB_OUTPUT
+          echo "Coverage: $COVERAGE%"
 
       - name: Create coverage badge
         run: |
-          COVERAGE=\${{ steps.coverage.outputs.percent }}
+          COVERAGE=${{ steps.coverage.outputs.percent }}
 
           # Determine color based on coverage
-          if [ \$COVERAGE -ge 90 ]; then
+          if [ $COVERAGE -ge 90 ]; then
             COLOR="brightgreen"
-          elif [ \$COVERAGE -ge 70 ]; then
+          elif [ $COVERAGE -ge 70 ]; then
             COLOR="yellow"
-          elif [ \$COVERAGE -ge 50 ]; then
+          elif [ $COVERAGE -ge 50 ]; then
             COLOR="orange"
           else
             COLOR="red"
@@ -125,10 +125,10 @@ jobs:
 
           # Create SVG badge
           mkdir -p .badges
-          curl -s "https://img.shields.io/badge/coverage-\${COVERAGE}%25-\${COLOR}" -o .badges/coverage.svg
+          curl -s "https://img.shields.io/badge/coverage-${COVERAGE}%25-${COLOR}" -o .badges/coverage.svg
 
           # Also save the percentage to a file for easy access
-          echo "\$COVERAGE" > .badges/coverage.txt
+          echo "$COVERAGE" > .badges/coverage.txt
 
       - name: Upload coverage artifacts
         if: always()
