@@ -64,13 +64,13 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 			SealedType::class => ['Sealed'],
 			AliasType::class => ['Alias'],
 			FunctionType::class => ['Function'],
-			ResultType::class => ['Result'],
 			MutableType::class => ['Mutable'],
 			ShapeType::class => ['Shape'],
 			TypeType::class => ['Type'],
 			UnionType::class => ['Union'],
 			IntersectionType::class => ['Intersection'],
 			NothingType::class => ['Nothing'],
+			ResultType::class => [],
 			AnyType::class => [],
 		];
 	}
@@ -150,6 +150,7 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 		if ($this->isJsonType($type)) {
 			$result[] = 'JsonValue';
 		}
+		$result[] = 'Result';
 		$result[] = 'Any';
 		if ($type instanceof NamedType && ($result[0] ?? null) !== $type->name->identifier) {
 			array_unshift($result, $type->name->identifier);

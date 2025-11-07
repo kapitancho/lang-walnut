@@ -21,126 +21,126 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testAny(): void {
 		$this->assertEquals(
-			['Any'],
+			['Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->any)
 		);
 	}
 
 	public function testNothing(): void {
 		$this->assertEquals(
-			['Nothing', 'Any'],
+			['Nothing', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->nothing)
 		);
 	}
 
 	public function testNull(): void {
 		$this->assertEquals(
-			['Null', 'Atom', 'JsonValue', 'Any'],
+			['Null', 'Atom', 'JsonValue', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->null)
 		);
 	}
 
 	public function testBoolean(): void {
 		$this->assertEquals(
-			['Boolean', 'Enumeration', 'JsonValue', 'Any'],
+			['Boolean', 'Enumeration', 'JsonValue', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->boolean)
 		);
 	}
 
 	public function testTrue(): void {
 		$this->assertEquals(
-			['Boolean', 'Enumeration', 'JsonValue', 'Any'],
+			['Boolean', 'Enumeration', 'JsonValue', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->true)
 		);
 	}
 
 	public function testFalse(): void {
 		$this->assertEquals(
-			['Boolean', 'Enumeration', 'JsonValue', 'Any'],
+			['Boolean', 'Enumeration', 'JsonValue', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->false)
 		);
 	}
 
 	public function testInteger(): void {
 		$this->assertEquals(
-			['Integer', 'Real', 'JsonValue', 'Any'],
+			['Integer', 'Real', 'JsonValue', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->integer())
 		);
 	}
 
 	public function testIntegerSubset(): void {
 		$this->assertEquals(
-			['Integer', 'Real', 'JsonValue', 'Any'],
+			['Integer', 'Real', 'JsonValue', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->integerSubset([new Number('1')]))
 		);
 	}
 
 	public function testReal(): void {
 		$this->assertEquals(
-			['Real', 'JsonValue', 'Any'],
+			['Real', 'JsonValue', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->real())
 		);
 	}
 
 	public function testRealSubset(): void {
 		$this->assertEquals(
-			['Real', 'JsonValue', 'Any'],
+			['Real', 'JsonValue', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->realSubset([new Number('3.14')]))
 		);
 	}
 
 	public function testString(): void {
 		$this->assertEquals(
-			['String', 'JsonValue', 'Any'],
+			['String', 'JsonValue', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->string())
 		);
 	}
 
 	public function testStringSubset(): void {
 		$this->assertEquals(
-			['String', 'JsonValue', 'Any'],
+			['String', 'JsonValue', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->stringSubset(['hello']))
 		);
 	}
 
 	public function testArray(): void {
 		$this->assertEquals(
-			['Array', 'Any'],
+			['Array', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->array())
 		);
 	}
 
 	public function testMap(): void {
 		$this->assertEquals(
-			['Map', 'Any'],
+			['Map', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->map())
 		);
 	}
 
 	public function testSet(): void {
 		$this->assertEquals(
-			['Set', 'Any'],
+			['Set', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->set())
 		);
 	}
 
 	public function testTuple(): void {
 		$this->assertEquals(
-			['Tuple', 'Array', 'JsonValue', 'Any'],
+			['Tuple', 'Array', 'JsonValue', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->tuple([]))
 		);
 	}
 
 	public function testRecord(): void {
 		$this->assertEquals(
-			['Record', 'Map', 'JsonValue', 'Any'],
+			['Record', 'Map', 'JsonValue', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->record([]))
 		);
 	}
 
 	public function testUnion(): void {
 		$this->assertEquals(
-			['Union', 'Any'],
+			['Union', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->union([
 				$this->typeRegistry->integer(),
 				$this->typeRegistry->typeByName(new TypeNameIdentifier('NotANumber'))
@@ -150,7 +150,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testUnionJsonValue(): void {
 		$this->assertEquals(
-			['Union', 'JsonValue', 'Any'],
+			['Union', 'JsonValue', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->union([
 				$this->typeRegistry->integer(),
 				$this->typeRegistry->string()
@@ -160,7 +160,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testIntersection(): void {
 		$this->assertEquals(
-			['Intersection', 'Any'],
+			['Intersection', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->intersection([
 				$this->typeRegistry->integer(),
 				$this->typeRegistry->string()
@@ -170,7 +170,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testFunction(): void {
 		$this->assertEquals(
-			['Function', 'Any'],
+			['Function', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->function(
 				$this->typeRegistry->integer(),
 				$this->typeRegistry->string()
@@ -180,7 +180,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testMutable(): void {
 		$this->assertEquals(
-			['Mutable', 'Any'],
+			['Mutable', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->mutable(
 				$this->typeRegistry->typeByName(new TypeNameIdentifier('NotANumber')),
 			))
@@ -189,7 +189,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testMutableJsonValue(): void {
 		$this->assertEquals(
-			['Mutable', 'JsonValue', 'Any'],
+			['Mutable', 'JsonValue', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->mutable(
 				$this->typeRegistry->integer(),
 			))
@@ -198,7 +198,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testOptionalKey(): void {
 		$this->assertEquals(
-			['Any'],
+			['Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->optionalKey(
 				$this->typeRegistry->integer(),
 			))
@@ -226,7 +226,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testAlias(): void {
 		$this->assertEquals(
-			['DatabaseValue', 'Alias', 'Union', 'JsonValue', 'Any'],
+			['DatabaseValue', 'Alias', 'Union', 'JsonValue', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->alias(
 				new TypeNameIdentifier('DatabaseValue')
 			))
@@ -235,7 +235,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testData(): void {
 		$this->assertEquals(
-			['DatabaseConnection', 'Data', 'Any'],
+			['DatabaseConnection', 'Data', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->data(
 				new TypeNameIdentifier('DatabaseConnection')
 			))
@@ -244,7 +244,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testOpen(): void {
 		$this->assertEquals(
-			['Uuid', 'Open', 'Any'],
+			['Uuid', 'Open', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->open(
 				new TypeNameIdentifier('Uuid')
 			))
@@ -253,7 +253,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	/*public function testSealed(): void {
 		$this->assertEquals(
-			['HydrationError', 'Open', 'Any'],
+			['HydrationError', 'Open', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->data(
 				new TypeNameIdentifier('HydrationError')
 			))
@@ -262,7 +262,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testAtom(): void {
 		$this->assertEquals(
-			['NotANumber', 'Atom', 'Any'],
+			['NotANumber', 'Atom', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->atom(
 				new TypeNameIdentifier('NotANumber')
 			))
@@ -271,7 +271,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testEnumeration(): void {
 		$this->assertEquals(
-			['DependencyContainerErrorType', 'Enumeration', 'Any'],
+			['DependencyContainerErrorType', 'Enumeration', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->enumeration(
 				new TypeNameIdentifier('DependencyContainerErrorType')
 			))
@@ -280,7 +280,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testEnumerationSubset(): void {
 		$this->assertEquals(
-			['Enumeration', 'Any'],
+			['Enumeration', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->enumerationSubsetType(
 				new TypeNameIdentifier('DependencyContainerErrorType'), [
 				new EnumValueIdentifier('NotFound')
@@ -290,7 +290,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testType(): void {
 		$this->assertEquals(
-			['Type', 'Any'],
+			['Type', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->type(
 				$this->typeRegistry->any,
 			))
@@ -299,7 +299,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testTypeFunction(): void {
 		$this->assertEquals(
-			['Function', 'Any'],
+			['Function', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::Function
 			))
@@ -308,7 +308,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testTypeTuple(): void {
 		$this->assertEquals(
-			['Tuple', 'Array', 'Any'],
+			['Tuple', 'Array', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::Tuple
 			))
@@ -317,7 +317,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testTypeRecord(): void {
 		$this->assertEquals(
-			['Record', 'Map', 'Any'],
+			['Record', 'Map', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::Record
 			))
@@ -326,7 +326,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testTypeUnion(): void {
 		$this->assertEquals(
-			['Union', 'Any'],
+			['Union', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::Union
 			))
@@ -335,7 +335,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testTypeIntersection(): void {
 		$this->assertEquals(
-			['Intersection', 'Any'],
+			['Intersection', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::Intersection
 			))
@@ -344,7 +344,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testTypeAtom(): void {
 		$this->assertEquals(
-			[/*'Atom', */'Any'],
+			[/*'Atom', */'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::Atom
 			))
@@ -353,7 +353,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testTypeEnumeration(): void {
 		$this->assertEquals(
-			[/*'Enumeration', */'Any'],
+			[/*'Enumeration', */'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::Enumeration
 			))
@@ -362,7 +362,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testTypeEnumerationSubset(): void {
 		$this->assertEquals(
-			[/*'EnumerationSubset', */'Any'],
+			[/*'EnumerationSubset', */'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::EnumerationSubset
 			))
@@ -371,7 +371,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testTypeIntegerSubset(): void {
 		$this->assertEquals(
-			[/*'IntegerSubset', */'Any'],
+			[/*'IntegerSubset', */'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::IntegerSubset
 			))
@@ -380,7 +380,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testTypeMutableValue(): void {
 		$this->assertEquals(
-			['Mutable', 'Any'],
+			['Mutable', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::MutableValue
 			))
@@ -389,7 +389,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testTypeRealSubset(): void {
 		$this->assertEquals(
-			[/*'RealSubset', */'Any'],
+			[/*'RealSubset', */'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::RealSubset
 			))
@@ -398,7 +398,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testTypeStringSubset(): void {
 		$this->assertEquals(
-			[/*'StringSubset', */'Any'],
+			[/*'StringSubset', */'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::StringSubset
 			))
@@ -407,7 +407,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testTypeAlias(): void {
 		$this->assertEquals(
-			[/*'Alias', */'Any'],
+			[/*'Alias', */'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::Alias
 			))
@@ -416,7 +416,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testTypeData(): void {
 		$this->assertEquals(
-			['Data', 'Any'],
+			['Data', 'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::Data
 			))
@@ -425,7 +425,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testTypeOpen(): void {
 		$this->assertEquals(
-			[/*'Sealed', */'Any'],
+			[/*'Sealed', */'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::Open
 			))
@@ -434,7 +434,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testTypeSealed(): void {
 		$this->assertEquals(
-			[/*'Sealed', */'Any'],
+			[/*'Sealed', */'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::Sealed
 			))
@@ -443,7 +443,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testTypeNamed(): void {
 		$this->assertEquals(
-			[/*'Named', */'Any'],
+			[/*'Named', */'Result', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::Named
 			))

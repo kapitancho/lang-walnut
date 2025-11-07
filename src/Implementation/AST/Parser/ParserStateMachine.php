@@ -1177,6 +1177,7 @@ final readonly class ParserStateMachine {
 						'||' => 'binaryOr',
 						'&&' => 'binaryAnd',
 						'^^' => 'binaryXor',
+						'??' => 'binaryOrElse',
 					};
 					$this->s->move(316);
 				},
@@ -1195,6 +1196,7 @@ final readonly class ParserStateMachine {
 				T::type_start->name => $c,
 				T::type_end->name => $c,
 				T::lambda_param->name => $c,
+				T::or_else->name => $c,
 				//binary operators end
 
 
@@ -1250,6 +1252,7 @@ final readonly class ParserStateMachine {
 				T::type_start->name => $c,
 				T::type_end->name => $c,
 				T::lambda_param->name => $c,
+				T::or_else->name => $c,
 				//binary operators end
 
 				T::this_var->name => $c,
@@ -1302,6 +1305,7 @@ final readonly class ParserStateMachine {
 				T::type_start->name => $c,
 				T::type_end->name => $c,
 				T::lambda_param->name => $c,
+				T::or_else->name => $c,
 				//binary operators end
 
 				T::pure_marker->name => $c,
@@ -1416,6 +1420,7 @@ final readonly class ParserStateMachine {
 				T::type_start->name => $c,
 				T::type_end->name => $c,
 				T::lambda_param->name => $c,
+				T::or_else->name => $c,
 				//binary operators end
 
 				T::pure_marker->name => $c,
@@ -2933,7 +2938,11 @@ final readonly class ParserStateMachine {
 				},
 			]],
 			738 => ['name' => 'type array range dots', 'transitions' => [
-				T::range_dots->name => 739
+				T::range_dots->name => 739,
+				T::type_end->name => function(LT $token) {
+					$this->s->result['maxLength'] = $this->s->result['minLength'];
+					$this->s->move(741);
+				}
 			]],
 			739 => ['name' => 'type array range end', 'transitions' => [
 				T::positive_integer_number->name => function(LT $token) {
@@ -2995,7 +3004,11 @@ final readonly class ParserStateMachine {
 				}
 			]],
 			748 => ['name' => 'type map range dots', 'transitions' => [
-				T::range_dots->name => 749
+				T::range_dots->name => 749,
+				T::type_end->name => function(LT $token) {
+					$this->s->result['maxLength'] = $this->s->result['minLength'];
+					$this->s->move(751);
+				}
 			]],
 			749 => ['name' => 'type map range end', 'transitions' => [
 				T::positive_integer_number->name => function(LT $token) {
@@ -3429,7 +3442,11 @@ final readonly class ParserStateMachine {
 				},
 			]],
 			830 => ['name' => 'type set range dots', 'transitions' => [
-				T::range_dots->name => 831
+				T::range_dots->name => 831,
+				T::type_end->name => function(LT $token) {
+					$this->s->result['maxLength'] = $this->s->result['minLength'];
+					$this->s->move(833);
+				}
 			]],
 			831 => ['name' => 'type set range end', 'transitions' => [
 				T::positive_integer_number->name => function(LT $token) {

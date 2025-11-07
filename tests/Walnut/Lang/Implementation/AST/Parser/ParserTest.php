@@ -827,6 +827,8 @@ class ParserTest extends TestCase {
 		yield ['a && x', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryAnd'))];
 		yield ['a ^^ x', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryXor'))];
 
+		yield ['a ?? x', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryOrElse'))];
+
 		yield ['a *> (null)', NoErrorExpressionNode::class, fn(NoErrorExpressionNode $e) =>
 			$e->targetExpression instanceof MethodCallExpressionNode &&
 			$e->targetExpression->target instanceof VariableNameExpressionNode && $e->targetExpression->target->variableName->equals(new VariableNameIdentifier('a')) &&
@@ -1226,6 +1228,7 @@ class ParserTest extends TestCase {
 		yield ['\\Array', ArrayTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('0') && $t->maxLength === PlusInfinity::value];
 		yield ['Array<5..>', ArrayTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('5') && $t->maxLength === PlusInfinity::value];
 		yield ['Array<..8>', ArrayTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('0') && $t->maxLength == new Number('8')];
+		yield ['Array<5>', ArrayTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('5') && $t->maxLength == new Number('5')];
 		yield ['Array<5..8>', ArrayTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('5') && $t->maxLength == new Number('8')];
 		yield ['Array<Boolean>', ArrayTypeNode::class, fn($t) => $t->itemType instanceOf BooleanTypeNode && $t->minLength == new Number('0') && $t->maxLength === PlusInfinity::value];
 		yield ['Array<Boolean, 5..>', ArrayTypeNode::class, fn($t) => $t->itemType instanceOf BooleanTypeNode && $t->minLength == new Number('5') && $t->maxLength === PlusInfinity::value];
@@ -1235,6 +1238,7 @@ class ParserTest extends TestCase {
 		yield ['\\Map', MapTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('0') && $t->maxLength === PlusInfinity::value];
 		yield ['Map<5..>', MapTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('5') && $t->maxLength === PlusInfinity::value];
 		yield ['Map<..8>', MapTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('0') && $t->maxLength == new Number('8')];
+		yield ['Map<5>', MapTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('5') && $t->maxLength == new Number('5')];
 		yield ['Map<5..8>', MapTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('5') && $t->maxLength == new Number('8')];
 		yield ['Map<Boolean>', MapTypeNode::class, fn($t) => $t->itemType instanceOf BooleanTypeNode && $t->minLength == new Number('0') && $t->maxLength === PlusInfinity::value];
 		yield ['Map<Boolean, 5..>', MapTypeNode::class, fn($t) => $t->itemType instanceOf BooleanTypeNode && $t->minLength == new Number('5') && $t->maxLength === PlusInfinity::value];
@@ -1244,6 +1248,7 @@ class ParserTest extends TestCase {
 		yield ['\\Set', SetTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('0') && $t->maxLength === PlusInfinity::value];
 		yield ['Set<5..>', SetTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('5') && $t->maxLength === PlusInfinity::value];
 		yield ['Set<..8>', SetTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('0') && $t->maxLength == new Number('8')];
+		yield ['Set<5>', SetTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('5') && $t->maxLength == new Number('5')];
 		yield ['Set<5..8>', SetTypeNode::class, fn($t) => $t->itemType instanceOf AnyTypeNode && $t->minLength == new Number('5') && $t->maxLength == new Number('8')];
 		yield ['Set<Boolean>', SetTypeNode::class, fn($t) => $t->itemType instanceOf BooleanTypeNode && $t->minLength == new Number('0') && $t->maxLength === PlusInfinity::value];
 		yield ['Set<Boolean, 5..>', SetTypeNode::class, fn($t) => $t->itemType instanceOf BooleanTypeNode && $t->minLength == new Number('5') && $t->maxLength === PlusInfinity::value];

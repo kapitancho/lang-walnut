@@ -57,6 +57,7 @@ enum Token: string {
 	case when_value_of = '\?whenValueOf\b';
 	case when = '\?when\b';
 	case when_value_is = '\bis\b';
+	case or_else = '\?\?';
 	case optional_key = '\?';
 	case string_value = '\'.*?\'';
 	//TOOD: allow forward slash but not two consecutive forward slashes
