@@ -39,6 +39,11 @@ Maps can have constraints on size and value types.
 ```walnut
 /* Fixed size */
 ThreeStringValues = Map<String, 3>;           /* Exactly 3 entries */
+config = [host: 'localhost', port: 5432];     /* Type: Map<String | Integer, 2> */
+
+/* Fixed size shorthand - Map<n> is shorthand for Map<n..n> */
+PairMap = Map<String, 2>;                     /* Exactly 2 entries (also Map<2..2>) */
+Triplet = Map<Integer, 3>;                    /* Exactly 3 entries (also Map<3..3>) */
 
 /* Minimum size */
 NonEmptyIntMap = Map<Integer, 1..>;           /* At least 1 entry */
@@ -390,9 +395,88 @@ ages->toArray(^[#key, #value] ::
 /* [[name: 'alice', age: 30], [name: 'bob', age: 25], ...] */
 ```
 
-## 26.3 Record Types
+## 26.3 Set Types
 
-### 26.3.1 Basic Record Type
+### 26.3.1 Basic Set Type
+
+Sets are unordered collections of unique values with a homogeneous element type.
+
+**Syntax:**
+```walnut
+Set<ElementType>
+```
+
+**Examples:**
+```walnut
+/* Basic sets */
+numbers = [1; 2; 3; 4; 5];              /* Type: Set<Integer> */
+tags = ['python'; 'rust'; 'go'];        /* Type: Set<String> */
+flags = [true; false];                  /* Type: Set<Boolean> */
+
+/* Empty set */
+empty = [];                             /* Type: Set<Any> - inferred as empty */
+```
+
+### 26.3.2 Set Type Refinements
+
+Sets can have constraints on size and element types.
+
+**Size constraints:**
+```walnut
+/* Fixed size */
+SmallSet = Set<Integer, 3>;             /* Exactly 3 elements */
+
+/* Fixed size shorthand - Set<n> is shorthand for Set<n..n> */
+Pair = Set<String, 2>;                  /* Exactly 2 elements (also Set<2..2>) */
+triplet = Set<Integer, 3>;              /* Exactly 3 elements (also Set<3..3>) */
+
+/* Minimum size */
+NonEmptyIntSet = Set<Integer, 1..>;     /* At least 1 element */
+
+/* Range size */
+SmallStringSet = Set<String, 1..10>;    /* 1 to 10 elements */
+```
+
+**Element type refinements:**
+```walnut
+/* Sets with refined element types */
+AgeSet = Set<Integer<0..150>>;
+PrioritySet = Set<Integer<1..10>>;
+EmailSet = Set<String<5..254>>;
+
+ages = [25; 30; 45];                    /* Type: AgeSet */
+```
+
+### 26.3.3 Set Literals
+
+**Syntax:**
+```walnut
+[element1; element2; element3]          /* Semicolon separates elements */
+[:]                                     /* Empty set */
+```
+
+**Examples:**
+```walnut
+/* Integer set */
+primes = [2; 3; 5; 7; 11; 13];
+
+/* String set */
+colors = ['red'; 'green'; 'blue'];
+
+/* Sets automatically deduplicate */
+unique = [1; 2; 2; 3; 3; 3];            /* [1; 2; 3] */
+
+/* Set with trailing semicolon */
+items = [
+    'first';
+    'second';
+    'third';
+];
+```
+
+## 26.4 Record Types
+
+### 26.4.1 Basic Record Type
 
 Records are fixed structures with named fields where each field can have a different type.
 
@@ -418,7 +502,7 @@ empty = [];
 /* Type: [] - unit record */
 ```
 
-### 26.3.2 Record Type Aliases
+### 26.4.2 Record Type Aliases
 
 Records can have type aliases for better semantics and reuse.
 
@@ -435,7 +519,7 @@ origin = [x: 0, y: 0];                                          /* Type: Point2D
 widget = [id: 1, name: 'Widget', price: 19.99, inStock: true]; /* Type: Product */
 ```
 
-### 26.3.3 Optional Fields
+### 26.4.3 Optional Fields
 
 Record fields can be optional using the `?` type modifier.
 
@@ -455,7 +539,7 @@ user2 = [name: 'Bob', age: 25, email: null, phone: null];                       
 user3 = [name: 'Charlie', age: 35, email: 'charlie@example.com', phone: '555-1234'];/* Type: User */
 ```
 
-### 26.3.4 OptionalKey Type
+### 26.4.4 OptionalKey Type
 
 The `OptionalKey<T>` type (short syntax: `?T`) represents record fields that may or may not be present.
 
@@ -611,7 +695,7 @@ ContactInfo = [
 ];
 ```
 
-### 26.3.5 Record Field Refinements
+### 26.4.5 Record Field Refinements
 
 Record fields can have type refinements.
 
@@ -638,7 +722,7 @@ person = [
 ];  /* Type: Person */
 ```
 
-### 26.3.6 Rest Types
+### 26.4.6 Rest Types
 
 Records can have a rest type to allow additional fields.
 
@@ -656,9 +740,9 @@ user = [
 ];  /* Type: BaseUser */
 ```
 
-## 26.4 Record Operations
+## 26.5 Record Operations
 
-### 26.4.1 Field Access
+### 26.5.1 Field Access
 
 Records support direct field access using dot notation.
 
@@ -689,7 +773,7 @@ user.address.street;                          /* '123 Main St' */
 user.address.city;                            /* 'London' */
 ```
 
-### 26.4.2 Record Modification
+### 26.5.2 Record Modification
 
 **`with(field, value)` - Update field value**
 ```walnut
@@ -733,7 +817,7 @@ updates = [age: 31];
 person->merge(updates);                       /* [name: 'Alice', age: 31] */
 ```
 
-### 26.4.3 Record Properties
+### 26.5.3 Record Properties
 
 **`keys` - Get field names**
 ```walnut
@@ -764,7 +848,7 @@ person->merge(updates);                       /* [name: 'Alice', age: 31] */
 [name: 'Alice', age: 30]->itemPairs;          /* [('name', 'Alice'), ('age', 30)] */
 ```
 
-### 26.4.4 Record Conversion
+### 26.5.4 Record Conversion
 
 **Convert record to map**
 ```walnut
@@ -777,9 +861,9 @@ person->keys;                                 /* ['name', 'age'] */
 person->values;                               /* ['Alice', 30] */
 ```
 
-## 26.5 Casting and Conversion
+## 26.6 Casting and Conversion
 
-### 26.5.1 Map to String
+### 26.6.1 Map to String
 
 Maps can be converted to strings.
 
@@ -792,7 +876,7 @@ Maps can be converted to strings.
 [outer: [inner: 42]]->asString;               /* '[outer: [inner: 42]]' */
 ```
 
-### 26.5.2 Record to String
+### 26.6.2 Record to String
 
 Records can be converted to strings.
 
@@ -802,7 +886,7 @@ Records can be converted to strings.
 []->asString;                                 /* '[]' */
 ```
 
-### 26.5.3 Array to Map
+### 26.6.3 Array to Map
 
 Arrays can be converted to maps using a key extractor.
 
@@ -817,7 +901,7 @@ usersById = users->toMap(^#.id->asString);
 /* Map<User> with keys '1' and '2' */
 ```
 
-### 26.5.4 Map to Array
+### 26.6.4 Map to Array
 
 Maps can be converted to arrays using `toArray`.
 
@@ -838,7 +922,7 @@ ages->toArray(^[#key, #value] ::
 /* [[name: 'alice', age: 30], [name: 'bob', age: 25]] */
 ```
 
-### 26.5.5 Record to Map
+### 26.6.5 Record to Map
 
 Records cannot be directly cast to Map type since maps have homogeneous values while records have heterogeneous fields. However, records support map-like operations:
 
@@ -852,7 +936,7 @@ person->keys;                                 /* ['name', 'age'] */
 person->contains('name');                     /* true */
 ```
 
-### 26.5.6 JSON Conversion
+### 26.6.6 JSON Conversion
 
 Both maps and records can be converted to/from JSON.
 
@@ -871,9 +955,9 @@ ages = [alice: 30, bob: 25];
 json = ages->jsonEncode;                      /* '{"alice":30,"bob":25}' */
 ```
 
-## 26.6 Practical Examples
+## 26.7 Practical Examples
 
-### 26.6.1 Configuration Management
+### 26.7.1 Configuration Management
 
 ```walnut
 /* Application configuration */
@@ -896,7 +980,7 @@ prodConfig = defaultConfig->merge([
 ]);
 ```
 
-### 26.6.2 Data Transformation
+### 26.7.2 Data Transformation
 
 ```walnut
 /* Transform user data */
@@ -929,7 +1013,7 @@ ageRanges = users->reduce(
 );
 ```
 
-### 26.6.3 Building Query Parameters
+### 26.7.3 Building Query Parameters
 
 ```walnut
 /* Build URL query string from map */
@@ -949,7 +1033,7 @@ queryString = buildQueryString(params);
 /* 'search=walnut&category=programming&page=1' */
 ```
 
-### 26.6.4 Validating Records
+### 26.7.4 Validating Records
 
 ```walnut
 /* Validation functions */
@@ -981,7 +1065,7 @@ user = [name: 'Alice', email: 'invalid', age: 30];
 errors = validateUser(user);                  /* ['Invalid email address'] */
 ```
 
-### 26.6.5 Merging and Filtering Maps
+### 26.7.5 Merging and Filtering Maps
 
 ```walnut
 /* Merge multiple configuration sources */
@@ -1014,7 +1098,7 @@ publicConfig = filterSensitive(config);
 /* [username: 'admin', database: 'myapp'] */
 ```
 
-### 26.6.6 Building Complex Structures
+### 26.7.6 Building Complex Structures
 
 ```walnut
 /* Build nested data structures */
@@ -1047,9 +1131,9 @@ items = [
 order = createOrder([customerId: 42, items: items]);
 ```
 
-## 26.7 Best Practices
+## 26.8 Best Practices
 
-### 26.7.1 Use Records for Fixed Structures
+### 26.8.1 Use Records for Fixed Structures
 
 ```walnut
 /* Good: Use records for fixed data structures */
@@ -1061,7 +1145,7 @@ user = [id: 1, name: 'Alice', email: 'alice@example.com'];  /* Type: User */
 /* Avoid: Maps for structured data - loses type information */
 ```
 
-### 26.7.2 Use Maps for Dynamic Collections
+### 26.8.2 Use Maps for Dynamic Collections
 
 ```walnut
 /* Good: Use maps for dynamic key-value pairs */
@@ -1071,7 +1155,7 @@ sessionData = [:];      /* Type: Map<Any> - dynamic structure */
 /* Avoid: Records for dynamic data - records have fixed structure */
 ```
 
-### 26.7.3 Define Strong Types
+### 26.8.3 Define Strong Types
 
 ```walnut
 /* Good: Define explicit record types */
@@ -1085,7 +1169,7 @@ Person = [
 person = [name: 'Alice', age: 30, email: 'alice@example.com'];
 ```
 
-### 26.7.4 Use Optional Fields Appropriately
+### 26.8.4 Use Optional Fields Appropriately
 
 ```walnut
 /* Good: Optional fields for truly optional data */
@@ -1099,7 +1183,7 @@ User = [
 /* Avoid: Required fields that might be missing */
 ```
 
-### 26.7.5 Validate Map Contents
+### 26.8.5 Validate Map Contents
 
 ```walnut
 /* Good: Validate map keys and values */
@@ -1121,7 +1205,7 @@ validateConfig = ^Map<String> => Result<Map<String>, String> :: {
 config->item('host')->trim;                   /* May fail if 'host' missing */
 ```
 
-### 26.7.6 Use Type Refinements
+### 26.8.6 Use Type Refinements
 
 ```walnut
 /* Good: Use size constraints for maps */
@@ -1133,7 +1217,7 @@ cache = [:];  /* Type: Map<String> */
 /* Use type refinements when constraints matter */
 ```
 
-### 26.7.7 Prefer Immutable Operations
+### 26.8.7 Prefer Immutable Operations
 
 ```walnut
 /* Good: Use immutable operations */
@@ -1143,9 +1227,9 @@ mergedMap = map1->merge(map2);
 /* Avoid: Mutable operations (not available for maps/records) */
 ```
 
-## 26.8 Performance Considerations
+## 26.9 Performance Considerations
 
-### 26.8.1 Map Lookups
+### 26.9.1 Map Lookups
 
 Map lookups by key are efficient (typically O(1)):
 
@@ -1157,7 +1241,7 @@ value = map->item('key');
 exists = map->contains('key');
 ```
 
-### 26.8.2 Map Transformations
+### 26.9.2 Map Transformations
 
 Map transformations create new maps. For multiple operations, chain them efficiently:
 
@@ -1174,7 +1258,7 @@ mapped = filtered->map(^# * 2);
 result = mapped->with('extra', 42);
 ```
 
-### 26.8.3 Record Field Access
+### 26.9.3 Record Field Access
 
 Direct field access is more efficient than dynamic lookups:
 
@@ -1187,7 +1271,7 @@ age = person.age;
 name = person->item('name');
 ```
 
-### 26.8.4 Building Large Maps
+### 26.9.4 Building Large Maps
 
 For building large maps, consider using `reduce` or chaining `with`:
 

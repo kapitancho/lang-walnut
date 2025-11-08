@@ -439,9 +439,166 @@ processResult = ^r: Result<Integer, String> => String ::
 ;
 ```
 
-## 11.9 Practical Patterns
+## 11.9 Result Methods and Transformations
 
-### 11.9.1 Validation Pipeline
+Result types provide a family of methods for transforming and working with success and error values without using control flow statements.
+
+### 11.9.1 Mapping Results: map
+
+The `map` method transforms the success value inside a Result without affecting error values.
+
+**Syntax:**
+```walnut
+Result<T, E>->map(^T => U => Result<U, E>)
+```
+
+**Examples:**
+```walnut
+/* Transform success value */
+result = 42;
+doubled = result->map(^# * 2);  /* 84 */
+
+/* Error passes through unchanged */
+error = @'Invalid input';
+doubled = error->map(^# * 2);  /* @'Invalid input' (error untouched) */
+
+/* Chain multiple transformations */
+value = 5;
+result = value->map(^# * 2)->map(^# + 10)->map(^#->asString);
+/* "20" */
+```
+
+### 11.9.2 Mapping Array Elements: mapIndexValue
+
+The `mapIndexValue` method transforms each element in an array within a Result, with access to both the element and its index.
+
+**Syntax:**
+```walnut
+Result<Array<T>, E>->mapIndexValue(^[index: Integer, value: T] => U => Result<Array<U>, E>)
+```
+
+**Examples:**
+```walnut
+/* Transform with index */
+result = ['a', 'b', 'c'];
+indexed = result->mapIndexValue(^[#index, #value] :: #index->asString + ': ' + #value);
+/* ['0: a', '1: b', '2: c'] */
+
+/* Error result returns unchanged */
+error = @'Array parsing failed';
+indexed = error->mapIndexValue(^[#index, #value] :: #value);
+/* @'Array parsing failed' */
+```
+
+### 11.9.3 Mapping Map/Record Entries: mapKeyValue
+
+The `mapKeyValue` method transforms each key-value pair in a Map or record within a Result.
+
+**Syntax:**
+```walnut
+Result<Map<T>, E>->mapKeyValue(^[key: String, value: T] => U => Result<Map<U>, E>)
+```
+
+**Examples:**
+```walnut
+/* Transform record entries */
+record = [name: 'Alice', age: 30, city: 'NYC'];
+transformed = record->mapKeyValue(^[#key, #value] :: #key + '=' + #value->asString);
+/* [name: 'name=Alice', age: 'age=30', city: 'city=NYC'] */
+
+/* Error result passes through */
+error = @'Record invalid';
+transformed = error->mapKeyValue(^[#key, #value] :: #value);
+/* @'Record invalid' */
+```
+
+### 11.9.4 Error Fallback: binaryOrElse (??)
+
+The `??` operator (binaryOrElse) unwraps a Result, returning the success value or a fallback value if an error occurs.
+
+**Syntax:**
+```walnut
+Result<T, E>->binaryOrElse(T => T)
+/* Or using the ?? operator */
+Result<T, E> ?? fallbackValue
+```
+
+**Examples:**
+```walnut
+/* Unwrap success value */
+result = 42;
+value = result ?? 0;  /* 42 */
+
+/* Use fallback for error */
+error = @'Not found';
+value = error ?? 0;  /* 0 */
+
+/* Practical usage */
+userId = getUserId() ?? 0;
+port = parsePort(configValue) ?? 8080;
+
+/* Chain with map */
+doubled = (getValue() ?? 0)->asString;
+```
+
+The `??` operator is particularly useful in expressions where you want to provide a default value without using `?whenIsError` or `?noError`.
+
+### 11.9.5 Custom Error Handling: ifError
+
+The `ifError` method applies a transformation function to the error value, returning the original success value unchanged if no error occurred.
+
+**Syntax:**
+```walnut
+Result<T, E>->ifError(^E => T => T)
+```
+
+**Examples:**
+```walnut
+/* Apply error handler callback */
+result = 42;
+handled = result->ifError(^err => 0);  /* 42 (no error, returned as-is) */
+
+error = @'Parse failed';
+handled = error->ifError(^err => -1);  /* -1 (error handler called) */
+
+/* Error recovery */
+parsed = parseInteger('42');
+withDefault = parsed->ifError(^err => 0);  /* Either parsed int or 0 */
+
+/* Logging errors */
+result = database->findUser(id);
+logged = result->ifError(^err => {
+    log->error('User lookup failed: ' + err->asString);
+    null
+});
+```
+
+### 11.9.6 Combining Transformation Methods
+
+Result transformation methods can be combined for elegant error handling:
+
+```walnut
+processData = ^input: String => Result<String, String> :: {
+    /* Parse and validate */
+    parsed = parseJson(input);
+
+    /* Extract array field and transform */
+    transformed = parsed
+        ->map(^# -> item('data'))  /* Extract 'data' field */
+        ->map(^# -> map(^item => # * 2));  /* Double each number */
+
+    /* Provide fallback */
+    result = transformed ?? [];
+
+    result->asString
+};
+```
+
+This combines mapping, transformation, and fallback handling in a functional style without explicit error checking.
+
+## 11.10 Practical Patterns
+
+### 11.10.1 Validation Pipeline
 
 ```walnut
 validateUser = ^input: Map => Result<User, ValidationError> :: {
@@ -453,7 +610,7 @@ validateUser = ^input: Map => Result<User, ValidationError> :: {
 };
 ```
 
-### 11.9.2 Database Operations
+### 11.10.2 Database Operations
 
 ```walnut
 findAndUpdateUser = ^id: Integer, updates: Map => *User %% [~Database] :: {
@@ -473,7 +630,7 @@ findAndUpdateUser = ^id: Integer, updates: Map => *User %% [~Database] :: {
 };
 ```
 
-### 11.9.3 Multi-Step Processing
+### 11.10.3 Multi-Step Processing
 
 ```walnut
 processOrder = ^orderId: Integer => Result<Receipt, Error> %% [~Database, ~Payment] :: {
@@ -503,7 +660,7 @@ processOrder = ^orderId: Integer => Result<Receipt, Error> %% [~Database, ~Payme
 };
 ```
 
-### 11.9.4 Error Recovery
+### 11.10.4 Error Recovery
 
 ```walnut
 loadConfig = ^path: String => Config :: {
@@ -521,7 +678,7 @@ loadConfig = ^path: String => Config :: {
 };
 ```
 
-### 11.9.5 Nested Error Handling
+### 11.10.5 Nested Error Handling
 
 ```walnut
 processNestedData = ^input: String => Result<Output, String> :: {
@@ -544,9 +701,9 @@ processNestedData = ^input: String => Result<Output, String> :: {
 };
 ```
 
-## 11.10 Error Handling Best Practices
+## 11.11 Error Handling Best Practices
 
-### 11.10.1 Use Result for Expected Failures
+### 11.11.1 Use Result for Expected Failures
 
 ```walnut
 /* Good: Use Result for expected failures */
@@ -562,7 +719,7 @@ findUser = ^id: Integer => Result<User, String> ::
 /* findUser = ^id: Integer => User|Null */
 ```
 
-### 11.10.2 Use Impure for External Operations
+### 11.11.2 Use Impure for External Operations
 
 ```walnut
 /* Good: Mark external operations as impure */
@@ -574,7 +731,7 @@ readFile = ^path: String => *String ::
 content = file |> read();
 ```
 
-### 11.10.3 Propagate Errors with => and |>
+### 11.11.3 Propagate Errors with => and |>
 
 ```walnut
 /* Good: Use shorthand operators */
@@ -587,7 +744,7 @@ result = database => query(id)
     database->query(id))->validate())->transform()); */
 ```
 
-### 11.10.4 Handle Errors at Appropriate Level
+### 11.11.4 Handle Errors at Appropriate Level
 
 ```walnut
 /* Good: Handle errors where you can recover */
@@ -605,7 +762,7 @@ strictLoadUser = ^id: Integer => *User :: {
 };
 ```
 
-### 11.10.5 Provide Context in Errors
+### 11.11.5 Provide Context in Errors
 
 ```walnut
 /* Good: Descriptive error messages */
@@ -620,82 +777,6 @@ validateAge = ^age: Integer => Result<Integer<0..150>, String> ::
 /* Avoid: Generic errors */
 /* @'Invalid' */
 ```
-
-## 11.11 Scoped Expressions and Early Returns
-
-Early returns work within scoped expressions (`:: { ... }`).
-
-**Example:**
-```walnut
-result = :: {
-    x = 10;
-    ?when(x > 5) {
-        => 'Large'  /* Exits the scoped expression */
-    };
-    'Small'
-};
-/* result = 'Large' */
-```
-
-**Multiple levels:**
-```walnut
-outer = :: {
-    inner = :: {
-        => 'Inner return'  /* Returns from inner scope */
-    };
-    inner + ' continued'
-};
-/* outer = 'Inner return continued' */
-```
-
-## 11.11 Result Folding with Collections
-
-When using `map` on collections where the mapping function returns a `Result` type, Walnut automatically "folds" the results. If any element produces an error, the entire operation returns that error immediately. Otherwise, it returns an array of the successful values.
-
-### 11.11.1 Automatic Result Folding
-
-**Example:**
-```walnut
-E := ();
-P := (a, b, c);
-Q := (d, e);
-
->>> {
-    myFn = ^ pl: Array<P> => Result<Array<Q>, E> :: {
-        pl->map(^~P => Result<Q, E> :: ?whenValueOf(p) is {
-            P.a: Q.d,
-            P.b: Q.e,
-            ~: @E
-        })
-    };
-
-    [myFn[P.a, P.b], myFn[P.b, P.c], myFn[]]->printed
-};
-/* Output: [[Q.d, Q.e], @E, []] */
-```
-
-**Explanation:**
-- `myFn[P.a, P.b]` maps both values successfully → `[Q.d, Q.e]`
-- `myFn[P.b, P.c]` encounters `P.c` which returns `@E` → entire result is `@E`
-- `myFn[]` maps empty array → `[]`
-
-This folding behavior means you don't need to manually check each result—the `map` operation automatically propagates errors for you.
-
-### 11.11.2 Folding Behavior
-
-```walnut
-/* When all succeed */
-[1, 2, 3]->map(^x => Result<Integer, String> :: x * 2);
-/* Returns: [2, 4, 6] */
-
-/* When one fails */
-[1, 2, 3]->map(^x => Result<Integer, String> ::
-    ?when(x == 2) { @'Error at 2' } ~ { x * 2 }
-);
-/* Returns: @'Error at 2' */
-```
-
-The folding stops at the first error, making it efficient and predictable.
 
 ## 11.12 Scoped Expressions and Early Returns
 
@@ -724,11 +805,62 @@ outer = :: {
 /* outer = 'Inner return continued' */
 ```
 
-## 11.13 Summary
+## 11.13 Result Folding with Collections
+
+When using `map` on collections where the mapping function returns a `Result` type, Walnut automatically "folds" the results. If any element produces an error, the entire operation returns that error immediately. Otherwise, it returns an array of the successful values.
+
+### 11.13.1 Automatic Result Folding
+
+**Example:**
+```walnut
+E := ();
+P := (a, b, c);
+Q := (d, e);
+
+>>> {
+    myFn = ^ pl: Array<P> => Result<Array<Q>, E> :: {
+        pl->map(^~P => Result<Q, E> :: ?whenValueOf(p) is {
+            P.a: Q.d,
+            P.b: Q.e,
+            ~: @E
+        })
+    };
+
+    [myFn[P.a, P.b], myFn[P.b, P.c], myFn[]]->printed
+};
+/* Output: [[Q.d, Q.e], @E, []] */
+```
+
+**Explanation:**
+- `myFn[P.a, P.b]` maps both values successfully → `[Q.d, Q.e]`
+- `myFn[P.b, P.c]` encounters `P.c` which returns `@E` → entire result is `@E`
+- `myFn[]` maps empty array → `[]`
+
+This folding behavior means you don't need to manually check each result—the `map` operation automatically propagates errors for you.
+
+### 11.13.2 Folding Behavior
+
+```walnut
+/* When all succeed */
+[1, 2, 3]->map(^x => Result<Integer, String> :: x * 2);
+/* Returns: [2, 4, 6] */
+
+/* When one fails */
+[1, 2, 3]->map(^x => Result<Integer, String> ::
+    ?when(x == 2) { @'Error at 2' } ~ { x * 2 }
+);
+/* Returns: @'Error at 2' */
+```
+
+The folding stops at the first error, making it efficient and predictable.
+
+## 11.14 Summary
 
 Walnut's error handling system provides:
 
 - **Result type** for representing success or failure
+- **Result transformation methods** (`map`, `mapIndexValue`, `mapKeyValue`, `ifError`)
+- **Error fallback operator** (`??`) via `binaryOrElse`
 - **Early returns** with `=>` for explicit control flow
 - **?noError** for automatic error propagation
 - **?noExternalError** for handling external errors separately
@@ -738,6 +870,7 @@ Walnut's error handling system provides:
 - **Explicit error types** for clear error contracts
 - **Impure types** for marking side-effecting operations
 - **Error checking expressions** with `?whenIsError`
+- **Result folding** with collections for elegant error handling in pipelines
 
 This system combines the benefits of:
 - **Explicit error handling** (like Result/Either in functional languages)

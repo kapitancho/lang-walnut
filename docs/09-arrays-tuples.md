@@ -41,6 +41,10 @@ Arrays can have constraints on length and element types.
 RGB = Array<Integer, 3>;                 /* Exactly 3 elements */
 coords = [10, 20, 30];                   /* Type: Array<Integer, 3> */
 
+/* Fixed length shorthand - Array<n> is shorthand for Array<n..n> */
+Triplet = Array<String, 3>;              /* Exactly 3 elements (also Array<3..3>) */
+Pair = Array<Integer, 2>;                /* Exactly 2 elements (also Array<2..2>) */
+
 /* Minimum length */
 NonEmptyIntegers = Array<Integer, 1..>;  /* At least 1 element */
 passwords = ['secret123'];               /* Type: Array<String, 1..> */

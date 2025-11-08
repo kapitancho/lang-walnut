@@ -1595,7 +1595,77 @@ err = @'Something went wrong';
 err->error;  /* 'Something went wrong' */
 ```
 
-## 16.16 JsonValue Methods
+## 16.16 Result Methods
+
+Methods for transforming and unwrapping Result types.
+
+### 16.16.1 Mapping and Transformation
+
+**`map`** - Transform the success value in a Result
+```walnut
+Result<T, E>->map(^T => U => Result<U, E>)
+
+result = 42;
+result->map(^# * 2);  /* 84 */
+
+error = @'Error occurred';
+error->map(^# * 2);  /* @'Error occurred' (error passes through) */
+
+/* Works with collections inside Result */
+result = [1, 2, 3];
+result->map(^# * 2);  /* [2, 4, 6] */
+```
+
+**`mapIndexValue`** - Transform array elements with index
+```walnut
+Result<Array<T>, E>->mapIndexValue(^[index: Integer, value: T] => U => Result<Array<U>, E>)
+
+result = ['a', 'b', 'c'];
+result->mapIndexValue(^[#index, #value] :: #index->asString + ': ' + #value);
+/* ['0: a', '1: b', '2: c'] */
+```
+
+**`mapKeyValue`** - Transform map/record key-value pairs
+```walnut
+Result<Map<T>, E>->mapKeyValue(^[key: String, value: T] => U => Result<Map<U>, E>)
+
+result = [a: 1, b: 2, c: 3];
+result->mapKeyValue(^[#key, #value] :: #key->toUpperCase + #value->asString);
+/* [a: 'A1', b: 'B2', c: 'C3'] */
+```
+
+### 16.16.2 Error Handling
+
+**`binaryOrElse` (??)** - Unwrap Result or provide fallback value
+```walnut
+Result<T, E>->binaryOrElse(T => T)
+
+result = 42;
+result ?? 0;  /* 42 */
+
+error = @'Error occurred';
+error ?? 0;  /* 0 (fallback value) */
+
+/* Useful in chains */
+value = getValue() ?? defaultValue;
+```
+
+**`ifError`** - Apply callback to error if present
+```walnut
+Result<T, E>->ifError(^E => T => T)
+
+result = 42;
+result->ifError(^err => 0);  /* 42 (no error, returns original) */
+
+error = @'Error occurred';
+error->ifError(^err => 0);  /* 0 (error callback called) */
+
+/* With custom error handling */
+result = parseInteger('abc');  /* Result<Integer, NotANumber> */
+result->ifError(^err => -1);  /* -1 (fallback on parse error) */
+```
+
+## 16.17 JsonValue Methods
 
 **`hydrateAs`** - Hydrate to type
 ```walnut
@@ -1613,7 +1683,7 @@ JsonValue->stringify(Null => String)
 json->stringify;  /* '{"a":1,"b":"hello"}' */
 ```
 
-## 16.17 Type Methods
+## 16.18 Type Methods
 
 Methods for introspecting and working with Type values:
 
@@ -1630,7 +1700,7 @@ Type->isSubtypeOf(Type => Boolean)
 
 **`numberRange`**, **`valueWithName`**, **`openApiSchema`** - Additional type utilities
 
-## 16.18 RegExp Methods
+## 16.19 RegExp Methods
 
 **`matchString`** - Match string against regular expression
 ```walnut
@@ -1640,7 +1710,7 @@ pattern = RegExp('/([a-z]+)([0-9]+)/');
 result = pattern->matchString('hello123');  /* ['hello123', 'hello', '123'] */
 ```
 
-## 16.19 Clock Methods
+## 16.20 Clock Methods
 
 **`now`** - Get current timestamp
 ```walnut
@@ -1649,7 +1719,7 @@ Clock->now(Null => Real)
 %clock->now;  /* Current Unix timestamp */
 ```
 
-## 16.20 Random Methods
+## 16.21 Random Methods
 
 **`integer`** - Generate random integer in range
 ```walnut
@@ -1665,7 +1735,7 @@ Random->uuid(Null => String)
 %random->uuid;  /* e.g., '550e8400-e29b-41d4-a716-446655440000' */
 ```
 
-## 16.21 PasswordString Methods
+## 16.22 PasswordString Methods
 
 **`hash`** - Hash password
 ```walnut
@@ -1683,7 +1753,7 @@ pwd = 'secret123';
 isValid = pwd->verify(hashedPassword);  /* true/false */
 ```
 
-## 16.22 DatabaseConnector Methods
+## 16.23 DatabaseConnector Methods
 
 **`query`** - Execute database query
 ```walnut
@@ -1695,7 +1765,7 @@ DatabaseConnector->query([sql: String, params: Array] => Array<Map>)
 DatabaseConnector->execute([sql: String, params: Array] => Integer)
 ```
 
-## 16.23 File Methods
+## 16.24 File Methods
 
 **`content`** - Read file content
 ```walnut
@@ -1717,28 +1787,28 @@ File->appendContent(String => Null)
 File->createIfMissing(Null => Null)
 ```
 
-## 16.24 RoutePattern Methods
+## 16.25 RoutePattern Methods
 
 **`matchAgainst`** - Match URL against route pattern
 ```walnut
 RoutePattern->matchAgainst(String => Result<Map<String>, NoMatch>)
 ```
 
-## 16.25 DependencyContainer Methods
+## 16.26 DependencyContainer Methods
 
 **`valueOf`** - Get value from dependency container
 ```walnut
 DependencyContainer->valueOf(Type => Any)
 ```
 
-## 16.26 EventBus Methods
+## 16.27 EventBus Methods
 
 **`fire`** - Fire event on event bus
 ```walnut
 EventBus->fire(Any => Null)
 ```
 
-## 16.27 Constructor Methods
+## 16.28 Constructor Methods
 
 **`asRegExp`** - Construct RegExp from string
 ```walnut
