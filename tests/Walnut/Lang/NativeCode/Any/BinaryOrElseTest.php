@@ -1,12 +1,19 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\Result;
+namespace Walnut\Lang\NativeCode\Any;
 
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 
 final class BinaryOrElseTest extends CodeExecutionTestHelper {
 
-	public function testIfErrorWithErrorTransform(): void {
+	public function testBinaryOrElseWithAny(): void {
+		$result = $this->executeCodeSnippet(
+			"404 ?? 504;",
+		);
+		$this->assertEquals("404", $result);
+	}
+
+	public function testBinaryOrElseWithErrorTransform(): void {
 		$result = $this->executeCodeSnippet(
 			"makeError(404) ?? 504;",
 			valueDeclarations: "
@@ -16,7 +23,7 @@ final class BinaryOrElseTest extends CodeExecutionTestHelper {
 		$this->assertEquals("504", $result);
 	}
 
-	public function testIfErrorWithNoTransform(): void {
+	public function testBinaryOrElseWithNoTransform(): void {
 		$result = $this->executeCodeSnippet(
 			"makeError(404) ?? 504;",
 			valueDeclarations: "
@@ -26,7 +33,7 @@ final class BinaryOrElseTest extends CodeExecutionTestHelper {
 		$this->assertEquals("'404'", $result);
 	}
 
-	public function testbinaryOrElseWithStringTransform(): void {
+	public function testBinaryOrElseWithStringTransform(): void {
 		$result = $this->executeCodeSnippet(
 			"makeError('failed') ?? 'ERROR';",
 			valueDeclarations: "

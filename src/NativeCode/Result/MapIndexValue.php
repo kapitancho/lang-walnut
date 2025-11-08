@@ -89,24 +89,8 @@ final readonly class MapIndexValue implements NativeMethod {
 			return $targetValue;
 		}
 
-		if ($targetValue instanceof TupleValue && $parameterValue instanceof FunctionValue) {
-			$values = $targetValue->values;
-			$result = [];
-			foreach($values as $index => $value) {
-				$r = $parameterValue->execute(
-					$programRegistry->executionContext,
-					$programRegistry->valueRegistry->record([
-						'index' => $programRegistry->valueRegistry->integer($index),
-						'value' => $value
-					])
-				);
-				if ($r instanceof ErrorValue) {
-					return $r;
-				}
-				$result[] = $r;
-			}
-			return ($programRegistry->valueRegistry->tuple($result));
-		}
+		// Only errors should reach this point, therefore no logic for Map<> values is needed.
+
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");
 		// @codeCoverageIgnoreEnd

@@ -132,7 +132,7 @@ AllTypes = [
         methodCall: 'method call'->length,
         scoped: :: 'scoped',
         functionBody: ^Any => Any :: 'function body',
-        data: MyData!1,
+        data: MyData!42,
         mutable: mutable{String, 'mutable'},
         matchTrue: ?whenIsTrue { 'then 1': 'then 1', 'then 2': 'then 2', ~: 'default' },
         matchType: ?whenTypeOf ('type') is { `String['type']: 'then 1', `String['other type']: 'then 2', ~: 'default' },
@@ -141,7 +141,6 @@ AllTypes = [
         matchIfThen: ?when('condition') { 'then' },
         matchIsErrorElse: ?whenIsError('condition') { 'then' } ~ { 'else' },
         matchIsError: ?whenIsError('condition') { 'then' },
-        data: MyData!42,
         functionCall: functionName('parameter'),
         constructorCall: TypeName('parameter'),
         propertyAccess: [property: 'value'].property

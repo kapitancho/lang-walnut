@@ -1,10 +1,17 @@
 <?php
 
-namespace Walnut\Lang\Test\NativeCode\Result;
+namespace Walnut\Lang\NativeCode\Any;
 
 use Walnut\Lang\Test\CodeExecutionTestHelper;
 
 final class IfErrorTest extends CodeExecutionTestHelper {
+
+	public function testIfErrorWithAny(): void {
+		$result = $this->executeCodeSnippet(
+			"404->ifError(^e: Integer => Integer :: e + 100);",
+		);
+		$this->assertEquals("404", $result);
+	}
 
 	public function testIfErrorWithErrorTransform(): void {
 		$result = $this->executeCodeSnippet(
@@ -35,11 +42,20 @@ final class IfErrorTest extends CodeExecutionTestHelper {
 		);
 	}
 
-	public function testIfErrorInvalidCallbackParameterType(): void {
+	public function testIfErrorInvalidCallbackParameterTypeForResult(): void {
 		$this->executeErrorCodeSnippet("The parameter type String of the callback function is not a subtype of Integer",
 			"makeError('x')->ifError(^e: Integer => Integer :: e);",
 			valueDeclarations: "
 				makeError = ^s: String => Result<Integer, String> :: @s;
+			"
+		);
+	}
+
+	public function testIfErrorInvalidCallbackParameterTypeForAny(): void {
+		$this->executeErrorCodeSnippet("The parameter type Any of the callback function is not a subtype of Integer",
+			"makeError('x')->ifError(^e: Integer => Integer :: e);",
+			valueDeclarations: "
+				makeError = ^s: String => Any :: @s;
 			"
 		);
 	}

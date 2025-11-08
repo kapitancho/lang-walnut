@@ -85,24 +85,8 @@ final readonly class MapKeyValue implements NativeMethod {
 			return $targetValue;
 		}
 
-		if ($targetValue instanceof RecordValue && $parameterValue instanceof FunctionValue) {
-			$values = $targetValue->values;
-			$result = [];
-			foreach($values as $key => $value) {
-				$r = $parameterValue->execute(
-					$programRegistry->executionContext,
-					$programRegistry->valueRegistry->record([
-						'key' => $programRegistry->valueRegistry->string($key),
-						'value' => $value
-					])
-				);
-				if ($r instanceof ErrorValue) {
-					return $r;
-				}
-				$result[$key] = $r;
-			}
-			return ($programRegistry->valueRegistry->record($result));
-		}
+		// Only errors should reach this point, therefore no logic for Map<> values is needed.
+
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");
 		// @codeCoverageIgnoreEnd

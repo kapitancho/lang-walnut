@@ -145,47 +145,8 @@ final readonly class Map implements NativeMethod {
 			return $targetValue;
 		}
 
-		if ($parameterValue instanceof FunctionValue) {
-			if ($targetValue instanceof TupleValue) {
-				$values = $targetValue->values;
-				$result = [];
-				foreach ($values as $value) {
-					$r = $parameterValue->execute($programRegistry->executionContext, $value);
-					if ($r instanceof ErrorValue) {
-						return $r;
-					}
-					$result[] = $r;
-				}
-				return $programRegistry->valueRegistry->tuple($result);
-			}
+		// Only errors should reach this point, therefore no logic for Map<> values is needed.
 
-			if ($targetValue instanceof RecordValue) {
-				$values = $targetValue->values;
-				$result = [];
-				foreach ($values as $key => $value) {
-					$r = $parameterValue->execute($programRegistry->executionContext, $value);
-					if ($r instanceof ErrorValue) {
-						return $r;
-					}
-					$result[$key] = $r;
-				}
-				return $programRegistry->valueRegistry->record($result);
-			}
-
-			if ($targetValue instanceof SetValue) {
-				$values = $targetValue->values;
-				$result = [];
-				foreach ($values as $value) {
-					$r = $parameterValue->execute($programRegistry->executionContext, $value);
-					if ($r instanceof ErrorValue) {
-						return $r;
-					}
-					$result[] = $r;
-				}
-				return $programRegistry->valueRegistry->set($result);
-			}
-
-		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");
 		// @codeCoverageIgnoreEnd
