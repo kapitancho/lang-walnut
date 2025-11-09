@@ -48,9 +48,9 @@ final readonly class BinaryLessThan implements NativeMethod {
 
 		if ($targetValue instanceof IntegerValue) {
 			if ($parameterValue instanceof IntegerValue) {
-				return ($programRegistry->valueRegistry->boolean(
+				return $programRegistry->valueRegistry->boolean(
 					$targetValue->literalValue < $parameterValue->literalValue
-				));
+				);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

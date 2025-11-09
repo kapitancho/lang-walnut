@@ -79,7 +79,7 @@ final readonly class Map implements NativeMethod {
 				}
 				$result[$key] = $r;
 			}
-			return ($programRegistry->valueRegistry->record($result));
+			return $programRegistry->valueRegistry->record($result);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

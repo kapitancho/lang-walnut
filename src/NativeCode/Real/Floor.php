@@ -49,7 +49,7 @@ final readonly class Floor implements NativeMethod {
 
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			$target = $targetValue->literalValue;
-			return ($programRegistry->valueRegistry->integer($target->floor()));
+			return $programRegistry->valueRegistry->integer($target->floor());
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

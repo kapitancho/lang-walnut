@@ -95,12 +95,12 @@ final readonly class Item implements NativeMethod {
 			if ($result !== null) {
 				return $result;
 			}
-			return ($programRegistry->valueRegistry->error(
+			return $programRegistry->valueRegistry->error(
 				$programRegistry->valueRegistry->dataValue(
 					new TypeNameIdentifier('MapItemNotFound'),
 					$programRegistry->valueRegistry->record(['key' => $parameter])
 				)
-			));
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

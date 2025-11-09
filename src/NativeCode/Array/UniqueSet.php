@@ -82,10 +82,10 @@ final readonly class UniqueSet implements NativeMethod {
 					// @codeCoverageIgnoreEnd
 				}
 				$rawValues = array_unique($rawValues);
-				return ($programRegistry->valueRegistry->set(array_map(
+				return $programRegistry->valueRegistry->set(array_map(
 					fn($value) => $programRegistry->valueRegistry->string($value),
 					$rawValues
-				)));
+				));
 			}
 			$rawValues = array_unique($rawValues, SORT_NUMERIC);
 			return $programRegistry->valueRegistry->set(array_map(

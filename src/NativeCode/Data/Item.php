@@ -133,12 +133,12 @@ final readonly class Item implements NativeMethod {
 				if ($result !== null) {
 					return $result;
 				}
-				return ($programRegistry->valueRegistry->error(
+				return $programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->dataValue(
 						new TypeNameIdentifier('IndexOutOfRange'),
 						$programRegistry->valueRegistry->record(['index' => $parameterValue])
 					)
-				));
+				);
 			}
 			if ($baseValue instanceof RecordValue && $parameterValue instanceof StringValue) {
 				$values = $baseValue->values;
@@ -146,12 +146,12 @@ final readonly class Item implements NativeMethod {
 				if ($result !== null) {
 					return $result;
 				}
-				return ($programRegistry->valueRegistry->error(
+				return $programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->dataValue(
 						new TypeNameIdentifier('MapItemNotFound'),
 						$programRegistry->valueRegistry->record(['key' => $parameterValue])
 					)
-				));
+				);
 			}
 		}
 		// @codeCoverageIgnoreStart

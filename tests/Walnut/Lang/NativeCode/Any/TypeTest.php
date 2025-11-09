@@ -91,4 +91,10 @@ final class TypeTest extends CodeExecutionTestHelper {
 		$this->assertEquals("type{Type<Integer>}", $result);
 	}
 
+	public function testTypeParameterType(): void {
+		$this->executeErrorCodeSnippet(
+			"Invalid parameter type: Integer[42]",
+			"'** hello **'->type(42);");
+	}
+
 }

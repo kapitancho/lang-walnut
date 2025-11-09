@@ -57,10 +57,9 @@ final readonly class MaxLength implements NativeMethod {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof StringType || $typeValue instanceof StringSubsetType ||
 				$typeValue instanceof ArrayType || $typeValue instanceof MapType || $typeValue instanceof SetType) {
-				return ($typeValue->range->maxLength === PlusInfinity::value ?
+				return $typeValue->range->maxLength === PlusInfinity::value ?
 					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('PlusInfinity')) :
-					$programRegistry->valueRegistry->integer($typeValue->range->maxLength)
-				);
+					$programRegistry->valueRegistry->integer($typeValue->range->maxLength);
 			}
 		}
 		// @codeCoverageIgnoreStart

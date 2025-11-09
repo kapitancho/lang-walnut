@@ -71,7 +71,7 @@ final readonly class Filter implements NativeMethod {
 					$result[] = $value;
 				}
 			}
-			return ($programRegistry->valueRegistry->tuple($result));
+			return $programRegistry->valueRegistry->tuple($result);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

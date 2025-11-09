@@ -6,6 +6,25 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 
 final class ValueOfTest extends CodeExecutionTestHelper {
 
+	public function testValueOf(): void {
+		$result = $this->executeCodeSnippet(
+			"getInteger()",
+			"A := Integer; ==> A :: {A!42};",
+			"getInteger = ^ => Result<Integer, DependencyContainerError> %% d: DependencyContainer :: d=>valueOf(`A)->value;"
+		);
+		$this->assertEquals(42, $result);
+	}
+
+
+	public function testValueOfNoDependencyFound(): void {
+		$result = $this->executeCodeSnippet(
+			"getInteger()",
+			"A := Integer;",
+			"getInteger = ^ => Result<Integer, DependencyContainerError> %% d: DependencyContainer :: d=>valueOf(`A)->value;"
+		);
+		$this->assertEquals("@DependencyContainerError![\n	targetType: type{A},\n	errorOnType: type{A},\n	errorMessage: 'Dependency not found'\n]", $result);
+	}
+
 	public function testValueOfWithInvalidTargetType(): void {
 		$this->executeErrorCodeSnippet(
 			'Cannot call method',

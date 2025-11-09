@@ -43,7 +43,7 @@ final readonly class Enumeration implements NativeMethod {
 		Value $parameter
 	): Value {
 		if ($target instanceof EnumerationValue) {
-			return ($programRegistry->valueRegistry->type($target->enumeration));
+			return $programRegistry->valueRegistry->type($target->enumeration);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

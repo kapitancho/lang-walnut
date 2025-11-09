@@ -74,13 +74,13 @@ final readonly class DownTo implements NativeMethod {
 		
 		if ($targetValue instanceof IntegerValue) {
 			if ($parameterValue instanceof IntegerValue) {
-	            return ($programRegistry->valueRegistry->tuple(
+	            return $programRegistry->valueRegistry->tuple(
 		            $targetValue->literalValue > $parameterValue->literalValue  ?
 						array_map(fn(int $i): IntegerValue =>
 							$programRegistry->valueRegistry->integer($i),
 							range($targetValue->literalValue, $parameterValue->literalValue, -1)
 						) : []
-	            ));
+	            );
 			}
 		}
 		// @codeCoverageIgnoreStart

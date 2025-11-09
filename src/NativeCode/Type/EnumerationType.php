@@ -53,7 +53,7 @@ final readonly class EnumerationType implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $targetValue->typeValue;
 			if ($typeValue instanceof EnumerationSubsetType) {
-				return ($programRegistry->valueRegistry->type($typeValue->enumeration));
+				return $programRegistry->valueRegistry->type($typeValue->enumeration);
 			}
 		}
 		// @codeCoverageIgnoreStart

@@ -60,14 +60,14 @@ final readonly class ReplaceContent implements NativeMethod {
 				$path = $targetValue->value->valueOf('path')->literalValue;
 				$result = @file_put_contents($path, $parameterValue->literalValue);
 				if ($result === false) {
-					return ($programRegistry->valueRegistry->error(
+					return $programRegistry->valueRegistry->error(
 						$programRegistry->valueRegistry->sealedValue(
 							new TypeNameIdentifier('CannotWriteFile'),
 							$targetValue
 						)
-					));
+					);
 				}
-				return ($programRegistry->valueRegistry->string($parameterValue));
+				return $programRegistry->valueRegistry->string($parameterValue);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

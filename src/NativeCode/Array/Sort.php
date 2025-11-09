@@ -79,18 +79,18 @@ final readonly class Sort implements NativeMethod {
 					// @codeCoverageIgnoreEnd
 				}
 				sort($rawValues, SORT_STRING);
-				return ($programRegistry->valueRegistry->tuple(array_map(
+				return $programRegistry->valueRegistry->tuple(array_map(
 					fn($value) => $programRegistry->valueRegistry->string($value),
 					$rawValues
-				)));
+				));
 			}
 			sort($rawValues, SORT_NUMERIC);
-			return ($programRegistry->valueRegistry->tuple(array_map(
+			return $programRegistry->valueRegistry->tuple(array_map(
 				fn($value) => str_contains((string)$value, '.') ?
 					$programRegistry->valueRegistry->real($value) :
 					$programRegistry->valueRegistry->integer($value),
 				$rawValues
-			)));
+			));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

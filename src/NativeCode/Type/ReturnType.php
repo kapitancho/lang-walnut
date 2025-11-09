@@ -52,7 +52,7 @@ final readonly class ReturnType implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof FunctionType || $typeValue instanceof ResultType) {
-				return ($programRegistry->valueRegistry->type($typeValue->returnType));
+				return $programRegistry->valueRegistry->type($typeValue->returnType);
 			}
 		}
 		// @codeCoverageIgnoreStart

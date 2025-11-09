@@ -46,7 +46,7 @@ final readonly class ErrorType implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof ResultType) {
-				return ($programRegistry->valueRegistry->type($typeValue->errorType));
+				return $programRegistry->valueRegistry->type($typeValue->errorType);
 			}
 		}
 		// @codeCoverageIgnoreStart

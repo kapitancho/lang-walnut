@@ -90,7 +90,7 @@ HydrationError->errorMessage(=> String) :: ''->concatList[
 ExternalError := $[errorType: String, originalError: Any, errorMessage: String];
 
 /* RegExp */
-InvalidRegExp := #[expression: String];
+InvalidRegExp := [expression: String];
 RegExp := $String;
 RegExpMatch := [match: String, groups: Array<String>];
 NoRegExpMatch := ();

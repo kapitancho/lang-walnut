@@ -86,7 +86,7 @@ final readonly class MapKeyValue implements NativeMethod {
 				}
 				$result[$key] = $r;
 			}
-			return ($programRegistry->valueRegistry->record($result));
+			return $programRegistry->valueRegistry->record($result);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

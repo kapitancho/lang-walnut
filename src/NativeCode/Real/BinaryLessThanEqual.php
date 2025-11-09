@@ -49,9 +49,9 @@ final readonly class BinaryLessThanEqual implements NativeMethod {
 		
 		if ($targetValue instanceof IntegerValue || $targetValue instanceof RealValue) {
 			if ($parameterValue instanceof IntegerValue || $targetValue instanceof RealValue) {
-				return ($programRegistry->valueRegistry->boolean(
+				return $programRegistry->valueRegistry->boolean(
 					$targetValue->literalValue <= $parameterValue->literalValue
-				));
+				);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

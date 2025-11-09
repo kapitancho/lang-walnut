@@ -69,7 +69,7 @@ final readonly class BinaryBitwiseXor implements NativeMethod {
 				foreach ($exclude as $value) {
 					$result[] = $value;
 				}
-				return ($programRegistry->valueRegistry->set($result));
+				return $programRegistry->valueRegistry->set($result);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

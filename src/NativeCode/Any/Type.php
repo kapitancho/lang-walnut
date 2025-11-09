@@ -35,9 +35,7 @@ final readonly class Type implements NativeMethod {
 		$parameterValue = $parameter;
 		
 		if ($parameterValue instanceof NullValue) {
-			return (
-				$programRegistry->valueRegistry->type($target->type)
-			);
+			return $programRegistry->valueRegistry->type($target->type);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid parameter value");

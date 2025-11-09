@@ -84,16 +84,16 @@ final readonly class InsertAt implements NativeMethod {
 							0,
 							[$value]
 						);
-						return ($programRegistry->valueRegistry->tuple($values));
+						return $programRegistry->valueRegistry->tuple($values);
 					}
-					return ($programRegistry->valueRegistry->error(
+					return $programRegistry->valueRegistry->error(
 						$programRegistry->valueRegistry->dataValue(
 							new TypeNameIdentifier('IndexOutOfRange'),
 							$programRegistry->valueRegistry->record([
 								'index' => $index
 							])
 						)
-					));
+					);
 				}
 				// @codeCoverageIgnoreStart
 				throw new ExecutionException("Invalid parameter value");
@@ -101,7 +101,7 @@ final readonly class InsertAt implements NativeMethod {
 			}
 			$values = $targetValue->values;
 			$values[] = $parameterValue;
-			return ($programRegistry->valueRegistry->tuple($values));
+			return $programRegistry->valueRegistry->tuple($values);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

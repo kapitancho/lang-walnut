@@ -49,7 +49,7 @@ final readonly class Ceil implements NativeMethod {
 
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			$target = $targetValue->literalValue;
-			return ($programRegistry->valueRegistry->integer($target->ceil()));
+			return $programRegistry->valueRegistry->integer($target->ceil());
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

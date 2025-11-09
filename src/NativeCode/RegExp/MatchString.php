@@ -55,26 +55,22 @@ final readonly class MatchString implements NativeMethod {
 					$matches
 				);
 				if ($result) {
-					return (
-						$programRegistry->valueRegistry->dataValue(
-							new TypeNameIdentifier('RegExpMatch'),
-							$programRegistry->valueRegistry->record([
-								'match' => $programRegistry->valueRegistry->string($matches[0]),
-								'groups' => $programRegistry->valueRegistry->tuple(
-									array_map(
-										fn($match) => $programRegistry->valueRegistry->string($match),
-										array_slice($matches, 1)
-									)
+					return $programRegistry->valueRegistry->dataValue(
+						new TypeNameIdentifier('RegExpMatch'),
+						$programRegistry->valueRegistry->record([
+							'match' => $programRegistry->valueRegistry->string($matches[0]),
+							'groups' => $programRegistry->valueRegistry->tuple(
+								array_map(
+									fn($match) => $programRegistry->valueRegistry->string($match),
+									array_slice($matches, 1)
 								)
-							])
-						)
+							)
+						])
 					);
 				} else {
-					return (
-						$programRegistry->valueRegistry->error(
-							$programRegistry->valueRegistry->atom(
-								new TypeNameIdentifier('NoRegExpMatch'),
-							)
+					return $programRegistry->valueRegistry->error(
+						$programRegistry->valueRegistry->atom(
+							new TypeNameIdentifier('NoRegExpMatch'),
 						)
 					);
 				}

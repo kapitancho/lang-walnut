@@ -66,13 +66,11 @@ final readonly class FindLast implements NativeMethod {
 			for ($index = count($values) - 1; $index >= 0; $index--) {
 				$r = $parameterValue->execute($programRegistry->executionContext, $values[$index]);
 				if ($true->equals($r)) {
-					return ($values[$index]);
+					return $values[$index];
 				}
 			}
-			return (
-				$programRegistry->valueRegistry->error(
-					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
-				)
+			return $programRegistry->valueRegistry->error(
+				$programRegistry->valueRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
 			);
 		}
 		// @codeCoverageIgnoreStart

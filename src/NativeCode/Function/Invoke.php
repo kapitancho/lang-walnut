@@ -27,8 +27,10 @@ final readonly class Invoke implements NativeMethod {
 			$typeRegistry->metaType(MetaTypeValue::Function)
 		);
 		if (!$baseTargetType) {
+			// @codeCoverageIgnoreStart
 			throw new AnalyserException(
 				sprintf("Invalid target type: %s, expected a function", $targetType));
+			// @codeCoverageIgnoreEnd
 		}
 		$p = $baseTargetType->parameterType;
 		$parameterType = $this->adjustParameterType(
@@ -55,9 +57,11 @@ final readonly class Invoke implements NativeMethod {
 	): Value {
 		$v = $target;
 		if (!($v instanceof FunctionValue)) {
+			// @codeCoverageIgnoreStart
 			throw new ExecutionException(
 				sprintf("Invalid target value: %s, expected a function", $target->type)
 			);
+			// @codeCoverageIgnoreEnd
 		}
 		$parameter = $this->adjustParameterValue(
 			$programRegistry->valueRegistry,

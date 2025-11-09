@@ -21,6 +21,14 @@ final class WithKeyValueTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[a: 'a', b: 5, c: 2]", $result);
 	}
 
+	public function testWithKeyValueAnyKey(): void {
+		$result = $this->executeCodeSnippet(
+			"f('f');",
+			valueDeclarations: "f = ^key: String => Map<String|Integer, 3..4> :: [a: 'a', b: 1, c: 2]->withKeyValue[value: 5, key: key];"
+		);
+		$this->assertEquals("[a: 'a', b: 1, c: 2, f: 5]", $result);
+	}
+
 	public function testWithKeyValueInvalidParameterValue(): void {
 		$this->executeErrorCodeSnippet("Invalid parameter type",
 			"[a: 'a', b: 1, c: 2]->withKeyValue[value: 'b']");

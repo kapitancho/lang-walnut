@@ -85,14 +85,14 @@ final readonly class BinaryPlus implements NativeMethod {
 		
 		if ($targetValue instanceof IntegerValue) {
 			if ($parameterValue instanceof IntegerValue) {
-	            return ($programRegistry->valueRegistry->integer(
+	            return $programRegistry->valueRegistry->integer(
 					$targetValue->literalValue + $parameterValue->literalValue
-	            ));
+	            );
 			}
 			if ($parameterValue instanceof RealValue) {
-	            return ($programRegistry->valueRegistry->real(
+	            return $programRegistry->valueRegistry->real(
 					$targetValue->literalValue + $parameterValue->literalValue
-	            ));
+	            );
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

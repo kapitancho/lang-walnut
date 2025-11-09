@@ -64,9 +64,7 @@ final readonly class BinaryMultiply implements NativeMethod {
 					$targetValue->literalValue,
 					(string)$parameterValue->literalValue
 				);
-				return (
-					$programRegistry->valueRegistry->string($result)
-				);
+				return $programRegistry->valueRegistry->string($result);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

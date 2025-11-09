@@ -11,6 +11,14 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 		$this->assertEquals("'hello hello hello '", $result);
 	}
 
+	public function testBinaryMultiplyInfinity(): void {
+		$result = $this->executeCodeSnippet(
+			"mul3('hello ');",
+			valueDeclarations: "mul3 = ^str: String => String :: str * 3;"
+		);
+		$this->assertEquals("'hello hello hello '", $result);
+	}
+
 	public function testBinaryMultiplyZero(): void {
 		$result = $this->executeCodeSnippet("'hello ' * 0;");
 		$this->assertEquals("''", $result);

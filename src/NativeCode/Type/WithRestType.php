@@ -83,14 +83,14 @@ final readonly class WithRestType implements NativeMethod {
 						$typeValue->types,
 						$parameter->typeValue,
 					);
-					return ($programRegistry->valueRegistry->type($result));
+					return $programRegistry->valueRegistry->type($result);
 				}
 				if ($typeValue instanceof RecordType) {
 					$result = $programRegistry->typeRegistry->record(
 						$typeValue->types,
 						$parameter->typeValue,
 					);
-					return ($programRegistry->valueRegistry->type($result));
+					return $programRegistry->valueRegistry->type($result);
 				}
 			}
 		}

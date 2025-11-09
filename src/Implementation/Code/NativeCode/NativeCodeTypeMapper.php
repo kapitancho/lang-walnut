@@ -108,6 +108,7 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 				'Intersection' => IntersectionType::class,
 				'EnumerationValue' => EnumerationType::class,
 				'Data' => DataType::class,
+				'Open' => OpenType::class,
 			][$type->value->value] ?? null;
 			return array_merge($baseIds,
 				$this->getTypeMapping()[$class] ?? []

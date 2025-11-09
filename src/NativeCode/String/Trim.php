@@ -46,10 +46,9 @@ final readonly class Trim implements NativeMethod {
 		$parameterValue = $parameter;
 
 		if ($targetValue instanceof StringValue) {
-			return ($parameterValue instanceof StringValue ?
+			return $parameterValue instanceof StringValue ?
 				$programRegistry->valueRegistry->string(trim($targetValue->literalValue, $parameterValue->literalValue)) :
-				$programRegistry->valueRegistry->string(trim($targetValue->literalValue))
-			);
+				$programRegistry->valueRegistry->string(trim($targetValue->literalValue));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

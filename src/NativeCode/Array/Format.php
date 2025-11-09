@@ -96,7 +96,9 @@ final readonly class Format implements NativeMethod {
 					$stringValue = $this->castAsString->evaluate($value);
 					if ($stringValue === null) {
 						// If conversion fails, use string representation
+						// @codeCoverageIgnoreStart
 						$stringValues[$index] = (string)$value;
+						// @codeCoverageIgnoreEnd
 					} else {
 						$stringValues[$index] = $stringValue;
 					}

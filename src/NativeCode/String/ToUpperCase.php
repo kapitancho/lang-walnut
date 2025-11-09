@@ -41,9 +41,7 @@ final readonly class ToUpperCase implements NativeMethod {
 		$targetValue = $target;
 
 		if ($targetValue instanceof StringValue) {
-			return (
-				$programRegistry->valueRegistry->string(mb_strtoupper($targetValue->literalValue))
-			);
+			return $programRegistry->valueRegistry->string(mb_strtoupper($targetValue->literalValue));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

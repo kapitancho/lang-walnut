@@ -69,11 +69,11 @@ final readonly class BinaryPower implements NativeMethod {
 
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			if ($parameterValue instanceof IntegerValue || $parameterValue instanceof RealValue) {
-                return ($programRegistry->valueRegistry->real(
+                return $programRegistry->valueRegistry->real(
 					str_contains($parameterValue->literalValue, '.') ?
 						((float)(string)$targetValue->literalValue) ** ((float)(string)$parameterValue->literalValue) :
 	                    $targetValue->literalValue->pow($parameterValue->literalValue)
-                ));
+                );
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

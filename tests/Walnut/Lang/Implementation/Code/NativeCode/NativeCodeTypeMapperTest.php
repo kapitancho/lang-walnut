@@ -425,7 +425,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testTypeOpen(): void {
 		$this->assertEquals(
-			[/*'Sealed', */'Any'],
+			['Open', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::Open
 			))

@@ -60,7 +60,7 @@ final readonly class BinaryPlus implements NativeMethod {
 		if ($targetValue instanceof RecordValue) {
 			if ($parameterValue instanceof RecordValue) {
 				$values = [... $targetValue->values, ... $parameterValue->values];
-				return ($programRegistry->valueRegistry->record($values));
+				return $programRegistry->valueRegistry->record($values);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

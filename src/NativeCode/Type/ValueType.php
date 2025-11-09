@@ -65,7 +65,7 @@ final readonly class ValueType implements NativeMethod {
 				$typeValue instanceof SealedType ||
 				$typeValue instanceof MutableType
 			) {
-				return ($programRegistry->valueRegistry->type($typeValue->valueType));
+				return $programRegistry->valueRegistry->type($typeValue->valueType);
 			}
 		}
 		// @codeCoverageIgnoreStart

@@ -51,7 +51,7 @@ final readonly class ParameterType implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof FunctionType) {
-				return ($programRegistry->valueRegistry->type($typeValue->parameterType));
+				return $programRegistry->valueRegistry->type($typeValue->parameterType);
 			}
 		}
 		// @codeCoverageIgnoreStart

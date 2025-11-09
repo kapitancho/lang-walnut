@@ -46,7 +46,7 @@ final readonly class Value implements NativeMethod {
 
 		$v = $targetValue;
 		if ($v instanceof MutableValue) {
-			return ($v->value);
+			return $v->value;
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

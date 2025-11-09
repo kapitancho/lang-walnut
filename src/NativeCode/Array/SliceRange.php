@@ -47,8 +47,10 @@ final readonly class SliceRange implements NativeMethod {
 					$endType->numberRange->max === PlusInfinity::value ? PlusInfinity::value :
 						min(
 							$targetType->range->maxLength,
-							$parameterType->types['start']->numberRange->min === MinusInfinity::value ?
+							$parameterType->types['start']->numberRange->min === MinusInfinity::value ? // not possible
+								// @codeCoverageIgnoreStart
 								$targetType->range->maxLength :
+								// @codeCoverageIgnoreEnd
 								$endType->numberRange->max->value - $parameterType->types['start']->numberRange->min->value
 						)
 				);
@@ -83,7 +85,7 @@ final readonly class SliceRange implements NativeMethod {
 						(string)$start->literalValue,
 						(string)$length
 					);
-					return ($programRegistry->valueRegistry->tuple($values));
+					return $programRegistry->valueRegistry->tuple($values);
 				}
 				// @codeCoverageIgnoreStart
 				throw new ExecutionException("Invalid parameter value");

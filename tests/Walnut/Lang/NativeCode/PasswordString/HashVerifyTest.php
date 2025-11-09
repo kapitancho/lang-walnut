@@ -16,4 +16,11 @@ final class HashVerifyTest extends CodeExecutionTestHelper {
 		$this->assertEquals("false", $result);
 	}
 
+	public function testHashVerifyInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet(
+			"Invalid parameter type: Integer[42]",
+			"x = PasswordString['test-123']; x->verify(42);"
+		);
+	}
+
 }

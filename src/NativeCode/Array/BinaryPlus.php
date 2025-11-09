@@ -63,7 +63,7 @@ final readonly class BinaryPlus implements NativeMethod {
 		if ($targetValue instanceof TupleValue) {
 			if ($parameterValue instanceof TupleValue) {
 				$values = array_merge($targetValue->values, $parameterValue->values);
-				return ($programRegistry->valueRegistry->tuple($values));
+				return $programRegistry->valueRegistry->tuple($values);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

@@ -56,13 +56,13 @@ final readonly class Ln implements NativeMethod {
 
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
             $val = (string)$targetValue->literalValue;
-			return ($val > 0 ? $programRegistry->valueRegistry->real(
+			return $val > 0 ? $programRegistry->valueRegistry->real(
 				log($val)
 			) : $programRegistry->valueRegistry->error(
                 $programRegistry->valueRegistry->atom(
                     new TypeNameIdentifier("NotANumber")
                 )
-            ));
+            );
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

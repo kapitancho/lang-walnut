@@ -58,14 +58,14 @@ final readonly class MinValue implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof IntegerType) {
-				return ($typeValue->numberRange->min === MinusInfinity::value ?
+				return $typeValue->numberRange->min === MinusInfinity::value ?
 					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('MinusInfinity')) :
-					$programRegistry->valueRegistry->integer($typeValue->numberRange->min->value));
+					$programRegistry->valueRegistry->integer($typeValue->numberRange->min->value);
 			}
 			if ($typeValue instanceof RealType) {
-				return ($typeValue->numberRange->min === MinusInfinity::value ?
+				return $typeValue->numberRange->min === MinusInfinity::value ?
 					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('MinusInfinity')) :
-					$programRegistry->valueRegistry->real($typeValue->numberRange->min->value));
+					$programRegistry->valueRegistry->real($typeValue->numberRange->min->value);
 			}
 		}
 		// @codeCoverageIgnoreStart

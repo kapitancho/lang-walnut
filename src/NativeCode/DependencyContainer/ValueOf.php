@@ -45,32 +45,28 @@ final readonly class ValueOf implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$parameterValue = $parameter;
-		
-		if ($parameterValue instanceof TypeValue) {
-			$type = $parameterValue->typeValue;
+		if ($parameter instanceof TypeValue) {
+			$type = $parameter->typeValue;
 			$result = $programRegistry->dependencyContainer->valueByType($type);
 			if ($result instanceof Value) {
 				return $result;
 			}
-			return (
-				$programRegistry->valueRegistry->error(
-					$programRegistry->valueRegistry->dataValue(
-						new TypeNameIdentifier('DependencyContainerError'),
-						$programRegistry->valueRegistry->record([
-							'targetType' => $programRegistry->valueRegistry->type($type),
-							'errorOnType' => $programRegistry->valueRegistry->type($result->type),
-							'errorMessage' => $programRegistry->valueRegistry->string(
-								match($result->unresolvableDependency) {
-									UnresolvableDependency::circularDependency => 'Circular dependency',
-									UnresolvableDependency::ambiguous => 'Ambiguous dependency',
-									UnresolvableDependency::notFound => 'Dependency not found',
-									UnresolvableDependency::unsupportedType => 'Unsupported type',
-									UnresolvableDependency::errorWhileCreatingValue => 'Error returned while creating value',
-								}
-							)
-						])
-					)
+			return $programRegistry->valueRegistry->error(
+				$programRegistry->valueRegistry->dataValue(
+					new TypeNameIdentifier('DependencyContainerError'),
+					$programRegistry->valueRegistry->record([
+						'targetType' => $programRegistry->valueRegistry->type($type),
+						'errorOnType' => $programRegistry->valueRegistry->type($result->type),
+						'errorMessage' => $programRegistry->valueRegistry->string(
+							match($result->unresolvableDependency) {
+								UnresolvableDependency::circularDependency => 'Circular dependency',
+								UnresolvableDependency::ambiguous => 'Ambiguous dependency',
+								UnresolvableDependency::notFound => 'Dependency not found',
+								UnresolvableDependency::unsupportedType => 'Unsupported type',
+								UnresolvableDependency::errorWhileCreatingValue => 'Error returned while creating value',
+							}
+						)
+					])
 				)
 			);
 		}

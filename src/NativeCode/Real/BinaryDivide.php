@@ -87,9 +87,9 @@ final readonly class BinaryDivide implements NativeMethod {
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			if ($parameterValue instanceof IntegerValue || $parameterValue instanceof RealValue) {
 				if ((float)(string)$parameterValue->literalValue === 0.0) {
-					return ($programRegistry->valueRegistry->error(
+					return $programRegistry->valueRegistry->error(
 						$programRegistry->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
-					));
+					);
 				}
 				// Special case: Integer / 1 = Integer
 				if (
@@ -99,10 +99,10 @@ final readonly class BinaryDivide implements NativeMethod {
 				) {
 					return $targetValue;
 				}
-                return ($programRegistry->valueRegistry->real(
+                return $programRegistry->valueRegistry->real(
 	                fdiv((string)$targetValue->literalValue, (string)$parameterValue->literalValue)
 	                //$targetValue->literalValue / $parameter->literalValue
-                ));
+                );
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

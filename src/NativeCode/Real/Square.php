@@ -76,9 +76,9 @@ final readonly class Square implements NativeMethod {
 
 
 		if ($targetValue instanceof IntegerValue || $targetValue instanceof RealValue) {
-			return ($programRegistry->valueRegistry->real(
+			return $programRegistry->valueRegistry->real(
                 $targetValue->literalValue * $targetValue->literalValue
-			));
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

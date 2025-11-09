@@ -41,9 +41,7 @@ final readonly class ToLowerCase implements NativeMethod {
 		$targetValue = $target;
 
 		if ($targetValue instanceof StringValue) {
-			return (
-				$programRegistry->valueRegistry->string(mb_strtolower($targetValue->literalValue))
-			);
+			return $programRegistry->valueRegistry->string(mb_strtolower($targetValue->literalValue));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

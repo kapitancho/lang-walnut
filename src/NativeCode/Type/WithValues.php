@@ -145,7 +145,7 @@ final readonly class WithValues implements NativeMethod {
 					$result = $programRegistry->typeRegistry->integerSubset(
 						array_map(fn(IntegerValue $value): Number => $value->literalValue, $values)
 					);
-					return ($programRegistry->valueRegistry->type($result));
+					return $programRegistry->valueRegistry->type($result);
 				}
 			}
 			if ($typeValue instanceof RealType) {
@@ -159,7 +159,7 @@ final readonly class WithValues implements NativeMethod {
 					$result = $programRegistry->typeRegistry->realSubset(
 						array_map(fn(RealValue|IntegerValue $value): Number => $value->literalValue, $values)
 					);
-					return ($programRegistry->valueRegistry->type($result));
+					return $programRegistry->valueRegistry->type($result);
 				}
 			}
 			if ($typeValue instanceof StringType) {
@@ -173,7 +173,7 @@ final readonly class WithValues implements NativeMethod {
 					$result = $programRegistry->typeRegistry->stringSubset(
 						array_map(fn(StringValue $value): string => $value->literalValue, $values)
 					);
-					return ($programRegistry->valueRegistry->type($result));
+					return $programRegistry->valueRegistry->type($result);
 				}
 			}
 			if ($typeValue instanceof EnumerationType) {
@@ -189,7 +189,7 @@ final readonly class WithValues implements NativeMethod {
 						if ($value instanceof EnumerationValue && $value->enumeration == $typeValue) {
 							$r[] = $value->name;
 						} else {
-							return ($programRegistry->valueRegistry->error(
+							return $programRegistry->valueRegistry->error(
 								$programRegistry->valueRegistry->dataValue(
 									new TypeNameIdentifier('UnknownEnumerationValue'),
 									$programRegistry->valueRegistry->record([
@@ -197,11 +197,11 @@ final readonly class WithValues implements NativeMethod {
 										'value' => $value
 									])
 								)
-							));
+							);
 						}
 					}
 					$result = $typeValue->subsetType($r);
-					return ($programRegistry->valueRegistry->type($result));
+					return $programRegistry->valueRegistry->type($result);
 				}
 			}
 		}

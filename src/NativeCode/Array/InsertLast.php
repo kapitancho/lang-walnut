@@ -54,7 +54,7 @@ final readonly class InsertLast implements NativeMethod {
 		if ($targetValue instanceof TupleValue) {
 			$values = $targetValue->values;
 			$values[] = $parameterValue;
-			return ($programRegistry->valueRegistry->tuple($values));
+			return $programRegistry->valueRegistry->tuple($values);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

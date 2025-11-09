@@ -69,7 +69,7 @@ final readonly class ChainInvoke implements NativeMethod {
 	            }
             }
         }
-		return ($parameterValue);
+		return $parameterValue;
     }
 
 }

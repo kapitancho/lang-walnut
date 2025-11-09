@@ -79,7 +79,7 @@ final readonly class WithLengthRange implements NativeMethod {
 						$minValue->literalValue,
 						$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
 					);
-					return ($programRegistry->valueRegistry->type($result));
+					return $programRegistry->valueRegistry->type($result);
 				}
 				if ($typeValue instanceof ArrayType) {
 					$range = $parameter->value->values;
@@ -90,7 +90,7 @@ final readonly class WithLengthRange implements NativeMethod {
 						$minValue->literalValue,
 						$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
 					);
-					return ($programRegistry->valueRegistry->type($result));
+					return $programRegistry->valueRegistry->type($result);
 				}
 				if ($typeValue instanceof MapType) {
 					$range = $parameter->value->values;
@@ -101,7 +101,7 @@ final readonly class WithLengthRange implements NativeMethod {
 						$minValue->literalValue,
 						$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
 					);
-					return ($programRegistry->valueRegistry->type($result));
+					return $programRegistry->valueRegistry->type($result);
 				}
 				if ($typeValue instanceof SetType) {
 					$range = $parameter->value->values;
@@ -112,7 +112,7 @@ final readonly class WithLengthRange implements NativeMethod {
 						$minValue->literalValue,
 						$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
 					);
-					return ($programRegistry->valueRegistry->type($result));
+					return $programRegistry->valueRegistry->type($result);
 				}
 			}
 		}

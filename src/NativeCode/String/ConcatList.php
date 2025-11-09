@@ -70,7 +70,7 @@ final readonly class ConcatList implements NativeMethod {
 						// @codeCoverageIgnoreEnd
 					}
 				}
-				return ($programRegistry->valueRegistry->string($result));
+				return $programRegistry->valueRegistry->string($result);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

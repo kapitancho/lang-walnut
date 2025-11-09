@@ -36,9 +36,9 @@ final readonly class IsSubtypeOf implements NativeMethod {
 		$parameterValue = $parameter;
 		
 		if ($targetValue instanceof TypeValue && $parameterValue instanceof TypeValue) {
-			return ($programRegistry->valueRegistry->boolean(
+			return $programRegistry->valueRegistry->boolean(
 				$targetValue->typeValue->isSubtypeOf($parameterValue->typeValue)
-			));
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid parameter value");

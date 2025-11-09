@@ -56,7 +56,7 @@ final readonly class BinaryMinus implements NativeMethod {
 						$result[] = $value;
 					}
 				}
-				return ($programRegistry->valueRegistry->set($result));
+				return $programRegistry->valueRegistry->set($result);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

@@ -67,7 +67,7 @@ final readonly class WithRefType implements NativeMethod {
 					$result = $programRegistry->typeRegistry->type(
 						$parameter->typeValue,
 					);
-					return ($programRegistry->valueRegistry->type($result));
+					return $programRegistry->valueRegistry->type($result);
 				}
 			}
 		}

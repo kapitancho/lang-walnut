@@ -81,14 +81,14 @@ final readonly class FindFirstKeyValue implements NativeMethod {
 						])
 					);
 					if ($filterResult->equals($true)) {
-						return ($val);
+						return $val;
 					}
 				}
-				return ($programRegistry->valueRegistry->error(
+				return $programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->atom(
 						new TypeNameIdentifier('ItemNotFound'),
 					)
-				));
+				);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

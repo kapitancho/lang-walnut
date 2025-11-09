@@ -81,16 +81,16 @@ final readonly class CountValues implements NativeMethod {
 					// @codeCoverageIgnoreEnd
 				}
 				$rawValues = array_count_values($rawValues);
-				return ($programRegistry->valueRegistry->record(array_map(
+				return $programRegistry->valueRegistry->record(array_map(
 					fn($value) => $programRegistry->valueRegistry->integer($value),
 					$rawValues
-				)));
+				));
 			}
 			$rawValues = array_count_values($rawValues);
-			return ($programRegistry->valueRegistry->record(array_map(
+			return $programRegistry->valueRegistry->record(array_map(
 				fn($value) => $programRegistry->valueRegistry->integer($value),
 				$rawValues
-			)));
+			));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

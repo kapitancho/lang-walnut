@@ -61,7 +61,7 @@ final readonly class Max implements NativeMethod {
 					$max = $value;
 				}
 			}
-			return ($maxV);
+			return $maxV;
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

@@ -89,7 +89,7 @@ final readonly class FilterKeyValue implements NativeMethod {
 						$result[$key] = $value;
 					}
 				}
-				return ($programRegistry->valueRegistry->record($result));
+				return $programRegistry->valueRegistry->record($result);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

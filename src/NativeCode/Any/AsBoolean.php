@@ -42,9 +42,9 @@ final readonly class AsBoolean implements NativeMethod {
 	): Value {
 		$targetValue = $target;
 		
-        return ($programRegistry->valueRegistry->boolean(
+        return $programRegistry->valueRegistry->boolean(
             $this->castAsBoolean->evaluate($targetValue)
-        ));
+        );
 	}
 
 }

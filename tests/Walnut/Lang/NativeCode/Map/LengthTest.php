@@ -15,4 +15,12 @@ final class LengthTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("[a: 1, b: 2]->length;");
 		$this->assertEquals("2", $result);
 	}
+
+	public function testLengthNonEmptyRange(): void {
+		$result = $this->executeCodeSnippet(
+			"[a: 1, b: 2]->length;",
+			valueDeclarations: "myLength = ^m: Map<3..5> => Integer<3..5> :: m->length;",
+		);
+		$this->assertEquals("2", $result);
+	}
 }

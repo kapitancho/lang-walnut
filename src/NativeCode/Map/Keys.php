@@ -48,14 +48,14 @@ final readonly class Keys implements NativeMethod {
 		$targetValue = $target;
 
 		if ($targetValue instanceof RecordValue) {
-			return ($programRegistry->valueRegistry->tuple(
+			return $programRegistry->valueRegistry->tuple(
 				array_map(
 					fn($key) => $programRegistry->valueRegistry->string($key),
 					array_keys(
 						$targetValue->values
 					)
 				)
-			));
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

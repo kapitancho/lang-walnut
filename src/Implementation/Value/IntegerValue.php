@@ -37,8 +37,8 @@ final class IntegerValue implements IntegerValueInterface, JsonSerializable {
 	}
 
 	public function equals(Value $other): bool {
-		return (($other instanceof RealValueInterface || $other instanceof IntegerValueInterface) &&
-			$this->normalize($this->literalValue) === $this->normalize($other->literalValue));
+		return ($other instanceof RealValueInterface || $other instanceof IntegerValueInterface) &&
+			$this->normalize($this->literalValue) === $this->normalize($other->literalValue);
 	}
 
 

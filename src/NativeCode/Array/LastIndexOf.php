@@ -58,14 +58,14 @@ final readonly class LastIndexOf implements NativeMethod {
 			$values = $targetValue->values;
 			for($index = count($values) - 1; $index >= 0; $index--) {
 				if ($values[$index]->equals($parameterValue)) {
-					return ($programRegistry->valueRegistry->integer($index));
+					return $programRegistry->valueRegistry->integer($index);
 				}
 			}
-			return ($programRegistry->valueRegistry->error(
+			return $programRegistry->valueRegistry->error(
 				$programRegistry->valueRegistry->atom(
 					new TypeNameIdentifier('ItemNotFound'),
 				)
-			));
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

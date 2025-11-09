@@ -43,12 +43,12 @@ final readonly class AsMutableOfType implements NativeMethod {
 
 		if ($parameterValue instanceof TypeValue) {
 			if ($target->type->isSubtypeOf($parameterValue->typeValue)) {
-				return ($programRegistry->valueRegistry->mutable(
+				return $programRegistry->valueRegistry->mutable(
 					$parameterValue->typeValue,
 					$targetValue
-				));
+				);
 			}
-			return ($programRegistry->valueRegistry->error(
+			return $programRegistry->valueRegistry->error(
 				$programRegistry->valueRegistry->dataValue(
 					new TypeNameIdentifier("CastNotAvailable"),
 					$programRegistry->valueRegistry->record([
@@ -56,7 +56,7 @@ final readonly class AsMutableOfType implements NativeMethod {
 						'to' => $programRegistry->valueRegistry->type($parameterValue->typeValue)
 					])
 				)
-			));
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid parameter value");

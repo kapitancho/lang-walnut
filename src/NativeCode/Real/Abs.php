@@ -69,7 +69,7 @@ final readonly class Abs implements NativeMethod {
 
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			$target = $targetValue->literalValue;
-			return ($programRegistry->valueRegistry->real(abs((string)$target)));
+			return $programRegistry->valueRegistry->real(abs((string)$target));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

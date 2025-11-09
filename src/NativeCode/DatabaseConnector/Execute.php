@@ -74,11 +74,9 @@ final readonly class Execute extends PdoMethod implements NativeMethod {
 					));
 					$rowCount = $stmt->rowCount();
 
-					return (
-						$programRegistry->valueRegistry->integer($rowCount)
-					);
+					return $programRegistry->valueRegistry->integer($rowCount);
 				} catch (PDOException $ex) {
-					return ($programRegistry->valueRegistry->error(
+					return $programRegistry->valueRegistry->error(
 						$programRegistry->valueRegistry->dataValue(
 							new TypeNameIdentifier('DatabaseQueryFailure'),
 							$programRegistry->valueRegistry->record([
@@ -87,7 +85,7 @@ final readonly class Execute extends PdoMethod implements NativeMethod {
 								'error' => $programRegistry->valueRegistry->string($ex->getMessage())
 							])
 						)
-					));
+					);
 				}
 			}
 			// @codeCoverageIgnoreStart

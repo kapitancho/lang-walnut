@@ -55,14 +55,14 @@ final readonly class KeyOf implements NativeMethod {
 			$values = $targetValue->values;
 			foreach ($values as $key => $value) {
 				if ($value->equals($parameterValue)) {
-					return ($programRegistry->valueRegistry->string($key));
+					return $programRegistry->valueRegistry->string($key);
 				}
 			}
-			return ($programRegistry->valueRegistry->error(
+			return $programRegistry->valueRegistry->error(
 				$programRegistry->valueRegistry->atom(
 					new TypeNameIdentifier('ItemNotFound'),
 				)
-			));
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

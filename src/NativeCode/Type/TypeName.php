@@ -63,7 +63,7 @@ final readonly class TypeName implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $targetValue->typeValue;
 			if ($typeValue instanceof NamedType) {
-				return ($programRegistry->valueRegistry->string($typeValue->name->identifier));
+				return $programRegistry->valueRegistry->string($typeValue->name->identifier);
 			}
 		}
 		// @codeCoverageIgnoreStart

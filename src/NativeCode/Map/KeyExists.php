@@ -53,9 +53,9 @@ final readonly class KeyExists implements NativeMethod {
 
 		if ($targetValue instanceof RecordValue && $parameterValue instanceof StringValue) {
 			$values = $targetValue->values;
-			return ($programRegistry->valueRegistry->boolean(
+			return $programRegistry->valueRegistry->boolean(
 				array_key_exists($parameterValue->literalValue, $values)
-			));
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

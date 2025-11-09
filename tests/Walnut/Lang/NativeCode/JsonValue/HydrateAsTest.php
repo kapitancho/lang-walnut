@@ -773,5 +773,12 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@HydrationError![\n\tvalue: 42,\n\thydrationPath: 'value',\n\terrorMessage: 'The value should be a string, containing a name of a valid type'\n]", $result);
 	}
 
+	public function testHydrateAsInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet(
+			"Invalid parameter type: Integer[42]",
+			"null->hydrateAs(42);"
+		);
+	}
+
 
 }

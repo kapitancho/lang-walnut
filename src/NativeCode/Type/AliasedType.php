@@ -53,7 +53,7 @@ final readonly class AliasedType implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $targetValue->typeValue;
 			if ($typeValue instanceof AliasType) {
-				return ($programRegistry->valueRegistry->type($typeValue->aliasedType));
+				return $programRegistry->valueRegistry->type($typeValue->aliasedType);
 			}
 		}
 		// @codeCoverageIgnoreStart

@@ -91,20 +91,16 @@ final readonly class Query extends PdoMethod implements NativeMethod {
 						);
 					}
 
-					return (
-						$programRegistry->valueRegistry->tuple($result)
-					);
+					return $programRegistry->valueRegistry->tuple($result);
 				} catch (PDOException $ex) {
-					return (
-						$programRegistry->valueRegistry->error(
-							$programRegistry->valueRegistry->dataValue(
-								new TypeNameIdentifier('DatabaseQueryFailure'),
-								$programRegistry->valueRegistry->record([
-									'query' => $parameterValue->values['query'],
-									'boundParameters' => $parameterValue->values['boundParameters'],
-									'error' => $programRegistry->valueRegistry->string($ex->getMessage())
-								])
-							)
+					return $programRegistry->valueRegistry->error(
+						$programRegistry->valueRegistry->dataValue(
+							new TypeNameIdentifier('DatabaseQueryFailure'),
+							$programRegistry->valueRegistry->record([
+								'query' => $parameterValue->values['query'],
+								'boundParameters' => $parameterValue->values['boundParameters'],
+								'error' => $programRegistry->valueRegistry->string($ex->getMessage())
+							])
 						)
 					);
 				}

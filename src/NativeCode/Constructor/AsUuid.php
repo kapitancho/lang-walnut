@@ -67,12 +67,10 @@ final readonly class AsUuid implements NativeMethod {
 				if ($this->isValidUuid($v->literalValue)) {
 					return $parameter;
 				}
-				return (
-					$programRegistry->valueRegistry->error(
-						$programRegistry->valueRegistry->dataValue(
-							new TypeNameIdentifier('InvalidUuid'),
-							$v
-						)
+				return $programRegistry->valueRegistry->error(
+					$programRegistry->valueRegistry->dataValue(
+						new TypeNameIdentifier('InvalidUuid'),
+						$v
 					)
 				);
 			}

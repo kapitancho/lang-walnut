@@ -58,13 +58,12 @@ final readonly class PositionOf implements NativeMethod {
 				if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof StringValue) {
 				$result = strpos($targetValue->literalValue, $parameterValue->literalValue);
-				return ($result === false ?
+				return $result === false ?
 					$programRegistry->valueRegistry->error(
 						$programRegistry->valueRegistry->atom(
 							new TypeNameIdentifier('SubstringNotInString')
 						)
-					) : $programRegistry->valueRegistry->integer($result)
-				);
+					) : $programRegistry->valueRegistry->integer($result);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

@@ -52,7 +52,7 @@ final readonly class MinLength implements NativeMethod {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof StringType || $typeValue instanceof StringSubsetType ||
 				$typeValue instanceof ArrayType || $typeValue instanceof MapType || $typeValue instanceof SetType) {
-				return ($programRegistry->valueRegistry->integer($typeValue->range->minLength));
+				return $programRegistry->valueRegistry->integer($typeValue->range->minLength);
 			}
 		}
 		// @codeCoverageIgnoreStart

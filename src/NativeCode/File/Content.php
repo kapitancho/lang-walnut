@@ -52,14 +52,14 @@ final readonly class Content implements NativeMethod {
 			$path = $targetValue->value->valueOf('path')->literalValue;
 			$contents = @file_get_contents($path);
 			if ($contents === false) {
-				return ($programRegistry->valueRegistry->error(
+				return $programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->sealedValue(
 						new TypeNameIdentifier('CannotReadFile'),
 						$targetValue->value
 					)
-				));
+				);
 			}
-			return ($programRegistry->valueRegistry->string($contents));
+			return $programRegistry->valueRegistry->string($contents);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

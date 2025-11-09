@@ -62,7 +62,7 @@ final readonly class Insert implements NativeMethod {
 			if (!$exists) {
 				$values[] = $parameterValue;
 			}
-			return ($programRegistry->valueRegistry->set($values));
+			return $programRegistry->valueRegistry->set($values);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

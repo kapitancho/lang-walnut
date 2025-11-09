@@ -82,7 +82,7 @@ final readonly class Slice implements NativeMethod {
 						(string)$start->literalValue,
 						(string)$length->literalValue
 					);
-					return ($programRegistry->valueRegistry->tuple($values));
+					return $programRegistry->valueRegistry->tuple($values);
 				}
 				// @codeCoverageIgnoreStart
 				throw new ExecutionException("Invalid parameter value");

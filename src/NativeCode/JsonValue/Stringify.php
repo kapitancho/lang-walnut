@@ -85,9 +85,9 @@ final readonly class Stringify implements NativeMethod {
 	): Value {
 		$targetValue = $target;
 
-		return ($programRegistry->valueRegistry->string(
+		return $programRegistry->valueRegistry->string(
 			json_encode($this->doStringify($targetValue), JSON_PRETTY_PRINT)
-		));
+		);
 	}
 
 }

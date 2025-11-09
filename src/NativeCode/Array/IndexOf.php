@@ -58,14 +58,14 @@ final readonly class IndexOf implements NativeMethod {
 			$values = $targetValue->values;
 			foreach ($values as $index => $value) {
 				if ($value->equals($parameterValue)) {
-					return ($programRegistry->valueRegistry->integer($index));
+					return $programRegistry->valueRegistry->integer($index);
 				}
 			}
-			return ($programRegistry->valueRegistry->error(
+			return $programRegistry->valueRegistry->error(
 				$programRegistry->valueRegistry->atom(
 					new TypeNameIdentifier('ItemNotFound'),
 				)
-			));
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

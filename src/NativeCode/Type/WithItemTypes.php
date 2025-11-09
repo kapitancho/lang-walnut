@@ -98,7 +98,7 @@ final readonly class WithItemTypes implements NativeMethod {
 						array_map(fn(TypeValue $tv): TypeInterface => $tv->typeValue, $parameter->values),
 						$typeValue->restType,
 					);
-					return ($programRegistry->valueRegistry->type($result));
+					return $programRegistry->valueRegistry->type($result);
 				}
 			}
 			if ($parameter->type->isSubtypeOf(
@@ -113,7 +113,7 @@ final readonly class WithItemTypes implements NativeMethod {
 						array_map(fn(TypeValue $tv): TypeInterface => $tv->typeValue, $parameter->values),
 						$typeValue->restType,
 					);
-					return ($programRegistry->valueRegistry->type($result));
+					return $programRegistry->valueRegistry->type($result);
 				}
 			}
 		}

@@ -40,30 +40,6 @@ final readonly class With implements NativeMethod {
 		if ($type instanceof DataType) {
 			$valueType = $this->toBaseType($type->valueType);
 
-			$alignTypeWithValidator = function() use ($typeRegistry, $methodFinder, $targetType, $valueType) {
-				$constructorType = $typeRegistry->atom(
-					new TypeNameIdentifier('Constructor')
-				);
-				$validatorMethod = $methodFinder->methodForType(
-					$constructorType,
-					new MethodNameIdentifier('as' . $targetType->name->identifier)
-				);
-				if ($validatorMethod !== UnknownMethod::value) {
-					$validatorResultType = $validatorMethod->analyse(
-						$typeRegistry,
-						$methodFinder,
-						$constructorType,
-						$valueType
-					);
-					if ($validatorResultType instanceof ResultType) {
-						return $typeRegistry->result(
-							$targetType, $validatorResultType->errorType
-						);
-					}
-				}
-				return $targetType;
-			};
-
 			$pType = $this->toBaseType($parameterType);
 
 			if ($valueType instanceof ArrayType) {
@@ -81,7 +57,7 @@ final readonly class With implements NativeMethod {
 							$pType->range->maxLength <= $valueType->range->maxLength
 						)
 					) {
-						return $alignTypeWithValidator();
+						return $targetType;
 					}
 					throw new AnalyserException(
 						sprintf("Cannot call 'with' on Array type %s with a parameter of Array type %s due to incompatible length",
@@ -107,7 +83,7 @@ final readonly class With implements NativeMethod {
 									$targetType, $parameterType, $vIndex));
 						}
 					}
-					return $alignTypeWithValidator();
+					return $targetType;
 				}
 				if ($pType instanceof TupleType) {
 					if (count($pType->types) > count($valueType->types)) {
@@ -130,7 +106,7 @@ final readonly class With implements NativeMethod {
 									$targetType, $parameterType, $vIndex));
 						}
 					}
-					return $alignTypeWithValidator();
+					return $targetType;
 				}
 			}
 			if ($valueType instanceof MapType) {
@@ -145,7 +121,7 @@ final readonly class With implements NativeMethod {
 					if (
 						$valueType->range->maxLength === PlusInfinity::value
 					) {
-						return $alignTypeWithValidator();
+						return $targetType;
 					}
 				}
 				throw new AnalyserException(
@@ -167,7 +143,7 @@ final readonly class With implements NativeMethod {
 									$targetType, $parameterType, $vKey));
 						}
 					}
-					return $alignTypeWithValidator();
+					return $targetType;
 				}
 			}
 		}
@@ -187,12 +163,8 @@ final readonly class With implements NativeMethod {
 		if ($targetValue instanceof DataValue) {
 			$baseValue = $targetValue->value;
 
-			$executeValidator = function(Value $parameterValue) use ($programRegistry, $baseValue, $targetValue) {
-				return new ValueConstructor()->executeValidator(
-					$programRegistry,
-					$targetValue->type,
-					$parameterValue
-				);
+			$construct = function(Value $parameterValue) use ($programRegistry, $baseValue, $targetValue) {
+				return $programRegistry->valueRegistry->dataValue($targetValue->type->name, $parameterValue);
 			};
 
 			if ($baseValue instanceof TupleValue && $parameterValue instanceof TupleValue) {
@@ -200,14 +172,14 @@ final readonly class With implements NativeMethod {
 				foreach ($parameter->values as $index => $value) {
 					$values[$index] = $value;
 				}
-				return $executeValidator($programRegistry->valueRegistry->tuple($values));
+				return $construct($programRegistry->valueRegistry->tuple($values));
 			}
 			if ($baseValue instanceof RecordValue && $parameterValue instanceof RecordValue) {
 				$values = $baseValue->values;
 				foreach ($parameter->values as $key => $value) {
 					$values[$key] = $value;
 				}
-				return $executeValidator($programRegistry->valueRegistry->record($values));
+				return $construct($programRegistry->valueRegistry->record($values));
 			}
 		}
 		// @codeCoverageIgnoreStart

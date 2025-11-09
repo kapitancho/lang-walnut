@@ -41,7 +41,7 @@ final readonly class Error implements NativeMethod {
 		$targetValue = $target;
 
 		if ($targetValue instanceof ErrorValue) {
-			return ($targetValue->errorValue);
+			return $targetValue->errorValue;
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

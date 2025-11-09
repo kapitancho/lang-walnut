@@ -65,10 +65,10 @@ final readonly class Flip implements NativeMethod {
 				}
 			}
 			$rawValues = array_flip($rawValues);
-			return ($programRegistry->valueRegistry->record(array_map(
+			return $programRegistry->valueRegistry->record(array_map(
 				fn($value) => $programRegistry->valueRegistry->integer($value),
 				$rawValues
-			)));
+			));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

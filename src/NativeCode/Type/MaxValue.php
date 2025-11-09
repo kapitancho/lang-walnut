@@ -59,16 +59,14 @@ final readonly class MaxValue implements NativeMethod {
 			//TODO: yyy - open vs closed intervals
 			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof IntegerType) {
-				return ($typeValue->numberRange->max === PlusInfinity::value ?
+				return $typeValue->numberRange->max === PlusInfinity::value ?
 					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('PlusInfinity')) :
-					$programRegistry->valueRegistry->integer($typeValue->numberRange->max->value)
-				);
+					$programRegistry->valueRegistry->integer($typeValue->numberRange->max->value);
 			}
 			if ($typeValue instanceof RealType) {
-				return ($typeValue->numberRange->max === PlusInfinity::value ?
+				return $typeValue->numberRange->max === PlusInfinity::value ?
 					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('PlusInfinity')) :
-					$programRegistry->valueRegistry->real($typeValue->numberRange->max->value)
-				);
+					$programRegistry->valueRegistry->real($typeValue->numberRange->max->value);
 			}
 		}
 		// @codeCoverageIgnoreStart

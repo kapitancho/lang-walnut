@@ -88,7 +88,7 @@ final readonly class PadLeft implements NativeMethod {
 						-(int)(string)$length->literalValue,
 						$padValue
 					);
-					return ($programRegistry->valueRegistry->tuple($result));
+					return $programRegistry->valueRegistry->tuple($result);
 				}
 			}
 			// @codeCoverageIgnoreStart

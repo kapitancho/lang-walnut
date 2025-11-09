@@ -46,7 +46,7 @@ final readonly class UnaryNot implements NativeMethod {
 		$targetValue = $target;
 
 		if ($targetValue instanceof BooleanValue) {
-            return ($programRegistry->valueRegistry->boolean(!$targetValue->literalValue));
+            return $programRegistry->valueRegistry->boolean(!$targetValue->literalValue);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

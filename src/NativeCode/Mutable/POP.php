@@ -56,11 +56,11 @@ final readonly class POP implements NativeMethod {
 					$value = array_pop($values);
 					$v->value = $programRegistry->valueRegistry->tuple($values);
 
-					return ($value);
+					return $value;
 				}
-				return ($programRegistry->valueRegistry->error(
+				return $programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->atom(new TypeNameIdentifier("ItemNotFound"))
-				));
+				);
 			}
 		}
 		// @codeCoverageIgnoreStart

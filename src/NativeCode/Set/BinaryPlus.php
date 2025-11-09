@@ -54,9 +54,9 @@ final readonly class BinaryPlus implements NativeMethod {
 
 				if ($targetValue instanceof SetValue) {
 			if ($parameterValue instanceof SetValue) {
-				return ($programRegistry->valueRegistry->set(
+				return $programRegistry->valueRegistry->set(
 					$targetValue->valueSet + $parameterValue->valueSet
-				));
+				);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

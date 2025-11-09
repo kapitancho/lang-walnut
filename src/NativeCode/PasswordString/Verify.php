@@ -53,12 +53,12 @@ final readonly class Verify implements NativeMethod {
 		)) {
 			$passwordString = $targetValue->value->valueOf('value');
 			if ($passwordString instanceof StringValue && $parameterValue instanceof StringValue) {
-				return ($programRegistry->valueRegistry->boolean(
+				return $programRegistry->valueRegistry->boolean(
 					password_verify(
 						$passwordString->literalValue,
 						$parameterValue->literalValue,
 					)
-				));
+				);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

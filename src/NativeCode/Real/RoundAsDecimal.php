@@ -51,9 +51,7 @@ final readonly class RoundAsDecimal implements NativeMethod {
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			$target = $targetValue->literalValue;
 			if ($parameterValue instanceof IntegerValue && $parameterValue->literalValue >= 0) {
-				return (
-					$programRegistry->valueRegistry->real($target->round((string)$parameterValue->literalValue))
-				);
+				return $programRegistry->valueRegistry->real($target->round((string)$parameterValue->literalValue));
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

@@ -87,15 +87,15 @@ final readonly class Values implements NativeMethod {
 			if ($targetValue instanceof TypeValue) {
 				$refType = $targetValue->typeValue;
 				if ($refType instanceof EnumerationSubsetType) {
-					return ($programRegistry->valueRegistry->tuple(
+					return $programRegistry->valueRegistry->tuple(
 						array_values(
 							array_unique(
 								$refType->subsetValues
 							)
 						)
-					));
+					);
 				} elseif ($refType instanceof IntegerSubsetType) {
-					return ($programRegistry->valueRegistry->tuple(
+					return $programRegistry->valueRegistry->tuple(
 						array_map(
 							fn(Number $value): IntegerValue => $programRegistry->valueRegistry->integer($value),
 							array_values(
@@ -104,9 +104,9 @@ final readonly class Values implements NativeMethod {
 								)
 							)
 						)
-					));
+					);
 				} elseif ($refType instanceof RealSubsetType) {
-					return ($programRegistry->valueRegistry->tuple(
+					return $programRegistry->valueRegistry->tuple(
 						array_map(
 							fn(Number $value): RealValue => $programRegistry->valueRegistry->real($value),
 							array_values(
@@ -115,9 +115,9 @@ final readonly class Values implements NativeMethod {
 								)
 							)
 						)
-					));
+					);
 				} elseif ($refType instanceof StringSubsetType) {
-					return ($programRegistry->valueRegistry->tuple(
+					return $programRegistry->valueRegistry->tuple(
 						array_map(
 							fn(string $value): StringValue => $programRegistry->valueRegistry->string($value),
 							array_values(
@@ -126,7 +126,7 @@ final readonly class Values implements NativeMethod {
 								)
 							)
 						)
-					));
+					);
 				}
 			}
 			// @codeCoverageIgnoreStart

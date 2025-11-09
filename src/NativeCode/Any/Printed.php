@@ -25,9 +25,9 @@ final readonly class Printed implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-        return ($programRegistry->valueRegistry->string(
+        return $programRegistry->valueRegistry->string(
             (string)$target
-        ));
+        );
 	}
 
 }

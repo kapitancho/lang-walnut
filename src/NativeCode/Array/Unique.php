@@ -83,18 +83,18 @@ final readonly class Unique implements NativeMethod {
 					// @codeCoverageIgnoreEnd
 				}
 				$rawValues = array_unique($rawValues);
-				return ($programRegistry->valueRegistry->tuple(array_map(
+				return $programRegistry->valueRegistry->tuple(array_map(
 					fn($value) => $programRegistry->valueRegistry->string($value),
 					$rawValues
-				)));
+				));
 			}
 			$rawValues = array_unique($rawValues, SORT_NUMERIC);
-			return ($programRegistry->valueRegistry->tuple(array_map(
+			return $programRegistry->valueRegistry->tuple(array_map(
 				fn($value) => str_contains($value, '.') ?
 					$programRegistry->valueRegistry->real($value) :
 					$programRegistry->valueRegistry->integer($value),
 				$rawValues
-			)));
+			));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

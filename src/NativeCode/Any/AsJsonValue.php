@@ -49,7 +49,7 @@ final readonly class AsJsonValue implements NativeMethod {
 		} catch (FunctionReturn $return) {
 			return $return->typedValue;
 		}
-		return ($result);
+		return $result;
 	}
 
 }

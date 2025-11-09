@@ -46,12 +46,11 @@ final readonly class AsInteger implements NativeMethod {
 
 		if ($targetValue instanceof StringValue) {
 			$target = $targetValue->literalValue;
-			return ((string)($result = (int)$target) === $target ?
+			return (string)($result = (int)$target) === $target ?
 				$programRegistry->valueRegistry->integer($result) :
 				$programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
-				)
-			);
+				);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

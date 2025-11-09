@@ -218,28 +218,24 @@ final readonly class ValueConstructor {
 		};
 		$parameterValue = $parameter;
 		if ($type instanceof ResultType) {
-			return (
-				$valueRegistry->error($parameterValue)
-			);
+			return $valueRegistry->error($parameterValue);
 		}
-		return (
-			match(true) {
-				/*$type instanceof DataType => $valueRegistry->dataValue(
-					$type->name, $parameterValue
-				),*/
-				$type instanceof OpenType => $valueRegistry->openValue(
-					$type->name, $parameterValue
-				),
-				$type instanceof SealedType => $valueRegistry->sealedValue(
-					$type->name, $parameterValue
-				),
-				//$type instanceof AtomType => $type->value,
-				$type instanceof EnumerationType => $et($type, $parameterValue),
-				default => throw new ExecutionException(
-					sprintf("Cannot construct a value of type: %s", $type)
-				)
-			}
-		);
+		return match(true) {
+			/*$type instanceof DataType => $valueRegistry->dataValue(
+				$type->name, $parameterValue
+			),*/
+			$type instanceof OpenType => $valueRegistry->openValue(
+				$type->name, $parameterValue
+			),
+			$type instanceof SealedType => $valueRegistry->sealedValue(
+				$type->name, $parameterValue
+			),
+			//$type instanceof AtomType => $type->value,
+			$type instanceof EnumerationType => $et($type, $parameterValue),
+			default => throw new ExecutionException(
+				sprintf("Cannot construct a value of type: %s", $type)
+			)
+		};
 	}
 
 	public function executeConstructor(

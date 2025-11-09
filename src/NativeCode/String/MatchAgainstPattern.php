@@ -70,7 +70,7 @@ final readonly class MatchAgainstPattern implements NativeMethod {
 				if (!preg_match('#' . $path . '#', $target, $matches)) {
 					return $programRegistry->valueRegistry->false;
 				}
-				return (is_array($pathArgs) ?
+				return is_array($pathArgs) ?
 					$programRegistry->valueRegistry->record(
 						array_map(fn($value) =>
 							$programRegistry->valueRegistry->string($value),
@@ -80,8 +80,7 @@ final readonly class MatchAgainstPattern implements NativeMethod {
 							)
 						)
 					) :
-					$programRegistry->valueRegistry->record([])
-				);
+					$programRegistry->valueRegistry->record([]);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

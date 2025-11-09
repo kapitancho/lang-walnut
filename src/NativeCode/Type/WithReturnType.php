@@ -89,7 +89,7 @@ final readonly class WithReturnType implements NativeMethod {
 						$parameter->typeValue,
 						$typeValue->errorType,
 					);
-					return ($programRegistry->valueRegistry->type($result));
+					return $programRegistry->valueRegistry->type($result);
 				}
 				if ($typeValue instanceof FunctionType) {
 					$result = $programRegistry->typeRegistry->function(

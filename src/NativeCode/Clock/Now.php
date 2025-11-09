@@ -49,7 +49,7 @@ final readonly class Now implements NativeMethod {
 			new TypeNameIdentifier('Clock')
 		)) {
 			$now = new DateTimeImmutable;
-			return ($programRegistry->valueRegistry->openValue(
+			return $programRegistry->valueRegistry->openValue(
 				new TypeNameIdentifier('DateAndTime'),
 				$programRegistry->valueRegistry->record([
 					'date' => $programRegistry->valueRegistry->openValue(
@@ -70,7 +70,7 @@ final readonly class Now implements NativeMethod {
 						)
 					),
 				])
-			));
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

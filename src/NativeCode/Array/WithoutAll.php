@@ -49,7 +49,7 @@ final readonly class WithoutAll implements NativeMethod {
 		if ($targetValue instanceof TupleValue) {
 			$values = $targetValue->values;
 			$values = array_values(array_filter($values, static fn($value) => !$value->equals($parameterValue)));
-			return ($programRegistry->valueRegistry->tuple($values));
+			return $programRegistry->valueRegistry->tuple($values);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

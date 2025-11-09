@@ -59,10 +59,10 @@ final readonly class Chunk implements NativeMethod {
 				if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof IntegerValue) {
 				$result = str_split($targetValue->literalValue, (string)$parameterValue->literalValue);
-				return ($programRegistry->valueRegistry->tuple(
+				return $programRegistry->valueRegistry->tuple(
 					array_map(fn(string $piece): StringValue =>
 						$programRegistry->valueRegistry->string($piece), $result)
-				));
+				);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

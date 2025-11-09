@@ -36,4 +36,11 @@ final class MatchAgainstTest extends CodeExecutionTestHelper {
 		$this->assertEquals("RoutePatternDoesNotMatch", $result);
 	}
 
+	public function testMatchAgainstInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet(
+			"Invalid parameter type: Integer[42]",
+			"RoutePattern('hello/{+who}')->matchAgainst(42);",
+			"RoutePatternDoesNotMatch := (); RoutePattern := # String;");
+	}
+
 }

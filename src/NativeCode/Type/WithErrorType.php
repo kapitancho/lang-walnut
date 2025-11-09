@@ -70,7 +70,7 @@ final readonly class WithErrorType implements NativeMethod {
 						$typeValue->returnType,
 						$parameter->typeValue,
 					);
-					return ($programRegistry->valueRegistry->type($result));
+					return $programRegistry->valueRegistry->type($result);
 				}
 			}
 		}

@@ -96,7 +96,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 			$found[$index] = $foundValue;
 		}
 
-		return ($this->programRegistry->valueRegistry->tuple($found));
+		return $this->programRegistry->valueRegistry->tuple($found);
 	}
 
 	private function findRecordValue(RecordType $recordType): Value|DependencyError {
@@ -124,7 +124,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 			}*/
 			$found[$key] = $foundValue;
 		}
-		return ($this->programRegistry->valueRegistry->record($found));
+		return $this->programRegistry->valueRegistry->record($found);
 	}
 
 	private function findDataValue(DataType $type): Value|DependencyError {

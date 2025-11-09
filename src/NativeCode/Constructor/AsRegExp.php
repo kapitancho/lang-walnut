@@ -67,12 +67,10 @@ final readonly class AsRegExp implements NativeMethod {
 				if ($this->isValidRegexp($v->literalValue)) {
 					return $parameter;
 				}
-				return (
-					$programRegistry->valueRegistry->error(
-						$programRegistry->valueRegistry->dataValue(
-							new TypeNameIdentifier('InvalidRegExp'),
-							$v
-						)
+				return $programRegistry->valueRegistry->error(
+					$programRegistry->valueRegistry->dataValue(
+						new TypeNameIdentifier('InvalidRegExp'),
+						$v
 					)
 				);
 			}

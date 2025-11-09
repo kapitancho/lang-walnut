@@ -47,12 +47,12 @@ final readonly class Contains implements NativeMethod {
 		
 				if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof StringValue) {
-				return ($programRegistry->valueRegistry->boolean(
+				return $programRegistry->valueRegistry->boolean(
 					str_contains(
 						$targetValue->literalValue,
 						$parameterValue->literalValue
 					)
-				));
+				);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

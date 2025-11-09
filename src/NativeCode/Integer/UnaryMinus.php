@@ -75,7 +75,7 @@ final readonly class UnaryMinus implements NativeMethod {
 
 		if ($targetValue instanceof IntegerValue) {
 			$target = $targetValue->literalValue;
-			return ($programRegistry->valueRegistry->integer(-$target));
+			return $programRegistry->valueRegistry->integer(-$target);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

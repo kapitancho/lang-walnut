@@ -53,11 +53,11 @@ final readonly class SHIFT implements NativeMethod {
 					$value = array_shift($values);
 					$v->value = $programRegistry->valueRegistry->tuple($values);
 
-					return ($value);
+					return $value;
 				}
-				return ($programRegistry->valueRegistry->error(
+				return $programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->atom(new TypeNameIdentifier("ItemNotFound"))
-				));
+				);
 			}
 		}
 		// @codeCoverageIgnoreStart

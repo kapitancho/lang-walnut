@@ -89,20 +89,20 @@ final readonly class ItemTypes implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof TupleType || $typeValue instanceof UnionType || $typeValue instanceof IntersectionType) {
-				return ($programRegistry->valueRegistry->tuple(
+				return $programRegistry->valueRegistry->tuple(
 					array_map(
 						fn(TypeInterface $type) => $programRegistry->valueRegistry->type($type),
 						$typeValue->types
 					)
-				));
+				);
 			}
 			if ($typeValue instanceof RecordType) {
-				return ($programRegistry->valueRegistry->record(
+				return $programRegistry->valueRegistry->record(
 					array_map(
 						fn(TypeInterface $type) => $programRegistry->valueRegistry->type($type),
 						$typeValue->types
 					)
-				));
+				);
 			}
 		}
 		// @codeCoverageIgnoreStart

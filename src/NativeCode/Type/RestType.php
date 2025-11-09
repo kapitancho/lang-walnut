@@ -54,7 +54,7 @@ final readonly class RestType implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof TupleType || $typeValue instanceof RecordType) {
-				return ($programRegistry->valueRegistry->type($typeValue->restType));
+				return $programRegistry->valueRegistry->type($typeValue->restType);
 			}
 		}
 		// @codeCoverageIgnoreStart

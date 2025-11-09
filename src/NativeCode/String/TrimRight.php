@@ -31,6 +31,7 @@ final readonly class TrimRight implements NativeMethod {
 			if ($parameterType instanceof NullType || $parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
 				return $typeRegistry->string(0, $targetType->range->maxLength);
 			}
+			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -46,10 +47,9 @@ final readonly class TrimRight implements NativeMethod {
 		$parameterValue = $parameter;
 
 		if ($targetValue instanceof StringValue) {
-			return ($parameterValue instanceof StringValue ?
+			return $parameterValue instanceof StringValue ?
 				$programRegistry->valueRegistry->string(rtrim($targetValue->literalValue, $parameterValue->literalValue)) :
-				$programRegistry->valueRegistry->string(rtrim($targetValue->literalValue))
-			);
+				$programRegistry->valueRegistry->string(rtrim($targetValue->literalValue));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

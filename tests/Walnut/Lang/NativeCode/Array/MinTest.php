@@ -15,6 +15,11 @@ final class MinTest extends CodeExecutionTestHelper {
 		$this->assertEquals("1", $result);
 	}
 
+	public function testMinNonEmptyReversed(): void {
+		$result = $this->executeCodeSnippet("[2, 1]->min;");
+		$this->assertEquals("1", $result);
+	}
+
 	public function testMinNonEmptyReal(): void {
 		$result = $this->executeCodeSnippet("[1, 3.14]->min;");
 		$this->assertEquals("1", $result);

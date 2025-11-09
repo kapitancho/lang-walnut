@@ -15,4 +15,12 @@ final class SquareTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("-1.5->square;");
 		$this->assertEquals("2.25", $result);
 	}
+
+	public function testSquareNegativeRnge(): void {
+		$result = $this->executeCodeSnippet(
+			"f(-11);",
+			valueDeclarations: "f = ^num: Real<-20..-3.14> => Real<9..400> :: num->square;"
+		);
+		$this->assertEquals("121", $result);
+	}
 }

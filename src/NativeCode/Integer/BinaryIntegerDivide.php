@@ -58,13 +58,13 @@ final readonly class BinaryIntegerDivide implements NativeMethod {
 		if ($targetValue instanceof IntegerValue) {
 			if ($parameterValue instanceof IntegerValue) {
 				if ((int)(string)$parameterValue->literalValue === 0) {
-					return ($programRegistry->valueRegistry->error(
+					return $programRegistry->valueRegistry->error(
 						$programRegistry->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
-					));
+					);
 				}
-                return ($programRegistry->valueRegistry->integer(
+                return $programRegistry->valueRegistry->integer(
 	                intdiv((string)$targetValue->literalValue, (string)$parameterValue->literalValue)
-                ));
+                );
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

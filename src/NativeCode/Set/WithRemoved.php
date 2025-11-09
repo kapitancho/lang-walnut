@@ -58,11 +58,11 @@ final readonly class WithRemoved implements NativeMethod {
 			$key = (string)$parameterValue;
 			if (array_key_exists($key, $values)) {
 				unset($values[$key]);
-				return ($programRegistry->valueRegistry->set($values));
+				return $programRegistry->valueRegistry->set($values);
 			}
-			return ($programRegistry->valueRegistry->error(
+			return $programRegistry->valueRegistry->error(
 				$programRegistry->valueRegistry->atom(new TypeNameIdentifier("ItemNotFound"))
-			));
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

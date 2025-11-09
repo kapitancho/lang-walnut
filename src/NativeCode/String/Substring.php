@@ -65,13 +65,13 @@ final readonly class Substring implements NativeMethod {
 				$start instanceof IntegerValue &&
 				$length instanceof IntegerValue
 			) {
-				return ($programRegistry->valueRegistry->string(
+				return $programRegistry->valueRegistry->string(
 					mb_substr(
 						$targetValue->literalValue,
 						(string)$start->literalValue,
 						(string)$length->literalValue
 					)
-				));
+				);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

@@ -26,4 +26,10 @@ final class BinaryAndTest extends CodeExecutionTestHelper {
 		$this->assertEquals("true", $result);
 	}
 
+	public function testBinaryAndInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet(
+			"Invalid parameter type: Integer[42]",
+			"true && 42;");
+	}
+
 }

@@ -60,19 +60,17 @@ final readonly class WithoutFirst implements NativeMethod {
 		if ($targetValue instanceof TupleValue) {
 			$values = $targetValue->values;
 			if (count($values) === 0) {
-				return (
-					$programRegistry->valueRegistry->error(
-						$programRegistry->valueRegistry->atom(
-							new TypeNameIdentifier("ItemNotFound")
-						)
+				return $programRegistry->valueRegistry->error(
+					$programRegistry->valueRegistry->atom(
+						new TypeNameIdentifier("ItemNotFound")
 					)
 				);
 			}
 			$element = array_shift($values);
-			return ($programRegistry->valueRegistry->record([
+			return $programRegistry->valueRegistry->record([
 				'element' => $element,
 				'array' => $programRegistry->valueRegistry->tuple($values)
-			]));
+			]);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

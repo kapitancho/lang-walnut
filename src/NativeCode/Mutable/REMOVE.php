@@ -58,11 +58,11 @@ final readonly class REMOVE implements NativeMethod {
 				if (array_key_exists($k, $vs)) {
 					unset($vs[$k]);
 					$v->value = $programRegistry->valueRegistry->set($vs);
-					return ($parameterValue);
+					return $parameterValue;
 				}
-				return ($programRegistry->valueRegistry->error(
+				return $programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->atom(new TypeNameIdentifier("ItemNotFound"))
-				));
+				);
 			}
 		}
 		// @codeCoverageIgnoreStart

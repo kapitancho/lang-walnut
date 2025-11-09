@@ -57,7 +57,7 @@ final readonly class AsInteger implements NativeMethod {
 
 		if ($targetValue instanceof BooleanValue) {
 			$target = $targetValue->literalValue;
-			return ($programRegistry->valueRegistry->integer($target ? 1 : 0));
+			return $programRegistry->valueRegistry->integer($target ? 1 : 0);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

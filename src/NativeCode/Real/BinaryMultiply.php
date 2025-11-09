@@ -90,9 +90,9 @@ final readonly class BinaryMultiply implements NativeMethod {
 
 		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			if ($parameterValue instanceof IntegerValue || $parameterValue instanceof RealValue) {
-                return ($programRegistry->valueRegistry->real(
+                return $programRegistry->valueRegistry->real(
 	                $targetValue->literalValue * $parameterValue->literalValue
-                ));
+                );
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

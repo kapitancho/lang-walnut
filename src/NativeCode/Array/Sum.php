@@ -103,9 +103,7 @@ final readonly class Sum implements NativeMethod {
 				}
 				$sum += $v;
 			}
-			return (
-				$hasReal ? $programRegistry->valueRegistry->real($sum) : $programRegistry->valueRegistry->integer($sum)
-			);
+			return $hasReal ? $programRegistry->valueRegistry->real($sum) : $programRegistry->valueRegistry->integer($sum);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

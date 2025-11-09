@@ -62,13 +62,13 @@ final readonly class Replace implements NativeMethod {
 				$replacement = $parameterValue->valueOf('replacement');
 				if ($replacement instanceof StringValue) {
 					if ($match instanceof StringValue) {
-						return ($programRegistry->valueRegistry->string(
+						return $programRegistry->valueRegistry->string(
 							str_replace($match->literalValue, $replacement->literalValue, $source)
-						));
+						);
 					} elseif ($match instanceof SealedValue && $match->type->name->equals(new TypeNameIdentifier('RegExp'))) {
-						return ($programRegistry->valueRegistry->string(
+						return $programRegistry->valueRegistry->string(
 							preg_replace($match->value->literalValue, $replacement->literalValue, $source)
-						));
+						);
 					}
 				}
 			}

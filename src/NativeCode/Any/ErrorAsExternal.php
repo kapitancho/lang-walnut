@@ -63,16 +63,14 @@ final readonly class ErrorAsExternal implements NativeMethod {
 				$errorMessage = $parameterValue instanceof StringValue ? $parameterValue :
 					$programRegistry->valueRegistry->string('Error');
 
-				return (
-				    $programRegistry->valueRegistry->error(
-						$programRegistry->valueRegistry->sealedValue(
-							new TypeNameIdentifier("ExternalError"),
-							$programRegistry->valueRegistry->record([
-								'errorType' => $programRegistry->valueRegistry->string((string)$errorValue->type),
-								'originalError' => $targetValue,
-								'errorMessage' => $errorMessage
-							])
-						)
+				return $programRegistry->valueRegistry->error(
+					$programRegistry->valueRegistry->sealedValue(
+						new TypeNameIdentifier("ExternalError"),
+						$programRegistry->valueRegistry->record([
+							'errorType' => $programRegistry->valueRegistry->string((string)$errorValue->type),
+							'originalError' => $targetValue,
+							'errorMessage' => $errorMessage
+						])
 					)
 				);
 			}

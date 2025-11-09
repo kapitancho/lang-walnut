@@ -67,7 +67,7 @@ final readonly class Flatten implements NativeMethod {
                     // @codeCoverageIgnoreEnd
                 }
             }
-			return ($programRegistry->valueRegistry->tuple($result));
+			return $programRegistry->valueRegistry->tuple($result);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

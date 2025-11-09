@@ -45,7 +45,7 @@ final readonly class RefType implements NativeMethod {
 		if ($targetValue instanceof TypeValue) {
 			$typeValue = $this->toBaseType($targetValue->typeValue);
 			if ($typeValue instanceof TypeType) {
-				return ($programRegistry->valueRegistry->type($typeValue->refType));
+				return $programRegistry->valueRegistry->type($typeValue->refType);
 			}
 		}
 		// @codeCoverageIgnoreStart

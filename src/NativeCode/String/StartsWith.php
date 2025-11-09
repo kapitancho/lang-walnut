@@ -47,12 +47,12 @@ final readonly class StartsWith implements NativeMethod {
 
 				if ($targetValue instanceof StringValue) {
 			if ($parameterValue instanceof StringValue) {
-				return ($programRegistry->valueRegistry->boolean(
+				return $programRegistry->valueRegistry->boolean(
 					str_starts_with(
 						$targetValue->literalValue,
 						$parameterValue->literalValue
 					)
-				));
+				);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

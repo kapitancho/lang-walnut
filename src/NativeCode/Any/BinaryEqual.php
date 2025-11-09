@@ -29,9 +29,9 @@ final readonly class BinaryEqual implements NativeMethod {
 		$targetValue = $target;
 		$parameterValue = $parameter;
 		
-		return ($programRegistry->valueRegistry->boolean(
+		return $programRegistry->valueRegistry->boolean(
             $targetValue->equals($parameterValue)
-        ));
+        );
 	}
 
 }

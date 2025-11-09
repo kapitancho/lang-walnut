@@ -49,7 +49,7 @@ final readonly class WithoutAll implements NativeMethod {
 		if ($targetValue instanceof RecordValue) {
 			$values = $targetValue->values;
 			$values = array_filter($values, static fn($value) => !$value->equals($parameterValue));
-			return ($programRegistry->valueRegistry->record($values));
+			return $programRegistry->valueRegistry->record($values);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

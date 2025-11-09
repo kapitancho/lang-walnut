@@ -82,7 +82,7 @@ final readonly class PadRight implements NativeMethod {
 						(string)$length->literalValue,
 						$padString->literalValue
                     );
-					return ($programRegistry->valueRegistry->string($result));
+					return $programRegistry->valueRegistry->string($result);
 				}
 			}
 			// @codeCoverageIgnoreStart

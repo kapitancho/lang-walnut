@@ -7,7 +7,7 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 final class NumberRangeTest extends CodeExecutionTestHelper {
 
 	public function testNumberRangeInteger(): void {
-		$result = $this->executeCodeSnippet("`Integer<(..10], 13, [20..25)>->numberRange;");
+		$result = $this->executeCodeSnippet("`Integer<(..10], 13, [20..25), (32..)>->numberRange;");
 		$this->assertEquals("IntegerNumberRange![
 	IntegerNumberInterval[
 		start: MinusInfinity,
@@ -20,6 +20,10 @@ final class NumberRangeTest extends CodeExecutionTestHelper {
 	IntegerNumberInterval[
 		start: IntegerNumberIntervalEndpoint![value: 20, inclusive: true],
 		end: IntegerNumberIntervalEndpoint![value: 25, inclusive: false]
+	],
+	IntegerNumberInterval[
+		start: IntegerNumberIntervalEndpoint![value: 32, inclusive: false],
+		end: PlusInfinity
 	]
 ]", $result);
 	}

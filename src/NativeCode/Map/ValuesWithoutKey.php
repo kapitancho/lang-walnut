@@ -71,15 +71,15 @@ final readonly class ValuesWithoutKey implements NativeMethod {
 			if ($parameterValue instanceof StringValue) {
 				$values = $targetValue->values;
 				if (!isset($values[$parameterValue->literalValue])) {
-					return ($programRegistry->valueRegistry->error(
+					return $programRegistry->valueRegistry->error(
 						$programRegistry->valueRegistry->dataValue(
 							new TypeNameIdentifier('MapItemNotFound'),
 							$programRegistry->valueRegistry->record(['key' => $parameterValue])
 						)
-					));
+					);
 				}
 				unset($values[$parameterValue->literalValue]);
-				return ($programRegistry->valueRegistry->record($values));
+				return $programRegistry->valueRegistry->record($values);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

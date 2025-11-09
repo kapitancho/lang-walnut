@@ -46,9 +46,9 @@ final readonly class Hash implements NativeMethod {
 		)) {
 			$passwordString = $targetValue->value->valueOf('value');
 			if ($passwordString instanceof StringValue) {
-				return ($programRegistry->valueRegistry->string(
+				return $programRegistry->valueRegistry->string(
 					password_hash($passwordString->literalValue, PASSWORD_DEFAULT)
-				));
+				);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

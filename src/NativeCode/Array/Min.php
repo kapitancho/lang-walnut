@@ -61,7 +61,7 @@ final readonly class Min implements NativeMethod {
 					$min = $value;
 				}
 			}
-			return ($minV);
+			return $minV;
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

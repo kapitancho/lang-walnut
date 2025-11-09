@@ -90,7 +90,7 @@ final readonly class WithItemType implements NativeMethod {
 						$typeValue->range->minLength,
 						$typeValue->range->maxLength,
 					);
-					return ($programRegistry->valueRegistry->type($result));
+					return $programRegistry->valueRegistry->type($result);
 				}
 				if ($typeValue instanceof MapType) {
 					$result = $programRegistry->typeRegistry->map(
@@ -98,7 +98,7 @@ final readonly class WithItemType implements NativeMethod {
 						$typeValue->range->minLength,
 						$typeValue->range->maxLength,
 					);
-					return ($programRegistry->valueRegistry->type($result));
+					return $programRegistry->valueRegistry->type($result);
 				}
 				if ($typeValue instanceof SetType) {
 					$result = $programRegistry->typeRegistry->set(
@@ -106,7 +106,7 @@ final readonly class WithItemType implements NativeMethod {
 						$typeValue->range->minLength,
 						$typeValue->range->maxLength,
 					);
-					return ($programRegistry->valueRegistry->type($result));
+					return $programRegistry->valueRegistry->type($result);
 				}
 			}
 		}

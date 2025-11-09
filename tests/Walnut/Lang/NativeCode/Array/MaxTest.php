@@ -15,6 +15,11 @@ final class MaxTest extends CodeExecutionTestHelper {
 		$this->assertEquals("2", $result);
 	}
 
+	public function testMaxNonEmptyReversed(): void {
+		$result = $this->executeCodeSnippet("[2, 1]->max;");
+		$this->assertEquals("2", $result);
+	}
+
 	public function testMaxNonEmptyReal(): void {
 		$result = $this->executeCodeSnippet("[1, 3.14]->max;");
 		$this->assertEquals("3.14", $result);

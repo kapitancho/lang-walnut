@@ -59,9 +59,9 @@ final readonly class BinaryBitwiseAnd implements NativeMethod {
 		
 		if ($targetValue instanceof IntegerValue) {
 			if ($parameterValue instanceof IntegerValue) {
-	            return ($programRegistry->valueRegistry->integer(
+	            return $programRegistry->valueRegistry->integer(
 		            (int)(string)$targetValue->literalValue & (int)(string)$parameterValue->literalValue
-	            ));
+	            );
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

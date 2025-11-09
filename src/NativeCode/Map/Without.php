@@ -62,12 +62,12 @@ final readonly class Without implements NativeMethod {
 			foreach($values as $key => $value) {
 				if ($value->equals($parameterValue)) {
 					unset($values[$key]);
-					return ($programRegistry->valueRegistry->record($values));
+					return $programRegistry->valueRegistry->record($values);
 				}
 			}
-			return ($programRegistry->valueRegistry->error(
+			return $programRegistry->valueRegistry->error(
 				$programRegistry->valueRegistry->atom(new TypeNameIdentifier("ItemNotFound"))
-			));
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

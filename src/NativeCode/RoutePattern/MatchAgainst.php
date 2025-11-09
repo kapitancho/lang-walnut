@@ -70,10 +70,10 @@ final readonly class MatchAgainst implements NativeMethod {
 				}
 				$pattern = strtolower($pattern);
 				if (!preg_match('#' . $pattern . '#', $path, $matches)) {
-					return ($programRegistry->valueRegistry->atom(new TypeNameIdentifier('RoutePatternDoesNotMatch')));
+					return $programRegistry->valueRegistry->atom(new TypeNameIdentifier('RoutePatternDoesNotMatch'));
 				}
 				if (!is_array($pathArgs)) {
-					return ($programRegistry->valueRegistry->record([]));
+					return $programRegistry->valueRegistry->record([]);
 				}
 				$values = [];
 				$matchedValues = array_slice($matches, 1);
@@ -88,7 +88,7 @@ final readonly class MatchAgainst implements NativeMethod {
 						);
 					}
 				}
-				return ($programRegistry->valueRegistry->record($values));
+				return $programRegistry->valueRegistry->record($values);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

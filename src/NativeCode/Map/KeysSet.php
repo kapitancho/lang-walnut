@@ -48,14 +48,14 @@ final readonly class KeysSet implements NativeMethod {
 		$targetValue = $target;
 
 		if ($targetValue instanceof RecordValue) {
-			return ($programRegistry->valueRegistry->set(
+			return $programRegistry->valueRegistry->set(
 				array_map(
 					fn($key) => $programRegistry->valueRegistry->string($key),
 					array_keys(
 						$targetValue->values
 					)
 				)
-			));
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

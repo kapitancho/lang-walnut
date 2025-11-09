@@ -69,10 +69,8 @@ final readonly class FindFirst implements NativeMethod {
 					return $value;
 				}
 			}
-			return (
-				$programRegistry->valueRegistry->error(
-					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
-				)
+			return $programRegistry->valueRegistry->error(
+				$programRegistry->valueRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
 			);
 		}
 		// @codeCoverageIgnoreStart

@@ -46,9 +46,9 @@ final readonly class BinaryGreaterThan implements NativeMethod {
 	): Value {
 		if ($target instanceof IntegerValue || $target instanceof RealValue) {
 			if ($parameter instanceof IntegerValue || $target instanceof RealValue) {
-				return ($programRegistry->valueRegistry->boolean(
+				return $programRegistry->valueRegistry->boolean(
 					$target->literalValue > $parameter->literalValue
-				));
+				);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

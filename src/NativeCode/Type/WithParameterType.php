@@ -80,7 +80,7 @@ final readonly class WithParameterType implements NativeMethod {
 						$parameter->typeValue,
 						$typeValue->returnType,
 					);
-					return ($programRegistry->valueRegistry->type($result));
+					return $programRegistry->valueRegistry->type($result);
 				}
 			}
 		}

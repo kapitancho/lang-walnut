@@ -33,9 +33,9 @@ final readonly class IsOfType implements NativeMethod {
 		Value $parameter
 	): Value {
 		if ($parameter instanceof TypeValue) {
-			return ($programRegistry->valueRegistry->boolean(
+			return $programRegistry->valueRegistry->boolean(
 				$target->type->isSubtypeOf($parameter->typeValue)
-			));
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid parameter value");

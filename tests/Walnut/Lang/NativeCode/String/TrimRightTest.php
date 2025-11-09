@@ -16,4 +16,10 @@ final class TrimRightTest extends CodeExecutionTestHelper {
 		$this->assertEquals("'** hello '", $result);
 	}
 
+	public function testTrimRightInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet(
+			"Invalid parameter type: Integer[42]",
+			"'** hello **'->trimRight(42);");
+	}
+
 }
