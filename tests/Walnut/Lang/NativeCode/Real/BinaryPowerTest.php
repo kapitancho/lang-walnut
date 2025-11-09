@@ -26,6 +26,22 @@ final class BinaryPowerTest extends CodeExecutionTestHelper {
 		$this->assertEquals("0", $result);
 	}
 
+	public function testBinaryZeroType(): void {
+		$result = $this->executeCodeSnippet(
+			"myPower(0);",
+			valueDeclarations: "myPower = ^base: Real<-5..5> => Real :: base ** 3.12;",
+		);
+		$this->assertEquals("0", $result);
+	}
+
+	public function testBinaryNonZeroType(): void {
+		$result = $this->executeCodeSnippet(
+			"myPower(1);",
+			valueDeclarations: "myPower = ^base: NonZeroReal => NonZeroReal :: base ** 3.12;",
+		);
+		$this->assertEquals("1", $result);
+	}
+
 	public function testBinaryPowerReal(): void {
 		$result = $this->executeCodeSnippet("1.2 ** 1.14;");
 		$this->assertEquals("1.2310242848447", $result);

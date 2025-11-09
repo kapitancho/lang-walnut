@@ -95,13 +95,10 @@ final readonly class InsertAt implements NativeMethod {
 						)
 					);
 				}
-				// @codeCoverageIgnoreStart
-				throw new ExecutionException("Invalid parameter value");
-				// @codeCoverageIgnoreEnd
 			}
-			$values = $targetValue->values;
-			$values[] = $parameterValue;
-			return $programRegistry->valueRegistry->tuple($values);
+			// @codeCoverageIgnoreStart
+			throw new ExecutionException("Invalid parameter value");
+			// @codeCoverageIgnoreEnd
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

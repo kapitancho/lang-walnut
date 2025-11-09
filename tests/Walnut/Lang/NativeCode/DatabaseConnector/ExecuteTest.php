@@ -6,19 +6,54 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 
 final class ExecuteTest extends CodeExecutionTestHelper {
 
-	public function testExecuteWithInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet(
-			'Cannot call method',
-			"'not a connector'->execute['INSERT INTO test VALUES(1)'];",
-			typeDeclarations: "DatabaseConnector := \$[connectionString: String];"
+	public function testExecute(): void {
+		$result = $this->executeCodeSnippet(
+			"{DatabaseConnector[connection: DatabaseConnection![dsn: 'sqlite::memory:']]}->execute[query: 'SELECT 1', boundParameters: []];",
+			typeDeclarations: "
+				DatabaseConnection := [dsn: String];
+				DatabaseConnector := $[connection: DatabaseConnection];
+				DatabaseSqlQuery = NonEmptyString;
+				DatabaseValue = String|Integer|Real|Boolean|Null;
+				DatabaseQueryDataRow = Map<DatabaseValue>;
+				DatabaseQueryBoundParameters = Array<DatabaseValue>|DatabaseQueryDataRow;
+				DatabaseQueryCommand = [query: DatabaseSqlQuery, boundParameters: DatabaseQueryBoundParameters];
+				DatabaseQueryFailure := [query: DatabaseSqlQuery, boundParameters: DatabaseQueryBoundParameters, error: String];
+			"
 		);
+		$this->assertEquals("0", $result);
 	}
 
-	public function testExecuteWithInvalidParameter(): void {
+	public function testExecuteError(): void {
+		$result = $this->executeCodeSnippet(
+			"{DatabaseConnector[connection: DatabaseConnection![dsn: 'sqlite::memory:']]}->execute[query: 'SELECT', boundParameters: []];",
+			typeDeclarations: "
+				DatabaseConnection := [dsn: String];
+				DatabaseConnector := $[connection: DatabaseConnection];
+				DatabaseSqlQuery = NonEmptyString;
+				DatabaseValue = String|Integer|Real|Boolean|Null;
+				DatabaseQueryDataRow = Map<DatabaseValue>;
+				DatabaseQueryBoundParameters = Array<DatabaseValue>|DatabaseQueryDataRow;
+				DatabaseQueryCommand = [query: DatabaseSqlQuery, boundParameters: DatabaseQueryBoundParameters];
+				DatabaseQueryFailure := [query: DatabaseSqlQuery, boundParameters: DatabaseQueryBoundParameters, error: String];
+			"
+		);
+		$this->assertStringContainsString("@DatabaseQueryFailure", $result);
+	}
+
+	public function testExecuteWithInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet(
-			'Cannot call method',
-			"123->execute[42];",
-			typeDeclarations: "DatabaseConnector := \$[connectionString: String];"
+			"Invalid parameter type: String['SELECT 1']",
+			"{DatabaseConnector[connection: DatabaseConnection![dsn: 'sqlite::memory:']]}->execute('SELECT 1');",
+			"
+				DatabaseConnection := [dsn: String];
+				DatabaseConnector := $[connection: DatabaseConnection];
+				DatabaseSqlQuery = NonEmptyString;
+				DatabaseValue = String|Integer|Real|Boolean|Null;
+				DatabaseQueryDataRow = Map<DatabaseValue>;
+				DatabaseQueryBoundParameters = Array<DatabaseValue>|DatabaseQueryDataRow;
+				DatabaseQueryCommand = [query: DatabaseSqlQuery, boundParameters: DatabaseQueryBoundParameters];
+				DatabaseQueryFailure := [query: DatabaseSqlQuery, boundParameters: DatabaseQueryBoundParameters, error: String];
+			"
 		);
 	}
 

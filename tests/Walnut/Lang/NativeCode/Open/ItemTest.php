@@ -16,6 +16,15 @@ final class ItemTest extends CodeExecutionTestHelper {
 		$this->assertEquals("5", $result);
 	}
 
+	public function testTupleItemInteger(): void {
+		$result = $this->executeCodeSnippet(
+			"get(1);",
+			"MyTuple := #[Integer, Real, String, Boolean];",
+			"t = MyTuple[42, 3.14, 'hello', false]; get = ^idx: Integer<1..2> => Real|String :: t->item(idx);",
+		);
+		$this->assertEquals("3.14", $result);
+	}
+
 	public function testTupleItemTypeWithRestSubset(): void {
 		$result = $this->executeCodeSnippet("getValue(MyTuple[6, true, false]);",
 			"MyTuple := #[Integer, ... Boolean];",
@@ -50,6 +59,16 @@ final class ItemTest extends CodeExecutionTestHelper {
 		$this->assertEquals("5", $result);
 	}
 
+	public function testRecordOptionalKeyItemInRange(): void {
+		$result = $this->executeCodeSnippet("{MyRecord[a: 3, b: 5]}->item('b');", "MyRecord := #[a: Integer, b: ?Real];");
+		$this->assertEquals("5", $result);
+	}
+
+	public function testRecordOptionalKeyItemMissing(): void {
+		$result = $this->executeCodeSnippet("{MyRecord[a: 3]}->item('b');", "MyRecord := #[a: Integer, b: ?Real];");
+		$this->assertEquals("@MapItemNotFound![key: 'b']", $result);
+	}
+
 	public function testRecordItemTypeWithRestSubset(): void {
 		$result = $this->executeCodeSnippet("getValue(MyRecord[a: 6, b: true, c: false]);",
 			"MyRecord := #[a: Integer, ... Boolean];",
@@ -72,6 +91,21 @@ final class ItemTest extends CodeExecutionTestHelper {
 			"getValue = ^[t: MyRecord, key: String] => Result<Integer|Boolean, MapItemNotFound> :: #t->item(#key);"
 		);
 		$this->assertEquals("false", $result);
+	}
+
+
+	public function testOpenTupleInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet(
+			"Invalid parameter type: Null",
+			"{MyTuple[3, 5]}->item;", "MyTuple := #[Integer, Real];"
+		);
+	}
+
+	public function testOpenRecordInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet(
+			"Invalid parameter type: Null",
+			"{MyRecord[a: 3, b: 5]}->item;", "MyRecord := #[a: Integer, b: Real];"
+		);
 	}
 
 }

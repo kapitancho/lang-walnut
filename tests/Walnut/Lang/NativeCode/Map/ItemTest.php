@@ -19,6 +19,46 @@ final class ItemTest extends CodeExecutionTestHelper {
 		$this->assertEquals("2", $result);
 	}
 
+	public function testItemIntersectionType(): void {
+		$result = $this->executeCodeSnippet(
+			"getItem[a: 'hello', b: 2, c: true];",
+			valueDeclarations: "getItem = ^m: [a: String, b: Real, ...]&[b: Integer, c: Boolean, ...] => Integer :: m->item('b');"
+		);
+		$this->assertEquals("2", $result);
+	}
+
+	public function testItemOptionalKey(): void {
+		$result = $this->executeCodeSnippet(
+			"getItem[a: 'hello', b: 2];",
+			valueDeclarations: "getItem = ^m: [a: String, b: ?Real] => Result<Real, MapItemNotFound> :: m->item('b');"
+		);
+		$this->assertEquals("2", $result);
+	}
+
+	public function testItemOptionalKeyMissing(): void {
+		$result = $this->executeCodeSnippet(
+			"getItem[a: 'hello'];",
+			valueDeclarations: "getItem = ^m: [a: String, b: ?Real] => Result<Real, MapItemNotFound> :: m->item('b');"
+		);
+		$this->assertEquals("@MapItemNotFound![key: 'b']", $result);
+	}
+
+	public function testItemMetaType(): void {
+		$result = $this->executeCodeSnippet(
+			"getItem[a: 1, b: 2];",
+			valueDeclarations: "getItem = ^m: Record :: m->item('b');"
+		);
+		$this->assertEquals("2", $result);
+	}
+
+	public function testItemMetaTypeMissing(): void {
+		$result = $this->executeCodeSnippet(
+			"getItem[a: 1, b: 2];",
+			valueDeclarations: "getItem = ^m: Record :: m->item('c');"
+		);
+		$this->assertEquals("@MapItemNotFound![key: 'c']", $result);
+	}
+
 	public function testItemNonEmptyIndexOutOfRange(): void {
 		$result = $this->executeCodeSnippet("getItem('r');", valueDeclarations: "getItem = ^s: String :: [a: 1, b: 2, c: 5, d: 10, e: 5]->item(s);");
 		$this->assertEquals("@MapItemNotFound![key: 'r']", $result);

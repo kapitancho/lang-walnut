@@ -24,6 +24,14 @@ final class FlattenTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[1, 3, 7, 10, 0, 2, 5, -4, 29]", $result);
 	}
 
+	public function testFlattenReturnTypeNoMaxLength(): void {
+		$result = $this->executeCodeSnippet(
+			"flatten[[1, 3, 7, 10], [0, 2, 5], [-4, 29]];",
+			valueDeclarations: "flatten = ^arr: Array<Array<Integer, 2..5>, 3..> => Array<Integer, 6..> :: arr->flatten;"
+		);
+		$this->assertEquals("[1, 3, 7, 10, 0, 2, 5, -4, 29]", $result);
+	}
+
 	public function testFlattenInvalidTargetType(): void {
 		$this->executeErrorCodeSnippet('Invalid target type', "[1, [0, 2, 5], [], [[[22]], 9]]->flatten;");
 	}

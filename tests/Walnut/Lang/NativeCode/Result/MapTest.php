@@ -30,6 +30,17 @@ final class MapTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[4, 5, 8, 13, 8]", $result);
 	}
 
+	public function testMapTuple(): void {
+		$result = $this->executeCodeSnippet(
+			"doArray[1, 2, 5, 10, 5];",
+			valueDeclarations: "
+				doArray = ^a: Result<[Integer, Integer, ...Integer], Null> => Result<Array<Integer>, Null> ::
+					a->map(^Integer => Integer :: # + 3);
+			"
+		);
+		$this->assertEquals("[4, 5, 8, 13, 8]", $result);
+	}
+
 	public function testMapArrayNonEmptyCallbackError(): void {
 		$result = $this->executeCodeSnippet(
 			"doArray[1, 2, 5, 10, 5];",
@@ -103,6 +114,17 @@ final class MapTest extends CodeExecutionTestHelper {
 			"doMap[a: 1, b: 2, c: 5, d: 10, e: 5];",
 			valueDeclarations: "
 				doMap = ^m: Result<Map<Integer>, Null> => Result<Map<Integer>, Null> ::
+					m->map(^Integer => Integer :: # + 3);
+			"
+		);
+		$this->assertEquals("[a: 4, b: 5, c: 8, d: 13, e: 8]", $result);
+	}
+
+	public function testMapRecord(): void {
+		$result = $this->executeCodeSnippet(
+			"doMap[a: 1, b: 2, c: 5, d: 10, e: 5];",
+			valueDeclarations: "
+				doMap = ^m: Result<[a: Integer, b: Integer, ... Integer], Null> => Result<Map<Integer>, Null> ::
 					m->map(^Integer => Integer :: # + 3);
 			"
 		);
@@ -347,6 +369,19 @@ final class MapTest extends CodeExecutionTestHelper {
 					s->map(^Boolean => Boolean :: true);
 			"
 		);
+	}
+
+	// Union
+
+	public function testMapUnion(): void {
+		$result = $this->executeCodeSnippet(
+			"doMap[a: 1, b: 2, c: 5, d: 10, e: 5];",
+			valueDeclarations: "
+				doMap = ^m: Result<Array<Integer>|Map<Integer>|Set<Integer>, Null> => Result<Array<Integer>|Map<Integer>|Set<Integer>, Null> ::
+					m->map(^Integer => Integer :: # + 3);
+			"
+		);
+		$this->assertEquals("[a: 4, b: 5, c: 8, d: 13, e: 8]", $result);
 	}
 
 }
