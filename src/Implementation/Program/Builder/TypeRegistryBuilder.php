@@ -334,7 +334,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		    'Atom' => $this->metaType(MetaTypeValue::Atom),
 		    'EnumerationValue' => $this->metaType(MetaTypeValue::EnumerationValue),
 		    'Record' => $this->metaType(MetaTypeValue::Record),
-		    'Result' => $this->result($this->any, $this->any),
+		    //'Result' => $this->result($this->any, $this->any),
 		    'Data' => $this->metaType(MetaTypeValue::Data),
 		    'Open' => $this->metaType(MetaTypeValue::Open),
 		    'Sealed' => $this->metaType(MetaTypeValue::Sealed),

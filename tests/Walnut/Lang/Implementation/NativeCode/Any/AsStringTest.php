@@ -36,6 +36,10 @@ final class AsStringTest extends BaseProgramTestHelper {
 		$this->callAsString($this->valueRegistry->true, "true");
 		$this->callAsString($this->valueRegistry->false, "false");
 		$this->callAsString($this->valueRegistry->null, "null");
+		$this->callAsString($this->valueRegistry->mutable(
+			$this->typeRegistry->string(),
+			$this->valueRegistry->string('hi!')
+		), "hi!");
 
         $this->analyseCallAsString(
             $this->typeRegistry->integer(-5, 42),

@@ -16,4 +16,11 @@ final class AsMutableOfTypeTest extends CodeExecutionTestHelper {
 		$this->assertEquals("mutable{Real, 3.14}", $result);
 	}
 
+	public function testAsMutableOfTypeInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet(
+			"Invalid parameter type: Integer[42]",
+			"3.14->asMutableOfType(42);"
+		);
+	}
+
 }

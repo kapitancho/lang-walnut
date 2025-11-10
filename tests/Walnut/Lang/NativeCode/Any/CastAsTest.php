@@ -30,4 +30,11 @@ final class CastAsTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@'error'", $result);
 	}
 
+	public function testCastAtInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet(
+			"Invalid parameter type: Integer[42]",
+			"1->as(42);"
+		);
+	}
+
 }
