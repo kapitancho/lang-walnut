@@ -60,12 +60,11 @@ final readonly class CombineAsString implements NativeMethod {
 	): Value {
 		$targetValue = $target;
 		$parameterValue = $parameter;
-		
-				if ($targetValue instanceof TupleValue) {
+
+		if ($targetValue instanceof TupleValue) {
 			if ($parameterValue instanceof StringValue) {
 				$result = [];
 				foreach($targetValue->values as $value) {
-					$value = $value;
 					if ($value instanceof StringValue) {
 						$result[] = $value->literalValue;
 					} else {

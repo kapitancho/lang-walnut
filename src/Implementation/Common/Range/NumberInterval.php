@@ -69,7 +69,7 @@ final readonly class NumberInterval implements NumberIntervalInterface {
 			}
 		} else {
 			if (!$this->contains($other->end->value) && !(
-				$this->start !== PlusInfinity::value &&
+				$this->end !== PlusInfinity::value &&
 				$this->end->value == $other->end->value && !$this->end->inclusive && !$other->end->inclusive
 			)) {
 				return false;

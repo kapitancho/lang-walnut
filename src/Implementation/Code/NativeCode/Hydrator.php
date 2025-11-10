@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnusedParameterInspection */
 
 namespace Walnut\Lang\Implementation\Code\NativeCode;
 

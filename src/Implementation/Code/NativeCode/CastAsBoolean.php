@@ -49,7 +49,7 @@ final readonly class CastAsBoolean {
 			($type instanceof IntegerSubsetType && count($type->subsetValues) === 1 && (int)(string)$type->subsetValues[0] === 0),
 			($type instanceof IntegerType && $type->numberRange->min instanceof NumberIntervalEndpoint && $type->numberRange->max instanceof NumberIntervalEndpoint && (int)(string)$type->numberRange->min->value === 0 && (int)(string)$type->numberRange->max->value === 0),
 			($type instanceof RealSubsetType && count($type->subsetValues) === 1 && (float)(string)$type->subsetValues[0] === 0.0),
-			($type instanceof RealType && $type->numberRange->min instanceof NumberIntervalEndpoint && $type->numberRange->max instanceof NumberIntervalEndpoint && (float)(string)$type->numberRange->min->value === 0 && (float)(string)$type->numberRange->max->value === 0),
+			($type instanceof RealType && $type->numberRange->min instanceof NumberIntervalEndpoint && $type->numberRange->max instanceof NumberIntervalEndpoint && (float)(string)$type->numberRange->min->value === 0.0 && (float)(string)$type->numberRange->max->value === 0.0),
 			($type instanceof StringSubsetType && count($type->subsetValues) === 1 && $type->subsetValues[0] === ''),
 			($type instanceof StringType && $type->range->maxLength instanceof Number && (int)(string)$type->range->maxLength === 0),
 			($type instanceof RecordType && count($type->types) === 0),
