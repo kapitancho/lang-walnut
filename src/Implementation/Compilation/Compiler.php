@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Implementation\Compilation;
 
 use Walnut\Lang\Blueprint\AST\Parser\ParserException;
-use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Compilation\AST\AstCodeMapper;
 use Walnut\Lang\Blueprint\Compilation\AST\AstProgramCompilationException;
 use Walnut\Lang\Blueprint\Compilation\CompilationResult as CompilationResultInterface;

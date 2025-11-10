@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Implementation\Program;
 
-use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope;
 use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder as CustomMethodRegistryBuilderInterface;

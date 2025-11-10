@@ -31,12 +31,7 @@ final readonly class EnumerationSubsetType implements EnumerationSubsetTypeInter
     }
 
     private static function isSubset(array $subset, array $superset): bool {
-		foreach($subset as $key => $value) {
-			if (!isset($superset[$key])) {
-				return false;
-			}
-		}
-		return true;
+	    return array_all($subset, fn(EnumerationValue $value, string $key) => isset($superset[$key]));
     }
 
 	public function __toString(): string {

@@ -44,10 +44,8 @@ final readonly class IsSubsetOf implements NativeMethod {
 
 				if ($targetValue instanceof SetValue) {
 			if ($parameterValue instanceof SetValue) {
-				foreach(array_keys($targetValue->valueSet) as $key) {
-					if (!array_key_exists($key, $parameterValue->valueSet)) {
-						return $programRegistry->valueRegistry->false;
-					}
+				if (array_any(array_keys($targetValue->valueSet), fn($key) => !array_key_exists($key, $parameterValue->valueSet))) {
+					return $programRegistry->valueRegistry->false;
 				}
 				return $programRegistry->valueRegistry->true;
 			}

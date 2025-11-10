@@ -12,7 +12,7 @@ final class UnknownType extends InvalidArgumentException {
     ) {
         parent::__construct(
 			sprintf(
-				"Unknown%s type: '$typeName'", $prefix ? " {$prefix}" : '')
+				"Unknown%s type: '$typeName'", $prefix ? " $prefix" : '')
         );
     }
 

@@ -58,7 +58,7 @@ final readonly class Item implements NativeMethod {
 										$parameterType->subsetValues
 									)
 								);
-							} elseif ($parameterType instanceof IntegerType) {
+							} else {
 								$isWithinLimit = $max !== PlusInfinity::value && $max->value < count($valueType->types);
 								$returnType = $typeRegistry->union(
 									$isWithinLimit ?

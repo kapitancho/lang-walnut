@@ -42,12 +42,10 @@ final readonly class IsSupersetOf implements NativeMethod {
 		$targetValue = $target;
 		$parameterValue = $parameter;
 
-				if ($targetValue instanceof SetValue) {
+		if ($targetValue instanceof SetValue) {
 			if ($parameterValue instanceof SetValue) {
-				foreach(array_keys($parameterValue->valueSet) as $key) {
-					if (!array_key_exists($key, $targetValue->valueSet)) {
-						return $programRegistry->valueRegistry->false;
-					}
+				if (array_any(array_keys($parameterValue->valueSet), fn($key) => !array_key_exists($key, $targetValue->valueSet))) {
+					return $programRegistry->valueRegistry->false;
 				}
 				return $programRegistry->valueRegistry->true;
 			}

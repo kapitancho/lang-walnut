@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\NativeCode\Any;
 
-use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;

@@ -89,17 +89,15 @@ final readonly class CastAsJsonValue {
 
 	public function getJsonValue(ProgramRegistry $programRegistry, Value $value): Value {
 		if ($value instanceof TupleValue) {
-			$items = [];
-			foreach($value->values as $item) {
-				$items[] = $this->getJsonValue($programRegistry, $item);
-			}
+			$items = array_map(function ($item) use ($programRegistry) {
+				return $this->getJsonValue($programRegistry, $item);
+			}, $value->values);
 			return $programRegistry->valueRegistry->tuple($items);
 		}
 		if ($value instanceof RecordValue) {
-			$items = [];
-			foreach($value->values as $key => $item) {
-				$items[$key] = $this->getJsonValue($programRegistry, $item);
-			}
+			$items = array_map(function ($item) use ($programRegistry) {
+				return $this->getJsonValue($programRegistry, $item);
+			}, $value->values);
 			return $programRegistry->valueRegistry->record($items);
 		}
 		if ($value instanceof NullValue ||

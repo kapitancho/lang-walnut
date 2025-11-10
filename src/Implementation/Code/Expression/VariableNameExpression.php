@@ -21,7 +21,7 @@ final readonly class VariableNameExpression implements VariableNameExpressionInt
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
 		try {
 			$type = $analyserContext->variableScope->typeOf($this->variableName);
-		} catch (UnknownContextVariable $e) {
+		} catch (UnknownContextVariable) {
 			throw new AnalyserException(
 				sprintf(
 					"Unknown variable '%s'",

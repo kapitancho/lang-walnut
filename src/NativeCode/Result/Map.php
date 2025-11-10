@@ -18,10 +18,6 @@ use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnionType;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
-use Walnut\Lang\Blueprint\Value\FunctionValue;
-use Walnut\Lang\Blueprint\Value\RecordValue;
-use Walnut\Lang\Blueprint\Value\SetValue;
-use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
@@ -138,7 +134,6 @@ final readonly class Map implements NativeMethod {
 		Value $parameter
 	): Value {
 		$targetValue = $target;
-		$parameterValue = $parameter;
 
 		// If the target is an error, return it as-is
 		if ($targetValue instanceof ErrorValue) {

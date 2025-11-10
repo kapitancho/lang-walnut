@@ -35,19 +35,10 @@ final readonly class Stringify implements NativeMethod {
 	}
 
 	private function doStringify(Value $value): string|int|float|bool|null|array|object {
-		if ($value instanceof TupleValue) {
-			$items = [];
-			foreach($value->values as $item) {
-				$items[] = $this->doStringify($item);
-			}
-			return $items;
-		}
-		if ($value instanceof RecordValue) {
-			$items = [];
-			foreach($value->values as $key => $item) {
-				$items[$key] = $this->doStringify($item);
-			}
-			return $items;
+		if ($value instanceof TupleValue || $value instanceof RecordValue) {
+			return array_map(function ($item) {
+				return $this->doStringify($item);
+			}, $value->values);
 		}
 		if ($value instanceof SetValue) {
 			$items = [];
