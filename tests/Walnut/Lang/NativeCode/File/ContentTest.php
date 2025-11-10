@@ -2,23 +2,30 @@
 
 namespace Walnut\Lang\Test\NativeCode\File;
 
-use Walnut\Lang\Test\CodeExecutionTestHelper;
+final class ContentTest extends FileAccessHelper {
 
-final class ContentTest extends CodeExecutionTestHelper {
-
-	public function testContentWithInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet(
-			'Cannot call method',
-			"'not a file'->content;",
-			typeDeclarations: "File := \$[path: String];"
+	public function testContentOk(): void {
+		file_put_contents($this->tempFilePath, "hi!");
+		$result = $this->executeCodeSnippet(
+			"{File[path: '$this->tempFilePath']}->content;",
+			typeDeclarations: "File := \$[path: String]; CannotReadFile := \$[file: File];			"
 		);
+		$this->assertEquals("'hi!'", $result);
 	}
 
-	public function testContentThrowsExceptionWithWrongType(): void {
+	public function testContentCannotReadFile(): void {
+		$result = $this->executeCodeSnippet(
+			"{File[path: '$this->tempFilePath']}->content;",
+			typeDeclarations: "File := \$[path: String]; CannotReadFile := \$[file: File];			"
+		);
+		$this->assertStringContainsString("@CannotReadFile", $result);
+	}
+
+	public function testContentInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet(
-			'Cannot call method',
-			"123->content;",
-			typeDeclarations: "File := \$[path: String];"
+			'Invalid parameter type: Integer[42]',
+			"{File[path: '$this->tempFilePath']}->content(42);",
+			typeDeclarations: "File := \$[path: String]; CannotReadFile := \$[file: File];			"
 		);
 	}
 

@@ -3,6 +3,8 @@
 namespace Walnut\Lang\Implementation\Type;
 
 use JsonSerializable;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\MutableType as MutableTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
 
@@ -24,6 +26,8 @@ final class MutableType implements MutableTypeInterface, JsonSerializable {
 			$ofType instanceof MutableTypeInterface =>
 				$this->valueType->isSubtypeOf($ofType->valueType) &&
 	            $ofType->valueType->isSubtypeOf($this->valueType),
+			$ofType instanceof AliasType && $ofType->name->equals(new TypeNameIdentifier('JsonValue')) =>
+				$this->valueType->isSubtypeOf($ofType),
 			$ofType instanceof SupertypeChecker => $ofType->isSupertypeOf($this),
 			default => false
 		};

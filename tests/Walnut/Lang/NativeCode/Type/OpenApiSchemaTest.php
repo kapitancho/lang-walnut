@@ -6,8 +6,18 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 
 final class OpenApiSchemaTest extends CodeExecutionTestHelper {
 
+	public function testOpenApiSchemaJsonValue(): void {
+		$result = $this->executeCodeSnippet("type{JsonValue}->openApiSchema;");
+		$this->assertEquals("[type: 'any']", $result);
+	}
+
 	public function testOpenApiSchemaInteger(): void {
 		$result = $this->executeCodeSnippet("type{Integer<(2..5]>}->openApiSchema;");
+		$this->assertEquals("[\n\ttype: 'integer',\n\tminimum: 2,\n\texclusiveMinimum: true,\n\tmaximum: 5,\n\texclusiveMaximum: false\n]", $result);
+	}
+
+	public function testOpenApiSchemaMutable(): void {
+		$result = $this->executeCodeSnippet("type{Mutable<Integer<(2..5]>>}->openApiSchema;");
 		$this->assertEquals("[\n\ttype: 'integer',\n\tminimum: 2,\n\texclusiveMinimum: true,\n\tmaximum: 5,\n\texclusiveMaximum: false\n]", $result);
 	}
 

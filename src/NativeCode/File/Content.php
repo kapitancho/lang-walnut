@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Type\NullType;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\SealedValue;
@@ -27,12 +28,15 @@ final readonly class Content implements NativeMethod {
 		if ($targetType instanceof SealedType && $targetType->name->equals(
 			new TypeNameIdentifier('File')
 		)) {
-			return $typeRegistry->result(
-				$typeRegistry->string(),
-				$typeRegistry->withName(
-					new TypeNameIdentifier('CannotReadFile')
-				)
-			);
+			if ($parameterType instanceof NullType) {
+				return $typeRegistry->result(
+					$typeRegistry->string(),
+					$typeRegistry->withName(
+						new TypeNameIdentifier('CannotReadFile')
+					)
+				);
+			}
+			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -50,8 +54,7 @@ final readonly class Content implements NativeMethod {
 			new TypeNameIdentifier('File')
 		)) {
 			$path = $targetValue->value->valueOf('path')->literalValue;
-			$contents = @file_get_contents($path);
-			if ($contents === false) {
+			if (!file_exists($path) || !is_readable($path) || ($contents = file_get_contents($path)) === false) {
 				return $programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->sealedValue(
 						new TypeNameIdentifier('CannotReadFile'),

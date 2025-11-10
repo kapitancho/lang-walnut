@@ -41,6 +41,7 @@ final readonly class CreateIfMissing implements NativeMethod {
 					)
 				);
 			}
+			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -61,8 +62,7 @@ final readonly class CreateIfMissing implements NativeMethod {
 			if ($parameterValue instanceof StringValue) {
 				$path = $targetValue->value->valueOf('path')->literalValue;
 				if (!file_exists($path)) {
-					$result = @file_put_contents($path, $parameterValue->literalValue);
-					if ($result === false) {
+					if (!is_writable(dirname($path)) || ($result = @file_put_contents($path, $parameterValue->literalValue)) === false) {
 						return $programRegistry->valueRegistry->error(
 							$programRegistry->valueRegistry->sealedValue(
 								new TypeNameIdentifier('CannotWriteFile'),
