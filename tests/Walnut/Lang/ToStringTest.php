@@ -145,10 +145,10 @@ final class ToStringTest extends BaseProgramTestHelper {
 			'Nothing' => $tr->nothing,
 			'(MyAtom|MyEnum)' => $tr->union([
 				$tr->atom($i('MyAtom')), $tr->enumeration($i('MyEnum'))
-			], false),
+			]),
 			'(MyAtom&MyEnum)' => $tr->intersection([
 				$tr->atom($i('MyAtom')), $tr->enumeration($i('MyEnum'))
-			], false),
+			]),
 			'OptionalKey<Integer>' => $tr->optionalKey($tr->integer()),
 
 	        'Union' => $tr->metaType(MetaTypeValue::Union),

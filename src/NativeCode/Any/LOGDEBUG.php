@@ -11,6 +11,8 @@ use Walnut\Lang\Blueprint\Value\Value;
 
 final readonly class LOGDEBUG implements NativeMethod {
 
+	// @codeCoverageIgnoreStart
+
 	public function analyse(
 		TypeRegistry $typeRegistry,
 		MethodFinder $methodFinder,
@@ -30,5 +32,7 @@ final readonly class LOGDEBUG implements NativeMethod {
         file_put_contents(__DIR__ . '/../../../log/nut.log', $targetValue . '\n\n', FILE_APPEND);
 		return $target;
 	}
+
+	// @codeCoverageIgnoreEnd
 
 }

@@ -16,6 +16,22 @@ final class BinaryMinusTest extends CodeExecutionTestHelper {
 		$this->assertEquals("-2.14", $result);
 	}
 
+	public function testBinaryMinusZeroParameter(): void {
+		$result = $this->executeCodeSnippet(
+			"minus(0);",
+			valueDeclarations: "v = 3; minus = ^p: Integer<0> => Integer<-3> :: p - v;"
+		);
+		$this->assertEquals("-3", $result);
+	}
+
+	public function testBinaryMinusZeroTarget(): void {
+		$result = $this->executeCodeSnippet(
+			"minus(0);",
+			valueDeclarations: "v = 3; minus = ^p: Integer<0> => Integer<3> :: v - p;"
+		);
+		$this->assertEquals("3", $result);
+	}
+
 	public function testBinaryMinusInvalidParameter(): void {
 		$this->executeErrorCodeSnippet('Invalid parameter type', "3 - 'hello';");
 	}
@@ -39,6 +55,20 @@ final class BinaryMinusTest extends CodeExecutionTestHelper {
 			subZero = ^[x: Integer[3, 5, 8], y: Integer[0]] => Integer[3, 5, 8] :: #x - #y;
 		NUT);
 		$this->assertEquals("5", $result);
+	}
+
+	public function testBinaryPlusInfinityParameter(): void {
+		$result = $this->executeCodeSnippet("minus(-20);", valueDeclarations: <<<NUT
+			minus = ^x: Integer<..3> => Integer<2..> :: 5 - x;
+		NUT);
+		$this->assertEquals("25", $result);
+	}
+
+	public function testBinaryMinusInfinityParameter(): void {
+		$result = $this->executeCodeSnippet("minus(20);", valueDeclarations: <<<NUT
+			minus = ^x: Integer<3..> => Integer<..2> :: 5 - x;
+		NUT);
+		$this->assertEquals("-15", $result);
 	}
 
 }

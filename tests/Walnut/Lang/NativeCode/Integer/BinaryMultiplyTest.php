@@ -16,6 +16,82 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 		$this->assertEquals("15.42", $result);
 	}
 
+	public function testBinaryMultiplyZeroParameter(): void {
+		$result = $this->executeCodeSnippet(
+			"mul(0);",
+			valueDeclarations: "v = 3; mul = ^p: Integer<0> => Integer<0> :: p * v;"
+		);
+		$this->assertEquals("0", $result);
+	}
+
+	public function testBinaryMultiplyZeroTarget(): void {
+		$result = $this->executeCodeSnippet(
+			"mul(0);",
+			valueDeclarations: "v = 3; mul = ^p: Integer<0> => Integer<0> :: v * p;"
+		);
+		$this->assertEquals("0", $result);
+	}
+
+	public function testBinaryMultiplyOneParameter(): void {
+		$result = $this->executeCodeSnippet(
+			"mul(1);",
+			valueDeclarations: "v = 3; mul = ^p: Integer<1> => Integer<3> :: p * v;"
+		);
+		$this->assertEquals("3", $result);
+	}
+
+	public function testBinaryMultiplyOneTarget(): void {
+		$result = $this->executeCodeSnippet(
+			"mul(1);",
+			valueDeclarations: "v = 3; mul = ^p: Integer<1> => Integer<3> :: v * p;"
+		);
+		$this->assertEquals("3", $result);
+	}
+
+	public function testBinaryMultiplyPlusInfinity(): void {
+		$result = $this->executeCodeSnippet(
+			"mul(123);",
+			valueDeclarations: "v = 3; mul = ^p: Integer<0..> => Integer<0..> :: v * p;"
+		);
+		$this->assertEquals("369", $result);
+	}
+
+	//TODO - refined Integer in the following tests.
+	public function testBinaryMultiplyIntegerWithZero(): void {
+		$result = $this->executeCodeSnippet(
+			"mul(2);",
+			valueDeclarations: "v = 3; mul = ^p: Integer<-5..5> => Integer :: v * p;"
+		);
+		$this->assertEquals("6", $result);
+	}
+
+	//TODO - refined Integer in the following tests.
+	public function testBinaryMultiplyIntegerWithoutZero(): void {
+		$result = $this->executeCodeSnippet(
+			"mul(-2);",
+			valueDeclarations: "v = 3; mul = ^p: Integer<-5..-2> => NonZeroInteger :: p * v;"
+		);
+		$this->assertEquals("-6", $result);
+	}
+
+	//TODO - refined Integer in the following tests.
+	public function testBinaryMultiplyRealWithZero(): void {
+		$result = $this->executeCodeSnippet(
+			"mul(2.1);",
+			valueDeclarations: "v = 3; mul = ^p: Real<-5..5.7> => Real :: v * p;"
+		);
+		$this->assertEquals("6.3", $result);
+	}
+
+	//TODO - refined Integer in the following tests.
+	public function testBinaryMultiplyRealWithoutZero(): void {
+		$result = $this->executeCodeSnippet(
+			"mul(-3.2);",
+			valueDeclarations: "v = 3; mul = ^p: Real<-5..-2.7> => NonZeroReal :: v * p;"
+		);
+		$this->assertEquals("-9.6", $result);
+	}
+
 	public function testBinaryMultiplyInvalidParameter(): void {
 		$this->executeErrorCodeSnippet('Invalid parameter type', "3 * 'hello';");
 	}

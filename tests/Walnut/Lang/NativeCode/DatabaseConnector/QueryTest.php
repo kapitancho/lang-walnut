@@ -9,7 +9,7 @@ final class QueryTest extends CodeExecutionTestHelper {
 
 	public function testExecute(): void {
 		$result = $this->executeCodeSnippet(
-			"{DatabaseConnector[connection: DatabaseConnection![dsn: 'sqlite::memory:']]}->query[query: 'SELECT 1 AS id', boundParameters: []];",
+			"{DatabaseConnector[connection: DatabaseConnection![dsn: 'sqlite::memory:']]}->query[query: 'SELECT 1 AS id, 3.14 AS r, \`hello\` AS str, null AS n', boundParameters: []];",
 			typeDeclarations: "
 				DatabaseConnection := [dsn: String];
 				DatabaseConnector := $[connection: DatabaseConnection];
@@ -23,7 +23,7 @@ final class QueryTest extends CodeExecutionTestHelper {
 				DatabaseQueryFailure := [query: DatabaseSqlQuery, boundParameters: DatabaseQueryBoundParameters, error: String];
 			"
 		);
-		$this->assertEquals("[[id: 1]]", $result);
+		$this->assertEquals("[\n	[id: 1, r: 3.14, str: 'hello', n: null]\n]", $result);
 	}
 
 	public function testQueryError(): void {

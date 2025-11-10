@@ -33,10 +33,16 @@ final readonly class Abs implements NativeMethod {
 		if ($targetType instanceof IntegerType) {
 			return $typeRegistry->integerFull(
 				new NumberInterval(
-					$targetType->numberRange->min === MinusInfinity::value ||
-					$targetType->numberRange->min->value < 0 ?
-						new NumberIntervalEndpoint(new Number(0), true) :
-						$targetType->numberRange->min,
+					match(true) {
+						$targetType->numberRange->max !== PlusInfinity::value && $targetType->numberRange->max->value < 0 =>
+							new NumberIntervalEndpoint(
+								new Number(abs((string)$targetType->numberRange->max->value)),
+								$targetType->numberRange->max->inclusive
+							),
+						$targetType->numberRange->min !== MinusInfinity::value && $targetType->numberRange->min->value >= 0 =>
+							$targetType->numberRange->min,
+						default => new NumberIntervalEndpoint(new Number(0), true)
+					},
 					$targetType->numberRange->min === MinusInfinity::value ||
 						$targetType->numberRange->max === PlusInfinity::value ?
 							PlusInfinity::value :

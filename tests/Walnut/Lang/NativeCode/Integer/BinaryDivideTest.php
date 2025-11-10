@@ -21,15 +21,39 @@ final class BinaryDivideTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@NotANumber", $result);
 	}
 
+		public function testBinaryDivideOneParameter(): void {
+		$result = $this->executeCodeSnippet(
+			"divide(3);",
+			valueDeclarations: "divide = ^p: Integer<-1..3> => Integer<-1..3> :: p / 1;"
+		);
+		$this->assertEquals("3", $result);
+	}
+
+	public function testBinaryDivideOneParameterInteger(): void {
+		$result = $this->executeCodeSnippet(
+			"divide(3);",
+			valueDeclarations: "divide = ^p: Integer<-1..3> => Integer<-1..3> :: p / 1;"
+		);
+		$this->assertEquals("3", $result);
+	}
+
+	public function testBinaryDividePositiveTargetFinite(): void {
+		$result = $this->executeCodeSnippet(
+			"divide(5);",
+			valueDeclarations: "divide = ^p: Integer<3..10> => Real<[1.2..4]> :: p / 2.5;"
+		);
+		$this->assertEquals("2", $result);
+	}
+
 	public function testBinaryDivideInvalidParameter(): void {
 		$this->executeErrorCodeSnippet('Invalid parameter type', "3 / 'hello';");
 	}
 
 	public function testBinaryDivideReturnTypeOk(): void {
-		$result = $this->executeCodeSnippet("div[3, 1.5];", valueDeclarations: <<<NUT
-			div = ^[a: Integer, b: Real<(..0), (0..)>] => Real :: #a / #b;
+		$result = $this->executeCodeSnippet("div[3, 2];", valueDeclarations: <<<NUT
+			div = ^[a: Integer, b: Integer<(..0), (0..)>] => Real :: #a / #b;
 		NUT);
-		$this->assertEquals("2", $result);
+		$this->assertEquals("1.5", $result);
 	}
 
 	public function testBinaryDivideByOneReturnsInteger(): void {
@@ -51,6 +75,13 @@ final class BinaryDivideTest extends CodeExecutionTestHelper {
 			divByOne = ^[x: Integer[3, 5, 8], y: Integer[1]] => Integer[3, 5, 8] :: #x / #y;
 		NUT);
 		$this->assertEquals("5", $result);
+	}
+
+	public function testBinaryDivideInfinityParameter(): void {
+		$result = $this->executeCodeSnippet("div(20);", valueDeclarations: <<<NUT
+			div = ^x: Integer<3..> => Real<(0..)> :: 5 / x;
+		NUT);
+		$this->assertEquals("0.25", $result);
 	}
 
 }

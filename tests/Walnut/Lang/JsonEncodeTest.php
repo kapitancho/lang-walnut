@@ -166,10 +166,10 @@ final class JsonEncodeTest extends BaseProgramTestHelper {
 			'{"type":"Nothing"}' => $tr->nothing,
 			'{"type":"Union","types":[{"type":"Atom","name":"MyAtom"},{"type":"Enumeration","name":"MyEnum","values":{"A":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"A"},"B":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"B"},"C":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"C"}}}]}' => $tr->union([
 				$tr->atom($i('MyAtom')), $tr->enumeration($i('MyEnum'))
-			], false),
+			]),
 			'{"type":"Intersection","types":[{"type":"Atom","name":"MyAtom"},{"type":"Enumeration","name":"MyEnum","values":{"A":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"A"},"B":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"B"},"C":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"C"}}}]}' => $tr->intersection([
 				$tr->atom($i('MyAtom')), $tr->enumeration($i('MyEnum'))
-			], false),
+			]),
 			'{"type":"OptionalKey","valueType":{"type":"Integer","range":{"intervals":[{"start":"MinusInfinity","end":"PlusInfinity"}]}}}' => $tr->optionalKey($tr->integer()),
 
 	        '{"type":"MetaType","metaType":"Union"}' => $tr->metaType(MetaTypeValue::Union),

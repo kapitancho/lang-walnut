@@ -93,7 +93,6 @@ final readonly class BinaryDivide implements NativeMethod {
 				}
 				// Special case: Integer / 1 = Integer
 				if (
-					$targetValue instanceof IntegerValue &&
 					$parameterValue instanceof IntegerValue &&
 					(string)$parameterValue->literalValue === '1'
 				) {

@@ -132,7 +132,7 @@ interface TypeRegistry {
 	/** @param list<Type> $types */
 	public function union(array $types, bool $normalize = true): Type;
 	/** @param list<Type> $types */
-	public function intersection(array $types, bool $normalize = true): Type;
+	public function intersection(array $types): Type;
 
 	public function function(Type $parameterType, Type $returnType): FunctionType;
 

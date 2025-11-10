@@ -22,6 +22,6 @@ final class BinaryLessThanTest extends CodeExecutionTestHelper {
 	}
 
 	public function testBinaryLessThanInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', "3 <= false;");
+		$this->executeErrorCodeSnippet('Invalid parameter type', "3 < false;");
 	}
 }

@@ -125,4 +125,13 @@ final class ShapeTest extends CodeExecutionTestHelper {
 		NUT);
 	}
 
+	public function testShapeIntersectionType(): void {
+		$result = $this->executeCodeSnippet(
+			"s(X);",
+			"X := (); X ==> Integer :: 5; X ==> String :: 'hello';",
+			"s = ^p: {Integer}&{String} => String :: p->shape(`String) + ' ' + p->shape(`Integer);"
+		);
+		$this->assertEquals("'hello 5'", $result);
+	}
+
 }

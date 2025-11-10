@@ -37,9 +37,6 @@ final readonly class BinaryMinus implements NativeMethod {
 				if ((string)$parameterType->numberRange === '0') {
 					return $targetType;
 				}
-				if ((string)$targetType->numberRange === '0') {
-					return $parameterType;
-				}
 
 				$min =
 					$targetType->numberRange->min === MinusInfinity::value ||

@@ -28,6 +28,15 @@ final class ItemTypesTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[a: type{Integer}, b: type{Real}]", $result);
 	}
 
+	public function testItemTypesIntersection(): void {
+		$result = $this->executeCodeSnippet(
+			"fn([a: 'hello', b: 3, c: true]->type);",
+			"MyShape := (); Type ==> MyShape :: MyShape;",
+			"fn = ^t: {MyShape}&Type<[a: String, ...]>&Type<[b: Integer, ...]> :: t->itemTypes;"
+		);
+		$this->assertEquals("[\n	a: type{String['hello']},\n	b: type{Integer[3]},\n	c: type{True}\n]", $result);
+	}
+
 	public function testItemTypesInvalidTargetType(): void {
 		$this->executeErrorCodeSnippet('Invalid target type',
 			"type{String}->itemTypes;");

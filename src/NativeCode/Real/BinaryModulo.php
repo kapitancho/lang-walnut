@@ -54,7 +54,7 @@ final readonly class BinaryModulo implements NativeMethod {
 		$targetValue = $target;
 		$parameterValue = $parameter;
 		
-				if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
+		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
 			if ($parameterValue instanceof IntegerValue || $parameterValue instanceof RealValue) {
 				if ((float)(string)$parameterValue->literalValue === 0.0) {
 					return $programRegistry->valueRegistry->error(

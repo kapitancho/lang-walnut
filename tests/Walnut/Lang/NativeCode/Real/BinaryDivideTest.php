@@ -29,6 +29,14 @@ final class BinaryDivideTest extends CodeExecutionTestHelper {
 		$this->assertEquals("3.14", $result);
 	}
 
+	public function testBinaryDivideOneParameterInteger(): void {
+		$result = $this->executeCodeSnippet(
+			"divide(3);",
+			valueDeclarations: "divide = ^p: Real<-1..3.14> => Real<-1..3.14> :: p / 1;"
+		);
+		$this->assertEquals("3", $result);
+	}
+
 	public function testBinaryDividePositiveTargetFinite(): void {
 		$result = $this->executeCodeSnippet(
 			"divide(5.75);",

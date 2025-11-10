@@ -238,6 +238,14 @@ final class IsOfTypeTest extends CodeExecutionTestHelper {
 		$this->assertEquals("false", $result);
 	}
 
+	public function testIsOfTypeShape(): void {
+		$result = $this->executeCodeSnippet(
+			"[X->isOfType(`{String}), X->isOfType(`{Integer}), X->isOfType(`{String}&{Integer})];",
+			"X := (); X ==> Integer :: 5; X ==> String :: 'hello';",
+		);
+		$this->assertEquals("[true, true, true]", $result);
+	}
+
 	public function testIsOfTypeInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet(
 			"Invalid parameter type: Integer[42]",

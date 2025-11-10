@@ -25,6 +25,16 @@ final class ValueOfTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@DependencyContainerError![\n	targetType: type{A},\n	errorOnType: type{A},\n	errorMessage: 'Dependency not found'\n]", $result);
 	}
 
+
+	public function testValueOfUnsupportedType(): void {
+		$result = $this->executeCodeSnippet(
+			"getInteger()",
+			"A := Integer;",
+			"getInteger = ^ => Result<String<3>, DependencyContainerError> %% d: DependencyContainer :: d=>valueOf(`String<3>);"
+		);
+		$this->assertEquals("@DependencyContainerError![\n	targetType: type{String<3..3>},\n	errorOnType: type{String<3..3>},\n	errorMessage: 'Unsupported type'\n]", $result);
+	}
+
 	public function testValueOfWithInvalidTargetType(): void {
 		$this->executeErrorCodeSnippet(
 			'Cannot call method',

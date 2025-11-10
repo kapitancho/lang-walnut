@@ -26,13 +26,6 @@ final readonly class Shape implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof IntersectionType) {
-			foreach($targetType->types as $type) {
-				try {
-					return $this->analyse($typeRegistry, $methodFinder, $type, $parameterType);
-				} catch (AnalyserException) {}
-			}
-		}
 		$parameterType = $this->toBaseType($parameterType);
 		if ($parameterType instanceof TypeType) {
 			return new ValueConverter()->analyseConvertValueToShape(

@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\Function\CustomMethod;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Type\IntersectionType;
 use Walnut\Lang\Blueprint\Type\ShapeType as ShapeTypeInterface;
 use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -42,6 +43,10 @@ final class ShapeType implements ShapeTypeInterface, JsonSerializable {
 
 	private function isShapeOf(Type $ofType): bool {
 		$baseType = $this->toBaseType($this->refType);
+		if ($baseType instanceof IntersectionType) {
+			return array_all($baseType->types, fn($checkType) =>
+				$this->typeRegistry->shape($checkType)->isShapeOf($ofType));
+		}
 		$refTypes = $baseType instanceof UnionType ? $baseType->types : [];
 		foreach([$this->refType, ...$refTypes] as $checkType) {
 			try {

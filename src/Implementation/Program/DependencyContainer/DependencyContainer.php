@@ -205,7 +205,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 
 	private function findValueByType(Type $type): Value|DependencyError {
 		return match(true) {
-			$type instanceof AtomType => ($type->value),
+			$type instanceof AtomType => $type->value,
             $type instanceof DataType => $this->findDataValue($type),
             $type instanceof OpenType => $this->findOpenValue($type),
 			$type instanceof SealedType => $this->findSealedValue($type),

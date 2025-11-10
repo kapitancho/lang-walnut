@@ -458,16 +458,14 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 	}
 
 	/** @param list<Type> $types */
-	public function intersection(array $types, bool $normalize = true): Type {
+	public function intersection(array $types): Type {
 		$types = $this->intersectionTypeNormalizer->flatten(... $types);
-		if ($normalize) {
-			try {
-				return $this->intersectionTypeNormalizer->normalize(... $types);
-			// @codeCoverageIgnoreStart
-			} catch (UnknownType) {}
-			// @codeCoverageIgnoreEnd
-		}
+		try {
+			return $this->intersectionTypeNormalizer->normalize(... $types);
+		// @codeCoverageIgnoreStart
+		} catch (UnknownType) {}
 		return new IntersectionType($this->intersectionTypeNormalizer, ...$types);
+		// @codeCoverageIgnoreEnd
 	}
 
 	public function function(Type $parameterType, Type $returnType): FunctionType {
