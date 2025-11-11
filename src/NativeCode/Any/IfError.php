@@ -59,15 +59,13 @@ final readonly class IfError implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-		if ($parameterValue instanceof FunctionValue) {
-			return $targetValue instanceof ErrorValue ?
-				$parameterValue->execute(
+		
+		if ($parameter instanceof FunctionValue) {
+			return $target instanceof ErrorValue ?
+				$parameter->execute(
 					$programRegistry->executionContext,
-					$targetValue->errorValue
-				) : $targetValue;
+					$target->errorValue
+				) : $target;
 		}
 
 		// @codeCoverageIgnoreStart

@@ -32,9 +32,7 @@ final readonly class AsInteger implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof NullValue) {
+		if ($target instanceof NullValue) {
 			return $programRegistry->valueRegistry->integer(0);
 		}
 		// @codeCoverageIgnoreStart

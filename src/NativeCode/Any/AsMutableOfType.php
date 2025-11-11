@@ -38,22 +38,20 @@ final readonly class AsMutableOfType implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-		if ($parameterValue instanceof TypeValue) {
-			if ($target->type->isSubtypeOf($parameterValue->typeValue)) {
+		
+		if ($parameter instanceof TypeValue) {
+			if ($target->type->isSubtypeOf($parameter->typeValue)) {
 				return $programRegistry->valueRegistry->mutable(
-					$parameterValue->typeValue,
-					$targetValue
+					$parameter->typeValue,
+					$target
 				);
 			}
 			return $programRegistry->valueRegistry->error(
 				$programRegistry->valueRegistry->dataValue(
 					new TypeNameIdentifier("CastNotAvailable"),
 					$programRegistry->valueRegistry->record([
-						'from' => $programRegistry->valueRegistry->type($targetValue->type),
-						'to' => $programRegistry->valueRegistry->type($parameterValue->typeValue)
+						'from' => $programRegistry->valueRegistry->type($target->type),
+						'to' => $programRegistry->valueRegistry->type($parameter->typeValue)
 					])
 				)
 			);

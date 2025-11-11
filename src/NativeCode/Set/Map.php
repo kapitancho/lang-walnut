@@ -62,14 +62,11 @@ final readonly class Map implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof SetValue && $parameterValue instanceof FunctionValue) {
-			$values = $targetValue->values;
+		if ($target instanceof SetValue && $parameter instanceof FunctionValue) {
+			$values = $target->values;
 			$result = [];
 			foreach($values as $value) {
-				$r = $parameterValue->execute($programRegistry->executionContext, $value);
+				$r = $parameter->execute($programRegistry->executionContext, $value);
 				if ($r instanceof ErrorValue) {
 					return $r;
 				}

@@ -54,10 +54,8 @@ final readonly class CountValues implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof TupleValue) {
-			$values = $targetValue->values;
+		if ($target instanceof TupleValue) {
+			$values = $target->values;
 
 			$rawValues = [];
 			$hasStrings = false;

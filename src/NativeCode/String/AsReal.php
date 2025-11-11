@@ -42,11 +42,8 @@ final readonly class AsReal implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof StringValue) {
-			$target = $targetValue->literalValue;
-			return (string)($result = (float)$target) === $target ?
+		if ($target instanceof StringValue) {
+			return (string)($result = (float)$target->literalValue) === $target->literalValue ?
 				$programRegistry->valueRegistry->real($result) :
 				$programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))

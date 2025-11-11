@@ -83,16 +83,14 @@ final readonly class Format implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-		if ($targetValue instanceof TupleValue) {
-			if ($parameterValue instanceof StringValue) {
-				$template = $parameterValue->literalValue;
+		
+		if ($target instanceof TupleValue) {
+			if ($parameter instanceof StringValue) {
+				$template = $parameter->literalValue;
 
 				// Convert all array elements to strings
 				$stringValues = [];
-				foreach ($targetValue->values as $index => $value) {
+				foreach ($target->values as $index => $value) {
 					$stringValue = $this->castAsString->evaluate($value);
 					if ($stringValue === null) {
 						// If conversion fails, use string representation
@@ -108,15 +106,15 @@ final readonly class Format implements NativeMethod {
 					// Replace placeholders {0}, {1}, {2}, etc.
 					$result = preg_replace_callback(
 						'/\{(\d+)\}/',
-						function ($matches) use ($stringValues, $programRegistry, $targetValue, $parameterValue) {
+						function ($matches) use ($stringValues, $programRegistry, $target, $parameter) {
 							$index = (int)$matches[1];
 							return $stringValues[$index] ?? throw new FunctionReturn(
 								$programRegistry->valueRegistry->error(
 									$programRegistry->valueRegistry->dataValue(
 										new TypeNameIdentifier("CannotFormatString"),
 										$programRegistry->valueRegistry->record([
-											'values' => $targetValue,
-											'format' => $parameterValue,
+											'values' => $target,
+											'format' => $parameter,
 										])
 									)
 								)

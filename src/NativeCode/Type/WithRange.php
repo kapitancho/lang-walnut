@@ -64,10 +64,8 @@ final readonly class WithRange implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof TypeValue) {
-			$typeValue = $this->toBaseType($targetValue->typeValue);
+		if ($target instanceof TypeValue) {
+			$typeValue = $this->toBaseType($target->typeValue);
 			if ($typeValue instanceof IntegerType) {
 				if ($parameter->type->isSubtypeOf(
 					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('IntegerRange'))

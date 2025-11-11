@@ -49,9 +49,7 @@ final readonly class UNSHIFT implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		$v = $targetValue;
+		$v = $target;
 		if ($v instanceof MutableValue) {
             $targetType = $this->toBaseType($v->targetType);
 			$mv = $v->value;

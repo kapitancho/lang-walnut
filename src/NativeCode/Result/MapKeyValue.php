@@ -75,11 +75,9 @@ final readonly class MapKeyValue implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
 		// If the target is an error, return it as-is
-		if ($targetValue instanceof ErrorValue) {
-			return $targetValue;
+		if ($target instanceof ErrorValue) {
+			return $target;
 		}
 
 		// Only errors should reach this point, therefore no logic for Map<> values is needed.

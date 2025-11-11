@@ -51,24 +51,21 @@ final readonly class AppendContent implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof SealedValue && $targetValue->type->name->equals(
+		if ($target instanceof SealedValue && $target->type->name->equals(
 			new TypeNameIdentifier('File')
 		)) {
-			if ($parameterValue instanceof StringValue) {
-				$path = $targetValue->value->valueOf('path')->literalValue;
-				$result = @file_put_contents($path, $parameterValue->literalValue, FILE_APPEND);
+			if ($parameter instanceof StringValue) {
+				$path = $target->value->valueOf('path')->literalValue;
+				$result = @file_put_contents($path, $parameter->literalValue, FILE_APPEND);
 				if ($result === false) {
 					return $programRegistry->valueRegistry->error(
 						$programRegistry->valueRegistry->sealedValue(
 							new TypeNameIdentifier('CannotWriteFile'),
-							$targetValue
+							$target
 						)
 					);
 				}
-				return $programRegistry->valueRegistry->string($parameterValue);
+				return $programRegistry->valueRegistry->string($parameter);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

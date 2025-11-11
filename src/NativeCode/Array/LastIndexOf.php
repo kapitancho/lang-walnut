@@ -51,13 +51,11 @@ final readonly class LastIndexOf implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-		if ($targetValue instanceof TupleValue) {
-			$values = $targetValue->values;
+		
+		if ($target instanceof TupleValue) {
+			$values = $target->values;
 			for($index = count($values) - 1; $index >= 0; $index--) {
-				if ($values[$index]->equals($parameterValue)) {
+				if ($values[$index]->equals($parameter)) {
 					return $programRegistry->valueRegistry->integer($index);
 				}
 			}

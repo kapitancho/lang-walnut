@@ -67,14 +67,14 @@ final readonly class MapKeyValue implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
+		$target = $target;
+		$parameter = $parameter;
 		
-		if ($targetValue instanceof RecordValue && $parameterValue instanceof FunctionValue) {
-			$values = $targetValue->values;
+		if ($target instanceof RecordValue && $parameter instanceof FunctionValue) {
+			$values = $target->values;
 			$result = [];
 			foreach($values as $key => $value) {
-				$r = $parameterValue->execute(
+				$r = $parameter->execute(
 					$programRegistry->executionContext,
 					$programRegistry->valueRegistry->record([
 						'key' => $programRegistry->valueRegistry->string($key),

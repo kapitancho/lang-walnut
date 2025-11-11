@@ -48,12 +48,10 @@ final readonly class InsertLast implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-		if ($targetValue instanceof TupleValue) {
-			$values = $targetValue->values;
-			$values[] = $parameterValue;
+		
+		if ($target instanceof TupleValue) {
+			$values = $target->values;
+			$values[] = $parameter;
 			return $programRegistry->valueRegistry->tuple($values);
 		}
 		// @codeCoverageIgnoreStart

@@ -55,14 +55,11 @@ final readonly class BinaryMultiply implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-				if ($targetValue instanceof StringValue) {
-			if ($parameterValue instanceof IntegerValue && $parameterValue->literalValue >= 0) {
+				if ($target instanceof StringValue) {
+			if ($parameter instanceof IntegerValue && $parameter->literalValue >= 0) {
 				$result = str_repeat(
-					$targetValue->literalValue,
-					(string)$parameterValue->literalValue
+					$target->literalValue,
+					(string)$parameter->literalValue
 				);
 				return $programRegistry->valueRegistry->string($result);
 			}

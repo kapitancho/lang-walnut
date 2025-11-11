@@ -38,10 +38,8 @@ final readonly class HtmlEscape implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof StringValue) {
-			return $programRegistry->valueRegistry->string(htmlspecialchars($targetValue->literalValue));
+		if ($target instanceof StringValue) {
+			return $programRegistry->valueRegistry->string(htmlspecialchars($target->literalValue));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

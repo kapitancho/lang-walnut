@@ -48,17 +48,15 @@ final readonly class Content implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof SealedValue && $targetValue->type->name->equals(
+		if ($target instanceof SealedValue && $target->type->name->equals(
 			new TypeNameIdentifier('File')
 		)) {
-			$path = $targetValue->value->valueOf('path')->literalValue;
+			$path = $target->value->valueOf('path')->literalValue;
 			if (!file_exists($path) || !is_readable($path) || ($contents = file_get_contents($path)) === false) {
 				return $programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->sealedValue(
 						new TypeNameIdentifier('CannotReadFile'),
-						$targetValue->value
+						$target->value
 					)
 				);
 			}

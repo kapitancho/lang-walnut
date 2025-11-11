@@ -54,12 +54,12 @@ final readonly class MergeWith implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
+		$target = $target;
+		$parameter = $parameter;
 		
-		if ($targetValue instanceof RecordValue) {
-			if ($parameterValue instanceof RecordValue) {
-				$values = [... $targetValue->values, ... $parameterValue->values];
+		if ($target instanceof RecordValue) {
+			if ($parameter instanceof RecordValue) {
+				$values = [... $target->values, ... $parameter->values];
 				return $programRegistry->valueRegistry->record($values);
 			}
 			// @codeCoverageIgnoreStart

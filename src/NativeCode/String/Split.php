@@ -46,12 +46,9 @@ final readonly class Split implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-				if ($targetValue instanceof StringValue) {
-			if ($parameterValue instanceof StringValue) {
-				$result = explode($parameterValue->literalValue, $targetValue->literalValue);
+				if ($target instanceof StringValue) {
+			if ($parameter instanceof StringValue) {
+				$result = explode($parameter->literalValue, $target->literalValue);
 				return $programRegistry->valueRegistry->tuple(
 					array_map(fn(string $piece): StringValue =>
 						$programRegistry->valueRegistry->string($piece), $result)

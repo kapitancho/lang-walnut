@@ -65,15 +65,12 @@ final readonly class FindFirstKeyValue implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-		if ($targetValue instanceof RecordValue) {
-			if ($parameterValue instanceof FunctionValue) {
-				$values = $targetValue->values;
+		if ($target instanceof RecordValue) {
+			if ($parameter instanceof FunctionValue) {
+				$values = $target->values;
 				$true = $programRegistry->valueRegistry->true;
 				foreach($values as $key => $value) {
-					$filterResult = $parameterValue->execute(
+					$filterResult = $parameter->execute(
 						$programRegistry->executionContext,
 						$val = $programRegistry->valueRegistry->record([
 							'key' => $programRegistry->valueRegistry->string($key),

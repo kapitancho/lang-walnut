@@ -53,11 +53,9 @@ final readonly class MaxValue implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof TypeValue) {
+		if ($target instanceof TypeValue) {
 			//TODO: yyy - open vs closed intervals
-			$typeValue = $this->toBaseType($targetValue->typeValue);
+			$typeValue = $this->toBaseType($target->typeValue);
 			if ($typeValue instanceof IntegerType) {
 				return $typeValue->numberRange->max === PlusInfinity::value ?
 					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('PlusInfinity')) :

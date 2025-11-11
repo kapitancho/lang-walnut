@@ -49,10 +49,8 @@ final readonly class Flip implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof RecordValue) {
-			$values = $targetValue->values;
+		if ($target instanceof RecordValue) {
+			$values = $target->values;
 
 			$rawValues = [];
 			foreach($values as $key => $value) {

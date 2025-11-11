@@ -80,27 +80,25 @@ final readonly class BinaryDivide implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
+		
 
-
-		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
-			if ($parameterValue instanceof IntegerValue || $parameterValue instanceof RealValue) {
-				if ((float)(string)$parameterValue->literalValue === 0.0) {
+		if ($target instanceof RealValue || $target instanceof IntegerValue) {
+			if ($parameter instanceof IntegerValue || $parameter instanceof RealValue) {
+				if ((float)(string)$parameter->literalValue === 0.0) {
 					return $programRegistry->valueRegistry->error(
 						$programRegistry->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
 					);
 				}
 				// Special case: Integer / 1 = Integer
 				if (
-					$parameterValue instanceof IntegerValue &&
-					(string)$parameterValue->literalValue === '1'
+					$parameter instanceof IntegerValue &&
+					(string)$parameter->literalValue === '1'
 				) {
-					return $targetValue;
+					return $target;
 				}
                 return $programRegistry->valueRegistry->real(
-	                fdiv((string)$targetValue->literalValue, (string)$parameterValue->literalValue)
-	                //$targetValue->literalValue / $parameter->literalValue
+	                fdiv((string)$target->literalValue, (string)$parameter->literalValue)
+	                //$target->literalValue / $parameter->literalValue
                 );
 			}
 			// @codeCoverageIgnoreStart

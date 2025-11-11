@@ -66,20 +66,17 @@ final readonly class ValueWithName implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($parameterValue instanceof StringValue) {
-			if ($targetValue instanceof TypeValue) {
-				$refType = $targetValue->typeValue;
+		if ($parameter instanceof StringValue) {
+			if ($target instanceof TypeValue) {
+				$refType = $target->typeValue;
 				if ($refType instanceof EnumerationSubsetType) {
-					return $refType->subsetValues[$parameterValue->literalValue] ??
+					return $refType->subsetValues[$parameter->literalValue] ??
 						$programRegistry->valueRegistry->error(
 							$programRegistry->valueRegistry->dataValue(
 								new TypeNameIdentifier('UnknownEnumerationValue'),
 								$programRegistry->valueRegistry->record([
 									'enumeration' => $programRegistry->valueRegistry->type($refType),
-									'value' => $parameterValue,
+									'value' => $parameter,
 								])
 							)
 						);

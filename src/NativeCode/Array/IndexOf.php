@@ -51,13 +51,11 @@ final readonly class IndexOf implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-		if ($targetValue instanceof TupleValue) {
-			$values = $targetValue->values;
+		
+		if ($target instanceof TupleValue) {
+			$values = $target->values;
 			foreach ($values as $index => $value) {
-				if ($value->equals($parameterValue)) {
+				if ($value->equals($parameter)) {
 					return $programRegistry->valueRegistry->integer($index);
 				}
 			}

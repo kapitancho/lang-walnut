@@ -56,19 +56,17 @@ final readonly class BinaryPlus implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-		if ($targetValue instanceof StringValue) {
-			$value = $parameterValue instanceof StringValue ?
-				$parameterValue :
+		
+		if ($target instanceof StringValue) {
+			$value = $parameter instanceof StringValue ?
+				$parameter :
 				new ValueConverter()->convertValueToShape(
 					$programRegistry,
-					$parameterValue,
+					$parameter,
 					$programRegistry->typeRegistry->string()
 				);
 			if ($value instanceof StringValue) {
-				$result = $targetValue->literalValue . $value->literalValue;
+				$result = $target->literalValue . $value->literalValue;
 				return $programRegistry->valueRegistry->string($result);
 			}
 			// @codeCoverageIgnoreStart

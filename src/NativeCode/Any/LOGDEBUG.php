@@ -27,9 +27,7 @@ final readonly class LOGDEBUG implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-        file_put_contents(__DIR__ . '/../../../log/nut.log', $targetValue . '\n\n', FILE_APPEND);
+        file_put_contents(__DIR__ . '/../../../log/nut.log', $target . '\n\n', FILE_APPEND);
 		return $target;
 	}
 

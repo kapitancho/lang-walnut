@@ -122,34 +122,31 @@ final readonly class Item implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof OpenValue) {
-			$baseValue = $targetValue->value;
-			if ($baseValue instanceof TupleValue && $parameterValue instanceof IntegerValue) {
+		if ($target instanceof OpenValue) {
+			$baseValue = $target->value;
+			if ($baseValue instanceof TupleValue && $parameter instanceof IntegerValue) {
 				$values = $baseValue->values;
-				$result = $values[(string)$parameterValue->literalValue] ?? null;
+				$result = $values[(string)$parameter->literalValue] ?? null;
 				if ($result !== null) {
 					return $result;
 				}
 				return $programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->dataValue(
 						new TypeNameIdentifier('IndexOutOfRange'),
-						$programRegistry->valueRegistry->record(['index' => $parameterValue])
+						$programRegistry->valueRegistry->record(['index' => $parameter])
 					)
 				);
 			}
-			if ($baseValue instanceof RecordValue && $parameterValue instanceof StringValue) {
+			if ($baseValue instanceof RecordValue && $parameter instanceof StringValue) {
 				$values = $baseValue->values;
-				$result = $values[$parameterValue->literalValue] ?? null;
+				$result = $values[$parameter->literalValue] ?? null;
 				if ($result !== null) {
 					return $result;
 				}
 				return $programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->dataValue(
 						new TypeNameIdentifier('MapItemNotFound'),
-						$programRegistry->valueRegistry->record(['key' => $parameterValue])
+						$programRegistry->valueRegistry->record(['key' => $parameter])
 					)
 				);
 			}

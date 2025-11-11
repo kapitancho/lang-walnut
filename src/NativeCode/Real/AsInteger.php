@@ -65,11 +65,8 @@ final readonly class AsInteger implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
-			$target = $targetValue->literalValue;
-			return $programRegistry->valueRegistry->integer((int)(string)$target);
+		if ($target instanceof RealValue || $target instanceof IntegerValue) {
+			return $programRegistry->valueRegistry->integer((int)(string)$target->literalValue);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

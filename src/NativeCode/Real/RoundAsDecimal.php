@@ -28,12 +28,15 @@ final readonly class RoundAsDecimal implements NativeMethod {
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof RealType) {
-			return $typeRegistry->real(
-				$targetType->numberRange->min === MinusInfinity::value ? MinusInfinity::value :
-					$targetType->numberRange->min->value->floor(),
-				$targetType->numberRange->max === PlusInfinity::value ? PlusInfinity::value :
-					$targetType->numberRange->max->value->ceil()
-			);
+			if ($parameterType->isSubtypeOf($typeRegistry->integer(0))) {
+				return $typeRegistry->real(
+					$targetType->numberRange->min === MinusInfinity::value ? MinusInfinity::value :
+						$targetType->numberRange->min->value->floor(),
+					$targetType->numberRange->max === PlusInfinity::value ? PlusInfinity::value :
+						$targetType->numberRange->max->value->ceil()
+				);
+			}
+			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -45,13 +48,9 @@ final readonly class RoundAsDecimal implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
-			$target = $targetValue->literalValue;
-			if ($parameterValue instanceof IntegerValue && $parameterValue->literalValue >= 0) {
-				return $programRegistry->valueRegistry->real($target->round((string)$parameterValue->literalValue));
+		if ($target instanceof RealValue || $target instanceof IntegerValue) {
+			if ($parameter instanceof IntegerValue && $parameter->literalValue >= 0) {
+				return $programRegistry->valueRegistry->real($target->literalValue->round((string)$parameter->literalValue));
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

@@ -25,9 +25,7 @@ final readonly class DUMPNL implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-        echo $targetValue, '<br/>', PHP_EOL;
+        echo $target, '<br/>', PHP_EOL;
 		return $target;
 	}
 

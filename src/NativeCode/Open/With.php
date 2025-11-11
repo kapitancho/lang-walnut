@@ -181,28 +181,25 @@ final readonly class With implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof OpenValue) {
-			$baseValue = $targetValue->value;
+		if ($target instanceof OpenValue) {
+			$baseValue = $target->value;
 
-			$executeValidator = function(Value $parameterValue) use ($programRegistry, $baseValue, $targetValue) {
+			$executeValidator = static function(Value $parameter) use ($programRegistry, $target) {
 				return new ValueConstructor()->executeValidator(
 					$programRegistry,
-					$targetValue->type,
-					$parameterValue
+					$target->type,
+					$parameter
 				);
 			};
 
-			if ($baseValue instanceof TupleValue && $parameterValue instanceof TupleValue) {
+			if ($baseValue instanceof TupleValue && $parameter instanceof TupleValue) {
 				$values = $baseValue->values;
 				foreach ($parameter->values as $index => $value) {
 					$values[$index] = $value;
 				}
 				return $executeValidator($programRegistry->valueRegistry->tuple($values));
 			}
-			if ($baseValue instanceof RecordValue && $parameterValue instanceof RecordValue) {
+			if ($baseValue instanceof RecordValue && $parameter instanceof RecordValue) {
 				$values = $baseValue->values;
 				foreach ($parameter->values as $key => $value) {
 					$values[$key] = $value;

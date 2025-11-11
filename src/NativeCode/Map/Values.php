@@ -50,10 +50,8 @@ final readonly class Values implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof RecordValue) {
-			return $programRegistry->valueRegistry->tuple(array_values($targetValue->values));
+		if ($target instanceof RecordValue) {
+			return $programRegistry->valueRegistry->tuple(array_values($target->values));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

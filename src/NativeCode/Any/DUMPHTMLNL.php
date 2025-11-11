@@ -25,9 +25,7 @@ final readonly class DUMPHTMLNL implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-        echo htmlspecialchars($targetValue), '<br/>', PHP_EOL;
+        echo htmlspecialchars($target), '<br/>', PHP_EOL;
 		return $target;
 	}
 

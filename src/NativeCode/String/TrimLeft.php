@@ -43,13 +43,11 @@ final readonly class TrimLeft implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-		if ($targetValue instanceof StringValue) {
-			return $parameterValue instanceof StringValue ?
-				$programRegistry->valueRegistry->string(ltrim($targetValue->literalValue, $parameterValue->literalValue)) :
-				$programRegistry->valueRegistry->string(ltrim($targetValue->literalValue))
+		
+		if ($target instanceof StringValue) {
+			return $parameter instanceof StringValue ?
+				$programRegistry->valueRegistry->string(ltrim($target->literalValue, $parameter->literalValue)) :
+				$programRegistry->valueRegistry->string(ltrim($target->literalValue))
 			;
 		}
 		// @codeCoverageIgnoreStart

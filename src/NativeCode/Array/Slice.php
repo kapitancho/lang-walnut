@@ -61,15 +61,12 @@ final readonly class Slice implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof TupleValue) {
-			if ($parameterValue instanceof RecordValue) {
-				$values = $targetValue->values;
-				$start = $parameterValue->valueOf('start');
+		if ($target instanceof TupleValue) {
+			if ($parameter instanceof RecordValue) {
+				$values = $target->values;
+				$start = $parameter->valueOf('start');
 				try {
-					$length = $parameterValue->valueOf('length');
+					$length = $parameter->valueOf('length');
 				} catch (UnknownProperty) {
 					$length = $programRegistry->valueRegistry->integer(count($values));
 				}

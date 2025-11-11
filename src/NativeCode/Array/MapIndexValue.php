@@ -71,14 +71,11 @@ final readonly class MapIndexValue implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof TupleValue && $parameterValue instanceof FunctionValue) {
-			$values = $targetValue->values;
+		if ($target instanceof TupleValue && $parameter instanceof FunctionValue) {
+			$values = $target->values;
 			$result = [];
 			foreach($values as $index => $value) {
-				$r = $parameterValue->execute(
+				$r = $parameter->execute(
 					$programRegistry->executionContext,
 					$programRegistry->valueRegistry->record([
 						'index' => $programRegistry->valueRegistry->integer($index),

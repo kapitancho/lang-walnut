@@ -206,10 +206,8 @@ final readonly class OpenApiSchema implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof TypeValue) {
-			return $this->typeToOpenApiSchema($programRegistry, $targetValue->typeValue);
+		if ($target instanceof TypeValue) {
+			return $this->typeToOpenApiSchema($programRegistry, $target->typeValue);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid parameter value");

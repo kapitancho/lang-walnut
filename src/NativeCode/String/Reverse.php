@@ -38,10 +38,8 @@ final readonly class Reverse implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof StringValue) {
-			return $programRegistry->valueRegistry->string(strrev($targetValue->literalValue));
+		if ($target instanceof StringValue) {
+			return $programRegistry->valueRegistry->string(strrev($target->literalValue));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

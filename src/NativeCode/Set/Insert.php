@@ -47,20 +47,18 @@ final readonly class Insert implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-		if ($targetValue instanceof SetValue) {
-			$values = $targetValue->values;
+		
+		if ($target instanceof SetValue) {
+			$values = $target->values;
 			$exists = false;
 			foreach ($values as $value) {
-				if ($value->equals($parameterValue)) {
+				if ($value->equals($parameter)) {
 					$exists = true;
 					break;
 				}
 			}
 			if (!$exists) {
-				$values[] = $parameterValue;
+				$values[] = $parameter;
 			}
 			return $programRegistry->valueRegistry->set($values);
 		}

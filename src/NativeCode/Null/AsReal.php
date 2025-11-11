@@ -32,9 +32,7 @@ final readonly class AsReal implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof NullValue) {
+		if ($target instanceof NullValue) {
 			return $programRegistry->valueRegistry->real(0);
 		}
 		// @codeCoverageIgnoreStart

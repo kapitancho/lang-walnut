@@ -47,10 +47,8 @@ final readonly class Length implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof TupleValue) {
-			return $programRegistry->valueRegistry->integer(count($targetValue->values));
+		if ($target instanceof TupleValue) {
+			return $programRegistry->valueRegistry->integer(count($target->values));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

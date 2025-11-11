@@ -39,15 +39,13 @@ final readonly class IsDisjointWith implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-				if ($targetValue instanceof SetValue) {
-			if ($parameterValue instanceof SetValue) {
+		
+				if ($target instanceof SetValue) {
+			if ($parameter instanceof SetValue) {
 				return $programRegistry->valueRegistry->boolean(
 					count(array_intersect(
-						array_keys($targetValue->valueSet),
-						array_keys($parameterValue->valueSet),
+						array_keys($target->valueSet),
+						array_keys($parameter->valueSet),
 					)) === 0
 				);
 			}

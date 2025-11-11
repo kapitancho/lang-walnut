@@ -46,11 +46,8 @@ final readonly class AsReal implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof IntegerValue || $targetValue instanceof RealValue) {
-			$target = $targetValue->literalValue;
-			return $programRegistry->valueRegistry->real((float)(string)$target);
+		if ($target instanceof IntegerValue || $target instanceof RealValue) {
+			return $programRegistry->valueRegistry->real((float)(string)$target->literalValue);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

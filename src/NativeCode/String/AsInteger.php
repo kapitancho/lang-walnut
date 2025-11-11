@@ -42,11 +42,8 @@ final readonly class AsInteger implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof StringValue) {
-			$target = $targetValue->literalValue;
-			return (string)($result = (int)$target) === $target ?
+		if ($target instanceof StringValue) {
+			return (string)($result = (int)$target->literalValue) === $target->literalValue ?
 				$programRegistry->valueRegistry->integer($result) :
 				$programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))

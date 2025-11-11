@@ -80,12 +80,9 @@ final readonly class Values implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($parameterValue instanceof NullValue) {
-			if ($targetValue instanceof TypeValue) {
-				$refType = $targetValue->typeValue;
+		if ($parameter instanceof NullValue) {
+			if ($target instanceof TypeValue) {
+				$refType = $target->typeValue;
 				if ($refType instanceof EnumerationSubsetType) {
 					return $programRegistry->valueRegistry->tuple(
 						array_values(
@@ -94,7 +91,8 @@ final readonly class Values implements NativeMethod {
 							)
 						)
 					);
-				} elseif ($refType instanceof IntegerSubsetType) {
+				}
+				if ($refType instanceof IntegerSubsetType) {
 					return $programRegistry->valueRegistry->tuple(
 						array_map(
 							fn(Number $value): IntegerValue => $programRegistry->valueRegistry->integer($value),
@@ -105,7 +103,8 @@ final readonly class Values implements NativeMethod {
 							)
 						)
 					);
-				} elseif ($refType instanceof RealSubsetType) {
+				}
+				if ($refType instanceof RealSubsetType) {
 					return $programRegistry->valueRegistry->tuple(
 						array_map(
 							fn(Number $value): RealValue => $programRegistry->valueRegistry->real($value),
@@ -116,7 +115,8 @@ final readonly class Values implements NativeMethod {
 							)
 						)
 					);
-				} elseif ($refType instanceof StringSubsetType) {
+				}
+				if ($refType instanceof StringSubsetType) {
 					return $programRegistry->valueRegistry->tuple(
 						array_map(
 							fn(string $value): StringValue => $programRegistry->valueRegistry->string($value),

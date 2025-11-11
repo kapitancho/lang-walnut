@@ -45,11 +45,9 @@ final readonly class Construct implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		//$targetValue = $target->value;
-		$parameterValue = $parameter;
-
-		if ($parameterValue instanceof TypeValue) {
-			$t = $parameterValue->typeValue;
+		//$target = $target->value;
+		if ($parameter instanceof TypeValue) {
+			$t = $parameter->typeValue;
 
 			return new ValueConstructor()->executeConstructor(
 				$programRegistry,

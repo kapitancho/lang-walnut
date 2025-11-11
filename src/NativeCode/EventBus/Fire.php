@@ -45,18 +45,15 @@ final readonly class Fire implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof SealedValue && $targetValue->type->name->equals(
+		if ($target instanceof SealedValue && $target->type->name->equals(
 			new TypeNameIdentifier('EventBus')
 		)) {
-			$listeners = $targetValue->value->values['listeners'] ?? null;
+			$listeners = $target->value->values['listeners'] ?? null;
 			if ($listeners instanceof TupleValue) {
 				foreach($listeners->values as $listener) {
 					if ($listener instanceof FunctionValue) {
-						if ($parameterValue->type->isSubtypeOf($listener->type->parameterType)) {
-							$result = $listener->execute($programRegistry->executionContext, $parameterValue);
+						if ($parameter->type->isSubtypeOf($listener->type->parameterType)) {
+							$result = $listener->execute($programRegistry->executionContext, $parameter);
 							if ($result->type->isSubtypeOf(
 								$programRegistry->typeRegistry->result(
 									$programRegistry->typeRegistry->nothing,
@@ -72,7 +69,7 @@ final readonly class Fire implements NativeMethod {
 						// @codeCoverageIgnoreEnd
 					}
 				}
-				return $parameterValue;
+				return $parameter;
 			}
 		}
 		// @codeCoverageIgnoreStart

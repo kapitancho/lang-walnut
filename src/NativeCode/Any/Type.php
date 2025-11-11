@@ -32,9 +32,7 @@ final readonly class Type implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$parameterValue = $parameter;
-		
-		if ($parameterValue instanceof NullValue) {
+		if ($parameter instanceof NullValue) {
 			return $programRegistry->valueRegistry->type($target->type);
 		}
 		// @codeCoverageIgnoreStart

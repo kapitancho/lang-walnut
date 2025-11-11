@@ -49,12 +49,10 @@ final readonly class Max implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof TupleValue && count($targetValue->values) > 0) {
-			$maxV = $targetValue->values[0];
+		if ($target instanceof TupleValue && count($target->values) > 0) {
+			$maxV = $target->values[0];
 			$max = $maxV->literalValue;
-			foreach($targetValue->values as $item) {
+			foreach($target->values as $item) {
 				$value = $item->literalValue;
 				if ($value > $max) {
 					$maxV = $item;

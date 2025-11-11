@@ -69,22 +69,22 @@ final readonly class WithoutByKey implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
+		$target = $target;
+		$parameter = $parameter;
 		
-		if ($targetValue instanceof RecordValue) {
-			if ($parameterValue instanceof StringValue) {
-				$values = $targetValue->values;
-				if (!isset($values[$parameterValue->literalValue])) {
+		if ($target instanceof RecordValue) {
+			if ($parameter instanceof StringValue) {
+				$values = $target->values;
+				if (!isset($values[$parameter->literalValue])) {
 					return $programRegistry->valueRegistry->error(
 						$programRegistry->valueRegistry->dataValue(
 							new TypeNameIdentifier('MapItemNotFound'),
-							$programRegistry->valueRegistry->record(['key' => $parameterValue])
+							$programRegistry->valueRegistry->record(['key' => $parameter])
 						)
 					);
 				}
-				$val = $values[$parameterValue->literalValue];
-				unset($values[$parameterValue->literalValue]);
+				$val = $values[$parameter->literalValue];
+				unset($values[$parameter->literalValue]);
 				return $programRegistry->valueRegistry->record([
 					'element' => $val,
 					'map' => $programRegistry->valueRegistry->record($values)

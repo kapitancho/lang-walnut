@@ -68,17 +68,14 @@ final readonly class PadLeft implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-				if ($targetValue instanceof StringValue) {
-			if ($parameterValue instanceof RecordValue) {
-				$values = $parameterValue->values;
+				if ($target instanceof StringValue) {
+			if ($parameter instanceof RecordValue) {
+				$values = $parameter->values;
 				$length = $values['length'] ?? null;
 				$padString = $values['padString'] ?? null;
 				if ($length instanceof IntegerValue && $padString instanceof StringValue) {
 					$result = str_pad(
-						$targetValue->literalValue,
+						$target->literalValue,
 						(string)$length->literalValue,
 						$padString->literalValue,
 						STR_PAD_LEFT

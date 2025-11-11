@@ -66,15 +66,13 @@ final readonly class AsString implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		$result = $this->castAsString->evaluate($targetValue);
+		$result = $this->castAsString->evaluate($target);
         return $result === null ?
 	        $programRegistry->valueRegistry->error(
 				$programRegistry->valueRegistry->dataValue(
 					new TypeNameIdentifier("CastNotAvailable"),
 					$programRegistry->valueRegistry->record([
-						'from' => $programRegistry->valueRegistry->type($targetValue->type),
+						'from' => $programRegistry->valueRegistry->type($target->type),
 						'to' => $programRegistry->valueRegistry->type($programRegistry->typeRegistry->string())
 					])
 				)

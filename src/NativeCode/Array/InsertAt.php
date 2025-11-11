@@ -67,16 +67,14 @@ final readonly class InsertAt implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-		if ($targetValue instanceof TupleValue) {
-			if ($parameterValue instanceof RecordValue) {
-				$value = $parameterValue->valueOf('value');
-				$index = $parameterValue->valueOf('index');
+		
+		if ($target instanceof TupleValue) {
+			if ($parameter instanceof RecordValue) {
+				$value = $parameter->valueOf('value');
+				$index = $parameter->valueOf('index');
 				if ($index instanceof IntegerValue) {
 					$idx = (string)$index->literalValue;
-					$values = $targetValue->values;
+					$values = $target->values;
 					if ($idx >= 0 && $idx <= count($values)) {
 						array_splice(
 							$values,

@@ -60,15 +60,12 @@ final readonly class Filter implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-		if ($targetValue instanceof RecordValue && $parameterValue instanceof FunctionValue) {
-			$values = $targetValue->values;
+		if ($target instanceof RecordValue && $parameter instanceof FunctionValue) {
+			$values = $target->values;
 			$result = [];
 			$true = $programRegistry->valueRegistry->true;
 			foreach($values as $key => $value) {
-				$r = $parameterValue->execute($programRegistry->executionContext, $value);
+				$r = $parameter->execute($programRegistry->executionContext, $value);
 				if ($true->equals($r)) {
 					$result[$key] = $value;
 				}

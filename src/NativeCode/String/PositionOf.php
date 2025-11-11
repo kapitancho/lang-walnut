@@ -52,12 +52,10 @@ final readonly class PositionOf implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-				if ($targetValue instanceof StringValue) {
-			if ($parameterValue instanceof StringValue) {
-				$result = strpos($targetValue->literalValue, $parameterValue->literalValue);
+		
+				if ($target instanceof StringValue) {
+			if ($parameter instanceof StringValue) {
+				$result = strpos($target->literalValue, $parameter->literalValue);
 				return $result === false ?
 					$programRegistry->valueRegistry->error(
 						$programRegistry->valueRegistry->atom(

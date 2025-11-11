@@ -40,13 +40,10 @@ final readonly class SET implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		$v = $targetValue;
+		$v = $target;
 		if ($v instanceof MutableValue) {
-			$v->value = $parameterValue;
-			return $targetValue;
+			$v->value = $parameter;
+			return $target;
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

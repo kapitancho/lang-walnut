@@ -65,10 +65,8 @@ final readonly class WithNumberRange implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof TypeValue) {
-			$typeValue = $this->toBaseType($targetValue->typeValue);
+		if ($target instanceof TypeValue) {
+			$typeValue = $this->toBaseType($target->typeValue);
 			if ($typeValue instanceof IntegerType || $typeValue instanceof RealType) {
 				$prefix = $typeValue instanceof IntegerType ? 'Integer' : 'Real';
 				if ($parameter->type->isSubtypeOf(

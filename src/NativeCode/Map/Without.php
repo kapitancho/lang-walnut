@@ -54,13 +54,13 @@ final readonly class Without implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
+		$target = $target;
+		$parameter = $parameter;
 		
-		if ($targetValue instanceof RecordValue) {
-			$values = $targetValue->values;
+		if ($target instanceof RecordValue) {
+			$values = $target->values;
 			foreach($values as $key => $value) {
-				if ($value->equals($parameterValue)) {
+				if ($value->equals($parameter)) {
 					unset($values[$key]);
 					return $programRegistry->valueRegistry->record($values);
 				}

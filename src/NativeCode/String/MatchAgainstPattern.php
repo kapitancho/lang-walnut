@@ -51,13 +51,9 @@ final readonly class MatchAgainstPattern implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-				if ($targetValue instanceof StringValue) {
-			if ($parameterValue instanceof StringValue) {
-				$target = $targetValue->literalValue;
-				$path = $parameterValue->literalValue;
+		if ($target instanceof StringValue) {
+			if ($parameter instanceof StringValue) {
+				$path = $parameter->literalValue;
 
 				if (preg_match_all(self::ROUTE_PATTERN_MATCH, $path, $matches)) {
 					$pathArgs = $matches[1] ?? [];
@@ -67,7 +63,7 @@ final readonly class MatchAgainstPattern implements NativeMethod {
 					$path = '^' . $path . '$';
 				}
 				$path = strtolower($path);
-				if (!preg_match('#' . $path . '#', $target, $matches)) {
+				if (!preg_match('#' . $path . '#', $target->literalValue, $matches)) {
 					return $programRegistry->valueRegistry->false;
 				}
 				return is_array($pathArgs) ?

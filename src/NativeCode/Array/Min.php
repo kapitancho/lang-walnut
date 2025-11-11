@@ -49,12 +49,10 @@ final readonly class Min implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof TupleValue && count($targetValue->values) > 0) {
-			$minV = $targetValue->values[0];
+		if ($target instanceof TupleValue && count($target->values) > 0) {
+			$minV = $target->values[0];
 			$min = $minV->literalValue;
-			foreach($targetValue->values as $item) {
+			foreach($target->values as $item) {
 				$value = $item->literalValue;
 				if ($value < $min) {
 					$minV = $item;

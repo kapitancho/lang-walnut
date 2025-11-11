@@ -45,14 +45,12 @@ final readonly class KeysSet implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof RecordValue) {
+		if ($target instanceof RecordValue) {
 			return $programRegistry->valueRegistry->set(
 				array_map(
 					fn($key) => $programRegistry->valueRegistry->string($key),
 					array_keys(
-						$targetValue->values
+						$target->values
 					)
 				)
 			);

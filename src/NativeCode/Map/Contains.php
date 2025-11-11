@@ -41,12 +41,9 @@ final readonly class Contains implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-		if ($targetValue instanceof RecordValue) {
-			$values = $targetValue->values;
-			if (array_any($values, fn($value) => $value->equals($parameterValue))) {
+		if ($target instanceof RecordValue) {
+			$values = $target->values;
+			if (array_any($values, fn($value) => $value->equals($parameter))) {
 				return $programRegistry->valueRegistry->true;
 			}
 			return $programRegistry->valueRegistry->false;

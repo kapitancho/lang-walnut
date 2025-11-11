@@ -48,13 +48,10 @@ final readonly class KeyExists implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-		if ($targetValue instanceof RecordValue && $parameterValue instanceof StringValue) {
-			$values = $targetValue->values;
+		if ($target instanceof RecordValue && $parameter instanceof StringValue) {
+			$values = $target->values;
 			return $programRegistry->valueRegistry->boolean(
-				array_key_exists($parameterValue->literalValue, $values)
+				array_key_exists($parameter->literalValue, $values)
 			);
 		}
 		// @codeCoverageIgnoreStart

@@ -46,19 +46,17 @@ final readonly class REMOVE implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-		$v = $targetValue;
+		
+		$v = $target;
 		if ($v instanceof MutableValue) {
             $targetType = $this->toBaseType($v->targetType);
 			if ($targetType instanceof SetType && $v->value instanceof SetValue) {
-				$k = (string)$parameterValue;
+				$k = (string)$parameter;
 				$vs = $v->value->valueSet;
 				if (array_key_exists($k, $vs)) {
 					unset($vs[$k]);
 					$v->value = $programRegistry->valueRegistry->set($vs);
-					return $parameterValue;
+					return $parameter;
 				}
 				return $programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->atom(new TypeNameIdentifier("ItemNotFound"))

@@ -42,9 +42,7 @@ final readonly class Value implements NativeMethod {
 		ValueInterface $target,
 		ValueInterface $parameter
 	): ValueInterface {
-		$targetValue = $target;
-
-		$v = $targetValue;
+		$v = $target;
 		if ($v instanceof MutableValue) {
 			return $v->value;
 		}

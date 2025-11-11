@@ -39,17 +39,15 @@ final readonly class JsonStringify implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
 		$method0 = $programRegistry->methodFinder->methodForType(
-			$targetValue->type, new MethodNameIdentifier('stringify')
+			$target->type, new MethodNameIdentifier('stringify')
 		);
 		if ($method0 !== UnknownMethod::value) {
 			return $method0->execute($programRegistry, $target, $parameter);
 		}
 
 		$method1 = $programRegistry->methodFinder->methodForType(
-			$targetValue->type, new MethodNameIdentifier('asJsonValue')
+			$target->type, new MethodNameIdentifier('asJsonValue')
 		);
 		$step1 = $method1->execute($programRegistry, $target, $parameter);
 		if ($step1 instanceof ErrorValue) {

@@ -56,20 +56,18 @@ final readonly class ChainInvoke implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-        if ($targetValue instanceof TupleValue) {
-            foreach($targetValue->values as $fnValue) {
+		
+        if ($target instanceof TupleValue) {
+            foreach($target->values as $fnValue) {
 				if ($fnValue instanceof FunctionValue) {
-                    $parameterValue = $fnValue->execute(
+                    $parameter = $fnValue->execute(
 						$programRegistry->executionContext,
-						$parameterValue
+						$parameter
                     );
 	            }
             }
         }
-		return $parameterValue;
+		return $parameter;
     }
 
 }

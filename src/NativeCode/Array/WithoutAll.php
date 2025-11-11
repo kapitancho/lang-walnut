@@ -43,12 +43,9 @@ final readonly class WithoutAll implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof TupleValue) {
-			$values = $targetValue->values;
-			$values = array_values(array_filter($values, static fn($value) => !$value->equals($parameterValue)));
+		if ($target instanceof TupleValue) {
+			$values = $target->values;
+			$values = array_values(array_filter($values, static fn($value) => !$value->equals($parameter)));
 			return $programRegistry->valueRegistry->tuple($values);
 		}
 		// @codeCoverageIgnoreStart

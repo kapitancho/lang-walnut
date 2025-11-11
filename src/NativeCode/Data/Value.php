@@ -43,10 +43,8 @@ final readonly class Value implements NativeMethod {
 		ValueInterface $target,
 		ValueInterface $parameter
 	): ValueInterface {
-		$targetValue = $target;
-
-		if ($targetValue instanceof DataValue) {
-			return $targetValue->value;
+		if ($target instanceof DataValue) {
+			return $target->value;
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

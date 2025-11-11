@@ -41,10 +41,8 @@ final readonly class Reverse implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof TupleValue) {
-			$values = $targetValue->values;
+		if ($target instanceof TupleValue) {
+			$values = $target->values;
 			$values = array_reverse($values);
 			return $programRegistry->valueRegistry->tuple($values);
 		}

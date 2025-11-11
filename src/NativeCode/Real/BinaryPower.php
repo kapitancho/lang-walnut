@@ -63,16 +63,13 @@ final readonly class BinaryPower implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
 
-		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
-			if ($parameterValue instanceof IntegerValue || $parameterValue instanceof RealValue) {
+		if ($target instanceof RealValue || $target instanceof IntegerValue) {
+			if ($parameter instanceof IntegerValue || $parameter instanceof RealValue) {
                 return $programRegistry->valueRegistry->real(
-					str_contains($parameterValue->literalValue, '.') ?
-						((float)(string)$targetValue->literalValue) ** ((float)(string)$parameterValue->literalValue) :
-	                    $targetValue->literalValue->pow($parameterValue->literalValue)
+					str_contains($parameter->literalValue, '.') ?
+						((float)(string)$target->literalValue) ** ((float)(string)$parameter->literalValue) :
+	                    $target->literalValue->pow($parameter->literalValue)
                 );
 			}
 			// @codeCoverageIgnoreStart

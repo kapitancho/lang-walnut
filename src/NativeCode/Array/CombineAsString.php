@@ -58,13 +58,11 @@ final readonly class CombineAsString implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-		if ($targetValue instanceof TupleValue) {
-			if ($parameterValue instanceof StringValue) {
+		
+		if ($target instanceof TupleValue) {
+			if ($parameter instanceof StringValue) {
 				$result = [];
-				foreach($targetValue->values as $value) {
+				foreach($target->values as $value) {
 					if ($value instanceof StringValue) {
 						$result[] = $value->literalValue;
 					} else {
@@ -73,7 +71,7 @@ final readonly class CombineAsString implements NativeMethod {
 						// @codeCoverageIgnoreEnd
 					}
 				}
-				$result = implode($parameterValue->literalValue, $result);
+				$result = implode($parameter->literalValue, $result);
 				return $programRegistry->valueRegistry->string($result);
 			}
 			// @codeCoverageIgnoreStart

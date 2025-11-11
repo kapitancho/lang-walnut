@@ -58,17 +58,15 @@ final readonly class TypeName implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof TypeValue) {
-			$typeValue = $targetValue->typeValue;
+		if ($target instanceof TypeValue) {
+			$typeValue = $target->typeValue;
 			if ($typeValue instanceof NamedType) {
 				return $programRegistry->valueRegistry->string($typeValue->name->identifier);
 			}
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException(
-			sprintf("Invalid target value: %s", $targetValue)
+			sprintf("Invalid target value: %s", $target)
 		);
 		// @codeCoverageIgnoreEnd
 	}

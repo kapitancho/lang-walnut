@@ -53,25 +53,22 @@ final readonly class CreateIfMissing implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof SealedValue && $targetValue->type->name->equals(
+		if ($target instanceof SealedValue && $target->type->name->equals(
 			new TypeNameIdentifier('File')
 		)) {
-			if ($parameterValue instanceof StringValue) {
-				$path = $targetValue->value->valueOf('path')->literalValue;
+			if ($parameter instanceof StringValue) {
+				$path = $target->value->valueOf('path')->literalValue;
 				if (!file_exists($path)) {
-					if (!is_writable(dirname($path)) || (@file_put_contents($path, $parameterValue->literalValue)) === false) {
+					if (!is_writable(dirname($path)) || (@file_put_contents($path, $parameter->literalValue)) === false) {
 						return $programRegistry->valueRegistry->error(
 							$programRegistry->valueRegistry->sealedValue(
 								new TypeNameIdentifier('CannotWriteFile'),
-								$targetValue
+								$target
 							)
 						);
 					}
 				}
-				return $targetValue;
+				return $target;
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

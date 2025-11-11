@@ -46,12 +46,10 @@ final readonly class AsInteger implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof MutableValue) {
-			$value = $targetValue->value;
+		if ($target instanceof MutableValue) {
+			$value = $target->value;
 			$method = $programRegistry->methodFinder->methodForType(
-				$targetValue->targetType,
+				$target->targetType,
 				new MethodNameIdentifier('asInteger')
 			);
 			if ($method instanceof Method) {

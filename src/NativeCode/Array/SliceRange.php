@@ -67,19 +67,16 @@ final readonly class SliceRange implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof TupleValue) {
-			if ($parameterValue instanceof RecordValue) {
-				$start = $parameterValue->valueOf('start');
-				$end = $parameterValue->valueOf('end');
+		if ($target instanceof TupleValue) {
+			if ($parameter instanceof RecordValue) {
+				$start = $parameter->valueOf('start');
+				$end = $parameter->valueOf('end');
 				if (
 					$start instanceof IntegerValue &&
 					$end instanceof IntegerValue
 				) {
 					$length = $end->literalValue - $start->literalValue;
-					$values = $targetValue->values;
+					$values = $target->values;
 					$values = array_slice(
 						$values,
 						(string)$start->literalValue,

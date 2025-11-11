@@ -26,11 +26,8 @@ final readonly class BinaryNotEqual implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
 		return $programRegistry->valueRegistry->boolean(
-            !$targetValue->equals($parameterValue)
+            !$target->equals($parameter)
         );
 	}
 

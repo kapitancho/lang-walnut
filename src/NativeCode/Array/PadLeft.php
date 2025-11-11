@@ -71,14 +71,11 @@ final readonly class PadLeft implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof TupleValue) {
-			if ($parameterValue instanceof RecordValue) {
-				$values = $targetValue->values;
+		if ($target instanceof TupleValue) {
+			if ($parameter instanceof RecordValue) {
+				$values = $target->values;
 
-				$paramValues = $parameterValue->values;
+				$paramValues = $parameter->values;
 				$length = $paramValues['length'] ?? null;
 				$padValue = $paramValues['value'] ?? null;
 

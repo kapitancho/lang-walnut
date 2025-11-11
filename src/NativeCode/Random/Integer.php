@@ -73,15 +73,12 @@ final readonly class Integer implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-				if ($targetValue instanceof AtomValue && $targetValue->type->name->equals(
+				if ($target instanceof AtomValue && $target->type->name->equals(
 			new TypeNameIdentifier('Random')
 		)) {
-			if ($parameterValue instanceof RecordValue) {
-				$from = $parameterValue->valueOf('min');
-				$to = $parameterValue->valueOf('max');
+			if ($parameter instanceof RecordValue) {
+				$from = $parameter->valueOf('min');
+				$to = $parameter->valueOf('max');
 				if (
 					$from instanceof IntegerValue &&
 					$to instanceof IntegerValue

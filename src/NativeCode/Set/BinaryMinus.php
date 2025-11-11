@@ -45,14 +45,12 @@ final readonly class BinaryMinus implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-				if ($targetValue instanceof SetValue) {
-			if ($parameterValue instanceof SetValue) {
+		
+				if ($target instanceof SetValue) {
+			if ($parameter instanceof SetValue) {
 				$result = [];
-				foreach($targetValue->valueSet as $key => $value) {
-					if (!array_key_exists($key, $parameterValue->valueSet)) {
+				foreach($target->valueSet as $key => $value) {
+					if (!array_key_exists($key, $parameter->valueSet)) {
 						$result[] = $value;
 					}
 				}

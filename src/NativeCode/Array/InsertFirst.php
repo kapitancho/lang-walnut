@@ -48,12 +48,9 @@ final readonly class InsertFirst implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof TupleValue) {
-			$values = $targetValue->values;
-			array_unshift($values, $parameterValue);
+		if ($target instanceof TupleValue) {
+			$values = $target->values;
+			array_unshift($values, $parameter);
 			return $programRegistry->valueRegistry->tuple($values);
 		}
 		// @codeCoverageIgnoreStart

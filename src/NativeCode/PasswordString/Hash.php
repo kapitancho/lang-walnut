@@ -39,12 +39,10 @@ final readonly class Hash implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof OpenValue && $targetValue->type->name->equals(
+		if ($target instanceof OpenValue && $target->type->name->equals(
 			new TypeNameIdentifier('PasswordString')
 		)) {
-			$passwordString = $targetValue->value->valueOf('value');
+			$passwordString = $target->value->valueOf('value');
 			if ($passwordString instanceof StringValue) {
 				return $programRegistry->valueRegistry->string(
 					password_hash($passwordString->literalValue, PASSWORD_DEFAULT)

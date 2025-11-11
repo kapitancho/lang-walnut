@@ -82,19 +82,16 @@ final readonly class Item implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof TupleValue && $parameterValue instanceof IntegerValue) {
-			$values = $targetValue->values;
-			$result = $values[(string)$parameterValue->literalValue] ?? null;
+		if ($target instanceof TupleValue && $parameter instanceof IntegerValue) {
+			$values = $target->values;
+			$result = $values[(string)$parameter->literalValue] ?? null;
 			if ($result !== null) {
 				return $result;
 			}
 			return $programRegistry->valueRegistry->error(
 				$programRegistry->valueRegistry->dataValue(
 					new TypeNameIdentifier('IndexOutOfRange'),
-					$programRegistry->valueRegistry->record(['index' => $parameterValue])
+					$programRegistry->valueRegistry->record(['index' => $parameter])
 				)
 			);
 		}

@@ -71,12 +71,10 @@ final readonly class Square implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
 
-
-		if ($targetValue instanceof IntegerValue) {
+		if ($target instanceof IntegerValue) {
 			return $programRegistry->valueRegistry->integer(
-                $targetValue->literalValue * $targetValue->literalValue
+                $target->literalValue * $target->literalValue
 			);
 		}
 		// @codeCoverageIgnoreStart

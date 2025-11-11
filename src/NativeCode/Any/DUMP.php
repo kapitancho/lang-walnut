@@ -25,9 +25,7 @@ final readonly class DUMP implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-        echo $targetValue;
+        echo $target;
 		return $target;
 	}
 

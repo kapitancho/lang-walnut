@@ -38,9 +38,7 @@ final readonly class Uuid implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof AtomValue && $targetValue->type->name->equals(
+		if ($target instanceof AtomValue && $target->type->name->equals(
 			new TypeNameIdentifier('Random')
 		)) {
 			/** @noinspection PhpUnhandledExceptionInspection */

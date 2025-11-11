@@ -152,24 +152,21 @@ final readonly class With implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof DataValue) {
-			$baseValue = $targetValue->value;
+		if ($target instanceof DataValue) {
+			$baseValue = $target->value;
 
-			$construct = function(Value $parameterValue) use ($programRegistry, $baseValue, $targetValue) {
-				return $programRegistry->valueRegistry->dataValue($targetValue->type->name, $parameterValue);
+			$construct = static function(Value $parameter) use ($programRegistry, $target) {
+				return $programRegistry->valueRegistry->dataValue($target->type->name, $parameter);
 			};
 
-			if ($baseValue instanceof TupleValue && $parameterValue instanceof TupleValue) {
+			if ($baseValue instanceof TupleValue && $parameter instanceof TupleValue) {
 				$values = $baseValue->values;
 				foreach ($parameter->values as $index => $value) {
 					$values[$index] = $value;
 				}
 				return $construct($programRegistry->valueRegistry->tuple($values));
 			}
-			if ($baseValue instanceof RecordValue && $parameterValue instanceof RecordValue) {
+			if ($baseValue instanceof RecordValue && $parameter instanceof RecordValue) {
 				$values = $baseValue->values;
 				foreach ($parameter->values as $key => $value) {
 					$values[$key] = $value;

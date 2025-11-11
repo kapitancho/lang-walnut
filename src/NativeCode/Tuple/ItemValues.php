@@ -39,8 +39,8 @@ final readonly class ItemValues implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		if ($targetValue instanceof TupleValue) {
+		
+		if ($target instanceof TupleValue) {
 			return $target;
 		}
 		// @codeCoverageIgnoreStart

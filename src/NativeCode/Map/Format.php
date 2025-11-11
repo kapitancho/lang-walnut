@@ -86,16 +86,13 @@ final readonly class Format implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-		if ($targetValue instanceof RecordValue) {
-			if ($parameterValue instanceof StringValue) {
-				$template = $parameterValue->literalValue;
+		if ($target instanceof RecordValue) {
+			if ($parameter instanceof StringValue) {
+				$template = $parameter->literalValue;
 
 				// Convert all map values to strings
 				$stringValues = [];
-				foreach ($targetValue->values as $key => $value) {
+				foreach ($target->values as $key => $value) {
 					$stringValue = $this->castAsString->evaluate($value);
 					if ($stringValue === null) {
 						// If conversion fails, use string representation
@@ -111,15 +108,15 @@ final readonly class Format implements NativeMethod {
 					// Replace placeholders {key}, {name}, {age}, etc.
 					$result = preg_replace_callback(
 						'/\{([a-zA-Z_][a-zA-Z0-9_]*)\}/',
-						function ($matches) use ($stringValues, $programRegistry, $targetValue, $parameterValue) {
+						function ($matches) use ($stringValues, $programRegistry, $target, $parameter) {
 							$key = $matches[1];
 							return $stringValues[$key] ?? throw new FunctionReturn(
 								$programRegistry->valueRegistry->error(
 									$programRegistry->valueRegistry->dataValue(
 										new TypeNameIdentifier("CannotFormatString"),
 										$programRegistry->valueRegistry->record([
-											'values' => $targetValue,
-											'format' => $parameterValue,
+											'values' => $target,
+											'format' => $parameter,
 										])
 									)
 								)

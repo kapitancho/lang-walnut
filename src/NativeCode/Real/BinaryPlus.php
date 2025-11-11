@@ -77,13 +77,11 @@ final readonly class BinaryPlus implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-				if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
-			if ($parameterValue instanceof IntegerValue || $parameterValue instanceof RealValue) {
+		
+				if ($target instanceof RealValue || $target instanceof IntegerValue) {
+			if ($parameter instanceof IntegerValue || $parameter instanceof RealValue) {
                 return $programRegistry->valueRegistry->real(
-					$targetValue->literalValue + $parameterValue->literalValue
+					$target->literalValue + $parameter->literalValue
                 );
 			}
 			// @codeCoverageIgnoreStart

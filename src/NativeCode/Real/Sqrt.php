@@ -50,13 +50,11 @@ final readonly class Sqrt implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
 
-
-		if ($targetValue instanceof IntegerValue || $targetValue instanceof RealValue) {
-			$val = (string)$targetValue->literalValue;
+		if ($target instanceof IntegerValue || $target instanceof RealValue) {
+			$val = (string)$target->literalValue;
 			return $val >= 0 ?
-				$programRegistry->valueRegistry->real($targetValue->literalValue->sqrt()) :
+				$programRegistry->valueRegistry->real($target->literalValue->sqrt()) :
 				$programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->atom(
 		                new TypeNameIdentifier("NotANumber")

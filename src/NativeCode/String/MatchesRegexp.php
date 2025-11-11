@@ -42,15 +42,12 @@ final readonly class MatchesRegexp implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof StringValue) {
-			if ($parameterValue instanceof StringValue) {
+		if ($target instanceof StringValue) {
+			if ($parameter instanceof StringValue) {
 				return $programRegistry->valueRegistry->boolean(
 					@preg_match(
-						'/' . $parameterValue->literalValue . '/',
-						$targetValue->literalValue,
+						'/' . $parameter->literalValue . '/',
+						$target->literalValue,
 					)
 				);
 			}

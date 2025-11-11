@@ -51,18 +51,15 @@ final readonly class BinaryModulo implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
-			if ($parameterValue instanceof IntegerValue || $parameterValue instanceof RealValue) {
-				if ((float)(string)$parameterValue->literalValue === 0.0) {
+		if ($target instanceof RealValue || $target instanceof IntegerValue) {
+			if ($parameter instanceof IntegerValue || $parameter instanceof RealValue) {
+				if ((float)(string)$parameter->literalValue === 0.0) {
 					return $programRegistry->valueRegistry->error(
 						$programRegistry->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
 					);
 				}
                 return $programRegistry->valueRegistry->real(
-	                fmod((string)$targetValue->literalValue, (string)$parameterValue->literalValue)
+	                fmod((string)$target->literalValue, (string)$parameter->literalValue)
                 );
 			}
 			// @codeCoverageIgnoreStart

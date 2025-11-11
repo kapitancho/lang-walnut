@@ -68,18 +68,15 @@ final readonly class WithoutByIndex implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof TupleValue) {
-			if ($parameterValue instanceof IntegerValue) {
-				$values = $targetValue->values;
-				$p = (string)$parameterValue->literalValue;
+		if ($target instanceof TupleValue) {
+			if ($parameter instanceof IntegerValue) {
+				$values = $target->values;
+				$p = (string)$parameter->literalValue;
 				if (!array_key_exists($p, $values)) {
 					return $programRegistry->valueRegistry->error(
 						$programRegistry->valueRegistry->dataValue(
 							new TypeNameIdentifier('IndexOutOfRange'),
-							$programRegistry->valueRegistry->record(['index' => $parameterValue])
+							$programRegistry->valueRegistry->record(['index' => $parameter])
 						)
 					);
 				}

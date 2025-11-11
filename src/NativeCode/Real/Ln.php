@@ -52,10 +52,8 @@ final readonly class Ln implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
-            $val = (string)$targetValue->literalValue;
+		if ($target instanceof RealValue || $target instanceof IntegerValue) {
+            $val = (string)$target->literalValue;
 			return $val > 0 ? $programRegistry->valueRegistry->real(
 				log($val)
 			) : $programRegistry->valueRegistry->error(

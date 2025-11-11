@@ -57,14 +57,11 @@ final readonly class FindLast implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof TupleValue && $parameterValue instanceof FunctionValue) {
-			$values = $targetValue->values;
+		if ($target instanceof TupleValue && $parameter instanceof FunctionValue) {
+			$values = $target->values;
 			$true = $programRegistry->valueRegistry->true;
 			for ($index = count($values) - 1; $index >= 0; $index--) {
-				$r = $parameterValue->execute($programRegistry->executionContext, $values[$index]);
+				$r = $parameter->execute($programRegistry->executionContext, $values[$index]);
 				if ($true->equals($r)) {
 					return $values[$index];
 				}

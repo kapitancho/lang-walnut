@@ -42,10 +42,8 @@ final readonly class AsJsonValue implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
 		try {
-			$result = $this->castAsJsonValue->getJsonValue($programRegistry, $targetValue);
+			$result = $this->castAsJsonValue->getJsonValue($programRegistry, $target);
 		} catch (FunctionReturn $return) {
 			return $return->typedValue;
 		}

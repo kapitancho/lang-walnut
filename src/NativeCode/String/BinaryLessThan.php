@@ -43,13 +43,10 @@ final readonly class BinaryLessThan implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof StringValue) {
-			if ($parameterValue instanceof StringValue) {
+		if ($target instanceof StringValue) {
+			if ($parameter instanceof StringValue) {
 				return $programRegistry->valueRegistry->boolean(
-					$targetValue->literalValue < $parameterValue->literalValue
+					$target->literalValue < $parameter->literalValue
 				);
 			}
 			// @codeCoverageIgnoreStart

@@ -53,24 +53,21 @@ final readonly class Execute extends PdoMethod implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof SealedValue && $targetValue->type->name->equals(
+		if ($target instanceof SealedValue && $target->type->name->equals(
 			new TypeNameIdentifier('DatabaseConnector')
 		)) {
-			if ($parameterValue->type->isSubtypeOf(
+			if ($parameter->type->isSubtypeOf(
 				$programRegistry->typeRegistry->withName(
 					new TypeNameIdentifier('DatabaseQueryCommand')
 				)
 			)) {
-				$dsn = $targetValue->value->valueOf('connection')
+				$dsn = $target->value->valueOf('connection')
 					->value->values['dsn']->literalValue;
 				try {
-					$stmt = $this->getPdo($dsn)->prepare($parameterValue->values['query']->literalValue);
+					$stmt = $this->getPdo($dsn)->prepare($parameter->values['query']->literalValue);
 					$stmt->execute(array_map(fn(Value $value): string|float|int|null =>
 					($v = $value)->literalValue instanceof Number ? (string)$v->literalValue : $v->literalValue,
-						$parameterValue->values['boundParameters']->values
+						$parameter->values['boundParameters']->values
 					));
 					$rowCount = $stmt->rowCount();
 
@@ -80,8 +77,8 @@ final readonly class Execute extends PdoMethod implements NativeMethod {
 						$programRegistry->valueRegistry->dataValue(
 							new TypeNameIdentifier('DatabaseQueryFailure'),
 							$programRegistry->valueRegistry->record([
-								'query' => $parameterValue->values['query'],
-								'boundParameters' => $parameterValue->values['boundParameters'],
+								'query' => $parameter->values['query'],
+								'boundParameters' => $parameter->values['boundParameters'],
 								'error' => $programRegistry->valueRegistry->string($ex->getMessage())
 							])
 						)

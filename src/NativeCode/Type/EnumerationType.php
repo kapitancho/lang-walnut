@@ -48,17 +48,15 @@ final readonly class EnumerationType implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof TypeValue) {
-			$typeValue = $targetValue->typeValue;
+		if ($target instanceof TypeValue) {
+			$typeValue = $target->typeValue;
 			if ($typeValue instanceof EnumerationSubsetType) {
 				return $programRegistry->valueRegistry->type($typeValue->enumeration);
 			}
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException(
-			sprintf("Invalid target value: %s", $targetValue)
+			sprintf("Invalid target value: %s", $target)
 		);
 		// @codeCoverageIgnoreEnd
 	}

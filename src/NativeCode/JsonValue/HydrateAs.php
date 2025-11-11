@@ -38,14 +38,11 @@ final readonly class HydrateAs implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($parameterValue instanceof TypeValue) {
+		if ($parameter instanceof TypeValue) {
 			try {
 				return new Hydrator(
 					$programRegistry,
-				)->hydrate($targetValue, $parameterValue->typeValue, 'value');
+				)->hydrate($target, $parameter->typeValue, 'value');
 			} catch (HydrationException $e) {
 				return $programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->dataValue(

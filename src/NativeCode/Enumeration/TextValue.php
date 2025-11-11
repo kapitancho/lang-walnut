@@ -52,12 +52,9 @@ final readonly class TextValue implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof EnumerationValue) {
-			if ($parameterValue instanceof NullValue) {
-				return $programRegistry->valueRegistry->string($targetValue->name->identifier);
+		if ($target instanceof EnumerationValue) {
+			if ($parameter instanceof NullValue) {
+				return $programRegistry->valueRegistry->string($target->name->identifier);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

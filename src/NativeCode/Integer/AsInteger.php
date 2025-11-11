@@ -37,13 +37,11 @@ final readonly class AsInteger implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof IntegerValue) {
-			return $programRegistry->valueRegistry->integer($targetValue->literalValue);
+		if ($target instanceof IntegerValue) {
+			return $programRegistry->valueRegistry->integer($target->literalValue);
 		}
 		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid target value: $targetValue");
+		throw new ExecutionException("Invalid target value: $target");
 		// @codeCoverageIgnoreEnd
 	}
 

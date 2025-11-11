@@ -39,8 +39,8 @@ final readonly class ItemValues implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		if ($targetValue instanceof RecordValue) {
+		
+		if ($target instanceof RecordValue) {
 			return $target;
 		}
 		// @codeCoverageIgnoreStart

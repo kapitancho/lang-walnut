@@ -91,12 +91,10 @@ final readonly class Sum implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof TupleValue) {
+		if ($target instanceof TupleValue) {
 			$sum = 0;
 			$hasReal = false;
-			foreach($targetValue->values as $item) {
+			foreach($target->values as $item) {
 				$v = $item->literalValue;
 				if (str_contains((string)$v, '.')) {
 					$hasReal = true;

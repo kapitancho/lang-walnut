@@ -42,15 +42,12 @@ final readonly class EndsWith implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-				if ($targetValue instanceof StringValue) {
-			if ($parameterValue instanceof StringValue) {
+				if ($target instanceof StringValue) {
+			if ($parameter instanceof StringValue) {
 				return $programRegistry->valueRegistry->boolean(
 					str_ends_with(
-						$targetValue->literalValue,
-						$parameterValue->literalValue
+						$target->literalValue,
+						$parameter->literalValue
 					)
 				);
 			}

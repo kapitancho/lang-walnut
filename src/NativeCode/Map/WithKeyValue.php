@@ -70,16 +70,16 @@ final readonly class WithKeyValue implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
+		$target = $target;
+		$parameter = $parameter;
 		
-		if ($targetValue instanceof RecordValue) {
-			if ($parameterValue instanceof RecordValue) {
-				$p = $parameterValue->values;
+		if ($target instanceof RecordValue) {
+			if ($parameter instanceof RecordValue) {
+				$p = $parameter->values;
 				$pKey = $p['key'] ?? null;
 				$pValue = $p['value'] ?? null;
 				if ($pValue && $pKey instanceof StringValue) {
-					$values = $targetValue->values;
+					$values = $target->values;
 					$values[$pKey->literalValue] = $pValue;
 					return $programRegistry->valueRegistry->record($values);
 				}

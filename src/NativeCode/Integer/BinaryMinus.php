@@ -76,18 +76,16 @@ final readonly class BinaryMinus implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-		if ($targetValue instanceof IntegerValue) {
-			if ($parameterValue instanceof IntegerValue) {
+		
+		if ($target instanceof IntegerValue) {
+			if ($parameter instanceof IntegerValue) {
 	            return $programRegistry->valueRegistry->integer(
-					$targetValue->literalValue - $parameterValue->literalValue
+					$target->literalValue - $parameter->literalValue
 	            );
 			}
-			if ($parameterValue instanceof RealValue) {
+			if ($parameter instanceof RealValue) {
 	            return $programRegistry->valueRegistry->real(
-					$targetValue->literalValue - $parameterValue->literalValue
+					$target->literalValue - $parameter->literalValue
 	            );
 			}
 		}

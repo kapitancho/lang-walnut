@@ -55,13 +55,10 @@ final readonly class BinaryBitwiseXor implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof IntegerValue) {
-			if ($parameterValue instanceof IntegerValue) {
+		if ($target instanceof IntegerValue) {
+			if ($parameter instanceof IntegerValue) {
 	            return $programRegistry->valueRegistry->integer(
-		            (int)(string)$targetValue->literalValue ^ (int)(string)$parameterValue->literalValue
+		            (int)(string)$target->literalValue ^ (int)(string)$parameter->literalValue
 	            );
 			}
 			// @codeCoverageIgnoreStart

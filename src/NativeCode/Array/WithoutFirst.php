@@ -55,10 +55,8 @@ final readonly class WithoutFirst implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof TupleValue) {
-			$values = $targetValue->values;
+		if ($target instanceof TupleValue) {
+			$values = $target->values;
 			if (count($values) === 0) {
 				return $programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->atom(

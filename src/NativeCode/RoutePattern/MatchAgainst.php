@@ -53,13 +53,11 @@ final readonly class MatchAgainst implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-
-		if ($targetValue instanceof OpenValue && $targetValue->type->name->equals(new TypeNameIdentifier('RoutePattern'))) {
-			$pattern = $targetValue->value->literalValue;
-			if ($parameterValue instanceof StringValue) {
-				$path = $parameterValue->literalValue;
+		
+		if ($target instanceof OpenValue && $target->type->name->equals(new TypeNameIdentifier('RoutePattern'))) {
+			$pattern = $target->value->literalValue;
+			if ($parameter instanceof StringValue) {
+				$path = $parameter->literalValue;
 
 				if (preg_match_all(self::ROUTE_PATTERN_MATCH, $pattern, $matches)) {
 					$pathArgs = $matches[1] ?? [];

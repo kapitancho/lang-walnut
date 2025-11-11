@@ -53,10 +53,8 @@ final readonly class AsInteger implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof BooleanValue) {
-			$target = $targetValue->literalValue;
+		if ($target instanceof BooleanValue) {
+			$target = $target->literalValue;
 			return $programRegistry->valueRegistry->integer($target ? 1 : 0);
 		}
 		// @codeCoverageIgnoreStart

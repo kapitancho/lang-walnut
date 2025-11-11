@@ -45,11 +45,8 @@ final readonly class RoundAsInteger implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof RealValue || $targetValue instanceof IntegerValue) {
-			$target = $targetValue->literalValue;
-			return $programRegistry->valueRegistry->integer($target->round());
+		if ($target instanceof RealValue || $target instanceof IntegerValue) {
+			return $programRegistry->valueRegistry->integer($target->literalValue->round());
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

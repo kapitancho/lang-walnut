@@ -82,10 +82,8 @@ final readonly class WithItemTypes implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-
-		if ($targetValue instanceof TypeValue) {
-			$typeValue = $this->toBaseType($targetValue->typeValue);
+		if ($target instanceof TypeValue) {
+			$typeValue = $this->toBaseType($target->typeValue);
 			if ($parameter->type->isSubtypeOf(
 				$programRegistry->typeRegistry->array(
 					$programRegistry->typeRegistry->type(

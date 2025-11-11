@@ -41,12 +41,9 @@ final readonly class Without implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$targetValue = $target;
-		$parameterValue = $parameter;
-		
-		if ($targetValue instanceof SetValue) {
-			$values = $targetValue->valueSet;
-			$key = (string)$parameterValue;
+		if ($target instanceof SetValue) {
+			$values = $target->valueSet;
+			$key = (string)$parameter;
 			if (array_key_exists($key, $values)) {
 				unset($values[$key]);
 			}
