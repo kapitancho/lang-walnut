@@ -21,7 +21,11 @@ final class UniqueTest extends CodeExecutionTestHelper {
 		$this->assertEquals("['hello', 'world', 'hi']", $result);
 	}
 
-	public function testUniqueInvalidType(): void {
+	public function testUniqueInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet('Invalid parameter type', "['hello','world', 'hi', 'hello']->unique(42);");
+	}
+
+	public function testUniqueInvalidTargetType(): void {
 		$this->executeErrorCodeSnippet('Invalid target type', "[12, 'hello','world', 'hi', 'hello']->unique;");
 	}
 }

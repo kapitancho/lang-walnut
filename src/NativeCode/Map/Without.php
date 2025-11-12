@@ -54,8 +54,8 @@ final readonly class Without implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$target = $target;
-		$parameter = $parameter;
+
+
 		
 		if ($target instanceof RecordValue) {
 			$values = $target->values;

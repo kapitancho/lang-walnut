@@ -101,6 +101,15 @@ final class ItemTest extends CodeExecutionTestHelper {
 	}
 
 
+	public function testItemArrayBaseTargetType(): void {
+		$this->executeErrorCodeSnippet(
+			"Invalid target type: MyTuple",
+			"getItem(MyTuple!'hello');",
+			"MyTuple := String;",
+			"getItem = ^m: MyTuple => Result<Real, MapItemNotFound> :: m->item('a');"
+		);
+	}
+
 	public function testItemArrayInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet(
 			"Invalid parameter type: String['a']",

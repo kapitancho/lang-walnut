@@ -4,8 +4,6 @@ namespace Walnut\Lang\NativeCode\Integer;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
-use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -13,11 +11,12 @@ use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Implementation\Code\NativeCode\Analyser\Numeric\RangeHelper;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 use Walnut\Lang\Implementation\Value\IntegerValue;
 
 final readonly class UpTo implements NativeMethod {
-	use BaseType;
+	use BaseType, RangeHelper;
 
 	public function analyse(
 		TypeRegistry $typeRegistry,
@@ -29,32 +28,10 @@ final readonly class UpTo implements NativeMethod {
 		if ($targetType instanceof IntegerType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof IntegerType) {
-				$tMin = $targetType->numberRange->min;
-				$tMax = $targetType->numberRange->max;
-				$pMin = $parameterType->numberRange->min;
-				$pMax = $parameterType->numberRange->max;
-
-				$minLength = max(0, $tMax === PlusInfinity::value || $pMin === MinusInfinity::value ?
-					0 : 1 +
-						$pMin->value - ($pMin->inclusive ? 0 : 1) -
-						$tMax->value + ($tMax->inclusive ? 0 : 1)
-				);
-				$maxLength = $pMax === PlusInfinity::value || $tMin === MinusInfinity::value ? PlusInfinity::value :
-					max(0, 1 +
-						$pMax->value - ($pMax->inclusive ? 0 : 1) -
-						$tMin->value + ($tMin->inclusive ? 0 : 1));
-
-				return $typeRegistry->array(
-					$maxLength === PlusInfinity::value || $maxLength > 0 ?
-						$typeRegistry->integer(
-							$tMin === MinusInfinity::value ? MinusInfinity::value :
-								$tMin->value + ($tMin->inclusive ? 0 : 1),
-							$pMax === PlusInfinity::value ? PlusInfinity::value :
-								$pMax->value - ($pMax->inclusive ? 0 : 1)
-						) :
-						$typeRegistry->nothing,
-					$maxLength === PlusInfinity::value ? $minLength : min($maxLength, $minLength),
-					$maxLength
+				return $this->getFromToAsArray(
+					$typeRegistry,
+					$targetType->numberRange,
+					$parameterType->numberRange
 				);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -72,8 +49,8 @@ final readonly class UpTo implements NativeMethod {
 		if ($target instanceof IntegerValue) {
 			if ($parameter instanceof IntegerValue) {
 	            return $programRegistry->valueRegistry->tuple(
-					$target->literalValue < $parameter->literalValue  ?
-						array_map(fn(int $i): IntegerValue =>
+					$target->literalValue < $parameter->literalValue ?
+						array_map(static fn(int $i): IntegerValue =>
 							$programRegistry->valueRegistry->integer($i),
 							range($target->literalValue, $parameter->literalValue)
 						) : []

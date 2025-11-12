@@ -42,41 +42,24 @@ final readonly class Sum implements NativeMethod {
 					$typeRegistry->real()
 				])
 			)) {
-				if ($itemType instanceof RealType) {
-					return $typeRegistry->realFull(
-						new NumberInterval(
-							$itemType->numberRange->min === MinusInfinity::value ? MinusInfinity::value :
-								new NumberIntervalEndpoint(
-									$itemType->numberRange->min->value->mul($targetType->range->minLength),
-									$itemType->numberRange->min->inclusive ||
-									(int)(string)$targetType->range->minLength === 0
-								),
-							$itemType->numberRange->max === PlusInfinity::value ||
-							$targetType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
-								new NumberIntervalEndpoint(
-									$itemType->numberRange->max->value->mul($targetType->range->maxLength),
-									$itemType->numberRange->max->inclusive
-								)
-						)
+				if ($itemType instanceof RealType || $itemType instanceof IntegerType) {
+					$interval = new NumberInterval(
+						$itemType->numberRange->min === MinusInfinity::value ? MinusInfinity::value :
+							new NumberIntervalEndpoint(
+								$itemType->numberRange->min->value->mul($targetType->range->minLength),
+								$itemType->numberRange->min->inclusive ||
+								(int)(string)$targetType->range->minLength === 0
+							),
+						$itemType->numberRange->max === PlusInfinity::value ||
+						$targetType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
+							new NumberIntervalEndpoint(
+								$itemType->numberRange->max->value->mul($targetType->range->maxLength),
+								$itemType->numberRange->max->inclusive
+							)
 					);
-				}
-				if ($itemType instanceof IntegerType) {
-					return $typeRegistry->integerFull(
-						new NumberInterval(
-							$itemType->numberRange->min === MinusInfinity::value ? MinusInfinity::value :
-								new NumberIntervalEndpoint(
-									$itemType->numberRange->min->value->mul($targetType->range->minLength),
-									$itemType->numberRange->min->inclusive ||
-									(int)(string)$targetType->range->minLength === 0
-								),
-								$itemType->numberRange->max === PlusInfinity::value ||
-								$targetType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
-								new NumberIntervalEndpoint(
-									$itemType->numberRange->max->value->mul($targetType->range->maxLength),
-									$itemType->numberRange->max->inclusive
-								)
-						)
-					);
+					return $itemType instanceof RealType ?
+						$typeRegistry->realFull($interval) :
+						$typeRegistry->integerFull($interval);
 				}
 				return $typeRegistry->real();
 			}

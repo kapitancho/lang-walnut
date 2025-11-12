@@ -25,7 +25,11 @@ final class MaxTest extends CodeExecutionTestHelper {
 		$this->assertEquals("3.14", $result);
 	}
 
-	public function testMaxInvalidType(): void {
+	public function testMaxInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet('Invalid parameter type', "[1, 3.14]->max('hello');");
+	}
+
+	public function testMaxInvalidTargetType(): void {
 		$this->executeErrorCodeSnippet('Invalid target type', "['hello','world', 'hi', 'hello']->max;");
 	}
 }

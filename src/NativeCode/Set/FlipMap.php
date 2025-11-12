@@ -8,19 +8,14 @@ use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
-use Walnut\Lang\Blueprint\Type\FunctionType;
-use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\SetType;
 use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Value\ErrorValue;
-use Walnut\Lang\Blueprint\Value\FunctionValue;
 use Walnut\Lang\Blueprint\Value\SetValue;
-use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Blueprint\Value\Value;
-use Walnut\Lang\Implementation\Type\Helper\BaseType;
+use Walnut\Lang\Implementation\Code\NativeCode\Analyser\Composite\FlipMap as FlipMapTrait;
 
 final readonly class FlipMap implements NativeMethod {
-	use BaseType;
+	use FlipMapTrait;
 
 	public function analyse(
 		TypeRegistry $typeRegistry,
@@ -29,33 +24,8 @@ final readonly class FlipMap implements NativeMethod {
 		Type $parameterType,
 	): Type {
         $targetType = $this->toBaseType($targetType);
-        $type = $targetType;
-		if ($type instanceof SetType) {
-			$itemType = $type->itemType;
-			if ($itemType->isSubtypeOf($typeRegistry->string())) {
-                $parameterType = $this->toBaseType($parameterType);
-                if ($parameterType instanceof FunctionType) {
-                    if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
-                        $r = $parameterType->returnType;
-                        $errorType = $r instanceof ResultType ? $r->errorType : null;
-                        $returnType = $r instanceof ResultType ? $r->returnType : $r;
-                        $t = $typeRegistry->map(
-                            $returnType,
-                            min(1, $type->range->minLength),
-                            $type->range->maxLength,
-                        );
-                        return $errorType ? $typeRegistry->result($t, $errorType) : $t;
-                    }
-                    throw new AnalyserException(
-						sprintf(
-                            "The parameter type %s of the callback function is not a subtype of %s",
-                            $type->itemType,
-                            $parameterType->parameterType
-						)
-                    );
-                }
-			}
-			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
+		if ($targetType instanceof SetType) {
+			return $this->analyseHelper($typeRegistry, $targetType, $parameterType);
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -67,22 +37,8 @@ final readonly class FlipMap implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-        if ($target instanceof SetValue && $parameter instanceof FunctionValue) {
-            $values = $target->values;
-            $result = [];
-            foreach($values as $value) {
-                if (!($value instanceof StringValue)) {
-                    // @codeCoverageIgnoreStart
-                    throw new ExecutionException("Invalid target value");
-                    // @codeCoverageIgnoreEnd
-                }
-                $r = $parameter->execute($programRegistry->executionContext, $value);
-	            if ($r instanceof ErrorValue) {
-                    return $r;
-                }
-                $result[$value->literalValue] = $r;
-            }
-            return $programRegistry->valueRegistry->record($result);
+        if ($target instanceof SetValue) {
+	        return $this->executeHelper($programRegistry, $target, $parameter);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

@@ -70,8 +70,8 @@ final readonly class WithKeyValue implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$target = $target;
-		$parameter = $parameter;
+
+
 		
 		if ($target instanceof RecordValue) {
 			if ($parameter instanceof RecordValue) {

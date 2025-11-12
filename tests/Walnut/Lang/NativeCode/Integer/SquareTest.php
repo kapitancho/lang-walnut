@@ -23,4 +23,12 @@ final class SquareTest extends CodeExecutionTestHelper {
 		);
 		$this->assertEquals("121", $result);
 	}
+
+	public function testSquareInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet(
+			"Invalid parameter type: String['hello']",
+			"3->square('hello');"
+		);
+	}
+
 }

@@ -15,10 +15,11 @@ use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Implementation\Code\NativeCode\Analyser\Composite\With as WithTrait;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class With implements NativeMethod {
-	use BaseType;
+	use BaseType, WithTrait;
 
 	public function analyse(
 		TypeRegistry $typeRegistry,
@@ -29,41 +30,10 @@ final readonly class With implements NativeMethod {
 		$targetType = $this->toBaseType($targetType);
 		$parameterType = $this->toBaseType($parameterType);
 		if ($targetType instanceof RecordType && $parameterType instanceof RecordType) {
-			$recTypes = [];
-			foreach($targetType->types as $tKey => $tType) {
-				$pType = $parameterType->types[$tKey] ?? null;
-				if ($tType instanceof OptionalKeyType) {
-					$recTypes[$tKey] = $pType instanceof OptionalKeyType ?
-						$typeRegistry->optionalKey(
-							$typeRegistry->union([
-								$tType->valueType,
-								$pType->valueType
-							])
-						) : $pType ?? $typeRegistry->optionalKey(
-							$typeRegistry->union([
-								$tType->valueType,
-								$parameterType->restType
-							])
-						);
-				} else {
-					$recTypes[$tKey] = $pType instanceof OptionalKeyType ?
-						$typeRegistry->union([
-							$tType,
-							$pType->valueType
-						]): $pType ?? $typeRegistry->union([
-						$tType,
-						$parameterType->restType
-					]);
-				}
-			}
-			foreach ($parameterType->types as $pKey => $pType) {
-				$recTypes[$pKey] ??= $pType;
-			}
-			return $typeRegistry->record($recTypes,
-				$typeRegistry->union([
-					$targetType->restType,
-					$parameterType->restType
-				])
+			return $this->getCombinedRecordType(
+				$typeRegistry,
+				$targetType,
+				$parameterType
 			);
 		}
 		if ($targetType instanceof RecordType) {
@@ -71,15 +41,10 @@ final readonly class With implements NativeMethod {
 		}
 		if ($targetType instanceof MapType) {
 			if ($parameterType instanceof MapType) {
-				return $typeRegistry->map(
-					$typeRegistry->union([
-						$targetType->itemType,
-						$parameterType->itemType
-					]),
-					max($targetType->range->minLength, $parameterType->range->minLength),
-					$targetType->range->maxLength === PlusInfinity::value ||
-						$parameterType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
-						((int)(string)$targetType->range->maxLength) + ((int)(string)$parameterType->range->maxLength)
+				return $this->getCombinedMapType(
+					$typeRegistry,
+					$targetType,
+					$parameterType
 				);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -95,14 +60,11 @@ final readonly class With implements NativeMethod {
 		Value $parameter
 	): Value {
 		if ($target instanceof RecordValue) {
-			if ($parameter instanceof RecordValue) {
-				return $programRegistry->valueRegistry->record([
-					... $target->values, ... $parameter->values
-				]);
-			}
-			// @codeCoverageIgnoreStart
-			throw new ExecutionException("Invalid parameter value");
-			// @codeCoverageIgnoreEnd
+			return $this->executeMapItem(
+				$programRegistry,
+				$target,
+				$parameter
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

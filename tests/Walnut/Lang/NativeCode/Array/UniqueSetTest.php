@@ -21,7 +21,11 @@ final class UniqueSetTest extends CodeExecutionTestHelper {
 		$this->assertEquals("['hello'; 'world'; 'hi']", $result);
 	}
 
-	public function testUniqueSetInvalidType(): void {
+	public function testUniqueSetInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet('Invalid parameter type', "['hello','world', 'hi', 'hello']->uniqueSet(42);");
+	}
+
+	public function testUniqueSetInvalidTargetType(): void {
 		$this->executeErrorCodeSnippet('Invalid target type', "[12, 'hello','world', 'hi', 'hello']->uniqueSet;");
 	}
 }

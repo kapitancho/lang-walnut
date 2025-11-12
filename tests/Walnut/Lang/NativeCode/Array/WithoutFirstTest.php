@@ -15,4 +15,12 @@ final class WithoutFirstTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("[1, 2]->withoutFirst;");
 		$this->assertEquals("[element: 1, array: [2]]", $result);
 	}
+
+	public function testWithoutFirstInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet(
+			"Invalid parameter type: Integer[42]",
+			"[1, 2]->withoutFirst(42);"
+		);
+	}
+
 }

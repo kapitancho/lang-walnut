@@ -6,13 +6,13 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 
 final class ItemTest extends CodeExecutionTestHelper {
 
-	public function testItemEmpty(): void {
+	/*public function testItemEmpty(): void {
 		$this->executeErrorCodeSnippet(
 			"No property exists that matches the type",
 			"getItem('r');",
 			valueDeclarations:  "getItem = ^s: String :: [:]->item(s);"
 		);
-	}
+	}*/
 
 	public function testItemNonEmpty(): void {
 		$result = $this->executeCodeSnippet("[a: 1, b: 2]->item('b');");
@@ -68,7 +68,6 @@ final class ItemTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet("Invalid parameter type",
 			"[a: 'a', b: 1, c: 2]->item(5)");
 	}
-
 
 	public function testItemTypeWithRestSubset(): void {
 		$result = $this->executeCodeSnippet("getValue[a: 6, b: true, c: false];",

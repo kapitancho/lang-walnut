@@ -2,73 +2,29 @@
 
 namespace Walnut\Lang\NativeCode\Mutable;
 
-use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
-use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
-use Walnut\Lang\Blueprint\Type\ArrayType;
-use Walnut\Lang\Blueprint\Type\MutableType;
-use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Value\MutableValue;
 use Walnut\Lang\Blueprint\Value\Value;
-use Walnut\Lang\Blueprint\Value\TupleValue;
+use Walnut\Lang\Implementation\Code\NativeCode\Analyser\Mutable\MutablePushUnshift;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class PUSH implements NativeMethod {
-	use BaseType;
-
-	public function analyse(
-		TypeRegistry $typeRegistry,
-		MethodFinder $methodFinder,
-		Type $targetType,
-		Type $parameterType,
-	): Type {
-		$t = $this->toBaseType($targetType);
-		if ($t instanceof MutableType) {
-            $valueType = $this->toBaseType($t->valueType);
-		    if ($valueType instanceof ArrayType && $valueType->range->maxLength === PlusInfinity::value) {
-			    $p = $this->toBaseType($parameterType);
-				if ($p->isSubtypeOf($valueType->itemType)) {
-					return $t;
-				}
-			    // @codeCoverageIgnoreStart
-	            throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
-	            // @codeCoverageIgnoreEnd
-            }
-		}
-		// @codeCoverageIgnoreStart
-		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
-		// @codeCoverageIgnoreEnd
-	}
+	use BaseType, MutablePushUnshift;
 
 	public function execute(
 		ProgramRegistry $programRegistry,
 		Value $target,
 		Value $parameter
 	): Value {
-		$v = $target;
-		if ($v instanceof MutableValue) {
-            $targetType = $this->toBaseType($v->targetType);
-			$mv = $v->value;
-			if ($targetType instanceof ArrayType && $mv instanceof TupleValue) {
-				if ($parameter->type->isSubtypeOf($targetType->itemType)) {
-					$arr = $mv->values;
-					$arr[] = $parameter;
-					$v->value = $programRegistry->valueRegistry->tuple($arr);
-					return $target;
-				}
-				// @codeCoverageIgnoreStart
-				throw new ExecutionException("Invalid parameter value");
-				// @codeCoverageIgnoreEnd
-
+		return $this->executeHelper(
+			$programRegistry,
+			$target,
+			$parameter,
+			function(array $arr, Value $parameter): array {
+				$arr[] = $parameter;
+				return $arr;
 			}
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid target value");
-		// @codeCoverageIgnoreEnd
+		);
 	}
 
 }

@@ -25,7 +25,11 @@ final class MinTest extends CodeExecutionTestHelper {
 		$this->assertEquals("1", $result);
 	}
 
-	public function testMinInvalidType(): void {
+	public function testMinInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet('Invalid parameter type', "[1, 3.14]->max('hello');");
+	}
+
+	public function testMinInvalidTargetType(): void {
 		$this->executeErrorCodeSnippet('Invalid target type', "['hello','world', 'hi', 'hello']->min;");
 	}
 }

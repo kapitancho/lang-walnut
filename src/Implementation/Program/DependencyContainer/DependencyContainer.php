@@ -141,7 +141,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 		return $found;
 	}
 
-	private function findOpenValue(OpenType $type): Value|DependencyError {
+	private function findSealedOrOpenType(SealedType|OpenType $type): Value|DependencyError {
 		$found = $this->findValueByNamedType($type);
 		if ($found instanceof DependencyError) {
 			$constructor = $this->programRegistry->valueRegistry->atom(new TypeNameIdentifier('Constructor'));
@@ -162,38 +162,12 @@ final class DependencyContainer implements DependencyContainerInterface {
 					return new DependencyError(
 						UnresolvableDependency::errorWhileCreatingValue,
 						$type,
-						sprintf("Error while creating value for open type %s", $type)
-					);
-				}
-				return $result;
-			}
-			return $baseValue;
-		}
-		return $found;
-	}
-
-	private function findSealedValue(SealedType $type): Value|DependencyError {
-		$found = $this->findValueByNamedType($type);
-		if ($found instanceof DependencyError) {
-			$constructor = $this->programRegistry->valueRegistry->atom(new TypeNameIdentifier('Constructor'));
-			$method = $this->methodFinder->methodForType($constructor->type,
-				new MethodNameIdentifier($type->name->identifier));
-			if ($method instanceof CustomMethod) {
-				$baseValue = $this->findValueByType($method->parameterType);
-			} else {
-				$baseValue = $this->findValueByType($type->valueType);
-			}
-			if ($baseValue instanceof Value) {
-				$result = $this->valueConstructor->executeConstructor(
-					$this->programRegistry,
-					$type,
-					$baseValue
-				);
-				if ($result instanceof ErrorValue) {
-					return new DependencyError(
-						UnresolvableDependency::errorWhileCreatingValue,
-						$type,
-						sprintf("Error while creating value for sealed type %s", $type)
+						sprintf("Error while creating value for %s type %s",
+							match(true) {
+								$type instanceof SealedType => 'sealed',
+								$type instanceof OpenType => 'open',
+							},
+							$type)
 					);
 				}
 				return $result;
@@ -207,8 +181,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 		return match(true) {
 			$type instanceof AtomType => $type->value,
             $type instanceof DataType => $this->findDataValue($type),
-            $type instanceof OpenType => $this->findOpenValue($type),
-			$type instanceof SealedType => $this->findSealedValue($type),
+            $type instanceof OpenType, $type instanceof SealedType => $this->findSealedOrOpenType($type),
 			$type instanceof NamedType => $this->findValueByNamedType($type),
 			$type instanceof TupleType => $this->findTupleValue($type),
 			$type instanceof RecordType => $this->findRecordValue($type),

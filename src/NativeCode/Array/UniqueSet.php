@@ -2,24 +2,19 @@
 
 namespace Walnut\Lang\NativeCode\Array;
 
-use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
-use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
+use BcMath\Number;
+use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
-use Walnut\Lang\Blueprint\Type\ArrayType;
-use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Value\IntegerValue;
-use Walnut\Lang\Blueprint\Value\RealValue;
-use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Blueprint\Value\Value;
-use Walnut\Lang\Blueprint\Value\TupleValue;
+use Walnut\Lang\Implementation\Code\NativeCode\Analyser\Composite\Array\ArrayUniqueUniqueSet;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class UniqueSet implements NativeMethod {
-	use BaseType;
+	use BaseType, ArrayUniqueUniqueSet;
 
 	public function analyse(
 		TypeRegistry $typeRegistry,
@@ -27,27 +22,13 @@ final readonly class UniqueSet implements NativeMethod {
 		Type $targetType,
 		Type $parameterType,
 	): Type {
-		$targetType = $this->toBaseType($targetType);
-		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
-
-		if ($type instanceof ArrayType) {
-			$itemType = $type->itemType;
-			if ($itemType->isSubtypeOf($typeRegistry->string()) || $itemType->isSubtypeOf(
-				$typeRegistry->union([
-					$typeRegistry->integer(),
-					$typeRegistry->real()
-				])
-			)) {
-				return $typeRegistry->set(
-					$type->itemType,
-					min(1, $type->range->minLength),
-					$type->range->maxLength
-				);
-			}
-		}
-		// @codeCoverageIgnoreStart
-		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
-		// @codeCoverageIgnoreEnd
+		return $this->analyseHelper(
+			$typeRegistry,
+			$targetType,
+			$parameterType,
+			fn(Type $itemType, int|Number $minLength, int|Number|PlusInfinity $maxLength): Type =>
+				$typeRegistry->set($itemType, $minLength, $maxLength),
+		);
 	}
 
 	public function execute(
@@ -55,47 +36,13 @@ final readonly class UniqueSet implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		if ($target instanceof TupleValue) {
-			$values = $target->values;
-
-			$rawValues = [];
-			$hasStrings = false;
-			$hasNumbers = false;
-			foreach($values as $value) {
-				if ($value instanceof StringValue) {
-					$hasStrings = true;
-				} elseif ($value instanceof IntegerValue || $value instanceof RealValue) {
-					$hasNumbers = true;
-				} else {
-					// @codeCoverageIgnoreStart
-					throw new ExecutionException("Invalid target value");
-					// @codeCoverageIgnoreEnd
-				}
-				$rawValues[] = (string)$value->literalValue;
-			}
-			if ($hasStrings) {
-				if ($hasNumbers) {
-					// @codeCoverageIgnoreStart
-					throw new ExecutionException("Invalid target value");
-					// @codeCoverageIgnoreEnd
-				}
-				$rawValues = array_unique($rawValues);
-				return $programRegistry->valueRegistry->set(array_map(
-					fn($value) => $programRegistry->valueRegistry->string($value),
-					$rawValues
-				));
-			}
-			$rawValues = array_unique($rawValues, SORT_NUMERIC);
-			return $programRegistry->valueRegistry->set(array_map(
-				fn($value) => str_contains($value, '.') ?
-					$programRegistry->valueRegistry->real($value) :
-					$programRegistry->valueRegistry->integer($value),
-				$rawValues
-			));
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid target value");
-		// @codeCoverageIgnoreEnd
+		return $programRegistry->valueRegistry->set(
+			$this->executeHelper(
+				$programRegistry,
+				$target,
+				$parameter
+			)
+		);
 	}
 
 }

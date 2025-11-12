@@ -15,4 +15,11 @@ final class WithoutLastTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("[1, 2]->withoutLast;");
 		$this->assertEquals("[element: 2, array: [1]]", $result);
 	}
+
+	public function testWithoutLastInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet(
+			"Invalid parameter type: Integer[42]",
+			"[1, 2]->withoutLast(42);"
+		);
+	}
 }
