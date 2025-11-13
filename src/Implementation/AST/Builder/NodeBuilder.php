@@ -207,8 +207,15 @@ final class NodeBuilder implements NodeBuilderInterface {
 		return new DataExpressionNode($this->getSourceLocation(), $typeName, $value);
 	}
 
-	public function constructorCall(TypeNameIdentifier $typeName, ExpressionNode $parameter): ConstructorCallExpressionNode {
-		return new ConstructorCallExpressionNode($this->getSourceLocation(), $typeName, $parameter);
+	public function constructorCall(
+		TypeNameIdentifier $typeName,
+		ExpressionNode $parameter
+	): ConstructorCallExpressionNode|MethodCallExpressionNode {
+		return new ConstructorCallExpressionNode(
+			$this->getSourceLocation(),
+			$typeName,
+			$parameter
+		);
 	}
 
 	public function functionCall(ExpressionNode $target, ExpressionNode $parameter): FunctionCallExpressionNode {

@@ -116,7 +116,7 @@ interface NodeBuilder {
 	public function constructorCall(
 		TypeNameIdentifier $typeName,
 		ExpressionNode $parameter
-	): ConstructorCallExpressionNode;
+	): ConstructorCallExpressionNode|MethodCallExpressionNode;
 
 	public function functionCall(ExpressionNode $target, ExpressionNode $parameter): FunctionCallExpressionNode;
 

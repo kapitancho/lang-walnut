@@ -6,6 +6,10 @@ namespace Walnut\Lang\Implementation\AST\Parser;
 
 use BcMath\Number;
 use Walnut\Lang\Blueprint\AST\Builder\NodeBuilder;
+use Walnut\Lang\Blueprint\AST\Node\Expression\MethodCallExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\NoErrorExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\NoExternalErrorExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\PropertyAccessExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\SequenceExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\IntersectionTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\UnionTypeNode;
@@ -813,10 +817,55 @@ final readonly class ParserStateMachine {
 			]],
 			219 => ['name' => 'constructor call value tuple or record', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->constructorCall(
-						new TypeNameIdentifier($this->s->result['type_name']),
-						$this->s->generated
-					);
+					$g = $this->s->generated;
+					// This "hack" is need to flip the priorities so that T[...]->method
+					// is {T[...]}->method instead of T([...]->method)
+					// Same for T[...]=>method , T[...]|>method and T[...].property
+					if ($g instanceof NoErrorExpressionNode && $g->targetExpression instanceof MethodCallExpressionNode) {
+						$this->s->generated = $this->nodeBuilder->methodCall(
+							$this->nodeBuilder->noError(
+								$this->nodeBuilder->constructorCall(
+									new TypeNameIdentifier($this->s->result['type_name']),
+									$g->targetExpression->target
+								)
+							),
+							$g->targetExpression->methodName,
+							$g->targetExpression->parameter
+						);
+					} elseif ($g instanceof NoExternalErrorExpressionNode && $g->targetExpression instanceof MethodCallExpressionNode) {
+						$this->s->generated = $this->nodeBuilder->methodCall(
+							$this->nodeBuilder->noExternalError(
+								$this->nodeBuilder->constructorCall(
+									new TypeNameIdentifier($this->s->result['type_name']),
+									$g->targetExpression->target
+								)
+							),
+							$g->targetExpression->methodName,
+							$g->targetExpression->parameter
+						);
+					} elseif ($g instanceof PropertyAccessExpressionNode) {
+						$this->s->generated = $this->nodeBuilder->propertyAccess(
+							$this->nodeBuilder->constructorCall(
+								new TypeNameIdentifier($this->s->result['type_name']),
+								$g->target
+							),
+							$g->propertyName,
+						);
+					} elseif ($g instanceof MethodCallExpressionNode) {
+						$this->s->generated = $this->nodeBuilder->methodCall(
+							$this->nodeBuilder->constructorCall(
+								new TypeNameIdentifier($this->s->result['type_name']),
+								$g->target
+							),
+							$g->methodName,
+							$g->parameter
+						);
+					} else {
+						$this->s->generated = $this->nodeBuilder->constructorCall(
+							new TypeNameIdentifier($this->s->result['type_name']),
+							$this->s->generated
+						);
+					}
 					$this->s->pop();
 				}
 			]],
