@@ -726,6 +726,36 @@ class ParserTest extends TestCase {
 			$e->parameter->values['a'] instanceof VariableNameExpressionNode && $e->parameter->values['a']->variableName->equals(new VariableNameIdentifier('x')) &&
 			$e->parameter->values['b'] instanceof VariableNameExpressionNode && $e->parameter->values['b']->variableName->equals(new VariableNameIdentifier('y'))];
 
+		yield ['C[:].a', PropertyAccessExpressionNode::class, fn(PropertyAccessExpressionNode $e) =>
+			$e->target instanceof ConstructorCallExpressionNode &&
+			$e->target->typeName->equals(new TypeNameIdentifier('C')) &&
+			$e->target->parameter instanceof ConstantExpressionNode &&
+			$e->target->parameter->value instanceof RecordValueNode && count($e->target->parameter->value->values) === 0 &&
+			$e->propertyName === 'a'];
+		yield ['C[:]->a', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof ConstructorCallExpressionNode &&
+			$e->target->typeName->equals(new TypeNameIdentifier('C')) &&
+			$e->target->parameter instanceof ConstantExpressionNode &&
+			$e->target->parameter->value instanceof RecordValueNode && count($e->target->parameter->value->values) === 0 &&
+			$e->methodName->equals(new MethodNameIdentifier('a')) &&
+			$e->parameter instanceof ConstantExpressionNode && $e->parameter->value instanceof NullValueNode];
+		yield ['C[:]=>a', NoErrorExpressionNode::class, fn(NoErrorExpressionNode $e) =>
+			$e->targetExpression instanceof MethodCallExpressionNode &&
+			$e->targetExpression->target instanceof ConstructorCallExpressionNode &&
+			$e->targetExpression->target->typeName->equals(new TypeNameIdentifier('C')) &&
+			$e->targetExpression->target->parameter instanceof ConstantExpressionNode &&
+			$e->targetExpression->target->parameter->value instanceof RecordValueNode && count($e->targetExpression->target->parameter->value->values) === 0 &&
+			$e->targetExpression->methodName->equals(new MethodNameIdentifier('a')) &&
+			$e->targetExpression->parameter instanceof ConstantExpressionNode && $e->targetExpression->parameter->value instanceof NullValueNode];
+		yield ['C[:]|>a', NoExternalErrorExpressionNode::class, fn(NoExternalErrorExpressionNode $e) =>
+			$e->targetExpression instanceof MethodCallExpressionNode &&
+			$e->targetExpression->target instanceof ConstructorCallExpressionNode &&
+			$e->targetExpression->target->typeName->equals(new TypeNameIdentifier('C')) &&
+			$e->targetExpression->target->parameter instanceof ConstantExpressionNode &&
+			$e->targetExpression->target->parameter->value instanceof RecordValueNode && count($e->targetExpression->target->parameter->value->values) === 0 &&
+			$e->targetExpression->methodName->equals(new MethodNameIdentifier('a')) &&
+			$e->targetExpression->parameter instanceof ConstantExpressionNode && $e->targetExpression->parameter->value instanceof NullValueNode];
+
 		yield ['f()', FunctionCallExpressionNode::class, fn(FunctionCallExpressionNode $e) => $e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('f')) &&
 			$e->parameter instanceof ConstantExpressionNode && $e->parameter->value instanceof NullValueNode];
 		yield ['f(x)', FunctionCallExpressionNode::class, fn(FunctionCallExpressionNode $e) => $e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('f')) &&

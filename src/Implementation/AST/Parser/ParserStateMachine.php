@@ -822,26 +822,26 @@ final readonly class ParserStateMachine {
 					// is {T[...]}->method instead of T([...]->method)
 					// Same for T[...]=>method , T[...]|>method and T[...].property
 					if ($g instanceof NoErrorExpressionNode && $g->targetExpression instanceof MethodCallExpressionNode) {
-						$this->s->generated = $this->nodeBuilder->methodCall(
-							$this->nodeBuilder->noError(
+						$this->s->generated = $this->nodeBuilder->noError(
+							$this->nodeBuilder->methodCall(
 								$this->nodeBuilder->constructorCall(
 									new TypeNameIdentifier($this->s->result['type_name']),
 									$g->targetExpression->target
-								)
-							),
-							$g->targetExpression->methodName,
-							$g->targetExpression->parameter
+								),
+								$g->targetExpression->methodName,
+								$g->targetExpression->parameter
+							)
 						);
 					} elseif ($g instanceof NoExternalErrorExpressionNode && $g->targetExpression instanceof MethodCallExpressionNode) {
-						$this->s->generated = $this->nodeBuilder->methodCall(
-							$this->nodeBuilder->noExternalError(
+						$this->s->generated = $this->nodeBuilder->noExternalError(
+							$this->nodeBuilder->methodCall(
 								$this->nodeBuilder->constructorCall(
 									new TypeNameIdentifier($this->s->result['type_name']),
 									$g->targetExpression->target
-								)
-							),
-							$g->targetExpression->methodName,
-							$g->targetExpression->parameter
+								),
+								$g->targetExpression->methodName,
+								$g->targetExpression->parameter
+							)
 						);
 					} elseif ($g instanceof PropertyAccessExpressionNode) {
 						$this->s->generated = $this->nodeBuilder->propertyAccess(
