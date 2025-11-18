@@ -27,6 +27,7 @@ final class RealSubsetType implements RealSubsetTypeInterface, JsonSerializable 
 	    }
 	    $selected = [];
 	    foreach($subsetValues as $value) {
+		    /** @phpstan-ignore-next-line instanceof.alwaysTrue */
 		    if (!$value instanceof Number) {
 			    // @codeCoverageIgnoreStart
 			    throw new InvalidArgumentException(

@@ -28,7 +28,6 @@ final class NullValue implements NullValueInterface, JsonSerializable {
 		return $other instanceof NullValueInterface;
 	}
 
-	/** @throws AnalyserException */
 	public function selfAnalyse(AnalyserContext $analyserContext): void {}
 
 	public function __toString(): string {

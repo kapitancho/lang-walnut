@@ -31,6 +31,6 @@ final class NodeAstCodeMapper implements AstCodeMapper {
 	}
 
 	public function getSourceLocation(Expression|Value|Type|FunctionBody|CustomMethod $element): SourceLocation|null {
-		return $this->nodeMap[$element]?->sourceLocation ?? null;
+		return $this->nodeMap[$element]->sourceLocation ?? null;
 	}
 }

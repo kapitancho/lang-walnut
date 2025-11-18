@@ -210,7 +210,7 @@ final class NodeBuilder implements NodeBuilderInterface {
 	public function constructorCall(
 		TypeNameIdentifier $typeName,
 		ExpressionNode $parameter
-	): ConstructorCallExpressionNode|MethodCallExpressionNode {
+	): ConstructorCallExpressionNode {
 		return new ConstructorCallExpressionNode(
 			$this->getSourceLocation(),
 			$typeName,
@@ -326,7 +326,7 @@ final class NodeBuilder implements NodeBuilderInterface {
 		return self::priorities[$methodName->identifier] ?? 99;
 	}
 
-	public function methodCall(ExpressionNode $target, MethodNameIdentifier $methodName, ExpressionNode|null $parameter): MethodCallExpressionNode {
+	public function methodCall(ExpressionNode $target, MethodNameIdentifier $methodName, ExpressionNode|null $parameter): MethodCallExpressionNodeInterface {
 		$mNode = new MethodCallExpressionNode(
 			$this->getSourceLocation(),
 			$target,
@@ -382,6 +382,7 @@ final class NodeBuilder implements NodeBuilderInterface {
 		while(!empty($operatorStack)) {
 			$add();
 		}
+		/** @phpstan-ignore-next-line return.type */
 		return $operandStack[0];
 		//return new MethodCallExpressionNode($this->getSourceLocation(), $target, $methodName, $parameter);
 	}

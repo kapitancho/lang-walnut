@@ -88,15 +88,11 @@ final readonly class NumberInterval implements NumberIntervalInterface {
 		$e = $i1->end->value;
 		$s = $i2->start->value;
 		if ($asIntegerInterval) {
-			if ($e !== MinusInfinity::value) {
-				$e = $e->floor();
-			}
-			if ($s !== PlusInfinity::value) {
-				$s = $s->ceil();
-			}
+			$e = $e->floor();
+			$s = $s->ceil();
 		}
 		return !(
-			($e < $s || ($e == $s && !($i1->end->inclusive && $i2->start->inclusive)))
+			($e < $s || ((string)$e === (string)$s && !($i1->end->inclusive && $i2->start->inclusive)))
 		);
 	}
 
@@ -124,12 +120,8 @@ final readonly class NumberInterval implements NumberIntervalInterface {
 		$e = $i1->end->value;
 		$s = $i2->start->value;
 		if ($asIntegerInterval) {
-			if ($e !== MinusInfinity::value) {
-				$e = $e->floor() + ($i1->end->inclusive && $i2->start->inclusive ? 1 : 0);
-			}
-			if ($s !== PlusInfinity::value) {
-				$s = $s->ceil();
-			}
+			$e = $e->floor() + ($i1->end->inclusive && $i2->start->inclusive ? 1 : 0);
+			$s = $s->ceil();
 		}
 		return !(
 			($e < $s || ($e == $s && !$i1->end->inclusive && !$i2->start->inclusive))

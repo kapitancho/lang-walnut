@@ -113,10 +113,7 @@ interface NodeBuilder {
 
 	public function data(TypeNameIdentifier $typeName, ExpressionNode $value): DataExpressionNode;
 
-	public function constructorCall(
-		TypeNameIdentifier $typeName,
-		ExpressionNode $parameter
-	): ConstructorCallExpressionNode|MethodCallExpressionNode;
+	public function constructorCall(TypeNameIdentifier $typeName, ExpressionNode $parameter): ConstructorCallExpressionNode;
 
 	public function functionCall(ExpressionNode $target, ExpressionNode $parameter): FunctionCallExpressionNode;
 

@@ -28,7 +28,7 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 trait With {
 	use BaseType;
 
-	/** @param callable(Type): Type $typeAdjustFn */
+	/** @param callable(): Type $typeAdjustFn */
 	private function analyseDataOpenType(
 		Type $targetType,
 		Type $parameterType,

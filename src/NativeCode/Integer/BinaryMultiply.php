@@ -48,11 +48,9 @@ final readonly class BinaryMultiply implements NativeMethod {
 						$typeRegistry->integer() :
 						$typeRegistry->nonZeroInteger();
 				}
-				if ($parameterType instanceof RealType) {
-					return $containsZero ?
-						$typeRegistry->real() :
-						$typeRegistry->nonZeroReal();
-				}
+				return $containsZero ?
+					$typeRegistry->real() :
+					$typeRegistry->nonZeroReal();
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}

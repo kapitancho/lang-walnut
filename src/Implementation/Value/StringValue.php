@@ -7,6 +7,7 @@ use Walnut\Lang\Blueprint\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Type\StringSubsetType as StringSubsetTypeInterface;
 use Walnut\Lang\Blueprint\Value\StringValue as StringValueInterface;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\StringSubsetType;
@@ -19,7 +20,7 @@ final class StringValue implements StringValueInterface, JsonSerializable {
 		public readonly string $literalValue
     ) {}
 
-	public StringSubsetType $type {
+	public StringSubsetTypeInterface $type {
 		get => $this->typeRegistry->stringSubset([$this->literalValue]);
     }
 
@@ -27,7 +28,6 @@ final class StringValue implements StringValueInterface, JsonSerializable {
 		return $other instanceof StringValueInterface && $this->literalValue === $other->literalValue;
 	}
 
-	/** @throws AnalyserException */
 	public function selfAnalyse(AnalyserContext $analyserContext): void {}
 
 	public function __toString(): string {

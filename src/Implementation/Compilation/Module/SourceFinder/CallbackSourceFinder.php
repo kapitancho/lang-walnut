@@ -10,6 +10,7 @@ final readonly class CallbackSourceFinder implements SourceFinder {
 
 	public function sourceExists(string $sourceName): bool {
 		return array_key_exists($sourceName, $this->callableMap) &&
+			/** @phpstan-ignore-next-line identical.alwaysTrue */
 			$this->callableMap[$sourceName]($sourceName) !== null;
 	}
 	public function readSource(string $sourceName): string|null {

@@ -10,6 +10,7 @@ use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\IntegerValue as IntegerValueInterface;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Code\NativeCode\Analyser\Numeric\RangeHelper;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
@@ -50,7 +51,7 @@ final readonly class DownTo implements NativeMethod {
 			if ($parameter instanceof IntegerValue) {
 	            return $programRegistry->valueRegistry->tuple(
 		            $target->literalValue > $parameter->literalValue ?
-						array_map(static fn(int $i): IntegerValue =>
+						array_map(static fn(int $i): IntegerValueInterface =>
 							$programRegistry->valueRegistry->integer($i),
 							range($target->literalValue, $parameter->literalValue, -1)
 						) : []

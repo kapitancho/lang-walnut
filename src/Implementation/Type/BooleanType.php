@@ -14,7 +14,7 @@ use Walnut\Lang\Blueprint\Value\EnumerationValue;
 
 final class BooleanType implements BooleanTypeInterface, JsonSerializable {
 
-	/** @var list<BooleanValue> $enumerationValues */
+	/** @var array<string, BooleanValue> $enumerationValues */
 	public readonly array $values;
 	private readonly TrueType $trueType;
 	private readonly FalseType $falseType;
@@ -40,10 +40,11 @@ final class BooleanType implements BooleanTypeInterface, JsonSerializable {
     }
 
     /**
-     * @param list<EnumerationValue> $values
+     * @param non-empty-list<EnumValueIdentifier> $values
      * @throws InvalidArgumentException
      **/
     public function subsetType(array $values): TrueType|FalseType|BooleanType {
+		/** @phpstan-ignore-next-line identical.alwaysFalse */
 		if ($values === []) {
 	        throw new InvalidArgumentException("Cannot create an empty subset type");
 	    }

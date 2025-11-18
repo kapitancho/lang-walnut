@@ -81,7 +81,6 @@ final readonly class Query extends PdoMethod implements NativeMethod {
 									'double' => $programRegistry->valueRegistry->real($value),
 									'integer' => $programRegistry->valueRegistry->integer($value),
 									'NULL' => $programRegistry->valueRegistry->null,
-									default => throw new ExecutionException("Invalid value type")
 								},
 								$row
 							)

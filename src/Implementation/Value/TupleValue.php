@@ -26,6 +26,7 @@ final class TupleValue implements TupleValueInterface, JsonSerializable {
 	    public readonly array $values
     ) {
 		foreach($this->values as $value) {
+			/** @phpstan-ignore-next-line instanceof.alwaysTrue */
 			if (!$value instanceof Value) {
 				throw new InvalidArgumentException(
 					'TupleValue must be constructed with a list of Value instances'

@@ -35,7 +35,6 @@ final class EnumerationValue implements EnumerationValueInterface, JsonSerializa
 			$this->name->equals($other->name);
 	}
 
-	/** @throws AnalyserException */
 	public function selfAnalyse(AnalyserContext $analyserContext): void {}
 
 	public function __toString(): string {

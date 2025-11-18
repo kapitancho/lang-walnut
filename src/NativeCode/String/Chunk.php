@@ -53,9 +53,9 @@ final readonly class Chunk implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-				if ($target instanceof StringValue) {
+		if ($target instanceof StringValue) {
 			if ($parameter instanceof IntegerValue) {
-				$result = str_split($target->literalValue, (string)$parameter->literalValue);
+				$result = str_split($target->literalValue, (int)(string)$parameter->literalValue);
 				return $programRegistry->valueRegistry->tuple(
 					array_map(fn(string $piece): StringValue =>
 						$programRegistry->valueRegistry->string($piece), $result)

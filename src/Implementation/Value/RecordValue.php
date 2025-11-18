@@ -26,6 +26,7 @@ final class RecordValue implements RecordValueInterface, JsonSerializable {
 	    public readonly array $values
     ) {
 	    foreach($this->values as $value) {
+		    /** @phpstan-ignore-next-line instanceof.alwaysTrue */
             if (!$value instanceof Value) {
                 throw new InvalidArgumentException(
                     'RecordValue must be constructed with a list of Value instances'
@@ -78,6 +79,7 @@ final class RecordValue implements RecordValueInterface, JsonSerializable {
 				$multiline ? ',' . "\n" . "\t" : ', ',
 				array_map(
 					static fn(string $key, Value $value): string =>
+						/** @phpstan-ignore-next-line booleanAnd.leftAlwaysTrue */
 						($s = sprintf("%s: %s", $key, $value)) && $multiline ?
 							str_replace("\n", "\n" . "\t", $s) : $s,
 					array_keys($this->values), $this->values

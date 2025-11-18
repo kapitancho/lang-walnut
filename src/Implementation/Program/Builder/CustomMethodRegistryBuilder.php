@@ -18,7 +18,7 @@ use Walnut\Lang\Implementation\Function\UserlandFunction;
 
 final class CustomMethodRegistryBuilder implements CustomMethodRegistryBuilderInterface, MethodRegistry, CustomMethodRegistry {
 
-	/** @var array<string, list<CustomMethodInterface>> $methods */
+	/** @var array<string, list<CustomMethodInterface>> $customMethods */
 	public array $customMethods = [];
 
 	private readonly FunctionContextFiller $contextFiller;

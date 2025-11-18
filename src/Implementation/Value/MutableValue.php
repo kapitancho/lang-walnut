@@ -6,6 +6,7 @@ use JsonSerializable;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Type\MutableType as MutableTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\MutableValue as MutableValueInterface;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -19,7 +20,7 @@ final class MutableValue implements MutableValueInterface, JsonSerializable {
 	    public Value $value
     ) {}
 
-	public MutableType $type {
+	public MutableTypeInterface $type {
         get => $this->typeRegistry->mutable($this->targetType);
     }
 

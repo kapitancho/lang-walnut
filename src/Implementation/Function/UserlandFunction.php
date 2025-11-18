@@ -149,6 +149,8 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 			$this->dependency,
 			$dependencyValue,
 		);
+		$returnValue = $this->functionBody->execute($executionContext);
+		/*
 		try {
 			$returnValue = $this->functionBody->execute($executionContext);
 		// @codeCoverageIgnoreStart
@@ -161,6 +163,7 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 			);
 		}
 		// @codeCoverageIgnoreEnd
+		*/
 		$this->checkValueType('return', $returnValue, $this->returnType);
 		return $returnValue;
 	}

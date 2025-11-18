@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\DependencyContainer;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\UnresolvableDependency;
@@ -19,9 +18,6 @@ use Walnut\Lang\Blueprint\Value\TypeValue;
 final readonly class ValueOf implements NativeMethod {
 
 	/** @noinspection PhpPropertyOnlyWrittenInspection */
-	public function __construct(
-		private NativeCodeTypeMapper $typeMapper,
-	) {}
 
 	public function analyse(
 		TypeRegistry $typeRegistry,

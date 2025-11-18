@@ -29,6 +29,7 @@ final class StringSubsetType implements StringSubsetTypeInterface, JsonSerializa
 	    }
 	    $selected = [];
 	    foreach($subsetValues as $value) {
+		    /** @phpstan-ignore-next-line instanceof.alwaysTrue */
 		    if (!is_string($value)) {
 			    // @codeCoverageIgnoreStart
 			    throw new InvalidArgumentException(

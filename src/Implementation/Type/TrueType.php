@@ -9,7 +9,7 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
 
 final readonly class TrueType implements TrueTypeInterface, JsonSerializable {
-	/** @var list<BooleanValue> $subsetValues */
+	/** @var array<string, BooleanValue> $subsetValues */
 	public array $subsetValues;
 
     public function __construct(

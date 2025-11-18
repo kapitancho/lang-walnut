@@ -56,7 +56,7 @@ final readonly class MatchAgainstPattern implements NativeMethod {
 				$path = $parameter->literalValue;
 
 				if (preg_match_all(self::ROUTE_PATTERN_MATCH, $path, $matches)) {
-					$pathArgs = $matches[1] ?? [];
+					$pathArgs = $matches[1];
 					$path = '^' . preg_replace(self::ROUTE_PATTERN_REPLACE, self::REPLACE_PATTERN, $path) . '$';
 				} else {
 					$pathArgs = null;

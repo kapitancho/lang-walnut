@@ -11,7 +11,7 @@ final readonly class TemplatePrecompiler implements CodePrecompiler {
 		private EscapeCharHandler $escapeCharHandler,
 	) {}
 
-	public function determineSourcePath(string $sourcePath): string|null {
+	public function determineSourcePath(string $sourcePath): string {
 		return $sourcePath . '.nut.html';
 	}
 

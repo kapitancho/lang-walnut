@@ -30,6 +30,7 @@ final class SetValue implements SetValueInterface, JsonSerializable {
     ) {
 		$set = [];
 		foreach($values as $value) {
+			/** @phpstan-ignore-next-line instanceof.alwaysTrue */
 			if (!$value instanceof Value) {
 				// @codeCoverageIgnoreStart
 				throw new InvalidArgumentException(

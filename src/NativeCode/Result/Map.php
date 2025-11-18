@@ -93,6 +93,7 @@ final readonly class Map implements NativeMethod {
 					if ($innerType instanceof UnionType) {
 						$ts = [];
 						foreach ($innerType->types as $innerUnionType) {
+							/** @phpstan-ignore-next-line match.unhandled */
 							$ts[] = match(true) {
 								$innerUnionType instanceof MapType => $typeRegistry->map(
 									$returnType,

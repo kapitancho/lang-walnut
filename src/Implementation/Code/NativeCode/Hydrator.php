@@ -61,7 +61,7 @@ final readonly class Hydrator {
 
 	/** @throws HydrationException */
 	public function hydrate(Value $value, Type $targetType, string $hydrationPath): Value {
-		/** @var callable-string $fn */
+		/** @phpstan-ignore-next-line var.type */
 		$fn = match(true) {
 			$targetType instanceof BooleanType => $this->hydrateBoolean(...),
 			$targetType instanceof FalseType => $this->hydrateFalse(...),
@@ -197,7 +197,8 @@ final readonly class Hydrator {
 		if ($result) {
 			foreach($targetType->subsetValues as $enumValue) {
 				if ($enumValue === $result) {
-					return $result;
+					/** @phpstan-ignore-next-line return.type */
+					return $enumValue;
 				}
 			}
 			throw new HydrationException(

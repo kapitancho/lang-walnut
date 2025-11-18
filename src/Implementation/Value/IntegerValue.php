@@ -7,6 +7,7 @@ use JsonSerializable;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Type\IntegerSubsetType as IntegerSubsetTypeInterface;
 use Walnut\Lang\Blueprint\Value\IntegerValue as IntegerValueInterface;
 use Walnut\Lang\Blueprint\Value\RealValue as RealValueInterface;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -19,7 +20,7 @@ final class IntegerValue implements IntegerValueInterface, JsonSerializable {
 		public readonly Number $literalValue
     ) {}
 
-	public IntegerSubsetType $type {
+	public IntegerSubsetTypeInterface $type {
 		get => $this->typeRegistry->integerSubset([$this->literalValue]);
     }
 
@@ -42,7 +43,6 @@ final class IntegerValue implements IntegerValueInterface, JsonSerializable {
 	}
 
 
-	/** @throws AnalyserException */
 	public function selfAnalyse(AnalyserContext $analyserContext): void {}
 
 	public function __toString(): string {

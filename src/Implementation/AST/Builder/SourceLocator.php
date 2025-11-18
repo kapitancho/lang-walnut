@@ -19,7 +19,7 @@ final readonly class SourceLocator implements SourceLocatorInterface {
 
 	public function getSourceLocation(): SourceLocation {
 		$token = $this->tokens[$this->state->i] ?? null;
-		$endPosition = $token?->sourcePosition ?? new SourcePosition(9999999, 9999, 9999);
+		$endPosition = $token->sourcePosition ?? new SourcePosition(9999999, 9999, 9999);
 		$startPosition = $this->state->result['startPosition'] ?? $endPosition;
 		$len = strlen($token?->patternMatch->text ?? '-') - 1;
 		return new SourceLocation(

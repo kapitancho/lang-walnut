@@ -16,6 +16,7 @@ final class UnknownType extends InvalidArgumentException {
         );
     }
 
+	/** @throws self */
     public static function withName(TypeNameIdentifier $typeName, string|null $prefix = null): never {
         throw new self($typeName->identifier, $prefix);
     }

@@ -28,7 +28,6 @@ final class BooleanValue implements BooleanValueInterface, JsonSerializable {
         get => $this->typeRegistry->boolean;
     }
 
-	/** @throws AnalyserException */
 	public function selfAnalyse(AnalyserContext $analyserContext): void {}
 
 	public function equals(Value $other): bool {

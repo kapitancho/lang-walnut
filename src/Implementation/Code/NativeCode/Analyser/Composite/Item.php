@@ -169,7 +169,7 @@ trait Item {
 	): Value {
 		if ($parameter instanceof IntegerValue) {
 			$values = $target->values;
-			return $values[(string)$parameter->literalValue] ?? $programRegistry->valueRegistry->error(
+			return $values[(int)(string)$parameter->literalValue] ?? $programRegistry->valueRegistry->error(
 				$programRegistry->valueRegistry->dataValue(
 					new TypeNameIdentifier('IndexOutOfRange'),
 					$programRegistry->valueRegistry->record(['index' => $parameter])

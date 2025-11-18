@@ -39,6 +39,7 @@ use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Type\UnionType;
 
 final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterface {
+	/** @return array<class-string, list<string>> */
 	private function getTypeMapping(): array {
 		return [
 			ArrayType::class => ['Array'],

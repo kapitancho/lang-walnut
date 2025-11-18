@@ -26,7 +26,6 @@ final class AtomValue implements AtomValueInterface, JsonSerializable {
 		return $other instanceof AtomValueInterface && $this->typeName->equals($other->type->name);
 	}
 
-	/** @throws AnalyserException */
 	public function selfAnalyse(AnalyserContext $analyserContext): void {}
 
 	public function __toString(): string {

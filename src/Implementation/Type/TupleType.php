@@ -20,7 +20,7 @@ final readonly class TupleType implements TupleTypeInterface, JsonSerializable {
 		public Type $restType
 	) {}
 
-	public function asArrayType(): ArrayType {
+	public function asArrayType(): ArrayTypeInterface {
 		$l = count($this->types);
 		return $this->typeRegistry->array(
 			$this->typeRegistry->union([... array_values($this->types), $this->restType]),

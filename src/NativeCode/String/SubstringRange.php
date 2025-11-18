@@ -73,7 +73,7 @@ final readonly class SubstringRange implements NativeMethod {
 				return $programRegistry->valueRegistry->string(
 					mb_substr(
 						$target->literalValue,
-						(string)$start->literalValue,
+						(int)(string)$start->literalValue,
 						$length
 					)
 				);

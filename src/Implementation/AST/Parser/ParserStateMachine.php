@@ -1206,6 +1206,7 @@ final readonly class ParserStateMachine {
 					$this->s->result = [];
 					$this->s->result['startPosition'] = $token->sourcePosition;
 					$this->s->result['expression_left'] = $this->s->generated;
+					/** @phpstan-ignore-next-line match.unhandled */
 					$this->s->result['method_name'] = match($token->patternMatch->text) {
 						'+' => 'binaryPlus',
 						'-' => 'binaryMinus',
@@ -1576,6 +1577,7 @@ final readonly class ParserStateMachine {
 			]],
 			332 => ['name' => 'match value pair match return', 'transitions' => [
 				'' => function(LT $token) {
+					/** @phpstan-ignore-next-line match.unhandled */
 					$this->s->generated = match($this->s->result['matchType']) {
 						'isTrue' => $this->nodeBuilder->matchTrue(
 							$this->s->result['matchPairs']
@@ -2669,6 +2671,7 @@ final readonly class ParserStateMachine {
 			]],
 			706 => ['name' => 'type basic', 'transitions' => [
 				'' => function(LT $token) {
+					/** @phpstan-ignore-next-line match.unhandled */
 					$this->s->generated = match($this->s->result['typeName']) {
 						'Any' => $this->nodeBuilder->anyType,
 						'Nothing' => $this->nodeBuilder->nothingType,

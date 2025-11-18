@@ -85,9 +85,9 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 
     public NullType $null;
 
-	/** @var array<string, AtomType> */
+	/** @var array<string, AtomTypeInterface> */
     private array $atomTypes;
-	/** @var array<string, EnumerationType> */
+	/** @var array<string, EnumerationTypeInterface> */
     private array $enumerationTypes;
 	/** @var array<string, AliasType> */
     private array $aliasTypes;
@@ -492,6 +492,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 	public function addEnumeration(TypeNameIdentifier $name, array $values): EnumerationType {
 		$keys = [];
 		foreach ($values as $value) {
+			/** @phpstan-ignore-next-line identical.alwaysTrue */
 			if (!$value instanceof EnumValueIdentifier) {
 				// @codeCoverageIgnoreStart
 				throw new InvalidArgumentException(

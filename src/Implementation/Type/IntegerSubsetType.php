@@ -5,6 +5,7 @@ namespace Walnut\Lang\Implementation\Type;
 use BcMath\Number;
 use InvalidArgumentException;
 use JsonSerializable;
+use Walnut\Lang\Blueprint\Common\Range\NumberRange as NumberRangeInterface;
 use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType as IntegerSubsetTypeInterface;
 use Walnut\Lang\Blueprint\Type\IntegerType as IntegerTypeInterface;
@@ -30,6 +31,7 @@ final class IntegerSubsetType implements IntegerSubsetTypeInterface, JsonSeriali
 		}
 		$selected = [];
 		foreach($subsetValues as $value) {
+			/** @phpstan-ignore-next-line instanceof.alwaysTrue */
 			if (!$value instanceof Number || ((string)$value !== (string)$value->floor())) {
 				// @codeCoverageIgnoreStart
 				throw new InvalidArgumentException(
@@ -80,7 +82,7 @@ final class IntegerSubsetType implements IntegerSubsetTypeInterface, JsonSeriali
 		];
 	}
 
-	public NumberRange $numberRange {
+	public NumberRangeInterface $numberRange {
 		get {
 			return $this->underlyingType->numberRange;
 		}

@@ -72,7 +72,7 @@ final readonly class LengthRange implements LengthRangeInterface, JsonSerializab
 			$this->compare($this->maxLength, $length) > -1;
 	}
 
-	/** @return int<-1>|int<0>|int<1> */
+	/** @return -1|0|1 */
 	private function compare(Number|PlusInfinity $a, Number|PlusInfinity $b): int {
 		if ($a === $b) { return 0; }
 		if ($a instanceof PlusInfinity) { return 1; }

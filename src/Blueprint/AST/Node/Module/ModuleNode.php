@@ -8,6 +8,6 @@ interface ModuleNode extends Node {
 	public string $moduleName { get; }
 	/** @var list<string> */
 	public array $moduleDependencies { get; }
-	/** @var array<string, ModuleDefinitionNode> */
+	/** @var list<ModuleDefinitionNode> */
 	public array $definitions { get; }
 }

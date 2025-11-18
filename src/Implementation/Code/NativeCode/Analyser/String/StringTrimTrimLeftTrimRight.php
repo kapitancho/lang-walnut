@@ -38,7 +38,7 @@ trait StringTrimTrimLeftTrimRight {
 	}
 
 	/**
-	 * @param callable(string, ?string): string $trimFn
+	 * @param callable(string): string|callable(string, string): string $trimFn
 	 */
 	private function executeHelper(
 		ProgramRegistry $programRegistry,

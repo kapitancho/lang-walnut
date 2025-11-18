@@ -18,6 +18,7 @@ final class UnknownEnumerationValue extends InvalidArgumentException {
         );
     }
 
+	/** @throws self */
     public static function of(
         TypeNameIdentifier $typeName,
         EnumValueIdentifier $enumValue

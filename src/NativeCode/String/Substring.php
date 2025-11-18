@@ -65,8 +65,8 @@ final readonly class Substring implements NativeMethod {
 				return $programRegistry->valueRegistry->string(
 					mb_substr(
 						$target->literalValue,
-						(string)$start->literalValue,
-						(string)$length->literalValue
+						(int)(string)$start->literalValue,
+						(int)(string)$length->literalValue
 					)
 				);
 			}

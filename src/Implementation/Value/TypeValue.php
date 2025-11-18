@@ -28,7 +28,6 @@ final class TypeValue implements TypeValueInterface, JsonSerializable {
 			$other->typeValue->isSubtypeOf($this->typeValue);
 	}
 
-	/** @throws AnalyserException */
 	public function selfAnalyse(AnalyserContext $analyserContext): void {}
 
 	public function __toString(): string {
