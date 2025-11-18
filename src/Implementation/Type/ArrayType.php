@@ -6,6 +6,7 @@ use JsonSerializable;
 use Walnut\Lang\Blueprint\Common\Range\LengthRange;
 use Walnut\Lang\Blueprint\Type\ArrayType as ArrayTypeInterface;
 use Walnut\Lang\Blueprint\Type\ProxyNamedType;
+use Walnut\Lang\Blueprint\Type\SupertypeChecker;
 use Walnut\Lang\Blueprint\Type\Type;
 
 final class ArrayType implements ArrayTypeInterface, JsonSerializable {

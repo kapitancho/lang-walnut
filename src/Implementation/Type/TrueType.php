@@ -3,8 +3,9 @@
 namespace Walnut\Lang\Implementation\Type;
 
 use JsonSerializable;
-use Walnut\Lang\Blueprint\Type\TrueType as TrueTypeInterface;
 use Walnut\Lang\Blueprint\Type\BooleanType as BooleanTypeInterface;
+use Walnut\Lang\Blueprint\Type\SupertypeChecker;
+use Walnut\Lang\Blueprint\Type\TrueType as TrueTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
 

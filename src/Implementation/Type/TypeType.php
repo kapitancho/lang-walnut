@@ -4,8 +4,9 @@ namespace Walnut\Lang\Implementation\Type;
 
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Type\MutableType as MutableTypeInterface;
-use Walnut\Lang\Blueprint\Type\TypeType as TypeTypeInterface;
+use Walnut\Lang\Blueprint\Type\SupertypeChecker;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Type\TypeType as TypeTypeInterface;
 
 /** @psalm-immutable */
 final readonly class TypeType implements TypeTypeInterface, JsonSerializable {

@@ -53,7 +53,7 @@ final readonly class BinaryPlus implements NativeMethod {
 		if ($target instanceof SetValue) {
 			if ($parameter instanceof SetValue) {
 				return $programRegistry->valueRegistry->set(
-					$target->valueSet + $parameter->valueSet
+					array_values($target->valueSet + $parameter->valueSet)
 				);
 			}
 			// @codeCoverageIgnoreStart

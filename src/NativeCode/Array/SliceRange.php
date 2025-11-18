@@ -79,8 +79,8 @@ final readonly class SliceRange implements NativeMethod {
 					$values = $target->values;
 					$values = array_slice(
 						$values,
-						(string)$start->literalValue,
-						(string)$length
+						(int)(string)$start->literalValue,
+						(int)(string)$length
 					);
 					return $programRegistry->valueRegistry->tuple($values);
 				}

@@ -47,7 +47,7 @@ final readonly class Without implements NativeMethod {
 			if (array_key_exists($key, $values)) {
 				unset($values[$key]);
 			}
-			return $programRegistry->valueRegistry->set($values);
+			return $programRegistry->valueRegistry->set(array_values($values));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

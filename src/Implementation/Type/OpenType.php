@@ -5,6 +5,7 @@ namespace Walnut\Lang\Implementation\Type;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Type\OpenType as OpenTypeInterface;
+use Walnut\Lang\Blueprint\Type\SupertypeChecker;
 use Walnut\Lang\Blueprint\Type\Type;
 
 final readonly class OpenType implements OpenTypeInterface, JsonSerializable {

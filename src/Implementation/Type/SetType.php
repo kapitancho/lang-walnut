@@ -4,8 +4,9 @@ namespace Walnut\Lang\Implementation\Type;
 
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Common\Range\LengthRange;
-use Walnut\Lang\Blueprint\Type\SetType as SetTypeInterface;
 use Walnut\Lang\Blueprint\Type\ProxyNamedType;
+use Walnut\Lang\Blueprint\Type\SetType as SetTypeInterface;
+use Walnut\Lang\Blueprint\Type\SupertypeChecker;
 use Walnut\Lang\Blueprint\Type\Type;
 
 final class SetType implements SetTypeInterface, JsonSerializable {

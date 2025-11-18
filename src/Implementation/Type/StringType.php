@@ -5,6 +5,7 @@ namespace Walnut\Lang\Implementation\Type;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Common\Range\LengthRange;
 use Walnut\Lang\Blueprint\Type\StringType as StringTypeInterface;
+use Walnut\Lang\Blueprint\Type\SupertypeChecker;
 use Walnut\Lang\Blueprint\Type\Type;
 
 final readonly class StringType implements StringTypeInterface, JsonSerializable {

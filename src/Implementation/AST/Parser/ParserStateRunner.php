@@ -3,10 +3,10 @@
 namespace Walnut\Lang\Implementation\AST\Parser;
 
 use Walnut\Lang\Blueprint\AST\Builder\NodeBuilderFactory;
+use Walnut\Lang\Blueprint\AST\Builder\SourceLocator;
 use Walnut\Lang\Blueprint\AST\Node\Module\ModuleNode;
 use Walnut\Lang\Blueprint\AST\Parser\ParserException;
 use Walnut\Lang\Blueprint\AST\Parser\ParserStateRunner as ParserStateRunnerInterface;
-use Walnut\Lang\Implementation\AST\Builder\SourceLocator;
 
 final readonly class ParserStateRunner implements ParserStateRunnerInterface {
 	public function __construct(

@@ -4,6 +4,7 @@ namespace Walnut\Lang\Implementation\Type;
 
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Type\IntersectionType as IntersectionTypeInterface;
+use Walnut\Lang\Blueprint\Type\SupertypeChecker;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Implementation\Program\Type\IntersectionTypeNormalizer;
 use Walnut\Lang\Implementation\Type\Helper\UnionIntersectionHelper;

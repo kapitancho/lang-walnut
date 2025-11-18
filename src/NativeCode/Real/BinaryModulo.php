@@ -59,7 +59,7 @@ final readonly class BinaryModulo implements NativeMethod {
 					);
 				}
                 return $programRegistry->valueRegistry->real(
-	                fmod((string)$target->literalValue, (string)$parameter->literalValue)
+	                fmod((float)(string)$target->literalValue, (float)(string)$parameter->literalValue)
                 );
 			}
 			// @codeCoverageIgnoreStart

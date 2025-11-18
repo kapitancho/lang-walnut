@@ -55,7 +55,7 @@ final readonly class Ln implements NativeMethod {
 		if ($target instanceof RealValue || $target instanceof IntegerValue) {
             $val = (string)$target->literalValue;
 			return $val > 0 ? $programRegistry->valueRegistry->real(
-				log($val)
+				log((float)$val)
 			) : $programRegistry->valueRegistry->error(
                 $programRegistry->valueRegistry->atom(
                     new TypeNameIdentifier("NotANumber")

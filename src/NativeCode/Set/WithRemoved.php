@@ -55,7 +55,7 @@ final readonly class WithRemoved implements NativeMethod {
 			$key = (string)$parameter;
 			if (array_key_exists($key, $values)) {
 				unset($values[$key]);
-				return $programRegistry->valueRegistry->set($values);
+				return $programRegistry->valueRegistry->set(array_values($values));
 			}
 			return $programRegistry->valueRegistry->error(
 				$programRegistry->valueRegistry->atom(new TypeNameIdentifier("ItemNotFound"))

@@ -78,15 +78,15 @@ final readonly class Sort implements NativeMethod {
 				}
 				sort($rawValues, SORT_STRING);
 				return $programRegistry->valueRegistry->tuple(array_map(
-					fn($value) => $programRegistry->valueRegistry->string($value),
+					fn(string $value) => $programRegistry->valueRegistry->string($value),
 					$rawValues
 				));
 			}
 			sort($rawValues, SORT_NUMERIC);
 			return $programRegistry->valueRegistry->tuple(array_map(
-				fn($value) => str_contains((string)$value, '.') ?
-					$programRegistry->valueRegistry->real($value) :
-					$programRegistry->valueRegistry->integer($value),
+				fn(string $value) => str_contains((string)$value, '.') ?
+					$programRegistry->valueRegistry->real((float)$value) :
+					$programRegistry->valueRegistry->integer((int)$value),
 				$rawValues
 			));
 		}

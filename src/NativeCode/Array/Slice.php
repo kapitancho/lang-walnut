@@ -76,8 +76,8 @@ final readonly class Slice implements NativeMethod {
 				) {
 					$values = array_slice(
 						$values,
-						(string)$start->literalValue,
-						(string)$length->literalValue
+						(int)(string)$start->literalValue,
+						(int)(string)$length->literalValue
 					);
 					return $programRegistry->valueRegistry->tuple($values);
 				}

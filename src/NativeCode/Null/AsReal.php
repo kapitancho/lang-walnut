@@ -23,7 +23,7 @@ final readonly class AsReal implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		return $typeRegistry->realSubset([
-			new Number(0.0)
+			new Number('0.0')
 		]);
 	}
 

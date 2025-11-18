@@ -102,9 +102,12 @@ trait Item {
 		Type $parameterType
 	): Type {
 		if ($targetType instanceof IntersectionType) {
+			//TODO: this is not a long-term fix.
+			/** @var list<MapType|RecordType|MetaType> $intersectionTypes */
+			$intersectionTypes = $targetType->types;
 			$types = array_map(
-				fn(Type $type) => $this->analyseMapItem($typeRegistry, $type, $parameterType),
-				$targetType->types
+				fn(MapType|RecordType|MetaType $type) => $this->analyseMapItem($typeRegistry, $type, $parameterType),
+				$intersectionTypes
 			);
 			return $typeRegistry->intersection($types);
 		}

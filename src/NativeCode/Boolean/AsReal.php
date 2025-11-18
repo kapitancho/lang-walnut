@@ -29,18 +29,18 @@ final readonly class AsReal implements NativeMethod {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof BooleanType) {
 			return $typeRegistry->realSubset([
-				new Number(0.0),
-				new Number(1.0)
+				new Number('0.0'),
+				new Number('1.0')
 			]);
 		}
 		if ($targetType instanceof TrueType) {
 			return $typeRegistry->realSubset([
-				new Number(1.0)
+				new Number('1.0')
 			]);
 		}
 		if ($targetType instanceof FalseType) {
 			return $typeRegistry->realSubset([
-				new Number(0.0),
+				new Number('0.0'),
 			]);
 		}
 		// @codeCoverageIgnoreStart

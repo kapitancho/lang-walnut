@@ -87,7 +87,7 @@ trait BinaryDivide {
 					return $target;
 				}
                 return $programRegistry->valueRegistry->real(
-	                fdiv((string)$target->literalValue, (string)$parameter->literalValue)
+	                fdiv((float)(string)$target->literalValue, (float)(string)$parameter->literalValue)
 	                //$target->literalValue / $parameter->literalValue
                 );
 			}

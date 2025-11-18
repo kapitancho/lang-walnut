@@ -5,6 +5,7 @@ namespace Walnut\Lang\Implementation\Type;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType as EnumerationSubsetTypeInterface;
 use Walnut\Lang\Blueprint\Type\EnumerationType as EnumerationTypeInterface;
+use Walnut\Lang\Blueprint\Type\SupertypeChecker;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\EnumerationValue;
 

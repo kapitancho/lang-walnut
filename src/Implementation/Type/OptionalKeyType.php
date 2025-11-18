@@ -4,6 +4,7 @@ namespace Walnut\Lang\Implementation\Type;
 
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Type\OptionalKeyType as OptionalKeyTypeInterface;
+use Walnut\Lang\Blueprint\Type\SupertypeChecker;
 use Walnut\Lang\Blueprint\Type\Type;
 
 final class OptionalKeyType implements OptionalKeyTypeInterface, SupertypeChecker, JsonSerializable {

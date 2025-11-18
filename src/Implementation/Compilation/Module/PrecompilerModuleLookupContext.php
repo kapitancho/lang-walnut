@@ -9,7 +9,7 @@ use Walnut\Lang\Blueprint\Compilation\Module\SourceFinder;
 
 final readonly class PrecompilerModuleLookupContext implements ModuleLookupContext {
 
-	/** @param array<string, CodePrecompiler> $precompilers */
+	/** @param list<CodePrecompiler> $precompilers */
 	public function __construct(
 		private SourceFinder $sourceFinder,
 		private array $precompilers,

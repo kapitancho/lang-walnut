@@ -80,7 +80,7 @@ final readonly class WithoutByIndex implements NativeMethod {
 						)
 					);
 				}
-				$removed = array_splice($values, $p, 1);
+				$removed = array_splice($values, (int)$p, 1);
 				return $programRegistry->valueRegistry->record([
 					'element' => $removed[0],
 					'array' => $programRegistry->valueRegistry->tuple($values)

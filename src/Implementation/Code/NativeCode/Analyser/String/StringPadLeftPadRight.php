@@ -76,7 +76,7 @@ trait StringPadLeftPadRight {
 				if ($length instanceof IntegerValue && $padString instanceof StringValue) {
 					$result = str_pad(
 						$target->literalValue,
-						(string)$length->literalValue,
+						(int)(string)$length->literalValue,
 						$padString->literalValue,
 						$padType
 					);

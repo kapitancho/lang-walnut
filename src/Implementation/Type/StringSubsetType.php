@@ -6,9 +6,11 @@ use BcMath\Number;
 use InvalidArgumentException;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\AST\Parser\EscapeCharHandler;
+use Walnut\Lang\Blueprint\Common\Range\LengthRange as LengthRangeInterface;
 use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\StringSubsetType as StringSubsetTypeInterface;
 use Walnut\Lang\Blueprint\Type\StringType as StringTypeInterface;
+use Walnut\Lang\Blueprint\Type\SupertypeChecker;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Implementation\Common\Range\LengthRange;
@@ -63,7 +65,7 @@ final class StringSubsetType implements StringSubsetTypeInterface, JsonSerializa
     }
 
 	/** @param list<string> $subsetValues */
-    private static function isInRange(array $subsetValues, LengthRange $range): bool {
+    private static function isInRange(array $subsetValues, LengthRangeInterface $range): bool {
 	    return array_all($subsetValues, fn($value) => $range->lengthInRange(
 			new Number(mb_strlen($value))
 	    ));

@@ -8,6 +8,7 @@ use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\AnyType;
 use Walnut\Lang\Blueprint\Type\ArrayType as ArrayTypeInterface;
 use Walnut\Lang\Blueprint\Type\NothingType;
+use Walnut\Lang\Blueprint\Type\SupertypeChecker;
 use Walnut\Lang\Blueprint\Type\TupleType as TupleTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnknownProperty;
@@ -23,7 +24,12 @@ final readonly class TupleType implements TupleTypeInterface, JsonSerializable {
 	public function asArrayType(): ArrayTypeInterface {
 		$l = count($this->types);
 		return $this->typeRegistry->array(
-			$this->typeRegistry->union([... array_values($this->types), $this->restType]),
+			$this->typeRegistry->union([
+				...
+				/** @phpstan-ignore-next-line arrayValues.list */
+				array_values($this->types),
+				$this->restType
+			]),
 			$l,
 			$this->restType instanceof NothingType ? $l : PlusInfinity::value,
 		);
@@ -32,7 +38,7 @@ final readonly class TupleType implements TupleTypeInterface, JsonSerializable {
 	/** @throws UnknownProperty */
 	public function typeOf(int $index): Type {
 		return $this->types[$index] ??
-			throw new UnknownProperty($index, (string)$this);
+			throw new UnknownProperty((string)$index, (string)$this);
 	}
 
     public function isSubtypeOf(Type $ofType): bool {

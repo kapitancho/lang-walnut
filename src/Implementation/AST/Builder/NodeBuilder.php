@@ -13,6 +13,7 @@ use Walnut\Lang\Blueprint\AST\Node\Expression\MultiVariableAssignmentExpressionN
 use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode as FunctionBodyNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\Module\ModuleDefinitionNode;
 use Walnut\Lang\Blueprint\AST\Node\NameAndTypeNode as NameAndTypeNodeInterface;
+use Walnut\Lang\Blueprint\AST\Node\SourceLocation as SourceLocationInterface;
 use Walnut\Lang\Blueprint\AST\Node\SourceNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\NumberIntervalNode as NumberIntervalNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
@@ -149,7 +150,7 @@ final class NodeBuilder implements NodeBuilderInterface {
 		);
 	}
 
-	private function getSourceLocation(): SourceLocation {
+	private function getSourceLocation(): SourceLocationInterface {
 		return $this->sourceLocator->getSourceLocation();
 	}
 
@@ -356,15 +357,15 @@ final class NodeBuilder implements NodeBuilderInterface {
 			$r = array_pop($operandStack);
 			$l = array_pop($operandStack);
 			$x = array_pop($operatorStack);
+			/** @noinspection PhpParamsInspection */
 			$operandStack[] = new MethodCallExpressionNode(
 				new SourceLocation(
 					$l->sourceLocation->moduleName,
 					$l->sourceLocation->startPosition,
 					$r->sourceLocation->endPosition
 				),
-				$l,
-				$x,
-				$r
+				/** @phpstan-ignore-next-line argument.type */
+				$l, $x, $r
 			);
 		};
 

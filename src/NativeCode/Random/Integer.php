@@ -85,8 +85,8 @@ final readonly class Integer implements NativeMethod {
 				) {
 					/** @noinspection PhpUnhandledExceptionInspection */
 					return $programRegistry->valueRegistry->integer(random_int(
-						(string)$from->literalValue,
-						(string)$to->literalValue
+						(int)(string)$from->literalValue,
+						(int)(string)$to->literalValue
 					));
 				}
 			}

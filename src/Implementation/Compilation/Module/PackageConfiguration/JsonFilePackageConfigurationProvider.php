@@ -32,23 +32,24 @@ final class JsonFilePackageConfigurationProvider implements PackageConfiguration
 		}
 		$data = json_decode($content, true);
 		if (
-			!is_array($data) ||
-			!isset($data['sourceRoot']) ||
-			!is_string($data['sourceRoot']) ||
-			!isset($data['packages']) ||
-			!is_array($data['packages']) ||
-			!array_all($data['packages'], fn(mixed $package): bool => is_string($package))
+			is_array($data) &&
+			isset($data['sourceRoot']) &&
+			is_string($data['sourceRoot']) &&
+			isset($data['packages']) &&
+			is_array($data['packages']) &&
+			array_all(array_keys($data['packages']), fn(mixed $package): bool => is_string($package)) &&
+			array_all($data['packages'], fn(mixed $package): bool => is_string($package))
 		) {
-			throw new RuntimeException(
-				sprintf(
-					"Invalid package configuration format in file '%s'.",
-					$this->filePath
-				)
+			return new PackageConfiguration(
+				$data['sourceRoot'],
+				$data['packages']
 			);
 		}
-		return new PackageConfiguration(
-			$data['sourceRoot'],
-			$data['packages']
+		throw new RuntimeException(
+			sprintf(
+				"Invalid package configuration format in file '%s'.",
+				$this->filePath
+			)
 		);
 	}
 }

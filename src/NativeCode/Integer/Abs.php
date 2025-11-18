@@ -36,7 +36,7 @@ final readonly class Abs implements NativeMethod {
 					match(true) {
 						$targetType->numberRange->max !== PlusInfinity::value && $targetType->numberRange->max->value < 0 =>
 							new NumberIntervalEndpoint(
-								new Number(abs((string)$targetType->numberRange->max->value)),
+								new Number(abs((int)(string)$targetType->numberRange->max->value)),
 								$targetType->numberRange->max->inclusive
 							),
 						$targetType->numberRange->min !== MinusInfinity::value && $targetType->numberRange->min->value >= 0 =>
@@ -49,12 +49,12 @@ final readonly class Abs implements NativeMethod {
 							new NumberIntervalEndpoint(
 								new Number(
 									max(
-										abs((string)$targetType->numberRange->min->value),
-										abs((string)$targetType->numberRange->max->value)
+										abs((int)(string)$targetType->numberRange->min->value),
+										abs((int)(string)$targetType->numberRange->max->value)
 									)
 								),
-								abs((string)$targetType->numberRange->min->value) >
-								abs((string)$targetType->numberRange->max->value) ?
+								abs((int)(string)$targetType->numberRange->min->value) >
+								abs((int)(string)$targetType->numberRange->max->value) ?
 									$targetType->numberRange->min->inclusive :
 									$targetType->numberRange->max->inclusive
 							)
@@ -72,7 +72,7 @@ final readonly class Abs implements NativeMethod {
 		Value $parameter
 	): Value {
 		if ($target instanceof RealValue || $target instanceof IntegerValue) {
-			return $programRegistry->valueRegistry->integer(abs((string)$target->literalValue));
+			return $programRegistry->valueRegistry->integer(abs((int)(string)$target->literalValue));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

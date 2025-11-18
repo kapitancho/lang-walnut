@@ -6,6 +6,7 @@ use JsonSerializable;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ProxyNamedType as ProxyNamedTypeInterface;
+use Walnut\Lang\Blueprint\Type\SupertypeChecker;
 use Walnut\Lang\Blueprint\Type\Type;
 
 final class ProxyNamedType implements ProxyNamedTypeInterface, SupertypeChecker, JsonSerializable {

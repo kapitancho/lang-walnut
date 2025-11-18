@@ -14,6 +14,7 @@ use Walnut\Lang\Blueprint\AST\Node\Expression\SequenceExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\IntersectionTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\UnionTypeNode;
 use Walnut\Lang\Blueprint\AST\Parser\EscapeCharHandler;
+use Walnut\Lang\Blueprint\AST\Parser\ParserState as ParserStateInterface;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
@@ -29,9 +30,9 @@ use Walnut\Lib\Walex\Token as LT;
 
 final readonly class ParserStateMachine {
 	public function __construct(
-		private ParserState $s,
-		private NodeBuilder $nodeBuilder,
-		private EscapeCharHandler $escapeCharHandler
+		private ParserStateInterface $s,
+		private NodeBuilder          $nodeBuilder,
+		private EscapeCharHandler    $escapeCharHandler
 	) {}
 
 	public function getAllStates(): array {

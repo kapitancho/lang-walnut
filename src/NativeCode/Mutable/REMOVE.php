@@ -55,7 +55,7 @@ final readonly class REMOVE implements NativeMethod {
 				$vs = $v->value->valueSet;
 				if (array_key_exists($k, $vs)) {
 					unset($vs[$k]);
-					$v->value = $programRegistry->valueRegistry->set($vs);
+					$v->value = $programRegistry->valueRegistry->set(array_values($vs));
 					return $parameter;
 				}
 				return $programRegistry->valueRegistry->error(

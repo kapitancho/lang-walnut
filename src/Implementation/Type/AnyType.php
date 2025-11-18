@@ -4,6 +4,7 @@ namespace Walnut\Lang\Implementation\Type;
 
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Type\AnyType as AnyTypeInterface;
+use Walnut\Lang\Blueprint\Type\SupertypeChecker;
 use Walnut\Lang\Blueprint\Type\Type;
 
 final readonly class AnyType implements AnyTypeInterface, SupertypeChecker, JsonSerializable {

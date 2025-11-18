@@ -68,8 +68,8 @@ final readonly class CastAsString {
 				$targetType->numberRange->min === MinusInfinity::value ?
 					1000 :
 					max(1,
-						(int)ceil(log10(abs((string)$targetType->numberRange->max->value))),
-						(int)ceil(log10(abs((string)$targetType->numberRange->min->value))) +
+						(int)ceil(log10(abs((int)(string)$targetType->numberRange->max->value))),
+						(int)ceil(log10(abs((int)(string)$targetType->numberRange->min->value))) +
 						($targetType->numberRange->min->value < 0 ? 1 : 0)
 					)
 

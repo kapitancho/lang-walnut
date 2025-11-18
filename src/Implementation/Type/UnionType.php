@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Implementation\Type;
 
 use JsonSerializable;
+use Walnut\Lang\Blueprint\Type\SupertypeChecker;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnionType as UnionTypeInterface;
 use Walnut\Lang\Implementation\Program\Type\UnionTypeNormalizer;

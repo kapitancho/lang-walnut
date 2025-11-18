@@ -100,6 +100,7 @@ final readonly class Hydrator {
 			)
 			// @codeCoverageIgnoreEnd
 		};
+		/** @phpstan-ignore-next-line argument.type */
 		return $fn($value, $targetType, $hydrationPath);
 	}
 

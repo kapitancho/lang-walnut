@@ -60,7 +60,7 @@ final readonly class BinaryIntegerDivide implements NativeMethod {
 					);
 				}
                 return $programRegistry->valueRegistry->integer(
-	                intdiv((string)$target->literalValue, (string)$parameter->literalValue)
+	                intdiv((int)(string)$target->literalValue, (int)(string)$parameter->literalValue)
                 );
 			}
 			// @codeCoverageIgnoreStart

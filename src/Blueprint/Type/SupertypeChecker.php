@@ -1,8 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Type;
-
-use Walnut\Lang\Blueprint\Type\Type;
+namespace Walnut\Lang\Blueprint\Type;
 
 interface SupertypeChecker {
     public function isSupertypeOf(Type $ofType): bool;

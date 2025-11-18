@@ -78,7 +78,7 @@ final readonly class NumberInterval implements NumberIntervalInterface {
 		return true;
 	}
 
-	private static function checkIntersectionHelper(self $i1, self $i2, bool $asIntegerInterval): bool {
+	private static function checkIntersectionHelper(NumberIntervalInterface $i1, NumberIntervalInterface $i2, bool $asIntegerInterval): bool {
 		if (!$i1->end instanceof NumberIntervalEndpoint) {
 			return true;
 		}
@@ -110,7 +110,7 @@ final readonly class NumberInterval implements NumberIntervalInterface {
 			) : null;
 	}
 
-	private static function checkUnionHelper(self $i1, self $i2, bool $asIntegerInterval): bool {
+	private static function checkUnionHelper(NumberIntervalInterface $i1, NumberIntervalInterface $i2, bool $asIntegerInterval): bool {
 		if (!$i1->end instanceof NumberIntervalEndpoint) {
 			return true;
 		}

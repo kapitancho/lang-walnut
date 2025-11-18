@@ -91,15 +91,15 @@ trait ArrayUniqueUniqueSet {
 					}
 					$rawValues = array_unique($rawValues);
 					return array_map(
-						fn($value) => $programRegistry->valueRegistry->string($value),
+						fn(string $value) => $programRegistry->valueRegistry->string($value),
 						$rawValues
 					);
 				}
 				$rawValues = array_unique($rawValues, SORT_NUMERIC);
 				return array_map(
-					fn($value) => str_contains($value, '.') ?
-						$programRegistry->valueRegistry->real($value) :
-						$programRegistry->valueRegistry->integer($value),
+					fn(string $value) => str_contains($value, '.') ?
+						$programRegistry->valueRegistry->real((float)$value) :
+						$programRegistry->valueRegistry->integer((int)$value),
 					$rawValues
 				);
 			}
