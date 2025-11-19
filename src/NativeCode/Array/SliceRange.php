@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\NativeCode\Array;
 
+use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
@@ -41,18 +42,20 @@ final readonly class SliceRange implements NativeMethod {
 			if ($parameterType->isSubtypeOf($pType)) {
 				$parameterType = $this->toBaseType($parameterType);
 				$endType = $parameterType->types['end'];
+				/** @var int|Number|PlusInfinity $maxLength */
+				$maxLength = $endType->numberRange->max === PlusInfinity::value ? PlusInfinity::value :
+					min(
+						$targetType->range->maxLength,
+						$parameterType->types['start']->numberRange->min === MinusInfinity::value ? // not possible
+							// @codeCoverageIgnoreStart
+							$targetType->range->maxLength :
+							// @codeCoverageIgnoreEnd
+							$endType->numberRange->max->value - $parameterType->types['start']->numberRange->min->value
+					);
 				return $typeRegistry->array(
 					$targetType->itemType,
 					0,
-					$endType->numberRange->max === PlusInfinity::value ? PlusInfinity::value :
-						min(
-							$targetType->range->maxLength,
-							$parameterType->types['start']->numberRange->min === MinusInfinity::value ? // not possible
-								// @codeCoverageIgnoreStart
-								$targetType->range->maxLength :
-								// @codeCoverageIgnoreEnd
-								$endType->numberRange->max->value - $parameterType->types['start']->numberRange->min->value
-						)
+					$maxLength
 				);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));

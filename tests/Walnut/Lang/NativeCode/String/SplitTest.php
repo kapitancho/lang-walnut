@@ -16,6 +16,12 @@ final class SplitTest extends CodeExecutionTestHelper {
 		$this->assertEquals("['hello']", $result);
 	}
 
+	public function testSplitEmptyString(): void {
+		$this->executeErrorCodeSnippet(
+			"Invalid parameter type: String['']",
+			"'hello'->split('');");
+	}
+
 	public function testSplitInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet('Invalid parameter type', "'hello'->split(false);");
 	}

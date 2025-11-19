@@ -21,7 +21,8 @@ final readonly class PackageBasedSourceFinder implements SourceFinder {
 
 	public function readSource(string $sourceName): string|null {
 		$path = $this->pathFor($sourceName);
-		return file_exists($path) && is_readable($path) ? file_get_contents($path) : null;
+		$content = file_exists($path) && is_readable($path) ? file_get_contents($path) : null;
+		return is_string($content) ? $content : null;
 	}
 
 	private function pathFor(string $sourceName): string {

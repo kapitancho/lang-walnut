@@ -19,6 +19,7 @@ final readonly class IntersectionType implements IntersectionTypeInterface, Supe
 		private IntersectionTypeNormalizer $normalizer,
         Type ... $types
 	) {
+		/** @var non-empty-list<Type> $types */
 		$this->types = $types;
 	}
 

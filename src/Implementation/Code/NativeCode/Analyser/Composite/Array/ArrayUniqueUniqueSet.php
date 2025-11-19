@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Implementation\Code\NativeCode\Analyser\Composite\Array;
 
 
+use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
@@ -46,7 +47,7 @@ trait ArrayUniqueUniqueSet {
 				if ($parameterType instanceof NullType) {
 					return $typeCreatorFn(
 						$type->itemType,
-						min(1, $type->range->minLength),
+						new Number(min(1, $type->range->minLength)),
 						$type->range->maxLength
 					);
 				}

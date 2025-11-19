@@ -23,7 +23,10 @@ final readonly class NativeCodeMethodRegistry implements MethodRegistry {
 			foreach($this->lookupNamespaces as $namespace) {
 				$className = $namespace . '\\' . $candidate . '\\' . $method;
 				if (class_exists($className)) {
-					return new $className($this->typeMapper);
+					$instance = new $className($this->typeMapper);
+					if ($instance instanceof Method) {
+						return $instance;
+					}
 				}
 			}
 		}

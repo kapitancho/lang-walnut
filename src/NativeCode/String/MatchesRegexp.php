@@ -20,7 +20,7 @@ final readonly class MatchesRegexp implements NativeMethod {
 		if ($target instanceof StringValue) {
 			if ($parameter instanceof StringValue) {
 				return $programRegistry->valueRegistry->boolean(
-					@preg_match(
+					(bool)@preg_match(
 						'/' . $parameter->literalValue . '/',
 						$target->literalValue,
 					)

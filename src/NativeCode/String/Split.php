@@ -27,7 +27,10 @@ final readonly class Split implements NativeMethod {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
+			if (
+				($parameterType instanceof StringType && $parameterType->range->minLength > 0) ||
+				($parameterType instanceof StringSubsetType && !$parameterType->contains(''))
+			) {
 				return $typeRegistry->array(
 					$targetType,
 					$targetType->range->minLength > 0 ? 1 : 0,
@@ -46,13 +49,17 @@ final readonly class Split implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-				if ($target instanceof StringValue) {
+		if ($target instanceof StringValue) {
 			if ($parameter instanceof StringValue) {
-				$result = explode($parameter->literalValue, $target->literalValue);
-				return $programRegistry->valueRegistry->tuple(
-					array_map(fn(string $piece): StringValue =>
-						$programRegistry->valueRegistry->string($piece), $result)
-				);
+				/** @var string $separator */
+				$separator = $parameter->literalValue;
+				if (strlen($separator) > 0) {
+					$result = explode($separator, $target->literalValue);
+					return $programRegistry->valueRegistry->tuple(
+						array_map(fn(string $piece): StringValue =>
+							$programRegistry->valueRegistry->string($piece), $result)
+					);
+				}
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

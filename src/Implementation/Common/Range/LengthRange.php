@@ -6,6 +6,7 @@ use BcMath\Number;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Common\Range\InvalidLengthRange;
 use Walnut\Lang\Blueprint\Common\Range\LengthRange as LengthRangeInterface;
+use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 
 final readonly class LengthRange implements LengthRangeInterface, JsonSerializable {
@@ -33,16 +34,6 @@ final readonly class LengthRange implements LengthRangeInterface, JsonSerializab
 		};
 	}
 
-	private function max(
-		PlusInfinity|Number $value1,
-		PlusInfinity|Number $value2
-	): PlusInfinity|Number {
-		return match(true) {
-			$value1 === PlusInfinity::value || $value2 === PlusInfinity::value => PlusInfinity::value,
-			default => max($value1, $value2)
-		};
-	}
-
 	public function intersectsWith(LengthRangeInterface $range): bool {
 		if ($this->maxLength instanceof Number && $this->maxLength < $range->minLength) {
 			return false;
@@ -55,7 +46,7 @@ final readonly class LengthRange implements LengthRangeInterface, JsonSerializab
 
 	public function tryRangeIntersectionWith(LengthRangeInterface $range): LengthRangeInterface|null {
 		return $this->intersectsWith($range) ? new self (
-			$this->max($this->minLength, $range->minLength),
+			max($this->minLength, $range->minLength),
 			$this->min($this->maxLength, $range->maxLength)
 		) : null;
 	}

@@ -19,6 +19,7 @@ final readonly class UnionType implements UnionTypeInterface, SupertypeChecker, 
 		private UnionTypeNormalizer $normalizer,
         Type ... $types
 	) {
+		/** @var non-empty-list<Type> $types */
 		$this->types = $types;
 	}
 

@@ -458,7 +458,7 @@ final readonly class Hydrator {
 
 	private function hydrateStringSubset(Value $value, StringSubsetType $targetType, string $hydrationPath): StringValue {
 		if ($value instanceof StringValue) {
-			if ($targetType->contains($value)) {
+			if ($targetType->contains($value->literalValue)) {
 				return $value;
 			}
 			throw new HydrationException(

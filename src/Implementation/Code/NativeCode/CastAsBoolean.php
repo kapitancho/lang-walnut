@@ -54,7 +54,7 @@ final readonly class CastAsBoolean {
 			($type instanceof StringType && $type->range->maxLength instanceof Number && (int)(string)$type->range->maxLength === 0),
 			($type instanceof RecordType && count($type->types) === 0),
 			($type instanceof TupleType && count($type->types) === 0),
-			($type instanceof SetType && ((int)(string)$type->range->maxLength) === 0),
+			($type instanceof SetType && ($setLength = $type->range->maxLength) instanceof Number && ((int)(string)$setLength) === 0),
 			($type instanceof ArrayType && $type->range->maxLength instanceof Number && (int)(string)$type->range->maxLength === 0),
 			($type instanceof MapType && $type->range->maxLength instanceof Number && (int)(string)$type->range->maxLength === 0)
 			=> $false,

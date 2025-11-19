@@ -354,8 +354,11 @@ final class NodeBuilder implements NodeBuilderInterface {
 		$operatorStack = [];
 
 		$add = function() use (&$operandStack, &$operatorStack): void {
+			/** @var SourceNode $r */
 			$r = array_pop($operandStack);
+			/** @var SourceNode $l */
 			$l = array_pop($operandStack);
+			/** @var string $x */
 			$x = array_pop($operatorStack);
 			/** @noinspection PhpParamsInspection */
 			$operandStack[] = new MethodCallExpressionNode(

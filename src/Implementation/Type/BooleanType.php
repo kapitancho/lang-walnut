@@ -7,7 +7,9 @@ use JsonSerializable;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Type\BooleanType as BooleanTypeInterface;
+use Walnut\Lang\Blueprint\Type\FalseType as FalseTypeInterface;
 use Walnut\Lang\Blueprint\Type\SupertypeChecker;
+use Walnut\Lang\Blueprint\Type\TrueType as TrueTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnknownEnumerationValue;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
@@ -43,7 +45,7 @@ final class BooleanType implements BooleanTypeInterface, JsonSerializable {
      * @param non-empty-list<EnumValueIdentifier> $values
      * @throws InvalidArgumentException
      **/
-    public function subsetType(array $values): TrueType|FalseType|BooleanType {
+    public function subsetType(array $values): TrueTypeInterface|FalseTypeInterface|BooleanTypeInterface {
 		/** @phpstan-ignore-next-line identical.alwaysFalse */
 		if ($values === []) {
 	        throw new InvalidArgumentException("Cannot create an empty subset type");

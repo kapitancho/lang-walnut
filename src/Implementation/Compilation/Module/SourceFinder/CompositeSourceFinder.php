@@ -10,7 +10,7 @@ final readonly class CompositeSourceFinder implements SourceFinder {
 	private array $sourceFinders;
 
 	public function __construct(SourceFinder ... $sourceFinders) {
-		$this->sourceFinders = $sourceFinders;
+		$this->sourceFinders = array_values($sourceFinders);
 	}
 
 	public function sourceExists(string $sourceName): bool {

@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\NativeCode\String;
 
+use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
@@ -37,14 +38,14 @@ final readonly class SubstringRange implements NativeMethod {
 			if ($parameterType->isSubtypeOf($pType)) {
 				$parameterType = $this->toBaseType($parameterType);
 				$endType = $parameterType->types['end'];
-				return $typeRegistry->string(0,
-					$endType->numberRange->max === PlusInfinity::value ? PlusInfinity::value :
+				/** @var int|Number|PlusInfinity $maxLength */
+				$maxLength = $endType->numberRange->max === PlusInfinity::value ? PlusInfinity::value :
 					min(
 						$targetType->range->maxLength,
 						$endType->numberRange->max->value -
 						$parameterType->types['start']->numberRange->min->value
-					)
-				);
+					);
+				return $typeRegistry->string(0, $maxLength);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}
@@ -69,7 +70,7 @@ final readonly class SubstringRange implements NativeMethod {
 				$start instanceof IntegerValue &&
 				$end instanceof IntegerValue
 			) {
-				$length = (string)$end->literalValue - (string)$start->literalValue;
+				$length = (int)(string)$end->literalValue - (int)(string)$start->literalValue;
 				return $programRegistry->valueRegistry->string(
 					mb_substr(
 						$target->literalValue,

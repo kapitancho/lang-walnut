@@ -28,9 +28,9 @@ use Walnut\Lang\Implementation\Code\NativeCode\ValueConstructor;
 
 final class DependencyContainer implements DependencyContainerInterface {
 
-	/** @var array<Type, Value|DependencyError> */
+	/** @var array<Type, Value|DependencyError> $cache */
 	private array $cache;
-	/** @var SplObjectStorage<Type> */
+	/** @var SplObjectStorage<Type, Type> $visited */
 	private SplObjectStorage $visited;
 
 	public function __construct(

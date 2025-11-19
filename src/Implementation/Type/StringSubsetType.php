@@ -75,8 +75,8 @@ final class StringSubsetType implements StringSubsetTypeInterface, JsonSerializa
 	    return array_all($subset, fn($value) => in_array($value, $superset));
     }
 
-	public function contains(StringValue $value): bool {
-		return in_array($value->literalValue, $this->subsetValues);
+	public function contains(string $value): bool {
+		return in_array($value, $this->subsetValues, true);
 	}
 
 	public function __toString(): string {

@@ -4,6 +4,7 @@ namespace Walnut\Lang\Implementation\Code\NativeCode;
 
 use BcMath\Number;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
+use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AtomType;
@@ -45,34 +46,35 @@ final readonly class CastAsString {
 			$targetType instanceof FalseType => ['false'],
 			$targetType instanceof BooleanType => ['true', 'false'],
 			$targetType instanceof EnumerationSubsetType =>
-			array_map(fn(EnumerationValue $enumerationValue): string =>
-			$enumerationValue->name->identifier, $targetType->subsetValues),
+				array_values(
+					array_map(fn(EnumerationValue $enumerationValue): string => $enumerationValue->name->identifier, $targetType->subsetValues),
+				),
 			$targetType instanceof IntegerSubsetType =>
-			array_map(fn(Number $integerValue): string =>
-			(string)$integerValue, $targetType->subsetValues),
+				array_values(
+					array_map(fn(Number $integerValue): string => (string)$integerValue, $targetType->subsetValues),
+				),
 			$targetType instanceof RealSubsetType =>
-			array_map(fn(Number $realValue): string =>
-			(string)$realValue, $targetType->subsetValues),
+				array_values(
+					array_map(fn(Number $realValue): string => (string)$realValue, $targetType->subsetValues),
+				),
 			default => null
 		};
 	}
 
-	/** @return array{int, int}|null */
+	/** @return array{int, int|PlusInfinity}|null */
 	public function detectRangedType(Type $targetType): array|null {
 		return match(true) {
 			$targetType instanceof AliasType => $this->detectRangedType($targetType->aliasedType),
 			$targetType instanceof MutableType => $this->detectRangedType($targetType->valueType),
 			$targetType instanceof IntegerType => [
 				1,
-				$targetType->numberRange->max === PlusInfinity::value ||
-				$targetType->numberRange->min === MinusInfinity::value ?
-					1000 :
+				($max = $targetType->numberRange->max) instanceof NumberIntervalEndpoint &&
+				($min = $targetType->numberRange->min) instanceof NumberIntervalEndpoint ?
 					max(1,
-						(int)ceil(log10(abs((int)(string)$targetType->numberRange->max->value))),
-						(int)ceil(log10(abs((int)(string)$targetType->numberRange->min->value))) +
-						($targetType->numberRange->min->value < 0 ? 1 : 0)
-					)
-
+						(int)ceil(log10(abs((int)(string)$max->value))),
+						(int)ceil(log10(abs((int)(string)$min->value))) +
+						($min->value < 0 ? 1 : 0)
+					) : 1000
 			],
 			$targetType instanceof RealType => [1, 1000],
 			$targetType instanceof TypeType => [1, PlusInfinity::value],

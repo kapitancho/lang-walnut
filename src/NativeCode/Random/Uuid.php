@@ -42,7 +42,7 @@ final readonly class Uuid implements NativeMethod {
 			new TypeNameIdentifier('Random')
 		)) {
 			/** @noinspection PhpUnhandledExceptionInspection */
-			$arr = (array)array_values(unpack('N1a/n4b/N1c', random_bytes(16)));
+			$arr = (array)array_values((array)unpack('N1a/n4b/N1c', random_bytes(16)));
 			$source = (int)(microtime(true) * 0x10000);
 			$arr[0] = $source >> 16;
 			$arr[1] = $source & 0xffff;

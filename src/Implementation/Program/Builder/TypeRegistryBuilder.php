@@ -22,11 +22,14 @@ use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\UnknownType;
 use Walnut\Lang\Blueprint\Type\AliasType as AliasTypeInterface;
 use Walnut\Lang\Blueprint\Type\AtomType as AtomTypeInterface;
+use Walnut\Lang\Blueprint\Type\BooleanType as BooleanTypeInterface;
 use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\EnumerationType as EnumerationTypeInterface;
+use Walnut\Lang\Blueprint\Type\FalseType as FalseTypeInterface;
 use Walnut\Lang\Blueprint\Type\NamedType as NamedTypeInterface;
 use Walnut\Lang\Blueprint\Type\ResultType as ResultTypeInterface;
+use Walnut\Lang\Blueprint\Type\TrueType as TrueTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnknownEnumerationValue;
 use Walnut\Lang\Implementation\Common\Range\LengthRange;
@@ -79,9 +82,9 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
     public AnyType $any;
     public NothingType $nothing;
 
-    public BooleanType $boolean;
-    public TrueType $true;
-    public FalseType $false;
+    public BooleanTypeInterface $boolean;
+    public TrueTypeInterface $true;
+    public FalseTypeInterface $false;
 
     public NullType $null;
 
@@ -142,8 +145,14 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 	            )
 	        )
         ];
-        $this->true = $this->boolean->subsetType([$trueValue]);
-        $this->false = $this->boolean->subsetType([$falseValue]);
+		/** @var TrueTypeInterface $trueType */
+		$trueType = $this->boolean->subsetType([$trueValue]);
+        $this->true = $trueType;
+
+		/** @var FalseTypeInterface $falseType false */
+	    $falseType = $this->boolean->subsetType([$falseValue]);
+        $this->false = $falseType;
+
         $this->enumerationTypes = $enumerationTypes;
 		$this->aliasTypes = [];
 	    $this->dataTypes = [];

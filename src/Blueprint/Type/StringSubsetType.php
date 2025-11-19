@@ -10,5 +10,5 @@ interface StringSubsetType extends Type {
 	public array $subsetValues { get; }
 	public LengthRange $range { get; }
 
-	public function contains(StringValue $value): bool;
+	public function contains(string $value): bool;
 }

@@ -255,13 +255,14 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 				;
 				$executionContext = $executionContext->withAddedVariableValue(
 					new VariableNameIdentifier('$' . $fieldName),
-					($value)
+					$value
 				);
 			}
 			if (!$targetType->valueType->restType instanceof NothingType) {
 				$executionContext = $executionContext->withAddedVariableValue(
 					new VariableNameIdentifier('$_'),
 					$tv instanceof RecordValue ?
+						/** @phpstan-ignore-next-line argument.type */
 						$executionContext->programRegistry->valueRegistry->record($restValues) :
 						$executionContext->programRegistry->valueRegistry->tuple(array_values($restValues))
 				);
