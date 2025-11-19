@@ -38,7 +38,7 @@ final readonly class UnionMethodCall implements Method {
 	public function execute(
 		ProgramRegistry $programRegistry,
 		Value           $target,
-		Value|null      $parameter,
+		Value      $parameter,
 	): Value {
 		foreach($this->methods as [$methodType, $method]) {
 			 if ($target->type->isSubtypeOf($methodType)) {

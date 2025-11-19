@@ -1,0 +1,14 @@
+parameters:
+    level: 9
+    paths:
+        - src
+    excludePaths:
+    phpVersion: 80400
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        - '#has an uninitialized readonly property#'
+        - '#Readonly property.*is assigned outside of the constructor#'
+        - '#Access to an undefined property#'
+        - '#Call to an undefined method#'
+        - '#no value type specified in iterable type array#'
+        - '#expects.*list.*given#'

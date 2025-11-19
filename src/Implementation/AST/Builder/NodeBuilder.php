@@ -327,7 +327,7 @@ final class NodeBuilder implements NodeBuilderInterface {
 		return self::priorities[$methodName->identifier] ?? 99;
 	}
 
-	public function methodCall(ExpressionNode $target, MethodNameIdentifier $methodName, ExpressionNode|null $parameter): MethodCallExpressionNodeInterface {
+	public function methodCall(ExpressionNode $target, MethodNameIdentifier $methodName, ExpressionNode $parameter): MethodCallExpressionNodeInterface {
 		$mNode = new MethodCallExpressionNode(
 			$this->getSourceLocation(),
 			$target,

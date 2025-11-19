@@ -161,7 +161,7 @@ interface NodeBuilder {
 	public function methodCall(
 		ExpressionNode $target,
 		MethodNameIdentifier $methodName,
-		ExpressionNode|null $parameter
+		ExpressionNode $parameter
 	): MethodCallExpressionNode;
 
 	public function functionBody(ExpressionNode $expression): FunctionBodyNode;

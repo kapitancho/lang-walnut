@@ -55,7 +55,7 @@ trait ArrayWithoutFirstIWithoutLast {
 	}
 
 	/**
-	 * @param callable(non-empty-array): array{mixed, array} $removeFn
+	 * @param callable(non-empty-list<Value>): array{Value, list<Value>} $removeFn
 	 */
 	private function executeHelper(
 		ProgramRegistry $programRegistry,

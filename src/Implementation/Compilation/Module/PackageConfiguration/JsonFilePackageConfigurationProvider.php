@@ -40,9 +40,11 @@ final class JsonFilePackageConfigurationProvider implements PackageConfiguration
 			array_all(array_keys($data['packages']), fn(mixed $package): bool => is_string($package)) &&
 			array_all($data['packages'], fn(mixed $package): bool => is_string($package))
 		) {
+			/** @var array<string, string> $packages */
+			$packages = $data['packages'];
 			return new PackageConfiguration(
 				$data['sourceRoot'],
-				$data['packages']
+				$packages
 			);
 		}
 		throw new RuntimeException(

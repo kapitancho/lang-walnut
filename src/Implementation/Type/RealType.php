@@ -34,9 +34,9 @@ final readonly class RealType implements RealTypeInterface, JsonSerializable {
 	public function __toString(): string {
 		$range = (string)$this->numberRange;
 		if (count($this->numberRange->intervals) === 1) {
-			$range = preg_replace('#((^\(-Infinity|^\[)(.*?)(\+Infinity\)$|]$))#', '$3', $range);
+			$range = (string)preg_replace('#((^\(-Infinity|^\[)(.*?)(\+Infinity\)$|]$))#', '$3', $range);
 		}
-		$range = preg_replace('#[+-]Infinity#', '', $range);
+		$range = (string)preg_replace('#[+-]Infinity#', '', $range);
 		return sprintf("Real%s", $range === '..' ? '' : "<$range>");
 	}
 

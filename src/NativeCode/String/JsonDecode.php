@@ -63,6 +63,7 @@ final readonly class JsonDecode implements NativeMethod {
 	): Value {
 		if ($target instanceof StringValue) {
 			try {
+				/** @var array|bool|float|int|object|string|null $value */
 				$value = json_decode($target->literalValue, false, 512, JSON_THROW_ON_ERROR);
 
 				return $this->phpToValue($programRegistry, $value);

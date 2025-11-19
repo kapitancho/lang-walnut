@@ -104,7 +104,7 @@ final readonly class Format implements NativeMethod {
 
 				try {
 					// Replace placeholders {0}, {1}, {2}, etc.
-					$result = preg_replace_callback(
+					$result = (string)preg_replace_callback(
 						'/\{(\d+)\}/',
 						function ($matches) use ($stringValues, $programRegistry, $target, $parameter) {
 							$index = (int)$matches[1];

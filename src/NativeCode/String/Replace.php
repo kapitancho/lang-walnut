@@ -65,7 +65,7 @@ final readonly class Replace implements NativeMethod {
 					}
 					if ($match instanceof SealedValue && $match->type->name->equals(new TypeNameIdentifier('RegExp'))) {
 						return $programRegistry->valueRegistry->string(
-							preg_replace($match->value->literalValue, $replacement->literalValue, $source)
+							(string)preg_replace($match->value->literalValue, $replacement->literalValue, $source)
 						);
 					}
 				}

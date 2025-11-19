@@ -106,7 +106,7 @@ final readonly class Format implements NativeMethod {
 
 				try {
 					// Replace placeholders {key}, {name}, {age}, etc.
-					$result = preg_replace_callback(
+					$result = (string)preg_replace_callback(
 						'/\{([a-zA-Z_][a-zA-Z0-9_]*)\}/',
 						function ($matches) use ($stringValues, $programRegistry, $target, $parameter) {
 							$key = $matches[1];
@@ -124,7 +124,6 @@ final readonly class Format implements NativeMethod {
 						},
 						$template
 					);
-
 					return $programRegistry->valueRegistry->string($result);
 				} catch (FunctionReturn $ret) {
 					return $ret->typedValue;
