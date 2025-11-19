@@ -72,7 +72,7 @@ trait TupleAsRecord {
 			try {
 				$value = $tupleValue->valueOf($index++);
 				$result[$key] = $value;
-			// @codeCoverageIgnoreStart
+                // @codeCoverageIgnoreStart
 			} catch (UnknownProperty $e) {
 				if (!($rType instanceof OptionalKeyType)) {
 					throw $e;

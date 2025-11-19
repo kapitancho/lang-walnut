@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<ruleset name="Walnut Lang Coding Standard">
+    <description>PHP CodeSniffer ruleset for Walnut Language project</description>
+
+    <!-- Paths to check -->
+    <file>src</file>
+    <exclude-pattern>*/ParserStateMachine.php</exclude-pattern>
+
+    <!-- Custom ruleset: K&R style (no PSR base to avoid conflicts) -->
+
+    <!-- Enforce K&R style: opening brace on SAME LINE -->
+    <rule ref="Generic.Classes.OpeningBraceSameLine"/>
+    <rule ref="Generic.Functions.OpeningFunctionBraceKernighanRitchie"/>
+
+    <!-- PHP code style -->
+    <rule ref="Generic.PHP.DisallowShortOpenTag"/>
+    <rule ref="Generic.PHP.DisallowAlternativePHPTags"/>
+    <rule ref="Generic.PHP.LowerCaseConstant"/>
+    <rule ref="Generic.PHP.LowerCaseKeyword"/>
+
+    <!-- Whitespace and blank lines -->
+    <rule ref="Generic.WhiteSpace.ScopeIndent"/>
+    <rule ref="Generic.WhiteSpace.IncrementDecrementSpacing"/>
+    <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace"/>
+
+    <rule ref="Squiz.WhiteSpace.FunctionOpeningBraceSpace"/>
+    <rule ref="Generic.Files.EndFileNoNewline"/>
+
+    <!-- Files -->
+    <rule ref="Generic.Files.LineEndings"/>
+    <rule ref="Generic.Files.ByteOrderMark"/>
+
+    <!-- Line length -->
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="120"/>
+            <property name="absoluteLineLimit" value="150"/>
+        </properties>
+    </rule>
+
+    <!-- Formatting -->
+    <rule ref="Generic.Formatting.DisallowMultipleStatements"/>
+    <rule ref="Generic.Functions.FunctionCallArgumentSpacing"/>
+
+    <!-- Control structures -->
+    <rule ref="Generic.ControlStructures.InlineControlStructure"/>
+
+    <!-- Naming -->
+    <rule ref="Generic.NamingConventions.UpperCaseConstantName"/>
+
+    <!-- Spacing and indentation -->
+    <arg name="tab-width" value="4"/>
+    <arg name="encoding" value="utf-8"/>
+
+    <!-- Show progress -->
+    <arg value="p"/>
+
+    <!-- Report configuration -->
+    <arg name="report-width" value="120"/>
+    <arg name="report" value="summary"/>
+
+    <!-- Full reports -->
+    <arg name="report-full" value="./dev/phpcs/report-full.txt"/>
+    <arg name="report-csv" value="./dev/phpcs/report-csv.csv"/>
+
+</ruleset>

@@ -83,7 +83,6 @@ final readonly class Format implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		
 		if ($target instanceof TupleValue) {
 			if ($parameter instanceof StringValue) {
 				$template = $parameter->literalValue;

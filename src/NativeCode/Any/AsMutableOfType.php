@@ -38,7 +38,6 @@ final readonly class AsMutableOfType implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		
 		if ($parameter instanceof TypeValue) {
 			if ($target->type->isSubtypeOf($parameter->typeValue)) {
 				return $programRegistry->valueRegistry->mutable(

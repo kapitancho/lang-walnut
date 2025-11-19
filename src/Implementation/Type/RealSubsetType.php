@@ -72,12 +72,12 @@ final class RealSubsetType implements RealSubsetTypeInterface, JsonSerializable 
 		} elseif (is_float($value)) {
 			$value = new Number((string)$value);
 		}
-		return in_array(	
+		return in_array(
 			$value,
 			$this->subsetValues
 		);
 	}
-	
+
 	public function __toString(): string {
 		return sprintf("Real[%s]", implode(', ', $this->subsetValues));
 	}

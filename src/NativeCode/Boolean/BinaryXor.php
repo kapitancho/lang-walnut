@@ -49,7 +49,6 @@ final readonly class BinaryXor implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		
 		if ($target instanceof BooleanValue) {
 			if ($parameter instanceof BooleanValue) {
 	            return $programRegistry->valueRegistry->boolean(

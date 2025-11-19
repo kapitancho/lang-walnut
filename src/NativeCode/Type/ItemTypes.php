@@ -34,7 +34,7 @@ final readonly class ItemTypes implements NativeMethod {
 			foreach($targetType->types as $type) {
 				try {
 					return $this->analyse($typeRegistry, $methodFinder, $type, $parameterType);
-				// @codeCoverageIgnoreStart
+                    // @codeCoverageIgnoreStart
 				} catch (AnalyserException) {}
 				// @codeCoverageIgnoreEnd
 			}

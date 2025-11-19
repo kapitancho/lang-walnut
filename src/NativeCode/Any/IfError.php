@@ -59,7 +59,6 @@ final readonly class IfError implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		
 		if ($parameter instanceof FunctionValue) {
 			return $target instanceof ErrorValue ?
 				$parameter->execute(

@@ -45,7 +45,7 @@ final readonly class Verify implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-				if ($target instanceof OpenValue && $target->type->name->equals(
+        if ($target instanceof OpenValue && $target->type->name->equals(
 			new TypeNameIdentifier('PasswordString')
 		)) {
 			$passwordString = $target->value->valueOf('value');

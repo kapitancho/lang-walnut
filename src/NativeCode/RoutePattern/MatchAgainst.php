@@ -53,7 +53,6 @@ final readonly class MatchAgainst implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		
 		if ($target instanceof OpenValue && $target->type->name->equals(new TypeNameIdentifier('RoutePattern'))) {
 			$pattern = $target->value->literalValue;
 			if ($parameter instanceof StringValue) {

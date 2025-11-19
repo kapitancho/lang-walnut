@@ -51,7 +51,6 @@ final readonly class BinaryIntegerDivide implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-
 		if ($target instanceof IntegerValue) {
 			if ($parameter instanceof IntegerValue) {
 				if ((int)(string)$parameter->literalValue === 0) {

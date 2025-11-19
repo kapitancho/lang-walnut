@@ -56,7 +56,6 @@ final readonly class ChainInvoke implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		
         if ($target instanceof TupleValue) {
             foreach($target->values as $fnValue) {
 				if ($fnValue instanceof FunctionValue) {
@@ -71,4 +70,3 @@ final readonly class ChainInvoke implements NativeMethod {
     }
 
 }
-

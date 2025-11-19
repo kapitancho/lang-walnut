@@ -41,9 +41,9 @@ final readonly class UnionMethodCall implements Method {
 		Value      $parameter,
 	): Value {
 		foreach($this->methods as [$methodType, $method]) {
-			 if ($target->type->isSubtypeOf($methodType)) {
-				 return $method->execute($programRegistry, $target, $parameter);
-			 }
+            if ($target->type->isSubtypeOf($methodType)) {
+                return $method->execute($programRegistry, $target, $parameter);
+            }
 		}
 		// It should never happen
 		// @codeCoverageIgnoreStart

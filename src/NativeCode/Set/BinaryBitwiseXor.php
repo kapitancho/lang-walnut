@@ -49,8 +49,7 @@ final readonly class BinaryBitwiseXor implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		
-				if ($target instanceof SetValue) {
+        if ($target instanceof SetValue) {
 			if ($parameter instanceof SetValue) {
 				$exclude = [];
 				foreach($parameter->values as $value) {

@@ -38,7 +38,6 @@ final readonly class OUT_HTML implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		
 		if ($target instanceof StringValue) {
 			echo nl2br(htmlspecialchars($target->literalValue));
 			return $target;

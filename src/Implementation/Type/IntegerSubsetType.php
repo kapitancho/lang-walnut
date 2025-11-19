@@ -71,7 +71,7 @@ final class IntegerSubsetType implements IntegerSubsetTypeInterface, JsonSeriali
 		}
 		return in_array($value, $this->subsetValues);
 	}
-	
+
 	public function __toString(): string {
 		return sprintf("Integer[%s]", implode(', ', $this->subsetValues));
 	}

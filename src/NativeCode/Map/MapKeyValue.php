@@ -67,9 +67,6 @@ final readonly class MapKeyValue implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-
-
-		
 		if ($target instanceof RecordValue && $parameter instanceof FunctionValue) {
 			$values = $target->values;
 			$result = [];

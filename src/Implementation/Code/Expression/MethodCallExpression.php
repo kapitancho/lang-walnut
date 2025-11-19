@@ -111,7 +111,7 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 			);
 			//TODO - DependencyContainerError
 			return $executionContext->asExecutionResult($retReturnTypedValue);
-		// @codeCoverageIgnoreStart
+            // @codeCoverageIgnoreStart
 		} catch (ExecutionException $e) {
 			throw new ExecutionException(
 				sprintf("Execution error in method call %s->%s(%s) : \n %s",

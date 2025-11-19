@@ -38,7 +38,6 @@ final readonly class OUT_TXT implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		
 		if ($target instanceof StringValue) {
 			echo $target->literalValue;
 			return $target;

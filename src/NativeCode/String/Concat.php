@@ -51,8 +51,7 @@ final readonly class Concat implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		
-				if ($target instanceof StringValue) {
+        if ($target instanceof StringValue) {
 			if ($parameter instanceof StringValue) {
 				$result = $target->literalValue . $parameter->literalValue;
 				return $programRegistry->valueRegistry->string($result);

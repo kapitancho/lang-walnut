@@ -48,8 +48,7 @@ final readonly class BinaryBitwiseAnd implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		
-				if ($target instanceof SetValue) {
+        if ($target instanceof SetValue) {
 			if ($parameter instanceof SetValue) {
 				$result = [];
 				foreach($target->valueSet as $key => $value) {

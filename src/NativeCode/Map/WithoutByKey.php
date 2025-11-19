@@ -69,9 +69,6 @@ final readonly class WithoutByKey implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-
-
-		
 		if ($target instanceof RecordValue) {
 			if ($parameter instanceof StringValue) {
 				$values = $target->values;

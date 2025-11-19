@@ -60,7 +60,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 				return new DependencyError(UnresolvableDependency::notFound, $type);
 			}
 			return $result;
-		// @codeCoverageIgnoreStart
+            // @codeCoverageIgnoreStart
 		} catch (AnalyserException) {
 			return new DependencyError(UnresolvableDependency::notFound, $type);
 		}

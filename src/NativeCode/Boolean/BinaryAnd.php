@@ -45,7 +45,6 @@ final readonly class BinaryAnd implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		
 		if ($target instanceof BooleanValue) {
 			if ($parameter instanceof BooleanValue) {
 	            return $programRegistry->valueRegistry->boolean(

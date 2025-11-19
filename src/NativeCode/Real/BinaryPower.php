@@ -63,7 +63,6 @@ final readonly class BinaryPower implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-
 		if ($target instanceof RealValue || $target instanceof IntegerValue) {
 			if ($parameter instanceof IntegerValue || $parameter instanceof RealValue) {
                 return $programRegistry->valueRegistry->real(

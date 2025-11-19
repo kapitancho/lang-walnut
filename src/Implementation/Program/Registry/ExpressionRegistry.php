@@ -91,7 +91,7 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 				$then
 			),
 			new MatchExpressionDefault($else)
-		]);
+            ]);
 	}
 
 	public function data(TypeNameIdentifier $typeName, Expression $parameter): DataExpression {
@@ -133,7 +133,7 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 			)
 		);
 	}
-	
+
 	public function constant(Value $value): ConstantExpression {
 		return new ConstantExpression($value);
 	}

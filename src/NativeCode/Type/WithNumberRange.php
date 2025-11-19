@@ -99,7 +99,7 @@ final readonly class WithNumberRange implements NativeMethod {
 					return $programRegistry->valueRegistry->type($type);
 				}
 			}
-/*
+            /*
 			if ($typeValue instanceof IntegerType) {
 				if ($parameter->type->isSubtypeOf(
 					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('IntegerRange'))
@@ -128,7 +128,7 @@ final readonly class WithNumberRange implements NativeMethod {
 					return ($programRegistry->valueRegistry->type($result));
 				}
 			}
-*/
+            */
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid parameter value");

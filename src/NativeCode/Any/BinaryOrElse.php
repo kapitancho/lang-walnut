@@ -34,7 +34,6 @@ final readonly class BinaryOrElse implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		
 		return $target instanceof ErrorValue ? $parameter : $target;
 	}
 

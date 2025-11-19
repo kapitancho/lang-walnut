@@ -53,7 +53,6 @@ final readonly class ErrorAsExternal implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		
 		if ($target instanceof ErrorValue) {
 			$errorValue = $target->errorValue;
 			if (!($errorValue instanceof SealedValue && $errorValue->type->name->equals(

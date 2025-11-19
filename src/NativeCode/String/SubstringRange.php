@@ -59,16 +59,15 @@ final readonly class SubstringRange implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		
-				if (
+        if (
 			$target instanceof StringValue &&
 			$parameter instanceof RecordValue
 		) {
 			$start = $parameter->valueOf('start');
 			$end = $parameter->valueOf('end');
 			if (
-				$start instanceof IntegerValue &&
-				$end instanceof IntegerValue
+            $start instanceof IntegerValue &&
+            $end instanceof IntegerValue
 			) {
 				$length = (int)(string)$end->literalValue - (int)(string)$start->literalValue;
 				return $programRegistry->valueRegistry->string(

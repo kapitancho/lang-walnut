@@ -40,7 +40,6 @@ final readonly class Contains implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		
 		if ($target instanceof SetValue) {
 			return $programRegistry->valueRegistry->boolean(
 				array_key_exists((string)$parameter, $target->valueSet)

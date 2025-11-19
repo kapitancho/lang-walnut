@@ -91,11 +91,11 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 
 			$cnt = count($methodFnTypes);
 			for ($k = 0; $k < $cnt; $k++) {
-				for ($j = 0; $j < $cnt; $j++) if ($k !== $j) {
-					if ($methodTargetTypes[$k]->isSubtypeOf($methodTargetTypes[$j]) &&
+				for ($j = 0; $j < $cnt; $j++) { if ($k !== $j) {
+                        if ($methodTargetTypes[$k]->isSubtypeOf($methodTargetTypes[$j]) &&
 						!$methodFnTypes[$k]->isSubtypeOf($methodFnTypes[$j])) {
 
-						$analyseErrors[] = new CustomMethodAnalyserException(
+                            $analyseErrors[] = new CustomMethodAnalyserException(
 							sprintf("Error in %s", $methods[$k]->methodInfo),
 							sprintf(
 								"the method %s is already defined for %s and therefore the signature %s should be a subtype of %s",
@@ -105,9 +105,10 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 								$methodFnTypes[$j]
 							),
 							$methods[$k]
-						);
-					}
+                            );
+                        }
 				}
+                }
 			}
 
 			$analyserContext = $this->programRegistry->analyserContext;

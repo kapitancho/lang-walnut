@@ -60,7 +60,6 @@ final readonly class CombineAsString implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		
 		if ($target instanceof TupleValue) {
 			if ($parameter instanceof StringValue) {
 				$result = [];

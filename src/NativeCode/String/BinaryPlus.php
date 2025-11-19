@@ -56,7 +56,6 @@ final readonly class BinaryPlus implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		
 		if ($target instanceof StringValue) {
 			$value = $parameter instanceof StringValue ?
 				$parameter :

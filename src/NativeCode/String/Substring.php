@@ -52,15 +52,15 @@ final readonly class Substring implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-				if (
+        if (
 			$target instanceof StringValue &&
 			$parameter instanceof RecordValue
 		) {
 			$start = $parameter->valueOf('start');
 			$length = $parameter->valueOf('length');
 			if (
-				$start instanceof IntegerValue &&
-				$length instanceof IntegerValue
+            $start instanceof IntegerValue &&
+            $length instanceof IntegerValue
 			) {
 				return $programRegistry->valueRegistry->string(
 					mb_substr(

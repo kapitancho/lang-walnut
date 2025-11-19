@@ -30,7 +30,7 @@ final readonly class BinaryMultiply implements NativeMethod {
 		if ($targetType instanceof IntegerType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof IntegerType || $parameterType instanceof RealType) {
-				$fixType = $this->getMultiplyFixType($typeRegistry, $targetType,$parameterType,);
+				$fixType = $this->getMultiplyFixType($typeRegistry, $targetType, $parameterType,);
 				if ($fixType !== null) {
 					return $fixType;
 				}

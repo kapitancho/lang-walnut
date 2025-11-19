@@ -400,9 +400,9 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 	  * @param non-empty-list<EnumValueIdentifier> $values
 	  * @throws UnknownEnumerationValue|DuplicateSubsetValue|InvalidArgumentException
 	  **/
-	 public function enumerationSubsetType(TypeNameIdentifier $typeName, array $values): EnumerationSubsetType {
-		 return $this->enumeration($typeName)->subsetType($values);
-	 }
+    public function enumerationSubsetType(TypeNameIdentifier $typeName, array $values): EnumerationSubsetType {
+        return $this->enumeration($typeName)->subsetType($values);
+    }
 
 	/** @throws InvalidLengthRange */
 	public function array(Type|null $itemType = null, int|Number $minLength = 0, int|Number|PlusInfinity $maxLength = PlusInfinity::value): ArrayType {
@@ -459,7 +459,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		if ($normalize) {
 			try {
 				return $this->unionTypeNormalizer->normalize(... $types);
-			// @codeCoverageIgnoreStart
+                // @codeCoverageIgnoreStart
 			} catch (UnknownType) {}
 			// @codeCoverageIgnoreEnd
 		}
@@ -471,7 +471,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		$types = $this->intersectionTypeNormalizer->flatten(... $types);
 		try {
 			return $this->intersectionTypeNormalizer->normalize(... $types);
-		// @codeCoverageIgnoreStart
+            // @codeCoverageIgnoreStart
 		} catch (UnknownType) {}
 		return new IntersectionType($this->intersectionTypeNormalizer, ...$types);
 		// @codeCoverageIgnoreEnd

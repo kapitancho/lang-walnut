@@ -73,7 +73,7 @@ final readonly class Integer implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-				if ($target instanceof AtomValue && $target->type->name->equals(
+        if ($target instanceof AtomValue && $target->type->name->equals(
 			new TypeNameIdentifier('Random')
 		)) {
 			if ($parameter instanceof RecordValue) {

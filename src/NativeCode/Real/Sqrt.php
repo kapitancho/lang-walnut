@@ -50,7 +50,6 @@ final readonly class Sqrt implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-
 		if ($target instanceof IntegerValue || $target instanceof RealValue) {
 			$val = (string)$target->literalValue;
 			return $val >= 0 ?

@@ -44,7 +44,6 @@ final readonly class BinaryGreaterThanEqual implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		
 		if ($target instanceof IntegerValue || $target instanceof RealValue) {
 			if ($parameter instanceof IntegerValue || $target instanceof RealValue) {
 				return $programRegistry->valueRegistry->boolean(

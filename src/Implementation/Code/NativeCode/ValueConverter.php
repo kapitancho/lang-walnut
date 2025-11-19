@@ -33,7 +33,7 @@ final readonly class ValueConverter {
 			return $targetType;
 		}
 
-		$methodNameString = sprintf('as%s',$targetType);
+		$methodNameString = sprintf('as%s', $targetType);
 		if (MethodNameIdentifier::isValidIdentifier($methodNameString)) {
 			//TODO - consider dropping this completely
 			$methodName = new MethodNameIdentifier($methodNameString);
@@ -135,7 +135,7 @@ final readonly class ValueConverter {
 		if ($sourceType->isSubtypeOf($targetType)) {
 			return $sourceType;
 		}
-		$methodNameString = sprintf('as%s',$targetType);
+		$methodNameString = sprintf('as%s', $targetType);
 		if (MethodNameIdentifier::isValidIdentifier($methodNameString)) {
 			$methodName = new MethodNameIdentifier($methodNameString);
 			$method = $methodFinder->methodForType($sourceType, $methodName);
@@ -178,7 +178,7 @@ final readonly class ValueConverter {
 		if ($sourceValue->type->isSubtypeOf($targetType)) {
 			return $sourceValue;
 		}
-		$methodNameString = sprintf('as%s',$targetType);
+		$methodNameString = sprintf('as%s', $targetType);
 		if (MethodNameIdentifier::isValidIdentifier($methodNameString)) {
 			$methodName = new MethodNameIdentifier($methodNameString);
 			$method = $programRegistry->methodFinder->methodForValue($sourceValue, $methodName);

@@ -163,5 +163,5 @@ interface TypeRegistry {
 	  * @param non-empty-list<EnumValueIdentifier> $values
 	  * @throws UnknownEnumerationValue|DuplicateSubsetValue|InvalidArgumentException
 	  **/
-	 public function enumerationSubsetType(TypeNameIdentifier $typeName, array $values): EnumerationSubsetType;
+    public function enumerationSubsetType(TypeNameIdentifier $typeName, array $values): EnumerationSubsetType;
 }

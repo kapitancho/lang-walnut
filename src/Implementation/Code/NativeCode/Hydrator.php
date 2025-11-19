@@ -552,7 +552,7 @@ final readonly class Hydrator {
 				throw new HydrationException(
 					$value,
 					$hydrationPath,
-					sprintf("The tuple value should be with %d items",$l)
+					sprintf("The tuple value should be with %d items", $l)
 				);
 			}
 			$result = [];
