@@ -35,6 +35,7 @@ final readonly class WithReturnType implements NativeMethod {
 					$typeRegistry->any
 				)
 			)) {
+				/** @var TypeType $parameterType */
 				if ($refType instanceof ResultType) {
 					return $typeRegistry->type(
 						$typeRegistry->result(
@@ -82,6 +83,7 @@ final readonly class WithReturnType implements NativeMethod {
 					$programRegistry->typeRegistry->any
 				)
 			)) {
+				/** @var TypeValue $parameter */
 				if ($typeValue instanceof ResultType) {
 					$result = $programRegistry->typeRegistry->result(
 						$parameter->typeValue,

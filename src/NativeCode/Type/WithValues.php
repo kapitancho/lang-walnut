@@ -22,6 +22,7 @@ use Walnut\Lang\Blueprint\Value\EnumerationValue;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
 use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
+use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
@@ -139,6 +140,8 @@ final readonly class WithValues implements NativeMethod {
 						1
 					)
 				)) {
+					/** @var TupleValue $parameter */
+					/** @var list<IntegerValue> $values */
 					$values = $parameter->values;
 					$result = $programRegistry->typeRegistry->integerSubset(
 						array_map(fn(IntegerValue $value): Number => $value->literalValue, $values)
@@ -153,6 +156,8 @@ final readonly class WithValues implements NativeMethod {
 						1
 					)
 				)) {
+					/** @var TupleValue $parameter */
+					/** @var list<RealValue|IntegerValue> $values */
 					$values = $parameter->values;
 					$result = $programRegistry->typeRegistry->realSubset(
 						array_map(fn(RealValue|IntegerValue $value): Number => $value->literalValue, $values)
@@ -167,6 +172,8 @@ final readonly class WithValues implements NativeMethod {
 						1
 					)
 				)) {
+					/** @var TupleValue $parameter */
+					/** @var list<StringValue> $values */
 					$values = $parameter->values;
 					$result = $programRegistry->typeRegistry->stringSubset(
 						array_map(fn(StringValue $value): string => $value->literalValue, $values)
@@ -181,6 +188,7 @@ final readonly class WithValues implements NativeMethod {
 						1
 					)
 				)) {
+					/** @var TupleValue $parameter */
 					$values = $parameter->values;
 					$r = [];
 					foreach($values as $value) {

@@ -64,6 +64,7 @@ final readonly class WithValueType implements NativeMethod {
 					$programRegistry->typeRegistry->any
 				)
 			)) {
+				/** @var TypeValue $parameter */
 				if ($typeValue instanceof MutableType) {
 					$result = $programRegistry->typeRegistry->mutable(
 						$parameter->typeValue,

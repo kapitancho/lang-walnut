@@ -573,7 +573,58 @@ logged = result->ifError(^err => {
 });
 ```
 
-### 11.9.6 Combining Transformation Methods
+### 11.9.6 Pattern Matching: when
+
+The `when` method provides pattern matching for Results by applying different callbacks depending on whether the Result contains a success value or an error value.
+
+**Syntax:**
+```walnut
+Result<T, E>->when(^[success: ^T => R1, error: ^E => R2] => R1|R2)
+```
+
+**Examples:**
+```walnut
+/* Transform success and error differently */
+result = 42;
+message = result->when([
+    success: ^value => 'Number: ' + value->asString,
+    error: ^err => 'Error: ' + err
+]);
+/* 'Number: 42' */
+
+/* Error case */
+error = @'Invalid input';
+message = error->when([
+    success: ^value => 'Got: ' + value->asString,
+    error: ^err => 'Error occurred: ' + err
+]);
+/* 'Error occurred: Invalid input' */
+
+/* Type transformation */
+result = parseInteger('123');
+output = result->when([
+    success: ^num => num * 2,
+    error: ^err => 0
+]);
+/* Either the doubled integer or 0 */
+
+/* Complex business logic */
+validation = validateForm(input);
+response = validation->when([
+    success: ^data => Response![status: 200, body: data],
+    error: ^reason => Response![status: 400, error: reason]
+]);
+```
+
+**Comparison with other methods:**
+- `when`: Full pattern matching - applies one of two callbacks based on Result type
+- `ifError`: Error handler only - applies callback only to errors
+- `??` (binaryOrElse): Simple fallback - returns value or default on error
+- `?whenIsError`: Control flow - branches based on error status
+
+The `when` method is particularly useful when you need to transform both success and error cases into the same type without using conditional expressions.
+
+### 11.9.7 Combining Transformation Methods
 
 Result transformation methods can be combined for elegant error handling:
 
@@ -859,7 +910,8 @@ The folding stops at the first error, making it efficient and predictable.
 Walnut's error handling system provides:
 
 - **Result type** for representing success or failure
-- **Result transformation methods** (`map`, `mapIndexValue`, `mapKeyValue`, `ifError`)
+- **Result transformation methods** (`map`, `mapIndexValue`, `mapKeyValue`, `when`, `ifError`)
+- **Pattern matching** with `when` for handling both success and error cases
 - **Error fallback operator** (`??`) via `binaryOrElse`
 - **Early returns** with `=>` for explicit control flow
 - **?noError** for automatic error propagation
