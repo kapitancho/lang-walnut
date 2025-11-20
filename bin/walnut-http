@@ -10,6 +10,7 @@ $host = '0.0.0.0';
 $port = 8080;
 $docroot = getcwd();
 $router = realpath($routerPath);
+$routerName = 'server';
 
 // Parse command line arguments
 $args = $argv;
@@ -24,6 +25,8 @@ while ($arg = array_shift($args)) {
         $port = (int)(array_shift($args) ?? $port);
     } elseif ($arg === '--docroot' || $arg === '-d') {
         $docroot = array_shift($args) ?? $docroot;
+    } elseif ($arg === '--router' || $arg === '-r') {
+        $routerName = array_shift($args) ?? $routerName;
     } elseif ($arg === '--help') {
         $showHelp = true;
     } else {
@@ -94,10 +97,11 @@ echo "\n";
 
 // Start PHP built-in server
 $command = sprintf(
-        'php -S %s:%d %s',
+        'ROUTER_NAME=%s php -S %s:%d %s',
+        escapeshellarg($routerName),
         escapeshellarg($host),
         $port,
-        escapeshellarg($router)
+        $router,
 );
 
 passthru($command, $exitCode);
