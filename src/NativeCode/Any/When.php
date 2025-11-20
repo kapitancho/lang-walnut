@@ -72,13 +72,17 @@ final readonly class When implements NativeMethod {
 			// Extract the success callback
 			$successFn = $parameter->values['success'];
 			if (!$successFn instanceof FunctionValue) {
+				// @codeCoverageIgnoreStart
 				throw new ExecutionException("Invalid parameter value for 'success' key");
+				// @codeCoverageIgnoreEnd
 			}
 
 			// Extract the error callback
 			$errorFn = $parameter->values['error'];
 			if (!$errorFn instanceof FunctionValue) {
+				// @codeCoverageIgnoreStart
 				throw new ExecutionException("Invalid parameter value for 'error' key");
+				// @codeCoverageIgnoreEnd
 			}
 
 			// Apply the appropriate callback based on whether target is an error

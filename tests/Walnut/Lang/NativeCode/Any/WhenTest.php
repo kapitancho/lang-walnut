@@ -6,13 +6,26 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 
 final class WhenTest extends CodeExecutionTestHelper {
 
+	public function testWhenSuccessBranchAny(): void {
+		$result = $this->executeCodeSnippet(
+			"doWhen(42);",
+			valueDeclarations: "
+				doWhen = ^a: Any :: a->when[
+					success: ^i: Any => Integer :: 42,
+					error: ^e: Any => Integer :: -1
+				];
+			"
+		);
+		$this->assertEquals("42", $result);
+	}
+
 	public function testWhenSuccessBranch(): void {
 		$result = $this->executeCodeSnippet(
 			"doWhen(42);",
 			valueDeclarations: "
 				doWhen = ^a: Result<Integer, String> :: a->when[
 					success: ^i: Integer => Integer :: i + 1,
-					error: ^e: String :: e->length
+					error: ^e: String => Integer :: e->length
 				];
 			"
 		);
@@ -25,7 +38,7 @@ final class WhenTest extends CodeExecutionTestHelper {
 			valueDeclarations: "
 				doWhen = ^a: Result<Integer, String> :: a->when[
 					success: ^i: Integer => Integer :: i + 1,
-					error: ^e: String :: e->length
+					error: ^e: String => Integer :: e->length
 				];
 			"
 		);
