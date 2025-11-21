@@ -49,4 +49,11 @@ final class BinaryIntegerDivideTest extends CodeExecutionTestHelper {
 		$this->assertEquals("5", $result);
 	}
 
+	public function testBinaryDivideInfinityParameter(): void {
+		$result = $this->executeCodeSnippet("div(20);", valueDeclarations: <<<NUT
+			div = ^x: Integer<3..> => Integer<0..1> :: 5 // x;
+		NUT);
+		$this->assertEquals("0", $result);
+	}
+
 }
