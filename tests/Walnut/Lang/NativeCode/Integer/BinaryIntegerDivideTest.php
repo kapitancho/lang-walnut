@@ -34,6 +34,14 @@ final class BinaryIntegerDivideTest extends CodeExecutionTestHelper {
 		$this->assertEquals("50", $result);
 	}
 
+	public function testBinaryIntegerDividePositiveTargetFinite(): void {
+		$result = $this->executeCodeSnippet(
+			"divide(5);",
+			valueDeclarations: "divide = ^p: Integer<3..10> => Integer<1..3> :: p // 3;"
+		);
+		$this->assertEquals("1", $result);
+	}
+
 	public function testBinaryIntegerDivideByOnePreservesRangeSubset(): void {
 		$result = $this->executeCodeSnippet("divOne[5, 1];", valueDeclarations: <<<NUT
 			divOne = ^[x: Integer[3, 5, 8], y: Integer[1]] => Integer[3, 5, 8] :: #x // #y;

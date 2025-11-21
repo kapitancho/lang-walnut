@@ -11,6 +11,7 @@ use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\ScopedExpression as ScopedExpressionInterface;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
+use Walnut\Lang\Blueprint\Type\NothingType;
 
 final readonly class ScopedExpression implements ScopedExpressionInterface, JsonSerializable {
 	public function __construct(
@@ -22,10 +23,11 @@ final readonly class ScopedExpression implements ScopedExpressionInterface, Json
 		$expressionType = $ret->expressionType;
 		$returnType = $ret->returnType;
 		return $analyserContext->asAnalyserResult(
-			$analyserContext->programRegistry->typeRegistry->result(
-				$expressionType,
-				$returnType
-			),
+			$returnType instanceof NothingType ? $expressionType :
+				$analyserContext->programRegistry->typeRegistry->result(
+					$expressionType,
+					$returnType
+				),
 			$analyserContext->programRegistry->typeRegistry->nothing
 		);
 	}

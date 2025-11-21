@@ -35,7 +35,7 @@ final readonly class DataExpression implements DataExpressionInterface, JsonSeri
 		if (!$analyserContext->expressionType->isSubtypeOf($dataType->valueType)) {
 			throw new AnalyserException(
 				sprintf(
-					"!!! The data type '%s' expected base value of type '%s', but got '%s'.",
+					"The data type '%s' expected base value of type '%s', but got '%s'.",
 					$this->typeName,
 					$dataType->valueType,
 					$analyserContext->expressionType

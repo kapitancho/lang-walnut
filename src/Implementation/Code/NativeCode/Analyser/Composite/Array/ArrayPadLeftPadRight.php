@@ -36,6 +36,9 @@ trait ArrayPadLeftPadRight {
 			if ($parameterType instanceof RecordType) {
 				$types = $parameterType->types;
 				$lengthType = $types['length'] ?? null;
+				if ($lengthType) {
+					$lengthType = $this->toBaseType($lengthType);
+				}
 				$valueType = $types['value'] ?? null;
 				if ($lengthType instanceof IntegerType) {
 					return $typeRegistry->array(

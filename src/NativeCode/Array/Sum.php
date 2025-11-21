@@ -35,7 +35,7 @@ final readonly class Sum implements NativeMethod {
 			$targetType = $targetType->asArrayType();
 		}
 		if ($targetType instanceof ArrayType) {
-			$itemType = $targetType->itemType;
+			$itemType = $this->toBaseType($targetType->itemType);
 			if ($itemType->isSubtypeOf(
 				$typeRegistry->union([
 					$typeRegistry->integer(),

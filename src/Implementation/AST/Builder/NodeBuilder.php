@@ -311,6 +311,7 @@ final class NodeBuilder implements NodeBuilderInterface {
 		'binaryMinus' => 5,
 		'binaryMultiply' => 8,
 		'binaryDivide' => 8,
+		'binaryIntegerDivide' => 8,
 		'binaryModulo' => 8,
 		'binaryPower' => 10,
 		'binaryLessThan' => 4,

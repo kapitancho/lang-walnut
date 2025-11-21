@@ -24,8 +24,11 @@ use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TypeValue;
+use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class Values implements NativeMethod {
+
+	use BaseType;
 
 	public function analyse(
 		TypeRegistry $typeRegistry,
@@ -35,7 +38,7 @@ final readonly class Values implements NativeMethod {
 	): TypeInterface {
 		if ($parameterType instanceof NullType) {
 			if ($targetType instanceof TypeType) {
-				$refType = $targetType->refType;
+				$refType = $this->toBaseType($targetType->refType);
 				if ($refType instanceof MetaType) {
 					$t = match($refType->value) {
 						MetaTypeValue::EnumerationValue,
@@ -65,7 +68,7 @@ final readonly class Values implements NativeMethod {
 						),
 					};
 					$l = count($refType->subsetValues);
-					return $typeRegistry->array($t, $l, $l);
+					return $typeRegistry->array($refType, $l, $l);
 				}
 			}
 			// @codeCoverageIgnoreStart
@@ -82,7 +85,7 @@ final readonly class Values implements NativeMethod {
 	): Value {
 		if ($parameter instanceof NullValue) {
 			if ($target instanceof TypeValue) {
-				$refType = $target->typeValue;
+				$refType = $this->toBaseType($target->typeValue);
 				if ($refType instanceof EnumerationSubsetType) {
 					return $programRegistry->valueRegistry->tuple(
 						array_values(
