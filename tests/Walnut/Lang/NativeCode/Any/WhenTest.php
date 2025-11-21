@@ -19,6 +19,19 @@ final class WhenTest extends CodeExecutionTestHelper {
 		$this->assertEquals("42", $result);
 	}
 
+	public function testWhenSuccessBranchNotAny(): void {
+		$result = $this->executeCodeSnippet(
+			"doWhen(42);",
+			valueDeclarations: "
+				doWhen = ^a: Integer :: a->when[
+					success: ^i: Any => Integer :: 42,
+					error: ^e: Any => Integer :: -1
+				];
+			"
+		);
+		$this->assertEquals("42", $result);
+	}
+
 	public function testWhenSuccessBranch(): void {
 		$result = $this->executeCodeSnippet(
 			"doWhen(42);",
