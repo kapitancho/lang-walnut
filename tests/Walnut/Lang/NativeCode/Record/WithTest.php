@@ -13,6 +13,13 @@ final class WithTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[a: 'hi', b: -9, c: 3.14]", $result);
 	}
 
+	public function testWithRecordMap(): void {
+		$result = $this->executeCodeSnippet("recWith[t: [a1: 'hi', b: 42], p: [b: -9, c: 3.14]];",
+			valueDeclarations: "recWith = ^[t: [a1: String, b: Integer], p: Map<String<1>:Integer|Real, 1..>] 
+				=> Map<String['a1', 'b']|String<1>:String|Real, 2..> :: #t->with(#p);");
+		$this->assertEquals("[a1: 'hi', b: -9, c: 3.14]", $result);
+	}
+
 	public function testWithRecordExtended(): void {
 		$result = $this->executeCodeSnippet(
 			"recWith[[a: 'a', b: 'b', c: 'c', x: 3.14], [b: 2.17, e: 'e', y: false]];",
@@ -27,13 +34,6 @@ final class WithTest extends CodeExecutionTestHelper {
 		);
 	}
 
-
-	public function testWithRecordMap(): void {
-		$result = $this->executeCodeSnippet("recWith[t: [a: 'hi', b: 42], p: [b: -9, c: 3.14]];",
-			valueDeclarations: "recWith = ^[t: [a: String, b: Integer], p: Map<Real>] 
-				=> Map<String|Real, 2..> :: #t->with(#p);");
-		$this->assertEquals("[a: 'hi', b: -9, c: 3.14]", $result);
-	}
 
 	public function testChunkInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet('Invalid parameter type', "[a: 1]->with(false);");

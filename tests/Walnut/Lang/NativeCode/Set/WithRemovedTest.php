@@ -20,4 +20,13 @@ final class WithRemovedTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("[1; 2; 5; 10; 5]->withRemoved(5);");
 		$this->assertEquals("[1; 2; 10]", $result);
 	}
+
+	public function testWithRemovedReturnType(): void {
+		$result = $this->executeCodeSnippet(
+			"fn[1; 2; 5; 10; 5];",
+			valueDeclarations: "fn = ^s: Set<Integer, ..5> => Result<Set<Integer, ..5>, ItemNotFound> :: s->withRemoved(5);",
+		);
+		$this->assertEquals("[1; 2; 10]", $result);
+	}
+
 }

@@ -4,6 +4,7 @@ namespace Walnut\Lang\NativeCode\String;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
+use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -32,9 +33,28 @@ final readonly class MatchAgainstPattern implements NativeMethod {
 		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
+				$maxLength = PlusInfinity::value;
+				$keyType = $typeRegistry->string();
+				if ($parameterType instanceof StringSubsetType) {
+					$allPathArgs = [];
+					foreach($parameterType->subsetValues as $subsetValue) {
+						if (preg_match_all(self::ROUTE_PATTERN_MATCH, $subsetValue, $matches)) {
+							$pathArgs = $matches[1];
+						} else {
+							$pathArgs = [];
+						}
+						$allPathArgs = array_merge($allPathArgs, $pathArgs);
+					}
+					$allPathArgs = array_unique($allPathArgs);
+					$keyType = count($allPathArgs) ? $typeRegistry->stringSubset($allPathArgs) : $typeRegistry->nothing;
+				}
+
 				return $typeRegistry->union([
 					$typeRegistry->map(
 						$typeRegistry->string(),
+						0,
+						$maxLength,
+						$keyType
 					),
 					$typeRegistry->false
 				]);

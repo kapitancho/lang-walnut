@@ -36,6 +36,7 @@ final readonly class Flip implements NativeMethod {
 					),
 					min(1, $targetType->range->minLength),
 					$targetType->range->maxLength,
+					$itemType
 				);
 			}
 		}

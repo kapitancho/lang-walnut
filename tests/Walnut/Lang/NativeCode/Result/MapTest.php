@@ -186,6 +186,17 @@ final class MapTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@null", $result);
 	}
 
+	public function testMapMapKeyType(): void {
+		$result = $this->executeCodeSnippet(
+			"doMap[a: 1, b: 2];",
+			valueDeclarations: "
+				doMap = ^m: Result<Map<String<1>:Integer>, Null> => Result<Map<String<1>:Integer>, Null> ::
+					m->map(^Integer => Integer :: # + 3);
+			"
+		);
+		$this->assertEquals("[a: 4, b: 5]", $result);
+	}
+
 	// Set tests
 
 	public function testMapSetEmpty(): void {
@@ -377,7 +388,7 @@ final class MapTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet(
 			"doMap[a: 1, b: 2, c: 5, d: 10, e: 5];",
 			valueDeclarations: "
-				doMap = ^m: Result<Array<Integer>|Map<Integer>|Set<Integer>, Null> => Result<Array<Integer>|Map<Integer>|Set<Integer>, Null> ::
+				doMap = ^m: Result<Array<Integer>|Map<String<1>|Integer>|Set<Integer>, Null> => Result<Array<Integer>|Map<String<1>|Integer>|Set<Integer>, Null> ::
 					m->map(^Integer => Integer :: # + 3);
 			"
 		);

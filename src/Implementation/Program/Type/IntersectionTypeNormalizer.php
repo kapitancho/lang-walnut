@@ -70,7 +70,8 @@ final readonly class IntersectionTypeNormalizer {
 		                    $tx = $this->typeRegistry->map(
 			                    $this->normalize($q->itemType, $tx->itemType),
 			                    $newRange->minLength,
-			                    $newRange->maxLength
+			                    $newRange->maxLength,
+			                    $this->normalize($q->keyType, $tx->keyType)
 		                    );
 	                    }
                     } else if ($q instanceof ArrayType && $tx instanceof ArrayType) {

@@ -4,6 +4,7 @@ namespace Walnut\Lang\NativeCode\Array;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
+use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -35,12 +36,28 @@ final readonly class CountValues implements NativeMethod {
 			if ($itemType->isSubtypeOf($typeRegistry->string()) ||
 				$itemType->isSubtypeOf($typeRegistry->integer())
 			) {
+				if ($itemType->isSubtypeOf($typeRegistry->string())) {
+					$keyType = $itemType;
+				} else {
+					$baseItemType = $this->toBaseType($itemType);
+					$keyType = $typeRegistry->string(
+						1,
+						($max = $baseItemType->numberRange->max) instanceof NumberIntervalEndpoint &&
+						($min = $baseItemType->numberRange->min) instanceof NumberIntervalEndpoint ?
+							max(1,
+								(int)ceil(log10(abs((int)(string)$max->value))),
+								(int)ceil(log10(abs((int)(string)$min->value))) +
+								($min->value < 0 ? 1 : 0)
+							) : 1000
+					);
+				}
 				return $typeRegistry->map(
 					$typeRegistry->integer(
 						1, max(1, $targetType->range->maxLength)
 					),
 					min(1, $targetType->range->minLength),
-					$targetType->range->maxLength
+					$targetType->range->maxLength,
+					$keyType
 				);
 			}
 		}

@@ -67,6 +67,7 @@ final readonly class Map implements NativeMethod {
 									$returnType,
 									$innerType->range->minLength,
 									$innerType->range->maxLength,
+									$innerType->keyType
 								),
 								$innerType instanceof ArrayType => $typeRegistry->array(
 									$returnType,
@@ -99,6 +100,7 @@ final readonly class Map implements NativeMethod {
 									$returnType,
 									$innerUnionType->range->minLength,
 									$innerUnionType->range->maxLength,
+									$innerUnionType->keyType
 								),
 								$innerUnionType instanceof ArrayType => $typeRegistry->array(
 									$returnType,

@@ -333,6 +333,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 		$i = fn(string $name) => new TypeNameIdentifier($name);
 		$ev = fn(string $name) => new EnumValueIdentifier($name);
 		$this->typeRegistryBuilder->addAlias($i('MyAlias'), $this->typeRegistry->null);
+		$this->typeRegistryBuilder->addAlias($i('NonEmptyString'), $this->typeRegistry->string(1));
 		$this->typeRegistryBuilder->addAtom($i('MyAtom'));
 		$this->typeRegistryBuilder->addEnumeration($i('MyEnum'), [
 			$ev('A'),

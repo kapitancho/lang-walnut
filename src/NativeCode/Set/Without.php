@@ -25,7 +25,7 @@ final readonly class Without implements NativeMethod {
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof SetType) {
-			return $typeRegistry->map(
+			return $typeRegistry->set(
 				$targetType->itemType,
 				max(0, $targetType->range->minLength - 1),
 				$targetType->range->maxLength

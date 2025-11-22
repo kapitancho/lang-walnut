@@ -83,6 +83,17 @@ final class MapKeyValueTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@null", $result);
 	}
 
+	public function testMapKeyValueWithNullErrorKeyType(): void {
+		$result = $this->executeCodeSnippet(
+			"doMap[a: 1, b: 2];",
+			valueDeclarations: "
+				doMap = ^m: Result<Map<String<1>:Integer>, Null> => Result<Map<String<1>:Integer>, Null> ::
+					m->mapKeyValue(^[key: String<1>, value: Integer] => Integer :: {#key->length} + #value);
+			"
+		);
+		$this->assertEquals("[a: 2, b: 3]", $result);
+	}
+
 	public function testMapKeyValueInvalidReturnType(): void {
 		$this->executeErrorCodeSnippet(
 			"expected a return value of type Map<Integer>, got Result<Map<Integer>, Null>",

@@ -137,12 +137,30 @@ final class WithTest extends CodeExecutionTestHelper {
 		$this->assertEquals("MyOpen[a: 1, b: 3, c: 2, d: 6]", $result);
 	}
 
+	public function testWithMapKeyType(): void {
+		$result = $this->executeCodeSnippet(
+			"{MyOpen[a:1,b:3,c:5]}->testWith[c:2,d:6];", <<<NUT
+			MyOpen := #Map<String<1>:Integer>;
+			MyOpen->testWith(^param: Map<String<1>:Integer, 1..3> => MyOpen) :: $->with(param);
+		NUT);
+		$this->assertEquals("MyOpen[a: 1, b: 3, c: 2, d: 6]", $result);
+	}
+
 	public function testWithMapMapWrongItemType(): void {
 		$this->executeErrorCodeSnippet(
 			"due to incompatible item type",
 			"{MyOpen[a:1,b:3,c:5]}->testWith[c:2,d:6.28];", <<<NUT
 			MyOpen := #Map<Integer>;
 			MyOpen->testWith(^param: Map<Real, 1..3> => MyOpen) :: $->with(param);
+		NUT);
+	}
+
+	public function testWithMapMapWrongKeyType(): void {
+		$this->executeErrorCodeSnippet(
+			"due to incompatible key type",
+			"{MyOpen[a:1,b:3,c:5]}->testWith[c:2,de:6];", <<<NUT
+			MyOpen := #Map<String<1>:Integer>;
+			MyOpen->testWith(^param: Map<String<1..2>:Integer, 1..3> => MyOpen) :: $->with(param);
 		NUT);
 	}
 

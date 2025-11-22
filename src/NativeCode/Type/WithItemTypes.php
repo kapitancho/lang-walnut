@@ -4,6 +4,7 @@ namespace Walnut\Lang\NativeCode\Type;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
+use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
@@ -54,7 +55,10 @@ final readonly class WithItemTypes implements NativeMethod {
 				$typeRegistry->map(
 					$typeRegistry->type(
 						$typeRegistry->any
-					)
+					),
+					0,
+					PlusInfinity::value,
+					$typeRegistry->string()
 				)
 			)) {
 				if ($refType instanceof RecordType || (
@@ -103,7 +107,10 @@ final readonly class WithItemTypes implements NativeMethod {
 				$programRegistry->typeRegistry->map(
 					$programRegistry->typeRegistry->type(
 						$programRegistry->typeRegistry->any
-					)
+					),
+					0,
+					PlusInfinity::value,
+					$programRegistry->typeRegistry->string()
 				)
 			)) {
 				if ($typeValue instanceof RecordType) {

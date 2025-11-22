@@ -112,6 +112,10 @@ final class ToStringTest extends BaseProgramTestHelper {
 			'Map<Integer, 3..>' => $tr->map($tr->integer(), 3),
 			'Map<Integer, 3..5>' => $tr->map($tr->integer(), 3, 5),
 			'Map<Integer, ..5>' => $tr->map($tr->integer(), 0, 5),
+			'Map<String<2>:Integer>' => $tr->map($tr->integer(), keyType: $tr->string(2, 2)),
+			'Map<String<1..5>:Integer, 3..5>' => $tr->map($tr->integer(), 3, 5, $tr->string(1, 5)),
+			"Map<String['a', 'b']:Integer, 3..5>" => $tr->map($tr->integer(), 3, 5, $tr->stringSubset(['a', 'b'])),
+			"Map<NonEmptyString:Integer, 3..5>" => $tr->map($tr->integer(), 3, 5, $tr->typeByName(new TypeNameIdentifier('NonEmptyString'))),
 
 	        'Set' => $tr->set(),
             'Set<3..>' => $tr->set($tr->any, 3),

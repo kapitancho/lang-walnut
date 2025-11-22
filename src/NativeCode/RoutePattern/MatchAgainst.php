@@ -5,6 +5,7 @@ namespace Walnut\Lang\NativeCode\RoutePattern;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -39,6 +40,9 @@ final readonly class MatchAgainst implements NativeMethod {
 						$typeRegistry->string(),
 						$typeRegistry->integer(0)
 					]),
+					0,
+					PlusInfinity::value,
+					$typeRegistry->string()
 				), $typeRegistry->atom(new TypeNameIdentifier('RoutePatternDoesNotMatch'))]);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));

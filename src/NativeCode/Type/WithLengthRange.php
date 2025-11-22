@@ -43,7 +43,7 @@ final readonly class WithLengthRange implements NativeMethod {
 					return $typeRegistry->type($typeRegistry->array($refType->itemType));
 				}
 				if ($refType instanceof MapType) {
-					return $typeRegistry->type($typeRegistry->map($refType->itemType));
+					return $typeRegistry->type($typeRegistry->map($refType->itemType, 0, PlusInfinity::value, $refType->keyType));
 				}
 				if ($refType instanceof SetType) {
 					return $typeRegistry->type($typeRegistry->set($refType->itemType));
@@ -98,6 +98,7 @@ final readonly class WithLengthRange implements NativeMethod {
 						$typeValue->itemType,
 						$minValue->literalValue,
 						$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
+						$typeValue->keyType
 					);
 					return $programRegistry->valueRegistry->type($result);
 				}

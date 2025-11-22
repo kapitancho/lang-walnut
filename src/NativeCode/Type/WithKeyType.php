@@ -17,7 +17,7 @@ use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
-final readonly class WithItemType implements NativeMethod {
+final readonly class WithKeyType implements NativeMethod {
 
 	use BaseType;
 
@@ -31,33 +31,17 @@ final readonly class WithItemType implements NativeMethod {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($parameterType->isSubtypeOf(
 				$typeRegistry->type(
-					$typeRegistry->any
+					$typeRegistry->string()
 				)
 			)) {
-				if ($refType instanceof ArrayType) {
-					return $typeRegistry->type(
-						$typeRegistry->array(
-							$parameterType->refType,
-							$refType->range->minLength,
-							$refType->range->maxLength)
-					);
-				}
 				if ($refType instanceof MapType) {
 					return $typeRegistry->type(
 						$typeRegistry->map(
-							$parameterType->refType,
+							$refType->itemType,
 							$refType->range->minLength,
 							$refType->range->maxLength,
-							$refType->keyType
-						)
-					);
-				}
-				if ($refType instanceof SetType) {
-					return $typeRegistry->type(
-						$typeRegistry->set(
 							$parameterType->refType,
-							$refType->range->minLength,
-							$refType->range->maxLength)
+						)
 					);
 				}
 				// @codeCoverageIgnoreStart
@@ -80,31 +64,15 @@ final readonly class WithItemType implements NativeMethod {
 			$typeValue = $this->toBaseType($target->typeValue);
 			if ($parameter->type->isSubtypeOf(
 				$programRegistry->typeRegistry->type(
-					$programRegistry->typeRegistry->any
+					$programRegistry->typeRegistry->string()
 				)
 			)) {
-				if ($typeValue instanceof ArrayType) {
-					$result = $programRegistry->typeRegistry->array(
-						$parameter->typeValue,
-						$typeValue->range->minLength,
-						$typeValue->range->maxLength,
-					);
-					return $programRegistry->valueRegistry->type($result);
-				}
 				if ($typeValue instanceof MapType) {
 					$result = $programRegistry->typeRegistry->map(
-						$parameter->typeValue,
+						$typeValue->itemType,
 						$typeValue->range->minLength,
 						$typeValue->range->maxLength,
-						$typeValue->keyType
-					);
-					return $programRegistry->valueRegistry->type($result);
-				}
-				if ($typeValue instanceof SetType) {
-					$result = $programRegistry->typeRegistry->set(
 						$parameter->typeValue,
-						$typeValue->range->minLength,
-						$typeValue->range->maxLength,
 					);
 					return $programRegistry->valueRegistry->type($result);
 				}

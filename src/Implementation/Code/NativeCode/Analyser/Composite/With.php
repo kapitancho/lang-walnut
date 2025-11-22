@@ -110,6 +110,12 @@ trait With {
 			if ($valueType instanceof MapType) {
 				$pType = $pType instanceof RecordType ? $pType->asMapType() : $pType;
 				if ($pType instanceof MapType) {
+					if (!$pType->keyType->isSubtypeOf($valueType->keyType)) {
+						throw new AnalyserException(
+							sprintf("Cannot call 'with' on Map type %s with a parameter of Map type %s due to incompatible key type",
+								$targetType, $parameterType)
+						);
+					}
 					if (!$pType->itemType->isSubtypeOf($valueType->itemType)) {
 						throw new AnalyserException(
 							sprintf("Cannot call 'with' on Map type %s with a parameter of Map type %s due to incompatible item type",
@@ -206,7 +212,11 @@ trait With {
 			max($targetType->range->minLength, $parameterType->range->minLength),
 			$targetType->range->maxLength === PlusInfinity::value ||
 				$parameterType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
-				((int)(string)$targetType->range->maxLength) + ((int)(string)$parameterType->range->maxLength)
+				((int)(string)$targetType->range->maxLength) + ((int)(string)$parameterType->range->maxLength),
+			$typeRegistry->union([
+				$targetType->keyType,
+				$parameterType->keyType
+			]),
 		);
 	}
 

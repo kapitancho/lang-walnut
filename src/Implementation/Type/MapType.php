@@ -57,6 +57,7 @@ final class MapType implements MapTypeInterface, JsonSerializable {
 	public function jsonSerialize(): array {
 		return [
 			'type' => 'Map',
+			'keyType' => $this->keyType,
 			'itemType' => $this->itemType,
 			'range' => $this->range
 		];

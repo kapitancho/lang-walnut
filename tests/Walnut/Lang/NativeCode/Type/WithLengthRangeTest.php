@@ -53,6 +53,11 @@ final class WithLengthRangeTest extends CodeExecutionTestHelper {
 		$this->assertEquals("type{Map<Boolean, 2..9>}", $result);
 	}
 
+	public function testWithLengthRangeMapKeyType(): void {
+		$result = $this->executeCodeSnippet("type{Map<String['a', 'b']:Boolean, 1..7>}->withLengthRange(?noError(LengthRange[2, 9]));");
+		$this->assertEquals("type{Map<String['a', 'b']:Boolean, 2..9>}", $result);
+	}
+
 	public function testWithLengthRangeMapInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet("Invalid parameter type",
 			"type{Map<Boolean>}->withLengthRange(42);");

@@ -20,4 +20,13 @@ final class WithoutTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("[1; 2; 5; 10; 5]->without(5);");
 		$this->assertEquals("[1; 2; 10]", $result);
 	}
+
+	public function testWithoutReturnType(): void {
+		$result = $this->executeCodeSnippet(
+			"fn[1; 2; 5; 10; 5];",
+			valueDeclarations: "fn = ^s: Set<Integer, ..5> => Set<Integer, ..5> :: s->without(5);",
+		);
+		$this->assertEquals("[1; 2; 10]", $result);
+	}
+
 }

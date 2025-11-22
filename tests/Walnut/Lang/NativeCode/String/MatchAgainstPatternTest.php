@@ -16,6 +16,15 @@ final class MatchAgainstPatternTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[:]", $result);
 	}
 
+	public function testMatchAgainstPatternKeyType(): void {
+		$result = $this->executeCodeSnippet(
+			"'hello/world'->matchAgainstPattern('hello/{who}');",
+			valueDeclarations: "fn = ^p: String['hello/{who}', 'goodbye/{who}/{how}', 'welcome/{whom}'] => Map<String['who', 'how', 'whom']:String>|False :: 
+				'hello/world'->matchAgainstPattern(p);"
+		);
+		$this->assertEquals("[who: 'world']", $result);
+	}
+
 	public function testMatchAgainstPatternNo(): void {
 		$result = $this->executeCodeSnippet("'hello/world'->matchAgainstPattern('goodbye/{who}');");
 		$this->assertEquals('false', $result);
