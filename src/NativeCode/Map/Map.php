@@ -43,6 +43,7 @@ final readonly class Map implements NativeMethod {
 						$returnType,
 						$targetType->range->minLength,
 						$targetType->range->maxLength,
+						$targetType->keyType
 					);
 					return $errorType ? $typeRegistry->result($t, $errorType) : $t;
 				}

@@ -30,7 +30,7 @@ final readonly class KeysSet implements NativeMethod {
 		}
 		if ($targetType instanceof MapType) {
 			return $typeRegistry->set(
-				$typeRegistry->string(),
+				$targetType->keyType,
 				$targetType->range->minLength,
 				$targetType->range->maxLength
 			);

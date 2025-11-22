@@ -47,6 +47,7 @@ final readonly class WithKeyValue implements NativeMethod {
 					}
 					$targetType = $targetType->asMapType();
 				}
+				$keyType = $parameterType->types['key'] ?? null;
 				$valueType = $parameterType->types['value'] ?? null;
 				return $typeRegistry->map(
 					$typeRegistry->union([
@@ -55,7 +56,11 @@ final readonly class WithKeyValue implements NativeMethod {
 					]),
 					$targetType->range->minLength,
 					$targetType->range->maxLength === PlusInfinity::value ?
-						PlusInfinity::value : $targetType->range->maxLength + 1
+						PlusInfinity::value : $targetType->range->maxLength + 1,
+					$typeRegistry->union([
+						$targetType->keyType,
+						$keyType
+					])
 				);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));

@@ -16,4 +16,12 @@ final class KeysTest extends CodeExecutionTestHelper {
 		$this->assertEquals("['a', 'b', 'c', 'd']", $result);
 	}
 
+	public function testKeysKeyType(): void {
+		$result = $this->executeCodeSnippet(
+			"fn[a: 1, b: 2];",
+			valueDeclarations: "fn = ^m: Map<String<1>:Integer> => Array<String<1>> :: m->keys;"
+		);
+		$this->assertEquals("['a', 'b']", $result);
+	}
+
 }

@@ -30,7 +30,7 @@ final readonly class KeyOf implements NativeMethod {
 			$targetType = $targetType->asMapType();
 		}
 		if ($targetType instanceof MapType) {
-			$returnType = $typeRegistry->string();
+			$returnType = $targetType->keyType;
 			return $typeRegistry->result(
 				$returnType,
 				$typeRegistry->atom(

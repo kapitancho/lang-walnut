@@ -20,10 +20,10 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class FindFirstKeyValue implements NativeMethod {
 	use BaseType;
 
-	private function getExpectedType(TypeRegistry $typeRegistry, Type $targetType): Type {
+	private function getExpectedType(TypeRegistry $typeRegistry, Type $keyType, Type $targetType): Type {
 		return $typeRegistry->function(
 			$typeRegistry->record([
-				'key' => $typeRegistry->string(),
+				'key' => $keyType,
 				'value' => $targetType
 			]),
 			$typeRegistry->boolean
@@ -41,11 +41,11 @@ final readonly class FindFirstKeyValue implements NativeMethod {
 			$targetType = $targetType->asMapType();
 		}
 		if ($targetType instanceof MapType) {
-			$expectedType = $this->getExpectedType($typeRegistry, $targetType->itemType);
+			$expectedType = $this->getExpectedType($typeRegistry, $targetType->keyType, $targetType->itemType);
 			if ($parameterType->isSubtypeOf($expectedType)) {
 				return $typeRegistry->result(
 					$typeRegistry->record([
-						'key' => $typeRegistry->string(),
+						'key' => $targetType->keyType,
 						'value' => $targetType->itemType
 					]),
 					$typeRegistry->atom(

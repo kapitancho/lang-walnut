@@ -38,7 +38,11 @@ trait MapMergeWith {
 					max($targetType->range->minLength, $parameterType->range->minLength),
 					$targetType->range->maxLength === PlusInfinity::value ||
 						$parameterType->range->maxLength === PlusInfinity::value ?
-						PlusInfinity::value : $targetType->range->maxLength + $parameterType->range->maxLength
+						PlusInfinity::value : $targetType->range->maxLength + $parameterType->range->maxLength,
+					$typeRegistry->union([
+						$targetType->keyType,
+						$parameterType->keyType
+					]),
 				);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));

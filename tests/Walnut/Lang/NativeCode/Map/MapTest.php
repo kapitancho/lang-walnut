@@ -21,6 +21,15 @@ final class MapTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@'error'", $result);
 	}
 
+	public function testMapKeyType(): void {
+		$result = $this->executeCodeSnippet(
+			"fn[a: 1, b: 2];",
+			valueDeclarations: "fn = ^m: Map<String<1>:Integer> => Map<String<1>:Boolean> :: 
+				m->map(^v: Integer => Boolean :: v > 1);"
+		);
+		$this->assertEquals("[a: false, b: true]", $result);
+	}
+
 	public function testMapInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet('Invalid parameter type', "[a: 1, b: 'a']->map(5);");
 	}

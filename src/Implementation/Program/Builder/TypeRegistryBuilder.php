@@ -27,6 +27,7 @@ use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\EnumerationType as EnumerationTypeInterface;
 use Walnut\Lang\Blueprint\Type\FalseType as FalseTypeInterface;
+use Walnut\Lang\Blueprint\Type\InvalidMapKeyType;
 use Walnut\Lang\Blueprint\Type\NamedType as NamedTypeInterface;
 use Walnut\Lang\Blueprint\Type\ResultType as ResultTypeInterface;
 use Walnut\Lang\Blueprint\Type\TrueType as TrueTypeInterface;
@@ -416,8 +417,18 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 	}
 
 	/** @throws InvalidLengthRange */
-	public function map(Type|null $itemType = null, int|Number $minLength = 0, int|Number|PlusInfinity $maxLength = PlusInfinity::value): MapType {
-		return new MapType($itemType ?? $this->any,
+	public function map(
+		Type|null $itemType = null,
+		int|Number $minLength = 0,
+		int|Number|PlusInfinity $maxLength = PlusInfinity::value,
+		Type|null $keyType = null,
+	): MapType {
+		if ($keyType && !$keyType->isSubtypeOf($this->string())) {
+			throw new InvalidMapKeyType($keyType);
+		}
+		return new MapType(
+			$keyType ?? $this->string(),
+			$itemType ?? $this->any,
 			new LengthRange(
 				is_int($minLength) ? new Number($minLength) : $minLength,
 		       is_int($maxLength) ? new Number($maxLength) : $maxLength

@@ -679,12 +679,14 @@ final class NodeBuilder implements NodeBuilderInterface {
 	}
 
 	public function mapType(
+		TypeNode|null $keyType = null,
 		TypeNode|null $itemType = null,
 		Number $minLength = new Number(0),
 		PlusInfinity|Number $maxLength = PlusInfinity::value
 	): MapTypeNode {
 		return new MapTypeNode(
 			$this->getSourceLocation(),
+			$keyType ?? $this->stringType(),
 			$itemType ?? $this->anyType,
 			$minLength,
 			$maxLength

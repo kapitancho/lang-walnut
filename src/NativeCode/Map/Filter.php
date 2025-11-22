@@ -37,7 +37,8 @@ final readonly class Filter implements NativeMethod {
 					return $typeRegistry->map(
 						$targetType->itemType,
 						0,
-						$targetType->range->maxLength
+						$targetType->range->maxLength,
+						$targetType->keyType
 					);
 				}
 				throw new AnalyserException(

@@ -11,6 +11,7 @@ use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 final readonly class MapTypeNode implements MapTypeNodeInterface {
 	public function __construct(
 		public SourceLocation $sourceLocation,
+		public TypeNode $keyType,
 		public TypeNode $itemType,
 		public Number $minLength,
 		public Number|PlusInfinity $maxLength
@@ -21,6 +22,7 @@ final readonly class MapTypeNode implements MapTypeNodeInterface {
 			'sourceLocation' => $this->sourceLocation,
 			'nodeCategory' => 'Type',
 			'nodeName' => 'MapType',
+			'keyType' => $this->keyType,
 			'itemType' => $this->itemType,
 			'minLength' => $this->minLength,
 			'maxLength' => $this->maxLength

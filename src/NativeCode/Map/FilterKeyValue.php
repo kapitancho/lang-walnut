@@ -19,10 +19,10 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class FilterKeyValue implements NativeMethod {
 	use BaseType;
 
-	private function getExpectedType(TypeRegistry $typeRegistry, Type $targetType): Type {
+	private function getExpectedType(TypeRegistry $typeRegistry, Type $itemType, Type $targetType): Type {
 		return $typeRegistry->function(
 			$typeRegistry->record([
-				'key' => $typeRegistry->string(),
+				'key' => $itemType,
 				'value' => $targetType
 			]),
 			$typeRegistry->boolean
@@ -40,13 +40,14 @@ final readonly class FilterKeyValue implements NativeMethod {
 			$targetType = $targetType->asMapType();
 		}
 		if ($targetType instanceof MapType) {
-			$expectedType = $this->getExpectedType($typeRegistry, $targetType->itemType);
+			$expectedType = $this->getExpectedType($typeRegistry, $targetType->keyType, $targetType->itemType);
 			if ($parameterType->isSubtypeOf($expectedType)) {
 				//if ($targetType->itemType()->isSubtypeOf($parameterType->parameterType())) {
 					return $typeRegistry->map(
 						$targetType->itemType,
 						0,
-						$targetType->range->maxLength
+						$targetType->range->maxLength,
+						$targetType->keyType
 					);
 				//}
 				/*throw new AnalyserException(

@@ -46,6 +46,7 @@ use Walnut\Lang\Blueprint\Compilation\AST\AstTypeCompiler as AstTypeCompilerInte
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\UnknownType;
 use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
+use Walnut\Lang\Blueprint\Type\InvalidMapKeyType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnknownEnumerationValue;
 use Walnut\Lang\Implementation\Common\Range\NumberInterval;
@@ -84,7 +85,8 @@ final readonly class AstTypeCompiler implements AstTypeCompilerInterface {
 				$typeNode instanceof MapTypeNode => $this->typeRegistry->map(
 					$this->type($typeNode->itemType),
 					$typeNode->minLength,
-					$typeNode->maxLength
+					$typeNode->maxLength,
+					$this->type($typeNode->keyType),
 				),
 				$typeNode instanceof SetTypeNode => $this->typeRegistry->set(
 					$this->type($typeNode->itemType),
@@ -185,6 +187,8 @@ final readonly class AstTypeCompiler implements AstTypeCompilerInterface {
 			throw new AstCompilationException($typeNode, "Type issue: " . $e->getMessage(), $e);
 		} catch (DuplicateSubsetValue $e) {
 			throw new AstCompilationException($typeNode, "Duplication issue: " . $e->getMessage(), $e);
+		} catch (InvalidMapKeyType $e) {
+			throw new AstCompilationException($typeNode, "Map key type issue: " . $e->getMessage(), $e);
 		} catch (UnknownEnumerationValue $e) {
 			throw new AstCompilationException($typeNode, "Enumeration issue: " . $e->getMessage(), $e);
 		} catch (InvalidLengthRange|InvalidNumberInterval $e) {

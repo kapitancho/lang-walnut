@@ -35,7 +35,7 @@ final readonly class MapKeyValue implements NativeMethod {
 			if ($parameterType instanceof FunctionType) {
 				$callbackParameterType = $parameterType->parameterType;
 				$expectedType = $typeRegistry->record([
-					'key' => $typeRegistry->string(),
+					'key' => $type->keyType,
 					'value' => $type->itemType
 				]);
 				if ($expectedType->isSubtypeOf($callbackParameterType)) {
@@ -46,6 +46,7 @@ final readonly class MapKeyValue implements NativeMethod {
 						$returnType,
 						$type->range->minLength,
 						$type->range->maxLength,
+						$type->keyType
 					);
 					return $errorType ? $typeRegistry->result($t, $errorType) : $t;
 				}

@@ -112,9 +112,10 @@ interface TypeRegistry {
 
 	/** @throws InvalidLengthRange */
 	public function map(
-		Type|null        $itemType = null,
+		Type|null               $itemType = null,
 		int|Number              $minLength = 0,
-		int|Number|PlusInfinity $maxLength = PlusInfinity::value
+		int|Number|PlusInfinity $maxLength = PlusInfinity::value,
+		Type|null               $keyType = null,
 	): MapType;
 
 	/** @throws InvalidLengthRange */

@@ -265,6 +265,7 @@ interface NodeBuilder {
 		Number|PlusInfinity $maxLength = PlusInfinity::value
 	): ArrayTypeNode;
 	public function mapType(
+		TypeNode|null $keyType = null,
 		TypeNode|null $itemType = null,
 		Number $minLength = new Number(0),
 		Number|PlusInfinity $maxLength = PlusInfinity::value

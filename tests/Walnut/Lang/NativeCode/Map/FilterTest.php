@@ -16,6 +16,15 @@ final class FilterTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[c: 5, d: 10, e: 5]", $result);
 	}
 
+	public function testFilterKeyType(): void {
+		$result = $this->executeCodeSnippet(
+			"fn[a: 1, b: 2];",
+			valueDeclarations: "fn = ^m: Map<String<1>:Integer> => Map<String<1>:Integer> :: 
+				m->filter(^v: Integer => Boolean :: v > 1);"
+		);
+		$this->assertEquals("[b: 2]", $result);
+	}
+
 	/* not yet supported
 	public function testFilterNonEmptyError(): void {
 		$result = $this->executeCodeSnippet("[1, 2, 5, 10, 5]->filter(^Integer => Result<Boolean, String> :: @'error');");

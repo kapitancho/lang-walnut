@@ -21,6 +21,24 @@ final class WithoutByKeyTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[element: 2, map: [a: 1, c: 5]]", $result);
 	}
 
+	public function testWithoutByKeyType(): void {
+		$result = $this->executeCodeSnippet(
+			"fn[a: 1, b: 2];",
+			valueDeclarations: "fn = ^m: Map<String<1>:Integer> => Result<[element: Integer, map: Map<String<1>:Integer>], MapItemNotFound> :: 
+				m->withoutByKey('a');"
+		);
+		$this->assertEquals("[element: 1, map: [b: 2]]", $result);
+	}
+
+	public function testWithoutByKeyTypeStringSubset(): void {
+		$result = $this->executeCodeSnippet(
+			"fn[a: 1, b: 2];",
+			valueDeclarations: "fn = ^m: Map<String['a', 'b']:Integer> => Result<[element: Integer, map: Map<String['b']:Integer>], MapItemNotFound> :: 
+				m->withoutByKey('a');"
+		);
+		$this->assertEquals("[element: 1, map: [b: 2]]", $result);
+	}
+
 	public function testWithoutByKeyInvalidParameterValue(): void {
 		$this->executeErrorCodeSnippet("Invalid parameter type",
 			"[a: 'a', b: 1, c: 2]->withoutByKey(15)");

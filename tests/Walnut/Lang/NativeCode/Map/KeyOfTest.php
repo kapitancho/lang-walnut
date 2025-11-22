@@ -15,4 +15,14 @@ final class KeyOfTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 5, d: 10, e: 5]->keyOf(5);");
 		$this->assertEquals("'c'", $result);
 	}
+
+	public function testKeyOfKeyType(): void {
+		$result = $this->executeCodeSnippet(
+			"fn[a: 1, b: 2];",
+			valueDeclarations: "fn = ^m: Map<String<1>:Integer> => Result<String<1>, ItemNotFound> :: 
+				m->keyOf(2);"
+		);
+		$this->assertEquals("'b'", $result);
+	}
+
 }

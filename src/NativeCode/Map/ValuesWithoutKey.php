@@ -19,9 +19,10 @@ use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
+use Walnut\Lang\Implementation\Type\Helper\SubsetTypeHelper;
 
 final readonly class ValuesWithoutKey implements NativeMethod {
-	use BaseType;
+	use BaseType, SubsetTypeHelper;
 
 	public function analyse(
 		TypeRegistry $typeRegistry,
@@ -35,6 +36,10 @@ final readonly class ValuesWithoutKey implements NativeMethod {
 		}
 		if ($targetType instanceof MapType) {
 			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
+				$keyType = $targetType->keyType;
+				if ($keyType instanceof StringSubsetType && $parameterType instanceof StringSubsetType) {
+					$keyType = $this->stringSubsetDiff($typeRegistry, $keyType, $parameterType);
+				}
 				return $typeRegistry->result(
 					$typeRegistry->map(
 						$targetType->itemType,
@@ -45,7 +50,8 @@ final readonly class ValuesWithoutKey implements NativeMethod {
 								$targetType->range->maxLength - 1
 							)),
 						$targetType->range->maxLength === PlusInfinity::value ?
-							PlusInfinity::value : max($targetType->range->maxLength - 1, 0)
+							PlusInfinity::value : max($targetType->range->maxLength - 1, 0),
+						$keyType
 					),
 					$typeRegistry->data(
 						new TypeNameIdentifier("MapItemNotFound")

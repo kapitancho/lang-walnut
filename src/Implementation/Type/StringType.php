@@ -4,6 +4,7 @@ namespace Walnut\Lang\Implementation\Type;
 
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Common\Range\LengthRange;
+use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Type\StringType as StringTypeInterface;
 use Walnut\Lang\Blueprint\Type\SupertypeChecker;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -22,6 +23,12 @@ final readonly class StringType implements StringTypeInterface, JsonSerializable
 
 	public function __toString(): string {
 		$range = (string)$this->range;
+		if (
+			$this->range->maxLength !== PlusInfinity::value &&
+			(string)$this->range->minLength === (string)$this->range->maxLength
+		) {
+			$range = (string)$this->range->minLength;
+		}
 		return sprintf("String%s", $range === '..' ? '' : "<$range>");
 	}
 

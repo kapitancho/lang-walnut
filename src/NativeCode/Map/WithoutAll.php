@@ -27,10 +27,12 @@ final readonly class WithoutAll implements NativeMethod {
 		$targetType = $this->toBaseType($targetType);
 		$targetType = $targetType instanceof RecordType ? $targetType->asMapType() : $targetType;
 		if ($targetType instanceof MapType) {
+			$keyType = $targetType->keyType;
 			return $typeRegistry->map(
 				$targetType->itemType,
 				0,
-				$targetType->range->maxLength
+				$targetType->range->maxLength,
+				$keyType
 			);
 		}
 		// @codeCoverageIgnoreStart

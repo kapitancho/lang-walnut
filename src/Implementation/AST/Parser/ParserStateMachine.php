@@ -2568,15 +2568,15 @@ final readonly class ParserStateMachine {
 						'Array' => 735,
 						'Set' => 827,
 						'Map' => 745,
-						'Type' => 755,
-						'Impure' => 760,
-						'Mutable' => 765,
-						'Result' => 775,
-						'Error' => 770,
+						'Type' => 756,
+						'Impure' => 761,
+						'Mutable' => 766,
+						'Result' => 776,
+						'Error' => 771,
 						'Shape' => 820,
 						'Any', 'Nothing', 'Boolean', 'True', 'False', 'Null',
 						'MutableValue', 'EnumerationValue' => 706,
-						default => 783
+						default => 784
 					};
 					$this->s->i++;
 				},
@@ -2591,14 +2591,14 @@ final readonly class ParserStateMachine {
 						'Set' => 827,
 						'Map' => 745,
 						'Shape' => 820,
-						'Type' => 755,
-						'Impure' => 760,
-						'Mutable' => 765,
-						'Error' => 770,
-						'Result' => 775,
+						'Type' => 756,
+						'Impure' => 761,
+						'Mutable' => 766,
+						'Error' => 771,
+						'Result' => 776,
 						'Any', 'Nothing', 'Boolean', 'True', 'False', 'Null',
 						'MutableValue', 'EnumerationValue' => 706,
-						default => 784
+						default => 785
 					};
 					$this->s->i++;
 				},
@@ -3076,6 +3076,7 @@ final readonly class ParserStateMachine {
 			751 => ['name' => 'type map return', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->mapType(
+						$this->s->result['keyType'] ?? null,
 						$this->s->result['type'] ?? $this->nodeBuilder->anyType,
 						isset($this->s->result['minLength']) ? new Number($this->s->result['minLength']) : new Number(0),
 						isset($this->s->result['maxLength']) ? new Number($this->s->result['maxLength']) : PlusInfinity::value
@@ -3083,24 +3084,35 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
-			752 => ['name' => 'type map return point', 'transitions' => [
+			752 => ['name' => 'type map return point key or item type', 'transitions' => [
+				T::colon->name => function(LT $token) {
+					$this->s->result['keyType'] = $this->s->generated;
+					$this->s->push(753);
+					$this->s->move(701);
+				},
 				'' => function(LT $token) {
 					$this->s->result['type'] = $this->s->generated;
-					$this->s->stay(753);
+					$this->s->stay(754);
 				}
 			]],
-			753 => ['name' => 'type map separator', 'transitions' => [
-				T::value_separator->name => 754,
+			753 => ['name' => 'type map return point item type', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->result['type'] = $this->s->generated;
+					$this->s->stay(754);
+				}
+			]],
+			754 => ['name' => 'type map separator', 'transitions' => [
+				T::value_separator->name => 755,
 				T::type_end->name => 751
 			]],
-			754 => ['name' => 'type map type or range', 'transitions' => [
+			755 => ['name' => 'type map type or range', 'transitions' => [
 				T::positive_integer_number->name => function(LT $token) {
 					$this->s->stay(747);
 				},
 				T::range_dots->name => 749,
 			]],
-			755 => ['name' => 'type type', 'transitions' => [
-				T::type_start->name => 756,
+			756 => ['name' => 'type type', 'transitions' => [
+				T::type_start->name => 757,
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->typeType(
 						$this->nodeBuilder->anyType
@@ -3108,7 +3120,7 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
-			756 => ['name' => 'type type type', 'transitions' => [
+			757 => ['name' => 'type type type', 'transitions' => [
 				T::type_keyword->name => function(LT $token) {
 					if (in_array($token->patternMatch->text, [
 						'Function', 'Tuple', 'Record', 'Union', 'Intersection', 'Atom', 'Enumeration',
@@ -3118,27 +3130,27 @@ final readonly class ParserStateMachine {
 						$this->s->result['type'] = $this->nodeBuilder->metaTypeType(
 							MetaTypeValue::from($token->patternMatch->text)
 						);
-						$this->s->move(758);
+						$this->s->move(759);
 						return;
 					}
-					$this->s->push(757);
+					$this->s->push(758);
 					$this->s->stay(701);
 				},
 				'' => function(LT $token) {
-					$this->s->push(757);
+					$this->s->push(758);
 					$this->s->stay(701);
 				},
 			]],
-			757 => ['name' => 'type type return point', 'transitions' => [
+			758 => ['name' => 'type type return point', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->result['type'] = $this->s->generated;
-					$this->s->stay(758);
+					$this->s->stay(759);
 				}
 			]],
-			758 => ['name' => 'type type separator', 'transitions' => [
-				T::type_end->name => 759
+			759 => ['name' => 'type type separator', 'transitions' => [
+				T::type_end->name => 760
 			]],
-			759 => ['name' => 'type type return', 'transitions' => [
+			760 => ['name' => 'type type return', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->typeType(
 						$this->s->result['type'] ?? $this->nodeBuilder->anyType,
@@ -3146,8 +3158,8 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
-			760 => ['name' => 'type impure', 'transitions' => [
-				T::type_start->name => 761,
+			761 => ['name' => 'type impure', 'transitions' => [
+				T::type_start->name => 762,
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->impureType(
 						$this->nodeBuilder->anyType
@@ -3155,22 +3167,22 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
-			761 => ['name' => 'type impure type', 'transitions' => [
+			762 => ['name' => 'type impure type', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->push(762);
+					$this->s->push(763);
 					$this->s->stay(701);
 				},
 			]],
-			762 => ['name' => 'type impure return point', 'transitions' => [
+			763 => ['name' => 'type impure return point', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->result['type'] = $this->s->generated;
-					$this->s->stay(763);
+					$this->s->stay(764);
 				}
 			]],
-			763 => ['name' => 'type impure separator', 'transitions' => [
-				T::type_end->name => 764
+			764 => ['name' => 'type impure separator', 'transitions' => [
+				T::type_end->name => 765
 			]],
-			764 => ['name' => 'type impure return', 'transitions' => [
+			765 => ['name' => 'type impure return', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->impureType(
 						$this->s->result['type'] ?? $this->nodeBuilder->anyType,
@@ -3178,8 +3190,8 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
-			765 => ['name' => 'type mutable', 'transitions' => [
-				T::type_start->name => 766,
+			766 => ['name' => 'type mutable', 'transitions' => [
+				T::type_start->name => 767,
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->mutableType(
 						$this->nodeBuilder->anyType
@@ -3187,22 +3199,22 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
-			766 => ['name' => 'type mutable type', 'transitions' => [
+			767 => ['name' => 'type mutable type', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->push(767);
+					$this->s->push(768);
 					$this->s->stay(701);
 				},
 			]],
-			767 => ['name' => 'type mutable return point', 'transitions' => [
+			768 => ['name' => 'type mutable return point', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->result['type'] = $this->s->generated;
-					$this->s->stay(768);
+					$this->s->stay(769);
 				}
 			]],
-			768 => ['name' => 'type mutable separator', 'transitions' => [
-				T::type_end->name => 769
+			769 => ['name' => 'type mutable separator', 'transitions' => [
+				T::type_end->name => 770
 			]],
-			769 => ['name' => 'type mutable return', 'transitions' => [
+			770 => ['name' => 'type mutable return', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->mutableType(
 						$this->s->result['type'] ?? $this->nodeBuilder->anyType,
@@ -3210,8 +3222,8 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
-			770 => ['name' => 'type error', 'transitions' => [
-				T::type_start->name => 771,
+			771 => ['name' => 'type error', 'transitions' => [
+				T::type_start->name => 772,
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->resultType(
 						$this->nodeBuilder->nothingType,
@@ -3220,22 +3232,22 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
-			771 => ['name' => 'type error type', 'transitions' => [
+			772 => ['name' => 'type error type', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->push(772);
+					$this->s->push(773);
 					$this->s->stay(701);
 				},
 			]],
-			772 => ['name' => 'type error return point', 'transitions' => [
+			773 => ['name' => 'type error return point', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->result['type'] = $this->s->generated;
-					$this->s->stay(773);
+					$this->s->stay(774);
 				}
 			]],
-			773 => ['name' => 'type error separator', 'transitions' => [
-				T::type_end->name => 774
+			774 => ['name' => 'type error separator', 'transitions' => [
+				T::type_end->name => 775
 			]],
-			774 => ['name' => 'type error return', 'transitions' => [
+			775 => ['name' => 'type error return', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->resultType(
 						$this->nodeBuilder->nothingType,
@@ -3244,8 +3256,8 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
-			775 => ['name' => 'type result', 'transitions' => [
-				T::type_start->name => 776,
+			776 => ['name' => 'type result', 'transitions' => [
+				T::type_start->name => 777,
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->resultType(
 						$this->nodeBuilder->anyType,
@@ -3254,41 +3266,41 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
-			776 => ['name' => 'type result type', 'transitions' => [
+			777 => ['name' => 'type result type', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->push(777);
+					$this->s->push(778);
 					$this->s->stay(701);
 				},
 			]],
-			777 => ['name' => 'type result return point', 'transitions' => [
+			778 => ['name' => 'type result return point', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->result['type'] = $this->s->generated;
-					$this->s->stay(778);
+					$this->s->stay(779);
 				}
 			]],
-			778 => ['name' => 'type result separator', 'transitions' => [
+			779 => ['name' => 'type result separator', 'transitions' => [
 				T::type_end->name => function(LT $token) {
 					$this->s->result['error_type'] = $this->nodeBuilder->anyType;
-					$this->s->stay(781);
+					$this->s->stay(782);
 				},
-				T::value_separator->name => 779
+				T::value_separator->name => 780
 			]],
-			779 => ['name' => 'type result error type', 'transitions' => [
+			780 => ['name' => 'type result error type', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->push(780);
+					$this->s->push(781);
 					$this->s->stay(701);
 				},
 			]],
-			780 => ['name' => 'type result error return point', 'transitions' => [
+			781 => ['name' => 'type result error return point', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->result['error_type'] = $this->s->generated;
-					$this->s->stay(781);
+					$this->s->stay(782);
 				}
 			]],
-			781 => ['name' => 'type result separator', 'transitions' => [
-				T::type_end->name => 782
+			782 => ['name' => 'type result separator', 'transitions' => [
+				T::type_end->name => 783
 			]],
-			782 => ['name' => 'type result return', 'transitions' => [
+			783 => ['name' => 'type result return', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->resultType(
 						$this->s->result['type'] ?? $this->nodeBuilder->anyType,
@@ -3297,8 +3309,8 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
-			783 => ['name' => 'type proxy basic', 'transitions' => [
-				T::tuple_start->name => 785,
+			784 => ['name' => 'type proxy basic', 'transitions' => [
+				T::tuple_start->name => 786,
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->proxyType(
 						new TypeNameIdentifier($this->s->result['typeName'])
@@ -3306,8 +3318,8 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
-			784 => ['name' => 'type basic', 'transitions' => [
-				T::tuple_start->name => 785,
+			785 => ['name' => 'type basic', 'transitions' => [
+				T::tuple_start->name => 786,
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->namedType(
 						new TypeNameIdentifier($this->s->result['typeName'])
@@ -3315,19 +3327,19 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
-			785 => ['name' => 'type enum subset value', 'transitions' => [
+			786 => ['name' => 'type enum subset value', 'transitions' => [
 				T::type_keyword->name => $c = function(LT $token) {
 					$this->s->result['subsetValues'] ??= [];
 					$this->s->result['subsetValues'][] = new EnumValueIdentifier($token->patternMatch->text);
-					$this->s->move(786);
+					$this->s->move(787);
 				},
 				T::var_keyword->name => $c
 			]],
-			786 => ['name' => 'type string subset separator', 'transitions' => [
-				T::value_separator->name => 785,
-				T::tuple_end->name => 787
+			787 => ['name' => 'type string subset separator', 'transitions' => [
+				T::value_separator->name => 786,
+				T::tuple_end->name => 788
 			]],
-			787 => ['name' => 'type string return', 'transitions' => [
+			788 => ['name' => 'type string return', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->enumerationSubsetType(
 						new TypeNameIdentifier($this->s->result['typeName']),
@@ -3336,8 +3348,8 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
-			788 => ['name' => 'type optional key', 'transitions' => [
-				T::type_start->name => 789,
+			789 => ['name' => 'type optional key', 'transitions' => [
+				T::type_start->name => 790,
 				'' => function(LT $token) {
 					$this->s->result['compositeValues'][$this->s->result['current_key']] =
 						$this->nodeBuilder->optionalKeyType(
@@ -3346,29 +3358,29 @@ final readonly class ParserStateMachine {
 					$this->s->stay(844);
 				},
 			]],
-			789 => ['name' => 'type optional type', 'transitions' => [
+			790 => ['name' => 'type optional type', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->push(790);
+					$this->s->push(791);
 					$this->s->stay(701);
 				},
 			]],
-			790 => ['name' => 'type optional return point', 'transitions' => [
+			791 => ['name' => 'type optional return point', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->result['type'] = $this->s->generated;
-					$this->s->stay(791);
+					$this->s->stay(792);
 				}
 			]],
-			791 => ['name' => 'type optional separator', 'transitions' => [
-				T::type_end->name => 792
+			792 => ['name' => 'type optional separator', 'transitions' => [
+				T::type_end->name => 793
 			]],
-			792 => ['name' => 'type optional return', 'transitions' => [
+			793 => ['name' => 'type optional return', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->result['compositeValues'][$this->s->result['current_key']] =
 						$this->nodeBuilder->optionalKeyType($this->s->generated);
 					$this->s->stay(844);
 				},
 			]],
-			793 => ['name' => 'type optional ? return point', 'transitions' => [
+			794 => ['name' => 'type optional ? return point', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->result['compositeValues'][$this->s->result['current_key']] =
 						$this->nodeBuilder->optionalKeyType($this->s->generated);
@@ -3604,14 +3616,14 @@ final readonly class ParserStateMachine {
 				T::optional_key->name => function(LT $token) {
 					$this->s->result['current_key'] ??=
                         $this->s->result['first_token']->patternMatch->text;
-					$this->s->push(793);
+					$this->s->push(794);
 					$this->s->move(701);
 				},
 				'' => function(LT $token) {
 					$this->s->result['current_key'] ??=
                         $this->s->result['first_token']->patternMatch->text;
 					if ($token->rule->tag === T::type_keyword->name && $token->patternMatch->text === 'OptionalKey') {
-						$this->s->move(788);
+						$this->s->move(789);
 						return;
 					}
 					$this->s->push(843);

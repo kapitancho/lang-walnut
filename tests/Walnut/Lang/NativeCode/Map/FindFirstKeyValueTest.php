@@ -16,6 +16,16 @@ final class FindFirstKeyValueTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[key: 'c', value: 5]", $result);
 	}
 
+
+	public function testFindFirstKeyValueKeyType(): void {
+		$result = $this->executeCodeSnippet(
+			"fn[a: 1, b: 2];",
+			valueDeclarations: "fn = ^m: Map<String<1>:Integer> => Map<String<1>:Integer> :: 
+				m->filterKeyValue(^[key: String<1>, value: Integer] => Boolean :: #value > #key->length);"
+		);
+		$this->assertEquals("[b: 2]", $result);
+	}
+
 	public function testFindFirstKeyValueInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet('Invalid parameter type', "[a: 1, b: 'a']->findFirstKeyValue(5);");
 	}

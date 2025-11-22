@@ -42,6 +42,7 @@ trait FlipMap {
                         $returnType,
 	                    $unique ? $targetType->range->minLength : min(1, $targetType->range->minLength),
                         $targetType->range->maxLength,
+	                    $itemType
                     );
                     return $errorType ? $typeRegistry->result($t, $errorType) : $t;
                 }

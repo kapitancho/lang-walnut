@@ -21,6 +21,24 @@ final class WithKeyValueTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[a: 'a', b: 5, c: 2]", $result);
 	}
 
+	public function testWithKeyValueKeyType(): void {
+		$result = $this->executeCodeSnippet(
+			"fn[a: 1, b: 2];",
+			valueDeclarations: "fn = ^m: Map<String<1>:Integer> => Map<String<1..2>:Integer> :: 
+				m->withKeyValue[key: 'cd', value: 3];"
+		);
+		$this->assertEquals("[a: 1, b: 2, cd: 3]", $result);
+	}
+
+	public function testWithKeyValueKeyTypeStringSubset(): void {
+		$result = $this->executeCodeSnippet(
+			"fn[a: 1, b: 2];",
+			valueDeclarations: "fn = ^m: Map<String['a', 'b']:Integer> => Map<String['a', 'b', 'cd']:Integer> :: 
+				m->withKeyValue[key: 'cd', value: 3];"
+		);
+		$this->assertEquals("[a: 1, b: 2, cd: 3]", $result);
+	}
+
 	public function testWithKeyValueAnyKey(): void {
 		$result = $this->executeCodeSnippet(
 			"f('f');",

@@ -33,9 +33,10 @@ final readonly class Flip implements NativeMethod {
 			$itemType = $targetType->itemType;
 			if ($itemType->isSubtypeOf($typeRegistry->string())) {
 				return $typeRegistry->map(
-					$typeRegistry->string(),
+					$targetType->keyType,
 					min(1, $targetType->range->minLength),
 					$targetType->range->maxLength,
+					$itemType
 				);
 			}
 		}
