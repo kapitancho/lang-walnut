@@ -28,6 +28,7 @@ trait FlipMap {
 		TypeRegistry $typeRegistry,
 		ArrayType|SetType $targetType,
 		Type $parameterType,
+		bool $unique
 	): MapType|ResultType {
 		$itemType = $targetType->itemType;
 		if ($itemType->isSubtypeOf($typeRegistry->string())) {
@@ -39,7 +40,7 @@ trait FlipMap {
                     $returnType = $r instanceof ResultType ? $r->returnType : $r;
                     $t = $typeRegistry->map(
                         $returnType,
-                        min(1, $targetType->range->minLength),
+	                    $unique ? $targetType->range->minLength : min(1, $targetType->range->minLength),
                         $targetType->range->maxLength,
                     );
                     return $errorType ? $typeRegistry->result($t, $errorType) : $t;

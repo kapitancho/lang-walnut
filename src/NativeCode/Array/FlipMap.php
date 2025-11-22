@@ -27,7 +27,7 @@ final readonly class FlipMap implements NativeMethod {
         $targetType = $this->toBaseType($targetType);
         $type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($type instanceof ArrayType) {
-			return $this->analyseHelper($typeRegistry, $type, $parameterType);
+			return $this->analyseHelper($typeRegistry, $type, $parameterType, false);
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
