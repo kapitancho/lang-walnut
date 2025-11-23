@@ -467,7 +467,7 @@ module my-service:
 /* No need to import core */
 UserId := Integer<1..>;                    /* Integer from core */
 UserName := String<1..100>;                /* String from core */
-Users := Map<UserId, String>;              /* Map from core */
+Users := Map<String:UserName>;             /* Map with string keys and UserName values */
 
 validateId = ^id: Any => Result<UserId, CastNotAvailable> :: {
     id->as(`UserId)  /* CastNotAvailable from core */

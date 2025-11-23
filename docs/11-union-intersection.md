@@ -182,10 +182,11 @@ config = [
     debug: true
 ];  /* Type: ConfigMap */
 
-/* Map with union key type */
-MixedKeyMap = Map<String | Integer, 1..10>;
+/* Map with union key type (union of string subtypes) */
+KeyType = String['config', 'status']|String<1..2>;
+UnionKeyMap = Map<KeyType:Integer, 1..10>;
 
-/* Merging maps with different value types */
+/* Merging maps with different value types (both have string keys) */
 merge = ^[map1: Map<String>, map2: Map<Integer>] => Map<String | Integer> :: {
     #map1->mergeWith(#map2)
 };

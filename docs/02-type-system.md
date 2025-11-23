@@ -16,7 +16,7 @@ y = 'hello';         /* Type: String (but can be assigned to Any) */
 z = [1, 2, 3];       /* Type: Tuple (but can be assigned to Any) */
 ```
 
-Types like `Array` and `Map` without explicit type parameters are actually `Array<Any>` and `Map<Any>`.
+Types like `Array` and `Map` without explicit type parameters are actually `Array<Any>` and `Map<String:Any>` (shorthand: `Map<Any>`).
 
 ### Nothing - The Bottom Type
 
@@ -289,26 +289,41 @@ values = [1, 2, 3, 4, 5];  /* Type: [Integer[1], Integer[2], Integer[3], Integer
 
 ### Map
 
-Unordered key-value collections with string keys and optional value type and length constraints.
+Unordered key-value collections with typed keys (must be string subtypes) and homogeneous values.
 
 **Syntax:**
-- `Map` - equivalent to `Map<Any>`
-- `Map<T>` - map with values of type T
-- `Map<min..max>` - map with length constraint
-- `Map<T, min..max>` - map with value type T and length constraint
+- `Map` - equivalent to `Map<String:Any>` (default string keys, any values)
+- `Map<T>` - equivalent to `Map<String:T>` (string keys, values of type T)
+- `Map<K:T>` - map with key type K (must be subtype of String) and value type T
+- `Map<min..max>` - map with length constraint (string keys, any values)
+- `Map<T, min..max>` - map with value type T and length constraint (string keys)
+- `Map<K:T, min..max>` - map with key type K, value type T, and length constraint
+
+**Key type constraints:**
+- Key type `K` must be a subtype of `String`
+- Valid key types: `String`, `String<min..max>`, `String[val1, val2, ...]`, or aliases/unions of these
+- Invalid: `Map<Integer:String>` (Integer is not a subtype of String)
 
 **Examples:**
 ```walnut
 /* Type annotations for function parameters/returns */
-/* userData: Map<String> */
-/* config: Map<Integer|String> */
-/* limitedMap: Map<Any, 1..10> */
+/* userData: Map<String> or Map<String:String> */
+/* config: Map<String:Integer|String> */
+/* limitedMap: Map<String:Any, 1..10> */
+/* statusMap: Map<String['active','pending']:Integer> */
 
 person = [name: 'Alice', city: 'NYC'];  /* Type: [name: String['Alice'], city: String['NYC']] */
+
+/* Maps with refined key types */
+ConfigKeys = String['host', 'port', 'debug'];
+config = [host: 'localhost', port: 5432, debug: true];
+/* Type: Map<ConfigKeys:String|Integer|Boolean, 3..3> */
 ```
 
 **Subtyping:**
-- `[a: Integer, b: Real, z: Boolean]` is a subtype of `Map<Real, 2..>`
+- `[a: Integer, b: Real, z: Boolean]` is a subtype of `Map<String:Real, 2..>`
+- Maps are covariant in their value type (like arrays)
+- Key type refinements are included in subtype checking
 
 ### Set
 

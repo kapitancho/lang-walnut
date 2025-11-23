@@ -13,57 +13,102 @@ Both types are immutable by default and support type refinements for enhanced ty
 
 ### 26.1.1 Basic Map Type
 
-Maps are collections of key-value pairs where keys are always strings and all values have the same type.
+Maps are collections of key-value pairs with typed keys and homogeneous values. Keys are strings by default but can be refined to specific string subtypes.
 
 **Syntax:**
 ```walnut
-Map<ValueType>
+Map<ValueType>                           /* Keys default to String */
+Map<KeyType:ValueType>                   /* Custom key type (must be subtype of String) */
 ```
 
 **Examples:**
 ```walnut
-/* Basic maps */
-ages = [alice: 30, bob: 25, charlie: 35];     /* Type: Map<Integer> */
-scores = [math: 95.5, english: 88.0];         /* Type: Map<Real> */
-flags = [debug: true, verbose: false];        /* Type: Map<Boolean> */
+/* Basic maps with default string keys */
+ages = [alice: 30, bob: 25, charlie: 35];     /* Type: Map<String:Integer> (or Map<Integer>) */
+scores = [math: 95.5, english: 88.0];         /* Type: Map<String:Real> (or Map<Real>) */
+flags = [debug: true, verbose: false];        /* Type: Map<String:Boolean> (or Map<Boolean>) */
 
 /* Empty map */
-empty = [:];                                  /* Type: Map<Any> */
+empty = [:];                                  /* Type: Map<String:Any> (or Map<Any>) */
+
+/* Maps with refined key types */
+statusMap = [active: 1, pending: 2];          /* Type: Map<String['active', 'pending']:Integer> */
+configMap = [host: 'localhost'];              /* Type: Map<String<1..>:String> */
 ```
 
-### 26.1.2 Map Type Refinements
+### 26.1.2 Map Key Types
+
+Map keys can be refined to specific string subtypes. This allows constraining what keys are valid in a map.
+
+**Key type syntax:**
+```walnut
+Map<KeyType:ValueType>      /* KeyType must be a subtype of String */
+```
+
+**KeyType must be a subtype of String. Valid examples include:**
+```walnut
+/* String aliases */
+MyString = String<2..5>;
+Map<MyString:Real>           /* Keys must be 2-5 character strings */
+
+/* Specific string values */
+Map<String['a', 'b', 'xyz']:Integer>   /* Only 'a', 'b', or 'xyz' allowed as keys */
+
+/* Length-constrained strings */
+Map<String<3..5>:Boolean>    /* Keys must be 3-5 characters long */
+
+/* Complex union types of string subtypes */
+Map<String['a', 'b']|String<4>:Any>    /* Keys can be 'a', 'b', or any 4-character string */
+```
+
+**Short form:**
+When the key type is exactly `String` and the value type is `Any`, you can use the short form `Map`:
+```walnut
+Map                          /* Shorthand for Map<String:Any> */
+```
+
+You **cannot** omit the value type if the key type is not `String`:
+```walnut
+Map<String<2>>               /* INVALID - cannot omit value type */
+Map<String<2>:Any>           /* VALID - must specify value type */
+```
+
+### 26.1.3 Map Type Refinements
 
 Maps can have constraints on size and value types.
 
 **Size constraints:**
 ```walnut
 /* Fixed size */
-ThreeStringValues = Map<String, 3>;           /* Exactly 3 entries */
-config = [host: 'localhost', port: 5432];     /* Type: Map<String | Integer, 2> */
+ThreeStringValues = Map<String:String, 3>;           /* Exactly 3 entries */
+config = [host: 'localhost', port: 5432];            /* Type: Map<String:String | Integer, 2> */
 
 /* Fixed size shorthand - Map<n> is shorthand for Map<n..n> */
-PairMap = Map<String, 2>;                     /* Exactly 2 entries (also Map<2..2>) */
-Triplet = Map<Integer, 3>;                    /* Exactly 3 entries (also Map<3..3>) */
+PairMap = Map<String:String, 2>;                     /* Exactly 2 entries (also Map<2..2>) */
+Triplet = Map<String:Integer, 3>;                    /* Exactly 3 entries (also Map<3..3>) */
 
 /* Minimum size */
-NonEmptyIntMap = Map<Integer, 1..>;           /* At least 1 entry */
+NonEmptyIntMap = Map<String:Integer, 1..>;           /* At least 1 entry */
 
 /* Range size */
-SmallStringMap = Map<String, 1..10>;          /* 1 to 10 entries */
+SmallStringMap = Map<String:String, 1..10>;          /* 1 to 10 entries */
 ```
 
 **Value type refinements:**
 ```walnut
 /* Maps with refined value types */
-AgeMap = Map<Integer<0..150>>;
-ScoreMap = Map<Real<0..100>>;
-EmailMap = Map<String<5..254>>;
+AgeMap = Map<String:Integer<0..150>>;
+ScoreMap = Map<String:Real<0..100>>;
+EmailMap = Map<String:String<5..254>>;
+
+/* With custom key types */
+StatusMap = Map<String['active', 'pending', 'archived']:Integer<0..100>>;
 
 ages = [alice: 30, bob: 25];                  /* Type: AgeMap */
 scores = [test1: 95.5, test2: 88.0];          /* Type: ScoreMap */
 ```
 
-### 26.1.3 Map Literals
+### 26.1.4 Map Literals
 
 **Syntax:**
 ```walnut
@@ -99,7 +144,7 @@ data = [
 ];
 ```
 
-## 26.2 Map Operations
+## 26.2 Map Operations (note: these examples use the shorthand syntax, but work equally with explicit key types)
 
 ### 26.2.1 Basic Properties
 

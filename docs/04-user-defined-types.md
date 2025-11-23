@@ -40,7 +40,7 @@ ShoppingCartProduct = [id: ProductId, title: String, price: ProductPrice];
 /* From http/message.nut */
 HttpRequestTarget = String;
 HttpResponseStatusCode = Integer<[101..103], [200..208], 226, [300..308], [400..418], 421, [422..426], 428, 429, 431, 451, [500..511]>;
-HttpHeaders = Map<Array<String, 1..>>;
+HttpHeaders = Map<String:Array<String, 1..>>;
 HttpMessageBody = String|Null;
 
 /* Function type aliases */

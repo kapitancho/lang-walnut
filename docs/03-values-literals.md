@@ -345,8 +345,8 @@ record->item('b')  /* Result: 2 */
 **Record as Map:**
 A record is a subtype of Map:
 ```walnut
-[a: 1, b: 2]               /* Can be used as Map<Integer, 2..2> */
-[a: 1, b: 'hi']            /* Can be used as Map<Integer|String, 2..2> */
+[a: 1, b: 2]               /* Can be used as Map<String:Integer, 2..2> */
+[a: 1, b: 'hi']            /* Can be used as Map<String:Integer|String, 2..2> */
 ```
 
 ## 3.6 Set Values

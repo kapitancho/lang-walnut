@@ -286,22 +286,26 @@ values = [1, 2, 3];
 
 ### 5.4.2 Map Length Constraints
 
-Maps can be refined with value type and length constraints.
+Maps can be refined with key type, value type, and length constraints.
 
 **Syntax:**
-- `Map<ValueType, min..max>` - map with value type and length
-- `Map<ValueType, min..>` - map with value type and minimum length
-- `Map<ValueType, ..max>` - map with value type and maximum length
-- `Map<ValueType>` - map with value type, any length
-- `Map<min..max>` - map with any value type and length constraint
-- `Map` - equivalent to `Map<Any>`
+- `Map<T, min..max>` - map with value type T and length constraint (string keys)
+- `Map<K:T, min..max>` - map with key type K, value type T, and length constraint
+- `Map<T, min..>` - map with value type T and minimum length (string keys)
+- `Map<K:T, min..>` - map with key type K, value type T, and minimum length
+- `Map<T, ..max>` - map with value type T and maximum length (string keys)
+- `Map<K:T, ..max>` - map with key type K, value type T, and maximum length
+- `Map<T>` - map with value type T, any length (string keys)
+- `Map<K:T>` - map with key type K and value type T, any length
+- `Map<min..max>` - map with any value type and length constraint (string keys)
+- `Map` - equivalent to `Map<String:Any>`
 
 **Examples:**
 ```walnut
-/* Configuration with 1-20 entries */
+/* Configuration with 1-20 entries (string keys) */
 Config = Map<String, 1..20>;
 
-/* Small lookup table */
+/* Small lookup table with integer values */
 LookupTable = Map<Integer, ..10>;
 
 /* Non-empty settings */
@@ -309,6 +313,14 @@ Settings = Map<String|Integer|Boolean, 1..>;
 
 /* User metadata */
 UserMetadata = Map<String<..100>, ..50>;
+
+/* Map with specific key values */
+StatusCode = String['success', 'pending', 'error'];
+StatusMap = Map<StatusCode:String, 1..3>;
+
+/* Map with refined key type */
+ServiceName = String<1..50>;
+ServiceMap = Map<ServiceName:Integer, ..100>;
 ```
 
 ### 5.4.3 Set Length Constraints
