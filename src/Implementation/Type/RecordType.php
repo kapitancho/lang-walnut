@@ -70,8 +70,12 @@ final readonly class RecordType implements RecordTypeInterface, JsonSerializable
 	}
 
 	private function isSubtypeOfMap(MapType $ofType): bool {
+		$keyType = $ofType->keyType;
 		$itemType = $ofType->itemType;
 		if (!$this->restType->isSubtypeOf($itemType)) {
+			return false;
+		}
+		if (!$this->typeRegistry->stringSubset(array_keys($this->types))->isSubtypeOf($keyType)) {
 			return false;
 		}
 		foreach($this->types as $type) {

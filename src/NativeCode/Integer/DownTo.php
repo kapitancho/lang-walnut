@@ -31,8 +31,8 @@ final readonly class DownTo implements NativeMethod {
 			if ($parameterType instanceof IntegerType) {
 				return $this->getFromToAsArray(
 					$typeRegistry,
-					$parameterType->numberRange,
-					$targetType->numberRange
+					$targetType->numberRange,
+					$parameterType->numberRange
 				);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));

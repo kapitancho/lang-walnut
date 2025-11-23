@@ -31,8 +31,8 @@ final readonly class UpTo implements NativeMethod {
 			if ($parameterType instanceof IntegerType) {
 				return $this->getFromToAsArray(
 					$typeRegistry,
-					$targetType->numberRange,
-					$parameterType->numberRange
+					$parameterType->numberRange,
+					$targetType->numberRange
 				);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
