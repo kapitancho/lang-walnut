@@ -120,7 +120,7 @@ final readonly class NumberInterval implements NumberIntervalInterface {
 		$e = $i1->end->value;
 		$s = $i2->start->value;
 		if ($asIntegerInterval) {
-			$e = $e->floor() + ($i1->end->inclusive && $i2->start->inclusive ? 1 : 0);
+			$e = $e->floor()->add($i1->end->inclusive && $i2->start->inclusive ? 1 : 0);
 			$s = $s->ceil();
 		}
 		return !(

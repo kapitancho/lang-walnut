@@ -8,7 +8,6 @@ use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder;
-use Walnut\Lang\Blueprint\Program\Builder\ScopeBuilder as ScopeBuilderInterface;
 use Walnut\Lang\Blueprint\Program\Builder\TypeRegistryBuilder;
 use Walnut\Lang\Blueprint\Program\ProgramContext as ProgramContextInterface;
 use Walnut\Lang\Blueprint\Program\Program as ProgramInterface;

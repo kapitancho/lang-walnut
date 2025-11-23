@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Implementation\Compilation\Module;
 
 use PHPUnit\Framework\TestCase;
-use Walnut\Lang\Implementation\Compilation\Module\Precompiler\TestPrecompiler;
 use Walnut\Lang\Implementation\Compilation\Module\SourceFinder\CompositeSourceFinder;
 use Walnut\Lang\Implementation\Compilation\Module\SourceFinder\InMemorySourceFinder;
 

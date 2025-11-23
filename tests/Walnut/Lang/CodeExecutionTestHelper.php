@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Test;
 
 use PHPUnit\Framework\TestCase;
-use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Compilation\AST\AstProgramCompilationException;
 use Walnut\Lang\Blueprint\Compilation\AST\AstProgramCompiler;
 use Walnut\Lang\Blueprint\Compilation\Module\ModuleLookupContext;

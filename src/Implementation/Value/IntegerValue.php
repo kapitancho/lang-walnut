@@ -5,13 +5,11 @@ namespace Walnut\Lang\Implementation\Value;
 use BcMath\Number;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
-use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType as IntegerSubsetTypeInterface;
 use Walnut\Lang\Blueprint\Value\IntegerValue as IntegerValueInterface;
 use Walnut\Lang\Blueprint\Value\RealValue as RealValueInterface;
 use Walnut\Lang\Blueprint\Value\Value;
-use Walnut\Lang\Implementation\Type\IntegerSubsetType;
 
 final class IntegerValue implements IntegerValueInterface, JsonSerializable {
 

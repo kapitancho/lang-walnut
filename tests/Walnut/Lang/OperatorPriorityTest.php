@@ -2,8 +2,6 @@
 
 namespace Walnut\Lang\Test;
 
-use Walnut\Lang\Test\CodeExecutionTestHelper;
-
 final class OperatorPriorityTest extends CodeExecutionTestHelper {
 	public function test1(): void {
 		$result = $this->executeCodeSnippet('2 + 3 + 4;');

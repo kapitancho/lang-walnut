@@ -5,7 +5,6 @@ namespace Walnut\Lang\Test\Implementation\Expression;
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Implementation\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Implementation\Code\Execution\ExecutionContext;
 use Walnut\Lang\Implementation\Code\Expression\ConstantExpression;

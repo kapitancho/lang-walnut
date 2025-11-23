@@ -6,7 +6,6 @@ use BcMath\Number;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Common\Range\InvalidLengthRange;
 use Walnut\Lang\Blueprint\Common\Range\LengthRange as LengthRangeInterface;
-use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 
 final readonly class LengthRange implements LengthRangeInterface, JsonSerializable {

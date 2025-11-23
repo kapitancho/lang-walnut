@@ -6,7 +6,6 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Code\Scope\UnknownContextVariable;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\FunctionBody;

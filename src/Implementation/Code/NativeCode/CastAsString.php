@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Implementation\Code\NativeCode;
 
 use BcMath\Number;
-use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Type\AliasType;

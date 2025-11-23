@@ -10,7 +10,6 @@ use Walnut\Lang\Blueprint\Type\MutableType as MutableTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\MutableValue as MutableValueInterface;
 use Walnut\Lang\Blueprint\Value\Value;
-use Walnut\Lang\Implementation\Type\MutableType;
 
 final class MutableValue implements MutableValueInterface, JsonSerializable {
 

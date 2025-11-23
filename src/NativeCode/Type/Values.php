@@ -59,14 +59,6 @@ final readonly class Values implements NativeMethod {
 					$refType instanceof StringSubsetType ||
 					$refType instanceof EnumerationSubsetType
 				) {
-					$t = match(true) {
-						$refType instanceof IntegerSubsetType => $typeRegistry->integer(),
-						$refType instanceof RealSubsetType => $typeRegistry->real(),
-						$refType instanceof StringSubsetType => $typeRegistry->string(),
-						$refType instanceof EnumerationSubsetType => $typeRegistry->enumeration(
-							$refType->enumeration->name,
-						),
-					};
 					$l = count($refType->subsetValues);
 					return $typeRegistry->array($refType, $l, $l);
 				}

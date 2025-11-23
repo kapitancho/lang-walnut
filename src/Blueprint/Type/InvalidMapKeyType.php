@@ -3,8 +3,6 @@
 namespace Walnut\Lang\Blueprint\Type;
 
 use InvalidArgumentException;
-use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 
 final class InvalidMapKeyType extends InvalidArgumentException {
     public function __construct(

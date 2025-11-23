@@ -12,7 +12,6 @@ use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Implementation\Common\Range\NumberInterval;
 use Walnut\Lang\Implementation\Common\Range\NumberIntervalEndpoint;
-use Walnut\Lang\Test\BaseProgramTestHelper;
 
 final class JsonEncodeTest extends BaseProgramTestHelper {
 

@@ -4,7 +4,6 @@ namespace Walnut\Lang\Test\Implementation\Registry;
 
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Test\Implementation\BaseProgramTestHelper;
 

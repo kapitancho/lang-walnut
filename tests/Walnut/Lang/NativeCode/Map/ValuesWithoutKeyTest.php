@@ -39,6 +39,15 @@ final class ValuesWithoutKeyTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[b: 2]", $result);
 	}
 
+	public function testValuesWithoutKeyTypeStringEmptySubset(): void {
+		$result = $this->executeCodeSnippet(
+			"fn[a: 1];",
+			valueDeclarations: "fn = ^m: Map<String['a']:Integer> => Result<Map<Nothing:Integer>, MapItemNotFound> :: 
+				m->valuesWithoutKey('a');"
+		);
+		$this->assertEquals("[:]", $result);
+	}
+
 	public function testValuesWithoutKeyInvalidParameterValue(): void {
 		$this->executeErrorCodeSnippet("Invalid parameter type",
 			"[a: 'a', b: 1, c: 2]->valuesWithoutKey(15)");

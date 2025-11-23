@@ -2,8 +2,6 @@
 
 namespace Walnut\Lang\Test;
 
-use Walnut\Lang\Test\CodeExecutionTestHelper;
-
 final class SealedBaseValueTest extends CodeExecutionTestHelper {
 	public function test1(): void {
 		$result = $this->executeCodeSnippet('t = S[a: 1, b: 2]; t->d;',

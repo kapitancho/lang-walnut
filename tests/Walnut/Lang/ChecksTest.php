@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Test;
 
 use InvalidArgumentException;
-use Walnut\Lang\Test\BaseProgramTestHelper;
 
 class ChecksTest extends BaseProgramTestHelper {
 

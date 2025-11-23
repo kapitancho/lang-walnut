@@ -16,7 +16,6 @@ use Walnut\Lang\Blueprint\Program\ProgramAnalyserException;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Implementation\Compilation\Compiler;
-use Walnut\Lang\Implementation\Compilation\Module\PackageConfiguration\JsonFilePackageConfigurationProvider;
 use Walnut\Lang\Implementation\Compilation\Module\PackageConfiguration\PackageConfiguration;
 use Walnut\Lang\Implementation\Compilation\Module\Precompiler\EmptyPrecompiler;
 use Walnut\Lang\Implementation\Compilation\Module\Precompiler\TemplatePrecompiler;
@@ -51,7 +50,7 @@ final class CompilerTest extends TestCase {
 
 	public function testBrokenCompilation(): void {
 		$this->expectException(ModuleDependencyException::class);
-		$result = $this->compiler->compile('missing');
+		$this->compiler->compile('missing');
 	}
 
 	public function testBrokenSafeCompilationMissing(): void {
@@ -129,7 +128,6 @@ final class CompilerTest extends TestCase {
 			$isExecutable = preg_match('/^(cast\d+|demo-\w+|nwk-\w+|lang-[\w\-]+)$/', $source);
 			if ($isExecutable) {
 				$program = $compilationResult->program;
-				$tr = $compilationResult->programContext->typeRegistry;
 				$vr = $compilationResult->programContext->valueRegistry;
 				$ep = $program->getEntryPoint(new TypeNameIdentifier('CliEntryPoint'));
 				/*$ep = $program->getEntryPoint(

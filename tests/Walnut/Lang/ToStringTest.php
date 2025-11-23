@@ -9,7 +9,6 @@ use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
-use Walnut\Lang\Test\BaseProgramTestHelper;
 
 final class ToStringTest extends BaseProgramTestHelper {
 

@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Implementation\Type;
 
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Test\Implementation\BaseProgramTestHelper;
 

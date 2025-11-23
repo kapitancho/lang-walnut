@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Test\Implementation\Program\EntryPoint;
 
-use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Compilation\Module\ModuleLookupContext;
 use Walnut\Lang\Blueprint\Program\EntryPoint\Http\Message\HttpProtocolVersion;
 use Walnut\Lang\Blueprint\Program\EntryPoint\Http\Message\HttpRequestMethod;

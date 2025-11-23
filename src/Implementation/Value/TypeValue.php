@@ -4,7 +4,6 @@ namespace Walnut\Lang\Implementation\Value;
 
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
-use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\TypeType;

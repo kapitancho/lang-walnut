@@ -5,12 +5,10 @@ namespace Walnut\Lang\Implementation\Value;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
-use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\StringSubsetType as StringSubsetTypeInterface;
 use Walnut\Lang\Blueprint\Value\StringValue as StringValueInterface;
 use Walnut\Lang\Blueprint\Value\Value;
-use Walnut\Lang\Implementation\Type\StringSubsetType;
 
 final class StringValue implements StringValueInterface, JsonSerializable {
 
