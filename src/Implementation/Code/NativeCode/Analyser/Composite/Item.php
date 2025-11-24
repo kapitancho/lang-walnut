@@ -11,6 +11,7 @@ use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
@@ -98,15 +99,18 @@ trait Item {
 
 	private function analyseMapItem(
 		TypeRegistry $typeRegistry,
-		IntersectionType|MapType|RecordType|MetaType $targetType,
+		IntersectionType|MapType|RecordType|MetaType|AliasType $targetType,
 		Type $parameterType
 	): Type {
+		if ($targetType instanceof AliasType) {
+			$targetType = $this->toBaseType($targetType);
+		}
 		if ($targetType instanceof IntersectionType) {
 			//TODO: this is not a long-term fix.
 			/** @var list<MapType|RecordType|MetaType> $intersectionTypes */
 			$intersectionTypes = $targetType->types;
 			$types = array_map(
-				fn(MapType|RecordType|MetaType $type) => $this->analyseMapItem($typeRegistry, $type, $parameterType),
+				fn(MapType|RecordType|MetaType|AliasType $type) => $this->analyseMapItem($typeRegistry, $type, $parameterType),
 				$intersectionTypes
 			);
 			return $typeRegistry->intersection($types);

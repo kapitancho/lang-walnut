@@ -33,6 +33,7 @@
         "bin/walnut-cli",
         "bin/walnut-init-project",
         "bin/walnut-test",
+        "bin/walnut-analyse",
         "bin/walnut-http"
     ]
 }
