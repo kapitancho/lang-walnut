@@ -64,6 +64,24 @@ final class ItemTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@MapItemNotFound![key: 'r']", $result);
 	}
 
+	public function testItemIntersection(): void {
+		$result = $this->executeCodeSnippet("getSb[a: 'hello', b: 10, c: 15, d: false];",
+			"
+				R = [a: String, b: Integer, c: Integer<5..20>, ... Any];
+				Q = [b: Real, c: Integer<10..30>, d: Boolean, ... Any];
+				S = R & Q;
+			",
+			"getSb = ^ ~S => Integer :: s.b;");
+		$this->assertEquals("10", $result);
+	}
+
+	public function testItemInvalidKeyType(): void {
+		$this->executeErrorCodeSnippet(
+			"Map<String<2>:Real> expected",
+			"f[xy: 3.14, wrong: -1.25];",
+			valueDeclarations: "f = ^m: Map<String<2>:Real> => Real :: m->values->sum;");
+	}
+
 	public function testItemInvalidParameterValue(): void {
 		$this->executeErrorCodeSnippet("Invalid parameter type",
 			"[a: 'a', b: 1, c: 2]->item(5)");
