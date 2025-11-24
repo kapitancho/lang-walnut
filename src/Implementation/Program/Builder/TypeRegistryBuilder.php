@@ -284,7 +284,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 	 * @throws DuplicateSubsetValue
 	 */
 	public function stringSubset(array $values): StringSubsetType {
-		return new StringSubsetType($this->escapeCharHandler, $values);
+		return new StringSubsetType($this, $this->escapeCharHandler, $values);
 	}
 
     public function optionalKey(Type $valueType): OptionalKeyType {

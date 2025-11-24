@@ -818,6 +818,52 @@ class ParserTest extends TestCase {
 			$e->parameter->values['a'] instanceof VariableNameExpressionNode && $e->parameter->values['a']->variableName->equals(new VariableNameIdentifier('x')) &&
 			$e->parameter->values['b'] instanceof VariableNameExpressionNode && $e->parameter->values['b']->variableName->equals(new VariableNameIdentifier('y'))];
 
+		yield ['c[a: 1].a', PropertyAccessExpressionNode::class, fn(PropertyAccessExpressionNode $e) =>
+			$e->target instanceof FunctionCallExpressionNode &&
+			$e->target->target instanceof VariableNameExpressionNode &&
+			$e->target->target->variableName->equals(new VariableNameIdentifier('c')) &&
+			$e->target->parameter instanceof RecordExpressionNode &&
+			count($e->target->parameter->values) === 1 &&
+			$e->target->parameter->values['a'] instanceof ConstantExpressionNode &&
+			$e->target->parameter->values['a']->value instanceof IntegerValueNode &&
+			(string)$e->target->parameter->values['a']->value->value === '1' &&
+			$e->propertyName === 'a'];
+		yield ['c[a: 1]->a', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof FunctionCallExpressionNode &&
+			$e->target->target instanceof VariableNameExpressionNode &&
+			$e->target->target->variableName->equals(new VariableNameIdentifier('c')) &&
+			$e->target->parameter instanceof RecordExpressionNode &&
+			count($e->target->parameter->values) === 1 &&
+			$e->target->parameter->values['a'] instanceof ConstantExpressionNode &&
+			$e->target->parameter->values['a']->value instanceof IntegerValueNode &&
+			(string)$e->target->parameter->values['a']->value->value === '1' &&
+			$e->methodName->equals(new MethodNameIdentifier('a')) &&
+			$e->parameter instanceof ConstantExpressionNode && $e->parameter->value instanceof NullValueNode];
+		yield ['c[a: 1]=>a', NoErrorExpressionNode::class, fn(NoErrorExpressionNode $e) =>
+			$e->targetExpression instanceof MethodCallExpressionNode &&
+			$e->targetExpression->target instanceof FunctionCallExpressionNode &&
+			$e->targetExpression->target->target instanceof VariableNameExpressionNode &&
+			$e->targetExpression->target->target->variableName->equals(new VariableNameIdentifier('c')) &&
+			$e->targetExpression->target->parameter instanceof RecordExpressionNode &&
+			count($e->targetExpression->target->parameter->values) === 1 &&
+			$e->targetExpression->target->parameter->values['a'] instanceof ConstantExpressionNode &&
+			$e->targetExpression->target->parameter->values['a']->value instanceof IntegerValueNode &&
+			(string)$e->targetExpression->target->parameter->values['a']->value->value === '1' &&
+			$e->targetExpression->methodName->equals(new MethodNameIdentifier('a')) &&
+			$e->targetExpression->parameter instanceof ConstantExpressionNode && $e->targetExpression->parameter->value instanceof NullValueNode];
+		yield ['c[a: 1]|>a', NoExternalErrorExpressionNode::class, fn(NoExternalErrorExpressionNode $e) =>
+			$e->targetExpression instanceof MethodCallExpressionNode &&
+			$e->targetExpression->target instanceof FunctionCallExpressionNode &&
+			$e->targetExpression->target->target instanceof VariableNameExpressionNode &&
+			$e->targetExpression->target->target->variableName->equals(new VariableNameIdentifier('c')) &&
+			$e->targetExpression->target->parameter instanceof RecordExpressionNode &&
+			count($e->targetExpression->target->parameter->values) === 1 &&
+			$e->targetExpression->target->parameter->values['a'] instanceof ConstantExpressionNode &&
+			$e->targetExpression->target->parameter->values['a']->value instanceof IntegerValueNode &&
+			(string)$e->targetExpression->target->parameter->values['a']->value->value === '1' &&
+			$e->targetExpression->methodName->equals(new MethodNameIdentifier('a')) &&
+			$e->targetExpression->parameter instanceof ConstantExpressionNode && $e->targetExpression->parameter->value instanceof NullValueNode];
+
 		yield ['a=>b', NoErrorExpressionNode::class, fn(NoErrorExpressionNode $e) =>
 			$e->targetExpression instanceof MethodCallExpressionNode &&
 			$e->targetExpression->target instanceof VariableNameExpressionNode && $e->targetExpression->target->variableName->equals(new VariableNameIdentifier('a')) &&

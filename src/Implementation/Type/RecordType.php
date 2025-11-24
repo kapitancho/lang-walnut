@@ -75,7 +75,9 @@ final readonly class RecordType implements RecordTypeInterface, JsonSerializable
 		if (!$this->restType->isSubtypeOf($itemType)) {
 			return false;
 		}
-		if (!$this->typeRegistry->stringSubset(array_keys($this->types))->isSubtypeOf($keyType)) {
+		if (count($this->types) && !$this->typeRegistry->stringSubset(
+			array_map(strval(...), array_keys($this->types))
+		)->isSubtypeOf($keyType)) {
 			return false;
 		}
 		foreach($this->types as $type) {

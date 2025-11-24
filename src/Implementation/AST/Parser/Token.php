@@ -17,7 +17,6 @@ enum Token: string {
 	case expression_separator = '\;';
 	case value_separator = '\,';
 	case atom_type = '\:\(\)';
-	case enum_type_start = '\:\(';
 	case named_type = '\:\=';
 	case colon = '\:';
 	case type_proxy_keyword = '\\\\[A-Z][a-zA-Z0-9_]*';

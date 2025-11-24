@@ -11,8 +11,8 @@ use Walnut\Lang\Blueprint\AST\Node\Expression\NoErrorExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\NoExternalErrorExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\PropertyAccessExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\SequenceExpressionNode;
-use Walnut\Lang\Blueprint\AST\Node\Type\IntersectionTypeNode;
-use Walnut\Lang\Blueprint\AST\Node\Type\UnionTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\IntersectionTypeNode as IntersectionTypeNodeInterface;
+use Walnut\Lang\Blueprint\AST\Node\Type\UnionTypeNode as UnionTypeNodeInterface;
 use Walnut\Lang\Blueprint\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Blueprint\AST\Parser\ParserState as ParserStateInterface;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
@@ -23,6 +23,8 @@ use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Implementation\AST\Node\SourceLocation;
+use Walnut\Lang\Implementation\AST\Node\Type\IntersectionTypeNode;
+use Walnut\Lang\Implementation\AST\Node\Type\UnionTypeNode;
 use Walnut\Lang\Implementation\AST\Parser\Token as T;
 use Walnut\Lang\Implementation\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lib\Walex\PatternMatch;
@@ -105,12 +107,6 @@ final readonly class ParserStateMachine {
 				T::tuple_start->name => 130,
 			]],
 			104 => ['name' => 'module level type assignment', 'transitions' => [
-				//T::atom_type->name => 105,
-				/*T::enum_type_start->name => function(LT $token) {
-					$this->s->result['enumerationValues'] = [];
-					$this->s->move(106);
-				},*/
-				//T::colon->name => 111,
 				T::type_keyword->name => $c = function(LT $token) {
 					$this->s->push(126);
 					$this->s->stay(701);
@@ -864,7 +860,7 @@ final readonly class ParserStateMachine {
 					} else {
 						$this->s->generated = $this->nodeBuilder->constructorCall(
 							new TypeNameIdentifier($this->s->result['type_name']),
-							$this->s->generated
+							$g
 						);
 					}
 					$this->s->pop();
@@ -1445,10 +1441,56 @@ final readonly class ParserStateMachine {
 				T::call_start->name => $c,
 				T::tuple_start->name => $c,*/
 				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->functionCall(
-						$this->s->result['expression_left'],
-						$this->s->generated
-					);
+					$g = $this->s->generated;
+					// This "hack" is need to flip the priorities so that T[...]->method
+					// is {T[...]}->method instead of T([...]->method)
+					// Same for T[...]=>method , T[...]|>method and T[...].property
+					if ($g instanceof NoErrorExpressionNode && $g->targetExpression instanceof MethodCallExpressionNode) {
+						$this->s->generated = $this->nodeBuilder->noError(
+							$this->nodeBuilder->methodCall(
+								$this->nodeBuilder->functionCall(
+									$this->s->result['expression_left'],
+									$g->targetExpression->target
+								),
+								$g->targetExpression->methodName,
+								$g->targetExpression->parameter
+							)
+						);
+					} elseif ($g instanceof NoExternalErrorExpressionNode && $g->targetExpression instanceof MethodCallExpressionNode) {
+						$this->s->generated = $this->nodeBuilder->noExternalError(
+							$this->nodeBuilder->methodCall(
+								$this->nodeBuilder->functionCall(
+									$this->s->result['expression_left'],
+									$g->targetExpression->target
+								),
+								$g->targetExpression->methodName,
+								$g->targetExpression->parameter
+							)
+						);
+					} elseif ($g instanceof PropertyAccessExpressionNode) {
+						$this->s->generated = $this->nodeBuilder->propertyAccess(
+							$this->nodeBuilder->functionCall(
+								$this->s->result['expression_left'],
+								$g->target
+							),
+							$g->propertyName,
+						);
+					} elseif ($g instanceof MethodCallExpressionNode) {
+						$this->s->generated = $this->nodeBuilder->methodCall(
+							$this->nodeBuilder->functionCall(
+								$this->s->result['expression_left'],
+								$g->target
+							),
+							$g->methodName,
+							$g->parameter
+						);
+					} else {
+						$this->s->generated = $this->nodeBuilder->functionCall(
+							$this->s->result['expression_left'],
+							$g
+						);
+					}
+
 					$this->s->pop();
 				}
 			]],
@@ -2706,8 +2748,8 @@ final readonly class ParserStateMachine {
 
 					//Temporary hack fixing (A|B) to include the brackets
 					if ($this->s->result['startPosition'] ?? null) {
-						if ($g instanceof UnionTypeNode) {
-							$this->s->generated = new \Walnut\Lang\Implementation\AST\Node\Type\UnionTypeNode(
+						if ($g instanceof UnionTypeNodeInterface) {
+							$this->s->generated = new UnionTypeNode(
 								new SourceLocation(
 									$g->sourceLocation->moduleName,
 									$this->s->result['startPosition'],
@@ -2716,8 +2758,8 @@ final readonly class ParserStateMachine {
 								$g->left,
 								$g->right
 							);
-						} elseif ($g instanceof IntersectionTypeNode) {
-							$this->s->generated = new \Walnut\Lang\Implementation\AST\Node\Type\IntersectionTypeNode(
+						} elseif ($g instanceof IntersectionTypeNodeInterface) {
+							$this->s->generated = new IntersectionTypeNode(
 								new SourceLocation(
 									$g->sourceLocation->moduleName,
 									$this->s->result['startPosition'],

@@ -7,6 +7,7 @@ use InvalidArgumentException;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Blueprint\Common\Range\LengthRange as LengthRangeInterface;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\StringSubsetType as StringSubsetTypeInterface;
 use Walnut\Lang\Blueprint\Type\StringType as StringTypeInterface;
@@ -20,6 +21,7 @@ final class StringSubsetType implements StringSubsetTypeInterface, JsonSerializa
 
 	/** @param list<string> $subsetValues */
     public function __construct(
+		private readonly TypeRegistry $typeRegistry,
 		private readonly EscapeCharHandler $escapeCharHandler,
         public readonly array $subsetValues
     ) {
@@ -58,6 +60,13 @@ final class StringSubsetType implements StringSubsetTypeInterface, JsonSerializa
                 self::isInRange($this->subsetValues, $ofType->range),
             $ofType instanceof StringSubsetTypeInterface =>
                 self::isSubset($this->subsetValues, $ofType->subsetValues),
+
+	        // Ugly case where a String[...] subset type is checked against a union of String types
+	        // represented in different ways, e.g. String['a', 'b']|String<2..3>
+	        count($this->subsetValues) > 1 && $ofType->isSubtypeOf($this->typeRegistry->string()) => array_all(
+		        $this->subsetValues,
+		        fn(string $value) => $this->typeRegistry->stringSubset([$value])->isSubtypeOf($ofType)
+	        ),
             $ofType instanceof SupertypeChecker => $ofType->isSupertypeOf($this),
             default => false
         };
