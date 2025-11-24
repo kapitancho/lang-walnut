@@ -1432,6 +1432,17 @@ Set<T <: String>->flipMap(^T => R => Map<R>)
 ['a'; 'bcd'; 'ef']->flipMap(^String => Integer :: #->length); /* [a: 1, bcd: 3, ef: 2] */
 ```
 
+**`flip`** - Convert to Map with elements as keys and indices as values
+```walnut
+Set<T <: String>->flip(Null => Map<T:Integer<0..max>, min..max>)
+
+/* For Set<String, 2..3>, returns Map<String:Integer<0..3>, 2..3> */
+['a'; 'b']->flip;  /* [a: 0, b: 1] */
+['x'; 'y'; 'z']->flip;  /* [x: 0, y: 1, z: 2] */
+```
+
+- Unlike Array->flip, the returned map always has exactly as many entries as the set size, since Set elements are guaranteed to be unique.
+
 **`filter`** - Filter elements
 ```walnut
 Set<T>->filter(^T => Boolean => Set<T>)
