@@ -41,15 +41,26 @@ final class ProxyNamedType implements ProxyNamedTypeInterface, SupertypeChecker,
 
 
 	public function isSupertypeOf(Type $ofType): bool {
-		//$t = $this->getActualType();
+		//TODO - another temporary solution
+		static $pairs = [];
+		static $pending = [];
+		$pair = "{$this} vs {$ofType}";
+		if (isset($pairs[$pair])) {
+			return $pairs[$pair];
+		}
+		if (isset($pending[$pair])) {
+			return false;
+		}
+		$pending[$pair] = true;
+
 		//TODO - fix the endless recursion
 		if (count(debug_backtrace()) > 150) {
 			return false;
 		}
-		//if (!($t instanceof SupertypeChecker)) {
-			return $ofType->isSubtypeOf($this->actualType);
-		//}
-		//return false;
+		$result = $ofType->isSubtypeOf($this->actualType);
+		$pairs[$pair] = $result;
+		unset($pending[$pair]);
+		return $result;
 	}
 	// @codeCoverageIgnoreEnd
 }

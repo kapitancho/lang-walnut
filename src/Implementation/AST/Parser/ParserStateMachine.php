@@ -181,6 +181,7 @@ final readonly class ParserStateMachine {
 					$this->s->stay(701);
 				},
 				T::arithmetic_op_multiply->name => $c,
+				T::type_proxy_keyword->name => $c,
 				T::type_keyword->name => $c,
 				T::sequence_start->name => $c,
 				T::lambda_param->name => $c,
@@ -3439,6 +3440,8 @@ final readonly class ParserStateMachine {
 					$this->s->stay(701);
 				},
 				T::arithmetic_op_multiply->name => $c,
+				T::type_proxy_keyword->name => $c,
+				T::call_start->name => $c,
 				T::sequence_start->name => $c, //Shape<T>
 				T::tuple_start->name => $c,
 				T::empty_tuple->name => $c,
@@ -3460,6 +3463,8 @@ final readonly class ParserStateMachine {
 					$this->s->push(818);
 					$this->s->stay(701);
 				},
+				T::type_proxy_keyword->name => $c,
+				T::call_start->name => $c,
 				T::sequence_start->name => $c, //Shape<T>
 				T::type_keyword->name => $c,
 				T::tuple_start->name => $c,
@@ -3628,6 +3633,7 @@ final readonly class ParserStateMachine {
 					$this->s->result['first_token'] = $token;
 					$this->s->move(840);
 				},
+				T::type_proxy_keyword->name => $t,
 				T::arithmetic_op_multiply->name => $t,
 				T::sequence_start->name => $t, //Shape<T>
 				T::word->name => $c = function(LT $token) {

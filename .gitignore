@@ -8,6 +8,7 @@ dev
 db.sqlite
 walnut-src
 CLAUDE.md
+CLAUDE-WALNUT.md
 build
 coverage.xml
 coverage-report/
