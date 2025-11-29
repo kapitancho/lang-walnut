@@ -29,14 +29,14 @@ final readonly class ConcatList implements NativeMethod {
 		Type $parameterType
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
+		if ($targetType instanceof StringType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof TupleType) {
 				$parameterType = $parameterType->asArrayType();
 			}
 			if ($parameterType instanceof ArrayType) {
 				$itemType = $this->toBaseType($parameterType->itemType);
-				if ($itemType instanceof StringType || $itemType instanceof StringSubsetType) {
+				if ($itemType instanceof StringType) {
 					return $typeRegistry->string(
 						$targetType->range->minLength +  $parameterType->range->minLength * $itemType->range->minLength,
 						$targetType->range->maxLength === PlusInfinity::value ||

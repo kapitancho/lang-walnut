@@ -34,7 +34,7 @@ final readonly class CombineAsString implements NativeMethod {
 		if ($targetType instanceof ArrayType) {
 			$itemType = $targetType->itemType;
 			if ($itemType->isSubtypeOf($typeRegistry->string())) {
-				if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
+				if ($parameterType instanceof StringType) {
 					return $typeRegistry->string(
 						$parameterType->range->minLength->mul(
 							max(0, $targetType->range->minLength - 1)

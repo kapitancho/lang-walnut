@@ -27,7 +27,7 @@ final readonly class JsonDecode implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
+		if ($targetType instanceof StringType) {
 			return $typeRegistry->result(
 				$typeRegistry->withName(new TypeNameIdentifier("JsonValue")),
 				$typeRegistry->withName(new TypeNameIdentifier("InvalidJsonString"))

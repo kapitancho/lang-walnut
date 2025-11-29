@@ -23,4 +23,21 @@ final class LengthTest extends CodeExecutionTestHelper {
 		);
 		$this->assertEquals("2", $result);
 	}
+
+	public function testLengthOfRecordWithRest(): void {
+		$result = $this->executeCodeSnippet(
+			"g[a: 1, b: 2, c: 'hello'];",
+			valueDeclarations: "g = ^p: [a: Integer, b: Real, ...String] => Integer<2..> :: p->length;"
+		);
+		$this->assertEquals("3", $result);
+	}
+
+	public function testLengthOfRecordWithOptionalKeyType(): void {
+		$result = $this->executeCodeSnippet(
+			"g[a: 1];",
+			valueDeclarations: "g = ^p: [a: Integer, b: ?Real, ...String] => Integer<1..> :: p->length;"
+		);
+		$this->assertEquals("1", $result);
+	}
+
 }

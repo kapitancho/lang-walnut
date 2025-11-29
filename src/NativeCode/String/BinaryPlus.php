@@ -27,9 +27,9 @@ final readonly class BinaryPlus implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
+		if ($targetType instanceof StringType) {
 			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
+			if ($parameterType instanceof StringType) {
 				return $typeRegistry->string(
 					$targetType->range->minLength + $parameterType->range->minLength,
 					$targetType->range->maxLength === PlusInfinity::value ||

@@ -60,7 +60,7 @@ final readonly class CastAsJsonValue {
 			$type instanceof BooleanType ||
 			$type instanceof IntegerType ||
 			$type instanceof RealType ||
-			$type instanceof StringType || $type instanceof StringSubsetType ||
+			$type instanceof StringType ||
 			$type instanceof EnumerationValue
 		) {
 			return true;

@@ -28,7 +28,7 @@ final readonly class Replace implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
+		if ($targetType instanceof StringType) {
 			if ($parameterType->isSubtypeOf(
 				$typeRegistry->record([
 					'match' => $typeRegistry->union([

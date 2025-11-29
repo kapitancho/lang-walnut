@@ -33,7 +33,7 @@ final readonly class KeyExists implements NativeMethod {
 		}
 		if ($targetType instanceof MapType) {
 			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
+			if ($parameterType instanceof StringType) {
 				return $typeRegistry->boolean;
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));

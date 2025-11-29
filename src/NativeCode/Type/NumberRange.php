@@ -89,7 +89,9 @@ final readonly class NumberRange implements NativeMethod {
 				}
 				return $programRegistry->valueRegistry->dataValue(
 					new TypeNameIdentifier($prefix . 'NumberRange'),
-					$programRegistry->valueRegistry->tuple($intervals)
+					$programRegistry->valueRegistry->record([
+						'intervals' => $programRegistry->valueRegistry->tuple($intervals)
+					])
 				);
 			}
 		}

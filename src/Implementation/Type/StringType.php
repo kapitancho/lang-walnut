@@ -5,6 +5,7 @@ namespace Walnut\Lang\Implementation\Type;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Common\Range\LengthRange;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
+use Walnut\Lang\Blueprint\Type\StringSubsetType as StringSubsetTypeInterface;
 use Walnut\Lang\Blueprint\Type\StringType as StringTypeInterface;
 use Walnut\Lang\Blueprint\Type\SupertypeChecker;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -15,6 +16,9 @@ final readonly class StringType implements StringTypeInterface, JsonSerializable
 
     public function isSubtypeOf(Type $ofType): bool {
         return match(true) {
+            $ofType instanceof StringSubsetTypeInterface =>
+                $this->range->maxLength !== PlusInfinity::value && (string)$this->range->maxLength === '0' &&
+	        	count($ofType->subsetValues) === 1 && $ofType->subsetValues[0] === '',
             $ofType instanceof StringTypeInterface => $this->range->isSubRangeOf($ofType->range),
             $ofType instanceof SupertypeChecker => $ofType->isSupertypeOf($this),
             default => false

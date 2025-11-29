@@ -31,7 +31,7 @@ final readonly class CreateIfMissing implements NativeMethod {
 			new TypeNameIdentifier('File')
 		)) {
 			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
+			if ($parameterType instanceof StringType) {
 				return $typeRegistry->result(
 					$typeRegistry->withName(
 						new TypeNameIdentifier('File')

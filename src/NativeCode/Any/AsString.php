@@ -33,16 +33,13 @@ final readonly class AsString implements NativeMethod {
 		Type $parameterType
 	): StringType|StringSubsetType|ResultType {
 		$baseTargetType = $this->toBaseType($targetType);
-		if ($baseTargetType instanceof StringSubsetType || $baseTargetType instanceof StringType) {
+		if ($baseTargetType instanceof StringType) {
 			return $baseTargetType;
 		}
 		if ((
 				$baseTargetType instanceof MutableType ||
 				$baseTargetType instanceof DataType
-			) && (
-				$baseTargetType->valueType instanceof StringType ||
-				$baseTargetType->valueType instanceof StringSubsetType
-			)) {
+			) && $baseTargetType->valueType instanceof StringType) {
 			return $baseTargetType->valueType;
 		}
 		$subsetValues = $this->castAsString->detectSubsetType($targetType);

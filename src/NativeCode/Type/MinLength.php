@@ -11,7 +11,6 @@ use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\SetType;
-use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Type\TypeType;
@@ -31,8 +30,10 @@ final readonly class MinLength implements NativeMethod {
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
-			if ($refType instanceof StringType || $refType instanceof StringSubsetType ||
-				$refType instanceof ArrayType || $refType instanceof MapType || $refType instanceof SetType) {
+			if (
+				$refType instanceof StringType || $refType instanceof ArrayType ||
+				$refType instanceof MapType || $refType instanceof SetType
+			) {
 				return $typeRegistry->integer(0);
 			}
 		}
@@ -48,8 +49,10 @@ final readonly class MinLength implements NativeMethod {
 	): Value {
 		if ($target instanceof TypeValue) {
 			$typeValue = $this->toBaseType($target->typeValue);
-			if ($typeValue instanceof StringType || $typeValue instanceof StringSubsetType ||
-				$typeValue instanceof ArrayType || $typeValue instanceof MapType || $typeValue instanceof SetType) {
+			if (
+				$typeValue instanceof StringType || $typeValue instanceof ArrayType ||
+				$typeValue instanceof MapType || $typeValue instanceof SetType
+			) {
 				return $programRegistry->valueRegistry->integer($typeValue->range->minLength);
 			}
 		}

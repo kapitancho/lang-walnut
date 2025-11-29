@@ -122,7 +122,7 @@ trait Item {
 		$mapItemNotFound = $typeRegistry->data(new TypeNameIdentifier("MapItemNotFound"));
 
 		$parameterType = $this->toBaseType($parameterType);
-		if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
+		if ($parameterType instanceof StringType) {
 			$returnType = $mapType->itemType;
 			if ($targetType instanceof RecordType && $parameterType instanceof StringSubsetType) {
 				$tConv = static fn(Type $fType): Type => $fType instanceof OptionalKeyType ?

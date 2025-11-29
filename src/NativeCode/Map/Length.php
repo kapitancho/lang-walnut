@@ -11,6 +11,7 @@ use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\NothingType;
+use Walnut\Lang\Blueprint\Type\OptionalKeyType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\RecordValue;
@@ -35,7 +36,7 @@ final readonly class Length implements NativeMethod {
 		}
 		if ($targetType instanceof RecordType) {
 			return $typeRegistry->integer(
-				$l = count($targetType->types),
+				$l = count(array_filter($targetType->types, fn(Type $type) => !$type instanceof OptionalKeyType)),
 				$targetType->restType instanceof NothingType ? $l : PlusInfinity::value
 			);
 		}

@@ -26,7 +26,7 @@ final readonly class AsReal implements NativeMethod {
 		Type $parameterType
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
+		if ($targetType instanceof StringType) {
 			return $typeRegistry->result(
 				$typeRegistry->real(),
 				$typeRegistry->atom(new TypeNameIdentifier('NotANumber'))

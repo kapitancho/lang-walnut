@@ -32,7 +32,7 @@ final readonly class APPEND implements NativeMethod {
             $valueType = $this->toBaseType($t->valueType);
 		    if ($valueType instanceof StringType && $valueType->range->maxLength === PlusInfinity::value) {
 			    $p = $this->toBaseType($parameterType);
-				if ($p instanceof StringType || $p instanceof StringSubsetType) {
+				if ($p instanceof StringType) {
 					return $t;
 				}
 			    // @codeCoverageIgnoreStart

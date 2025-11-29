@@ -8,6 +8,7 @@ use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Type\ShapeType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -26,7 +27,7 @@ final readonly class RefType implements NativeMethod {
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
-			if ($refType instanceof TypeType) {
+			if ($refType instanceof TypeType || $refType instanceof ShapeType) {
 				return $typeRegistry->type($refType->refType);
 			}
 		}
@@ -42,7 +43,7 @@ final readonly class RefType implements NativeMethod {
 	): Value {
 		if ($target instanceof TypeValue) {
 			$typeValue = $this->toBaseType($target->typeValue);
-			if ($typeValue instanceof TypeType) {
+			if ($typeValue instanceof TypeType || $typeValue instanceof ShapeType) {
 				return $programRegistry->valueRegistry->type($typeValue->refType);
 			}
 		}

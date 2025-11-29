@@ -30,15 +30,13 @@ trait StringPadLeftPadRight {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
+		if ($targetType instanceof StringType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof RecordType) {
 				$types = $parameterType->types;
 				$lengthType = $types['length'] ?? null;
 				$padStringType = $types['padString'] ?? null;
-				if (($lengthType instanceof IntegerType) &&
-					($padStringType instanceof StringType || $padStringType instanceof StringSubsetType)
-				) {
+				if ($lengthType instanceof IntegerType && $padStringType instanceof StringType) {
 					return $typeRegistry->string(
 						max(
 							$targetType->range->minLength,

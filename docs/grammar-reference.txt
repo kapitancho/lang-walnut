@@ -100,9 +100,7 @@ Examples:
 
 MethodDefinition ::= TypeName '-' '>' MethodName MethodParamSpec ('@' ErrorType)? ('%' '%' DependencySpec)? '::' Expression
 
-MethodParamSpec ::= '(' '^' ParamSpec ('=>' ReturnType)? ')'
-                  | '(' '=>' ReturnType ')'
-                  | '(' ')'
+MethodParamSpec ::= '(' ('^' ParamSpec)? ('=>' ReturnType)? ')'
 
 ParamSpec ::= TypeExpr                               // Type only
             | '~' TypeName                           // Inferred variable name
@@ -128,10 +126,7 @@ Examples:
 ## CAST DEFINITIONS
 ================================================================================
 
-CastDefinition ::= SourceType '=' '=' '>' TargetType ('@' ErrorType)? ('%' '%' DependencySpec)? (';' | '::' Expression)
-
-SourceType ::= TypeExpr
-             |  ε   // DependencyContainer
+CastDefinition ::= TypeExpr? '=' '=' '>' TargetType ('@' ErrorType)? ('%' '%' DependencySpec)? (';' | '::' Expression)
 
 Examples:
   Date ==> String :: [...]->combineAsString('-')    // Cast method
@@ -149,8 +144,8 @@ Examples:
 CliEntryPoint ::= ('%' '%' DependencyList)? '>' '>' '>' Expression
 
 Examples:
-  >>> null
-  %% D >>> null
+  >>> 'hello'
+  %% D >>> 'hello'
 
 ================================================================================
 ## EXPRESSIONS
@@ -163,6 +158,7 @@ Expression ::= ConstantExpression
              | TupleExpression
              | RecordExpression
              | SetExpression
+             | DataExpression
              | SequenceExpression
              | ScopedExpression
              | ReturnExpression
@@ -215,7 +211,7 @@ EnumValueLiteral ::= TypeName '.' EnumValue
 
 AtomValueLiteral ::= TypeName  // For atom types
 
-DataConstant ::= TypeName '!' Expression   // Data type constant
+DataConstant ::= TypeName '!' ConstantExpression   // Data type constant
 
 VariableName ::= Identifier
                | '$'
@@ -226,6 +222,7 @@ VariableName ::= Identifier
                | '#' IntegerLiteral
                | '%' IntegerLiteral
                | '$' '$'
+               | '$' '_'
 
 VariableAssignment ::= VarName '=' Expression
 
@@ -245,13 +242,16 @@ TupleExpression ::= '[' ']'  // Empty tuple
                   | '[' Expression (',' Expression)+ ']'  // Multi-element
 
 SetExpression ::= '[' ';' ']'  // Empty set
-                | '[' Expression ';' (Expression ';')* ']'
+                | '[' Expression ';' ']'
+                | '[' Expression (';' Expression)* ']'
 
 RecordExpression ::= '[' ':' ']'  // Empty record
                    | '[' RecordItem (',' RecordItem)* ']'
 
 RecordItem ::= FieldName ':' Expression
              | StringLiteral ':' Expression
+
+DataExpression ::= TypeName '!' Expression   // Data type constant
 
 SequenceExpression ::= '{' (Expression (';' Expression)* ';'?)? '}'
 
@@ -271,6 +271,8 @@ FunctionCall ::= Expression '(' Expression? ')'
                | Expression RecordExpression
 
 MethodCall ::= Expression MethodOp MethodName MethodArgs?
+
+ErrorAsExternalCall ::= Expression '*' '>' '(' Expression ')'
 
 MethodOp ::= '-' '>'   // Regular method call
            | '=' '>'   // noError method call
@@ -407,6 +409,7 @@ BinaryOp ::= '+'     // binaryPlus
            | '|''|'  // binaryOr
            | '&''&'  // binaryAnd
            | '^''^'  // binaryXor
+           | '?''?'  // binaryOrElse
 
 UnaryOperation ::= UnaryOp Expression
 
@@ -443,16 +446,22 @@ BasicType ::= 'Integer' | 'Real' | 'String' | 'Boolean'
             | 'JsonValue' | 'NotANumber'
             | TypeName
 
+NonNegativeInteger ::= [0-9]+   // Non-negative integer (used for length constraints)
+
 CompositeType ::= TupleTypeExpr
                 | RecordTypeExpr
                 | 'Array' ('<' TypeAndLengthSpec '>')?
-                | 'Map' ('<' TypeAndLengthSpec '>')?
+                | 'Map' ('<' MapTypeAndLengthSpec '>')?
                 | 'Set' ('<' TypeAndLengthSpec '>')?
 
 TypeAndLengthSpec ::= TypeExpr (',' LengthRange)?
                     | LengthRange
 
-LengthRange ::= (PositiveInteger)? '..' (PositiveInteger)?
+MapTypeAndLengthSpec ::= (TypeExpr ':')? TypeExpr (',' LengthRange)?
+                    | LengthRange
+
+LengthRange ::= NonNegativeInteger                      // Exact length (shorthand: min = max)
+              | (NonNegativeInteger)? '..' (NonNegativeInteger)?  // Range: min..max
 
 TupleTypeExpr ::= '[' '...'? ']'  // Empty tuple type or just rest
                 | '[' TypeExpr (',' TypeExpr)+ (',' '...')? ']'  // Tuple with optional rest
@@ -503,7 +512,7 @@ RealInterval ::= '[' Real '..' Real ']'       // Closed
 
 RealSubset ::= Real (',' Real)*
 
-StringConstraint ::= (PositiveInteger)? '..' (PositiveInteger)?
+StringConstraint ::= (NonNegativeInteger)? '..' (NonNegativeInteger)?
 
 StringSubset ::= StringLiteral (',' StringLiteral)*
 
@@ -511,7 +520,7 @@ UnionType ::= TypeExpr '|' TypeExpr ('|' TypeExpr)*
 
 IntersectionType ::= TypeExpr '&' TypeExpr ('&' TypeExpr)*
 
-FunctionType ::= '^' TypeExpr '=' '>' TypeExpr
+FunctionType ::= '^' TypeExpr ('=' '>' TypeExpr)?
                | '^' '=' '>' TypeExpr   // Parameter optional
 
 ImpureType ::= '*' TypeExpr   // Shorthand for Impure<TypeExpr>
@@ -524,7 +533,8 @@ Examples:
   Integer<1..>                                     // Min only (+infinity max)
   Integer<..100>                                   // Max only (-infinity min)
   Integer[2, 4, 10]                                // Integer subset
-  String<1..50>                                    // Length constraint
+  String<1..50>                                    // Length constraint (min=1, max=50)
+  String<5>                                        // Exact length 5 (shorthand: min=max=5)
   String<1..>                                      // Min length 1, no max
   String<..50>                                     // Max length 50, min is 0
   String['hello', '', 'world']                     // String subset
@@ -541,10 +551,13 @@ Examples:
   Array<Integer, 1..>                              // Array of Integer, min length 1
   Array<1..5>                                      // Array of Any, length 1 to 5
   Array<Product, 1..10>                            // Array of Product, length 1 to 10
+  Array<3>                                         // Array of Any, exact length 3 (shorthand: min=max=3)
   Map<Product>                                     // Map of Product, no size limit
   Map<Integer, 1..>                                // Map with min size 1
+  Map<String:Integer, 5>                           // Map of String to Integer, exact size 5 (shorthand: min=max=5)
   Set<String>                                      // Set of String
   Set<1..100>                                      // Set of Any, size 1 to 100
+  Set<10>                                          // Set of Any, exact size 10 (shorthand: min=max=10)
   Type<Integer>                                    // Type type
   Result<Integer, String>                          // Result type
   Error<String>                                    // Error type

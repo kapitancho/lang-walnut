@@ -29,7 +29,7 @@ final readonly class SubstringRange implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
+		if ($targetType instanceof StringType) {
 			$pInt = $typeRegistry->integer(0);
 			$pType = $typeRegistry->record([
 				"start" => $pInt,

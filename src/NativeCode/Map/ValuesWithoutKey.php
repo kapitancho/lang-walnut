@@ -35,7 +35,7 @@ final readonly class ValuesWithoutKey implements NativeMethod {
 			$targetType = $targetType->asMapType();
 		}
 		if ($targetType instanceof MapType) {
-			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
+			if ($parameterType instanceof StringType) {
 				$keyType = $targetType->keyType;
 				if ($keyType instanceof StringSubsetType && $parameterType instanceof StringSubsetType) {
 					$keyType = $this->stringSubsetDiff($typeRegistry, $keyType, $parameterType);

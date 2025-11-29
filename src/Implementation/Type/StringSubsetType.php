@@ -56,10 +56,10 @@ final class StringSubsetType implements StringSubsetTypeInterface, JsonSerializa
 
     public function isSubtypeOf(Type $ofType): bool {
         return match(true) {
+	        $ofType instanceof StringSubsetTypeInterface =>
+	        self::isSubset($this->subsetValues, $ofType->subsetValues),
             $ofType instanceof StringTypeInterface =>
                 self::isInRange($this->subsetValues, $ofType->range),
-            $ofType instanceof StringSubsetTypeInterface =>
-                self::isSubset($this->subsetValues, $ofType->subsetValues),
 
 	        // Ugly case where a String[...] subset type is checked against a union of String types
 	        // represented in different ways, e.g. String['a', 'b']|String<2..3>

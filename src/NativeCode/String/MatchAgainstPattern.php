@@ -30,9 +30,9 @@ final readonly class MatchAgainstPattern implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
+		if ($targetType instanceof StringType) {
 			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
+			if ($parameterType instanceof StringType) {
 				$maxLength = PlusInfinity::value;
 				$keyType = $typeRegistry->string();
 				if ($parameterType instanceof StringSubsetType) {

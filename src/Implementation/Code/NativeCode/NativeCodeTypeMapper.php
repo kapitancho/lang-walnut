@@ -126,7 +126,7 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 			$typeStr === '[:]', $typeStr === '[]' => true,
 			$type instanceof IntegerType,
 			$type instanceof RealType,
-			$type instanceof StringType, $type instanceof StringSubsetType,
+			$type instanceof StringType,
 			$type instanceof BooleanType, $type instanceof TrueType,
 			$type instanceof FalseType, $type instanceof NullType => true,
 			$type instanceof ArrayType => $this->isJsonType($type->itemType),

@@ -33,8 +33,10 @@ final readonly class MaxLength implements NativeMethod {
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
-			if ($refType instanceof StringType || $refType instanceof StringSubsetType ||
-				$refType instanceof ArrayType || $refType instanceof MapType || $refType instanceof SetType) {
+			if (
+				$refType instanceof StringType || $refType instanceof ArrayType ||
+				$refType instanceof MapType || $refType instanceof SetType
+			) {
 				return $typeRegistry->union([
 					$typeRegistry->integer(0),
 					$typeRegistry->withName(new TypeNameIdentifier('PlusInfinity'))
@@ -53,8 +55,10 @@ final readonly class MaxLength implements NativeMethod {
 	): Value {
 		if ($target instanceof TypeValue) {
 			$typeValue = $this->toBaseType($target->typeValue);
-			if ($typeValue instanceof StringType || $typeValue instanceof StringSubsetType ||
-				$typeValue instanceof ArrayType || $typeValue instanceof MapType || $typeValue instanceof SetType) {
+			if (
+				$typeValue instanceof StringType || $typeValue instanceof ArrayType ||
+				$typeValue instanceof MapType || $typeValue instanceof SetType
+			) {
 				return $typeValue->range->maxLength === PlusInfinity::value ?
 					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('PlusInfinity')) :
 					$programRegistry->valueRegistry->integer($typeValue->range->maxLength);

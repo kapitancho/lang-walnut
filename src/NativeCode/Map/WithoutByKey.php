@@ -36,7 +36,7 @@ final readonly class WithoutByKey implements NativeMethod {
 		}
 		if ($targetType instanceof MapType) {
 			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
+			if ($parameterType instanceof StringType) {
 				$keyType = $targetType->keyType;
 				if ($keyType instanceof StringSubsetType && $parameterType instanceof StringSubsetType) {
 					$keyType = $this->stringSubsetDiff($typeRegistry, $keyType, $parameterType);

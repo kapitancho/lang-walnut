@@ -8,6 +8,7 @@ use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Type\ShapeType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -38,6 +39,13 @@ final readonly class WithRefType implements NativeMethod {
 						)
 					);
 				}
+				if ($refType instanceof ShapeType) {
+					return $typeRegistry->type(
+						$typeRegistry->shape(
+							$parameterType->refType
+						)
+					);
+				}
 				// @codeCoverageIgnoreStart
 				throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
 				// @codeCoverageIgnoreEnd
@@ -63,6 +71,12 @@ final readonly class WithRefType implements NativeMethod {
 			)) {
 				if ($typeValue instanceof TypeType) {
 					$result = $programRegistry->typeRegistry->type(
+						$parameter->typeValue,
+					);
+					return $programRegistry->valueRegistry->type($result);
+				}
+				if ($typeValue instanceof ShapeType) {
+					$result = $programRegistry->typeRegistry->shape(
 						$parameter->typeValue,
 					);
 					return $programRegistry->valueRegistry->type($result);

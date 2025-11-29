@@ -24,7 +24,7 @@ final readonly class MatchString implements NativeMethod {
 	public function analyse(TypeRegistry $typeRegistry, MethodFinder $methodFinder, Type $targetType, Type $parameterType): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof SealedType && $targetType->name->equals(new TypeNameIdentifier('RegExp'))) {
-			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
+			if ($parameterType instanceof StringType) {
 				return $typeRegistry->result(
 					$typeRegistry->data(
 						new TypeNameIdentifier('RegExpMatch')

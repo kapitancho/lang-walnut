@@ -44,7 +44,7 @@ final readonly class Values implements NativeMethod {
 						MetaTypeValue::EnumerationValue,
 						MetaTypeValue::Enumeration,
 						MetaTypeValue::EnumerationSubset
-							=> $typeRegistry->any,
+							=> $typeRegistry->metaType(MetaTypeValue::EnumerationValue),
 						MetaTypeValue::IntegerSubset => $typeRegistry->integer(),
 						MetaTypeValue::RealSubset => $typeRegistry->real(),
 						MetaTypeValue::StringSubset => $typeRegistry->string(),

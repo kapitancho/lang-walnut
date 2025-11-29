@@ -34,7 +34,7 @@ final readonly class MatchAgainst implements NativeMethod {
 	): Type {
 		if ($targetType instanceof OpenType && $targetType->name->equals(new TypeNameIdentifier('RoutePattern'))) {
 			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
+			if ($parameterType instanceof StringType) {
 				return $typeRegistry->union([$typeRegistry->map(
 					$typeRegistry->union([
 						$typeRegistry->string(),

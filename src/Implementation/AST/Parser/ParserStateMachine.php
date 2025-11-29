@@ -3168,7 +3168,7 @@ final readonly class ParserStateMachine {
 					if (in_array($token->patternMatch->text, [
 						'Function', 'Tuple', 'Record', 'Union', 'Intersection', 'Atom', 'Enumeration',
 						'EnumerationSubset', 'EnumerationValue', 'IntegerSubset', 'RealSubset', 'StringSubset',
-						'Data', 'Open', 'Sealed', 'Alias', 'Named', 'MutableValue'
+						'Data', 'Open', 'Sealed', 'Alias', 'Named', 'MutableValue',
 					], true)) {
 						$this->s->result['type'] = $this->nodeBuilder->metaTypeType(
 							MetaTypeValue::from($token->patternMatch->text)

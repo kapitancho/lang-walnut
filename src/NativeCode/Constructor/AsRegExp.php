@@ -24,7 +24,7 @@ final readonly class AsRegExp implements NativeMethod {
 	public function analyse(TypeRegistry $typeRegistry, MethodFinder $methodFinder, Type $targetType, Type $parameterType): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof AtomType && $targetType->name->equals(new TypeNameIdentifier('Constructor'))) {
-			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
+			if ($parameterType instanceof StringType) {
 				$mayBeInvalid = true;
 				$resultType = $typeRegistry->string();
 				if ($parameterType instanceof StringSubsetType) {

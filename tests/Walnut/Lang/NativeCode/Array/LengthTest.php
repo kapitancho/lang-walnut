@@ -15,4 +15,12 @@ final class LengthTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("[1, 2]->length;");
 		$this->assertEquals("2", $result);
 	}
+
+	public function testLengthOfTupleWithRest(): void {
+		$result = $this->executeCodeSnippet(
+			"g[1, 2, 'hello'];",
+			valueDeclarations: "g = ^p: [Integer, Real, ...String] => Integer<2..> :: p->length;"
+		);
+		$this->assertEquals("3", $result);
+	}
 }

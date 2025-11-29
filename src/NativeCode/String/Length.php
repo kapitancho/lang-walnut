@@ -25,7 +25,7 @@ final readonly class Length implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
+		if ($targetType instanceof StringType) {
 			return $typeRegistry->integer(
 				$targetType->range->minLength,
 				$targetType->range->maxLength,

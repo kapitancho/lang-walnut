@@ -29,7 +29,7 @@ final readonly class BinaryMultiply implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
+		if ($targetType instanceof StringType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof IntegerType) {
 				$minValue = $parameterType->numberRange->min;

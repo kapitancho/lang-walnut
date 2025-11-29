@@ -53,7 +53,7 @@ final readonly class Format implements NativeMethod {
 			}
 
 			// Parameter must be a String (the format template)
-			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
+			if ($parameterType instanceof StringType) {
 				$isSafe = false;
 				if ($parameterType instanceof StringSubsetType) {
 					$max = -1;

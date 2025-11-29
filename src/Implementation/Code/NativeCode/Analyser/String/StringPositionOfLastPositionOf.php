@@ -26,9 +26,9 @@ trait StringPositionOfLastPositionOf {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
+		if ($targetType instanceof StringType) {
 			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof StringType || $parameterType instanceof StringSubsetType) {
+			if ($parameterType instanceof StringType) {
 				return $typeRegistry->result(
 					$typeRegistry->integer(0,
 						$targetType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :

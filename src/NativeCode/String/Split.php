@@ -25,12 +25,9 @@ final readonly class Split implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof StringType || $targetType instanceof StringSubsetType) {
+		if ($targetType instanceof StringType) {
 			$parameterType = $this->toBaseType($parameterType);
-			if (
-				($parameterType instanceof StringType && $parameterType->range->minLength > 0) ||
-				($parameterType instanceof StringSubsetType && !$parameterType->contains(''))
-			) {
+			if ($parameterType instanceof StringType && $parameterType->range->minLength > 0) {
 				return $typeRegistry->array(
 					$targetType,
 					$targetType->range->minLength > 0 ? 1 : 0,

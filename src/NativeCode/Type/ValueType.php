@@ -14,6 +14,7 @@ use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\OpenType;
+use Walnut\Lang\Blueprint\Type\OptionalKeyType;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Type\TypeType;
@@ -33,7 +34,7 @@ final readonly class ValueType implements NativeMethod {
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
-			if ($refType instanceof CompositeNamedType || $refType instanceof MutableType) {
+			if ($refType instanceof CompositeNamedType || $refType instanceof MutableType || $refType instanceof OptionalKeyType) {
 				return $typeRegistry->type($refType->valueType);
 			}
 			if ($refType instanceof MetaType) {
@@ -61,7 +62,8 @@ final readonly class ValueType implements NativeMethod {
 			if ($typeValue instanceof DataType ||
 				$typeValue instanceof OpenType ||
 				$typeValue instanceof SealedType ||
-				$typeValue instanceof MutableType
+				$typeValue instanceof MutableType ||
+				$typeValue instanceof OptionalKeyType
 			) {
 				return $programRegistry->valueRegistry->type($typeValue->valueType);
 			}
