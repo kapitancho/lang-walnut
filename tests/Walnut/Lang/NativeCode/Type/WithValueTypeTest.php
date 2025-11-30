@@ -17,6 +17,12 @@ final class WithValueTypeTest extends CodeExecutionTestHelper {
 		$this->assertEquals("type{Mutable<Integer>}", $result);
 	}
 
+	public function testWithValueTypeOptionalKeyType(): void {
+		$result = $this->executeCodeSnippet("getWithValueType(type{OptionalKey<String>});",
+			valueDeclarations: "getWithValueType = ^Type<OptionalKey> => Type<OptionalKey> :: #->withValueType(type{Integer});");
+		$this->assertEquals("type{OptionalKey<Integer>}", $result);
+	}
+
 	public function testWithValueTypeInvalidTargetType(): void {
 		$this->executeErrorCodeSnippet('Invalid target type',
 			"type{String}->withValueType(type{Integer});");

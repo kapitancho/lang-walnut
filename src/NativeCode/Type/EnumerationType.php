@@ -54,7 +54,6 @@ final readonly class EnumerationType implements NativeMethod {
 				return $programRegistry->valueRegistry->type($typeValue->enumeration);
 			}
 		}
-		echo "$typeValue!";
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException(
 			sprintf("Invalid target value: %s", $target)
