@@ -24,12 +24,12 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 	private function typeByName(TypeNameIdentifier $typeName): Type {
 		$tr = $this->programRegistry->typeRegistry;
 		return match($typeName->identifier) {
-			'Union' => $tr->metaType(MetaTypeValue::Union),
-			'Intersection' => $tr->metaType(MetaTypeValue::Intersection),
+			//'Union' => $tr->metaType(MetaTypeValue::Union),
+			//'Intersection' => $tr->metaType(MetaTypeValue::Intersection),
 			'Record' => $tr->metaType(MetaTypeValue::Record),
-			'Tuple' => $tr->metaType(MetaTypeValue::Tuple),
-			'Alias' => $tr->metaType(MetaTypeValue::Alias),
-			'Function' => $tr->metaType(MetaTypeValue::Function),
+			//'Tuple' => $tr->metaType(MetaTypeValue::Tuple),
+			//'Alias' => $tr->metaType(MetaTypeValue::Alias),
+			//'Function' => $tr->metaType(MetaTypeValue::Function),
 			default => $this->programRegistry->typeRegistry->typeByName($typeName)
 		};
 	}

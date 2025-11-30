@@ -63,13 +63,13 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 			DataType::class => ['Data'],
 			OpenType::class => ['Open'],
 			SealedType::class => ['Sealed'],
-			AliasType::class => ['Alias'],
+			AliasType::class => [/*'Alias'*/],
 			FunctionType::class => ['Function'],
 			MutableType::class => ['Mutable'],
 			ShapeType::class => ['Shape'],
 			TypeType::class => ['Type'],
-			UnionType::class => ['Union'],
-			IntersectionType::class => ['Intersection'],
+			UnionType::class => [/*'Union'*/],
+			IntersectionType::class => [/*'Intersection'*/],
 			NothingType::class => ['Nothing'],
 			ResultType::class => ['Result'],
 			AnyType::class => [],
@@ -90,9 +90,9 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 			$alias ??= $k;
 			$type = $type->aliasedType;
 		}
-		if ($alias !== null) {
+		/*if ($alias !== null) {
 			$baseIds[] = 'Alias';
-		}
+		}*/
 
 		foreach ($this->getTypeMapping() as $typeClass => $ids) {
 			if ($type instanceof $typeClass) {

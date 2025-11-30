@@ -140,7 +140,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testUnion(): void {
 		$this->assertEquals(
-			['Union', 'Any'],
+			[/*'Union', */'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->union([
 				$this->typeRegistry->integer(),
 				$this->typeRegistry->typeByName(new TypeNameIdentifier('NotANumber'))
@@ -150,7 +150,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testUnionJsonValue(): void {
 		$this->assertEquals(
-			['Union', 'JsonValue', 'Any'],
+			[/*'Union', */'JsonValue', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->union([
 				$this->typeRegistry->integer(),
 				$this->typeRegistry->string()
@@ -160,7 +160,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testIntersection(): void {
 		$this->assertEquals(
-			['Intersection', 'Any'],
+			[/*'Intersection',*/ 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->intersection([
 				$this->typeRegistry->integer(),
 				$this->typeRegistry->string()
@@ -226,7 +226,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testAlias(): void {
 		$this->assertEquals(
-			['DatabaseValue', 'Alias', 'Union', 'JsonValue', 'Any'],
+			['DatabaseValue', /*'Alias', 'Union',*/ 'JsonValue', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->alias(
 				new TypeNameIdentifier('DatabaseValue')
 			))
@@ -326,7 +326,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testTypeUnion(): void {
 		$this->assertEquals(
-			['Union', 'Any'],
+			[/*'Union',*/ 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::Union
 			))
@@ -335,7 +335,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testTypeIntersection(): void {
 		$this->assertEquals(
-			['Intersection', 'Any'],
+			[/*'Intersection',*/ 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::Intersection
 			))

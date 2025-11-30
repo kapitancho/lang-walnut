@@ -65,12 +65,6 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[MyAtom, MyOtherAtom]", $result);
 	}
 
-	public function testHydrateAsIntersection2(): void {
-		$result = $this->executeCodeSnippet("null->hydrateAs(`MyAtom&MyOtherAtom);",
-			"MyAtom := (); MyOtherAtom := (); JsonValue ==> MyAtom @ String :: ?whenValueOf($) is { true: MyAtom, ~ : @'error' };");
-		$this->assertEquals("[MyAtom, MyOtherAtom]", $result);
-	}
-
 	public function testHydrateAsTrueFromTrue(): void {
 		$result = $this->executeCodeSnippet("true->hydrateAs(`True);");
 		$this->assertEquals("true", $result);
