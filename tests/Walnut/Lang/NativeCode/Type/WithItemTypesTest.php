@@ -16,6 +16,16 @@ final class WithItemTypesTest extends CodeExecutionTestHelper {
 		$this->assertEquals("type[a: Integer, b: Boolean, ... Real]", $result);
 	}
 
+	public function testWithItemTypesIntersection(): void {
+		$result = $this->executeCodeSnippet("type{Intersection}->withItemTypes[type{Integer}, type{Boolean}];");
+		$this->assertEquals("type{(Integer&Boolean)}", $result);
+	}
+
+	public function testWithItemTypesUnion(): void {
+		$result = $this->executeCodeSnippet("type{Union}->withItemTypes[type{Integer}, type{Boolean}];");
+		$this->assertEquals("type{(Integer|Boolean)}", $result);
+	}
+
 	public function testWithItemTypesMetaTypeTuple(): void {
 		$result = $this->executeCodeSnippet("getWithItemTypes(type{[Integer, Real, ...String]});",
 			valueDeclarations: "getWithItemTypes = ^Type<Tuple> => Type<Tuple> :: #->withItemTypes[type{Integer}, type{Boolean}];");

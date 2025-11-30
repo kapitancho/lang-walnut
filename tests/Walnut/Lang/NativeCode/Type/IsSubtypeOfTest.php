@@ -16,6 +16,11 @@ final class IsSubtypeOfTest extends CodeExecutionTestHelper {
 		$this->assertEquals("true", $result);
 	}
 
+	public function testIsSubtypeOfMetaTypeNamedFalse(): void {
+		$result = $this->executeCodeSnippet("type{Named}->isSubtypeOf(type{Atom});");
+		$this->assertEquals("false", $result);
+	}
+
 	public function testIsSubtypeOfMetaTypeEnumeration(): void {
 		$result = $this->executeCodeSnippet("type{EnumerationSubset}->isSubtypeOf(type{Enumeration});");
 		$this->assertEquals("true", $result);

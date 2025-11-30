@@ -6,9 +6,14 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 
 final class WithRefTypeTest extends CodeExecutionTestHelper {
 
-	public function testWithRefType(): void {
+	public function testWithRefTypeType(): void {
 		$result = $this->executeCodeSnippet("type{Type<String>}->withRefType(type{Integer});");
 		$this->assertEquals("type{Type<Integer>}", $result);
+	}
+
+	public function testWithRefTypeShape(): void {
+		$result = $this->executeCodeSnippet("type{Shape<String>}->withRefType(type{Integer});");
+		$this->assertEquals("type{Shape<Integer>}", $result);
 	}
 
 	public function testWithRefTypeMetaType(): void {
