@@ -2211,6 +2211,7 @@ final readonly class ParserStateMachine {
 					$this->s->push(443);
 					$this->s->stay(701);
 				},
+				T::call_start->name => $c,
 				T::sequence_start->name => $c, //Shape<T>
 				T::arithmetic_op_multiply->name => $c,
 				T::tuple_start->name => $c,
@@ -2280,6 +2281,8 @@ final readonly class ParserStateMachine {
 					$this->s->push(442);
 					$this->s->stay(701);
 				},
+				T::call_start->name => $c,
+				T::sequence_start->name => $c, //Shape<T>
 				T::arithmetic_op_multiply->name => $c,
 				T::tuple_start->name => $c,
 				T::lambda_param->name => $c,
