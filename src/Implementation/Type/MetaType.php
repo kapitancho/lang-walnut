@@ -35,8 +35,21 @@ final readonly class MetaType implements MetaTypeInterface, SupertypeChecker, Js
 	}
 
 	public function isSupertypeOf(Type $ofType): bool {
-		if ($ofType instanceof self && $this->value === $ofType->value) {
-			return true;
+		if ($ofType instanceof self) {
+			if ($this->value === $ofType->value) {
+				return true;
+			}
+			$isSupertype = match($this->value) {
+				MetaTypeValue::Named => in_array($ofType->value, [
+					MetaTypeValue::Atom, MetaTypeValue::Enumeration, MetaTypeValue::Data,
+					MetaTypeValue::Open, MetaTypeValue::Sealed
+				], true),
+				MetaTypeValue::Enumeration => $ofType->value === MetaTypeValue::EnumerationSubset,
+				default => false
+			};
+			if ($isSupertype) {
+				return true;
+			}
 		}
 		$result = match($this->value) {
 			MetaTypeValue::Function => $ofType instanceof FunctionType,

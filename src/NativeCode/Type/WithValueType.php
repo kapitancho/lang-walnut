@@ -11,6 +11,7 @@ use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\MutableType;
+use Walnut\Lang\Blueprint\Type\OptionalKeyType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -41,6 +42,11 @@ final readonly class WithValueType implements NativeMethod {
 						$typeRegistry->metaType(MetaTypeValue::MutableValue)
 					);
 				}
+				if ($refType instanceof OptionalKeyType) {
+					return $typeRegistry->type(
+						$typeRegistry->optionalKey($parameterType->refType)
+					);
+				}
 				// @codeCoverageIgnoreStart
 				throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
 				// @codeCoverageIgnoreEnd
@@ -65,8 +71,16 @@ final readonly class WithValueType implements NativeMethod {
 				)
 			)) {
 				/** @var TypeValue $parameter */
-				if ($typeValue instanceof MutableType) {
+				if ($typeValue instanceof MutableType || (
+					$typeValue instanceof MetaType && $typeValue->value === MetaTypeValue::MutableValue
+				)) {
 					$result = $programRegistry->typeRegistry->mutable(
+						$parameter->typeValue,
+					);
+					return $programRegistry->valueRegistry->type($result);
+				}
+				if ($typeValue instanceof OptionalKeyType) {
+					$result = $programRegistry->typeRegistry->optionalKey(
 						$parameter->typeValue,
 					);
 					return $programRegistry->valueRegistry->type($result);

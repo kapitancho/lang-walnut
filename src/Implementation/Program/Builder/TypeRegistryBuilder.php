@@ -345,6 +345,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		    'Data' => $this->metaType(MetaTypeValue::Data),
 		    'Open' => $this->metaType(MetaTypeValue::Open),
 		    'Sealed' => $this->metaType(MetaTypeValue::Sealed),
+		    'Named' => $this->metaType(MetaTypeValue::Named),
 		    //'Tuple' => $this->metaType(MetaTypeValue::Tuple),
 		    //'Alias' => $this->metaType(MetaTypeValue::Alias),
 		    'Enumeration' => $this->metaType(MetaTypeValue::Enumeration),

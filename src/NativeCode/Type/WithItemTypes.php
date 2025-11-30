@@ -10,11 +10,13 @@ use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Type\IntersectionType;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
 use Walnut\Lang\Blueprint\Type\TypeType;
+use Walnut\Lang\Blueprint\Type\UnionType;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
@@ -44,6 +46,24 @@ final readonly class WithItemTypes implements NativeMethod {
 					return $typeRegistry->type(
 						$typeRegistry->metaType(
 							MetaTypeValue::Tuple
+						)
+					);
+				}
+				if ($refType instanceof IntersectionType || (
+					$refType instanceof MetaType && $refType->value === MetaTypeValue::Intersection
+				)) {
+					return $typeRegistry->type(
+						$typeRegistry->metaType(
+							MetaTypeValue::Intersection
+						)
+					);
+				}
+				if ($refType instanceof UnionType || (
+					$refType instanceof MetaType && $refType->value === MetaTypeValue::Union
+				)) {
+					return $typeRegistry->type(
+						$typeRegistry->metaType(
+							MetaTypeValue::Union
 						)
 					);
 				}
@@ -95,10 +115,28 @@ final readonly class WithItemTypes implements NativeMethod {
 					)
 				)
 			)) {
-				if ($typeValue instanceof TupleType) {
+				if ($typeValue instanceof TupleType || (
+					$typeValue instanceof MetaType && $typeValue->value === MetaTypeValue::Tuple
+				)) {
 					$result = $programRegistry->typeRegistry->tuple(
 						array_map(fn(TypeValue $tv): TypeInterface => $tv->typeValue, $parameter->values),
-						$typeValue->restType,
+						$typeValue instanceof TupleType ? $typeValue->restType : $programRegistry->typeRegistry->nothing,
+					);
+					return $programRegistry->valueRegistry->type($result);
+				}
+				if ($typeValue instanceof IntersectionType || (
+					$typeValue instanceof MetaType && $typeValue->value === MetaTypeValue::Intersection
+				)) {
+					$result = $programRegistry->typeRegistry->intersection(
+						array_map(fn(TypeValue $tv): TypeInterface => $tv->typeValue, $parameter->values),
+					);
+					return $programRegistry->valueRegistry->type($result);
+				}
+				if ($typeValue instanceof UnionType || (
+					$typeValue instanceof MetaType && $typeValue->value === MetaTypeValue::Union
+				)) {
+					$result = $programRegistry->typeRegistry->union(
+						array_map(fn(TypeValue $tv): TypeInterface => $tv->typeValue, $parameter->values),
 					);
 					return $programRegistry->valueRegistry->type($result);
 				}
@@ -113,10 +151,12 @@ final readonly class WithItemTypes implements NativeMethod {
 					$programRegistry->typeRegistry->string()
 				)
 			)) {
-				if ($typeValue instanceof RecordType) {
+				if ($typeValue instanceof RecordType || (
+					$typeValue instanceof MetaType && $typeValue->value === MetaTypeValue::Record
+				)) {
 					$result = $programRegistry->typeRegistry->record(
 						array_map(fn(TypeValue $tv): TypeInterface => $tv->typeValue, $parameter->values),
-						$typeValue->restType,
+						$typeValue instanceof RecordType ? $typeValue->restType : $programRegistry->typeRegistry->nothing,
 					);
 					return $programRegistry->valueRegistry->type($result);
 				}

@@ -76,16 +76,20 @@ final readonly class WithRestType implements NativeMethod {
 					$programRegistry->typeRegistry->any
 				)
 			)) {
-				if ($typeValue instanceof TupleType) {
+				if ($typeValue instanceof TupleType || (
+					$typeValue instanceof MetaType && $typeValue->value === MetaTypeValue::Tuple
+				)) {
 					$result = $programRegistry->typeRegistry->tuple(
-						$typeValue->types,
+						$typeValue instanceof TupleType ? $typeValue->types : [],
 						$parameter->typeValue,
 					);
 					return $programRegistry->valueRegistry->type($result);
 				}
-				if ($typeValue instanceof RecordType) {
+				if ($typeValue instanceof RecordType || (
+					$typeValue instanceof MetaType && $typeValue->value === MetaTypeValue::Record
+				)) {
 					$result = $programRegistry->typeRegistry->record(
-						$typeValue->types,
+						$typeValue instanceof RecordType ? $typeValue->types : [],
 						$parameter->typeValue,
 					);
 					return $programRegistry->valueRegistry->type($result);
