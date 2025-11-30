@@ -41,10 +41,9 @@ final readonly class Values implements NativeMethod {
 				$refType = $this->toBaseType($targetType->refType);
 				if ($refType instanceof MetaType) {
 					$t = match($refType->value) {
-						MetaTypeValue::EnumerationValue,
 						MetaTypeValue::Enumeration,
 						MetaTypeValue::EnumerationSubset
-							=> $typeRegistry->metaType(MetaTypeValue::EnumerationValue),
+							=> $typeRegistry->metaType(MetaTypeValue::Enumeration),
 						MetaTypeValue::IntegerSubset => $typeRegistry->integer(),
 						MetaTypeValue::RealSubset => $typeRegistry->real(),
 						MetaTypeValue::StringSubset => $typeRegistry->string(),

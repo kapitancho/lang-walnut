@@ -33,8 +33,8 @@ final readonly class EnumerationType implements NativeMethod {
 				return $typeRegistry->type($refType->enumeration);
 			}
 			if ($refType instanceof MetaType) {
-				if ($refType->value === MetaTypeValue::EnumerationSubset || $refType->value === MetaTypeValue::EnumerationValue) {
-					return $typeRegistry->type($typeRegistry->any);
+				if ($refType->value === MetaTypeValue::EnumerationSubset || $refType->value === MetaTypeValue::Enumeration) {
+					return $typeRegistry->type($typeRegistry->metaType(MetaTypeValue::Enumeration));
 				}
 			}
 		}
@@ -49,11 +49,12 @@ final readonly class EnumerationType implements NativeMethod {
 		Value $parameter
 	): Value {
 		if ($target instanceof TypeValue) {
-			$typeValue = $target->typeValue;
-			if ($typeValue instanceof EnumerationSubsetType) {
+			$typeValue = $this->toBaseType($target->typeValue);
+			if ($typeValue instanceof EnumerationSubsetType || $typeValue instanceof EnumerationType) {
 				return $programRegistry->valueRegistry->type($typeValue->enumeration);
 			}
 		}
+		echo "$typeValue!";
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException(
 			sprintf("Invalid target value: %s", $target)

@@ -6,6 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\CustomMethodAnalyser as CustomMethodAnalyserInterface;
 use Walnut\Lang\Blueprint\Function\CustomMethodAnalyserException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
@@ -19,6 +20,19 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 		private ProgramRegistry $programRegistry,
 		private NativeCodeTypeMapper $nativeCodeTypeMapper,
 	) {}
+
+	private function typeByName(TypeNameIdentifier $typeName): Type {
+		$tr = $this->programRegistry->typeRegistry;
+		return match($typeName->identifier) {
+			'Union' => $tr->metaType(MetaTypeValue::Union),
+			'Intersection' => $tr->metaType(MetaTypeValue::Intersection),
+			'Record' => $tr->metaType(MetaTypeValue::Record),
+			'Tuple' => $tr->metaType(MetaTypeValue::Tuple),
+			'Alias' => $tr->metaType(MetaTypeValue::Alias),
+			'Function' => $tr->metaType(MetaTypeValue::Function),
+			default => $this->programRegistry->typeRegistry->typeByName($typeName)
+		};
+	}
 
 	public function analyse(CustomMethodRegistry $registry): array {
 		$analyseErrors = [];
@@ -43,7 +57,7 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 				);
 				$usedMethods = [];
 				foreach(array_reverse($customizedTypeCandidates[(string)$methodTargetType] ?? []) as $customizedTypeCandidate) {
-					$customizedTypeCandidateType = $this->programRegistry->typeRegistry->typeByName(
+					$customizedTypeCandidateType = $this->typeByName(
 						new TypeNameIdentifier($customizedTypeCandidate)
 					);
 					$baseMethod = $this->programRegistry->methodFinder->methodForType(

@@ -107,7 +107,7 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 				'Record' => RecordType::class,
 				'Union' => UnionType::class,
 				'Intersection' => IntersectionType::class,
-				'EnumerationValue' => EnumerationType::class,
+				'Enumeration' => EnumerationType::class,
 				'Data' => DataType::class,
 				'Open' => OpenType::class,
 			][$type->value->value] ?? null;

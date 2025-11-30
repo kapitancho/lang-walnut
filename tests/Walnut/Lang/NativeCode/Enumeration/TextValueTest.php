@@ -14,7 +14,7 @@ final class TextValueTest extends CodeExecutionTestHelper {
 	public function testTextValueMetaTypeValue(): void {
 		$result = $this->executeCodeSnippet("getTextValue(MyEnum.A);",
 			'MyEnum := (A, B, C);',
-			'getTextValue = ^EnumerationValue => String<1..> :: #->textValue;'
+			'getTextValue = ^Enumeration => String<1..> :: #->textValue;'
 		);
 		$this->assertEquals("'A'", $result);
 	}

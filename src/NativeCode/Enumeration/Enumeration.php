@@ -24,7 +24,7 @@ final readonly class Enumeration implements NativeMethod {
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
-		if ($targetType instanceof MetaType && $targetType->value === MetaTypeValue::EnumerationValue) {
+		if ($targetType instanceof MetaType && $targetType->value === MetaTypeValue::Enumeration) {
 			return $typeRegistry->type(
 				$typeRegistry->metaType(MetaTypeValue::Enumeration)
 			);

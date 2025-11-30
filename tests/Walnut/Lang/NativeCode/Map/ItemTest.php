@@ -43,22 +43,6 @@ final class ItemTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@MapItemNotFound![key: 'b']", $result);
 	}
 
-	public function testItemMetaType(): void {
-		$result = $this->executeCodeSnippet(
-			"getItem[a: 1, b: 2];",
-			valueDeclarations: "getItem = ^m: Record :: m->item('b');"
-		);
-		$this->assertEquals("2", $result);
-	}
-
-	public function testItemMetaTypeMissing(): void {
-		$result = $this->executeCodeSnippet(
-			"getItem[a: 1, b: 2];",
-			valueDeclarations: "getItem = ^m: Record :: m->item('c');"
-		);
-		$this->assertEquals("@MapItemNotFound![key: 'c']", $result);
-	}
-
 	public function testItemNonEmptyIndexOutOfRange(): void {
 		$result = $this->executeCodeSnippet("getItem('r');", valueDeclarations: "getItem = ^s: String :: [a: 1, b: 2, c: 5, d: 10, e: 5]->item(s);");
 		$this->assertEquals("@MapItemNotFound![key: 'r']", $result);

@@ -1356,7 +1356,7 @@ class ParserTest extends TestCase {
 		yield ['\\Type', TypeTypeNode::class, fn($t) => $t->refType instanceOf AnyTypeNode];
 		yield ['Type<Boolean>', TypeTypeNode::class, fn($t) => $t->refType instanceOf BooleanTypeNode];
 		yield ['Type<Tuple>', TypeTypeNode::class, fn($t) => $t->refType instanceOf MetaTypeTypeNode && $t->refType->value === MetaTypeValue::Tuple];
-		yield ['Type<\\EnumerationValue>', TypeTypeNode::class, fn($t) => $t->refType instanceOf MetaTypeTypeNode && $t->refType->value === MetaTypeValue::EnumerationValue];
+		yield ['Type<\\Enumeration>', TypeTypeNode::class, fn($t) => $t->refType instanceOf MetaTypeTypeNode && $t->refType->value === MetaTypeValue::Enumeration];
 		yield ['Type<\\MutableValue>', TypeTypeNode::class, fn($t) => $t->refType instanceOf MetaTypeTypeNode && $t->refType->value === MetaTypeValue::MutableValue];
 		yield ['Type<Integer|Boolean>', TypeTypeNode::class, fn($t) => $t->refType instanceOf UnionTypeNode &&
 			$t->refType->left instanceOf IntegerTypeNode && $t->refType->right instanceOf BooleanTypeNode];

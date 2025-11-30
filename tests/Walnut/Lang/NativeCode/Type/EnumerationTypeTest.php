@@ -24,7 +24,7 @@ final class EnumerationTypeTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet(
 			"getEnumerationType(MyEnumerationType.A->type);",
 			"MyEnumerationType := (A, B, C);",
-			"getEnumerationType = ^Type<EnumerationValue> => Type :: #->enumerationType;"
+			"getEnumerationType = ^Type<Enumeration> => Type :: #->enumerationType;"
 		);
 		$this->assertEquals("type{MyEnumerationType}", $result);
 	}

@@ -353,7 +353,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 
 	public function testTypeEnumeration(): void {
 		$this->assertEquals(
-			[/*'Enumeration', */'Any'],
+			['Enumeration', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->metaType(
 				MetaTypeValue::Enumeration
 			))

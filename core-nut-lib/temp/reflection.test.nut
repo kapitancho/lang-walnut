@@ -312,18 +312,18 @@ MySealed := $String;
         ],
 
         ^ => TestResult :: TestResult[
-            name: 'EnumerationValue->enumeration',
+            name: 'Enumeration->enumeration',
             expected: `MyEnum,
             actual: ^ :: {
-                fn = ^ t: EnumerationValue => Type<Enumeration> :: t->enumeration;
+                fn = ^ t: Enumeration => Type<Enumeration> :: t->enumeration;
                 fn(MyEnum.A)
             }
         ],
         ^ => TestResult :: TestResult[
-            name: 'EnumerationValue->textValue',
+            name: 'Enumeration->textValue',
             expected: 'A',
             actual: ^ :: {
-                fn = ^ t: EnumerationValue => String<1..> :: t->textValue;
+                fn = ^ t: Enumeration => String<1..> :: t->textValue;
                 fn(MyEnum.A)
             }
         ],
@@ -340,25 +340,24 @@ MySealed := $String;
             name: 'Type<Enumeration>->values',
             expected: [MyEnum.A, MyEnum.B, MyEnum.C],
             actual: ^ :: {
-                fn = ^ t: Type<Enumeration> => Array<EnumerationValue, 1..> :: t->values;
+                fn = ^ t: Type<Enumeration> => Array<Enumeration, 1..> :: t->values;
                 fn(`MyEnum)
             }
         ],
-/*
+
         ^ => TestResult :: TestResult[
             name: 'Type<EnumerationSubset>->enumerationType',
-            expected: 'MyEnum',
+            expected: `MyEnum,
             actual: ^ :: {
                 fn = ^ t: Type<EnumerationSubset> => Type<Enumeration> :: t->enumerationType;
                 fn(`MyEnumSubset)
             }
         ],
-*/
         ^ => TestResult :: TestResult[
             name: 'Type<EnumerationSubset>->values',
             expected: [MyEnum.A, MyEnum.C],
             actual: ^ :: {
-                fn = ^ t: Type<EnumerationSubset> => Array<EnumerationValue, 1..> :: t->values;
+                fn = ^ t: Type<EnumerationSubset> => Array<Enumeration, 1..> :: t->values;
                 fn(`MyEnumSubset)
             }
         ],
@@ -533,7 +532,7 @@ MySealed := $String;
             name: 'Temp Test',
             expected: 'ok',
             actual: ^ :: {
-                fn = ^ t: Integer => Type<Integer> :: t->type;
+                fn = ^ t: Type<?String> => Type<Type<String>> :: t->type;
                 'ok'
             }
         ],

@@ -26,7 +26,7 @@ final readonly class TextValue implements NativeMethod {
 		TypeInterface $targetType,
 		TypeInterface $parameterType,
 	): TypeInterface {
-		if ($targetType instanceof MetaType && $targetType->value === MetaTypeValue::EnumerationValue) {
+		if ($targetType instanceof MetaType && $targetType->value === MetaTypeValue::Enumeration) {
 			return $typeRegistry->string(1, 999999);
 		}
 		if ($targetType instanceof EnumerationType || $targetType instanceof EnumerationSubsetType) {

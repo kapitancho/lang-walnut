@@ -60,15 +60,9 @@ class TypeRegistryBuilderTest extends TestCase {
 		$this->assertInstanceOf(StringType::class, $b->typeByName(new TypeNameIdentifier('String')));
 		$this->assertInstanceOf(ShapeType::class, $b->typeByName(new TypeNameIdentifier('Shape')));
 		$this->assertInstanceOf(MetaType::class, $b->typeByName(new TypeNameIdentifier('Atom')));
-		$this->assertInstanceOf(MetaType::class, $b->typeByName(new TypeNameIdentifier('EnumerationValue')));
-		$this->assertInstanceOf(MetaType::class, $b->typeByName(new TypeNameIdentifier('Record')));
 		$this->assertInstanceOf(MetaType::class, $b->typeByName(new TypeNameIdentifier('Open')));
 		$this->assertInstanceOf(MetaType::class, $b->typeByName(new TypeNameIdentifier('Sealed')));
-		$this->assertInstanceOf(MetaType::class, $b->typeByName(new TypeNameIdentifier('Tuple')));
-		$this->assertInstanceOf(MetaType::class, $b->typeByName(new TypeNameIdentifier('Alias')));
 		$this->assertInstanceOf(MetaType::class, $b->typeByName(new TypeNameIdentifier('Enumeration')));
-		$this->assertInstanceOf(MetaType::class, $b->typeByName(new TypeNameIdentifier('Union')));
-		$this->assertInstanceOf(MetaType::class, $b->typeByName(new TypeNameIdentifier('Intersection')));
 	}
 
 }

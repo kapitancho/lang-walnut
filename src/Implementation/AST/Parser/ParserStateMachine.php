@@ -2158,11 +2158,48 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
+
+			4381 => ['name' => 'type value short optional key', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->optionalKeyType(
+						$this->s->generated
+					);
+					$this->s->stay(443);
+				}
+			]],
+			4382 => ['name' => 'type value short type optional key', 'transitions' => [
+				T::type_start->name => 4383,
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->optionalKeyType($this->nodeBuilder->anyType);
+					$this->s->stay(443);
+				},
+			]],
+			4383 => ['name' => 'type value short type optional type', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(4384);
+					$this->s->stay(701);
+				},
+			]],
+			4384 => ['name' => 'type value short type optional return point', 'transitions' => [
+				T::type_end->name => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->optionalKeyType($this->s->generated);
+					$this->s->move(443);
+				}
+			]],
+
 			439 => ['name' => 'type value short', 'transitions' => [
+				T::optional_key->name => function(LT $token) {
+					$this->s->push(4381);
+					$this->s->move(701);
+				},
 				T::type_keyword->name => $c = function(LT $token) {
+					if ($token->rule->tag === T::type_keyword->name && $token->patternMatch->text === 'OptionalKey') {
+						$this->s->move(4382);
+						return;
+					}
 					if (in_array($token->patternMatch->text, [
 						'Function', 'Tuple', 'Record', 'Union', 'Intersection', 'Atom', 'Enumeration',
-						'EnumerationSubset', 'EnumerationValue', 'IntegerSubset', 'MutableValue',
+						'EnumerationSubset', 'IntegerSubset', 'MutableValue',
 						'RealSubset', 'StringSubset', 'State', 'Subset', 'Alias', 'Named'
 					], true)) {
 						$this->s->generated = $this->nodeBuilder->metaTypeType(
@@ -2178,6 +2215,9 @@ final readonly class ParserStateMachine {
 				T::arithmetic_op_multiply->name => $c,
 				T::tuple_start->name => $c,
 				T::lambda_param->name => $c,
+				T::empty_tuple->name => $c,
+				T::empty_set->name => $c,
+				T::empty_record->name => $c,
 			]],
 			440 => ['name' => 'type value', 'transitions' => [
 				T::tuple_start->name => function(LT $token) {
@@ -2186,11 +2226,49 @@ final readonly class ParserStateMachine {
 				},
 				T::sequence_start->name => 441,
 			]],
+
+			4401 => ['name' => 'type value type optional key', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->optionalKeyType(
+						$this->s->generated
+					);
+					$this->s->stay(442);
+				}
+			]],
+			4402 => ['name' => 'type value type type optional key', 'transitions' => [
+				T::type_start->name => 4403,
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->optionalKeyType($this->nodeBuilder->anyType);
+					$this->s->stay(442);
+				},
+			]],
+			4403 => ['name' => 'type value type type optional type', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(4404);
+					$this->s->stay(701);
+				},
+			]],
+			4404 => ['name' => 'type value type optional return point', 'transitions' => [
+				T::type_end->name => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->optionalKeyType($this->s->generated);
+					$this->s->move(442);
+				}
+			]],
+
+
 			441 => ['name' => 'type value type', 'transitions' => [
+				T::optional_key->name => function(LT $token) {
+					$this->s->push(4401);
+					$this->s->move(701);
+				},
 				T::type_keyword->name => $c = function(LT $token) {
+					if ($token->rule->tag === T::type_keyword->name && $token->patternMatch->text === 'OptionalKey') {
+						$this->s->move(4402);
+						return;
+					}
 					if (in_array($token->patternMatch->text, [
 						'Function', 'Tuple', 'Record', 'Union', 'Intersection', 'Atom', 'Enumeration',
-						'EnumerationSubset', 'EnumerationValue', 'IntegerSubset', 'MutableValue',
+						'EnumerationSubset', 'IntegerSubset', 'MutableValue',
 						'RealSubset', 'StringSubset', 'State', 'Subset', 'Alias', 'Named'
 					], true)) {
 						$this->s->generated = $this->nodeBuilder->metaTypeType(
@@ -2618,7 +2696,7 @@ final readonly class ParserStateMachine {
 						'Error' => 771,
 						'Shape' => 820,
 						'Any', 'Nothing', 'Boolean', 'True', 'False', 'Null',
-						'MutableValue', 'EnumerationValue' => 706,
+						'MutableValue', 'Enumeration' => 706,
 						default => 784
 					};
 					$this->s->i++;
@@ -2640,7 +2718,7 @@ final readonly class ParserStateMachine {
 						'Error' => 771,
 						'Result' => 776,
 						'Any', 'Nothing', 'Boolean', 'True', 'False', 'Null',
-						'MutableValue', 'EnumerationValue' => 706,
+						'MutableValue', 'Enumeration' => 706,
 						default => 785
 					};
 					$this->s->i++;
@@ -2731,8 +2809,8 @@ final readonly class ParserStateMachine {
 						'Set' => $this->nodeBuilder->setType(),
 						'Map' => $this->nodeBuilder->mapType(),
 						*/
-						'EnumerationValue' => $this->nodeBuilder->metaTypeType(MetaTypeValue::EnumerationValue),
-						'MutableValue' => $this->nodeBuilder->metaTypeType(MetaTypeValue::MutableValue)
+						'MutableValue' => $this->nodeBuilder->metaTypeType(MetaTypeValue::MutableValue),
+						'Enumeration' => $this->nodeBuilder->metaTypeType(MetaTypeValue::Enumeration),
 					};
 					$this->s->pop();
 				},
@@ -3163,11 +3241,48 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
+
+			7561 => ['name' => 'type type optional key', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->result['type'] = $this->nodeBuilder->optionalKeyType(
+						$this->s->generated
+					);
+					$this->s->stay(759);
+				}
+			]],
+			7562 => ['name' => 'type type optional key', 'transitions' => [
+				T::type_start->name => 7563,
+				'' => function(LT $token) {
+					$this->s->result['type'] = $this->nodeBuilder->optionalKeyType($this->nodeBuilder->anyType);
+					$this->s->stay(759);
+				},
+			]],
+			7563 => ['name' => 'type type optional type', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(7564);
+					$this->s->stay(701);
+				},
+			]],
+			7564 => ['name' => 'type type optional return point', 'transitions' => [
+				T::type_end->name => function(LT $token) {
+					$this->s->result['type'] = $this->nodeBuilder->optionalKeyType($this->s->generated);
+					$this->s->move(759);
+				}
+			]],
+
 			757 => ['name' => 'type type type', 'transitions' => [
+				T::optional_key->name => function(LT $token) {
+					$this->s->push(7561);
+					$this->s->move(701);
+				},
 				T::type_keyword->name => function(LT $token) {
+					if ($token->rule->tag === T::type_keyword->name && $token->patternMatch->text === 'OptionalKey') {
+						$this->s->move(7562);
+						return;
+					}
 					if (in_array($token->patternMatch->text, [
 						'Function', 'Tuple', 'Record', 'Union', 'Intersection', 'Atom', 'Enumeration',
-						'EnumerationSubset', 'EnumerationValue', 'IntegerSubset', 'RealSubset', 'StringSubset',
+						'EnumerationSubset', 'IntegerSubset', 'RealSubset', 'StringSubset',
 						'Data', 'Open', 'Sealed', 'Alias', 'Named', 'MutableValue',
 					], true)) {
 						$this->s->result['type'] = $this->nodeBuilder->metaTypeType(

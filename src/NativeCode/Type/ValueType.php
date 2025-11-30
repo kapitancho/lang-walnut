@@ -67,9 +67,10 @@ final readonly class ValueType implements NativeMethod {
 			) {
 				return $programRegistry->valueRegistry->type($typeValue->valueType);
 			}
+			return $programRegistry->valueRegistry->type($typeValue);
 		}
 		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid parameter value");
+		throw new ExecutionException("Invalid target value");
 		// @codeCoverageIgnoreEnd
 	}
 
