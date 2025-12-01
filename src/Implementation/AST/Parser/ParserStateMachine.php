@@ -781,7 +781,7 @@ final readonly class ParserStateMachine {
 				T::call_start->name => 217,
 				T::tuple_start->name => function(LT $token) {
 					$this->s->push(219);
-					$this->s->stay(201);
+					$this->s->stay(301);
 				},
 				'' => function (LT $token) {
 					$this->s->generated = $this->nodeBuilder->constant(
@@ -815,55 +815,10 @@ final readonly class ParserStateMachine {
 			]],
 			219 => ['name' => 'constructor call value tuple or record', 'transitions' => [
 				'' => function(LT $token) {
-					$g = $this->s->generated;
-					// This "hack" is need to flip the priorities so that T[...]->method
-					// is {T[...]}->method instead of T([...]->method)
-					// Same for T[...]=>method , T[...]|>method and T[...].property
-					if ($g instanceof NoErrorExpressionNode && $g->targetExpression instanceof MethodCallExpressionNode) {
-						$this->s->generated = $this->nodeBuilder->noError(
-							$this->nodeBuilder->methodCall(
-								$this->nodeBuilder->constructorCall(
-									new TypeNameIdentifier($this->s->result['type_name']),
-									$g->targetExpression->target
-								),
-								$g->targetExpression->methodName,
-								$g->targetExpression->parameter
-							)
-						);
-					} elseif ($g instanceof NoExternalErrorExpressionNode && $g->targetExpression instanceof MethodCallExpressionNode) {
-						$this->s->generated = $this->nodeBuilder->noExternalError(
-							$this->nodeBuilder->methodCall(
-								$this->nodeBuilder->constructorCall(
-									new TypeNameIdentifier($this->s->result['type_name']),
-									$g->targetExpression->target
-								),
-								$g->targetExpression->methodName,
-								$g->targetExpression->parameter
-							)
-						);
-					} elseif ($g instanceof PropertyAccessExpressionNode) {
-						$this->s->generated = $this->nodeBuilder->propertyAccess(
-							$this->nodeBuilder->constructorCall(
-								new TypeNameIdentifier($this->s->result['type_name']),
-								$g->target
-							),
-							$g->propertyName,
-						);
-					} elseif ($g instanceof MethodCallExpressionNode) {
-						$this->s->generated = $this->nodeBuilder->methodCall(
-							$this->nodeBuilder->constructorCall(
-								new TypeNameIdentifier($this->s->result['type_name']),
-								$g->target
-							),
-							$g->methodName,
-							$g->parameter
-						);
-					} else {
-						$this->s->generated = $this->nodeBuilder->constructorCall(
-							new TypeNameIdentifier($this->s->result['type_name']),
-							$g
-						);
-					}
+					$this->s->generated = $this->nodeBuilder->constructorCall(
+						new TypeNameIdentifier($this->s->result['type_name']),
+						$this->s->generated
+					);
 					$this->s->pop();
 				}
 			]],
@@ -1331,9 +1286,12 @@ final readonly class ParserStateMachine {
 				T::call_start->name => function(LT $token) {
 					$this->s->move(307);
 				},
-				T::tuple_start->name => function(LT $token) {
+				T::tuple_start->name => $t = function(LT $token) {
 					$this->s->stay(309);
 				},
+				T::empty_tuple->name => $t,
+				T::empty_set->name => $t,
+				T::empty_record->name => $t,
 				T::property_accessor->name => $c = function(LT $token) {
 					$this->noErrorMethodCall(false);
 					$this->s->stay(302);
@@ -1380,7 +1338,7 @@ final readonly class ParserStateMachine {
 			309 => ['name' => 'method call start tuple or record', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->push(310);
-					$this->s->stay(201);
+					$this->s->stay(301);
 				}
 			]],
 			310 => ['name' => 'method call value tuple or record', 'transitions' => [
@@ -1396,7 +1354,8 @@ final readonly class ParserStateMachine {
 				T::tuple_start->name => $c,*/
 				'' => function(LT $token) {
 					$this->noErrorMethodCall(true);
-					$this->s->pop();
+					$this->s->stay(315);
+					//$this->s->pop();
 				}
 			]],
 			311 => ['name' => 'function call start', 'transitions' => [
@@ -1424,75 +1383,16 @@ final readonly class ParserStateMachine {
 			313 => ['name' => 'function call start tuple or record', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->push(314);
-					$this->s->stay(201);
+					$this->s->stay(301);
 				}
 			]],
 			314 => ['name' => 'function call value tuple or record', 'transitions' => [
-				/*T::property_accessor->name => $c = function(LT $token) {
+				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->functionCall(
 						$this->s->result['expression_left'],
 						$this->s->generated
 					);
-					$this->s->stay(302);
-				},
-				T::pure_marker->name => $c,
-				T::method_marker->name => $c,
-				T::lambda_return->name => $c,
-				T::error_as_external->name => $c,
-				T::call_start->name => $c,
-				T::tuple_start->name => $c,*/
-				'' => function(LT $token) {
-					$g = $this->s->generated;
-					// This "hack" is need to flip the priorities so that T[...]->method
-					// is {T[...]}->method instead of T([...]->method)
-					// Same for T[...]=>method , T[...]|>method and T[...].property
-					if ($g instanceof NoErrorExpressionNode && $g->targetExpression instanceof MethodCallExpressionNode) {
-						$this->s->generated = $this->nodeBuilder->noError(
-							$this->nodeBuilder->methodCall(
-								$this->nodeBuilder->functionCall(
-									$this->s->result['expression_left'],
-									$g->targetExpression->target
-								),
-								$g->targetExpression->methodName,
-								$g->targetExpression->parameter
-							)
-						);
-					} elseif ($g instanceof NoExternalErrorExpressionNode && $g->targetExpression instanceof MethodCallExpressionNode) {
-						$this->s->generated = $this->nodeBuilder->noExternalError(
-							$this->nodeBuilder->methodCall(
-								$this->nodeBuilder->functionCall(
-									$this->s->result['expression_left'],
-									$g->targetExpression->target
-								),
-								$g->targetExpression->methodName,
-								$g->targetExpression->parameter
-							)
-						);
-					} elseif ($g instanceof PropertyAccessExpressionNode) {
-						$this->s->generated = $this->nodeBuilder->propertyAccess(
-							$this->nodeBuilder->functionCall(
-								$this->s->result['expression_left'],
-								$g->target
-							),
-							$g->propertyName,
-						);
-					} elseif ($g instanceof MethodCallExpressionNode) {
-						$this->s->generated = $this->nodeBuilder->methodCall(
-							$this->nodeBuilder->functionCall(
-								$this->s->result['expression_left'],
-								$g->target
-							),
-							$g->methodName,
-							$g->parameter
-						);
-					} else {
-						$this->s->generated = $this->nodeBuilder->functionCall(
-							$this->s->result['expression_left'],
-							$g
-						);
-					}
-
-					$this->s->pop();
+					$this->s->stay(315);
 				}
 			]],
 			315 => ['name' => 'method call value', 'transitions' => [
@@ -1523,6 +1423,11 @@ final readonly class ParserStateMachine {
 				T::error_as_external->name => $c,
 				T::call_start->name => $c,
 				T::tuple_start->name => $c,
+
+				T::empty_tuple->name => $c,
+				T::empty_record->name => $c,
+				T::empty_set->name => $c,
+
 				'' => function(LT $token) {
 					$this->s->pop();
 				}

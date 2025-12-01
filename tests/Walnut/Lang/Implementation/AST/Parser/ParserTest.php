@@ -93,7 +93,6 @@ use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
-use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Implementation\AST\Builder\NodeBuilderFactory;
 use Walnut\Lang\Implementation\AST\Builder\SourceLocator;
 use Walnut\Lang\Implementation\AST\Parser\ParserState;
