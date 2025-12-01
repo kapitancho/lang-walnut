@@ -77,6 +77,9 @@ SubstringNotInString := ();
 /* casts */
 CastNotAvailable := [from: Type, to: Type];
 
+/* functions */
+InvocationError := [functionType: Type, parameterType: Type];
+
 /* enumerations */
 UnknownEnumerationValue := [enumeration: Type, value: String];
 

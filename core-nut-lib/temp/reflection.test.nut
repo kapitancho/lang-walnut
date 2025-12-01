@@ -528,15 +528,6 @@ MySealed := $String;
                 fn(`String['a', 'b'])
             }
         ],
-        ^ => TestResult :: TestResult[
-            name: 'Temp Test',
-            expected: 'ok',
-            actual: ^ :: {
-                fn = ^ t: Type<?String> => Type<Type<String>> :: t->type;
-                'ok'
-            }
-        ],
-
 
         ^ => TestResult :: TestResult[
             name: 'Smoke Test',

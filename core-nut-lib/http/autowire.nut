@@ -37,7 +37,7 @@ HttpAutoWireRoute->handleRequest(^request: {HttpRequest} => Result<{HttpResponse
                         handlerReturnType = handlerType->returnType;
                         handlerParams = callParams=>hydrateAs(handlerParameterType);
                         handlerInstance = dependencyContainer=>valueOf(handlerType);
-                        handlerResult = ?noError(handlerInstance(handlerParams));
+                        handlerResult = handlerInstance=>forceInvoke(handlerParams);
                         $response->shape(`HttpAutoWireResponseBodyFromParameter)=>invoke(handlerResult)
                     },
                     ~: @HttpAutoWireRouteDoesNotMatch

@@ -17,8 +17,6 @@ use Walnut\Lang\Blueprint\Value\TypeValue;
 
 final readonly class ValueOf implements NativeMethod {
 
-	/** @noinspection PhpPropertyOnlyWrittenInspection */
-
 	public function analyse(
 		TypeRegistry $typeRegistry,
 		MethodFinder $methodFinder,
