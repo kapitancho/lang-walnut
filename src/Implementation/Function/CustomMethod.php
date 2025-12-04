@@ -6,6 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethod as CustomMethodInterface;
 use Walnut\Lang\Blueprint\Function\UserlandFunction;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
@@ -97,8 +98,10 @@ final class CustomMethod implements CustomMethodInterface {
 	}
 
 	public Type $targetType { get => $this->function->targetType; }
+	public VariableNameIdentifier|null $parameterName { get => $this->function->parameter->name; }
 	public Type $parameterType { get => $this->function->parameter->type; }
 	public Type $returnType { get => $this->function->returnType; }
+	public VariableNameIdentifier|null $dependencyName { get => $this->function->dependency->name; }
 	public Type $dependencyType { get => $this->function->dependency->type; }
 
 	public string $methodInfo {

@@ -5,6 +5,7 @@ namespace Walnut\Lang\Blueprint\Function;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Type\Type;
 
@@ -18,8 +19,10 @@ interface CustomMethod extends Method {
 	public MethodNameIdentifier $methodName { get; }
 
 	public Type $targetType { get; }
+	public VariableNameIdentifier|null $parameterName { get; }
 	public Type $parameterType { get; }
 	public Type $returnType { get; }
+	public VariableNameIdentifier|null $dependencyName { get; }
 	public Type $dependencyType { get; }
 
 	public string $methodInfo { get; }
