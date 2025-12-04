@@ -55,7 +55,7 @@ final readonly class REMOVE implements NativeMethod {
 							$t = $valueType->types[$subsetValue] ?? null;
 							if ($t) {
 								if ($t instanceof OptionalKeyType) {
-									$t = $t->valueType;
+									$returnTypes[] = $t->valueType;
 								} else {
 									throw new AnalyserException(
 										sprintf("[%s] Invalid parameter type: %s. Cannot remove map value with key %s",

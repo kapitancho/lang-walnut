@@ -102,9 +102,16 @@ final class AddTest extends CodeExecutionTestHelper {
 	}
 
 	public function testRecordAddMapTypeInvalidValueType(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type',
+		$this->executeErrorCodeSnippet("the value type String['hello'] should be a subtype of Integer",
 			"r('b');",
 			valueDeclarations: "r = ^s: String => Mutable<[a: Real, b: ?String, ...Integer]> :: mutable{[a: Real, b: ?String, ...Integer], [a: 1, b: 'hello', c: 3]}->ADD[key: s, value: 'hello'];"
+		);
+	}
+
+	public function testRecordAddMapTypeInvalidRestRelation(): void {
+		$this->executeErrorCodeSnippet('the value type Integer[20] of item b should be a subtype of Integer',
+			"r('b');",
+			valueDeclarations: "r = ^s: String => Mutable<[a: Real, b: ?String, ...Integer]> :: mutable{[a: Real, b: ?String, ...Integer], [a: 1, b: 'hello', c: 3]}->ADD[key: s, value: 20];"
 		);
 	}
 

@@ -39,7 +39,7 @@ final class RemoveTest extends CodeExecutionTestHelper {
 	}
 
 	public function testMapRemoveInvalidTargetTypeKey(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "mutable{Map<String<1>: Any, 1..>, [a: 1, b: 2, c: 3]}->REMOVE('abc');");
+		$this->executeErrorCodeSnippet('Invalid parameter type', "mutable{Map<String<1>: Any>, [a: 1, b: 2, c: 3]}->REMOVE('abc');");
 	}
 
 	public function testRecordRemoveRestMissing(): void {
@@ -70,6 +70,11 @@ final class RemoveTest extends CodeExecutionTestHelper {
 	// The key 'a' is of type Integer and is not optional or part of the rest
 	public function testRecordRemoveInvalidParameterTypeKey(): void {
 		$this->executeErrorCodeSnippet('Cannot remove map value with key a', "mutable{[a: Integer, b: ?Integer, c: Integer], [a: 1, b: 2, c: 3]}->REMOVE('a');");
+	}
+
+	// The key 'a' is of type Integer and is not optional or part of the rest
+	public function testRecordRemoveInvalidParameterTypeKeyRest(): void {
+		$this->executeErrorCodeSnippet('Cannot remove map value with key d', "mutable{[a: Integer, b: ?Integer, c: Integer], [a: 1, b: 2, c: 3]}->REMOVE('d');");
 	}
 
 	public function testRecordRemoveUseMapType(): void {
