@@ -27,9 +27,9 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 			//'Union' => $tr->metaType(MetaTypeValue::Union),
 			//'Intersection' => $tr->metaType(MetaTypeValue::Intersection),
 			'Record' => $tr->metaType(MetaTypeValue::Record),
-			//'Tuple' => $tr->metaType(MetaTypeValue::Tuple),
+			'Tuple' => $tr->metaType(MetaTypeValue::Tuple),
 			//'Alias' => $tr->metaType(MetaTypeValue::Alias),
-			//'Function' => $tr->metaType(MetaTypeValue::Function),
+			'Function' => $tr->metaType(MetaTypeValue::Function),
 			default => $this->programRegistry->typeRegistry->typeByName($typeName)
 		};
 	}
