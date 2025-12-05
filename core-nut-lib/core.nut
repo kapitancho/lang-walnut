@@ -7,16 +7,21 @@ Constructor := ();
 NotANumber := ();
 MinusInfinity := ();
 PlusInfinity := ();
-InvalidRange := ();
-IntegerRange := #[minValue: Integer|MinusInfinity, maxValue: Integer|PlusInfinity] @ InvalidRange ::
+NegativeValue := ();
+InvalidIntegerRange := [min: Integer, max: Integer];
+IntegerRange := #[minValue: Integer|MinusInfinity, maxValue: Integer|PlusInfinity] @ InvalidIntegerRange ::
     ?whenTypeOf(#) is { `[minValue: Integer, maxValue: Integer]:
-        ?when (#.minValue > #.maxValue) { => @InvalidRange }};
-RealRange := #[minValue: Real|MinusInfinity, maxValue: Real|PlusInfinity] @ InvalidRange ::
+        ?when (#.minValue > #.maxValue) { => @InvalidIntegerRange![min: #.minValue, max: #.maxValue] }};
+
+InvalidRealRange := [min: Real, max: Real];
+RealRange := #[minValue: Real|MinusInfinity, maxValue: Real|PlusInfinity] @ InvalidRealRange ::
     ?whenTypeOf(#) is { `[minValue: Real, maxValue: Real]:
-        ?when (#.minValue > #.maxValue) { => @InvalidRange }};
-LengthRange := #[minLength: Integer<0..>, maxLength: Integer<0..>|PlusInfinity] @ InvalidRange ::
+        ?when (#.minValue > #.maxValue) { => @InvalidRealRange![min: #.minValue, max: #.maxValue] }};
+
+InvalidLengthRange := [min: Integer<0..>, max: Integer<0..>];
+LengthRange := #[minLength: Integer<0..>, maxLength: Integer<0..>|PlusInfinity] @ InvalidLengthRange ::
     ?whenTypeOf(#) is { `[minLength: Integer<0..>, maxLength: Integer<0..>]:
-        ?when (#.minLength > #.maxLength) { => @InvalidRange }};
+        ?when (#.minLength > #.maxLength) { => @InvalidLengthRange![min: #.minLength, max: #.maxLength] }};
 
 PositiveInteger = Integer<1..>;
 NonNegativeInteger = Integer<0..>;
@@ -28,12 +33,12 @@ IntegerNumberIntervalEndpoint := [value: Integer, inclusive: Boolean];
 IntegerNumberInterval := #[
     start: MinusInfinity|IntegerNumberIntervalEndpoint,
     end: PlusInfinity|IntegerNumberIntervalEndpoint
-] @ InvalidRange :: ?whenTypeOf(#) is {
+] @ InvalidIntegerRange :: ?whenTypeOf(#) is {
     `[start: IntegerNumberIntervalEndpoint, end: IntegerNumberIntervalEndpoint]:
         ?when (
             {#.start.value > #.end.value} ||
             {#.start.value == #.end.value && {!{#.start.inclusive} || !{#.end.inclusive}}}
-        ) { => @InvalidRange }
+        ) { => @InvalidIntegerRange![min: #.start.value, max: #.end.value] }
 };
 IntegerNumberRange := [intervals: Array<IntegerNumberInterval, 1..>];
 
@@ -47,12 +52,12 @@ RealNumberIntervalEndpoint := [value: Real, inclusive: Boolean];
 RealNumberInterval := #[
     start: MinusInfinity|RealNumberIntervalEndpoint,
     end: PlusInfinity|RealNumberIntervalEndpoint
-] @ InvalidRange :: ?whenTypeOf(#) is {
+] @ InvalidRealRange :: ?whenTypeOf(#) is {
     `[start: RealNumberIntervalEndpoint, end: RealNumberIntervalEndpoint]:
         ?when (
             {#.start.value > #.end.value} ||
             {#.start.value == #.end.value && {!{#.start.inclusive} || !{#.end.inclusive}}}
-        ) { => @InvalidRange }
+        ) { => @InvalidRealRange![min: #.start.value, max: #.end.value] }
 };
 RealNumberRange := [intervals: Array<RealNumberInterval, 1..>];
 
