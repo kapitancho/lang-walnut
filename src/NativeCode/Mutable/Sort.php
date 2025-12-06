@@ -32,9 +32,6 @@ final readonly class Sort implements NativeMethod {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof MutableType) {
 			$valueType = $this->toBaseType($targetType->valueType);
-			if ($valueType instanceof TupleType) {
-				$valueType = $valueType->asArrayType();
-			}
 			if ($valueType instanceof ArrayType) {
 				$itemType = $valueType->itemType;
 				if ($itemType->isSubtypeOf($typeRegistry->string()) || $itemType->isSubtypeOf(

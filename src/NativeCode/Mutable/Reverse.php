@@ -28,9 +28,6 @@ final readonly class Reverse implements NativeMethod {
 	): Type {
 		if ($targetType instanceof MutableType) {
 			$valueType = $this->toBaseType($targetType->valueType);
-			if ($valueType instanceof TupleType) {
-				$valueType = $valueType->asArrayType();
-			}
 			if ($valueType instanceof ArrayType) {
 				return $targetType;
 			}

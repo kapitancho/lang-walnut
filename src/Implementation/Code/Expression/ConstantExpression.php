@@ -29,26 +29,8 @@ final readonly class ConstantExpression implements ConstantExpressionInterface, 
 
 	/** @return list<string> */
 	public function analyseDependencyType(DependencyContainer $dependencyContainer): array {
-		$analyseErrors = [];
-		if ($this->value instanceof FunctionValue) {
-			$d = $this->value->function->dependency->type;
-			if (!($d instanceof NothingType)) {
-				$value = $dependencyContainer->valueByType($d);
-				if ($value instanceof DependencyError) {
-					$analyseErrors[] = sprintf("Error in %s: the dependency %s cannot be resolved: %s (type: %s)",
-						$this->value->function->displayName,
-						$d,
-						$value->unresolvableDependency->errorInfo(),
-						$value->type
-					);
-				}
-			}
-			$functionErrors = $this->value->function->analyseDependencyType($dependencyContainer);
-			if (count($functionErrors) > 0) {
-				$analyseErrors = array_merge($analyseErrors, $functionErrors);
-			}
-		}
-		return $analyseErrors;
+		return $this->value instanceof FunctionValue ?
+			$this->value->analyseDependencyType($dependencyContainer) : [];
 	}
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {

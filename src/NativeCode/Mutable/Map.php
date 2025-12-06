@@ -35,11 +35,6 @@ final readonly class Map implements NativeMethod {
 	): Type {
 		if ($targetType instanceof MutableType) {
 			$type = $this->toBaseType($targetType->valueType);
-			if ($type instanceof TupleType) {
-				$type = $type->asArrayType();
-			} elseif ($type instanceof RecordType) {
-				$type = $type->asMapType();
-			}
 			if ($type->isSubtypeOf(
 				$typeRegistry->union([
 					$typeRegistry->array($type->itemType),

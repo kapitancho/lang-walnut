@@ -73,4 +73,11 @@ final class DigitsTest extends CodeExecutionTestHelper {
 		);
 	}
 
+	public function testDigitsInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet(
+			"Invalid parameter type",
+			"55->digits(1);"
+		);
+	}
+
 }
