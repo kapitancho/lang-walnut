@@ -55,22 +55,8 @@ final readonly class Digits implements NativeMethod {
 		// @codeCoverageIgnoreEnd
 	}
 
-	private function digitCount($bound): Number|PlusInfinity {
-		if ($bound === PlusInfinity::value) {
-			return PlusInfinity::value;
-		}
-
-		$value = (string)$bound->value;
-		if ($value === '0') {
-			return new Number(1);
-		}
-
-		// For negative numbers, we'll handle in execution
-		if ($value[0] === '-') {
-			return new Number(strlen($value) - 1); // Exclude the minus sign
-		}
-
-		return new Number(strlen($value));
+	private function digitCount(Number $bound): Number|PlusInfinity {
+		return new Number(strlen((string)$bound));
 	}
 
 	public function execute(

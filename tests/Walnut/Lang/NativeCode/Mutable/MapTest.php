@@ -81,6 +81,13 @@ final class MapTest extends CodeExecutionTestHelper {
 		);
 	}
 
+	public function testMapArrayInvalidParameterReturnType(): void {
+		$this->executeErrorCodeSnippet("The value type Real is not a subtype of the return type Integer of the callback function",
+			"testFn(mutable{Array<Integer>, [1]});",
+			valueDeclarations: "testFn = ^m: Mutable<Array<Integer>> => Mutable<Array<Integer>> :: m->map(^b: Integer => Real :: 1);"
+		);
+	}
+
 	public function testMapArrayInvalidParameterParameterType(): void {
 		$this->executeErrorCodeSnippet("The parameter type Integer of the callback function is not a subtype of Boolean",
 			"testFn(mutable{Array<Integer>, [1]});",
@@ -92,6 +99,13 @@ final class MapTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet('Invalid target type',
 			"testFn(mutable{Set<Integer, 2..>, [1; 2; 3; 4]});",
 			valueDeclarations: "testFn = ^m: Mutable<Set<Integer, 2..>> => Mutable<Set<Integer, 2..>> :: m->map(^i: Integer => Integer :: i % 2);"
+		);
+	}
+
+	public function testMapMapInvalidTargetTypeOther(): void {
+		$this->executeErrorCodeSnippet('Invalid target type',
+			"testFn(mutable{Boolean, false});",
+			valueDeclarations: "testFn = ^m: Mutable<Boolean> => Mutable<Boolean> :: m->map(^i: Integer => Integer :: i % 2);"
 		);
 	}
 

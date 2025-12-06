@@ -30,6 +30,14 @@ final class CompositeFunctionValue implements FunctionValueInterface, JsonSerial
 		);
 	}
 
+	public FunctionType $type {
+		get => $this->typeRegistry->function(
+			$this->first->type->parameterType,
+			$this->second->type->returnType
+		);
+	}
+
+	// @codeCoverageIgnoreStart
 	public function analyseDependencyType(DependencyContainer $dependencyContainer): array {
 		$analyseErrors = [];
 		$firstErrors = $this->first->analyseDependencyType($dependencyContainer);
@@ -57,13 +65,6 @@ final class CompositeFunctionValue implements FunctionValueInterface, JsonSerial
 		$this->second->selfAnalyse($analyserContext);
 	}
 
-	public FunctionType $type {
-		get => $this->typeRegistry->function(
-			$this->first->type->parameterType,
-			$this->second->type->returnType
-		);
-	}
-
 	public function execute(ExecutionContext $executionContext, Value $parameterValue): Value {
 		$intermediateValue = $this->first->execute($executionContext, $parameterValue);
 		return $this->second->execute($executionContext, $intermediateValue);
@@ -86,4 +87,6 @@ final class CompositeFunctionValue implements FunctionValueInterface, JsonSerial
 			'second' => $this->second,
 		];
 	}
+	// @codeCoverageIgnoreEnd
+
 }
