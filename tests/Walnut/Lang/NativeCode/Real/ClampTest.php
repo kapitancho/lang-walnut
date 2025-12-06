@@ -70,6 +70,17 @@ final class ClampTest extends CodeExecutionTestHelper {
 		$this->assertEquals("10.7", $result);
 	}
 
+	public function testClampReturnRangesInfinity(): void {
+		$result = $this->executeCodeSnippet(
+			"clampFn[min: 2, max: 4];",
+			valueDeclarations: "
+				getReal = ^ => Real :: 11.2;
+				clampFn = ^range: [min: Real<2..3>, max: Real<3..4>] => Real<2..4> :: getReal()->clamp(range);
+			"
+		);
+		$this->assertEquals('4', $result);
+	}
+
 	#[DataProvider('clampReturnRangesProvider')]
 	public function testClampReturnRanges(string $param, string $range, string $returnType, string $expected): void {
 		$result = $this->executeCodeSnippet(
