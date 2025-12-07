@@ -450,6 +450,81 @@ chunkData = ^[arr: Array<Integer, 5>, size: Integer<2>] =>
 [['a'], ['b', 'c'], ['d']]->flatten();   /* ['a', 'b', 'c', 'd'] */
 ```
 
+**`flatMap(transform)` - Map and flatten in one operation**
+```walnut
+/* Signature */
+^[Array<T, minL..maxL>, ^T => Array<U, minI..maxI>] => Array<U, minL*minI..maxL*maxI>
+
+/* Examples */
+/* Duplicate each element */
+[1, 2, 3]->flatMap(^i: Integer => Array<Integer> :: [i, i]);
+/* [1, 1, 2, 2, 3, 3] */
+
+/* Expand nested data */
+users = [
+    [name: 'Alice', tags: ['dev', 'admin']],
+    [name: 'Bob', tags: ['user']]
+];
+users->flatMap(^# => Array<String> :: #.tags);
+/* ['dev', 'admin', 'user'] */
+
+/* Conditional expansion */
+[1, 2, 3, 4]->flatMap(^i: Integer => Array<Integer> ::
+    match i % 2 == 0 {
+        Boolean.true :: [i, i * 2],
+        Boolean.false :: []
+    }
+);
+/* [2, 4, 4, 8] - only even numbers, doubled */
+
+/* Result type with error handling */
+processWithErrors = ^[Array<String>, ^String => Result<Array<Integer>, Error>] =>
+    Result<Array<Integer>, Error> ::
+    #arr->flatMap(#fn);
+/* Stops at first error, returns Result<Array<Integer>, Error> */
+
+/* Type inference with bounds */
+flatMapData = ^[arr: Array<Integer, 3>, fn: ^Integer => Array<String, 2>] =>
+    Array<String, 6..6> ::
+    arr->flatMap(fn);
+/* Result is exactly 6 elements (3 * 2) */
+```
+
+**`partition(predicate)` - Split array into matching and non-matching elements**
+```walnut
+/* Signature */
+^[Array<T>, ^T => Boolean] => [matching: Array<T>, notMatching: Array<T>]
+
+/* Examples */
+/* Split even and odd numbers */
+[1, 2, 3, 4, 5, 6]->partition(^i: Integer => Boolean :: i % 2 == 0);
+/* [matching: [2, 4, 6], notMatching: [1, 3, 5]] */
+
+/* Separate active users */
+users = [
+    [name: 'Alice', active: true],
+    [name: 'Bob', active: false],
+    [name: 'Charlie', active: true]
+];
+result = users->partition(^#.active);
+activeUsers = result.matching;          /* [[name: 'Alice', ...], [name: 'Charlie', ...]] */
+inactiveUsers = result.notMatching;     /* [[name: 'Bob', ...]] */
+
+/* Access parts directly */
+[1, 2, 3, 4, 5]->partition(^# > 3).matching;    /* [4, 5] */
+[1, 2, 3, 4, 5]->partition(^# > 3).notMatching; /* [1, 2, 3] */
+
+/* Count each partition */
+result = data->partition(^#.isValid);
+validCount = result.matching->length;
+invalidCount = result.notMatching->length;
+
+/* Both partitions have same element type as original array */
+partitionData = ^a: Array<String|Integer, 3..7> =>
+    [matching: Array<String|Integer, ..7>, notMatching: Array<String|Integer, ..7>] ::
+    a->partition(^v: Integer|String => Boolean :: v->isOfType(`String));
+```
+
 ### 25.2.6 Slicing and Padding
 
 **`slice(start, end)` - Extract subarray**
@@ -468,23 +543,36 @@ chunkData = ^[arr: Array<Integer, 5>, size: Integer<2>] =>
 **`take(count)` - Take first n elements**
 ```walnut
 /* Signature */
-^[Array<T>, Integer] => Array<T>
+^[Array<T, minL..maxL>, Integer<0..>] => Array<T, minR..maxR>
 
 /* Examples */
 [1, 2, 3, 4, 5]->take(3);                /* [1, 2, 3] */
 ['a', 'b', 'c']->take(2);                /* ['a', 'b'] */
 [1, 2]->take(5);                         /* [1, 2] (no error if too few) */
+[]->take(3);                             /* [] */
+
+/* Type inference */
+takeThree = ^[arr: Array<String, 3..6>, n: Integer<2..8>] =>
+    Array<String, 2..6> ::
+    arr->take(n);
+/* Result type is calculated: min(minL, minCount) to min(maxL, maxCount) */
 ```
 
-**`skip(count)` - Skip first n elements**
+**`drop(count)` - Skip first n elements**
 ```walnut
 /* Signature */
-^[Array<T>, Integer] => Array<T>
+^[Array<T, minL..maxL>, Integer<0..>] => Array<T, minR..maxR>
 
 /* Examples */
-[1, 2, 3, 4, 5]->skip(2);                /* [3, 4, 5] */
-['a', 'b', 'c', 'd']->skip(1);           /* ['b', 'c', 'd'] */
-[1, 2]->skip(5);                         /* [] (no error if too many) */
+[1, 2, 3, 4, 5]->drop(2);                /* [3, 4, 5] */
+['a', 'b', 'c', 'd']->drop(1);           /* ['b', 'c', 'd'] */
+[1, 2]->drop(5);                         /* [] (no error if too many) */
+
+/* Type inference */
+dropTwo = ^[arr: Array<String, 4..16>, n: Integer<1..3>] =>
+    Array<String, 1..15> ::
+    arr->drop(n);
+/* Result type is calculated based on input constraints */
 ```
 
 **`padLeft(length, value)` - Pad on the left**
@@ -638,6 +726,82 @@ products = [
 /* Note: duplicate keys will keep the last occurrence */
 byCategory = products->indexBy(^#.category);
 /* Map with 'fruit' => [name: 'Banana', ...] (overwrites Apple) */
+```
+
+**`groupBy(keyExtractor)` - Group array elements by key into a Map of Arrays**
+```walnut
+/* Signature */
+^[Array<T, minL..maxL>, ^T => String] => Map<Array<T, minG..maxL>, minM..maxL>
+
+/* Examples */
+/* Group numbers by parity */
+[1, 2, 3, 4, 5, 6]->groupBy(^i: Integer => String ::
+    match i % 2 == 0 {
+        Boolean.true :: 'even',
+        Boolean.false :: 'odd'
+    }
+);
+/* [odd: [1, 3, 5], even: [2, 4, 6]] */
+
+/* Group users by status */
+users = [
+    [name: 'Alice', status: 'active'],
+    [name: 'Bob', status: 'inactive'],
+    [name: 'Charlie', status: 'active'],
+    [name: 'David', status: 'pending']
+];
+
+byStatus = users->groupBy(^#.status);
+/* [
+    active: [[name: 'Alice', ...], [name: 'Charlie', ...]],
+    inactive: [[name: 'Bob', ...]],
+    pending: [[name: 'David', ...]]
+] */
+
+/* Access groups */
+activeUsers = byStatus->item('active');         /* Array of active users */
+activeCount = byStatus->item('active')->length; /* Count active users */
+
+/* Group by length */
+words = ['ant', 'bear', 'cat', 'dog', 'elephant'];
+byLength = words->groupBy(^s: String => String :: s->length->asString);
+/* [
+    3: ['ant', 'cat', 'dog'],
+    4: ['bear'],
+    8: ['elephant']
+] */
+
+/* Group by type */
+mixedData = [1, 'hello', 2.5, 'world', 3];
+byType = mixedData->groupBy(^v: Real|String => String ::
+    ?whenTypeOf(v) is {
+        `String: 'string',
+        `Integer: 'integer',
+        `Real: 'real'
+    }
+);
+/* [
+    integer: [1, 3],
+    string: ['hello', 'world'],
+    real: [2.5]
+] */
+
+/* All groups contain at least 1 element */
+groupedData = ^a: Array<String, 5..10> => Map<Array<String, 1..10>, 1..10> ::
+    a->groupBy(^s: String => String :: s->length->asString);
+/* Each group array has 1..10 elements, and there are 1..10 groups */
+
+/* Unlike indexBy, groupBy preserves all items with the same key */
+products = [
+    [name: 'Apple', category: 'fruit'],
+    [name: 'Carrot', category: 'vegetable'],
+    [name: 'Banana', category: 'fruit']
+];
+byCategory = products->groupBy(^#.category);
+/* [
+    fruit: [[name: 'Apple', ...], [name: 'Banana', ...]],
+    vegetable: [[name: 'Carrot', ...]]
+] */
 ```
 
 **`toMap(keyExtractor)` - Convert to map**

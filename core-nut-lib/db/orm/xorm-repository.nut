@@ -6,11 +6,8 @@ OxRepository[~Type, model: Type] @ ExternalError  :: [
     type: #type
 ];
 
-EntryNotFound := $[key: DatabaseValue];
-EntryNotFound->key(=> DatabaseValue) :: $key;
-
-DuplicateEntry := $[key: DatabaseValue];
-DuplicateEntry->key(=> DatabaseValue) :: $key;
+EntryNotFound := [key: DatabaseValue];
+DuplicateEntry := [key: DatabaseValue];
 
 OxRepository->all(=> *Array) %% ~DatabaseConnector :: {
     query = $ox->selectAllQuery /*'SELECT * FROM <table>'*/
@@ -18,7 +15,7 @@ OxRepository->all(=> *Array) %% ~DatabaseConnector :: {
     {databaseConnector
         -> query[query: query, boundParameters: []]}
         *> ('Failed to get entries from the database')
-        -> map(^DatabaseQueryDataRow => Result<Any, HydrationError> :: #->hydrateAs($type))
+        -> map(^row: DatabaseQueryDataRow => Result<Any, HydrationError> :: row->hydrateAs($type))
         *> ('Failed to hydrate entries')
 };
 
@@ -28,11 +25,11 @@ OxRepository->one(^v: DatabaseValue => *Result<Any, EntryNotFound>) %% ~Database
     entries = {databaseConnector
           -> query[query: query, boundParameters: [:]->withKeyValue[key: $ox->keyField, value: #]]
         } *> ('Failed to get entry from the database')
-          ->map(^DatabaseQueryDataRow => Result<Any, HydrationError> :: #->hydrateAs($type))
+          ->map(^row: DatabaseQueryDataRow => Result<Any, HydrationError> :: row->hydrateAs($type))
           *> ('Failed to hydrate entries');
     ?whenTypeOf(entries) is {
         `Array<1..>: entries.0,
-        ~: @EntryNotFound[key: v]
+        ~: @EntryNotFound![key: v]
     }
 };
 
@@ -45,7 +42,7 @@ OxRepository->insertOne(^v: {DatabaseQueryDataRow} => *Result<Null, DuplicateEnt
         /* *> ('Failed to insert entry into the database') */;
     ?whenTypeOf(result) is {
         `Error<DatabaseQueryFailure> : ?whenIsTrue {
-            result->error.error->contains('SQLSTATE[23'): @DuplicateEntry[key: entryId],
+            result->error.error->contains('SQLSTATE[23'): @DuplicateEntry![key: entryId],
             ~: result *> ('Failed to insert entry into the database')
         },
         `Error: result *> ('Failed to insert entry into the database'),
@@ -65,7 +62,7 @@ OxRepository->deleteOne(^v: DatabaseValue => *Result<Null, EntryNotFound>) %% ~D
         -> errorAsExternal('Failed to delete entry from the database');
     ?whenTypeOf(result) is {
         `Integer<1..1> : null,
-        ~: @EntryNotFound[key: v]
+        ~: @EntryNotFound![key: v]
     }
 };
 
@@ -78,6 +75,6 @@ OxRepository->updateOne(^v: {DatabaseQueryDataRow} => *Result<Null, EntryNotFoun
         *> ('Failed to update entry in the database');
     ?whenTypeOf(result) is {
         `Integer<1..1> : null,
-        ~: @EntryNotFound[key: entryId]
+        ~: @EntryNotFound![key: entryId]
     }
 };

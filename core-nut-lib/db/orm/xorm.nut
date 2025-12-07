@@ -3,7 +3,7 @@ module $db/orm/xorm %% $db/core, $db/sql/query-builder, $db/sql/quoter-mysql:
 FieldTypes = Map<Type>;
 UnknownFieldTypes := ();
 
-UnknownOrmModel := $[type: Type];
+UnknownOrmModel := Type;
 OrmModel := #[table: DatabaseTableName, keyField: DatabaseFieldName, sequenceField: ?DatabaseFieldName];
 OrmModel->orderBy(=> SqlOrderByFields|Null) :: ?whenTypeOf($sequenceField) is {
     `String<1..>: SqlOrderByFields[[SqlOrderByField[$sequenceField, SqlOrderByDirection.Asc]]]
@@ -18,16 +18,16 @@ Ox[~Type] @ UnknownOrmModel|UnknownFieldTypes :: {
     ormModel = #type->as(`OrmModel);
     ormModel = ?whenTypeOf(ormModel) is {
         `OrmModel: ormModel,
-        ~: => @UnknownOrmModel(#)
+        ~: => @UnknownOrmModel!#type
     };
 
-    fieldTypesHelper = ^Type => Result<Map<Type>, UnknownFieldTypes> :: {
-        ?whenTypeOf(#) is {
-            `Type<Data>: fieldTypesHelper=>invoke(#->valueType),
-            `Type<Open>: fieldTypesHelper=>invoke(#->valueType),
-            `Type<Record>: #->itemTypes,
-            `Type<Alias>: fieldTypesHelper=>invoke(#->aliasedType),
-            `Type<Type>: fieldTypesHelper=>invoke(#->refType),
+    fieldTypesHelper = ^ t: Type => Result<Map<Type>, UnknownFieldTypes> :: {
+        ?whenTypeOf(t) is {
+            `Type<Data>: fieldTypesHelper=>invoke(t->valueType),
+            `Type<Open>: fieldTypesHelper=>invoke(t->valueType),
+            `Type<Record>: t->itemTypes,
+            `Type<Alias>: fieldTypesHelper=>invoke(t->aliasedType),
+            `Type<Type>: fieldTypesHelper=>invoke(t->refType),
             ~: @UnknownFieldTypes
         }
     };
@@ -52,14 +52,14 @@ FieldTypes->forWrite(=> Map<QueryValue>) :: {
 
 
 Ox->selectAllQuery(=> DatabaseSqlQuery) :: {
-    {SelectQuery[
+    SelectQuery[
         tableName: $ormModel.table,
         fields: $fieldTypes->forSelect[$ormModel.table],
         joins: [],
         queryFilter: SqlQueryFilter[SqlRawExpression['1']],
         orderBy: $ormModel->orderBy,
         limit: null
-    ]}->asDatabaseSqlQuery
+    ]->asDatabaseSqlQuery
 };
 Ox->selectOneQuery(=> DatabaseSqlQuery) :: {
     {SelectQuery[

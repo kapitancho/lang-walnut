@@ -405,6 +405,9 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 
 	/** @throws InvalidLengthRange */
 	public function array(Type|null $itemType = null, int|Number $minLength = 0, int|Number|PlusInfinity $maxLength = PlusInfinity::value): ArrayType {
+		if ($maxLength === 0 || ($maxLength instanceof Number && (string)$maxLength === '0')) {
+			$itemType = $this->nothing;
+		}
 		return new ArrayType(
 			$itemType ?? $this->any,
 			new LengthRange(
@@ -424,6 +427,9 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		if ($keyType && !$keyType->isSubtypeOf($this->string())) {
 			throw new InvalidMapKeyType($keyType);
 		}
+		if ($maxLength === 0 || ($maxLength instanceof Number && (string)$maxLength === '0')) {
+			$itemType = $this->nothing;
+		}
 		return new MapType(
 			$keyType ?? $this->string(),
 			$itemType ?? $this->any,
@@ -440,6 +446,9 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		int|Number              $minLength = 0,
 		int|Number|PlusInfinity $maxLength = PlusInfinity::value
 	): SetType {
+		if ($maxLength === 0 || ($maxLength instanceof Number && (string)$maxLength === '0')) {
+			$itemType = $this->nothing;
+		}
 		return new SetType(
 			$itemType ?? $this->any,
 			new LengthRange(

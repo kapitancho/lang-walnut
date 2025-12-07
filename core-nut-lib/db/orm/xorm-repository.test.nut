@@ -53,7 +53,7 @@ ProductModel ==> OrmModel :: OrmModel[table: 'products', keyField: 'id'];
         ],
         ^ => TestResult :: TestResult[
             name: 'Test get product by id not found',
-            expected: @EntryNotFound[key: 3],
+            expected: @EntryNotFound![key: 3],
             actual : ^ :: ?noError(OxRepository[type: `Product, model: `Product])->one(3),
             before: beforeFn,
             after: afterFn
@@ -69,7 +69,7 @@ ProductModel ==> OrmModel :: OrmModel[table: 'products', keyField: 'id'];
         ],
         ^ => TestResult :: TestResult[
             name: 'Test insert product duplicate id',
-            expected: @DuplicateEntry[key: 1],
+            expected: @DuplicateEntry![key: 1],
             actual : ^ :: {?noError(OxRepository[type: `Product, model: `Product])->insertOne(
                 Product![id: 1, name: 'Product 1', price: 10]
             )},
@@ -87,7 +87,7 @@ ProductModel ==> OrmModel :: OrmModel[table: 'products', keyField: 'id'];
         ],
         ^ => TestResult :: TestResult[
             name: 'Test update product not found',
-            expected: @EntryNotFound[key: 999],
+            expected: @EntryNotFound![key: 999],
             actual : ^ :: ?noError(OxRepository[type: `Product, model: `Product])->updateOne(
                 Product![id: 999, name: 'Nonexistent Product', price: 100]
             ),
@@ -103,7 +103,7 @@ ProductModel ==> OrmModel :: OrmModel[table: 'products', keyField: 'id'];
         ],
         ^ => TestResult :: TestResult[
             name: 'Test delete product not found',
-            expected: @EntryNotFound[key: 999],
+            expected: @EntryNotFound![key: 999],
             actual : ^ :: ?noError(OxRepository[type: `Product, model: `Product])->deleteOne(999)
         ]
     ]

@@ -1,0 +1,79 @@
+<?php
+
+namespace Walnut\Lang\NativeCode\Array;
+
+use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
+use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
+use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
+use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Type\ArrayType;
+use Walnut\Lang\Blueprint\Type\IntegerType;
+use Walnut\Lang\Blueprint\Type\TupleType;
+use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\IntegerValue;
+use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Blueprint\Value\TupleValue;
+use Walnut\Lang\Implementation\Type\Helper\BaseType;
+
+final readonly class Drop implements NativeMethod {
+	use BaseType;
+
+	public function analyse(
+		TypeRegistry $typeRegistry,
+		MethodFinder $methodFinder,
+		Type $targetType,
+		Type $parameterType,
+	): Type {
+		$targetType = $this->toBaseType($targetType);
+		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
+		if ($type instanceof ArrayType) {
+			/** @var IntegerType $parameterType */
+			$parameterType = $this->toBaseType($parameterType);
+			if ($parameterType->isSubtypeOf($typeRegistry->integer(0))) {
+				$minLength = match(true) {
+					$parameterType->numberRange->max === PlusInfinity::value,
+					$parameterType->numberRange->max->value > $type->range->minLength => 0,
+					default => $type->range->minLength->sub($parameterType->numberRange->max->value)
+				};
+				$maxLength = match(true) {
+					$type->range->maxLength === PlusInfinity::value => PlusInfinity::value,
+					$parameterType->numberRange->min->value > $type->range->maxLength => 0,
+					default => $type->range->maxLength->sub($parameterType->numberRange->min->value)
+				};
+				return $typeRegistry->array(
+					$type->itemType,
+					$minLength,
+					$maxLength
+				);
+			}
+			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
+		}
+		// @codeCoverageIgnoreStart
+		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
+		// @codeCoverageIgnoreEnd
+	}
+
+	public function execute(
+		ProgramRegistry $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		if ($target instanceof TupleValue) {
+			if ($parameter instanceof IntegerValue && $parameter->literalValue >= 0) {
+				return $programRegistry->valueRegistry->tuple(
+					array_slice($target->values, (int)(string)$parameter->literalValue)
+				);
+			}
+			// @codeCoverageIgnoreStart
+			throw new ExecutionException("Invalid parameter value");
+			// @codeCoverageIgnoreEnd
+		}
+		// @codeCoverageIgnoreStart
+		throw new ExecutionException("Invalid target value");
+		// @codeCoverageIgnoreEnd
+	}
+
+}

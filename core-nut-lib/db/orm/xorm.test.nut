@@ -11,12 +11,12 @@ ProductModel ==> OrmModel :: OrmModel[table: 'products', keyField: 'id'];
     [
         ^ => TestResult :: TestResult[
             name: 'Test ORM Unknown Model',
-            expected: @UnknownOrmModel[`Car],
+            expected: @UnknownOrmModel!`Car,
             actual : ^ :: Ox[`Car]
         ],
         ^ => TestResult :: TestResult[
             name: 'Test ORM Unknown Field Types',
-            expected: @UnknownOrmModel[`Power],
+            expected: @UnknownOrmModel!`Power,
             actual : ^ :: Ox[`Power]
         ],
         ^ => TestResult :: TestResult[
