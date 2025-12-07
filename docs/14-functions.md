@@ -369,6 +369,129 @@ result1 = sum[a: 1, b: 2];  /* Record syntax */
 result2 = sum[1, 2];        /* Tuple syntax - positional mapping */
 ```
 
+## Function Composition
+
+### The `+` Operator - Function Composition
+
+Functions can be composed using the `+` operator, which creates a new function that applies the first function and then the second function to the result.
+
+**Syntax:**
+```walnut
+function1 + function2
+```
+
+**Type signature:**
+```walnut
+^[^A => B, ^B => C] => ^A => C
+```
+
+**Semantics:**
+- The `+` operator composes two functions left-to-right
+- The return type of the first function must match (or be a subtype of) the parameter type of the second function
+- The resulting function takes the parameter type of the first function and returns the return type of the second function
+- Equivalent to: `^x :: function2(function1(x))`
+
+**Examples:**
+
+```walnut
+/* Basic composition */
+double = ^Integer => Integer :: # * 2;
+toString = ^Integer => String :: #->asString;
+
+/* Compose: first double, then convert to string */
+doubleAndStringify = double + toString;
+
+doubleAndStringify(21);                  /* '42' */
+
+/* Multi-step composition */
+increment = ^Integer => Integer :: # + 1;
+square = ^Integer => Integer :: # * #;
+toString = ^Integer => String :: #->asString;
+
+process = increment + square + toString;
+process(4);                              /* '25' (4 + 1 = 5, 5 * 5 = 25) */
+
+/* Composing with type transformations */
+parseInteger = ^String => Integer :: /* parse string to integer */;
+double = ^Integer => Integer :: # * 2;
+toString = ^Integer => String :: #->asString;
+
+pipeline = parseInteger + double + toString;
+pipeline('21');                          /* '42' */
+
+/* Practical use - data transformation pipeline */
+trimSpaces = ^String => String :: #->trim;
+toLowerCase = ^String => String :: #->toLowerCase;
+capitalize = ^String => String ::
+    #->item(0)->toUpperCase + #->slice(1, #->length);
+
+normalizeAndCapitalize = trimSpaces + toLowerCase + capitalize;
+normalizeAndCapitalize('  HELLO  ');     /* 'Hello' */
+```
+
+**Comparison with manual composition:**
+
+```walnut
+/* Using + operator (left-to-right) */
+composed = f + g;
+result = composed(x);                    /* Equivalent to: g(f(x)) */
+
+/* Manual composition (right-to-left) */
+compose = ^[f: ^A => B, g: ^B => C] => ^A => C ::
+    ^x: A => C :: g(f(x));
+
+manual = compose[f: f, g: g];
+result = manual(x);                      /* Same result */
+
+/* The + operator is more concise and reads naturally left-to-right */
+```
+
+**Type checking:**
+
+```walnut
+/* Type mismatch is caught at compile time */
+toString = ^Integer => String :: #->asString;
+double = ^Integer => Integer :: # * 2;
+
+/* Error: String is not a subtype of Integer */
+/* invalid = toString + double;  // Compile error */
+
+/* Correct order */
+valid = double + toString;               /* OK: Integer => Integer => String */
+```
+
+**Chaining multiple compositions:**
+
+```walnut
+/* Build complex transformations */
+removeSpaces = ^String => String :: #->replace(' ', '');
+toLowerCase = ^String => String :: #->toLowerCase;
+reverseString = ^String => String :: #->reverse;
+addPrefix = ^String => String :: 'processed: ' + #;
+
+transform = removeSpaces + toLowerCase + reverseString + addPrefix;
+
+transform('Hello World');                /* 'processed: dlrowolleh' */
+```
+
+**Practical examples:**
+
+```walnut
+/* Validation pipeline */
+validateEmail = ^String => Result<String, Error> :: ...;
+normalizeEmail = ^String => String :: #->toLowerCase->trim;
+sendEmail = ^String => Result<Null, Error> :: ...;
+
+emailPipeline = normalizeEmail + validateEmail;
+
+/* Data processing */
+parseJSON = ^String => Result<JsonValue, Error> :: ...;
+extractField = ^JsonValue => Result<String, Error> :: ...;
+validateField = ^String => Result<String, Error> :: ...;
+
+processData = parseJSON + extractField + validateField;
+```
+
 ## Syntactic Sugar
 
 Walnut provides several shorthands to reduce verbosity:

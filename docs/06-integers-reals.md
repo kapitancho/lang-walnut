@@ -278,6 +278,88 @@ Integer->square(Null => Integer<0..>)
 (-3)->square; /* 9 */
 ```
 
+#### Clamp
+
+```walnut
+Integer->clamp([min: Integer, max: Integer] => Result<Integer, InvalidIntegerRange>)
+
+/* Signature with optional min/max */
+^[Integer, [min: ?Integer, max: ?Integer]] => Result<Integer, InvalidIntegerRange>
+
+/* Signature with at least one of min/max Real */
+^[Integer, [min: ?Real, max: ?Real]] => Result<Real, InvalidRealRange>
+
+/* In case that min and max are guaranteed to be a valid range, the return type can be simplified to Integer or Real respectively */
+
+/* Examples */
+/* Clamp within range */
+5->clamp[min: 0, max: 10];               /* 5 (within bounds) */
+-5->clamp[min: 0, max: 10];              /* 0 (clamped to min) */
+15->clamp[min: 0, max: 10];              /* 10 (clamped to max) */
+
+/* Clamp with only min */
+5->clamp[min: 10];                       /* 10 (below minimum) */
+15->clamp[min: 10];                      /* 15 (above minimum, no max) */
+
+/* Clamp with only max */
+5->clamp[max: 10];                       /* 5 (below maximum) */
+15->clamp[max: 10];                      /* 10 (above maximum) */
+
+/* No constraints - returns value unchanged */
+5->clamp[:];                             /* 5 */
+
+/* Practical use - constrain user input */
+userInput = -50;
+percentage = userInput->clamp[min: 0, max: 100];  /* 0 */
+```
+
+#### Digits
+
+```walnut
+Integer->digits(=> Array<Integer<0..9>>)
+
+/* Examples */
+/* Single digit */
+5->digits;                               /* [5] */
+0->digits;                               /* [0] */
+
+/* Multiple digits */
+42->digits;                              /* [4, 2] */
+123->digits;                             /* [1, 2, 3] */
+1000->digits;                            /* [1, 0, 0, 0] */
+
+/* Large number */
+987654321->digits;                       /* [9, 8, 7, 6, 5, 4, 3, 2, 1] */
+
+/* Practical use - sum of digits */
+sumDigits = ^n: Integer<0..> => Integer ::
+    n->digits->reduce[
+        reducer: ^[result: Integer, item: Integer<0..9>] => Integer ::
+            #result + #item,
+        initial: 0
+    ];
+
+sumDigits(123);                          /* 6 (1 + 2 + 3) */
+
+/* Check for specific digits */
+hasDigit7 = ^n: Integer<0..> => Boolean ::
+    n->digits->any(^# == 7);
+
+hasDigit7(1723);                         /* true */
+hasDigit7(1234);                         /* false */
+
+/* Type inference - digits are always 0..9 */
+digitCheck = ^v: Integer<0..9> => Array<Integer<0..9>, 1> ::
+    v->digits;
+```
+
+**Note:** The `digits` method only works with non-negative integers. For negative numbers, take the absolute value first:
+
+```walnut
+num = -123;
+digitArray = num->abs->digits;           /* [1, 2, 3] */
+```
+
 ### 22.1.9 Integer Range Generation
 
 #### Ascending Range
@@ -554,6 +636,42 @@ Real->roundAsInteger(Null => Integer)
 3.4->roundAsInteger;  /* 3 */
 2.7->roundAsInteger;  /* 3 */
 (-3.5)->roundAsInteger; /* -4 */
+```
+
+#### Clamp
+
+```walnut
+Real->clamp([min: Real, max: Real] => Result<Real, InvalidRealRange>)
+
+/* Signature with optional min/max */
+^[Real, [min?: Real, max?: Real]] => Result<Real, InvalidRealRange>
+
+/* In case that min and max are guaranteed to be a valid range, the return type can be simplified to Real */
+
+/* Examples */
+/* Clamp within range */
+5.5->clamp[min: 0.0, max: 10.0];         /* 5.5 (within bounds) */
+-5.5->clamp[min: 0.0, max: 10.0];        /* 0.0 (clamped to min) */
+15.5->clamp[min: 0.0, max: 10.0];        /* 10.0 (clamped to max) */
+
+/* Clamp with only min */
+5.5->clamp[min: 10.0];                   /* 10.0 (below minimum) */
+15.5->clamp[min: 10.0];                  /* 15.5 (above minimum, no max) */
+
+/* Clamp with only max */
+5.5->clamp[max: 10.0];                   /* 5.5 (below maximum) */
+15.5->clamp[max: 10.0];                  /* 10.0 (above maximum) */
+
+/* No constraints - returns value unchanged */
+5.5->clamp[:];                           /* 5.5 */
+
+/* Practical use - constrain probability */
+rawValue = 1.5;
+probability = rawValue->clamp[min: 0.0, max: 1.0];  /* 1.0 */
+
+/* Constrain temperature */
+temp = -300.0;
+validTemp = temp->clamp[min: -273.15];   /* -273.15 (absolute zero) */
 ```
 
 ### 22.2.8 Casting From Real

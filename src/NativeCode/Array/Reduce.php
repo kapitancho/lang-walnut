@@ -51,16 +51,6 @@ final readonly class Reduce implements NativeMethod {
 				$resultType = $reducerParamType->types['result'];
 				$itemType = $reducerParamType->types['item'];
 
-				if (!$type->itemType->isSubtypeOf($itemType)) {
-					throw new AnalyserException(
-						sprintf(
-							"[%s] Reducer item type %s must be compatible with array item type %s",
-							__CLASS__,
-							$itemType,
-							$type->itemType
-						)
-					);
-				}
 				if (!$reducerType->returnType->isSubtypeOf($resultType)) {
 					throw new AnalyserException(
 						sprintf(

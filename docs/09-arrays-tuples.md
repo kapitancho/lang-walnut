@@ -314,28 +314,42 @@ users->filter(^#.age >= 30);             /* [[name: 'Alice', age: 30],
                                             [name: 'Charlie', age: 35]] */
 ```
 
-**`reduce(initial, accumulator)` - Reduce to single value**
+**`reduce([reducer, initial])` - Reduce to single value**
 ```walnut
 /* Signature */
-^[Array<T>, U, ^[U, T] => U] => U
+^[Array<T>, [reducer: ^[result: A, item: T] => A, initial: A]] => A
 
 /* Examples */
 /* Sum all numbers */
-[1, 2, 3, 4, 5]->reduce(0, ^[#acc, #val] :: #acc + #val);  /* 15 */
+[1, 2, 3, 4, 5]->reduce[
+    reducer: ^[result: Integer, item: Integer] => Integer :: #result + #item,
+    initial: 0
+];  /* 15 */
 
 /* Concatenate strings */
-['hello', ' ', 'world']->reduce('', ^[#acc, #val] :: #acc + #val);
-/* 'hello world' */
+['hello', ' ', 'world']->reduce[
+    reducer: ^[result: String, item: String] => String :: #result + #item,
+    initial: ''
+];  /* 'hello world' */
 
-/* Count occurrences */
-[1, 2, 2, 3, 2, 4]->reduce(
-    [count: 0],
-    ^[#acc, #val] :: ?when(#val == 2) {
-        [count: #acc.count + 1]
-    } ~ {
-        #acc
-    }
-);                                       /* [count: 3] */
+/* Transform types - build comma-separated string from integers */
+[1, 2, 3, 4, 5]->reduce[
+    reducer: ^[result: String, item: Integer] => String ::
+        ?when(#result == '') { #item->asString }
+        ~ { #result + ', ' + #item->asString },
+    initial: ''
+];  /* '1, 2, 3, 4, 5' */
+
+/* Complex aggregation - count occurrences */
+[1, 2, 2, 3, 2, 4]->reduce[
+    reducer: ^[result: [count: Integer], item: Integer] => [count: Integer] ::
+        ?when(#item == 2) {
+            [count: #result.count + 1]
+        } ~ {
+            #result
+        },
+    initial: [count: 0]
+];  /* [count: 3] */
 ```
 
 **`sort()` - Sort array in ascending order**
@@ -394,6 +408,36 @@ users->sortBy(^#.name);
 /* Examples */
 [1, 2, 2, 3, 3, 3, 4]->unique();         /* [1, 2, 3, 4] */
 ['a', 'b', 'a', 'c', 'b']->unique();     /* ['a', 'b', 'c'] */
+```
+
+**`chunk(size)` - Split array into chunks of specified size**
+```walnut
+/* Signature */
+^[Array<T, minL..maxL>, Integer<minS..maxS>] => Array<Array<T, minI..maxI>, minO..maxO>
+
+/* Examples */
+/* Basic chunking */
+[1, 2, 3, 4, 5]->chunk(2);               /* [[1, 2], [3, 4], [5]] */
+
+/* Exact division */
+[1, 2, 3, 4, 5, 6]->chunk(3);            /* [[1, 2, 3], [4, 5, 6]] */
+
+/* Chunk size of 1 */
+[1, 2, 3]->chunk(1);                     /* [[1], [2], [3]] */
+
+/* Chunk size larger than array */
+[1, 2, 3]->chunk(10);                    /* [[1, 2, 3]] */
+
+/* Empty array */
+[]->chunk(2);                            /* [] */
+
+/* Chunking strings */
+['a', 'b', 'c', 'd', 'e']->chunk(2);     /* [['a', 'b'], ['c', 'd'], ['e']] */
+
+/* Type inference with refined bounds */
+chunkData = ^[arr: Array<Integer, 5>, size: Integer<2>] =>
+    Array<Array<Integer, 1..2>, 3> ::
+    arr->chunk(size);
 ```
 
 **`flatten()` - Flatten nested array by one level**
@@ -559,6 +603,41 @@ users->sortBy(^#.name);
 ['hello', 'world']->join(' ');           /* 'hello world' */
 ['a', 'b', 'c']->join('');               /* 'abc' */
 []->join(', ');                          /* '' */
+```
+
+**`indexBy(keyExtractor)` - Create map indexed by extracted key**
+```walnut
+/* Signature */
+^[Array<T>, ^T => String] => Map<T>
+
+/* Examples */
+/* Index users by ID */
+users = [
+    [id: 1, name: 'Alice', email: 'alice@example.com'],
+    [id: 2, name: 'Bob', email: 'bob@example.com'],
+    [id: 3, name: 'Charlie', email: 'charlie@example.com']
+];
+
+userById = users->indexBy(^#.id->asString);
+/* Map with keys '1', '2', '3' mapping to user records */
+
+/* Index by email */
+userByEmail = users->indexBy(^#.email);
+/* Map with keys 'alice@example.com', etc. */
+
+/* Access indexed data */
+alice = userById->item('1');  /* [id: 1, name: 'Alice', email: 'alice@example.com'] */
+
+/* Index products by category */
+products = [
+    [name: 'Apple', category: 'fruit'],
+    [name: 'Carrot', category: 'vegetable'],
+    [name: 'Banana', category: 'fruit']
+];
+
+/* Note: duplicate keys will keep the last occurrence */
+byCategory = products->indexBy(^#.category);
+/* Map with 'fruit' => [name: 'Banana', ...] (overwrites Apple) */
 ```
 
 **`toMap(keyExtractor)` - Convert to map**

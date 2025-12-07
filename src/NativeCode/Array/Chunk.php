@@ -55,7 +55,10 @@ final readonly class Chunk implements NativeMethod {
 				$maxO = match(true) {
 					$maxL === PlusInfinity::value => PlusInfinity::value,
 					$minS > 0 => $maxL->div($minS)->ceil(),
+					// Should not happen due to earlier checks
+					// @codeCoverageIgnoreStart
 					default => PlusInfinity::value,
+					// @codeCoverageIgnoreEnd
 				};
 
 				return $typeRegistry->array(

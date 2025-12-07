@@ -61,6 +61,22 @@ final class ChunkTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[[1, 2], [3, 4], [5]]", $result);
 	}
 
+	public function testChunkTypeMaxInfinity(): void {
+		$result = $this->executeCodeSnippet(
+			"chunk([[1, 2, 3, 4, 5], 2])",
+			valueDeclarations: "chunk = ^[arr: Array<Integer, 5>, size: Integer<2..>] => Array<Array<Integer, 1..2>, 1..3> :: #arr->chunk(#size);"
+		);
+		$this->assertEquals("[[1, 2], [3, 4], [5]]", $result);
+	}
+
+	public function testChunkTypeMaxInfinityEmptyArray(): void {
+		$result = $this->executeCodeSnippet(
+			"chunk([[1, 2, 3, 4, 5], 2])",
+			valueDeclarations: "chunk = ^[arr: Array<Integer, ..5>, size: Integer<2..>] => Array<Array<Integer, ..2>, ..3> :: #arr->chunk(#size);"
+		);
+		$this->assertEquals("[[1, 2], [3, 4], [5]]", $result);
+	}
+
 	public function testChunkTypeExactDivision(): void {
 		$result = $this->executeCodeSnippet(
 			"chunk([[1, 2, 3, 4, 5, 6], 3])",

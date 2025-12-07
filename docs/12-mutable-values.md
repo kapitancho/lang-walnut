@@ -482,6 +482,192 @@ numbers->CLEAR->ADD(10)->ADD(20);
 numbers->value;  /* Returns: [10; 20] */
 ```
 
+### Filter - Filter Array Elements In-Place
+
+The `Filter` method removes elements from a mutable array/set/map that don't match a predicate, modifying it in-place.
+
+**Syntax:**
+```walnut
+mutableCollection->Filter(predicate)
+```
+
+**Returns:** The mutable reference (for chaining)
+
+**Applicable to:** `Mutable<Array<T>>`, `Mutable<Map<T>>`, `Mutable<Set<T>>`
+
+**Examples:**
+```walnut
+/* Filter array - keep only even numbers */
+numbers = mutable{Array<Integer>, [1, 2, 3, 4, 5, 6]};
+numbers->Filter(^# % 2 == 0);
+numbers->value;  /* Returns: [2, 4, 6] */
+
+/* Filter with complex condition */
+users = mutable{Array<[name: String, age: Integer]>, [
+    [name: 'Alice', age: 30],
+    [name: 'Bob', age: 25],
+    [name: 'Charlie', age: 35]
+]};
+users->Filter(^#.age >= 30);
+users->value;  /* Returns: [[name: 'Alice', age: 30], [name: 'Charlie', age: 35]] */
+
+/* Chaining Filter operations */
+data = mutable{Array<Integer>, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]};
+data->Filter(^# > 3)->Filter(^# % 2 == 0);
+data->value;  /* Returns: [4, 6, 8, 10] */
+
+/* Filter set */
+tags = mutable{Set<String>, ['apple'; 'banana'; 'apricot'; 'cherry']};
+tags->Filter(^#->startsWith('a'));
+tags->value;  /* Returns: ['apple'; 'apricot'] */
+```
+
+### Map - Transform Array Elements In-Place
+
+The `Map` method transforms each element of a mutable array/set/map using a function, modifying it in-place.
+
+**Syntax:**
+```walnut
+mutableCollection->Map(transform)
+```
+
+**Returns:** The mutable reference (for chaining)
+
+**Applicable to:** `Mutable<Array<T>>`, `Mutable<Map<T>>`, `Mutable<Set<T>>`
+
+**Note:** The transformation function must return a value of the same type as the collection's item type.
+
+**Examples:**
+```walnut
+/* Map array - double all numbers */
+numbers = mutable{Array<Integer>, [1, 2, 3, 4, 5]};
+numbers->Map(^# * 2);
+numbers->value;  /* Returns: [2, 4, 6, 8, 10] */
+
+/* Map with complex transformation */
+values = mutable{Array<Integer>, [1, 2, 3, 4, 5]};
+values->Map(^?when(# % 2 == 0) { # * 10 } ~ { # });
+values->value;  /* Returns: [1, 20, 3, 40, 5] */
+
+/* Chaining Map with Filter */
+data = mutable{Array<Integer>, [1, 2, 3, 4, 5]};
+data->Filter(^# > 2)->Map(^# * 2);
+data->value;  /* Returns: [6, 8, 10] */
+
+/* Map set */
+numbers = mutable{Set<Integer>, [1; 2; 3]};
+numbers->Map(^# * 10);
+numbers->value;  /* Returns: [10; 20; 30] */
+```
+
+### Sort - Sort Array In-Place
+
+The `Sort` method sorts a mutable array in ascending order, modifying it in-place.
+
+**Syntax:**
+```walnut
+mutableArray->Sort
+```
+
+**Returns:** The mutable reference (for chaining)
+
+**Applicable to:** `Mutable<Array<T>>` where T is comparable (Integer, Real, or String)
+
+**Examples:**
+```walnut
+/* Sort integers */
+numbers = mutable{Array<Integer>, [3, 1, 4, 1, 5, 9, 2, 6]};
+numbers->Sort;
+numbers->value;  /* Returns: [1, 1, 2, 3, 4, 5, 6, 9] */
+
+/* Sort reals */
+values = mutable{Array<Real>, [3.14, 2.71, 1.41, 2.23]};
+values->Sort;
+values->value;  /* Returns: [1.41, 2.23, 2.71, 3.14] */
+
+/* Sort strings */
+names = mutable{Array<String>, ['charlie', 'alice', 'bob', 'david']};
+names->Sort;
+names->value;  /* Returns: ['alice', 'bob', 'charlie', 'david'] */
+
+/* Chaining Sort with other operations */
+data = mutable{Array<Integer>, [5, 2, 8, 1, 9]};
+data->Filter(^# > 2)->Sort;
+data->value;  /* Returns: [5, 8, 9] */
+```
+
+### Reverse - Reverse Array In-Place
+
+The `Reverse` method reverses the order of elements in a mutable array, modifying it in-place.
+
+**Syntax:**
+```walnut
+mutableArray->Reverse
+```
+
+**Returns:** The mutable reference (for chaining)
+
+**Applicable to:** `Mutable<Array<T>>`
+
+**Examples:**
+```walnut
+/* Reverse integers */
+numbers = mutable{Array<Integer>, [1, 2, 3, 4, 5]};
+numbers->Reverse;
+numbers->value;  /* Returns: [5, 4, 3, 2, 1] */
+
+/* Reverse strings */
+words = mutable{Array<String>, ['hello', 'world', 'walnut']};
+words->Reverse;
+words->value;  /* Returns: ['walnut', 'world', 'hello'] */
+
+/* Chaining Reverse with Sort */
+data = mutable{Array<Integer>, [3, 1, 4, 1, 5, 9]};
+data->Sort->Reverse;
+data->value;  /* Returns: [9, 5, 4, 3, 1, 1] (descending order) */
+
+/* Double reverse returns to original */
+arr = mutable{Array<Integer>, [1, 2, 3]};
+arr->Reverse->Reverse;
+arr->value;  /* Returns: [1, 2, 3] */
+```
+
+### Shuffle - Shuffle Array In-Place
+
+The `Shuffle` method randomly shuffles the elements of a mutable array, modifying it in-place.
+
+**Syntax:**
+```walnut
+mutableArray->Shuffle
+```
+
+**Returns:** The mutable reference (for chaining)
+
+**Applicable to:** `Mutable<Array<T>>`
+
+**Examples:**
+```walnut
+/* Shuffle integers */
+numbers = mutable{Array<Integer>, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]};
+numbers->Shuffle;
+numbers->value;  /* Returns: [7, 2, 9, 1, 5, 3, 8, 6, 10, 4] (random order) */
+
+/* Shuffle deck of cards */
+deck = mutable{Array<String>, ['A♠', 'K♠', 'Q♠', 'J♠', '10♠']};
+deck->Shuffle;
+deck->value;  /* Returns: random permutation of the deck */
+
+/* Shuffle before taking samples */
+data = mutable{Array<Integer>, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]};
+data->Shuffle;
+sample = data->value->slice(0, 3);  /* Take first 3 after shuffle */
+
+/* Chaining Shuffle with other operations */
+arr = mutable{Array<Integer>, [1, 2, 3, 4, 5]};
+arr->Filter(^# > 2)->Shuffle;
+arr->value;  /* Returns: random permutation of [3, 4, 5] */
+```
+
 ## Type Invariance
 
 The inner type `T` in `Mutable<T>` is **invariant**, meaning:
