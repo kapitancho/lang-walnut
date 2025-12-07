@@ -37,6 +37,14 @@ final class FlatMapTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[1, 2, 2, 3, 3, 4]", $result);
 	}
 
+	public function testFlatMapReturnTypeTuple(): void {
+		$result = $this->executeCodeSnippet(
+			"testFn[1, 2, 3];",
+			valueDeclarations: "testFn = ^arr: Array<Integer, 2..3> => Array<Integer, 4..6> :: arr->flatMap(^i: Integer => [Integer, Integer] :: [i, i + 1]);"
+		);
+		$this->assertEquals("[1, 2, 2, 3, 3, 4]", $result);
+	}
+
 	public function testFlatMapResultOk(): void {
 		$result = $this->executeCodeSnippet(
 			"testFn[1, 2, 3];",

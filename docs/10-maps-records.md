@@ -351,6 +351,23 @@ ages->filterKeyValue(^[#key, #value] ::
 );                                            /* [alice: 30] */
 ```
 
+**`keySort(options)` - Sort map by keys in ascending or descending order**
+```walnut
+/* Signature */
+^[Map<T>, Null|[reverse: Boolean]] => Map<T>
+
+/* Examples */
+ages = [charlie: 35, alice: 30, bob: 25];
+ages->keySort(null);                          /* [alice: 30, bob: 25, charlie: 35] */
+
+/* Sort by keys in descending order */
+ages->keySort([reverse: true]);               /* [charlie: 35, bob: 25, alice: 30] */
+
+/* Sort in ascending order (explicit) */
+prices = [banana: 0.99, apple: 1.99, cherry: 2.49];
+prices->keySort([reverse: false]);            /* [apple: 1.99, banana: 0.99, cherry: 2.49] */
+```
+
 **`reduce(initial, accumulator)` - Reduce to single value**
 ```walnut
 /* Signature */

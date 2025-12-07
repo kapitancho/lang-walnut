@@ -562,12 +562,15 @@ numbers->value;  /* Returns: [10; 20; 30] */
 
 ### SORT - Sort Array In-Place
 
-The `SORT` method sorts a mutable array in ascending order, modifying it in-place.
+The `SORT` method sorts a mutable array in ascending or descending order, modifying it in-place.
 
 **Syntax:**
 ```walnut
-mutableArray->SORT
+mutableArray->SORT(options)
 ```
+
+**Parameters:**
+- `options` - `Null|[reverse: Boolean]` - Pass `null` or `[reverse: false]` for ascending, `[reverse: true]` for descending
 
 **Returns:** The mutable reference (for chaining)
 
@@ -575,24 +578,29 @@ mutableArray->SORT
 
 **Examples:**
 ```walnut
-/* Sort integers */
+/* Sort integers in ascending order */
 numbers = mutable{Array<Integer>, [3, 1, 4, 1, 5, 9, 2, 6]};
-numbers->SORT;
+numbers->SORT(null);
 numbers->value;  /* Returns: [1, 1, 2, 3, 4, 5, 6, 9] */
+
+/* Sort integers in descending order */
+numbers = mutable{Array<Integer>, [3, 1, 4, 1, 5, 9, 2, 6]};
+numbers->SORT([reverse: true]);
+numbers->value;  /* Returns: [9, 6, 5, 4, 3, 2, 1, 1] */
 
 /* Sort reals */
 values = mutable{Array<Real>, [3.14, 2.71, 1.41, 2.23]};
-values->SORT;
+values->SORT([reverse: false]);
 values->value;  /* Returns: [1.41, 2.23, 2.71, 3.14] */
 
-/* Sort strings */
+/* Sort strings in descending order */
 names = mutable{Array<String>, ['charlie', 'alice', 'bob', 'david']};
-names->SORT;
-names->value;  /* Returns: ['alice', 'bob', 'charlie', 'david'] */
+names->SORT([reverse: true]);
+names->value;  /* Returns: ['david', 'charlie', 'bob', 'alice'] */
 
 /* Chaining SORT with other operations */
 data = mutable{Array<Integer>, [5, 2, 8, 1, 9]};
-data->FILTER(^# > 2)->SORT;
+data->FILTER(^# > 2)->SORT(null);
 data->value;  /* Returns: [5, 8, 9] */
 ```
 
@@ -621,10 +629,10 @@ words = mutable{Array<String>, ['hello', 'world', 'walnut']};
 words->REVERSE;
 words->value;  /* Returns: ['walnut', 'world', 'hello'] */
 
-/* Chaining REVERSE with SORT */
+/* Reverse after filter */
 data = mutable{Array<Integer>, [3, 1, 4, 1, 5, 9]};
-data->SORT->REVERSE;
-data->value;  /* Returns: [9, 5, 4, 3, 1, 1] (descending order) */
+data->FILTER(^# > 2)->REVERSE;
+data->value;  /* Returns: [9, 5, 4, 3] */
 
 /* Double reverse returns to original */
 arr = mutable{Array<Integer>, [1, 2, 3]};
@@ -666,6 +674,45 @@ sample = data->value->slice(0, 3);  /* Take first 3 after shuffle */
 arr = mutable{Array<Integer>, [1, 2, 3, 4, 5]};
 arr->FILTER(^# > 2)->SHUFFLE;
 arr->value;  /* Returns: random permutation of [3, 4, 5] */
+```
+
+### KEYSORT - Sort Map By Keys In-Place
+
+The `KEYSORT` method sorts a mutable map by its keys in ascending or descending order, modifying it in-place.
+
+**Syntax:**
+```walnut
+mutableMap->KEYSORT(options)
+```
+
+**Parameters:**
+- `options` - `Null|[reverse: Boolean]` - Pass `null` or `[reverse: false]` for ascending, `[reverse: true]` for descending
+
+**Returns:** The mutable reference (for chaining)
+
+**Applicable to:** `Mutable<Map<T>>`
+
+**Examples:**
+```walnut
+/* Sort by keys in ascending order */
+ages = mutable{Map<Integer>, [charlie: 35, alice: 30, bob: 25]};
+ages->KEYSORT(null);
+ages->value;  /* Returns: [alice: 30, bob: 25, charlie: 35] */
+
+/* Sort by keys in descending order */
+scores = mutable{Map<Real>, [test1: 95.5, test3: 88.0, test2: 78.0]};
+scores->KEYSORT([reverse: true]);
+scores->value;  /* Returns: [test3: 88.0, test2: 78.0, test1: 95.5] */
+
+/* Sort in ascending order (explicit) */
+prices = mutable{Map<Real>, [banana: 0.99, apple: 1.99, cherry: 2.49]};
+prices->KEYSORT([reverse: false]);
+prices->value;  /* Returns: [apple: 1.99, banana: 0.99, cherry: 2.49] */
+
+/* Chaining KEYSORT with FILTER */
+data = mutable{Map<Integer>, [z: 26, a: 1, m: 13, c: 3]};
+data->FILTER(^# > 5)->KEYSORT(null);
+data->value;  /* Returns: [m: 13, z: 26] */
 ```
 
 ## Type Invariance
@@ -1121,8 +1168,9 @@ Key operations summary:
 | `CLEAR` | `Mutable<Set>` | Mutable ref | Remove all elements |
 | `FILTER` | `Mutable<Array/Map/Set>` | Mutable ref | Filter elements in-place |
 | `MAP` | `Mutable<Array/Map/Set>` | Mutable ref | Transform elements in-place |
-| `SORT` | `Mutable<Array>` (comparable) | Mutable ref | Sort in ascending order |
+| `SORT` | `Mutable<Array>` (comparable) | Mutable ref | Sort in ascending/descending order |
 | `REVERSE` | `Mutable<Array>` | Mutable ref | Reverse element order |
 | `SHUFFLE` | `Mutable<Array>` | Mutable ref | Randomly shuffle elements |
+| `KEYSORT` | `Mutable<Map>` | Mutable ref | Sort by keys in ascending/descending order |
 
 Remember: Use mutable values judiciously, preferring immutable operations when possible, and leverage mutability for state management, accumulation, and performance-critical scenarios.

@@ -352,23 +352,21 @@ users->filter(^#.age >= 30);             /* [[name: 'Alice', age: 30],
 ];  /* [count: 3] */
 ```
 
-**`sort()` - Sort array in ascending order**
+**`sort(options)` - Sort array in ascending or descending order**
 ```walnut
 /* Signature */
-^Array<T> => Array<T>  /* where T is comparable */
+^[Array<T>, Null|[reverse: Boolean]] => Array<T>  /* where T is comparable */
 
 /* Examples */
-[3, 1, 4, 1, 5, 9]->sort();              /* [1, 1, 3, 4, 5, 9] */
-['charlie', 'alice', 'bob']->sort();     /* ['alice', 'bob', 'charlie'] */
-```
+[3, 1, 4, 1, 5, 9]->sort(null);                /* [1, 1, 3, 4, 5, 9] */
+['charlie', 'alice', 'bob']->sort(null);       /* ['alice', 'bob', 'charlie'] */
 
-**`sortDescending()` - Sort array in descending order**
-```walnut
-/* Signature */
-^Array<T> => Array<T>  /* where T is comparable */
+/* Sort in descending order */
+[3, 1, 4, 1, 5, 9]->sort([reverse: true]);     /* [9, 5, 4, 3, 1, 1] */
+['charlie', 'alice', 'bob']->sort([reverse: true]);  /* ['charlie', 'bob', 'alice'] */
 
-/* Examples */
-[3, 1, 4, 1, 5, 9]->sortDescending();    /* [9, 5, 4, 3, 1, 1] */
+/* Sort in ascending order (explicit) */
+[3, 1, 4, 1, 5, 9]->sort([reverse: false]);    /* [1, 1, 3, 4, 5, 9] */
 ```
 
 **`sortBy(keyExtractor)` - Sort by custom key**
