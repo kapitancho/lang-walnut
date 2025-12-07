@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\Array;
+namespace Walnut\Lang\NativeCode\Map;
 
 use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
@@ -11,8 +11,11 @@ use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
+use Walnut\Lang\Blueprint\Type\MapType;
+use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Implementation\Code\NativeCode\Analyser\Composite\Partition as PartitionTrait;
@@ -27,14 +30,14 @@ final readonly class Partition implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
-		if ($type instanceof ArrayType) {
+		$type = $targetType instanceof RecordType ? $targetType->asMapType() : $targetType;
+		if ($type instanceof MapType) {
 			return $this->analyseHelper(
 				$typeRegistry,
 				$type,
 				$parameterType,
 				fn(Type|null $itemType, int|Number $minLength, int|Number|PlusInfinity $maxLength) =>
-					$typeRegistry->array($itemType, $minLength, $maxLength)
+					$typeRegistry->map($itemType, $minLength, $maxLength)
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -47,12 +50,12 @@ final readonly class Partition implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		if ($target instanceof TupleValue) {
+		if ($target instanceof RecordValue) {
 			return $this->executeHelper(
 				$programRegistry,
 				$target,
 				$parameter,
-				fn(array $values) => $programRegistry->valueRegistry->tuple(array_values($values))
+				fn(array $values) => $programRegistry->valueRegistry->record($values)
 			);
 		}
 		// @codeCoverageIgnoreStart

@@ -37,6 +37,24 @@ final class FlatMapTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[1, 2, 2, 3, 3, 4]", $result);
 	}
 
+	public function testFlatMapResultOk(): void {
+		$result = $this->executeCodeSnippet(
+			"testFn[1, 2, 3];",
+			valueDeclarations: "testFn = ^arr: Array<Integer, 2..3> => Result<Array<Integer, 4..9>, NotANumber> :: 
+				arr->flatMap(^i: Integer => Result<Array<Integer, 2..3>, NotANumber> :: [i, ?noError(5 // i)]);"
+		);
+		$this->assertEquals("[1, 5, 2, 2, 3, 1]", $result);
+	}
+
+	public function testFlatMapResultError(): void {
+		$result = $this->executeCodeSnippet(
+			"testFn[0, 1, 2];",
+			valueDeclarations: "testFn = ^arr: Array<Integer, 2..3> => Result<Array<Integer, 4..9>, NotANumber> :: 
+				arr->flatMap(^i: Integer => Result<Array<Integer, 2..3>, NotANumber> :: [i, ?noError(5 // i)]);"
+		);
+		$this->assertEquals("@NotANumber", $result);
+	}
+
 	public function testFlatMapNestedArrays(): void {
 		$result = $this->executeCodeSnippet("[[1, 2], [3, 4], [5]]->flatMap(^a: Array<Integer> => Array<Integer> :: a);");
 		$this->assertEquals("[1, 2, 3, 4, 5]", $result);
