@@ -11,8 +11,11 @@ use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\BooleanValue;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
+use Walnut\Lang\Blueprint\Value\NullValue;
 use Walnut\Lang\Blueprint\Value\RealValue;
+use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TupleValue;
@@ -39,7 +42,20 @@ final readonly class Sort implements NativeMethod {
 					$typeRegistry->real()
 				])
 			)) {
-				return $targetType;
+				$pType = $typeRegistry->union([
+					$typeRegistry->null,
+					$typeRegistry->record([
+						'reverse' => $typeRegistry->boolean
+					])
+				]);
+				if ($parameterType->isSubtypeOf($pType)) {
+					return $targetType;
+				}
+				throw new AnalyserException(sprintf(
+					"The parameter type %s is not a subtype of %s",
+					$parameterType,
+					$pType
+				));
 			}
 		}
 		// @codeCoverageIgnoreStart
@@ -53,42 +69,53 @@ final readonly class Sort implements NativeMethod {
 		Value $parameter
 	): Value {
 		if ($target instanceof TupleValue) {
-			$values = $target->values;
+			if ($parameter instanceof NullValue || (
+				$parameter instanceof RecordValue &&
+				($rev = $parameter->values['reverse'] ?? null) instanceof BooleanValue
+			)) {
+				$reverse = isset($rev) ? $rev->literalValue : false;
+				$sort = $reverse ? rsort(...) : sort(...);
 
-			$rawValues = [];
-			$hasStrings = false;
-			$hasNumbers = false;
-			foreach($values as $value) {
-				if ($value instanceof StringValue) {
-					$hasStrings = true;
-				} elseif ($value instanceof IntegerValue || $value instanceof RealValue) {
-					$hasNumbers = true;
-				} else {
-					// @codeCoverageIgnoreStart
-					throw new ExecutionException("Invalid target value");
-					// @codeCoverageIgnoreEnd
+				$values = $target->values;
+
+				$rawValues = [];
+				$hasStrings = false;
+				$hasNumbers = false;
+				foreach($values as $value) {
+					if ($value instanceof StringValue) {
+						$hasStrings = true;
+					} elseif ($value instanceof IntegerValue || $value instanceof RealValue) {
+						$hasNumbers = true;
+					} else {
+						// @codeCoverageIgnoreStart
+						throw new ExecutionException("Invalid target value");
+						// @codeCoverageIgnoreEnd
+					}
+					$rawValues[] = (string)$value->literalValue;
 				}
-				$rawValues[] = (string)$value->literalValue;
-			}
-			if ($hasStrings) {
-				if ($hasNumbers) {
-					// @codeCoverageIgnoreStart
-					throw new ExecutionException("Invalid target value");
-					// @codeCoverageIgnoreEnd
+				if ($hasStrings) {
+					if ($hasNumbers) {
+						// @codeCoverageIgnoreStart
+						throw new ExecutionException("Invalid target value");
+						// @codeCoverageIgnoreEnd
+					}
+					$sort($rawValues, SORT_STRING);
+					return $programRegistry->valueRegistry->tuple(array_map(
+						fn(string $value) => $programRegistry->valueRegistry->string($value),
+						$rawValues
+					));
 				}
-				sort($rawValues, SORT_STRING);
+				$sort($rawValues, SORT_NUMERIC);
 				return $programRegistry->valueRegistry->tuple(array_map(
-					fn(string $value) => $programRegistry->valueRegistry->string($value),
+					fn(string $value) => str_contains((string)$value, '.') ?
+						$programRegistry->valueRegistry->real((float)$value) :
+						$programRegistry->valueRegistry->integer((int)$value),
 					$rawValues
 				));
 			}
-			sort($rawValues, SORT_NUMERIC);
-			return $programRegistry->valueRegistry->tuple(array_map(
-				fn(string $value) => str_contains((string)$value, '.') ?
-					$programRegistry->valueRegistry->real((float)$value) :
-					$programRegistry->valueRegistry->integer((int)$value),
-				$rawValues
-			));
+			// @codeCoverageIgnoreStart
+			throw new ExecutionException("Invalid parameter value");
+			// @codeCoverageIgnoreEnd
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

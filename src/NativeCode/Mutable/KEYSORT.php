@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
+use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -23,7 +24,7 @@ use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
-final readonly class SORT implements NativeMethod {
+final readonly class KEYSORT implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
@@ -35,29 +36,21 @@ final readonly class SORT implements NativeMethod {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof MutableType) {
 			$valueType = $this->toBaseType($targetType->valueType);
-			if ($valueType instanceof ArrayType) {
-				$itemType = $valueType->itemType;
-				if ($itemType->isSubtypeOf($typeRegistry->string()) || $itemType->isSubtypeOf(
-					$typeRegistry->union([
-						$typeRegistry->integer(),
-						$typeRegistry->real()
+			if ($valueType instanceof MapType) {
+				$pType = $typeRegistry->union([
+					$typeRegistry->null,
+					$typeRegistry->record([
+						'reverse' => $typeRegistry->boolean
 					])
-				)) {
-					$pType = $typeRegistry->union([
-						$typeRegistry->null,
-						$typeRegistry->record([
-							'reverse' => $typeRegistry->boolean
-						])
-					]);
-					if ($parameterType->isSubtypeOf($pType)) {
-						return $targetType;
-					}
-					throw new AnalyserException(sprintf(
-						"The parameter type %s is not a subtype of %s",
-						$parameterType,
-						$pType
-					));
+				]);
+				if ($parameterType->isSubtypeOf($pType)) {
+					return $targetType;
 				}
+				throw new AnalyserException(sprintf(
+					"The parameter type %s is not a subtype of %s",
+					$parameterType,
+					$pType
+				));
 			}
 		}
 		// @codeCoverageIgnoreStart
@@ -72,51 +65,15 @@ final readonly class SORT implements NativeMethod {
 	): Value {
 		if ($target instanceof MutableValue) {
 			$v = $target->value;
-			if ($v instanceof TupleValue) {
+			if ($v instanceof RecordValue) {
 				if ($parameter instanceof NullValue || (
 					$parameter instanceof RecordValue &&
 					($rev = $parameter->values['reverse'] ?? null) instanceof BooleanValue
 				)) {
 					$reverse = isset($rev) ? $rev->literalValue : false;
-					$sort = $reverse ? rsort(...) : sort(...);
-
 					$values = $v->values;
-
-					$rawValues = [];
-					$hasStrings = false;
-					$hasNumbers = false;
-					foreach ($values as $value) {
-						if ($value instanceof StringValue) {
-							$hasStrings = true;
-						} elseif ($value instanceof IntegerValue || $value instanceof RealValue) {
-							$hasNumbers = true;
-						} else {
-							// @codeCoverageIgnoreStart
-							throw new ExecutionException("Invalid target value");
-							// @codeCoverageIgnoreEnd
-						}
-						$rawValues[] = (string)$value->literalValue;
-					}
-					if ($hasStrings) {
-						if ($hasNumbers) {
-							// @codeCoverageIgnoreStart
-							throw new ExecutionException("Invalid target value");
-							// @codeCoverageIgnoreEnd
-						}
-						$sort($rawValues, SORT_STRING);
-						$target->value = $programRegistry->valueRegistry->tuple(array_map(
-							fn(string $value) => $programRegistry->valueRegistry->string($value),
-							$rawValues
-						));
-						return $target;
-					}
-					$sort($rawValues, SORT_NUMERIC);
-					$target->value = $programRegistry->valueRegistry->tuple(array_map(
-						fn(string $value) => str_contains((string)$value, '.') ?
-							$programRegistry->valueRegistry->real((float)$value) :
-							$programRegistry->valueRegistry->integer((int)$value),
-						$rawValues
-					));
+					$reverse ? krsort($values, SORT_STRING) : ksort($values, SORT_STRING);
+					$target->value = $programRegistry->valueRegistry->record($values);
 					return $target;
 				}
 				// @codeCoverageIgnoreStart

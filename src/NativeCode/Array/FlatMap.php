@@ -42,25 +42,21 @@ final readonly class FlatMap implements NativeMethod {
 					// Return type must be an array
 					if ($returnType->isSubtypeOf($typeRegistry->array())) {
 						$returnType = $this->toBaseType($returnType);
-						if ($returnType instanceof ArrayType) {
-							// Calculate flattened array bounds
-							$minLength = ((int)(string)$type->range->minLength) * ((int)(string)$returnType->range->minLength);
-							$maxLength = $type->range->maxLength === PlusInfinity::value ||
-								$returnType->range->maxLength === PlusInfinity::value ?
-								PlusInfinity::value :
-								((int)(string)$type->range->maxLength) * ((int)(string)$returnType->range->maxLength);
-
-							$resultArray = $typeRegistry->array(
-								$returnType->itemType,
-								$minLength,
-								$maxLength
-							);
-							return $errorType ? $typeRegistry->result($resultArray, $errorType) : $resultArray;
+						if ($returnType instanceof TupleType) {
+							$returnType = $returnType->asArrayType();
 						}
-						// Generic array type without specific bounds
-						return $errorType ?
-							$typeRegistry->result($typeRegistry->array(), $errorType) :
-							$typeRegistry->array();
+						$minLength = ((int)(string)$type->range->minLength) * ((int)(string)$returnType->range->minLength);
+						$maxLength = $type->range->maxLength === PlusInfinity::value ||
+							$returnType->range->maxLength === PlusInfinity::value ?
+							PlusInfinity::value :
+							((int)(string)$type->range->maxLength) * ((int)(string)$returnType->range->maxLength);
+
+						$resultArray = $typeRegistry->array(
+							$returnType->itemType,
+							$minLength,
+							$maxLength
+						);
+						return $errorType ? $typeRegistry->result($resultArray, $errorType) : $resultArray;
 					}
 					throw new AnalyserException(
 						sprintf(
