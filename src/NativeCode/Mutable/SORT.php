@@ -20,7 +20,7 @@ use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
-final readonly class Sort implements NativeMethod {
+final readonly class SORT implements NativeMethod {
 	use BaseType;
 
 	public function analyse(

@@ -17,7 +17,7 @@ use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
-final readonly class Reverse implements NativeMethod {
+final readonly class SHUFFLE implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
@@ -46,7 +46,7 @@ final readonly class Reverse implements NativeMethod {
 			$t = $target->value;
 			if ($t instanceof TupleValue) {
 				$values = $t->values;
-				$values = array_reverse($values);
+				shuffle($values);
 				$target->value = $programRegistry->valueRegistry->tuple($values);
 				return $target;
 			}

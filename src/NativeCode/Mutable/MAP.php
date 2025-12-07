@@ -24,7 +24,7 @@ use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
-final readonly class Map implements NativeMethod {
+final readonly class MAP implements NativeMethod {
 	use BaseType;
 
 	public function analyse(

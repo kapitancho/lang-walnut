@@ -33,13 +33,18 @@ final readonly class Reverse implements NativeMethod {
 		// @codeCoverageIgnoreEnd
 	}
 
+	private function reverse(string $str): string {
+		preg_match_all('/./us', $str, $matches);
+		return implode('', array_reverse($matches[0]));
+	}
+
 	public function execute(
 		ProgramRegistry $programRegistry,
 		Value $target,
 		Value $parameter
 	): Value {
 		if ($target instanceof StringValue) {
-			return $programRegistry->valueRegistry->string(strrev($target->literalValue));
+			return $programRegistry->valueRegistry->string($this->reverse($target->literalValue));
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");
