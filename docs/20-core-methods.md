@@ -1393,6 +1393,30 @@ Set<T>->binaryMinus(Set => Set<T>)
 [1; 2; 3] - [2; 3];  /* [1] */
 ```
 
+**`binaryMultiply` (*)** - Cartesian product
+```walnut
+Set<T, a..b>->binaryMultiply(Set<P, c..d> => Set<[T, P], a*c..b*d>)
+
+/* Basic cartesian product */
+[1; 2] * [3; 4];
+/* [[1, 3]; [1, 4]; [2, 3]; [2, 4]] */
+
+/* Single element */
+['a';] * ['x';];
+/* [['a', 'x'];] */
+
+/* Mixed types */
+['a'; 'b'] * [1; 2; 3];
+/* [['a', 1]; ['a', 2]; ['a', 3]; ['b', 1]; ['b', 2]; ['b', 3]] */
+
+/* Type bounds are multiplied: Set<3> * Set<3> => Set<9> */
+s1 = [1; 2; 3];      /* Set<Integer, 3> */
+s2 = [10; 20; 30];   /* Set<Integer, 3> */
+product = s1 * s2;   /* Set<[Integer, Integer], 9> */
+```
+
+The cartesian product creates all possible pairs by combining each element from the first set with each element from the second set. The result length bounds are the product of the input bounds: `minLength1 * minLength2 .. maxLength1 * maxLength2`.
+
 ### 16.8.4 Set Comparisons
 
 **`isDisjointWith`** - Check if disjoint

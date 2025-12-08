@@ -38,6 +38,7 @@
   | countValues                | ✅     | ❌ Possible   | ❌ N/A        | Count occurrences into Map               |
   | Combining                  |        |               |               |                                          |
   | + (concat/merge/union)     | ✅     | ✅            | ✅            | Combine collections                      |
+  | * (cartesian product)      | ❌     | ❌            | ✅            | All pairs from two sets                  |
   | flip                       | ✅     | ✅            | ✅            | Swap keys/values or index/value          |
   | unique                     | ✅     | ❌ N/A        | ❌ N/A        | Remove duplicates                        |
   | Key-Value Variants         |        |               |               |                                          |
