@@ -85,4 +85,11 @@ final class FirstTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@ItemNotFound", $result);
 	}
 
+	public function testInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet(
+			"Invalid parameter type",
+			"[]->first(1);"
+		);
+	}
+
 }
