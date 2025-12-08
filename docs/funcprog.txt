@@ -44,7 +44,7 @@
   | Key-Value Variants         |        |               |               |                                          |
   | mapKeyValue                | ❌     | ✅            | ❌            | Transform with access to key and value   |
   | mapIndexValue              | ✅     | ❌            | ❌            | Transform with access to index and value |
-  | remapKeys                  | ❌     | ✅            | ❌            | Transform keys while preserving values   |
+  | remapKeys / REMAPKEYS      | ❌     | ✅ ᴹ          | ❌            | Transform keys while preserving values   |
   | filterKeyValue             | ❌     | ✅            | ❌            | Filter with access to key and value      |
   | findFirstKeyValue          | ❌     | ✅            | ❌            | Find with access to key and value        |
   | Mutable-Only Operations    |        |               |               |                                          |

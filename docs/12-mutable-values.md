@@ -715,6 +715,78 @@ data->FILTER(^# > 5)->KEYSORT(null);
 data->value;  /* Returns: [m: 13, z: 26] */
 ```
 
+### REMAPKEYS - Transform Map Keys In-Place
+
+The `REMAPKEYS` method transforms all keys in a mutable map using a callback function, modifying it in-place.
+
+**Syntax:**
+```walnut
+mutableMap->REMAPKEYS(callback)
+```
+
+**Parameters:**
+- `callback` - `^K => K` - Function that takes a key and returns a new key **of the same type**
+  - Unlike the immutable `remapKeys`, the return type must match the original key type
+  - Can return `Result<K, Error>` for validation
+
+**Returns:**
+- The mutable reference (for chaining) if successful
+- Error value if the callback returns an error
+
+**Applicable to:** `Mutable<Map<K:T>>`
+
+**Examples:**
+```walnut
+/* Add prefix to all keys */
+config = mutable{Map<String>, [host: 'localhost', port: '8080']};
+config->REMAPKEYS(^k: String => String :: 'app.' + k);
+config->value;  /* Returns: [app.host: 'localhost', app.port: '8080'] */
+
+/* Normalize keys to lowercase */
+data = mutable{Map<Integer>, [Name: 1, AGE: 2, City: 3]};
+data->REMAPKEYS(^k: String => String :: k->lowercase);
+data->value;  /* Returns: [name: 1, age: 2, city: 3] */
+
+/* Identity transformation (no change) */
+info = mutable{Map<Real>, [a: 1.5, b: 2.5]};
+info->REMAPKEYS(^k: String => String :: k);
+info->value;  /* Returns: [a: 1.5, b: 2.5] */
+
+/* Collision handling - last value wins */
+items = mutable{Map<Integer>, [a: 1, b: 2, c: 3]};
+items->REMAPKEYS(^k: String => String :: 'x');
+items->value;  /* Returns: [x: 3] (last value wins) */
+
+/* Using with constrained key types */
+restrictedMap = mutable{Map<String['a', 'b', 'c']:Integer>, [a: 1, b: 2]};
+/* Can only remap to keys 'a', 'b', or 'c' */
+restrictedMap->REMAPKEYS(^k: String['a', 'b', 'c'] => String['a', 'b', 'c'] ::
+    ?when(k) {
+        'a': 'b',
+        'b': 'c',
+        'c': 'a'
+    }
+);
+restrictedMap->value;  /* Returns: [b: 1, c: 2] */
+
+/* Error handling with Result type */
+userIds = mutable{Map<Integer>, [user1: 100, user2: 200]};
+result = userIds->REMAPKEYS(^k: String => Result<String, String> ::
+    k->contains('admin') ? @'Invalid key' : k + '_verified'
+);
+/* Returns error if any key contains 'admin', otherwise transforms all keys */
+
+/* Chaining with other mutable operations */
+products = mutable{Map<Real>, [apple: 1.99, banana: 0.99, cherry: 2.49]};
+products->FILTER(^# < 2.0)->REMAPKEYS(^k: String => String :: k + '_sale');
+products->value;  /* Returns: [apple_sale: 1.99, banana_sale: 0.99] */
+```
+
+**Key Differences from Immutable `remapKeys`:**
+- Return type **must match** the original key type (stricter constraint)
+- Modifies the map in-place instead of creating a new one
+- Returns the mutable reference for chaining
+
 ## Type Invariance
 
 The inner type `T` in `Mutable<T>` is **invariant**, meaning:
@@ -1172,5 +1244,6 @@ Key operations summary:
 | `REVERSE` | `Mutable<Array>` | Mutable ref | Reverse element order |
 | `SHUFFLE` | `Mutable<Array>` | Mutable ref | Randomly shuffle elements |
 | `KEYSORT` | `Mutable<Map>` | Mutable ref | Sort by keys in ascending/descending order |
+| `REMAPKEYS` | `Mutable<Map>` | Mutable ref or Error | Transform keys with callback function |
 
 Remember: Use mutable values judiciously, preferring immutable operations when possible, and leverage mutability for state management, accumulation, and performance-critical scenarios.
