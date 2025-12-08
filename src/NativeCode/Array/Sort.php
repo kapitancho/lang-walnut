@@ -11,18 +11,12 @@ use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Value\BooleanValue;
-use Walnut\Lang\Blueprint\Value\IntegerValue;
-use Walnut\Lang\Blueprint\Value\NullValue;
-use Walnut\Lang\Blueprint\Value\RealValue;
-use Walnut\Lang\Blueprint\Value\RecordValue;
-use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TupleValue;
-use Walnut\Lang\Implementation\Type\Helper\BaseType;
+use Walnut\Lang\Implementation\Code\NativeCode\Analyser\Composite\Sort as SortTrait;
 
 final readonly class Sort implements NativeMethod {
-	use BaseType;
+	use SortTrait;
 
 	public function analyse(
 		TypeRegistry $typeRegistry,
@@ -35,28 +29,12 @@ final readonly class Sort implements NativeMethod {
 			$targetType = $targetType->asArrayType();
 		}
 		if ($targetType instanceof ArrayType) {
-			$itemType = $targetType->itemType;
-			if ($itemType->isSubtypeOf($typeRegistry->string()) || $itemType->isSubtypeOf(
-				$typeRegistry->union([
-					$typeRegistry->integer(),
-					$typeRegistry->real()
-				])
-			)) {
-				$pType = $typeRegistry->union([
-					$typeRegistry->null,
-					$typeRegistry->record([
-						'reverse' => $typeRegistry->boolean
-					])
-				]);
-				if ($parameterType->isSubtypeOf($pType)) {
-					return $targetType;
-				}
-				throw new AnalyserException(sprintf(
-					"The parameter type %s is not a subtype of %s",
-					$parameterType,
-					$pType
-				));
-			}
+			return $this->analyseHelper(
+				$typeRegistry,
+				$targetType,
+				$targetType,
+				$parameterType
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -69,53 +47,12 @@ final readonly class Sort implements NativeMethod {
 		Value $parameter
 	): Value {
 		if ($target instanceof TupleValue) {
-			if ($parameter instanceof NullValue || (
-				$parameter instanceof RecordValue &&
-				($rev = $parameter->values['reverse'] ?? null) instanceof BooleanValue
-			)) {
-				$reverse = isset($rev) ? $rev->literalValue : false;
-				$sort = $reverse ? rsort(...) : sort(...);
-
-				$values = $target->values;
-
-				$rawValues = [];
-				$hasStrings = false;
-				$hasNumbers = false;
-				foreach($values as $value) {
-					if ($value instanceof StringValue) {
-						$hasStrings = true;
-					} elseif ($value instanceof IntegerValue || $value instanceof RealValue) {
-						$hasNumbers = true;
-					} else {
-						// @codeCoverageIgnoreStart
-						throw new ExecutionException("Invalid target value");
-						// @codeCoverageIgnoreEnd
-					}
-					$rawValues[] = (string)$value->literalValue;
-				}
-				if ($hasStrings) {
-					if ($hasNumbers) {
-						// @codeCoverageIgnoreStart
-						throw new ExecutionException("Invalid target value");
-						// @codeCoverageIgnoreEnd
-					}
-					$sort($rawValues, SORT_STRING);
-					return $programRegistry->valueRegistry->tuple(array_map(
-						fn(string $value) => $programRegistry->valueRegistry->string($value),
-						$rawValues
-					));
-				}
-				$sort($rawValues, SORT_NUMERIC);
-				return $programRegistry->valueRegistry->tuple(array_map(
-					fn(string $value) => str_contains((string)$value, '.') ?
-						$programRegistry->valueRegistry->real((float)$value) :
-						$programRegistry->valueRegistry->integer((int)$value),
-					$rawValues
-				));
-			}
-			// @codeCoverageIgnoreStart
-			throw new ExecutionException("Invalid parameter value");
-			// @codeCoverageIgnoreEnd
+			return $this->executeHelper(
+				$programRegistry,
+				$target,
+				$parameter,
+				fn(array $values) => $programRegistry->valueRegistry->tuple(array_values($values))
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

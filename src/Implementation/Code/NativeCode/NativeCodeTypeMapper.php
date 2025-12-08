@@ -83,11 +83,11 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 	private function findTypesFor(Type $type): array {
 		$baseIds = [];
 		$k = 0;
-		$alias = null;
+		//$alias = null;
 		while ($type instanceof AliasType) {
 			$k++;
 			$baseIds[] = $type->name->identifier;
-			$alias ??= $k;
+			//$alias ??= $k;
 			$type = $type->aliasedType;
 		}
 		/*if ($alias !== null) {

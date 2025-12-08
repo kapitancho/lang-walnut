@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\String;
+namespace Walnut\Lang\NativeCode\Set;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
@@ -8,14 +8,14 @@ use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
-use Walnut\Lang\Blueprint\Type\StringType;
+use Walnut\Lang\Blueprint\Type\SetType;
 use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Value\StringValue;
+use Walnut\Lang\Blueprint\Value\SetValue;
 use Walnut\Lang\Blueprint\Value\Value;
-use Walnut\Lang\Implementation\Type\Helper\BaseType;
+use Walnut\Lang\Implementation\Code\NativeCode\Analyser\Composite\Sort as SortTrait;
 
-final readonly class ToUpperCase implements NativeMethod {
-	use BaseType;
+final readonly class Sort implements NativeMethod {
+	use SortTrait;
 
 	public function analyse(
 		TypeRegistry $typeRegistry,
@@ -24,8 +24,13 @@ final readonly class ToUpperCase implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof StringType) {
-			return $targetType;
+		if ($targetType instanceof SetType) {
+			return $this->analyseHelper(
+				$typeRegistry,
+				$targetType,
+				$targetType,
+				$parameterType
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -37,11 +42,17 @@ final readonly class ToUpperCase implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		if ($target instanceof StringValue) {
-			return $programRegistry->valueRegistry->string(mb_strtoupper($target->literalValue));
+		if ($target instanceof SetValue) {
+			return $this->executeHelper(
+				$programRegistry,
+				$target,
+				$parameter,
+				fn(array $values) => $programRegistry->valueRegistry->set(array_values($values))
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");
 		// @codeCoverageIgnoreEnd
 	}
+
 }

@@ -202,7 +202,7 @@ final class ReduceTest extends CodeExecutionTestHelper {
 	public function testReduceInvalidItemTypeMismatch(): void {
 		$this->executeErrorCodeSnippet(
 			"Parameter must be a record",
-			"reduceWrong([1, 2, 3])",
+			"reduceWrong[1, 2, 3]",
 			valueDeclarations: "reduceWrong = ^arr: Array<Integer, 3> => Integer :: arr->reduce[reducer: ^[result: Integer, item: String] => Integer :: #result + #item->length, initial: 0];"
 		);
 	}

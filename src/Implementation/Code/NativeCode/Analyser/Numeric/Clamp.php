@@ -2,15 +2,12 @@
 
 namespace Walnut\Lang\Implementation\Code\NativeCode\Analyser\Numeric;
 
-use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
-use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\InvalidNumberInterval;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint as NumberIntervalEndpointInterface;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerType;
@@ -22,10 +19,8 @@ use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Common\Range\NumberInterval;
-use Walnut\Lang\Implementation\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 use Walnut\Lang\Implementation\Value\IntegerValue;
-use Walnut\Lang\NativeCode\Array\Min;
 
 trait Clamp {
 	use BaseType;

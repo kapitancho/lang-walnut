@@ -8,13 +8,8 @@ use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
-use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\FunctionType;
-use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\MutableType;
-use Walnut\Lang\Blueprint\Type\RecordType;
-use Walnut\Lang\Blueprint\Type\SetType;
-use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
 use Walnut\Lang\Blueprint\Value\MutableValue;
@@ -82,7 +77,6 @@ final readonly class MAP implements NativeMethod {
 			if ($v instanceof TupleValue || $v instanceof RecordValue || $v instanceof SetValue) {
 				$values = $v->values;
 				$result = [];
-				$true = $programRegistry->valueRegistry->true;
 				foreach($values as $key => $value) {
 					$r = $parameter->execute($programRegistry->executionContext, $value);
 					$result[$key] = $r;

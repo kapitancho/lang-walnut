@@ -9,22 +9,19 @@ use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
+use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\MutableType;
-use Walnut\Lang\Blueprint\Type\TupleType;
+use Walnut\Lang\Blueprint\Type\SetType;
 use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Value\BooleanValue;
-use Walnut\Lang\Blueprint\Value\IntegerValue;
 use Walnut\Lang\Blueprint\Value\MutableValue;
-use Walnut\Lang\Blueprint\Value\NullValue;
-use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\RecordValue;
-use Walnut\Lang\Blueprint\Value\StringValue;
+use Walnut\Lang\Blueprint\Value\SetValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TupleValue;
-use Walnut\Lang\Implementation\Type\Helper\BaseType;
+use Walnut\Lang\Implementation\Code\NativeCode\Analyser\Composite\Sort as SortTrait;
 
 final readonly class SORT implements NativeMethod {
-	use BaseType;
+	use SortTrait;
 
 	public function analyse(
 		TypeRegistry $typeRegistry,
@@ -35,29 +32,13 @@ final readonly class SORT implements NativeMethod {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof MutableType) {
 			$valueType = $this->toBaseType($targetType->valueType);
-			if ($valueType instanceof ArrayType) {
-				$itemType = $valueType->itemType;
-				if ($itemType->isSubtypeOf($typeRegistry->string()) || $itemType->isSubtypeOf(
-					$typeRegistry->union([
-						$typeRegistry->integer(),
-						$typeRegistry->real()
-					])
-				)) {
-					$pType = $typeRegistry->union([
-						$typeRegistry->null,
-						$typeRegistry->record([
-							'reverse' => $typeRegistry->boolean
-						])
-					]);
-					if ($parameterType->isSubtypeOf($pType)) {
-						return $targetType;
-					}
-					throw new AnalyserException(sprintf(
-						"The parameter type %s is not a subtype of %s",
-						$parameterType,
-						$pType
-					));
-				}
+			if ($valueType instanceof ArrayType || $valueType instanceof MapType || $valueType instanceof SetType) {
+				return $this->analyseHelper(
+					$typeRegistry,
+					$targetType,
+					$valueType,
+					$parameterType
+				);
 			}
 		}
 		// @codeCoverageIgnoreStart
@@ -72,56 +53,19 @@ final readonly class SORT implements NativeMethod {
 	): Value {
 		if ($target instanceof MutableValue) {
 			$v = $target->value;
-			if ($v instanceof TupleValue) {
-				if ($parameter instanceof NullValue || (
-					$parameter instanceof RecordValue &&
-					($rev = $parameter->values['reverse'] ?? null) instanceof BooleanValue
-				)) {
-					$reverse = isset($rev) ? $rev->literalValue : false;
-					$sort = $reverse ? rsort(...) : sort(...);
-
-					$values = $v->values;
-
-					$rawValues = [];
-					$hasStrings = false;
-					$hasNumbers = false;
-					foreach ($values as $value) {
-						if ($value instanceof StringValue) {
-							$hasStrings = true;
-						} elseif ($value instanceof IntegerValue || $value instanceof RealValue) {
-							$hasNumbers = true;
-						} else {
-							// @codeCoverageIgnoreStart
-							throw new ExecutionException("Invalid target value");
-							// @codeCoverageIgnoreEnd
-						}
-						$rawValues[] = (string)$value->literalValue;
-					}
-					if ($hasStrings) {
-						if ($hasNumbers) {
-							// @codeCoverageIgnoreStart
-							throw new ExecutionException("Invalid target value");
-							// @codeCoverageIgnoreEnd
-						}
-						$sort($rawValues, SORT_STRING);
-						$target->value = $programRegistry->valueRegistry->tuple(array_map(
-							fn(string $value) => $programRegistry->valueRegistry->string($value),
-							$rawValues
-						));
-						return $target;
-					}
-					$sort($rawValues, SORT_NUMERIC);
-					$target->value = $programRegistry->valueRegistry->tuple(array_map(
-						fn(string $value) => str_contains((string)$value, '.') ?
-							$programRegistry->valueRegistry->real((float)$value) :
-							$programRegistry->valueRegistry->integer((int)$value),
-						$rawValues
-					));
-					return $target;
-				}
-				// @codeCoverageIgnoreStart
-				throw new ExecutionException("Invalid parameter value");
-				// @codeCoverageIgnoreEnd
+			if ($v instanceof TupleValue || $v instanceof RecordValue || $v instanceof SetValue) {
+				$result = $this->executeHelper(
+					$programRegistry,
+					$v,
+					$parameter,
+					match(true) {
+						$v instanceof TupleValue => fn(array $values) => $programRegistry->valueRegistry->tuple($values),
+						$v instanceof RecordValue => fn(array $values) => $programRegistry->valueRegistry->record($values),
+						$v instanceof SetValue => fn(array $values) => $programRegistry->valueRegistry->set($values),
+					},
+				);
+				$target->value = $result;
+				return $target;
 			}
 		}
 		// @codeCoverageIgnoreStart

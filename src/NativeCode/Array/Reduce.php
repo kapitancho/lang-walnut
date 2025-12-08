@@ -9,8 +9,6 @@ use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
-use Walnut\Lang\Blueprint\Type\FunctionType;
-use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
@@ -49,7 +47,6 @@ final readonly class Reduce implements NativeMethod {
 
 				$reducerParamType = $this->toBaseType($reducerType->parameterType);
 				$resultType = $reducerParamType->types['result'];
-				$itemType = $reducerParamType->types['item'];
 
 				if (!$reducerType->returnType->isSubtypeOf($resultType)) {
 					throw new AnalyserException(

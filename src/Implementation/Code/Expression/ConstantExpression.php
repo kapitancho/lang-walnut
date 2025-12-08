@@ -9,8 +9,6 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\ConstantExpression as ConstantExpressionInterface;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
-use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyError;
-use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
 use Walnut\Lang\Blueprint\Value\Value;
 
