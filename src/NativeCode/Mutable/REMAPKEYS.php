@@ -34,9 +34,6 @@ final readonly class REMAPKEYS implements NativeMethod {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof MutableType) {
 			$valueType = $this->toBaseType($targetType->valueType);
-			if ($valueType instanceof RecordType) {
-				$valueType = $valueType->asMapType();
-			}
 			if ($valueType instanceof MapType) {
 				if ($valueType->range->minLength > 1) {
 					throw new AnalyserException(
