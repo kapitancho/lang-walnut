@@ -143,6 +143,62 @@ colors->item(-2);                        /* 'green' (second-to-last) */
 ['apple', 'banana']->contains('orange'); /* false */
 ```
 
+**`first` - Get first element**
+```walnut
+/* Signature */
+Array<T, min..max>->first(Null => T)                    /* When min > 0 */
+Array<T, min..max>->first(Null => Result<T, ItemNotFound>) /* When min could be 0 */
+
+/* Examples */
+[1, 2, 3]->first;                        /* 1 */
+['apple', 'banana', 'cherry']->first;    /* 'apple' */
+
+/* Type-safe - no error possible when min > 0 */
+getFirst = ^arr: Array<String, 1..> => String :: arr->first;
+getFirst(['a', 'b', 'c']);               /* 'a' */
+
+/* Result type when array might be empty */
+getMaybeFirst = ^arr: Array<String> => Result<String, ItemNotFound> :: arr->first;
+getMaybeFirst([]);                       /* @ItemNotFound */
+getMaybeFirst(['x', 'y']);               /* 'x' */
+
+/* Works with tuples */
+tuple = [1, 'hello', true];
+tuple->first;                            /* 1 : Integer */
+```
+
+The return type is automatically inferred:
+- If the array's minimum length is greater than 0, returns `T` directly (no error possible)
+- If the array's minimum length is 0, returns `Result<T, ItemNotFound>` (might be empty)
+
+**`last` - Get last element**
+```walnut
+/* Signature */
+Array<T, min..max>->last(Null => T)                    /* When min > 0 */
+Array<T, min..max>->last(Null => Result<T, ItemNotFound>) /* When min could be 0 */
+
+/* Examples */
+[1, 2, 3]->last;                         /* 3 */
+['apple', 'banana', 'cherry']->last;     /* 'cherry' */
+
+/* Type-safe - no error possible when min > 0 */
+getLast = ^arr: Array<String, 1..> => String :: arr->last;
+getLast(['a', 'b', 'c']);                /* 'c' */
+
+/* Result type when array might be empty */
+getMaybeLast = ^arr: Array<String> => Result<String, ItemNotFound> :: arr->last;
+getMaybeLast([]);                        /* @ItemNotFound */
+getMaybeLast(['x', 'y']);                /* 'y' */
+
+/* Works with tuples */
+tuple = [1, 'hello', true];
+tuple->last;                             /* true : Boolean */
+```
+
+The return type is automatically inferred:
+- If the array's minimum length is greater than 0, returns `T` directly (no error possible)
+- If the array's minimum length is 0, returns `Result<T, ItemNotFound>` (might be empty)
+
 **`indexOf(value)` - Find first index of value**
 ```walnut
 /* Signature */
