@@ -326,6 +326,50 @@ ages->mapKeyValue(^[#key, #value] ::
 /* [alice: 'alice is 30 years old', bob: 'bob is 25 years old'] */
 ```
 
+**`remapKeys(transform)` - Transform map keys while preserving values**
+```walnut
+/* Signature */
+^[Map<K:T, minL..maxL>, ^K => String] => Map<String:T, minNewL..maxL>
+
+/* Examples */
+/* Add prefix to all keys */
+[a: 1, b: 2, c: 3]->remapKeys(^k: String => String :: k + '_new');
+/* [a_new: 1, b_new: 2, c_new: 3] */
+
+/* Transform keys based on pattern */
+data = [firstName: 'Alice', lastName: 'Smith', age: 30];
+data->remapKeys(^k: String => String ::
+    k->replace('Name', '_name')->toLowerCase
+);
+/* [first_name: 'Alice', last_name: 'Smith', age: 30] */
+
+/* Wrap keys in brackets */
+[a: 1, b: 2]->remapKeys(^k: String => String :: '[' + k + ']');
+/* [[a]: 1, [b]: 2] */
+
+/* Duplicate keys: last value wins */
+[a: 1, b: 2, c: 3]->remapKeys(^k: String => String :: 'key');
+/* [key: 3] : Map<String:Integer, 1..3> */
+/* All keys map to 'key', so only last value (3) is kept */
+
+/* Error handling with Result type */
+validateKey = ^k: String => Result<String, InvalidKey> :: {
+    ?when(k->length < 3) {
+        @InvalidKey
+    } ~ {
+        k->toUpperCase
+    }
+};
+[name: 'Alice', id: '123']->remapKeys(validateKey);
+/* @InvalidKey (since 'id' has length 2) */
+
+/* Normalize keys */
+[' Name ', 'AGE  ', '  City']->remapKeys(^k: String => String ::
+    k->trim->toLowerCase
+);
+/* [name: ..., age: ..., city: ...] */
+```
+
 **`filter(predicate)` - Keep matching entries**
 ```walnut
 /* Signature */

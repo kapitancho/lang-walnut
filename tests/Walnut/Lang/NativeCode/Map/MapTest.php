@@ -7,12 +7,12 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 final class MapTest extends CodeExecutionTestHelper {
 
 	public function testMapEmpty(): void {
-		$result = $this->executeCodeSnippet("[:]->map(^Integer => Integer :: # + 3);");
+		$result = $this->executeCodeSnippet("[:]->map(^i: Integer => Integer :: i + 3);");
 		$this->assertEquals("[:]", $result);
 	}
 
 	public function testMapNonEmpty(): void {
-		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 5, d: 10, e: 5]->map(^Integer => Integer :: # + 3);");
+		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 5, d: 10, e: 5]->map(^i: Integer => Integer :: i + 3);");
 		$this->assertEquals("[a: 4, b: 5, c: 8, d: 13, e: 8]", $result);
 	}
 
@@ -35,7 +35,7 @@ final class MapTest extends CodeExecutionTestHelper {
 	}
 
 	public function testMapInvalidParameterParameterType(): void {
-		$this->executeErrorCodeSnippet("The parameter type (Integer[1]|String['a']) of the callback function is not a subtype of Boolean",
+		$this->executeErrorCodeSnippet("The parameter type Boolean of the callback function is not a supertype of (Integer[1]|String['a'])",
 			"[a: 1, b: 'a']->map(^Boolean => Boolean :: true);");
 	}
 

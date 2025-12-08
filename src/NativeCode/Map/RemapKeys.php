@@ -16,10 +16,11 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
 use Walnut\Lang\Blueprint\Value\RecordValue;
+use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
-final readonly class Map implements NativeMethod {
+final readonly class RemapKeys implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
@@ -35,23 +36,31 @@ final readonly class Map implements NativeMethod {
 		if ($targetType instanceof MapType) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof FunctionType) {
-				if ($targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
+				if ($targetType->keyType->isSubtypeOf($parameterType->parameterType)) {
 					$r = $parameterType->returnType;
 					$errorType = $r instanceof ResultType ? $r->errorType : null;
 					$returnType = $r instanceof ResultType ? $r->returnType : $r;
-					$t = $typeRegistry->map(
-						$returnType,
-						$targetType->range->minLength,
-						$targetType->range->maxLength,
-						$targetType->keyType
+					if ($returnType->isSubtypeOf($typeRegistry->string())) {
+						$t = $typeRegistry->map(
+							$targetType->itemType,
+							$targetType->range->minLength > 0 ? 1 : 0,
+							$targetType->range->maxLength,
+							$returnType,
+						);
+						return $errorType ? $typeRegistry->result($t, $errorType) : $t;
+					}
+					throw new AnalyserException(
+						sprintf(
+							"The return type %s of the callback function is not a subtype of String",
+							$returnType
+						)
 					);
-					return $errorType ? $typeRegistry->result($t, $errorType) : $t;
 				}
 				throw new AnalyserException(
                     sprintf(
     					"The parameter type %s of the callback function is not a supertype of %s",
 	                    $parameterType->parameterType,
-	    				$targetType->itemType,
+	    				$targetType->keyType,
                     )
 				);
 			}
@@ -71,11 +80,20 @@ final readonly class Map implements NativeMethod {
 			$values = $target->values;
 			$result = [];
 			foreach($values as $key => $value) {
-				$r = $parameter->execute($programRegistry->executionContext, $value);
+				$r = $parameter->execute(
+					$programRegistry->executionContext,
+					$programRegistry->valueRegistry->string($key)
+				);
 				if ($r instanceof ErrorValue) {
 					return $r;
 				}
-				$result[$key] = $r;
+				if ($r instanceof StringValue) {
+					$result[$r->literalValue] = $value;
+				} else {
+					// @codeCoverageIgnoreStart
+					throw new ExecutionException("Invalid callback value");
+					// @codeCoverageIgnoreEnd
+				}
 			}
 			return $programRegistry->valueRegistry->record($result);
 		}
