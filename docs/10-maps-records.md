@@ -351,6 +351,64 @@ ages->filterKeyValue(^[#key, #value] ::
 );                                            /* [alice: 30] */
 ```
 
+**`zip(other)` - Combine two maps/records into map/record of tuples (intersection of keys)**
+```walnut
+/* Signature - Maps */
+^[Map<T1, minL1..maxL1>, Map<T2, minL2..maxL2>]
+  => Map<(T1, T2), min(minL1,minL2)..min(maxL1,maxL2)>
+
+/* Signature - Records (preserves record type) */
+^[[a: T1, b: T2, c: T3], [a: U1, b: U2, d: U4]]
+  => [a: [(T1, U1)], b: [(T2, U2)]]  /* Only common keys */
+
+/* Examples - Maps */
+/* Basic pairing - only keys present in BOTH maps */
+map1 = [a: 1, b: 2, c: 3];
+map2 = [a: 'x', b: 'y', d: 'z'];
+map1->zip(map2);
+/* [a: [(1, 'x')], b: [(2, 'y')]] : Map<(Integer, String)> */
+/* Note: keys 'c' and 'd' are omitted (not in both maps) */
+
+/* Empty if no common keys */
+[a: 1, b: 2]->zip([c: 'x', d: 'y']);
+/* [:] : Map<(Integer, String), 0> */
+
+/* Combine parallel data structures */
+prices = [apple: 1.99, banana: 0.99, orange: 1.49];
+stock = [apple: 50, banana: 100, grape: 25];
+prices->zip(stock);
+/* [apple: [(1.99, 50)], banana: [(0.99, 100)]] */
+/* grape omitted (not in prices), orange omitted (not in stock) */
+
+/* Use with mapKeyValue */
+prices = [apple: 1.99, banana: 0.99];
+quantities = [apple: 10, banana: 5];
+prices->zip(quantities)->mapKeyValue(^[#key, [(#price, #qty)]] ::
+  #key + ': $' + (#price * #qty)->asString
+);
+/* [apple: 'apple: $19.90', banana: 'banana: $4.95'] */
+
+/* Examples - Records (result is also a Record) */
+person = [name: 'Alice', age: 30, city: 'NYC'];
+stats = [name: 'A', age: 'thirty', country: 'USA'];
+person->zip(stats);
+/* [name: [('Alice', 'A')], age: [(30, 'thirty')]] : [name: [(String, String)], age: [(Integer, String)]] */
+/* Note: 'city' and 'country' omitted (not in both records) */
+
+/* Records with optional fields */
+user = [id: 1, name: 'Bob', email: 'bob@example.com'];
+prefs = [id: 'u1', theme: 'dark'];
+user->zip(prefs);
+/* [id: [(1, 'u1')]] : [id: [(Integer, String)]] */
+/* Only 'id' is common */
+
+/* Records with rest types */
+rec1 = [a: 'hello', b: 42, ...moreFields];
+rec2 = [a: 1.5, c: true, ...otherFields];
+rec1->zip(rec2);
+/* [a: [('hello', 1.5)], ...restZip] - handles rest type intersection */
+```
+
 **`keySort(options)` - Sort map by keys in ascending or descending order**
 ```walnut
 /* Signature */

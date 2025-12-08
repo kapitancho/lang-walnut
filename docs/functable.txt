@@ -1,0 +1,93 @@
+
+  Walnut Collection Methods Pivot Table
+
+  | Category           | Method                       | Array      | Map                | Set          | Notes                                        |
+  |--------------------|------------------------------|------------|--------------------|--------------|----------------------------------------------|
+  | Basic Properties   |                              |            |                    |              |                                              |
+  |                    | length                       | ✅          | ✅                  | ✅            | Get collection size                          |
+  |                    | item(key/index)              | ✅          | ✅                  | ❌            | Sets don't have indexed access               |
+  |                    | keys                         | ❌          | ✅                  | ❌            | Map-specific                                 |
+  |                    | keysSet                      | ❌          | ✅                  | ❌            | Map keys as Set                              |
+  |                    | values                       | ❌          | ✅                  | ✅            | Convert to Array                             |
+  |                    | valuesWithoutKey             | ❌          | ✅                  | ❌            | Map-specific                                 |
+  | Searching          |                              |            |                    |              |                                              |
+  |                    | contains(value)              | ✅          | ✅                  | ✅            | Check if value exists                        |
+  |                    | keyExists(key)               | ❌          | ✅                  | ❌            | Map-specific                                 |
+  |                    | indexOf(value)               | ✅          | ❌                  | ❌            | Array-specific                               |
+  |                    | lastIndexOf(value)           | ✅          | ❌                  | ❌            | Array-specific                               |
+  |                    | keyOf(value)                 | ❌          | ✅                  | ❌            | Map-specific                                 |
+  |                    | findFirst(predicate)         | ✅          | ✅                  | ❌            | First matching element                       |
+  |                    | findLast(predicate)          | ✅          | ❌                  | ❌            | Array-specific                               |
+  |                    | findFirstKeyValue(predicate) | ❌          | ✅                  | ❌            | Map-specific                                 |
+  | Modification       |                              |            |                    |              |                                              |
+  |                    | with(key/index, value)       | ❌          | ✅ via withKeyValue | ❌            | Update/add entry                             |
+  |                    | without(value/key)           | ✅          | ✅                  | ✅            | Remove entry                                 |
+  |                    | withoutAll(values)           | ✅          | ✅                  | ❌            | Remove multiple                              |
+  |                    | withoutByIndex(index)        | ✅          | ❌                  | ❌            | Array-specific                               |
+  |                    | withoutByKey(key)            | ❌          | ✅                  | ❌            | Map-specific                                 |
+  |                    | withoutFirst                 | ✅          | ❌                  | ❌            | Array-specific                               |
+  |                    | withoutLast                  | ✅          | ❌                  | ❌            | Array-specific                               |
+  |                    | withRemoved(value)           | ❌          | ❌                  | ✅            | Set-specific                                 |
+  |                    | insertFirst(value)           | ✅          | ❌                  | ❌            | Array-specific                               |
+  |                    | insertLast(value)            | ✅          | ❌                  | ❌            | Array-specific                               |
+  |                    | insertAt(index, value)       | ✅          | ❌                  | ❌            | Array-specific                               |
+  |                    | insert(value)                | ❌          | ❌                  | ✅            | Set-specific                                 |
+  |                    | appendWith(array)            | ✅          | ❌                  | ❌            | Array concatenation                          |
+  |                    | mergeWith(map)               | ❌          | ✅                  | ❌            | Map merge                                    |
+  | Transformation     |                              |            |                    |              |                                              |
+  |                    | map(transform)               | ✅          | ✅                  | ✅            | Transform values                             |
+  |                    | mapIndexValue(transform)     | ✅          | ❌                  | ❌            | Array with index                             |
+  |                    | mapKeyValue(transform)       | ❌          | ✅                  | ❌            | Map with key                                 |
+  |                    | filter(predicate)            | ✅          | ✅                  | ✅            | Keep matching                                |
+  |                    | filterKeyValue(predicate)    | ❌          | ✅                  | ❌            | Map-specific                                 |
+  |                    | flatMap(transform)           | ✅ NEW      | ❌ N/A              | ❌ N/A        | Map then flatten                             |
+  |                    | flatten                      | ✅          | ❌ N/A              | ❌ N/A        | Flatten nested arrays                        |
+  |                    | reduce(initial, fn)          | ✅          | ✅ via values       | ✅ via values | Aggregate to single value                    |
+  |                    | flip                         | ✅          | ✅                  | ✅            | Swap keys/values                             |
+  |                    | flipMap                      | ✅          | ❌                  | ✅            | Flip to Map                                  |
+  |                    | unique                       | ✅          | ❌ N/A              | ❌ N/A        | Remove duplicates                            |
+  |                    | uniqueSet                    | ✅          | ❌ N/A              | ❌ N/A        | To Set                                       |
+  |                    | countValues                  | ✅          | ❌ Possible         | ❌ N/A        | Count occurrences                            |
+  |                    | partition(predicate)         | ✅ NEW      | ✅                  | ✅            | Split into matching/not                      |
+  |                    | groupBy(keyFn)               | ✅ NEW      | ❌ N/A              | ❌ Possible   | Group by key into Map                        |
+  |                    | indexBy(keyFn)               | ✅          | ❌ N/A              | ❌ N/A        | Index by key into Map                        |
+  |                    | chunk(size)                  | ✅          | ❌ N/A              | ❌ N/A        | Split into chunks                            |
+  | Slicing            |                              |            |                    |              |                                              |
+  |                    | slice(start, length)         | ✅          | ❌ N/A              | ❌ N/A        | Extract portion                              |
+  |                    | sliceRange(start, end)       | ✅          | ❌ N/A              | ❌ N/A        | Extract range                                |
+  |                    | take(count)                  | ✅ NEW      | ❌ Possible         | ❌ Possible   | First N elements                             |
+  |                    | drop(count)                  | ✅ NEW      | ❌ Possible         | ❌ Possible   | Skip first N                                 |
+  |                    | padLeft(length, fill)        | ✅          | ❌ N/A              | ❌ N/A        | Pad on left                                  |
+  |                    | padRight(length, fill)       | ✅          | ❌ N/A              | ❌ N/A        | Pad on right                                 |
+  | Sorting & Ordering |                              |            |                    |              |                                              |
+  |                    | sort(options)                | ✅ UPDATED  | ✅                  | ✅            | Sort values (now accepts [reverse: Boolean]) |
+  |                    | keySort(options)             | ❌ N/A      | ✅ NEW              | ❌ N/A        | Sort by keys                                 |
+  |                    | reverse                      | ✅          | ❌ Possible         | ❌ N/A        | Reverse order                                |
+  |                    | shuffle                      | ✅          | ❌ Possible         | ❌ N/A        | Random order                                 |
+  | Aggregation        |                              |            |                    |              |                                              |
+  |                    | all(predicate)               | ✅          | ✅ via values       | ✅ via values | All match?                                   |
+  |                    | any(predicate)               | ✅          | ✅ via values       | ✅ via values | Any match?                                   |
+  |                    | sum                          | ✅          | ❌ Possible         | ❌ Possible   | Sum numeric values                           |
+  |                    | min                          | ✅          | ❌ Possible         | ❌ Possible   | Minimum value                                |
+  |                    | max                          | ✅          | ❌ Possible         | ❌ Possible   | Maximum value                                |
+  | Set Operations     |                              |            |                    |              |                                              |
+  |                    | + (union)                    | ✅ concat   | ✅ merge            | ✅ union      | Combine collections                          |
+  |                    | - (difference)               | ❌          | ❌                  | ✅            | Set difference                               |
+  |                    | & (intersection)             | ❌          | ❌                  | ✅            | Set intersection                             |
+  |                    | ^ (symmetric diff)           | ❌          | ❌                  | ✅            | Set symmetric difference                     |
+  |                    | isSubsetOf                   | ❌ Possible | ❌                  | ✅            | Subset check                                 |
+  |                    | isSupersetOf                 | ❌ Possible | ❌                  | ✅            | Superset check                               |
+  |                    | isDisjointWith               | ❌ Possible | ❌                  | ✅            | Disjoint check                               |
+  | Formatting         |                              |            |                    |              |                                              |
+  |                    | format(fn)                   | ✅          | ✅                  | ❌ Possible   | Custom string format                         |
+  |                    | combineAsString(sep)         | ✅          | ❌ Possible         | ❌ Possible   | Join to string                               |
+  |                    | chainInvoke(method)          | ✅          | ❌ Possible         | ❌ Possible   | Invoke on all items                          |
+
+  Legend
+
+  - ✅ - Implemented
+  - NEW - Newly implemented in recent updates
+  - UPDATED - Signature/behavior updated recently
+  - ❌ N/A - Not applicable (conceptually doesn't make sense)
+  - ❌ Possible - Not implemented but could be useful
+

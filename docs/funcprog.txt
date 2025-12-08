@@ -1,0 +1,65 @@
+ Walnut Collection Methods - Functional Programming Focus
+
+  | Method                     | Array | Map          | Set          | Notes                                    |
+  |----------------------------|-------|--------------|--------------|------------------------------------------|
+  | Core Functional Operations |        |               |               |                                          |
+  | map / MAP                  | ✅ ᴹ   | ✅ ᴹ          | ✅ ᴹ          | Transform each element                   |
+  | filter / FILTER            | ✅ ᴹ   | ✅ ᴹ          | ✅ ᴹ          | Keep elements matching predicate         |
+  | reduce                     | ✅     | ✅ via values | ✅ via values | Aggregate to single value                |
+  | flatMap                    | ✅     | ❌ N/A        | ❌ N/A        | Map then flatten                         |
+  | flatten                    | ✅     | ❌ N/A        | ❌ N/A        | Flatten nested arrays                    |
+  | Searching & Testing        |        |               |               |                                          |
+  | findFirst                  | ✅     | ✅            | ❌ via values | Find first matching element              |
+  | findLast                   | ✅     | ❌ via values | ❌ via values | Find last matching element               |
+  | all                        | ✅     | ❌ via values | ❌ via values | Test if all match predicate              |
+  | any                        | ✅     | ❌ via values | ❌ via values | Test if any match predicate              |
+  | contains                   | ✅     | ✅            | ✅            | Check if value exists                    |
+  | Partitioning & Grouping    |        |               |               |                                          |
+  | partition                  | ✅     | ✅            | ✅            | Split into matching/notMatching          |
+  | groupBy                    | ✅     | ❌ N/A        | ❌ via values | Group by key function into Map<Array>    |
+  | indexBy                    | ✅     | ❌ N/A        | ❌ via values | Index by key function into Map           |
+  | zip                        | ✅     | ✅            | ❌            | Combine two collections into tuples      |
+  | zipMap                     | ✅     | ❌            | ✅            | Combine keys and values into Map         |
+  | chunk                      | ✅     | ❌ N/A        | ❌ N/A        | Split into fixed-size chunks             |
+  | Slicing & Taking           |        |               |               |                                          |
+  | take                       | ✅     | ❌ Possible   | ❌ Possible   | Take first N elements                    |
+  | drop                       | ✅     | ❌ Possible   | ❌ Possible   | Skip first N elements                    |
+  | slice                      | ✅     | ❌ N/A        | ❌ N/A        | Extract portion by index                 |
+  | Sorting & Ordering         |        |               |               |                                          |
+  | sort / SORT                | ✅ ᴹ   | ✅            | ✅            | Sort values by value                     |
+  | keySort / KEYSORT          | ❌ N/A | ✅ ᴹ          | ❌ N/A        | Sort by keys                             |
+  | sortBy                     | ✅     | ❌ via flip   | ❌ via values | Sort by custom key function              |
+  | reverse / REVERSE          | ✅ ᴹ   | ❌ Possible   | ❌ N/A        | Reverse order                            |
+  | shuffle / SHUFFLE          | ✅ ᴹ   | ❌ Possible   | ❌ N/A        | Randomize order                          |
+  | Aggregation                |        |               |               |                                          |
+  | sum                        | ✅     | ❌ via values | ❌ via values | Sum numeric values                       |
+  | min                        | ✅     | ❌ via values | ❌ via values | Minimum value                            |
+  | max                        | ✅     | ❌ via values | ❌ via values | Maximum value                            |
+  | countValues                | ✅     | ❌ Possible   | ❌ N/A        | Count occurrences into Map               |
+  | Combining                  |        |               |               |                                          |
+  | + (concat/merge/union)     | ✅     | ✅            | ✅            | Combine collections                      |
+  | flip                       | ✅     | ✅            | ✅            | Swap keys/values or index/value          |
+  | unique                     | ✅     | ❌ N/A        | ❌ N/A        | Remove duplicates                        |
+  | Key-Value Variants         |        |               |               |                                          |
+  | mapKeyValue                | ❌     | ✅            | ❌            | Transform with access to key and value   |
+  | mapIndexValue              | ✅     | ❌            | ❌            | Transform with access to index and value |
+  | filterKeyValue             | ❌     | ✅            | ❌            | Filter with access to key and value      |
+  | findFirstKeyValue          | ❌     | ✅            | ❌            | Find with access to key and value        |
+  | Mutable-Only Operations    |        |               |               |                                          |
+  | PUSH                       | ᴹ      | ❌            | ❌            | Add to end of array                      |
+  | POP                        | ᴹ      | ❌            | ❌            | Remove from end of array                 |
+  | UNSHIFT                    | ᴹ      | ❌            | ❌            | Add to beginning of array                |
+  | SHIFT                      | ᴹ      | ❌            | ❌            | Remove from beginning of array           |
+  | ADD                        | ❌     | ❌            | ᴹ             | Add element to set                       |
+  | REMOVE                     | ❌     | ❌            | ᴹ             | Remove element from set                  |
+  | CLEAR                      | ❌     | ❌            | ᴹ             | Remove all elements from set             |
+  | SET                        | ᴹ      | ᴹ             | ᴹ             | Replace entire value                     |
+
+  Legend
+
+  - ✅ - Immutable operation available
+  - ᴹ - Mutable operation available (in-place modification)
+  - ✅ ᴹ - Both immutable and mutable versions available
+  - ❌ N/A - Not applicable (doesn't make conceptual sense)
+  - ❌ Possible - Could be implemented, not currently available
+  - ❌ via method - Not implemented but achievable via the shown method chain

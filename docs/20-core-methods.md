@@ -1432,6 +1432,29 @@ Set<T <: String>->flipMap(^T => R => Map<R>)
 ['a'; 'bcd'; 'ef']->flipMap(^String => Integer :: #->length); /* [a: 1, bcd: 3, ef: 2] */
 ```
 
+**`zipMap`** - Combine set of keys with array of values into a Map
+```walnut
+Set<String, minL1..maxL1>->zipMap(Array<T, minL2..maxL2> => Map<String:T, min(minL1,minL2)..min(maxL1,maxL2)>)
+
+/* Basic key-value pairing with guaranteed unique keys */
+keys = ['name'; 'age'; 'city'];
+values = ['Alice', 30, 'NYC'];
+keys->zipMap(values);
+/* [name: 'Alice', age: 30, city: 'NYC'] : Map<String|Integer> */
+
+/* Truncates to shortest length */
+['a'; 'b'; 'c']->zipMap([1, 2]);
+/* [a: 1, b: 2] : Map<Integer, 2> */
+
+/* No duplicate key issues - Set enforces uniqueness */
+schema = ['id'; 'name'; 'email'];
+data = [42, 'Bob', 'bob@example.com'];
+schema->zipMap(data);
+/* [id: 42, name: 'Bob', email: 'bob@example.com'] */
+
+/* More precise type bounds than Array->zipMap since no duplicate keys */
+```
+
 **`flip`** - Convert to Map with elements as keys and indices as values
 ```walnut
 Set<T <: String>->flip(Null => Map<T:Integer<0..max>, min..max>)

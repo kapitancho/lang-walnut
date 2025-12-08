@@ -802,6 +802,87 @@ byCategory = products->groupBy(^#.category);
 ] */
 ```
 
+**`zip(other)` - Combine two arrays/tuples into array/tuple of tuples**
+```walnut
+/* Signature - Arrays */
+^[Array<T1, minL1..maxL1>, Array<T2, minL2..maxL2>]
+  => Array<(T1, T2), min(minL1,minL2)..min(maxL1,maxL2)>
+
+/* Signature - Tuples (preserves tuple type) */
+^[[T1, T2, T3], [U1, U2, U3]] => [[(T1, U1)], [(T2, U2)], [(T3, U3)]]
+
+/* Examples - Arrays */
+/* Basic pairing */
+[1, 2, 3]->zip(['a', 'b', 'c']);
+/* [[(1, 'a')], [(2, 'b')], [(3, 'c')]] : Array<(Integer, String)> */
+
+/* Truncates to shortest */
+[1, 2, 3, 4]->zip(['a', 'b']);
+/* [[(1, 'a')], [(2, 'b')]] : Array<(Integer, String), 2> */
+
+/* Combine parallel data */
+names = ['Alice', 'Bob', 'Charlie'];
+ages = [30, 25, 35];
+names->zip(ages);
+/* [[('Alice', 30)], [('Bob', 25)], [('Charlie', 35)]] */
+
+/* Use with destructuring */
+pairs = [1, 2, 3]->zip([10, 20, 30]);
+pairs->map(^[(a, b)] :: a + b);
+/* [11, 22, 33] */
+
+/* Common pattern: zip then process */
+headers = ['id', 'name', 'email'];
+values = [42, 'Alice', 'alice@example.com'];
+headers->zip(values)->map(^[(key, val)] :: key + ': ' + val->asString);
+/* ['id: 42', 'name: Alice', 'email: alice@example.com'] */
+
+/* Examples - Tuples (result is also a Tuple) */
+tuple1 = ['Alice', 30, true];
+tuple2 = [1.75, false, 'active'];
+tuple1->zip(tuple2);
+/* [[('Alice', 1.75)], [(30, false)], [(true, 'active')]] : [[String, Real], [Integer, Boolean], [Boolean, String]] */
+
+/* Tuples with rest types */
+t1 = ['a', 1, true, ...moreValues];  /* [String, Integer, Boolean, ...T] */
+t2 = [1.5, false, 42];
+t1->zip(t2);  /* Result includes rest handling */
+```
+
+**`zipMap(values)` - Combine array of keys with array of values into a Map**
+```walnut
+/* Signature */
+^[Array<String, minL1..maxL1>, Array<T, minL2..maxL2>] => Map<String:T, 1..min(maxL1,maxL2)>
+
+/* Examples */
+/* Basic key-value pairing */
+keys = ['name', 'age', 'city'];
+values = ['Alice', 30, 'NYC'];
+keys->zipMap(values);
+/* [name: 'Alice', age: 30, city: 'NYC'] : Map<String|Integer> */
+
+/* Truncates to shortest length */
+['a', 'b', 'c']->zipMap([1, 2]);
+/* [a: 1, b: 2] : Map<Integer, 2> */
+
+['a', 'b']->zipMap([1, 2, 3, 4]);
+/* [a: 1, b: 2] : Map<Integer, 2> */
+
+/* CSV/TSV parsing */
+headers = ['id', 'name', 'email'];
+row = ['42', 'Bob', 'bob@example.com'];
+record = headers->zipMap(row);
+/* [id: '42', name: 'Bob', email: 'bob@example.com'] */
+
+/* Dynamic record construction */
+buildRecord = ^[Array<String>, Array<Integer>] => Map<String:Integer> ::
+    headers->zipMap(values);
+
+/* Duplicate keys: last value wins */
+['key', 'name', 'key']->zipMap([1, 'Alice', 42]);
+/* [key: 42, name: 'Alice'] - second 'key' overwrites first */
+```
+
 **`toMap(keyExtractor)` - Convert to map**
 ```walnut
 /* Signature */
