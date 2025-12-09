@@ -13,7 +13,7 @@ final class MapTest extends CodeExecutionTestHelper {
 			"doArray([]);",
 			valueDeclarations: "
 				doArray = ^a: Result<Array<Integer>, Null> => Result<Array<Integer>, Null> ::
-					a->map(^Integer => Integer :: # + 3);
+					a->map(^i: Integer => Integer :: i + 3);
 			"
 		);
 		$this->assertEquals("[]", $result);
@@ -24,7 +24,7 @@ final class MapTest extends CodeExecutionTestHelper {
 			"doArray[1, 2, 5, 10, 5];",
 			valueDeclarations: "
 				doArray = ^a: Result<Array<Integer>, Null> => Result<Array<Integer>, Null> ::
-					a->map(^Integer => Integer :: # + 3);
+					a->map(^i: Integer => Integer :: i + 3);
 			"
 		);
 		$this->assertEquals("[4, 5, 8, 13, 8]", $result);
@@ -35,7 +35,7 @@ final class MapTest extends CodeExecutionTestHelper {
 			"doArray[1, 2, 5, 10, 5];",
 			valueDeclarations: "
 				doArray = ^a: Result<[Integer, Integer, ...Integer], Null> => Result<Array<Integer>, Null> ::
-					a->map(^Integer => Integer :: # + 3);
+					a->map(^i: Integer => Integer :: i + 3);
 			"
 		);
 		$this->assertEquals("[4, 5, 8, 13, 8]", $result);
@@ -57,7 +57,7 @@ final class MapTest extends CodeExecutionTestHelper {
 			"doArray(@'initial_error');",
 			valueDeclarations: "
 				doArray = ^a: Result<Array<Integer>, String> => Result<Array<Integer>, String> ::
-					a->map(^Integer => Integer :: # + 3);
+					a->map(^i: Integer => Integer :: i + 3);
 			"
 		);
 		$this->assertEquals("@'initial_error'", $result);
@@ -79,7 +79,7 @@ final class MapTest extends CodeExecutionTestHelper {
 			"doArray[1, 2];",
 			valueDeclarations: "
 				doArray = ^a: Result<Array<Integer>, Null> => Result<Array<Integer>, Null> ::
-					a->map(^Integer => Integer :: # + 3);
+					a->map(^i: Integer => Integer :: i + 3);
 			"
 		);
 		$this->assertEquals("[4, 5]", $result);
@@ -90,7 +90,7 @@ final class MapTest extends CodeExecutionTestHelper {
 			"doArray(@null);",
 			valueDeclarations: "
 				doArray = ^a: Result<Array<Integer>, Null> => Result<Array<Integer>, Null> ::
-					a->map(^Integer => Integer :: # + 3);
+					a->map(^i: Integer => Integer :: i + 3);
 			"
 		);
 		$this->assertEquals("@null", $result);
@@ -103,7 +103,7 @@ final class MapTest extends CodeExecutionTestHelper {
 			"doMap([:]);",
 			valueDeclarations: "
 				doMap = ^m: Result<Map<Integer>, Null> => Result<Map<Integer>, Null> ::
-					m->map(^Integer => Integer :: # + 3);
+					m->map(^i: Integer => Integer :: i + 3);
 			"
 		);
 		$this->assertEquals("[:]", $result);
@@ -114,7 +114,7 @@ final class MapTest extends CodeExecutionTestHelper {
 			"doMap[a: 1, b: 2, c: 5, d: 10, e: 5];",
 			valueDeclarations: "
 				doMap = ^m: Result<Map<Integer>, Null> => Result<Map<Integer>, Null> ::
-					m->map(^Integer => Integer :: # + 3);
+					m->map(^i: Integer => Integer :: i + 3);
 			"
 		);
 		$this->assertEquals("[a: 4, b: 5, c: 8, d: 13, e: 8]", $result);
@@ -125,7 +125,7 @@ final class MapTest extends CodeExecutionTestHelper {
 			"doMap[a: 1, b: 2, c: 5, d: 10, e: 5];",
 			valueDeclarations: "
 				doMap = ^m: Result<[a: Integer, b: Integer, ... Integer], Null> => Result<Map<Integer>, Null> ::
-					m->map(^Integer => Integer :: # + 3);
+					m->map(^i: Integer => Integer :: i + 3);
 			"
 		);
 		$this->assertEquals("[a: 4, b: 5, c: 8, d: 13, e: 8]", $result);
@@ -147,7 +147,7 @@ final class MapTest extends CodeExecutionTestHelper {
 			"doMap(@'initial_error');",
 			valueDeclarations: "
 				doMap = ^m: Result<Map<Integer>, String> => Result<Map<Integer>, String> ::
-					m->map(^Integer => Integer :: # + 3);
+					m->map(^i: Integer => Integer :: i + 3);
 			"
 		);
 		$this->assertEquals("@'initial_error'", $result);
@@ -169,7 +169,7 @@ final class MapTest extends CodeExecutionTestHelper {
 			"doMap[a: 1, b: 2];",
 			valueDeclarations: "
 				doMap = ^m: Result<Map<Integer>, Null> => Result<Map<Integer>, Null> ::
-					m->map(^Integer => Integer :: # + 3);
+					m->map(^i: Integer => Integer :: i + 3);
 			"
 		);
 		$this->assertEquals("[a: 4, b: 5]", $result);
@@ -180,7 +180,7 @@ final class MapTest extends CodeExecutionTestHelper {
 			"doMap(@null);",
 			valueDeclarations: "
 				doMap = ^m: Result<Map<Integer>, Null> => Result<Map<Integer>, Null> ::
-					m->map(^Integer => Integer :: # + 3);
+					m->map(^i: Integer => Integer :: i + 3);
 			"
 		);
 		$this->assertEquals("@null", $result);
@@ -191,7 +191,7 @@ final class MapTest extends CodeExecutionTestHelper {
 			"doMap[a: 1, b: 2];",
 			valueDeclarations: "
 				doMap = ^m: Result<Map<String<1>:Integer>, Null> => Result<Map<String<1>:Integer>, Null> ::
-					m->map(^Integer => Integer :: # + 3);
+					m->map(^i: Integer => Integer :: i + 3);
 			"
 		);
 		$this->assertEquals("[a: 4, b: 5]", $result);
@@ -204,7 +204,7 @@ final class MapTest extends CodeExecutionTestHelper {
 			"doSet([;]);",
 			valueDeclarations: "
 				doSet = ^s: Result<Set<Integer>, Null> => Result<Set<Integer>, Null> ::
-					s->map(^Integer => Integer :: # + 3);
+					s->map(^i: Integer => Integer :: i + 3);
 			"
 		);
 		$this->assertEquals("[;]", $result);
@@ -215,7 +215,7 @@ final class MapTest extends CodeExecutionTestHelper {
 			"doSet[1; 2; 5; 10; 5];",
 			valueDeclarations: "
 				doSet = ^s: Result<Set<Integer>, Null> => Result<Set<Integer>, Null> ::
-					s->map(^Integer => Integer :: # + 3);
+					s->map(^i: Integer => Integer :: i + 3);
 			"
 		);
 		$this->assertEquals("[4; 5; 8; 13]", $result);
@@ -248,7 +248,7 @@ final class MapTest extends CodeExecutionTestHelper {
 			"doSet(@'initial_error');",
 			valueDeclarations: "
 				doSet = ^s: Result<Set<Integer>, String> => Result<Set<Integer>, String> ::
-					s->map(^Integer => Integer :: # + 3);
+					s->map(^i: Integer => Integer :: i + 3);
 			"
 		);
 		$this->assertEquals("@'initial_error'", $result);
@@ -270,7 +270,7 @@ final class MapTest extends CodeExecutionTestHelper {
 			"doSet[1; 2];",
 			valueDeclarations: "
 				doSet = ^s: Result<Set<Integer>, Null> => Result<Set<Integer>, Null> ::
-					s->map(^Integer => Integer :: # + 3);
+					s->map(^i: Integer => Integer :: i + 3);
 			"
 		);
 		$this->assertEquals("[4; 5]", $result);
@@ -281,7 +281,7 @@ final class MapTest extends CodeExecutionTestHelper {
 			"doSet(@null);",
 			valueDeclarations: "
 				doSet = ^s: Result<Set<Integer>, Null> => Result<Set<Integer>, Null> ::
-					s->map(^Integer => Integer :: # + 3);
+					s->map(^i: Integer => Integer :: i + 3);
 			"
 		);
 		$this->assertEquals("@null", $result);
@@ -295,7 +295,7 @@ final class MapTest extends CodeExecutionTestHelper {
 			"doMap([]);",
 			valueDeclarations: "
 				doMap = ^a: Result<Array<Integer>, Null> => Array<Integer> ::
-					a->map(^Integer => Integer :: # + 3);
+					a->map(^i: Integer => Integer :: i + 3);
 			"
 		);
 	}
@@ -306,7 +306,7 @@ final class MapTest extends CodeExecutionTestHelper {
 			"doMap([:]);",
 			valueDeclarations: "
 				doMap = ^m: Result<Map<Integer>, Null> => Map<Integer> ::
-					m->map(^Integer => Integer :: # + 3);
+					m->map(^i: Integer => Integer :: i + 3);
 			"
 		);
 	}
@@ -357,7 +357,7 @@ final class MapTest extends CodeExecutionTestHelper {
 			"doSet([;]);",
 			valueDeclarations: "
 				doSet = ^s: Result<Set<Integer>, Null> => Set<Integer> ::
-					s->map(^Integer => Integer :: # + 3);
+					s->map(^i: Integer => Integer :: i + 3);
 			"
 		);
 	}
@@ -389,7 +389,7 @@ final class MapTest extends CodeExecutionTestHelper {
 			"doMap[a: 1, b: 2, c: 5, d: 10, e: 5];",
 			valueDeclarations: "
 				doMap = ^m: Result<Array<Integer>|Map<String<1>|Integer>|Set<Integer>, Null> => Result<Array<Integer>|Map<String<1>|Integer>|Set<Integer>, Null> ::
-					m->map(^Integer => Integer :: # + 3);
+					m->map(^i: Integer => Integer :: i + 3);
 			"
 		);
 		$this->assertEquals("[a: 4, b: 5, c: 8, d: 13, e: 8]", $result);

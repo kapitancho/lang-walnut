@@ -9,8 +9,10 @@ use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
+use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
 use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\TupleValue;
@@ -46,14 +48,21 @@ final readonly class Reduce implements NativeMethod {
 				$initialType = $this->toBaseType($parameterType->types['initial']);
 
 				$reducerParamType = $this->toBaseType($reducerType->parameterType);
-				$resultType = $reducerParamType->types['result'];
+				$resultType = $reducerParamType->types['result'] ?? $typeRegistry->any;
 
-				if (!$reducerType->returnType->isSubtypeOf($resultType)) {
+				$reducerReturnType = $this->toBaseType($reducerType->returnType);
+
+				$reducerReturnErrorType = $reducerReturnType instanceof ResultType ?
+					$reducerReturnType->errorType : null;
+				$reducerReturnReturnType = $reducerReturnType instanceof ResultType ?
+					$reducerReturnType->returnType : $reducerReturnType;
+
+				if (!$reducerReturnReturnType->isSubtypeOf($resultType)) {
 					throw new AnalyserException(
 						sprintf(
 							"[%s] Reducer return type %s must match result type %s",
 							__CLASS__,
-							$reducerType->returnType,
+							$reducerReturnReturnType,
 							$resultType
 						)
 					);
@@ -68,7 +77,9 @@ final readonly class Reduce implements NativeMethod {
 						)
 					);
 				}
-				return $resultType;
+				return $reducerReturnErrorType ?
+					$typeRegistry->result($resultType, $reducerReturnErrorType) :
+					$resultType;
 			}
 			throw new AnalyserException(sprintf("[%s] Parameter must be a record with 'reducer' and 'initial' fields", __CLASS__));
 		}
@@ -92,6 +103,9 @@ final readonly class Reduce implements NativeMethod {
 						foreach ($target->values as $item) {
 							$reducerParam = $programRegistry->valueRegistry->record(['result' => $accumulator, 'item' => $item]);
 							$accumulator = $reducer->execute($programRegistry->executionContext, $reducerParam);
+							if ($accumulator instanceof ErrorValue) {
+								break;
+							}
 						}
 						return $accumulator;
 					}

@@ -11,7 +11,9 @@ use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\RecordType;
+use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
 use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -32,14 +34,21 @@ final readonly class Filter implements NativeMethod {
 		}
 		if ($targetType instanceof MapType) {
 			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf($typeRegistry->boolean)) {
+			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf(
+				$typeRegistry->result($typeRegistry->boolean, $typeRegistry->any)
+			)) {
+				$pType = $this->toBaseType($parameterType->returnType);
 				if ($targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
-					return $typeRegistry->map(
+					$returnType = $typeRegistry->map(
 						$targetType->itemType,
 						0,
 						$targetType->range->maxLength,
 						$targetType->keyType
 					);
+					return $pType instanceof ResultType ? $typeRegistry->result(
+						$returnType,
+						$pType->errorType
+					) : $returnType;
 				}
 				throw new AnalyserException(
 					sprintf(
@@ -67,6 +76,9 @@ final readonly class Filter implements NativeMethod {
 			$true = $programRegistry->valueRegistry->true;
 			foreach($values as $key => $value) {
 				$r = $parameter->execute($programRegistry->executionContext, $value);
+				if ($r instanceof ErrorValue) {
+					return $r;
+				}
 				if ($true->equals($r)) {
 					$result[$key] = $value;
 				}

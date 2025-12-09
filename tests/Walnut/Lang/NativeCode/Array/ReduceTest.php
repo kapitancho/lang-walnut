@@ -108,7 +108,7 @@ final class ReduceTest extends CodeExecutionTestHelper {
 	// Type inference tests
 	public function testReduceTypeInteger(): void {
 		$result = $this->executeCodeSnippet(
-			"reduceSum([1, 2, 3, 4, 5])",
+			"reduceSum[1, 2, 3, 4, 5]",
 			valueDeclarations: "reduceSum = ^arr: Array<Integer, 5> => Integer :: arr->reduce[reducer: ^[result: Integer, item: Integer] => Integer :: #result + #item, initial: 0];"
 		);
 		$this->assertEquals("15", $result);
@@ -116,7 +116,7 @@ final class ReduceTest extends CodeExecutionTestHelper {
 
 	public function testReduceTypeString(): void {
 		$result = $this->executeCodeSnippet(
-			"reduceConcat(['a', 'b', 'c'])",
+			"reduceConcat['a', 'b', 'c']",
 			valueDeclarations: "reduceConcat = ^arr: Array<String, 3> => String :: arr->reduce[reducer: ^[result: String, item: String] => String :: #result + #item, initial: ''];"
 		);
 		$this->assertEquals("'abc'", $result);
@@ -124,7 +124,7 @@ final class ReduceTest extends CodeExecutionTestHelper {
 
 	public function testReduceTypeTransformIntegerToString(): void {
 		$result = $this->executeCodeSnippet(
-			"transform([1, 2, 3])",
+			"transform[1, 2, 3]",
 			valueDeclarations: "transform = ^arr: Array<Integer, 3> => String :: arr->reduce[reducer: ^[result: String, item: Integer] => String :: #result + #item->asString, initial: 'Numbers: '];"
 		);
 		$this->assertEquals("'Numbers: 123'", $result);
@@ -132,10 +132,26 @@ final class ReduceTest extends CodeExecutionTestHelper {
 
 	public function testReduceTypeTransformStringToInteger(): void {
 		$result = $this->executeCodeSnippet(
-			"countChars(['hello', 'world'])",
+			"countChars['hello', 'world']",
 			valueDeclarations: "countChars = ^arr: Array<String, 2> => Integer :: arr->reduce[reducer: ^[result: Integer, item: String] => Integer :: #result + #item->length, initial: 0];"
 		);
 		$this->assertEquals("10", $result);
+	}
+
+	public function testReduceTypeTransformStringToIntegerResultOk(): void {
+		$result = $this->executeCodeSnippet(
+			"countChars['3', '7', '-2']",
+			valueDeclarations: "countChars = ^arr: Array<String, 3> => Result<Integer, NotANumber> :: arr->reduce[reducer: ^[result: Integer, item: String] => Result<Integer, NotANumber> :: #result + #item=>asInteger, initial: 0];"
+		);
+		$this->assertEquals("8", $result);
+	}
+
+	public function testReduceTypeTransformStringToIntegerResultError(): void {
+		$result = $this->executeCodeSnippet(
+			"countChars['3', 'hello', '-2']",
+			valueDeclarations: "countChars = ^arr: Array<String, 3> => Result<Integer, NotANumber> :: arr->reduce[reducer: ^[result: Integer, item: String] => Result<Integer, NotANumber> :: #result + #item=>asInteger, initial: 0];"
+		);
+		$this->assertEquals("@NotANumber", $result);
 	}
 
 	public function testReduceTypeEmptyArray(): void {
@@ -148,7 +164,7 @@ final class ReduceTest extends CodeExecutionTestHelper {
 
 	public function testReduceTypeWithRange(): void {
 		$result = $this->executeCodeSnippet(
-			"reduceRange([5, 10, 15])",
+			"reduceRange[5, 10, 15]",
 			valueDeclarations: "reduceRange = ^arr: Array<Integer<1..20>, 3> => Integer :: arr->reduce[reducer: ^[result: Integer, item: Integer<1..20>] => Integer :: #result + #item, initial: 0];"
 		);
 		$this->assertEquals("30", $result);
@@ -156,7 +172,7 @@ final class ReduceTest extends CodeExecutionTestHelper {
 
 	public function testReduceTypeRealNumbers(): void {
 		$result = $this->executeCodeSnippet(
-			"reduceReals([1.5, 2.5, 3.5])",
+			"reduceReals[1.5, 2.5, 3.5]",
 			valueDeclarations: "reduceReals = ^arr: Array<Real, 3> => Real :: arr->reduce[reducer: ^[result: Real, item: Real] => Real :: #result + #item, initial: 0.0];"
 		);
 		$this->assertEquals("7.5", $result);

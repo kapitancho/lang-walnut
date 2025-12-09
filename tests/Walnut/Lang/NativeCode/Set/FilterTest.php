@@ -16,11 +16,10 @@ final class FilterTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[5; 10]", $result);
 	}
 
-	/* not yet supported
 	public function testFilterNonEmptyError(): void {
 		$result = $this->executeCodeSnippet("[1, 2, 5, 10, 5]->filter(^Integer => Result<Boolean, String> :: @'error');");
 		$this->assertEquals("@'error'", $result);
-	}*/
+	}
 
 	public function testFilterInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet('Invalid parameter type', "[1; 'a']->filter(5);");
