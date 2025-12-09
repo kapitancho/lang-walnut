@@ -29,6 +29,14 @@ final class ProductTest extends CodeExecutionTestHelper {
 		$this->assertEquals("3.2", $result);
 	}
 
+	public function testProductReturnTypeDefault(): void {
+		$result = $this->executeCodeSnippet(
+			"myProduct[1.6, 2];",
+			valueDeclarations:  "myProduct = ^arr: Array<Real, 2..3> => Real :: arr->product;"
+		);
+		$this->assertEquals("3.2", $result);
+	}
+
 	public function testProductInvalidType(): void {
 		$this->executeErrorCodeSnippet('Invalid target type', "['hello','world', 'hi', 'hello']->product;");
 	}

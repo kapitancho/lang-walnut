@@ -4,6 +4,7 @@ namespace Walnut\Lang\NativeCode\Result;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
+use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -19,10 +20,11 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnionType;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Implementation\Code\NativeCode\Analyser\Composite\ResultProxy;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class Map implements NativeMethod {
-	use BaseType;
+	use ResultProxy;
 
 	public function analyse(
 		TypeRegistry $typeRegistry,
@@ -30,122 +32,13 @@ final readonly class Map implements NativeMethod {
 		Type $targetType,
 		Type $parameterType,
 	): Type {
-		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof ResultType) {
-			$innerType = $this->toBaseType($targetType->returnType);
-			// Handle both MapType and ArrayType
-			if ($innerType instanceof RecordType) {
-				$innerType = $innerType->asMapType();
-			} elseif ($innerType instanceof TupleType) {
-				$innerType = $innerType->asArrayType();
-			}
-
-			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof FunctionType) {
-				$r = $parameterType->returnType;
-				$callbackErrorType = $r instanceof ResultType ? $r->errorType : null;
-				$returnType = $r instanceof ResultType ? $r->returnType : $r;
-
-				// Combine error types: original Result error type and callback error type
-				if ($callbackErrorType) {
-					$combinedErrorType = $typeRegistry->union([$targetType->errorType, $callbackErrorType]);
-				} else {
-					$combinedErrorType = $targetType->errorType;
-				}
-
-				if ($innerType->isSubtypeOf(
-					$typeRegistry->union([
-						$typeRegistry->array(),
-						$typeRegistry->map(),
-						$typeRegistry->set()
-					])
-				)) {
-					if ($innerType instanceof MapType || $innerType instanceof ArrayType || $innerType instanceof SetType) {
-						if ($innerType->itemType->isSubtypeOf($parameterType->parameterType)) {
-							$t = match(true) {
-								$innerType instanceof MapType => $typeRegistry->map(
-									$returnType,
-									$innerType->range->minLength,
-									$innerType->range->maxLength,
-									$innerType->keyType
-								),
-								$innerType instanceof ArrayType => $typeRegistry->array(
-									$returnType,
-									$innerType->range->minLength,
-									$innerType->range->maxLength,
-								),
-								$innerType instanceof SetType => $typeRegistry->set(
-									$returnType,
-									$innerType->range->minLength > 0 ? 1 : 0,
-									$innerType->range->maxLength,
-								)
-							};
-							return $typeRegistry->result($t, $combinedErrorType);
-						}
-						throw new AnalyserException(
-							sprintf(
-								"The parameter type %s of the callback function is not a subtype of %s",
-								$innerType->itemType,
-								$parameterType->parameterType
-							)
-						);
-					}
-					// It should be a union type
-					if ($innerType instanceof UnionType) {
-						$ts = [];
-						foreach ($innerType->types as $innerUnionType) {
-							/** @phpstan-ignore-next-line match.unhandled */
-							$ts[] = match(true) {
-								$innerUnionType instanceof MapType => $typeRegistry->map(
-									$returnType,
-									$innerUnionType->range->minLength,
-									$innerUnionType->range->maxLength,
-									$innerUnionType->keyType
-								),
-								$innerUnionType instanceof ArrayType => $typeRegistry->array(
-									$returnType,
-									$innerUnionType->range->minLength,
-									$innerUnionType->range->maxLength,
-								),
-								$innerUnionType instanceof SetType => $typeRegistry->set(
-									$returnType,
-									$innerUnionType->range->minLength > 0 ? 1 : 0,
-									$innerUnionType->range->maxLength,
-								)
-							};
-						}
-						return $typeRegistry->result(
-							$typeRegistry->union($ts),
-							$combinedErrorType
-						);
-					}
-				}
-				// @codeCoverageIgnoreStart
-				throw new AnalyserException(sprintf("[%s] Invalid target type: Result must contain a Map or Array, got %s", __CLASS__, $targetType->returnType));
-				// @codeCoverageIgnoreEnd
-			}
-			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
-		}
-		// @codeCoverageIgnoreStart
-		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
-		// @codeCoverageIgnoreEnd
-	}
-
-	public function execute(
-		ProgramRegistry $programRegistry,
-		Value $target,
-		Value $parameter
-	): Value {
-		// If the target is an error, return it as-is
-		if ($target instanceof ErrorValue) {
-			return $target;
-		}
-
-		// Only errors should reach this point, therefore no logic for Map<> values is needed.
-
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid target value");
-		// @codeCoverageIgnoreEnd
+		return $this->analyseHelper(
+			$typeRegistry,
+			$methodFinder,
+			$targetType,
+			$parameterType,
+			new MethodNameIdentifier('map')
+		);
 	}
 
 }

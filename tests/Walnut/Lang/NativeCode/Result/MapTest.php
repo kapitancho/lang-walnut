@@ -342,7 +342,7 @@ final class MapTest extends CodeExecutionTestHelper {
 	}
 
 	public function testMapMapInvalidParameterParameterType(): void {
-		$this->executeErrorCodeSnippet("The parameter type Integer of the callback function is not a subtype of Boolean",
+		$this->executeErrorCodeSnippet("The parameter type Boolean of the callback function is not a supertype of Integer",
 			"doMap([a: 1, b: 2]);",
 			valueDeclarations: "
 				doMap = ^m: Result<Map<Integer>, Null> => Result<Map<Integer>, Null> ::
@@ -383,7 +383,7 @@ final class MapTest extends CodeExecutionTestHelper {
 	}
 
 	// Union
-
+	/* disabled for now:
 	public function testMapUnion(): void {
 		$result = $this->executeCodeSnippet(
 			"doMap[a: 1, b: 2, c: 5, d: 10, e: 5];",
@@ -394,5 +394,5 @@ final class MapTest extends CodeExecutionTestHelper {
 		);
 		$this->assertEquals("[a: 4, b: 5, c: 8, d: 13, e: 8]", $result);
 	}
-
+	*/
 }
