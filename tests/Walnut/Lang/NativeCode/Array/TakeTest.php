@@ -44,6 +44,10 @@ final class TakeTest extends CodeExecutionTestHelper {
 		yield ['[arr: Array<String, ..4>, n: Integer<0..3>] => Array<String, ..3>'];
 		yield ['[arr: Array<String, 3..6>, n: Integer<2..8>] => Array<String, 2..6>'];
 		yield ['[arr: Array<String, 2..8>, n: Integer<3..6>] => Array<String, 2..6>'];
+		yield ['[arr: [String, String, ... String], n: Integer<3..6>] => Array<String, 2..>'];
+		yield ['[arr: [String, String, String, String], n: Integer<3..6>] => Array<String, 3..4>'];
+		yield ['[arr: [String, String, ... String], n: Integer[3]] => [String, String, ... String]'];
+		yield ['[arr: [String, String, String, String], n: Integer[3]] => [String, String, String]'];
 	}
 
 	#[DataProvider('takeParameterTypeProvider')]
@@ -55,6 +59,36 @@ final class TakeTest extends CodeExecutionTestHelper {
 			"
 		);
 		$this->assertEquals("['hello', 'world', 'foo']", $result);
+	}
+
+	public function testTakeParameterTypeTupleIn(): void {
+		$result = $this->executeCodeSnippet(
+			"take[false, 'hello', 3.14, 2, -9.1];",
+			valueDeclarations: "
+				take = ^arr: [Boolean, String, ...Real] => [Boolean, String] :: arr->take(2);
+			"
+		);
+		$this->assertEquals("[false, 'hello']", $result);
+	}
+
+	public function testTakeParameterTypeTupleOut(): void {
+		$result = $this->executeCodeSnippet(
+			"take[false, 'hello', 3.14, 2, -9.1];",
+			valueDeclarations: "
+				take = ^arr: [Boolean, String, ...Real] => [Boolean, String, ...Real] :: arr->take(3);
+			"
+		);
+		$this->assertEquals("[false, 'hello', 3.14]", $result);
+	}
+
+	public function testTakeParameterTypeTupleInMore(): void {
+		$result = $this->executeCodeSnippet(
+			"take[false, 'hello'];",
+			valueDeclarations: "
+				take = ^arr: [Boolean, String] => [Boolean, String] :: arr->take(3);
+			"
+		);
+		$this->assertEquals("[false, 'hello']", $result);
 	}
 
 	public function testTakeInvalidParameterType(): void {

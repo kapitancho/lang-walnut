@@ -39,6 +39,36 @@ final class WithoutByKeyTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[element: 1, map: [b: 2]]", $result);
 	}
 
+	public function testFilterRecordSingleValue(): void {
+		$result = $this->executeCodeSnippet(
+			"fn[map: [a: 1.72, b: 2, c: 3, d: 'hello', e: 'hi!'], key: 'c'];",
+			valueDeclarations: "fn = ^m: [map: [a: Real, b: ?Integer, c: Real|Boolean, ...String], key: String['c']]
+				=> [element: Real|Boolean, map: [a: Real, b: ?Integer, ...String]] :: 
+					m.map->withoutByKey(m.key);"
+		);
+		$this->assertEquals("[\n	element: 3,\n	map: [a: 1.72, b: 2, d: 'hello', e: 'hi!']\n]", $result);
+	}
+
+	public function testFilterRecordMultipleValues(): void {
+		$result = $this->executeCodeSnippet(
+			"fn[map: [a: 1.72, b: 2, c: 3, d: 'hello', e: 'hi!'], key: 'c'];",
+			valueDeclarations: "fn = ^m: [map: [a: Real, b: ?Integer, c: Real|Boolean, ...String], key: String['a', 'c']]
+				=> [element: Real|Boolean, map: [a: ?Real, b: ?Integer, c: ?Real|Boolean, ...String]] :: 
+					m.map->withoutByKey(m.key);"
+		);
+		$this->assertEquals("[\n	element: 3,\n	map: [a: 1.72, b: 2, d: 'hello', e: 'hi!']\n]", $result);
+	}
+
+	public function testFilterRecordMultipleValuesNotFound(): void {
+		$result = $this->executeCodeSnippet(
+			"fn[map: [a: 1.72, b: 2, c: 3, d: 'hello', e: 'hi!'], key: 'c'];",
+			valueDeclarations: "fn = ^m: [map: [a: Real, b: ?Integer, c: Real|Boolean, ...String], key: String['a', 'c', 'x']]
+				=> Result<[element: Real|Boolean|String, map: [a: ?Real, b: ?Integer, c: ?Real|Boolean, ...String]], MapItemNotFound> :: 
+					m.map->withoutByKey(m.key);"
+		);
+		$this->assertEquals("[\n	element: 3,\n	map: [a: 1.72, b: 2, d: 'hello', e: 'hi!']\n]", $result);
+	}
+
 	public function testWithoutByKeyInvalidParameterValue(): void {
 		$this->executeErrorCodeSnippet("Invalid parameter type",
 			"[a: 'a', b: 1, c: 2]->withoutByKey(15)");

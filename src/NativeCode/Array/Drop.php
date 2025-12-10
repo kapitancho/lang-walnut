@@ -10,7 +10,9 @@ use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
+use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
+use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
@@ -27,21 +29,32 @@ final readonly class Drop implements NativeMethod {
 		Type $targetType,
 		Type $parameterType,
 	): Type {
-		$targetType = $this->toBaseType($targetType);
-		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
+		$type = $this->toBaseType($targetType);
+		$pType = $this->toBaseType($parameterType);
+		if ($type instanceof TupleType && $pType instanceof IntegerSubsetType && count($pType->subsetValues) === 1) {
+			$param = (int)(string)$pType->subsetValues[0];
+			if ($param >= 0) {
+				return $typeRegistry->tuple(
+					array_slice($type->types, $param),
+					$type->restType
+				);
+			}
+		}
+
+		$type = $type instanceof TupleType ? $type->asArrayType() : $type;
 		if ($type instanceof ArrayType) {
 			/** @var IntegerType $parameterType */
-			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType->isSubtypeOf($typeRegistry->integer(0))) {
+			$pType = $this->toBaseType($parameterType);
+			if ($pType->isSubtypeOf($typeRegistry->integer(0))) {
 				$minLength = match(true) {
-					$parameterType->numberRange->max === PlusInfinity::value,
-					$parameterType->numberRange->max->value > $type->range->minLength => 0,
-					default => $type->range->minLength->sub($parameterType->numberRange->max->value)
+					$pType->numberRange->max === PlusInfinity::value,
+					$pType->numberRange->max->value > $type->range->minLength => 0,
+					default => $type->range->minLength->sub($pType->numberRange->max->value)
 				};
 				$maxLength = match(true) {
 					$type->range->maxLength === PlusInfinity::value => PlusInfinity::value,
-					$parameterType->numberRange->min->value > $type->range->maxLength => 0,
-					default => $type->range->maxLength->sub($parameterType->numberRange->min->value)
+					$pType->numberRange->min->value > $type->range->maxLength => 0,
+					default => $type->range->maxLength->sub($pType->numberRange->min->value)
 				};
 				return $typeRegistry->array(
 					$type->itemType,

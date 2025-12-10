@@ -10,6 +10,7 @@ use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\MapType;
+use Walnut\Lang\Blueprint\Type\OptionalKeyType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -29,7 +30,18 @@ final readonly class Filter implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
+		$recordReturnType = null;
 		if ($targetType instanceof RecordType) {
+			$recordReturnType = $typeRegistry->record(
+				array_map(
+					fn(Type $type): OptionalKeyType =>
+						$type instanceof OptionalKeyType ?
+							$type :
+							$typeRegistry->optionalKey($type),
+					$targetType->types
+				),
+				$targetType->restType
+			);
 			$targetType = $targetType->asMapType();
 		}
 		if ($targetType instanceof MapType) {
@@ -39,7 +51,7 @@ final readonly class Filter implements NativeMethod {
 			)) {
 				$pType = $this->toBaseType($parameterType->returnType);
 				if ($targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
-					$returnType = $typeRegistry->map(
+					$returnType = $recordReturnType ?? $typeRegistry->map(
 						$targetType->itemType,
 						0,
 						$targetType->range->maxLength,

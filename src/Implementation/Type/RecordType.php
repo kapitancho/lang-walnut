@@ -33,9 +33,13 @@ final readonly class RecordType implements RecordTypeInterface, JsonSerializable
 			$this->typeRegistry->union(array_values([... $types, $this->restType])),
 			$min,
 			$this->restType instanceof NothingType ? $l : PlusInfinity::value,
-			count($this->types) > 0 ?
-				$this->typeRegistry->stringSubset(array_map(strval(...), array_keys($this->types))) :
-				$this->typeRegistry->nothing
+			match(true) {
+				count($this->types) === 0 => $this->typeRegistry->nothing,
+				$this->restType instanceof NothingType => $this->typeRegistry->stringSubset(
+					array_map(strval(...), array_keys($this->types))
+				),
+				default => $this->typeRegistry->string
+			}
 		);
 	}
 

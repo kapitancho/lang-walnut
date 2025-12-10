@@ -21,9 +21,8 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 trait ArrayWithoutFirstIWithoutLast {
 	use BaseType;
 
-	public function analyse(
+	private function analyseHelper(
 		TypeRegistry $typeRegistry,
-		MethodFinder $methodFinder,
 		Type $targetType,
 		Type $parameterType,
 	): Type {

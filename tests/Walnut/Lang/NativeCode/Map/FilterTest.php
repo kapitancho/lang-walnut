@@ -12,7 +12,7 @@ final class FilterTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFilterNonEmpty(): void {
-		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 5, d: 10, e: 5]->filter(^Integer => Boolean :: # > 4);");
+		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 5, d: 10, e: 5]->filter(^i: Integer => Boolean :: i > 4);");
 		$this->assertEquals("[c: 5, d: 10, e: 5]", $result);
 	}
 
@@ -23,6 +23,15 @@ final class FilterTest extends CodeExecutionTestHelper {
 				m->filter(^v: Integer => Boolean :: v > 1);"
 		);
 		$this->assertEquals("[b: 2]", $result);
+	}
+
+	public function testFilterRecord(): void {
+		$result = $this->executeCodeSnippet(
+			"fn[a: 1.72, b: 2, c: 3, d: 'hello', e: 'hi!'];",
+			valueDeclarations: "fn = ^m: [a: Real, b: ?Integer, c: Real|Boolean, ...String] => [a: ?Real, b: ?Integer, c: ?Real|Boolean, ...String] :: 
+				m->filter(^v: Real|Boolean|String => Boolean :: ?when(v->isOfType(`Integer|String['hi!'])) { true; } ~ { false; });"
+		);
+		$this->assertEquals("[b: 2, c: 3, e: 'hi!']", $result);
 	}
 
 	public function testFilterNonEmptyError(): void {

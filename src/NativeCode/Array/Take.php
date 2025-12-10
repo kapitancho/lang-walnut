@@ -10,6 +10,7 @@ use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
+use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -27,21 +28,31 @@ final readonly class Take implements NativeMethod {
 		Type $targetType,
 		Type $parameterType,
 	): Type {
-		$targetType = $this->toBaseType($targetType);
-		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
+		$type = $this->toBaseType($targetType);
+		$pType = $this->toBaseType($parameterType);
+		if ($type instanceof TupleType && $pType instanceof IntegerSubsetType && count($pType->subsetValues) === 1) {
+			$param = (int)(string)$pType->subsetValues[0];
+			if ($param >= 0) {
+				return $typeRegistry->tuple(
+					array_slice($type->types, 0, $param),
+					$param > count($type->types) ? $type->restType : $typeRegistry->nothing
+				);
+			}
+		}
+
+		$type = $type instanceof TupleType ? $type->asArrayType() : $type;
 		if ($type instanceof ArrayType) {
 			/** @var IntegerType $parameterType */
-			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType->isSubtypeOf($typeRegistry->integer(0))) {
+			if ($pType->isSubtypeOf($typeRegistry->integer(0))) {
 				$maxLength = match(true) {
-					$parameterType->numberRange->max === PlusInfinity::value => $type->range->maxLength,
+					$pType->numberRange->max === PlusInfinity::value => $type->range->maxLength,
 					$type->range->maxLength === PlusInfinity::value,
-					$type->range->maxLength > $parameterType->numberRange->max->value => $parameterType->numberRange->max->value,
+					$type->range->maxLength > $pType->numberRange->max->value => $pType->numberRange->max->value,
 					default => $type->range->maxLength,
 				};
 				return $typeRegistry->array(
 					$type->itemType,
-					min($parameterType->numberRange->min->value, $type->range->minLength),
+					min($pType->numberRange->min->value, $type->range->minLength),
 					$maxLength
 				);
 			}

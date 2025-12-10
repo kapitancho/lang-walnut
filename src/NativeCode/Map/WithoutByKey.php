@@ -11,6 +11,7 @@ use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\MapType;
+use Walnut\Lang\Blueprint\Type\OptionalKeyType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
@@ -31,11 +32,65 @@ final readonly class WithoutByKey implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
+		$parameterType = $this->toBaseType($parameterType);
+		$recordReturnType = null;
 		if ($targetType instanceof RecordType) {
+			if ($parameterType instanceof StringSubsetType) {
+				$recordTypes = $targetType->types;
+				if (
+					count($parameterType->subsetValues) === 1 &&
+					array_key_exists($parameterType->subsetValues[0], $recordTypes)
+				) {
+					$elementType = $recordTypes[$parameterType->subsetValues[0]];
+					unset($recordTypes[$parameterType->subsetValues[0]]);
+					return $typeRegistry->record([
+						'element' => $elementType,
+						'map' => $typeRegistry->record(
+							$recordTypes,
+							$targetType->restType
+						)
+					]);
+				} else {
+					$canBeMissing = false;
+					$elementTypes = [];
+					foreach ($parameterType->subsetValues as $subsetValue) {
+						if (array_key_exists($subsetValue, $recordTypes)) {
+							$elementTypes[] = $recordTypes[$subsetValue];
+							if ($recordTypes[$subsetValue] instanceof OptionalKeyType) {
+								$canBeMissing = true;
+							} else {
+								$recordTypes[$subsetValue] = $typeRegistry->optionalKey(
+									$recordTypes[$subsetValue]
+								);
+							}
+						} else {
+							$canBeMissing = true;
+							$elementTypes[] = $targetType->restType;
+						}
+					}
+					$returnType = $typeRegistry->record([
+						'element' => $typeRegistry->union($elementTypes),
+						'map' => $typeRegistry->record(
+							array_map(
+								fn(Type $type): OptionalKeyType => $type instanceof OptionalKeyType ?
+									$type :
+									$typeRegistry->optionalKey($type),
+								$targetType->types
+							),
+							$targetType->restType
+						)
+					]);
+					return $canBeMissing ? $typeRegistry->result(
+						$returnType,
+						$typeRegistry->data(
+							new TypeNameIdentifier("MapItemNotFound")
+						)
+					) : $returnType;
+				}
+			}
 			$targetType = $targetType->asMapType();
 		}
 		if ($targetType instanceof MapType) {
-			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof StringType) {
 				$keyType = $targetType->keyType;
 				if ($keyType instanceof StringSubsetType && $parameterType instanceof StringSubsetType) {

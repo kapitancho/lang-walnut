@@ -12,7 +12,9 @@ use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
+use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
+use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
@@ -29,10 +31,37 @@ final readonly class WithoutByIndex implements NativeMethod {
 		Type $targetType,
 		Type $parameterType,
 	): Type {
-		$targetType = $this->toBaseType($targetType);
-		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
+		$type = $this->toBaseType($targetType);
+		$pType = $this->toBaseType($parameterType);
+		if ($type instanceof TupleType && $pType instanceof IntegerSubsetType && count($pType->subsetValues) === 1) {
+			$param = (int)(string)$pType->subsetValues[0];
+			if ($param >= 0) {
+				$hasError = $param >= count($type->types);
+				$paramType = $type->types[$param] ?? $type->restType;
+				$paramItemTypes = $type->types;
+				array_splice($paramItemTypes, $param, 1);
+				$returnType = $paramType instanceof NothingType ?
+					$paramType :
+					$typeRegistry->record([
+						'element' => $paramType,
+						'array' => $hasError ? $type : $typeRegistry->tuple(
+							$paramItemTypes,
+							$type->restType
+						)
+					]);
+				return $hasError ?
+					$typeRegistry->result(
+						$returnType,
+						$typeRegistry->data(
+							new TypeNameIdentifier("IndexOutOfRange")
+						)
+					) :
+					$returnType;
+			}
+		}
+		$type = $type instanceof TupleType ? $type->asArrayType() : $type;
 		if ($type instanceof ArrayType) {
-			if ($parameterType instanceof IntegerType) {
+			if ($pType instanceof IntegerType) {
 				$returnType = $typeRegistry->record([
 					'element' => $type->itemType,
 					'array' => $typeRegistry->array(
@@ -43,10 +72,10 @@ final readonly class WithoutByIndex implements NativeMethod {
 					)
 				]);
 				return
-					$parameterType->numberRange->min instanceof NumberIntervalEndpoint &&
-					($parameterType->numberRange->min->value + ($parameterType->numberRange->min->inclusive ? 0 : 1)) >= 0 &&
-					$parameterType->numberRange->max instanceof NumberIntervalEndpoint &&
-					($parameterType->numberRange->max->value - ($parameterType->numberRange->max->inclusive ? 0 : 1)) <
+					$pType->numberRange->min instanceof NumberIntervalEndpoint &&
+					($pType->numberRange->min->value + ($pType->numberRange->min->inclusive ? 0 : 1)) >= 0 &&
+					$pType->numberRange->max instanceof NumberIntervalEndpoint &&
+					($pType->numberRange->max->value - ($pType->numberRange->max->inclusive ? 0 : 1)) <
 						$type->range->maxLength ?
 						$returnType :
 						$typeRegistry->result(

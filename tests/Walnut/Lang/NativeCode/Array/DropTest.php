@@ -45,6 +45,11 @@ final class DropTest extends CodeExecutionTestHelper {
 		yield ['[arr: Array<String, 4..16>, n: Integer<1..3>] => Array<String, 1..15>'];
 		yield ['[arr: Array<String, 3..6>, n: Integer<2..8>] => Array<String, ..4>'];
 		yield ['[arr: Array<String, 2..8>, n: Integer<3..6>] => Array<String, ..5>'];
+
+		yield ['[arr: [String, String, ... String], n: Integer<3..6>] => Array<String>'];
+		yield ['[arr: [String, String, String, String], n: Integer<3..6>] => Array<String, ..1>'];
+		yield ['[arr: [String, String, ... String], n: Integer[3]] => [... String]'];
+		yield ['[arr: [String, String, String, String], n: Integer[3]] => [String]'];
 	}
 
 	#[DataProvider('dropParameterTypeProvider')]
@@ -56,6 +61,47 @@ final class DropTest extends CodeExecutionTestHelper {
 			"
 		);
 		$this->assertEquals("['bar']", $result);
+	}
+
+
+	public function testDropParameterTypeTupleIn(): void {
+		$result = $this->executeCodeSnippet(
+			"drop[false, 'hello', 3.14, 2, -9.1];",
+			valueDeclarations: "
+				drop = ^arr: [Boolean, String, ...Real] => [String, ... Real] :: arr->drop(1);
+			"
+		);
+		$this->assertEquals("['hello', 3.14, 2, -9.1]", $result);
+	}
+
+	public function testDropParameterTypeTupleOut(): void {
+		$result = $this->executeCodeSnippet(
+			"drop[false, 'hello', 3.14, 2, -9.1];",
+			valueDeclarations: "
+				drop = ^arr: [Boolean, String, ...Real] => [... Real] :: arr->drop(3);
+			"
+		);
+		$this->assertEquals("[2, -9.1]", $result);
+	}
+
+	public function testDropParameterTypeTupleNoRest(): void {
+		$result = $this->executeCodeSnippet(
+			"drop[false, 'hello', 3.14, 2, -9.1];",
+			valueDeclarations: "
+				drop = ^arr: [Boolean, String, Real, Real, Real] => [Real, Real] :: arr->drop(3);
+			"
+		);
+		$this->assertEquals("[2, -9.1]", $result);
+	}
+
+	public function testDropParameterTypeTupleInMore(): void {
+		$result = $this->executeCodeSnippet(
+			"drop[false, 'hello'];",
+			valueDeclarations: "
+				drop = ^arr: [Boolean, String] => [] :: arr->drop(3);
+			"
+		);
+		$this->assertEquals("[]", $result);
 	}
 
 	public function testTakeParameterTypeZero(): void {
