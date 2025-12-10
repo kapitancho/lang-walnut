@@ -59,6 +59,16 @@ final class WithoutByKeyTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[\n	element: 3,\n	map: [a: 1.72, b: 2, d: 'hello', e: 'hi!']\n]", $result);
 	}
 
+	public function testFilterRecordMultipleValuesOptionalKey(): void {
+		$result = $this->executeCodeSnippet(
+			"fn[map: [a: 1.72, b: 2, c: 3, d: 'hello', e: 'hi!'], key: 'c'];",
+			valueDeclarations: "fn = ^m: [map: [a: Real, b: ?Integer, c: Real|Boolean, ...String], key: String['a', 'b', 'c']]
+				=> Result<[element: Real|Boolean, map: [a: ?Real, b: ?Integer, c: ?Real|Boolean, ...String]], MapItemNotFound> :: 
+					m.map->withoutByKey(m.key);"
+		);
+		$this->assertEquals("[\n	element: 3,\n	map: [a: 1.72, b: 2, d: 'hello', e: 'hi!']\n]", $result);
+	}
+
 	public function testFilterRecordMultipleValuesNotFound(): void {
 		$result = $this->executeCodeSnippet(
 			"fn[map: [a: 1.72, b: 2, c: 3, d: 'hello', e: 'hi!'], key: 'c'];",

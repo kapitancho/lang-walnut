@@ -55,10 +55,11 @@ final readonly class WithoutByKey implements NativeMethod {
 					$elementTypes = [];
 					foreach ($parameterType->subsetValues as $subsetValue) {
 						if (array_key_exists($subsetValue, $recordTypes)) {
-							$elementTypes[] = $recordTypes[$subsetValue];
 							if ($recordTypes[$subsetValue] instanceof OptionalKeyType) {
+								$elementTypes[] = $recordTypes[$subsetValue]->valueType;
 								$canBeMissing = true;
 							} else {
+								$elementTypes[] = $recordTypes[$subsetValue];
 								$recordTypes[$subsetValue] = $typeRegistry->optionalKey(
 									$recordTypes[$subsetValue]
 								);
