@@ -99,10 +99,12 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 				}
 				if ($t instanceof RecordType) {
 					foreach($t->types as $fieldName => $fieldType) {
-						$analyserContext = $analyserContext->withAddedVariableType(
-							new VariableNameIdentifier($variableName . $fieldName),
-							$tConv($fieldType)
-						);
+						try {
+							$analyserContext = $analyserContext->withAddedVariableType(
+								new VariableNameIdentifier($variableName . $fieldName),
+								$tConv($fieldType)
+							);
+						} catch (IdentifierException) {}
 					}
 					if (!$t->restType instanceof NothingType) {
 						$analyserContext = $analyserContext->withAddedVariableType(

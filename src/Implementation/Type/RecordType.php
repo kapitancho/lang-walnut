@@ -38,7 +38,7 @@ final readonly class RecordType implements RecordTypeInterface, JsonSerializable
 				$this->restType instanceof NothingType => $this->typeRegistry->stringSubset(
 					array_map(strval(...), array_keys($this->types))
 				),
-				default => $this->typeRegistry->string
+				default => $this->typeRegistry->string()
 			}
 		);
 	}

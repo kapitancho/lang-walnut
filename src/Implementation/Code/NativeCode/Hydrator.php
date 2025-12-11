@@ -27,6 +27,7 @@ use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\NullType;
 use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\OptionalKeyType;
+use Walnut\Lang\Blueprint\Type\ProxyNamedType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\ResultType;
@@ -92,16 +93,21 @@ final readonly class Hydrator {
 			$targetType instanceof DataType => $this->hydrateData(...),
 			$targetType instanceof OpenType => $this->hydrateOpen(...),
 			$targetType instanceof SealedType => $this->hydrateSealed(...),
+			$targetType instanceof ProxyNamedType => $this->hydrateProxyNamed(...),
 			// @codeCoverageIgnoreStart
 			default => throw new HydrationException(
 				$value,
 				$hydrationPath,
-				"Unsupported type"
+				"Unsupported type: " . $targetType::class
 			)
 			// @codeCoverageIgnoreEnd
 		};
 		/** @phpstan-ignore-next-line argument.type */
 		return $fn($value, $targetType, $hydrationPath);
+	}
+
+	private function hydrateProxyNamed(Value $value, ProxyNamedType $targetType, string $hydrationPath): Value {
+		return $this->hydrate($value, $targetType->actualType, $hydrationPath);
 	}
 
 	private function hydrateAny(Value $value, AnyType $targetType, string $hydrationPath): Value {
