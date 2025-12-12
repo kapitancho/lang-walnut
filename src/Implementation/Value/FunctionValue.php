@@ -14,6 +14,7 @@ use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyError;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\NothingType;
+use Walnut\Lang\Blueprint\Value\FunctionCompositionMode;
 use Walnut\Lang\Blueprint\Value\FunctionValue as FunctionValueInterface;
 use Walnut\Lang\Blueprint\Value\Value;
 
@@ -124,11 +125,12 @@ final readonly class FunctionValue implements FunctionValueInterface, JsonSerial
 		return $other instanceof self && (string)$this === (string)$other;
 	}
 
-	public function composeWith(FunctionValueInterface $nextFunction): FunctionValueInterface {
+	public function composeWith(FunctionValueInterface $nextFunction, FunctionCompositionMode $compositionMode): FunctionValueInterface {
 		return new CompositeFunctionValue(
 			$this->typeRegistry,
 			$this,
-			$nextFunction
+			$nextFunction,
+			$compositionMode
 		);
 	}
 

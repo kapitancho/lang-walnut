@@ -16,7 +16,7 @@ use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Code\NativeCode\Analyser\Function\Compose;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
-final readonly class BinaryPlus implements NativeMethod {
+final readonly class BinaryMultiply implements NativeMethod {
 
 	use Compose;
 
@@ -29,7 +29,7 @@ final readonly class BinaryPlus implements NativeMethod {
 		return $this->analyseHelper(
 			$targetType,
 			$parameterType,
-			FunctionCompositionMode::direct
+			FunctionCompositionMode::bypassExternalErrors
 		);
 	}
 
@@ -41,7 +41,7 @@ final readonly class BinaryPlus implements NativeMethod {
 		return $this->executeHelper(
 			$target,
 			$parameter,
-			FunctionCompositionMode::direct
+			FunctionCompositionMode::bypassExternalErrors
 		);
 	}
 }

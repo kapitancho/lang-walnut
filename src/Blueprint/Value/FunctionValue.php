@@ -22,6 +22,6 @@ interface FunctionValue extends Value {
 
 	public function analyseDependencyType(DependencyContainer $dependencyContainer): array;
 
-	public function composeWith(FunctionValue $nextFunction): FunctionValue;
+	public function composeWith(FunctionValue $nextFunction, FunctionCompositionMode $compositionMode): FunctionValue;
 
 }

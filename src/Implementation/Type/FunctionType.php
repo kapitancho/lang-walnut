@@ -3,9 +3,11 @@
 namespace Walnut\Lang\Implementation\Type;
 
 use JsonSerializable;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\FunctionType as FunctionTypeInterface;
 use Walnut\Lang\Blueprint\Type\SupertypeChecker;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\FunctionCompositionMode;
 
 final class FunctionType implements FunctionTypeInterface, JsonSerializable {
 
@@ -13,6 +15,7 @@ final class FunctionType implements FunctionTypeInterface, JsonSerializable {
 	private readonly Type $realReturnType;
 
     public function __construct(
+		private readonly TypeRegistry $typeRegistry,
         private readonly Type $declaredParameterType,
         private readonly Type $declaredReturnType
     ) {}
@@ -31,7 +34,17 @@ final class FunctionType implements FunctionTypeInterface, JsonSerializable {
 		}
 	}
 
-    public function isSubtypeOf(Type $ofType): bool {
+	public function composeWith(FunctionTypeInterface $nextFunctionType, FunctionCompositionMode $compositionMode): FunctionTypeInterface {
+		return new CompositeFunctionType(
+			$this->typeRegistry,
+			$this,
+			$nextFunctionType,
+			$compositionMode
+		);
+	}
+
+
+	public function isSubtypeOf(Type $ofType): bool {
 		return match(true) {
 			$ofType instanceof FunctionTypeInterface =>
 				$ofType->parameterType->isSubtypeOf($this->parameterType) &&

@@ -496,7 +496,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 	}
 
 	public function function(Type $parameterType, Type $returnType): FunctionType {
-		return new FunctionType($parameterType, $returnType);
+		return new FunctionType($this, $parameterType, $returnType);
 	}
 
 	public function mutable(Type $valueType): MutableType {

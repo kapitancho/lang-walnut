@@ -7,11 +7,15 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope as VariableValueScopeInterface;
+use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\FunctionType;
+use Walnut\Lang\Blueprint\Value\ErrorValue;
+use Walnut\Lang\Blueprint\Value\FunctionCompositionMode;
 use Walnut\Lang\Blueprint\Value\FunctionValue as FunctionValueInterface;
+use Walnut\Lang\Blueprint\Value\SealedValue;
 use Walnut\Lang\Blueprint\Value\Value;
 
 final class CompositeFunctionValue implements FunctionValueInterface, JsonSerializable {
@@ -20,13 +24,15 @@ final class CompositeFunctionValue implements FunctionValueInterface, JsonSerial
 		private readonly TypeRegistry $typeRegistry,
 		public readonly FunctionValueInterface $first,
 		public readonly FunctionValueInterface $second,
+		public readonly FunctionCompositionMode $compositionMode
 	) {}
 
-	public function composeWith(FunctionValueInterface $nextFunction): FunctionValueInterface {
+	public function composeWith(FunctionValueInterface $nextFunction, FunctionCompositionMode $compositionMode): FunctionValueInterface {
 		return new CompositeFunctionValue(
 			$this->typeRegistry,
 			$this,
-			$nextFunction
+			$nextFunction,
+			$compositionMode
 		);
 	}
 
@@ -67,13 +73,25 @@ final class CompositeFunctionValue implements FunctionValueInterface, JsonSerial
 
 	public function execute(ExecutionContext $executionContext, Value $parameterValue): Value {
 		$intermediateValue = $this->first->execute($executionContext, $parameterValue);
+		if ($intermediateValue instanceof ErrorValue) {
+			if ($this->compositionMode === FunctionCompositionMode::bypassErrors || (
+				$this->compositionMode === FunctionCompositionMode::bypassExternalErrors &&
+				$intermediateValue->errorValue instanceof SealedValue &&
+				$intermediateValue->errorValue->type->name->equals(
+					new TypeNameIdentifier('ExternalError')
+				)
+			)) {
+				return $intermediateValue;
+			}
+		}
 		return $this->second->execute($executionContext, $intermediateValue);
 	}
 
 	public function equals(Value $other): bool {
 		return $other instanceof self &&
 			$this->first->equals($other->first) &&
-			$this->second->equals($other->second);
+			$this->second->equals($other->second) &&
+			$this->compositionMode === $other->compositionMode;
 	}
 
 	public function __toString(): string {

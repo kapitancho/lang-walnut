@@ -20,32 +20,14 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnionType;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\SealedValue;
+use Walnut\Lang\Implementation\Type\Helper\ExternalTypeHelper;
 
 final readonly class NoExternalErrorExpression implements NoExternalErrorExpressionInterface, JsonSerializable {
+	use ExternalTypeHelper;
+
 	public function __construct(
 		public Expression $targetExpression
 	) {}
-
-	private function withoutExternalError(TypeRegistry $typeRegistry, ResultType $resultType): Type {
-		$errorType = $resultType->errorType;
-		$errorType = match(true) {
-			$errorType instanceof SealedType && $errorType->name->equals(
-				new TypeNameIdentifier('ExternalError')) => $typeRegistry->nothing,
-			$errorType instanceof UnionType => $typeRegistry->union(
-				array_filter($errorType->types, static fn(Type $t): bool => !(
-					$t instanceof SealedType && $t->name->equals(
-						new TypeNameIdentifier('ExternalError')
-					)
-				))
-			),
-			default => $errorType
-		};
-		return $errorType instanceof NothingType ? $resultType->returnType :
-			$typeRegistry->result(
-				$resultType->returnType,
-				$errorType
-			);
-	}
 
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
 		$ret = $this->targetExpression->analyse($analyserContext);
