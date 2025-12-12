@@ -26,6 +26,11 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@HydrationError![\n\tvalue: 42,\n\thydrationPath: 'value',\n\terrorMessage: 'Intersection type values cannot be hydrated'\n]", $result);
 	}
 
+	public function testHydrateAsProxy(): void {
+		$result = $this->executeCodeSnippet("[42]->hydrateAs(type[\X]);", "X := Integer;");
+		$this->assertEquals("[X!42]", $result);
+	}
+
 
 	public function testHydrateAsNullFromNull(): void {
 		$result = $this->executeCodeSnippet("null->hydrateAs(type{Null});");

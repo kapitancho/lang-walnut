@@ -35,7 +35,7 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 	protected function getTestCode(): string {
 		return <<<NUT
 			MyTuple = [String];
-			MyRecord = [a: Boolean, b: ?Integer, c: ?Integer];
+			MyRecord = [a: Boolean, b: ?Integer, c: ?Integer, '\$ref': Real];
 			MySealed := \$Real;
 			MySealedTuple := \$[Boolean, ... Integer];
 			MySealedRecord := \$[a: Real, b: ?String, c: ?String, ... Boolean];
