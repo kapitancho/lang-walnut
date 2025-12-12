@@ -68,10 +68,6 @@ final readonly class CompositeFunctionType implements FunctionType {
 			$this->second->returnType;
 	}
 
-	public function __toString(): string {
-		return md5($this->first . ' + ' . $this->second);
-	}
-
 	public function composeWith(FunctionType $nextFunctionType, FunctionCompositionMode $compositionMode): FunctionType {
 		return new CompositeFunctionType(
 			$this->typeRegistry,
@@ -79,6 +75,11 @@ final readonly class CompositeFunctionType implements FunctionType {
 			$nextFunctionType,
 			$compositionMode
 		);
+	}
+
+	// @codeCoverageIgnoreStart
+	public function __toString(): string {
+		return md5($this->first . ' + ' . $this->second);
 	}
 
 	public function isSubtypeOf(Type $ofType): bool {
@@ -90,4 +91,5 @@ final readonly class CompositeFunctionType implements FunctionType {
 			default => false
 		};
 	}
+	// @codeCoverageIgnoreEnd
 }
