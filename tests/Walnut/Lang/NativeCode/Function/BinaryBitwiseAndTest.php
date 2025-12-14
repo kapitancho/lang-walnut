@@ -327,7 +327,7 @@ final class BinaryBitwiseAndTest extends CodeExecutionTestHelper {
 			valueDeclarations: "
 				fn1 = ^s: JsonValue => Result<Integer, HydrationError> :: s->hydrateAs(`Integer);
 				fn2 = ^i: Integer => Result<Real<0..>, NotANumber> :: i->sqrt;
-				fnC = ^s: JsonValue => Result<Real<0..>, HydrationError|NotANumber> :: {fn1 & fn2}(s);
+				fnC = ^s: JsonValue => Result<Real<0..>, HydrationError|NotANumber> :: s->apply(fn1 & fn2);
 			"
 		);
 		$this->assertEquals("5", $result);

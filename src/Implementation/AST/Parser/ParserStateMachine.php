@@ -59,6 +59,7 @@ final readonly class ParserStateMachine {
 			]],
 			102 => ['name' => 'module content start', 'transitions' => [
 				T::cli_entry_point->name => function(LT $token) {
+					$this->s->result['dependencyName'] = null;
 					$this->s->result['dependencyType'] = $this->nodeBuilder->nothingType;
 					$this->s->result['startPosition'] = $token->sourcePosition;
 					$this->s->push(112);
@@ -67,7 +68,7 @@ final readonly class ParserStateMachine {
 				T::dependency_marker->name => function(LT $token) {
 					$this->s->result['startPosition'] = $token->sourcePosition;
 					$this->s->push(113);
-					$this->s->move(701);
+					$this->s->move(625);
 				},
 				T::type_keyword->name => function(LT $token) {
 					$this->s->result = [];
@@ -228,7 +229,8 @@ final readonly class ParserStateMachine {
 			]],
 			113 => ['name' => 'module level cli entry point dependency type return', 'transitions' => [
 				T::cli_entry_point->name => function(LT $token) {
-					$this->s->result['dependencyType'] = $this->s->generated;
+					$this->s->result['dependencyName'] = $this->s->generated['dependency_name'];
+					$this->s->result['dependencyType'] = $this->s->generated['dependency_type'];
 					$this->s->push(112);
 					$this->s->move(201);
 				},
