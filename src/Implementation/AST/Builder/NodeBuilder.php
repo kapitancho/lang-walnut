@@ -306,28 +306,6 @@ final class NodeBuilder implements NodeBuilderInterface {
 		return new MatchExpressionDefaultNode($this->getSourceLocation(), $valueExpression);
 	}
 
-	private const array priorities = [
-		'binaryPlus' => 5,
-		'binaryMinus' => 5,
-		'binaryMultiply' => 8,
-		'binaryDivide' => 8,
-		'binaryIntegerDivide' => 8,
-		'binaryModulo' => 8,
-		'binaryPower' => 10,
-		'binaryLessThan' => 4,
-		'binaryLessThanEqual' => 4,
-		'binaryGreaterThan' => 4,
-		'binaryGreaterThanEqual' => 4,
-		'binaryNotEqual' => 3,
-		'binaryEqual' => 3,
-		'binaryOr' => 1,
-		'binaryAnd' => 2,
-	];
-
-	private function getOperandPriority(MethodNameIdentifier $methodName): int {
-		return self::priorities[$methodName->identifier] ?? 99;
-	}
-
 	public function methodCall(ExpressionNode $target, MethodNameIdentifier $methodName, ExpressionNode $parameter): MethodCallExpressionNodeInterface {
 		return new MethodCallExpressionNode($this->getSourceLocation(), $target, $methodName, $parameter);
 	}

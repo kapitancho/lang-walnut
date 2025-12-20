@@ -1964,42 +1964,6 @@ final readonly class ParserStateMachine {
 					$this->s->moveAndPop();
 				},
 			]],
-			349 => ['name' => 'unary op start', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->result = [];
-					$this->s->result['startPosition'] = $token->sourcePosition;
-					$this->s->result['method_name'] = match($token->patternMatch->text) {
-						'+' => 'unaryPlus',
-						'-' => 'unaryMinus',
-						'~' => 'unaryBitwiseNot',
-						'!' => 'unaryNot',
-						// @codeCoverageIgnoreStart
-						default => 'unaryUnknown',
-						// @codeCoverageIgnoreEnd
-					};
-					$this->s->push(350);
-					$this->s->move(201);
-				},
-			]],
-			350 => ['name' => 'unary op return', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->stay(351);
-				}
-			]],
-			351 => ['name' => 'unary op return end', 'transitions' => [
-				'' => function(LT $token) {
-					$g = $this->s->generated;
-					$m = $this->s->result['method_name'];
-					$this->s->pop();
-					$this->s->generated = $this->nodeBuilder->methodCall(
-						$g,
-						new MethodNameIdentifier($m),
-						$this->nodeBuilder->constant(
-							$this->nodeBuilder->nullValue
-						)
-					);
-				},
-			]],
 			352 => ['name' => 'match error start', 'transitions' => [
 				T::call_start->name => 353
 			]],
