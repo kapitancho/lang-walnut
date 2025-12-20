@@ -1508,34 +1508,6 @@ final readonly class ParserStateMachine {
 					$this->s->result['expression_left'] = $this->s->generated;
 					$this->s->move(3311);
 				},
-				/*T::tuple_start->name => function(LT $token) {
-					$this->s->push(3141);
-					$this->s->result = [];
-					$this->s->result['startPosition'] = $token->sourcePosition;
-					$this->s->result['expression_left'] = $this->s->generated;
-					$this->s->stay(3313);
-				},*/
-				T::empty_tuple->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->functionCall(
-						$this->s->generated,
-						$this->nodeBuilder->constant($this->nodeBuilder->tupleValue([]))
-					);
-					$this->s->move(3141);
-				},
-				T::empty_record->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->functionCall(
-						$this->s->generated,
-						$this->nodeBuilder->constant($this->nodeBuilder->recordValue([]))
-					);
-					$this->s->move(3141);
-				},
-				T::empty_set->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->functionCall(
-						$this->s->generated,
-						$this->nodeBuilder->constant($this->nodeBuilder->setValue([]))
-					);
-					$this->s->move(3141);
-				},
 				'' => function(LT $token) {
 					$this->s->pop();
 				}
