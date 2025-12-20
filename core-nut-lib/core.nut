@@ -36,8 +36,8 @@ IntegerNumberInterval := #[
 ] @ InvalidIntegerRange :: ?whenTypeOf(#) is {
     `[start: IntegerNumberIntervalEndpoint, end: IntegerNumberIntervalEndpoint]:
         ?when (
-            {#.start.value > #.end.value} ||
-            {#.start.value == #.end.value && {!{#.start.inclusive} || !{#.end.inclusive}}}
+            #.start.value > #.end.value ||
+            #.start.value == #.end.value && {!#.start.inclusive || !#.end.inclusive}
         ) { => @InvalidIntegerRange![min: #.start.value, max: #.end.value] }
 };
 IntegerNumberRange := [intervals: Array<IntegerNumberInterval, 1..>];
@@ -56,7 +56,7 @@ RealNumberInterval := #[
     `[start: RealNumberIntervalEndpoint, end: RealNumberIntervalEndpoint]:
         ?when (
             {#.start.value > #.end.value} ||
-            {#.start.value == #.end.value && {!{#.start.inclusive} || !{#.end.inclusive}}}
+            {#.start.value == #.end.value && {{!#.start.inclusive} || {!#.end.inclusive}}}
         ) { => @InvalidRealRange![min: #.start.value, max: #.end.value] }
 };
 RealNumberRange := [intervals: Array<RealNumberInterval, 1..>];

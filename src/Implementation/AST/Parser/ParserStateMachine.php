@@ -627,8 +627,7 @@ final readonly class ParserStateMachine {
 			]],
 			201 => ['name' => 'expression adt start', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->push(302);
-					$this->s->stay(301);
+					$this->s->stay(3010);
 				}
 			]],
 			202 => ['name' => 'constant expression', 'transitions' => [
@@ -752,7 +751,7 @@ final readonly class ParserStateMachine {
 			216 => ['name' => 'type expression', 'transitions' => [
 				T::boolean_op_not->name => function (LT $token) {
 					$this->s->push(215);
-					$this->s->move(301);
+					$this->s->move(3010);
 				},
 				T::property_accessor->name => function(LT $token) {
 					$this->s->push(220);
@@ -779,7 +778,7 @@ final readonly class ParserStateMachine {
 				T::call_start->name => 217,
 				T::tuple_start->name => function(LT $token) {
 					$this->s->push(219);
-					$this->s->stay(301);
+					$this->s->stay(3160);
 				},
 				'' => function (LT $token) {
 					$this->s->generated = $this->nodeBuilder->constant(
@@ -986,7 +985,592 @@ final readonly class ParserStateMachine {
 			241 => ['name' => 'dict expression separator', 'transitions' => [
 				T::colon->name => 224
 			]],
-			301 => ['name' => 'expression start', 'transitions' => [
+
+
+			3010 => ['name' => 'or expression start', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(3011);
+					$this->s->stay(3020);
+				},
+			]],
+			3011 => ['name' => 'or expression op', 'transitions' => [
+				T::boolean_op->name => function(LT $token) {
+					if ($token->patternMatch->text === '||') {
+						$this->s->result['expression_left'] = $this->s->generated;
+						$this->s->push(3012);
+						$this->s->move(3020);
+						return;
+					}
+					$this->s->pop();
+				},
+				'' => function(LT $token) {
+					$this->s->pop();
+				}
+			]],
+			3012 => ['name' => 'or expression op expr', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->methodCall(
+						$this->s->result['expression_left'],
+						new MethodNameIdentifier('binaryOr'),
+						$this->s->generated
+					);
+					$this->s->stay(3011);
+				}
+			]],
+
+			3020 => ['name' => 'xor expression start', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(3021);
+					$this->s->stay(3030);
+				},
+			]],
+			3021 => ['name' => 'xor expression op', 'transitions' => [
+				T::boolean_op->name => function(LT $token) {
+					if ($token->patternMatch->text === '^^') {
+						$this->s->result['expression_left'] = $this->s->generated;
+						$this->s->push(3022);
+						$this->s->move(3030);
+						return;
+					}
+					$this->s->pop();
+				},
+				'' => function(LT $token) {
+					$this->s->pop();
+				}
+			]],
+			3022 => ['name' => 'xor expression op expr', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->methodCall(
+						$this->s->result['expression_left'],
+						new MethodNameIdentifier('binaryXor'),
+						$this->s->generated
+					);
+					$this->s->stay(3021);
+				}
+			]],
+
+			3030 => ['name' => 'or else expression start', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(3031);
+					$this->s->stay(3040);
+				},
+			]],
+			3031 => ['name' => 'or else expression op', 'transitions' => [
+				T::or_else->name => function(LT $token) {
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->push(3032);
+					$this->s->move(3040);
+				},
+				'' => function(LT $token) {
+					$this->s->pop();
+				}
+			]],
+			3032 => ['name' => 'or else expression op expr', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->methodCall(
+						$this->s->result['expression_left'],
+						new MethodNameIdentifier('binaryOrElse'),
+						$this->s->generated
+					);
+					$this->s->stay(3031);
+				}
+			]],
+
+
+			3040 => ['name' => 'and expression start', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(3041);
+					$this->s->stay(3050);
+				},
+			]],
+			3041 => ['name' => 'and expression op', 'transitions' => [
+				T::boolean_op->name => function(LT $token) {
+					if ($token->patternMatch->text === '&&') {
+						$this->s->result['expression_left'] = $this->s->generated;
+						$this->s->push(3042);
+						$this->s->move(3050);
+						return;
+					}
+					$this->s->pop();
+				},
+				'' => function(LT $token) {
+					$this->s->pop();
+				}
+			]],
+			3042 => ['name' => 'and expression op expr', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->methodCall(
+						$this->s->result['expression_left'],
+						new MethodNameIdentifier('binaryAnd'),
+						$this->s->generated
+					);
+					$this->s->stay(3041);
+				}
+			]],
+
+
+
+			3050 => ['name' => 'bitwise or expression start', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(3051);
+					$this->s->stay(3060);
+				},
+			]],
+			3051 => ['name' => 'bitwise or expression op', 'transitions' => [
+				T::union->name => function(LT $token) {
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->push(3052);
+					$this->s->move(3060);
+				},
+				'' => function(LT $token) {
+					$this->s->pop();
+				}
+			]],
+			3052 => ['name' => 'bitwise or expression op expr', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->methodCall(
+						$this->s->result['expression_left'],
+						new MethodNameIdentifier('binaryBitwiseOr'),
+						$this->s->generated
+					);
+					$this->s->stay(3051);
+				}
+			]],
+
+			3060 => ['name' => 'bitwise xor expression start', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(3061);
+					$this->s->stay(3070);
+				},
+			]],
+			3061 => ['name' => 'bitwise xor expression op', 'transitions' => [
+				T::lambda_param->name => function(LT $token) {
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->push(3062);
+					$this->s->move(3070);
+				},
+				'' => function(LT $token) {
+					$this->s->pop();
+				}
+			]],
+			3062 => ['name' => 'bitwise xor expression op expr', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->methodCall(
+						$this->s->result['expression_left'],
+						new MethodNameIdentifier('binaryBitwiseXor'),
+						$this->s->generated
+					);
+					$this->s->stay(3061);
+				}
+			]],
+
+
+			3070 => ['name' => 'bitwise and expression start', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(3071);
+					$this->s->stay(3080);
+				},
+			]],
+			3071 => ['name' => 'bitwise and expression op', 'transitions' => [
+				T::intersection->name => function(LT $token) {
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->push(3072);
+					$this->s->move(3080);
+				},
+				'' => function(LT $token) {
+					$this->s->pop();
+				}
+			]],
+			3072 => ['name' => 'bitwise and expression op expr', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->methodCall(
+						$this->s->result['expression_left'],
+						new MethodNameIdentifier('binaryBitwiseAnd'),
+						$this->s->generated
+					);
+					$this->s->stay(3071);
+				}
+			]],
+
+
+			3080 => ['name' => 'eq expression start', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(3081);
+					$this->s->stay(3090);
+				},
+			]],
+			3081 => ['name' => 'eq expression op', 'transitions' => [
+				T::equals->name => function(LT $token) {
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->result['op'] = 'binaryEqual';
+					$this->s->push(3082);
+					$this->s->move(3090);
+				},
+				T::not_equals->name => function(LT $token) {
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->result['op'] = 'binaryNotEqual';
+					$this->s->push(3082);
+					$this->s->move(3090);
+				},
+				'' => function(LT $token) {
+					$this->s->pop();
+				}
+			]],
+			3082 => ['name' => 'eq expression op expr', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->methodCall(
+						$this->s->result['expression_left'],
+						new MethodNameIdentifier($this->s->result['op']),
+						$this->s->generated
+					);
+					$this->s->pop();
+				}
+			]],
+
+
+
+			3090 => ['name' => 'rel expression start', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(3091);
+					$this->s->stay(3100);
+				},
+			]],
+			3091 => ['name' => 'rel expression op', 'transitions' => [
+				T::greater_than_equal->name => function(LT $token) {
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->result['op'] = 'binaryGreaterThanEqual';
+					$this->s->push(3092);
+					$this->s->move(3100);
+				},
+				T::less_than_equal->name => function(LT $token) {
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->result['op'] = 'binaryLessThanEqual';
+					$this->s->push(3092);
+					$this->s->move(3100);
+				},
+				T::type_start->name => function(LT $token) {
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->result['op'] = 'binaryLessThan';
+					$this->s->push(3092);
+					$this->s->move(3100);
+				},
+				T::type_end->name => function(LT $token) {
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->result['op'] = 'binaryGreaterThan';
+					$this->s->push(3092);
+					$this->s->move(3100);
+				},
+				'' => function(LT $token) {
+					$this->s->pop();
+				}
+			]],
+			3092 => ['name' => 'rel expression op expr', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->methodCall(
+						$this->s->result['expression_left'],
+						new MethodNameIdentifier($this->s->result['op']),
+						$this->s->generated
+					);
+					$this->s->pop();
+				}
+			]],
+
+
+
+			3100 => ['name' => 'additive expression start', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(3101);
+					$this->s->stay(3110);
+				},
+			]],
+			3101 => ['name' => 'additive expression op', 'transitions' => [
+				T::arithmetic_op->name => function(LT $token) {
+					if ($token->patternMatch->text === '+') {
+						$this->s->result['expression_left'] = $this->s->generated;
+						$this->s->result['op'] = 'binaryPlus';
+						$this->s->push(3102);
+						$this->s->move(3110);
+						return;
+					}
+					if ($token->patternMatch->text === '-') {
+						$this->s->result['expression_left'] = $this->s->generated;
+						$this->s->result['op'] = 'binaryMinus';
+						$this->s->push(3102);
+						$this->s->move(3110);
+						return;
+					}
+					$this->s->pop();
+				},
+				'' => function(LT $token) {
+					$this->s->pop();
+				}
+			]],
+			3102 => ['name' => 'additive expression op expr', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->methodCall(
+						$this->s->result['expression_left'],
+						new MethodNameIdentifier($this->s->result['op']),
+						$this->s->generated
+					);
+					$this->s->stay(3101);
+				}
+			]],
+
+
+			3110 => ['name' => 'multiplicative expression start', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(3111);
+					$this->s->stay(3120);
+				},
+			]],
+			3111 => ['name' => 'multiplicative expression op', 'transitions' => [
+				T::special_var_modulo->name => function(LT $token) {
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->result['op'] = 'binaryModulo';
+					$this->s->push(3112);
+					$this->s->move(3120);
+				},
+				T::arithmetic_op_multiply->name => function(LT $token) {
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->result['op'] = 'binaryMultiply';
+					$this->s->push(3112);
+					$this->s->move(3120);
+				},
+				T::arithmetic_op2->name => function(LT $token) {
+					if ($token->patternMatch->text === '//') {
+						$this->s->result['expression_left'] = $this->s->generated;
+						$this->s->result['op'] = 'binaryIntegerDivide';
+						$this->s->push(3112);
+						$this->s->move(3120);
+						return;
+					}
+					$this->s->pop();
+				},
+				T::arithmetic_op->name => function(LT $token) {
+					if ($token->patternMatch->text === '/') {
+						$this->s->result['expression_left'] = $this->s->generated;
+						$this->s->result['op'] = 'binaryDivide';
+						$this->s->push(3112);
+						$this->s->move(3120);
+						return;
+					}
+					$this->s->pop();
+				},
+				'' => function(LT $token) {
+					$this->s->pop();
+				}
+			]],
+			3112 => ['name' => 'multiplicative expression op expr', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->methodCall(
+						$this->s->result['expression_left'],
+						new MethodNameIdentifier($this->s->result['op']),
+						$this->s->generated
+					);
+					$this->s->stay(3111);
+				}
+			]],
+
+
+
+			3120 => ['name' => 'power expression start', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(3121);
+					$this->s->stay(3130);
+				},
+			]],
+			3121 => ['name' => 'power expression op', 'transitions' => [
+				T::arithmetic_op2->name => function(LT $token) {
+					if ($token->patternMatch->text === '**') {
+						$this->s->result['expression_left'] = $this->s->generated;
+						$this->s->push(3122);
+						$this->s->move(3120);
+						return;
+					}
+					$this->s->pop();
+				},
+				'' => function(LT $token) {
+					$this->s->pop();
+				}
+			]],
+			3122 => ['name' => 'power expression op expr', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->methodCall(
+						$this->s->result['expression_left'],
+						new MethodNameIdentifier('binaryPower'),
+						$this->s->generated
+					);
+					$this->s->stay(3121);
+				}
+			]],
+
+
+			3130 => ['name' => 'unary expression start', 'transitions' => [
+				T::boolean_op_not->name => function(LT $token) {
+					$this->s->result['op'] = 'unaryNot';
+					$this->s->push(3131);
+					$this->s->move(3130);
+				},
+				T::default_match->name => function(LT $token) {
+					$this->s->result['op'] = 'unaryBitwiseNot';
+					$this->s->push(3131);
+					$this->s->move(3130);
+				},
+				T::arithmetic_op->name => function(LT $token) {
+					if ($token->patternMatch->text === '+') {
+						$this->s->result['op'] = 'unaryPlus';
+						$this->s->push(3131);
+						$this->s->move(3130);
+						return;
+					}
+					if ($token->patternMatch->text === '-') {
+						$this->s->result['op'] = 'unaryMinus';
+						$this->s->push(3131);
+						$this->s->move(3130);
+						return;
+					}
+					$this->s->stay(3140);
+				},
+				'' => function(LT $token) {
+					$this->s->stay(3140);
+				}
+			]],
+			3131 => ['name' => 'unary expression op expr', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->methodCall(
+						$this->s->generated,
+						new MethodNameIdentifier($this->s->result['op']),
+						$this->nodeBuilder->constant(
+							$this->nodeBuilder->nullValue
+						)
+					);
+					$this->s->pop();
+				}
+			]],
+
+
+
+			3140 => ['name' => 'postfix expression start', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(3141);
+					$this->s->stay(3150);
+				},
+			]],
+			3141 => ['name' => 'postfix expression op', 'transitions' => [
+				T::property_accessor->name => function(LT $token) {
+					$this->s->push(3141);
+					$this->s->result = [];
+					$this->s->result['startPosition'] = $token->sourcePosition;
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->move(3303);
+				},
+				T::pure_marker->name => function(LT $token) {
+					$this->s->push(3141);
+					$this->s->result = [];
+					$this->s->result['startPosition'] = $token->sourcePosition;
+					$this->s->result['is_no_external_error'] = true;
+					$this->s->result['is_no_error'] = false;
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->move(3305);
+				},
+				T::method_marker->name => function(LT $token) {
+					$this->s->push(3141);
+					$this->s->result = [];
+					$this->s->result['startPosition'] = $token->sourcePosition;
+					$this->s->result['is_no_external_error'] = false;
+					$this->s->result['is_no_error'] = false;
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->move(3305);
+				},
+				T::lambda_return->name => function(LT $token) {
+					$this->s->push(3141);
+					$this->s->result = [];
+					$this->s->result['startPosition'] = $token->sourcePosition;
+					$this->s->result['is_no_external_error'] = false;
+					$this->s->result['is_no_error'] = true;
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->move(3305);
+				},
+				T::error_as_external->name => function(LT $token) {
+					$this->s->push(3141);
+					$this->s->result = [];
+					$this->s->result['startPosition'] = $token->sourcePosition;
+					$this->s->result['is_no_external_error'] = false;
+					$this->s->result['is_no_error'] = true;
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->result['method_name'] = 'errorAsExternal';
+					$this->s->move(3306);
+				},
+				T::call_start->name => function(LT $token) {
+					$this->s->push(3141);
+					$this->s->result = [];
+					$this->s->result['startPosition'] = $token->sourcePosition;
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->move(3311);
+				},
+				/*T::tuple_start->name => function(LT $token) {
+					$this->s->push(3141);
+					$this->s->result = [];
+					$this->s->result['startPosition'] = $token->sourcePosition;
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->stay(3313);
+				},*/
+				T::empty_tuple->name => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->functionCall(
+						$this->s->generated,
+						$this->nodeBuilder->constant($this->nodeBuilder->tupleValue([]))
+					);
+					$this->s->move(3141);
+				},
+				T::empty_record->name => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->functionCall(
+						$this->s->generated,
+						$this->nodeBuilder->constant($this->nodeBuilder->recordValue([]))
+					);
+					$this->s->move(3141);
+				},
+				T::empty_set->name => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->functionCall(
+						$this->s->generated,
+						$this->nodeBuilder->constant($this->nodeBuilder->setValue([]))
+					);
+					$this->s->move(3141);
+				},
+				'' => function(LT $token) {
+					$this->s->pop();
+				}
+			]],
+
+			3150 => ['name' => 'tuple call expression start', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(3151);
+					$this->s->stay(3160);
+				},
+			]],
+			3151 => ['name' => 'tuple call expression op', 'transitions' => [
+				T::tuple_start->name => $c = function(LT $token) {
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->push(3152);
+					$this->s->stay(3160);
+				},
+				T::empty_set->name => $c,
+				T::empty_record->name => $c,
+				T::empty_tuple->name => $c,
+				'' => function(LT $token) {
+					$this->s->pop();
+				},
+			]],
+			3152 => ['name' => 'tuple call expression op expr', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->functionCall(
+						$this->s->result['expression_left'],
+						$this->s->generated
+					);
+					$this->s->pop();
+				},
+			]],
+
+			3160 => ['name' => 'expression start', 'transitions' => [
 				T::string_value->name => $c = function(LT $token) {
 					$this->s->stay(202);
 				},
@@ -1009,16 +1593,11 @@ final readonly class ParserStateMachine {
 
 				T::sequence_start->name => -204,
 				T::sequence_end->name => function(LT $token) { $this->s->stay(318); },
-				T::lambda_return->name => -206,
+				T::lambda_return->name => -206, //TODO
 				T::no_error->name => -208,
 				T::no_external_error->name => -210,
 
-				T::function_body_marker->name => -340,
-
-				T::boolean_op->name => $u = function(LT $token) { $this->s->stay(349); },
-				T::boolean_op_not->name => $u,
-				T::arithmetic_op->name => $u,
-				T::default_match->name => $u,
+				T::function_body_marker->name => -340, //TODO
 
 				T::var->name => -613,
 
@@ -1076,153 +1655,27 @@ final readonly class ParserStateMachine {
 					$this->s->move(333);
 				},
 			]],
-			302 => ['name' => 'property method or call', 'transitions' => [
-				T::property_accessor->name => function(LT $token) {
-					$this->s->result = [];
-					$this->s->result['startPosition'] = $token->sourcePosition;
-					$this->s->result['expression_left'] = $this->s->generated;
-					$this->s->move(303);
-				},
-				T::pure_marker->name => function(LT $token) {
-					$this->s->result = [];
-					$this->s->result['startPosition'] = $token->sourcePosition;
-					$this->s->result['is_no_external_error'] = true;
-					$this->s->result['is_no_error'] = false;
-					$this->s->result['expression_left'] = $this->s->generated;
-					$this->s->move(305);
-				},
-				T::method_marker->name => function(LT $token) {
-					$this->s->result = [];
-					$this->s->result['startPosition'] = $token->sourcePosition;
-					$this->s->result['is_no_external_error'] = false;
-					$this->s->result['is_no_error'] = false;
-					$this->s->result['expression_left'] = $this->s->generated;
-					$this->s->move(305);
-				},
-				T::lambda_return->name => function(LT $token) {
-					$this->s->result = [];
-					$this->s->result['startPosition'] = $token->sourcePosition;
-					$this->s->result['is_no_external_error'] = false;
-					$this->s->result['is_no_error'] = true;
-					$this->s->result['expression_left'] = $this->s->generated;
-					$this->s->move(305);
-				},
-				T::error_as_external->name => function(LT $token) {
-					$this->s->result = [];
-					$this->s->result['startPosition'] = $token->sourcePosition;
-					$this->s->result['is_no_external_error'] = false;
-					$this->s->result['is_no_error'] = true;
-					$this->s->result['expression_left'] = $this->s->generated;
-					$this->s->result['method_name'] = 'errorAsExternal';
-					$this->s->move(306);
-				},
-				T::call_start->name => function(LT $token) {
-					$this->s->result = [];
-					$this->s->result['startPosition'] = $token->sourcePosition;
-					$this->s->result['expression_left'] = $this->s->generated;
-					$this->s->move(311);
-				},
-				T::tuple_start->name => function(LT $token) {
-					$this->s->result = [];
-					$this->s->result['startPosition'] = $token->sourcePosition;
-					$this->s->result['expression_left'] = $this->s->generated;
-					$this->s->stay(313);
-				},
-				T::empty_tuple->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->functionCall(
-						$this->s->generated,
-						$this->nodeBuilder->constant($this->nodeBuilder->tupleValue([]))
-					);
-					$this->s->move(315);
-				},
-				T::empty_record->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->functionCall(
-						$this->s->generated,
-						$this->nodeBuilder->constant($this->nodeBuilder->recordValue([]))
-					);
-					$this->s->move(315);
-				},
-				T::empty_set->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->functionCall(
-						$this->s->generated,
-						$this->nodeBuilder->constant($this->nodeBuilder->setValue([]))
-					);
-					$this->s->move(315);
-				},
-				T::arithmetic_op->name => $c = function(LT $token) {
-					/*if ($token->patternMatch->text === '$') {
-						$this->s->pop();
-						return;
-					}*/
-					$this->s->result = [];
-					$this->s->result['startPosition'] = $token->sourcePosition;
-					$this->s->result['expression_left'] = $this->s->generated;
-					/** @phpstan-ignore-next-line match.unhandled */
-					$this->s->result['method_name'] = match($token->patternMatch->text) {
-						'+' => 'binaryPlus',
-						'-' => 'binaryMinus',
-						'*' => 'binaryMultiply',
-						'/' => 'binaryDivide',
-						'//' => 'binaryIntegerDivide',
-						'%' => 'binaryModulo',
-						'**' => 'binaryPower',
-						'&' => 'binaryBitwiseAnd',
-						'|' => 'binaryBitwiseOr',
-						'^' => 'binaryBitwiseXor',
-						'<' => 'binaryLessThan',
-						'<=' => 'binaryLessThanEqual',
-						'>' => 'binaryGreaterThan',
-						'>=' => 'binaryGreaterThanEqual',
-						'!=' => 'binaryNotEqual',
-						'==' => 'binaryEqual',
-						'||' => 'binaryOr',
-						'&&' => 'binaryAnd',
-						'^^' => 'binaryXor',
-						'??' => 'binaryOrElse',
-					};
-					$this->s->move(316);
-				},
-
-				//binary operators start
-				T::boolean_op->name => $c,
-				//T::boolean_op_not->name => $c,
-				T::less_than_equal->name => $c,
-				T::greater_than_equal->name => $c,
-				T::intersection->name => $c,
-				T::union->name => $c,
-				T::arithmetic_op2->name => $c,
-				T::arithmetic_op_multiply->name => $c,
-				T::equals->name => $c,
-				T::not_equals->name => $c,
-				T::type_start->name => $c,
-				T::type_end->name => $c,
-				T::lambda_param->name => $c,
-				T::or_else->name => $c,
-				//binary operators end
 
 
-				//T::this_var->name => $c,
-				T::special_var_modulo->name => $c,
-				'' => function(LT $token) {
-					$this->s->pop();
-				},
-			]],
-			303 => ['name' => 'property name', 'transitions' => [
+
+
+
+			3303 => ['name' => 'property name', 'transitions' => [
 				T::string_value->name => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->propertyAccess(
-						$this->s->result['expression_left'],
+						$this->s->generated,
 						$this->escapeCharHandler->unescape( $token->patternMatch->text)
 					);
-					$this->s->move(304);
+					$this->s->moveAndPop();
 				},
 				T::var_keyword->name => $c = function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->propertyAccess(
-						$this->s->result['expression_left'],
+						$this->s->generated,
 						is_numeric($token->patternMatch->text) ?
 							(int)$token->patternMatch->text :
 							$token->patternMatch->text
 					);
-					$this->s->move(304);
+					$this->s->moveAndPop();
 				},
 				T::type->name => $c,
 				T::true->name => $c,
@@ -1234,216 +1687,76 @@ final readonly class ParserStateMachine {
 				T::lambda_return->name => $c,
 				T::positive_integer_number->name => $c,
 			]],
-			304 => ['name' => 'property name next', 'transitions' => [
-				T::property_accessor->name => $c = function(LT $token) {
-					$this->s->stay(302);
-				},
-				//binary operators start
-				T::boolean_op->name => $c,
-				T::boolean_op_not->name => $c,
-				T::less_than_equal->name => $c,
-				T::greater_than_equal->name => $c,
-				T::arithmetic_op->name => $c,
-				T::intersection->name => $c,
-				T::union->name => $c,
-				T::arithmetic_op2->name => $c,
-				T::arithmetic_op_multiply->name => $c,
-				T::equals->name => $c,
-				T::not_equals->name => $c,
-				T::type_start->name => $c,
-				T::type_end->name => $c,
-				T::lambda_param->name => $c,
-				T::or_else->name => $c,
-				//binary operators end
 
-				T::this_var->name => $c,
-				T::special_var->name => $c,
-				T::special_var_param->name => $c,
-				T::special_var_modulo->name => $c,
-				T::pure_marker->name => $c,
-				T::method_marker->name => $c,
-				T::error_as_external->name => $c,
-				T::lambda_return->name => $c,
-				T::call_start->name => $c,
-				T::tuple_start->name => $c,
-				T::tuple_end->name => $c,
-				'' => function(LT $token) {
-					$this->s->pop();
-				},
-			]],
-			305 => ['name' => 'method name', 'transitions' => [
+
+			3305 => ['name' => 'method name', 'transitions' => [
 				T::var_keyword->name => $c = function(LT $token) {
 					$this->s->result['method_name'] = $token->patternMatch->text;
-					$this->s->move(306);
+					$this->s->move(3306);
 				},
 				T::type_keyword->name => $c,
 				T::type->name => $c,
 				T::val->name => $c,
 			]],
-			306 => ['name' => 'method name next', 'transitions' => [
+			3306 => ['name' => 'method name next', 'transitions' => [
 				T::call_start->name => function(LT $token) {
-					$this->s->move(307);
+					$this->s->move(3307);
 				},
 				T::tuple_start->name => $t = function(LT $token) {
-					$this->s->stay(309);
+					$this->s->stay(3309);
 				},
 				T::empty_tuple->name => $t,
 				T::empty_set->name => $t,
 				T::empty_record->name => $t,
-				T::property_accessor->name => $c = function(LT $token) {
-					$this->noErrorMethodCall(false);
-					$this->s->stay(302);
-				},
-				//binary operators start
-				T::boolean_op->name => $c,
-				T::boolean_op_not->name => $c,
-				T::less_than_equal->name => $c,
-				T::greater_than_equal->name => $c,
-				T::arithmetic_op->name => $c,
-				T::intersection->name => $c,
-				T::union->name => $c,
-				T::arithmetic_op2->name => $c,
-				T::arithmetic_op_multiply->name => $c,
-				T::equals->name => $c,
-				T::not_equals->name => $c,
-				T::type_start->name => $c,
-				T::type_end->name => $c,
-				T::lambda_param->name => $c,
-				T::or_else->name => $c,
-				//binary operators end
-
-				T::pure_marker->name => $c,
-				T::method_marker->name => $c,
-				T::error_as_external->name => $c,
-				T::lambda_return->name => $c,
 				'' => function(LT $token) {
 					$this->noErrorMethodCall(false);
 					$this->s->pop();
 				},
 			]],
-			307 => ['name' => 'method call start', 'transitions' => [
+			3307 => ['name' => 'method call start', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->push(308);
+					$this->s->push(3308);
 					$this->s->stay(201);
 				}
 			]],
-			308 => ['name' => 'method call value', 'transitions' => [
+			3308 => ['name' => 'method call value', 'transitions' => [
 				T::call_end->name => function(LT $token) {
 					$this->noErrorMethodCall(true);
-					$this->s->move(315);
+					$this->s->moveAndPop();
 				}
 			]],
-			309 => ['name' => 'method call start tuple or record', 'transitions' => [
+			3309 => ['name' => 'method call start tuple or record', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->push(310);
-					$this->s->stay(301);
+					$this->s->push(3310);
+					$this->s->stay(3010);
 				}
 			]],
-			310 => ['name' => 'method call value tuple or record', 'transitions' => [
-				/*T::property_accessor->name => $c = function(LT $token) {
-					$this->noErrorMethodCall(true);
-					$this->s->stay(302);
-				},
-				T::pure_marker->name => $c,
-				T::method_marker->name => $c,
-				T::lambda_return->name => $c,
-				T::error_as_external->name => $c,
-				T::call_start->name => $c,
-				T::tuple_start->name => $c,*/
+			3310 => ['name' => 'method call value tuple or record', 'transitions' => [
 				'' => function(LT $token) {
 					$this->noErrorMethodCall(true);
-					$this->s->stay(315);
-					//$this->s->pop();
+					$this->s->pop();
 				}
 			]],
-			311 => ['name' => 'function call start', 'transitions' => [
+			3311 => ['name' => 'function call start', 'transitions' => [
 				T::call_end->name => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->functionCall(
 						$this->s->result['expression_left'],
 						$this->nodeBuilder->constant($this->nodeBuilder->nullValue)
 					);
-					$this->s->move(315);
+					$this->s->moveAndPop();
 				},
 				'' => function(LT $token) {
-					$this->s->push(312);
+					$this->s->push(3312);
 					$this->s->stay(201);
 				}
 			]],
-			312 => ['name' => 'function call value', 'transitions' => [
+			3312 => ['name' => 'function call value', 'transitions' => [
 				T::call_end->name => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->functionCall(
 						$this->s->result['expression_left'],
 						$this->s->generated
 					);
-					$this->s->move(315);
-				}
-			]],
-			313 => ['name' => 'function call start tuple or record', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->push(314);
-					$this->s->stay(301);
-				}
-			]],
-			314 => ['name' => 'function call value tuple or record', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->functionCall(
-						$this->s->result['expression_left'],
-						$this->s->generated
-					);
-					$this->s->stay(315);
-				}
-			]],
-			315 => ['name' => 'method call value', 'transitions' => [
-				T::property_accessor->name => $c = function(LT $token) {
-					$this->s->stay(302);
-				},
-				//binary operators start
-				T::boolean_op->name => $c,
-				T::boolean_op_not->name => $c,
-				T::less_than_equal->name => $c,
-				T::greater_than_equal->name => $c,
-				T::arithmetic_op->name => $c,
-				T::intersection->name => $c,
-				T::union->name => $c,
-				T::arithmetic_op2->name => $c,
-				T::arithmetic_op_multiply->name => $c,
-				T::equals->name => $c,
-				T::not_equals->name => $c,
-				T::type_start->name => $c,
-				T::type_end->name => $c,
-				T::lambda_param->name => $c,
-				T::or_else->name => $c,
-				//binary operators end
-
-				T::pure_marker->name => $c,
-				T::method_marker->name => $c,
-				T::lambda_return->name => $c,
-				T::error_as_external->name => $c,
-				T::call_start->name => $c,
-				T::tuple_start->name => $c,
-
-				T::empty_tuple->name => $c,
-				T::empty_record->name => $c,
-				T::empty_set->name => $c,
-
-				'' => function(LT $token) {
-					$this->s->pop();
-				}
-			]],
-			316 => ['name' => 'method call arithmetic start', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->push(317);
-					$this->s->stay(201);
-				}
-			]],
-			317 => ['name' => 'method call arithmetic value', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->methodCall(
-						$this->s->result['expression_left'],
-						new MethodNameIdentifier($this->s->result['method_name']),
-						$this->s->generated
-					);
-					$this->s->stay(315);
+					$this->s->moveAndPop();
 				}
 			]],
 			318 => ['name' => 'sequence early end', 'transitions' => [
@@ -1609,7 +1922,7 @@ final readonly class ParserStateMachine {
 			342 => ['name' => 'error value value start', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->push(343);
-					$this->s->stay(301);
+					$this->s->stay(3010);
 				},
 			]],
 			343 => ['name' => 'error value type return', 'transitions' => [
@@ -1639,7 +1952,7 @@ final readonly class ParserStateMachine {
 				'' => function(LT $token) {
 					$this->s->result['mutable_type'] = $this->s->generated;
 					$this->s->push(348);
-					$this->s->stay(301);
+					$this->s->stay(3010);
 				},
 			]],
 			348 => ['name' => 'mutable value type return', 'transitions' => [
@@ -1665,7 +1978,7 @@ final readonly class ParserStateMachine {
 						// @codeCoverageIgnoreEnd
 					};
 					$this->s->push(350);
-					$this->s->move(301);
+					$this->s->move(201);
 				},
 			]],
 			350 => ['name' => 'unary op return', 'transitions' => [
@@ -4011,12 +4324,6 @@ final readonly class ParserStateMachine {
 
 	private function noErrorMethodCall(bool $useGenerated): void {
 		$parameter = $this->s->result['expression_left'];
-		//TEMP
-		/*if ($this->s->result['is_no_external_error'] ?? false) {
-			$parameter = $this->nodeBuilder->noExternalError($parameter);
-		} elseif ($this->s->result['is_no_error'] ?? false) {
-			$parameter = $this->nodeBuilder->noError($parameter);
-		}*/
 		$this->s->generated = $this->nodeBuilder->methodCall(
 			$parameter,
 			new MethodNameIdentifier($this->s->result['method_name']),

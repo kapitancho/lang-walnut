@@ -329,67 +329,7 @@ final class NodeBuilder implements NodeBuilderInterface {
 	}
 
 	public function methodCall(ExpressionNode $target, MethodNameIdentifier $methodName, ExpressionNode $parameter): MethodCallExpressionNodeInterface {
-		$mNode = new MethodCallExpressionNode(
-			$this->getSourceLocation(),
-			$target,
-			$methodName,
-			$parameter
-		);
-
-		$operands = [];
-		$operators = [];
-		$step = function(ExpressionNode $n) use (&$operands, &$operators, &$step): void {
-			if ($n instanceof MethodCallExpressionNodeInterface) {
-				$step($n->target);
-				$operators[] = $n->methodName;
-				$step($n->parameter);
-			} else {
-				$operands[] = $n;
-			}
-		};
-		$step($mNode);
-
-		/** @var SourceNode[] $operandStack */
-		$operandStack = [];
-		/** @var string[] $operandStack */
-		$operatorStack = [];
-
-		$add = function() use (&$operandStack, &$operatorStack): void {
-			/** @var SourceNode $r */
-			$r = array_pop($operandStack);
-			/** @var SourceNode $l */
-			$l = array_pop($operandStack);
-			/** @var string $x */
-			$x = array_pop($operatorStack);
-			/** @noinspection PhpParamsInspection */
-			$operandStack[] = new MethodCallExpressionNode(
-				new SourceLocation(
-					$l->sourceLocation->moduleName,
-					$l->sourceLocation->startPosition,
-					$r->sourceLocation->endPosition
-				),
-				/** @phpstan-ignore-next-line argument.type */
-				$l, $x, $r
-			);
-		};
-
-		$len = count($operators);
-		for ($i = 0; $i < $len; $i++) {
-			$operandStack[] = $operands[$i];
-			$op = $operators[$i];
-			$pop = $this->getOperandPriority($op);
-			while(!empty($operatorStack) && $this->getOperandPriority($operatorStack[array_key_last($operatorStack)]) >= $pop) {
-				$add();
-			}
-			$operatorStack[] = $op;
-		}
-		$operandStack[] = $operands[$len];
-		while(!empty($operatorStack)) {
-			$add();
-		}
-		/** @phpstan-ignore-next-line return.type */
-		return $operandStack[0];
-		//return new MethodCallExpressionNode($this->getSourceLocation(), $target, $methodName, $parameter);
+		return new MethodCallExpressionNode($this->getSourceLocation(), $target, $methodName, $parameter);
 	}
 
 	public function functionBody(ExpressionNode $expression): FunctionBodyNode {
