@@ -670,20 +670,6 @@ final readonly class ParserStateMachine {
 					$this->s->moveAndPop();
 				}
 			]],
-			206 => ['name' => 'expression return', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->result['sequence_expressions'] = [];
-					$this->s->push(207);
-					$this->s->stay(201);
-				}
-			]],
-			207 => ['name' => 'expression sequence return', 'transitions' => [
-				'' => function(LT $token) {
-					$result = $this->s->generated;
-					$this->s->generated = $this->nodeBuilder->return($result);
-					$this->s->pop();
-				},
-			]],
 			208 => ['name' => 'expression no error', 'transitions' => [
 				T::call_start->name => function(LT $token) {
 					$this->s->result['sequence_expressions'] = [];
@@ -1867,18 +1853,6 @@ final readonly class ParserStateMachine {
 					);
 					$this->s->pop();
 				}
-			]],
-			340 => ['name' => 'scoped expression start', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->push(341);
-					$this->s->stay(201);
-				},
-			]],
-			341 => ['name' => 'scoped expression end', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->scoped($this->s->generated);
-					$this->s->pop();
-				},
 			]],
 			342 => ['name' => 'error value value start', 'transitions' => [
 				'' => function(LT $token) {
