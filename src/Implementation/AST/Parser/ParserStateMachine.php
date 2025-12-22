@@ -1524,6 +1524,7 @@ final readonly class ParserStateMachine {
 				T::string_value->name => $c = function(LT $token) {
 					$this->s->stay(202);
 				},
+				T::byte_array_value->name => $c,
 				T::positive_integer_number->name => $c,
 				T::integer_number->name => $c,
 				T::real_number->name => $c,
@@ -1978,6 +1979,7 @@ final readonly class ParserStateMachine {
 			]],
 			401 => ['name' => 'value start', 'transitions' => [
 				T::string_value->name => function(LT $token) { $this->s->stay(408); },
+				T::byte_array_value->name => function(LT $token) { $this->s->stay(4081); },
 				T::positive_integer_number->name => function(LT $token) { $this->s->stay(416); },
 				T::integer_number->name => function(LT $token) { $this->s->stay(416); },
 				T::real_number->name => function(LT $token) { $this->s->stay(417); },
@@ -2055,6 +2057,14 @@ final readonly class ParserStateMachine {
 			408 => ['name' => 'string value', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->stringValue(
+						$this->escapeCharHandler->unescape( $token->patternMatch->text)
+					);
+					$this->s->moveAndPop();
+				},
+			]],
+			4081 => ['name' => 'byte array value', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->byteArrayValue(
 						$this->escapeCharHandler->unescape( $token->patternMatch->text)
 					);
 					$this->s->moveAndPop();
@@ -2803,6 +2813,7 @@ final readonly class ParserStateMachine {
 						'Integer' => 709,
 						'Real' => 718,
 						'String' => 727,
+						'ByteArray' => 7271,
 						'Array' => 735,
 						'Set' => 827,
 						'Map' => 745,
@@ -2825,6 +2836,7 @@ final readonly class ParserStateMachine {
 						'Integer' => 709,
 						'Real' => 718,
 						'String' => 727,
+						'ByteArray' => 7271,
 						'Array' => 735,
 						'Set' => 827,
 						'Map' => 745,
@@ -3146,6 +3158,48 @@ final readonly class ParserStateMachine {
 					$this->s->moveAndPop();
 				},
 			]],
+
+			7271 => ['name' => 'type byte array', 'transitions' => [
+				T::type_start->name => 7272,
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->byteArrayType();
+					$this->s->pop();
+				},
+			]],
+			7272 => ['name' => 'type byte array range start', 'transitions' => [
+				T::positive_integer_number->name => function(LT $token) {
+					$this->s->result['minLength'] = $token->patternMatch->text;
+					$this->s->move(7273);
+				},
+				T::range_dots->name => 7274
+			]],
+			7273 => ['name' => 'type byte array range dots', 'transitions' => [
+				T::range_dots->name => 7274,
+				T::type_end->name => function(LT $token) {
+					$this->s->result['maxLength'] = $this->s->result['minLength'];
+					$this->s->move(7276);
+				}
+			]],
+			7274 => ['name' => 'type string range end', 'transitions' => [
+				T::positive_integer_number->name => function(LT $token) {
+					$this->s->result['maxLength'] = $token->patternMatch->text;
+					$this->s->move(7275);
+				},
+				T::type_end->name => 7276
+			]],
+			7275 => ['name' => 'type string type end', 'transitions' => [
+				T::type_end->name => 7276
+			]],
+			7276 => ['name' => 'type string return', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->byteArrayType(
+						isset($this->s->result['minLength']) ? new Number($this->s->result['minLength']) : new Number(0),
+						isset($this->s->result['maxLength']) ? new Number($this->s->result['maxLength']) : PlusInfinity::value
+					);
+					$this->s->pop();
+				},
+			]],
+
 			727 => ['name' => 'type string', 'transitions' => [
 				T::type_start->name => 728,
 				T::tuple_start->name => 733,

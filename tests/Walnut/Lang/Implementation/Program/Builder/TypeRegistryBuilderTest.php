@@ -22,7 +22,7 @@ use Walnut\Lang\Blueprint\Type\ShapeType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\TrueType;
 use Walnut\Lang\Blueprint\Type\TypeType;
-use Walnut\Lang\Implementation\AST\Parser\EscapeCharHandler;
+use Walnut\Lang\Implementation\AST\Parser\StringEscapeCharHandler;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
 
 class TypeRegistryBuilderTest extends TestCase {
@@ -35,7 +35,7 @@ class TypeRegistryBuilderTest extends TestCase {
 		$this->typeRegistryBuilder = new TypeRegistryBuilder(
 			$this->createMock(CustomMethodRegistryBuilder::class),
 			$this->createMock(MethodFinder::class),
-			new EscapeCharHandler(),
+			new StringEscapeCharHandler(),
 		);
 		$this->typeRegistryBuilder->addAtom(new TypeNameIdentifier('ExternalError')); // Fake reference
 	}

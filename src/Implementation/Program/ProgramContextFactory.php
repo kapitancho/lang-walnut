@@ -3,7 +3,8 @@
 namespace Walnut\Lang\Implementation\Program;
 
 use Walnut\Lang\Blueprint\Program\ProgramContextFactory as ProgramContextFactoryInterface;
-use Walnut\Lang\Implementation\AST\Parser\EscapeCharHandler;
+use Walnut\Lang\Implementation\AST\Parser\ByteArrayEscapeCharHandler;
+use Walnut\Lang\Implementation\AST\Parser\StringEscapeCharHandler;
 use Walnut\Lang\Implementation\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
 use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
@@ -28,10 +29,14 @@ final class ProgramContextFactory implements ProgramContextFactoryInterface {
 						self::lookupNamespace
 					]
 				),
-				$ech = new EscapeCharHandler(),
+				$ech = new StringEscapeCharHandler(),
 			),
 			$typeRegistryBuilder,
-			$valueRegistry = new ValueRegistry($typeRegistryBuilder, $ech),
+			$valueRegistry = new ValueRegistry(
+				$typeRegistryBuilder,
+				$ech,
+				new ByteArrayEscapeCharHandler()
+			),
 			new ExpressionRegistry($typeRegistryBuilder, $valueRegistry),
 			$methodFinder,
 			VariableValueScope::empty(),

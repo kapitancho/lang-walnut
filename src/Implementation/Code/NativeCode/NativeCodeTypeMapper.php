@@ -8,6 +8,7 @@ use Walnut\Lang\Blueprint\Type\AnyType;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Type\BooleanType;
+use Walnut\Lang\Blueprint\Type\ByteArrayType;
 use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
@@ -51,6 +52,7 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 			IntegerSubsetType::class => ['Integer', 'Real'],
 			RealType::class => ['Real'],
 			RealSubsetType::class => ['Real'],
+			ByteArrayType::class => ['ByteArray'],
 			StringType::class => ['String'],
 			StringSubsetType::class => ['String'],
 			BooleanType::class => ['Boolean', 'Enumeration'],

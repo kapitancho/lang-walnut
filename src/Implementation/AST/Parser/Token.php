@@ -60,6 +60,7 @@ enum Token: string {
 	case or_else = '\?\?';
 	case optional_key = '\?';
 	case string_value = '\'.*?\'';
+	case byte_array_value = '\".*?\"';
 	//TOOD: allow forward slash but not two consecutive forward slashes
 	case module_identifier = 'module \$?[a-z][a-z0-9_-]*(\/[a-z][a-z0-9_-]*)*(\s*\%\%\s+\$?[a-z][a-z0-9_-]*(\/[a-z][a-z0-9_-]*)*(\s*\,\s*\$?[a-z][a-z0-9_-]*(\/[a-z][a-z0-9_-]*)*)*)?\:';
 	case type_short = '`';

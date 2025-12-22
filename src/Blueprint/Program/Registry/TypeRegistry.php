@@ -19,6 +19,7 @@ use Walnut\Lang\Blueprint\Type\AnyType;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Type\BooleanType;
+use Walnut\Lang\Blueprint\Type\ByteArrayType;
 use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
@@ -102,6 +103,12 @@ interface TypeRegistry {
 	 * @throws DuplicateSubsetValue
 	 */
 	public function stringSubset(array $values): StringSubsetType;
+
+	/** @throws InvalidLengthRange */
+	public function byteArray(
+		int|Number $minLength = 0,
+		int|Number|PlusInfinity $maxLength = PlusInfinity::value
+	): ByteArrayType;
 
 	/** @throws InvalidLengthRange */
 	public function array(

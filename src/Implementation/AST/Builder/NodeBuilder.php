@@ -67,6 +67,7 @@ use Walnut\Lang\Implementation\AST\Node\SourceLocation;
 use Walnut\Lang\Implementation\AST\Node\Type\AnyTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\ArrayTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\BooleanTypeNode;
+use Walnut\Lang\Implementation\AST\Node\Type\ByteArrayTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\EnumerationSubsetTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\FalseTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\FunctionTypeNode;
@@ -98,6 +99,7 @@ use Walnut\Lang\Implementation\AST\Node\Type\TupleTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\TypeTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Type\UnionTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Value\AtomValueNode;
+use Walnut\Lang\Implementation\AST\Node\Value\ByteArrayValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\DataValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\EnumerationValueNode;
 use Walnut\Lang\Implementation\AST\Node\Value\ErrorValueNode;
@@ -583,6 +585,13 @@ final class NodeBuilder implements NodeBuilderInterface {
 		return new StringSubsetTypeNode($this->getSourceLocation(), $values);
 	}
 
+	public function byteArrayType(
+		Number $minLength = new Number(0),
+		PlusInfinity|Number $maxLength = PlusInfinity::value
+	): ByteArrayTypeNode {
+		return new ByteArrayTypeNode($this->getSourceLocation(), $minLength, $maxLength);
+	}
+
 	public function arrayType(
 		TypeNode|null $itemType = null,
 		Number $minLength = new Number(0),
@@ -634,6 +643,10 @@ final class NodeBuilder implements NodeBuilderInterface {
 
 	public function stringValue(string $value): StringValueNode {
 		return new StringValueNode($this->getSourceLocation(), $value);
+	}
+
+	public function byteArrayValue(string $value): ByteArrayValueNode {
+		return new ByteArrayValueNode($this->getSourceLocation(), $value);
 	}
 
 	public function typeValue(TypeNode $type): TypeValueNode {

@@ -1,0 +1,26 @@
+<?php
+
+namespace Walnut\Lang\NativeCode\ByteArray;
+
+use Walnut\Lang\Blueprint\Function\NativeMethod;
+use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Implementation\Code\NativeCode\Analyser\ByteArray\ByteArrayPadLeftPadRight;
+
+final readonly class PadRight implements NativeMethod {
+	use ByteArrayPadLeftPadRight;
+
+	public function execute(
+		ProgramRegistry $programRegistry,
+		Value $target,
+		Value $parameter
+	): Value {
+		return $this->executeHelper(
+			$programRegistry,
+			$target,
+			$parameter,
+			STR_PAD_RIGHT
+		);
+	}
+
+}

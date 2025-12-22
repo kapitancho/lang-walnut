@@ -14,7 +14,7 @@ use Walnut\Lang\Blueprint\Compilation\SuccessfulCompilationResult;
 use Walnut\Lang\Blueprint\Program\Program;
 use Walnut\Lang\Blueprint\Program\ProgramAnalyserException;
 use Walnut\Lang\Blueprint\Value\Value;
-use Walnut\Lang\Implementation\AST\Parser\EscapeCharHandler;
+use Walnut\Lang\Implementation\AST\Parser\StringEscapeCharHandler;
 use Walnut\Lang\Implementation\Compilation\Compiler;
 use Walnut\Lang\Implementation\Compilation\Module\PackageConfiguration\PackageConfiguration;
 use Walnut\Lang\Implementation\Compilation\Module\Precompiler\EmptyPrecompiler;
@@ -41,7 +41,7 @@ final class CompilerTest extends TestCase {
 				),
 				[
 					'.nut' => new EmptyPrecompiler(),
-					'.nut.html' => new TemplatePrecompiler(new EscapeCharHandler()),
+					'.nut.html' => new TemplatePrecompiler(new StringEscapeCharHandler()),
 					'.test.nut' => new TestPrecompiler()
 				]
 			),
@@ -69,7 +69,7 @@ final class CompilerTest extends TestCase {
 			),
 			[
 				'.nut' => new EmptyPrecompiler(),
-				'.nut.html' => new TemplatePrecompiler(new EscapeCharHandler()),
+				'.nut.html' => new TemplatePrecompiler(new StringEscapeCharHandler()),
 				'.test.nut' => new TestPrecompiler()
 			]
 		);

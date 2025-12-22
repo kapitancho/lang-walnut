@@ -5,7 +5,7 @@ namespace Walnut\Lang\Implementation\Compilation;
 use Walnut\Lang\Blueprint\Compilation\CompilerFactory as CompilerFactoryInterface;
 use Walnut\Lang\Blueprint\Compilation\Module\PackageConfigurationProvider;
 use Walnut\Lang\Blueprint\Compilation\Module\SourceFinder;
-use Walnut\Lang\Implementation\AST\Parser\EscapeCharHandler;
+use Walnut\Lang\Implementation\AST\Parser\StringEscapeCharHandler;
 use Walnut\Lang\Implementation\Compilation\Module\Precompiler\EmptyPrecompiler;
 use Walnut\Lang\Implementation\Compilation\Module\Precompiler\TemplatePrecompiler;
 use Walnut\Lang\Implementation\Compilation\Module\Precompiler\TestPrecompiler;
@@ -30,7 +30,7 @@ final readonly class CompilerFactory implements CompilerFactoryInterface {
 			[
 				new TestPrecompiler(),
 				new EmptyPrecompiler(),
-				new TemplatePrecompiler(new EscapeCharHandler()),
+				new TemplatePrecompiler(new StringEscapeCharHandler()),
 			]
 		);
 		return new Compiler($lookupContext);

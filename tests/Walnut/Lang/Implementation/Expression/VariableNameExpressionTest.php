@@ -4,7 +4,8 @@ namespace Walnut\Lang\Test\Implementation\Expression;
 
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
-use Walnut\Lang\Implementation\AST\Parser\EscapeCharHandler;
+use Walnut\Lang\Implementation\AST\Parser\ByteArrayEscapeCharHandler;
+use Walnut\Lang\Implementation\AST\Parser\StringEscapeCharHandler;
 use Walnut\Lang\Implementation\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Implementation\Code\Execution\ExecutionContext;
 use Walnut\Lang\Implementation\Code\Expression\VariableNameExpression;
@@ -34,9 +35,13 @@ final class VariableNameExpressionTest extends TestCase {
 				new NestedMethodRegistry(),
 				[]
 			),
-			$ech = new EscapeCharHandler()
+			$ech = new StringEscapeCharHandler()
 		);
-		$this->valueRegistry = new ValueRegistry($this->typeRegistry, $ech);
+		$this->valueRegistry = new ValueRegistry(
+			$this->typeRegistry,
+			$ech,
+			new ByteArrayEscapeCharHandler()
+		);
 		$this->variableNameExpression = new VariableNameExpression(
 			new VariableNameIdentifier('x')
 		);

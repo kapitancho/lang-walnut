@@ -4,19 +4,19 @@ namespace Walnut\Lang\Implementation\AST\Parser;
 
 use Walnut\Lang\Blueprint\AST\Parser\EscapeCharHandler as EscapeCharHandlerInterface;
 
-final readonly class EscapeCharHandler implements EscapeCharHandlerInterface {
+final readonly class ByteArrayEscapeCharHandler implements EscapeCharHandlerInterface {
 
-	private const array escapeOriginalChars = ['\\', "\n", "\t", "'"];
-	private const array escapedChars = ['\\\\', '\n', '\t', '\`'];
+	private const array escapeOriginalChars = ['\\', "\n", "\t", '"'];
+	private const array escapedChars = ['\\\\', '\n', '\t', '\``'];
 
-	private const array unescapeOriginalChars = ['\`', '\n', '\t', '\\\\'];
-	private const array unescapedChars = ["'", "\n", "\t", "\\"];
+	private const array unescapeOriginalChars = ['\``', '\n', '\t', '\\\\'];
+	private const array unescapedChars = ['"', "\n", "\t", "\\"];
 
 	public function escape(string $value): string {
 		return
-			"'" .
+			'"' .
 			str_replace(self::escapeOriginalChars, self::escapedChars, $value) .
-			"'";
+			'"';
 	}
 
 	public function unescape(string $value): string {

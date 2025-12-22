@@ -3,7 +3,8 @@
 namespace Walnut\Lang\Test\Implementation\Value;
 
 use PHPUnit\Framework\TestCase;
-use Walnut\Lang\Implementation\AST\Parser\EscapeCharHandler;
+use Walnut\Lang\Implementation\AST\Parser\ByteArrayEscapeCharHandler;
+use Walnut\Lang\Implementation\AST\Parser\StringEscapeCharHandler;
 use Walnut\Lang\Implementation\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
@@ -25,9 +26,13 @@ final class NullValueTest extends TestCase {
 				new NestedMethodRegistry(),
 				[]
 			),
-			$ech = new EscapeCharHandler()
+			$ech = new StringEscapeCharHandler()
 		);
-		$this->valueRegistry = new ValueRegistry($this->typeRegistry, $ech);
+		$this->valueRegistry = new ValueRegistry(
+			$this->typeRegistry,
+			$ech,
+			new ByteArrayEscapeCharHandler()
+		);
 	}
 	public function testNullValue(): void {
 		$nullType = $this->typeRegistry->null;
