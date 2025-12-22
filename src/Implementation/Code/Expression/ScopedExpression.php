@@ -24,10 +24,10 @@ final readonly class ScopedExpression implements ScopedExpressionInterface, Json
 		$returnType = $ret->returnType;
 		return $analyserContext->asAnalyserResult(
 			$returnType instanceof NothingType ? $expressionType :
-				$analyserContext->programRegistry->typeRegistry->result(
+				$analyserContext->programRegistry->typeRegistry->union([
 					$expressionType,
 					$returnType
-				),
+				]),
 			$analyserContext->programRegistry->typeRegistry->nothing
 		);
 	}
