@@ -10,17 +10,15 @@ use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerType;
+use Walnut\Lang\Blueprint\Type\NullType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
+use Walnut\Lang\Blueprint\Value\NullValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
-final readonly class UnaryBitwiseNot implements NativeMethod {
+final readonly class Chr implements NativeMethod {
 	use BaseType;
-
-	private function bitwiseNot(int $x): int {
-		return (~$x) & 0x7FFFFFFFFFFFFFFF;
-	}
 
 	public function analyse(
 		TypeRegistry $typeRegistry,
@@ -32,16 +30,15 @@ final readonly class UnaryBitwiseNot implements NativeMethod {
 		if (($targetType instanceof IntegerType) &&
 			$targetType->numberRange->min instanceof NumberIntervalEndpoint &&
 			$targetType->numberRange->min->value >= 0 &&
-			$targetType->numberRange->min->value <= PHP_INT_MAX
+			$targetType->numberRange->min->value <= 255
 		) {
-			return $typeRegistry->integer(
-				$this->bitwiseNot((int)(string)$targetType->numberRange->max->value),
-				$this->bitwiseNot((int)(string)$targetType->numberRange->min->value)
-			);
+			$parameterType = $this->toBaseType($parameterType);
+			if ($parameterType instanceof NullType) {
+				return $typeRegistry->byteArray(1, 1);
+			}
+			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}
-		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
-		// @codeCoverageIgnoreEnd
 	}
 
 	public function execute(
@@ -49,10 +46,15 @@ final readonly class UnaryBitwiseNot implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		if ($target instanceof IntegerValue) {
-			return $programRegistry->valueRegistry->integer(
-				$this->bitwiseNot((int)(string)$target->literalValue)
-			);
+		if ($target instanceof IntegerValue && ($v = (int)(string)$target->literalValue) >= 0 && $v <= 255) {
+			if ($parameter instanceof NullValue) {
+				return $programRegistry->valueRegistry->byteArray(
+					chr((int)(string)$target->literalValue)
+				);
+			}
+			// @codeCoverageIgnoreStart
+			throw new ExecutionException("Invalid parameter value");
+			// @codeCoverageIgnoreEnd
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

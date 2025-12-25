@@ -20,6 +20,6 @@ use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Code\NativeCode\Analyser\Composite\Array\ArrayChunk;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
-final readonly class Chunk implements NativeMethod {
+final readonly class BinaryDivide implements NativeMethod {
 	use ArrayChunk;
 }

@@ -95,7 +95,15 @@ final class CompositeFunctionValue implements FunctionValueInterface, JsonSerial
 	}
 
 	public function __toString(): string {
-		return md5($this->first . ' + ' . $this->second);
+		return sprintf("{{%s} %s {%s}}",
+			$this->first,
+			match($this->compositionMode) {
+				FunctionCompositionMode::direct => '+',
+				FunctionCompositionMode::bypassErrors => '&',
+				FunctionCompositionMode::bypassExternalErrors => '*',
+			},
+			$this->second,
+		);
 	}
 
 	public function jsonSerialize(): array {

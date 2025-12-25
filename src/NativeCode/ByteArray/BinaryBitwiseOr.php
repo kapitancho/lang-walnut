@@ -1,20 +1,18 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\Integer;
+namespace Walnut\Lang\NativeCode\ByteArray;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint;
-use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
-use Walnut\Lang\Blueprint\Type\IntegerType;
+use Walnut\Lang\Blueprint\Type\ByteArrayType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\ByteArrayValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
-use Walnut\Lang\Implementation\Value\IntegerValue;
 
 final readonly class BinaryBitwiseOr implements NativeMethod {
 	use BaseType;
@@ -26,21 +24,13 @@ final readonly class BinaryBitwiseOr implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if (($targetType instanceof IntegerType) &&
-			$targetType->numberRange->min instanceof NumberIntervalEndpoint &&
-			$targetType->numberRange->min->value >= 0 &&
-			$targetType->numberRange->min->value <= PHP_INT_MAX
-		) {
+		if ($targetType instanceof ByteArrayType) {
 			$parameterType = $this->toBaseType($parameterType);
-
-			if (($parameterType instanceof IntegerType) &&
-				$parameterType->numberRange->min instanceof NumberIntervalEndpoint &&
-				$parameterType->numberRange->min->value >= 0 &&
-				$parameterType->numberRange->min->value <= PHP_INT_MAX
-			) {
-				$min = max($targetType->numberRange->min->value, $parameterType->numberRange->min->value);
-				$max = 2 * max($targetType->numberRange->max->value, $parameterType->numberRange->max->value);
-				return $typeRegistry->integer($min, $max);
+			if ($parameterType instanceof ByteArrayType) {
+				// Result has the length of the longer input (we pad the shorter one)
+				$minLength = max($targetType->range->minLength, $parameterType->range->minLength);
+				$maxLength = max($targetType->range->maxLength, $parameterType->range->maxLength);
+				return $typeRegistry->byteArray($minLength, $maxLength);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}
@@ -54,11 +44,28 @@ final readonly class BinaryBitwiseOr implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		if ($target instanceof IntegerValue) {
-			if ($parameter instanceof IntegerValue) {
-	            return $programRegistry->valueRegistry->integer(
-		            (int)(string)$target->literalValue | (int)(string)$parameter->literalValue
-	            );
+		if ($target instanceof ByteArrayValue) {
+			if ($parameter instanceof ByteArrayValue) {
+				$targetBytes = $target->literalValue;
+				$paramBytes = $parameter->literalValue;
+				$targetLen = strlen($targetBytes);
+				$paramLen = strlen($paramBytes);
+
+				// Pad the shorter one with zeros on the left
+				$maxLen = max($targetLen, $paramLen);
+				if ($targetLen < $maxLen) {
+					$targetBytes = str_pad($targetBytes, $maxLen, "\x00", STR_PAD_LEFT);
+				}
+				if ($paramLen < $maxLen) {
+					$paramBytes = str_pad($paramBytes, $maxLen, "\x00", STR_PAD_LEFT);
+				}
+
+				$result = '';
+				for ($i = 0; $i < $maxLen; $i++) {
+					$result .= chr(ord($targetBytes[$i]) | ord($paramBytes[$i]));
+				}
+
+				return $programRegistry->valueRegistry->byteArray($result);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

@@ -1,22 +1,22 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\Integer;
+namespace Walnut\Lang\Implementation\Code\NativeCode\Analyser\String;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerType;
+use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
+use Walnut\Lang\Blueprint\Value\IntegerValue;
+use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
-use Walnut\Lang\Implementation\Value\IntegerValue;
 
-final readonly class BinaryBitwiseOr implements NativeMethod {
+trait StringChunk {
 	use BaseType;
 
 	public function analyse(
@@ -26,21 +26,18 @@ final readonly class BinaryBitwiseOr implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if (($targetType instanceof IntegerType) &&
-			$targetType->numberRange->min instanceof NumberIntervalEndpoint &&
-			$targetType->numberRange->min->value >= 0 &&
-			$targetType->numberRange->min->value <= PHP_INT_MAX
-		) {
+		if ($targetType instanceof StringType) {
 			$parameterType = $this->toBaseType($parameterType);
-
-			if (($parameterType instanceof IntegerType) &&
-				$parameterType->numberRange->min instanceof NumberIntervalEndpoint &&
-				$parameterType->numberRange->min->value >= 0 &&
-				$parameterType->numberRange->min->value <= PHP_INT_MAX
-			) {
-				$min = max($targetType->numberRange->min->value, $parameterType->numberRange->min->value);
-				$max = 2 * max($targetType->numberRange->max->value, $parameterType->numberRange->max->value);
-				return $typeRegistry->integer($min, $max);
+			if ($parameterType instanceof IntegerType) {
+				return $typeRegistry->array(
+					$typeRegistry->string(
+						min(1, $targetType->range->minLength),
+						$parameterType->numberRange->max === PlusInfinity::value ?
+							PlusInfinity::value : $parameterType->numberRange->max->value
+					),
+					$targetType->range->minLength > 0 ? 1 : 0,
+					$targetType->range->maxLength
+				);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}
@@ -54,11 +51,16 @@ final readonly class BinaryBitwiseOr implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		if ($target instanceof IntegerValue) {
+		if ($target instanceof StringValue) {
 			if ($parameter instanceof IntegerValue) {
-	            return $programRegistry->valueRegistry->integer(
-		            (int)(string)$target->literalValue | (int)(string)$parameter->literalValue
-	            );
+				$splitLength = (int)(string)$parameter->literalValue;
+				if ($splitLength > 0) {
+					$result = str_split($target->literalValue, $splitLength);
+					return $programRegistry->valueRegistry->tuple(
+						array_map(fn(string $piece): StringValue =>
+						$programRegistry->valueRegistry->string($piece), $result)
+					);
+				}
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");
