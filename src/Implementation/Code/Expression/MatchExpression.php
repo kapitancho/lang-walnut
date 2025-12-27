@@ -145,11 +145,12 @@ final readonly class MatchExpression implements MatchExpressionInterface, JsonSe
 						);
 					}
 				}
-				return $pair->valueExpression->execute($innerContext);
+				$result = $pair->valueExpression->execute($innerContext);
+				return $executionContext->withValue($result->value);
 			}
 		}
 		return $executionContext->asExecutionResult(
-			($executionContext->programRegistry->valueRegistry->null)
+			$executionContext->programRegistry->valueRegistry->null
 		);
 	}
 

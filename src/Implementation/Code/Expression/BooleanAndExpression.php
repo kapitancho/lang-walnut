@@ -17,10 +17,12 @@ use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Implementation\Code\NativeCode\CastAsBoolean;
 use Walnut\Lang\Implementation\Type\Helper\BaseTypeHelper;
+use Walnut\Lang\Implementation\Type\Helper\VariableScopeHelper;
 
 final readonly class BooleanAndExpression implements BooleanAndExpressionInterface, JsonSerializable {
 
 	use BaseTypeHelper;
+	use VariableScopeHelper;
 
 	private CastAsBoolean $castAsBoolean;
 
@@ -48,9 +50,7 @@ final readonly class BooleanAndExpression implements BooleanAndExpressionInterfa
 			return $firstAnalyserContext;
 		}
 		$firstReturnType = $firstAnalyserContext->returnType;
-
 		$firstBooleanType = $this->analyseType($analyserContext, $firstExpressionType);
-
 		if ($firstBooleanType instanceof FalseType) {
 			return $firstAnalyserContext->withExpressionType($firstBooleanType);
 		}
@@ -61,7 +61,16 @@ final readonly class BooleanAndExpression implements BooleanAndExpressionInterfa
 
 		$secondBooleanType = $this->analyseType($analyserContext, $secondExpressionType);
 
-		return $analyserContext->asAnalyserResult(
+		if (!$this->scopeVariablesMatch(
+			$firstAnalyserContext->variableScope,
+			$secondAnalyserContext->variableScope
+		)) {
+			throw new AnalyserException(
+				"Variable scopes do not match between first and second expressions in boolean AND operation."
+			);
+		}
+
+		return $this->contextUnion($firstAnalyserContext, $secondAnalyserContext)->asAnalyserResult(
 			$secondBooleanType,
 			$analyserContext->programRegistry->typeRegistry->union([
 				$firstReturnType,

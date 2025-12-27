@@ -17,10 +17,12 @@ use Walnut\Lang\Blueprint\Type\TrueType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Implementation\Code\NativeCode\CastAsBoolean;
 use Walnut\Lang\Implementation\Type\Helper\BaseTypeHelper;
+use Walnut\Lang\Implementation\Type\Helper\VariableScopeHelper;
 
 final readonly class BooleanOrExpression implements BooleanOrExpressionInterface, JsonSerializable {
 
 	use BaseTypeHelper;
+	use VariableScopeHelper;
 
 	private CastAsBoolean $castAsBoolean;
 
@@ -59,7 +61,16 @@ final readonly class BooleanOrExpression implements BooleanOrExpressionInterface
 
 		$secondBooleanType = $this->analyseType($analyserContext, $secondExpressionType);
 
-		return $analyserContext->asAnalyserResult(
+		if (!$this->scopeVariablesMatch(
+			$firstAnalyserContext->variableScope,
+			$secondAnalyserContext->variableScope
+		)) {
+			throw new AnalyserException(
+				"Variable scopes do not match between first and second expressions in boolean OR operation."
+			);
+		}
+
+		return $this->contextUnion($firstAnalyserContext, $secondAnalyserContext)->asAnalyserResult(
 			$secondBooleanType,
 			$analyserContext->programRegistry->typeRegistry->union([
 				$firstReturnType,

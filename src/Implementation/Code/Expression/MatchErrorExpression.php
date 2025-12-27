@@ -100,7 +100,9 @@ final readonly class MatchErrorExpression implements MatchErrorExpressionInterfa
 					$typedValue
 				);
 			}
-			return $this->onError->execute($innerContext);
+			return $executionContext->withValue(
+				$this->onError->execute($innerContext)->value
+			);
 		}
 		if ($this->else) {
 			$innerContext = $executionContext;
@@ -110,7 +112,9 @@ final readonly class MatchErrorExpression implements MatchErrorExpressionInterfa
 					$typedValue
 				);
 			}
-			return $this->else->execute($innerContext);
+			return $executionContext->withValue(
+				$this->else->execute($innerContext)->value
+			);
 		}
 		return $executionContext;
 	}
