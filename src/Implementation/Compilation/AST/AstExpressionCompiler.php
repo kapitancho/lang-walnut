@@ -2,6 +2,10 @@
 
 namespace Walnut\Lang\Implementation\Compilation\AST;
 
+use Walnut\Lang\Blueprint\AST\Node\Expression\BooleanAndExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\BooleanNotExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\BooleanOrExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\BooleanXorExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ConstantExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ConstructorCallExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\DataExpressionNode;
@@ -165,6 +169,25 @@ final readonly class AstExpressionCompiler implements AstExpressionCompilerInter
 			$expressionNode instanceof ScopedExpressionNode =>
 				$this->expressionRegistry->scoped(
 					$this->expression($expressionNode->targetExpression),
+				),
+			$expressionNode instanceof BooleanOrExpressionNode =>
+				$this->expressionRegistry->booleanOr(
+					$this->expression($expressionNode->first),
+					$this->expression($expressionNode->second)
+				),
+			$expressionNode instanceof BooleanAndExpressionNode =>
+				$this->expressionRegistry->booleanAnd(
+					$this->expression($expressionNode->first),
+					$this->expression($expressionNode->second)
+				),
+			$expressionNode instanceof BooleanXorExpressionNode =>
+				$this->expressionRegistry->booleanXor(
+					$this->expression($expressionNode->first),
+					$this->expression($expressionNode->second)
+				),
+			$expressionNode instanceof BooleanNotExpressionNode =>
+				$this->expressionRegistry->booleanNot(
+					$this->expression($expressionNode->expression)
 				),
 			$expressionNode instanceof MutableExpressionNode =>
 				$this->expressionRegistry->mutable(

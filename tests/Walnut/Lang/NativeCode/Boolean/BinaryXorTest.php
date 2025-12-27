@@ -26,10 +26,32 @@ final class BinaryXorTest extends CodeExecutionTestHelper {
 		$this->assertEquals("false", $result);
 	}
 
-	public function testBinaryXorInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet(
-			"Invalid parameter type: Integer[42]",
-			"true ^^ 42;");
+	public function testBinaryXorBoolTrueFalse(): void {
+		$result = $this->executeCodeSnippet("1 ^^ 0;");
+		$this->assertEquals("true", $result);
+	}
+
+	public function testBinaryXorBoolFalseTrue(): void {
+		$result = $this->executeCodeSnippet("0 ^^ 1;");
+		$this->assertEquals("true", $result);
+	}
+
+	public function testBinaryXorBothTrue(): void {
+		$result = $this->executeCodeSnippet("1 ^^ 1;");
+		$this->assertEquals("false", $result);
+	}
+
+	public function testBinaryXorBothFalse(): void {
+		$result = $this->executeCodeSnippet("0 ^^ 0;");
+		$this->assertEquals("false", $result);
+	}
+
+	public function testBinaryAndReturnTypeBoolean(): void {
+		$result = $this->executeCodeSnippet(
+			"xor(0);",
+			valueDeclarations: "xor = ^x: Integer<0..4> => Boolean :: x ^^ true;"
+		);
+		$this->assertEquals("true", $result);
 	}
 
 }

@@ -26,6 +26,10 @@ use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
+use Walnut\Lang\Implementation\AST\Node\Expression\BooleanAndExpressionNode;
+use Walnut\Lang\Implementation\AST\Node\Expression\BooleanNotExpressionNode;
+use Walnut\Lang\Implementation\AST\Node\Expression\BooleanOrExpressionNode;
+use Walnut\Lang\Implementation\AST\Node\Expression\BooleanXorExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\ConstantExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\ConstructorCallExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\DataExpressionNode;
@@ -313,6 +317,19 @@ final class NodeBuilder implements NodeBuilderInterface {
 
 	public function functionBody(ExpressionNode $expression): FunctionBodyNode {
 		return new FunctionBodyNode($this->getSourceLocation(), $expression);
+	}
+
+	public function booleanOr(ExpressionNode $first, ExpressionNode $second): BooleanOrExpressionNode {
+		return new BooleanOrExpressionNode($this->getSourceLocation(), $first, $second);
+	}
+	public function booleanAnd(ExpressionNode $first, ExpressionNode $second): BooleanAndExpressionNode {
+		return new BooleanAndExpressionNode($this->getSourceLocation(), $first, $second);
+	}
+	public function booleanXor(ExpressionNode $first, ExpressionNode $second): BooleanXorExpressionNode {
+		return new BooleanXorExpressionNode($this->getSourceLocation(), $first, $second);
+	}
+	public function booleanNot(ExpressionNode $expression): BooleanNotExpressionNode {
+		return new BooleanNotExpressionNode($this->getSourceLocation(), $expression);
 	}
 
 	public function addMethod(

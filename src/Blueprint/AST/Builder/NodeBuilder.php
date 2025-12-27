@@ -3,6 +3,10 @@
 namespace Walnut\Lang\Blueprint\AST\Builder;
 
 use BcMath\Number;
+use Walnut\Lang\Blueprint\AST\Node\Expression\BooleanAndExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\BooleanNotExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\BooleanOrExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\BooleanXorExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ConstantExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ConstructorCallExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\DataExpressionNode;
@@ -167,6 +171,11 @@ interface NodeBuilder {
 	): MethodCallExpressionNode;
 
 	public function functionBody(ExpressionNode $expression): FunctionBodyNode;
+
+	public function booleanOr(ExpressionNode $first, ExpressionNode $second): BooleanOrExpressionNode;
+	public function booleanAnd(ExpressionNode $first, ExpressionNode $second): BooleanAndExpressionNode;
+	public function booleanXor(ExpressionNode $first, ExpressionNode $second): BooleanXorExpressionNode;
+	public function booleanNot(ExpressionNode $expression): BooleanNotExpressionNode;
 
 	public function addMethod(
 		TypeNode $targetType,

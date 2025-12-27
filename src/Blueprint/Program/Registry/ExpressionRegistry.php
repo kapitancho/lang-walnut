@@ -2,6 +2,10 @@
 
 namespace Walnut\Lang\Blueprint\Program\Registry;
 
+use Walnut\Lang\Blueprint\Code\Expression\BooleanAndExpression;
+use Walnut\Lang\Blueprint\Code\Expression\BooleanNotExpression;
+use Walnut\Lang\Blueprint\Code\Expression\BooleanOrExpression;
+use Walnut\Lang\Blueprint\Code\Expression\BooleanXorExpression;
 use Walnut\Lang\Blueprint\Code\Expression\ConstantExpression;
 use Walnut\Lang\Blueprint\Code\Expression\DataExpression;
 use Walnut\Lang\Blueprint\Code\Expression\ScopedExpression;
@@ -69,6 +73,11 @@ interface ExpressionRegistry {
 
 	public function functionBody(Expression $expression): FunctionBody;
 	public function mutable(Type $type, Expression $value): MutableExpression;
+
+	public function booleanOr(Expression $first, Expression $second): BooleanOrExpression;
+	public function booleanAnd(Expression $first, Expression $second): BooleanAndExpression;
+	public function booleanXor(Expression $first, Expression $second): BooleanXorExpression;
+	public function booleanNot(Expression $expression): BooleanNotExpression;
 
 	/** @param list<MatchExpressionPair|MatchExpressionDefault> $pairs */
 	public function matchTrue(array $pairs): MatchExpression;

@@ -1019,9 +1019,8 @@ final readonly class ParserStateMachine {
 			]],
 			3012 => ['name' => 'or expression op expr', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->methodCall(
+					$this->s->generated = $this->nodeBuilder->booleanOr(
 						$this->s->result['expression_left'],
-						new MethodNameIdentifier('binaryOr'),
 						$this->s->generated
 					);
 					$this->s->stay(3011);
@@ -1046,9 +1045,8 @@ final readonly class ParserStateMachine {
 			]],
 			3022 => ['name' => 'xor expression op expr', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->methodCall(
+					$this->s->generated = $this->nodeBuilder->booleanXor(
 						$this->s->result['expression_left'],
-						new MethodNameIdentifier('binaryXor'),
 						$this->s->generated
 					);
 					$this->s->stay(3021);
@@ -1101,9 +1099,8 @@ final readonly class ParserStateMachine {
 			]],
 			3042 => ['name' => 'and expression op expr', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->methodCall(
+					$this->s->generated = $this->nodeBuilder->booleanAnd(
 						$this->s->result['expression_left'],
-						new MethodNameIdentifier('binaryAnd'),
 						$this->s->generated
 					);
 					$this->s->stay(3041);
@@ -1415,13 +1412,16 @@ final readonly class ParserStateMachine {
 			]],
 			3131 => ['name' => 'unary expression op expr', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->methodCall(
-						$this->s->generated,
-						new MethodNameIdentifier($this->s->result['op']),
-						$this->nodeBuilder->constant(
-							$this->nodeBuilder->nullValue
-						)
-					);
+					$this->s->generated =
+						$this->s->result['op'] === 'unaryNot' ?
+							$this->nodeBuilder->booleanNot($this->s->generated) :
+						$this->nodeBuilder->methodCall(
+							$this->s->generated,
+							new MethodNameIdentifier($this->s->result['op']),
+							$this->nodeBuilder->constant(
+								$this->nodeBuilder->nullValue
+							)
+						);
 					$this->s->pop();
 				}
 			]],

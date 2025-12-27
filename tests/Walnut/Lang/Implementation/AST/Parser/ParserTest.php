@@ -5,6 +5,10 @@ namespace Walnut\Lang\Test\Implementation\AST\Parser;
 use BcMath\Number;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Walnut\Lang\Blueprint\AST\Node\Expression\BooleanAndExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\BooleanNotExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\BooleanOrExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\BooleanXorExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ConstantExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ConstructorCallExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\FunctionCallExpressionNode;
@@ -966,11 +970,8 @@ class ParserTest extends TestCase {
 			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('a')) &&
 			$e->methodName->equals(new MethodNameIdentifier('unaryBitwiseNot')) &&
 			$e->parameter instanceof ConstantExpressionNode && $e->parameter->value instanceof NullValueNode];
-		yield ['!a', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
-			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('a')) &&
-			$e->methodName->equals(new MethodNameIdentifier('unaryNot')) &&
-			$e->parameter instanceof ConstantExpressionNode && $e->parameter->value instanceof NullValueNode];
-
+		yield ['!a', BooleanNotExpressionNode::class, fn(BooleanNotExpressionNode $e) =>
+			$e->expression instanceof VariableNameExpressionNode && $e->expression->variableName->equals(new VariableNameIdentifier('a'))];
 		yield ['a + x', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
 			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameIdentifier('a')) &&
 			$e->methodName->equals(new MethodNameIdentifier('binaryPlus')) &&
@@ -990,10 +991,18 @@ class ParserTest extends TestCase {
 		yield ['a >= x', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryGreaterThanEqual'))];
 		yield ['a != x', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryNotEqual'))];
 		yield ['a == x', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryEqual'))];
-		yield ['a || x', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryOr'))];
-		yield ['a && x', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryAnd'))];
-		yield ['a ^^ x', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryXor'))];
-
+		yield ['a || x', BooleanOrExpressionNode::class, fn(BooleanOrExpressionNode $e) =>
+			$e->first instanceof VariableNameExpressionNode && $e->first->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->second instanceof VariableNameExpressionNode && $e->second->variableName->equals(new VariableNameIdentifier('x'))
+		];
+		yield ['a && x', BooleanAndExpressionNode::class, fn(BooleanAndExpressionNode $e) =>
+			$e->first instanceof VariableNameExpressionNode && $e->first->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->second instanceof VariableNameExpressionNode && $e->second->variableName->equals(new VariableNameIdentifier('x'))
+		];
+		yield ['a ^^ x', BooleanXorExpressionNode::class, fn(BooleanXorExpressionNode $e) =>
+			$e->first instanceof VariableNameExpressionNode && $e->first->variableName->equals(new VariableNameIdentifier('a')) &&
+			$e->second instanceof VariableNameExpressionNode && $e->second->variableName->equals(new VariableNameIdentifier('x'))
+		];
 		yield ['a ?? x', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameIdentifier('binaryOrElse'))];
 
 		yield ['a *> (null)', NoErrorExpressionNode::class, fn(NoErrorExpressionNode $e) =>

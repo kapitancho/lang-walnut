@@ -6,27 +6,27 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 
 final class BinaryBitwiseXorTest extends CodeExecutionTestHelper {
 
-	public function testBinaryXorFalseFalse(): void {
+	public function testBinaryBitwiseXorFalseFalse(): void {
 		$result = $this->executeCodeSnippet("false ^ false;");
 		$this->assertEquals("false", $result);
 	}
 
-	public function testBinaryXorFalseTrue(): void {
+	public function testBinaryBitwiseXorFalseTrue(): void {
 		$result = $this->executeCodeSnippet("false ^ true;");
 		$this->assertEquals("true", $result);
 	}
 
-	public function testBinaryXorTrueFalse(): void {
+	public function testBinaryBitwiseXorTrueFalse(): void {
 		$result = $this->executeCodeSnippet("false ^ true;");
 		$this->assertEquals("true", $result);
 	}
 
-	public function testBinaryXorTrueTrue(): void {
+	public function testBinaryBitwiseXorTrueTrue(): void {
 		$result = $this->executeCodeSnippet("true ^ true;");
 		$this->assertEquals("false", $result);
 	}
 
-	public function testBinaryXorReturnType(): void {
+	public function testBinaryBitwiseXorReturnType(): void {
 		$result = $this->executeCodeSnippet(
 			"bool[true, true];",
 			valueDeclarations: "
@@ -36,7 +36,7 @@ final class BinaryBitwiseXorTest extends CodeExecutionTestHelper {
 		$this->assertEquals("false", $result);
 	}
 
-	public function testBinaryXorReturnTypeDifferent(): void {
+	public function testBinaryBitwiseXorReturnTypeDifferent(): void {
 		$result = $this->executeCodeSnippet(
 			"bool[true, false];",
 			valueDeclarations: "
@@ -46,7 +46,7 @@ final class BinaryBitwiseXorTest extends CodeExecutionTestHelper {
 		$this->assertEquals("true", $result);
 	}
 
-	public function testBinaryXorReturnTypeSameTrue(): void {
+	public function testBinaryBitwiseXorReturnTypeSameTrue(): void {
 		$result = $this->executeCodeSnippet(
 			"bool[true, true];",
 			valueDeclarations: "
@@ -56,7 +56,7 @@ final class BinaryBitwiseXorTest extends CodeExecutionTestHelper {
 		$this->assertEquals("false", $result);
 	}
 
-	public function testBinaryXorReturnTypeSameFalse(): void {
+	public function testBinaryBitwiseXorReturnTypeSameFalse(): void {
 		$result = $this->executeCodeSnippet(
 			"bool[false, false];",
 			valueDeclarations: "
@@ -66,7 +66,7 @@ final class BinaryBitwiseXorTest extends CodeExecutionTestHelper {
 		$this->assertEquals("false", $result);
 	}
 
-	public function testBinaryXorInvalidParameterType(): void {
+	public function testBinaryBitwiseXorInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet(
 			"Invalid parameter type: Integer[42]",
 			"true ^ 42;");

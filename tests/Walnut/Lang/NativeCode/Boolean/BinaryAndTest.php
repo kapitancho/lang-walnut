@@ -26,10 +26,35 @@ final class BinaryAndTest extends CodeExecutionTestHelper {
 		$this->assertEquals("true", $result);
 	}
 
-	public function testBinaryAndInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet(
-			"Invalid parameter type: Integer[42]",
-			"true && 42;");
+	public function testBinaryAndFirstFalse(): void {
+		$result = $this->executeCodeSnippet("0 && 1;");
+		$this->assertEquals("false", $result);
+	}
+
+	public function testBinaryAndSecondFalse(): void {
+		$result = $this->executeCodeSnippet("1 && 0;");
+		$this->assertEquals("false", $result);
+	}
+
+	public function testBinaryAndBothTrue(): void {
+		$result = $this->executeCodeSnippet("1 && 1;");
+		$this->assertEquals("true", $result);
+	}
+
+	public function testBinaryAndReturnTypeFalse(): void {
+		$result = $this->executeCodeSnippet(
+			"and(0);",
+			valueDeclarations: "and = ^x: Integer<0> => False :: x && true;"
+		);
+		$this->assertEquals("false", $result);
+	}
+
+	public function testBinaryAndReturnTypeBoolean(): void {
+		$result = $this->executeCodeSnippet(
+			"and(0);",
+			valueDeclarations: "and = ^x: Integer<0..4> => Boolean :: x && true;"
+		);
+		$this->assertEquals("false", $result);
 	}
 
 }

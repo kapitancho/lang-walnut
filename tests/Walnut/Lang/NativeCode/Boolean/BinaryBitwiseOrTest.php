@@ -6,27 +6,27 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 
 final class BinaryBitwiseOrTest extends CodeExecutionTestHelper {
 
-	public function testBinaryOrFalseFalse(): void {
+	public function testBinaryBitwiseOrFalseFalse(): void {
 		$result = $this->executeCodeSnippet("false | false;");
 		$this->assertEquals("false", $result);
 	}
 
-	public function testBinaryOrFalseTrue(): void {
+	public function testBinaryBitwiseOrFalseTrue(): void {
 		$result = $this->executeCodeSnippet("false | true;");
 		$this->assertEquals("true", $result);
 	}
 
-	public function testBinaryOrTrueFalse(): void {
+	public function testBinaryBitwiseOrTrueFalse(): void {
 		$result = $this->executeCodeSnippet("false | true;");
 		$this->assertEquals("true", $result);
 	}
 
-	public function testBinaryOrTrueTrue(): void {
+	public function testBinaryBitwiseOrTrueTrue(): void {
 		$result = $this->executeCodeSnippet("true | true;");
 		$this->assertEquals("true", $result);
 	}
 
-	public function testBinaryOrReturnType(): void {
+	public function testBinaryBitwiseOrReturnType(): void {
 		$result = $this->executeCodeSnippet(
 			"bool[true, true];",
 			valueDeclarations: "
@@ -36,7 +36,7 @@ final class BinaryBitwiseOrTest extends CodeExecutionTestHelper {
 		$this->assertEquals("true", $result);
 	}
 
-	public function testBinaryOrReturnTypeTrue(): void {
+	public function testBinaryBitwiseOrReturnTypeTrue(): void {
 		$result = $this->executeCodeSnippet(
 			"bool[true, true];",
 			valueDeclarations: "
@@ -46,7 +46,7 @@ final class BinaryBitwiseOrTest extends CodeExecutionTestHelper {
 		$this->assertEquals("true", $result);
 	}
 
-	public function testBinaryOrInvalidParameterType(): void {
+	public function testBinaryBitwiseOrInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet(
 			"Invalid parameter type: Integer[42]",
 			"true | 42;");

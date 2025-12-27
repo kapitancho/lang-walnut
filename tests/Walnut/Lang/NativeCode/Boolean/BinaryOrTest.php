@@ -26,10 +26,35 @@ final class BinaryOrTest extends CodeExecutionTestHelper {
 		$this->assertEquals("true", $result);
 	}
 
-	public function testBinaryOrInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet(
-			"Invalid parameter type: Integer[42]",
-			"true || 42;");
+	public function testBinaryOrFirstTrue(): void {
+		$result = $this->executeCodeSnippet("1 || 0;");
+		$this->assertEquals("true", $result);
+	}
+
+	public function testBinaryOrSecondTrue(): void {
+		$result = $this->executeCodeSnippet("0 || 1;");
+		$this->assertEquals("true", $result);
+	}
+
+	public function testBinaryOrBothFalse(): void {
+		$result = $this->executeCodeSnippet("0 || 0;");
+		$this->assertEquals("false", $result);
+	}
+
+	public function testBinaryOrReturnTypeTrue(): void {
+		$result = $this->executeCodeSnippet(
+			"or(2);",
+			valueDeclarations: "or = ^x: Integer<2..4> => True :: x || false;"
+		);
+		$this->assertEquals("true", $result);
+	}
+
+	public function testBinaryOrReturnTypeBoolean(): void {
+		$result = $this->executeCodeSnippet(
+			"or(2);",
+			valueDeclarations: "or = ^x: Integer<0..4> => Boolean :: x || false;"
+		);
+		$this->assertEquals("true", $result);
 	}
 
 }

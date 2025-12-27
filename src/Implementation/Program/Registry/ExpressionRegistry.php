@@ -14,6 +14,10 @@ use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Implementation\Code\Expression\BooleanAndExpression;
+use Walnut\Lang\Implementation\Code\Expression\BooleanNotExpression;
+use Walnut\Lang\Implementation\Code\Expression\BooleanOrExpression;
+use Walnut\Lang\Implementation\Code\Expression\BooleanXorExpression;
 use Walnut\Lang\Implementation\Code\Expression\ConstantExpression;
 use Walnut\Lang\Implementation\Code\Expression\DataExpression;
 use Walnut\Lang\Implementation\Code\Expression\ScopedExpression;
@@ -236,4 +240,18 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 			$value
 		);
 	}
+
+	public function booleanOr(Expression $first, Expression $second): BooleanOrExpression {
+		return new BooleanOrExpression($first, $second);
+	}
+	public function booleanAnd(Expression $first, Expression $second): BooleanAndExpression {
+		return new BooleanAndExpression($first, $second);
+	}
+	public function booleanXor(Expression $first, Expression $second): BooleanXorExpression {
+		return new BooleanXorExpression($first, $second);
+	}
+	public function booleanNot(Expression $expression): BooleanNotExpression {
+		return new BooleanNotExpression($expression);
+	}
+
 }
