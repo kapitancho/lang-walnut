@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\Type;
+namespace Walnut\Lang\NativeCode\String;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
@@ -8,33 +8,27 @@ use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Type\TypeType;
-use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
+use Walnut\Lang\Implementation\Value\StringValue;
 
-final readonly class BinaryBitwiseAnd implements NativeMethod {
+final readonly class AsByteArray implements NativeMethod {
 	use BaseType;
 
 	public function analyse(
 		TypeRegistry $typeRegistry,
 		MethodFinder $methodFinder,
 		Type $targetType,
-		Type $parameterType,
+		Type $parameterType
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof TypeType) {
-			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof TypeType) {
-				return $typeRegistry->type(
-					$typeRegistry->intersection([
-						$targetType->refType,
-						$parameterType->refType
-					])
-				);
-			}
-			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
+		if ($targetType instanceof StringType) {
+			return $typeRegistry->byteArray(
+				$targetType->range->minLength,
+				$targetType->range->maxLength
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -46,21 +40,12 @@ final readonly class BinaryBitwiseAnd implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		if ($target instanceof TypeValue) {
-			if ($parameter instanceof TypeValue) {
-	            return $programRegistry->valueRegistry->type(
-		            $programRegistry->typeRegistry->intersection([
-						$target->typeValue,
-						$parameter->typeValue
-					])
-	            );
-			}
-			// @codeCoverageIgnoreStart
-			throw new ExecutionException("Invalid parameter value");
-			// @codeCoverageIgnoreEnd
+		if ($target instanceof StringValue) {
+			return $programRegistry->valueRegistry->byteArray($target->literalValue);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");
 		// @codeCoverageIgnoreEnd
 	}
+
 }

@@ -120,6 +120,11 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 		$this->assertEquals("'hello'", $result);
 	}
 
+	public function testHydrateAsByteArrayFromString(): void {
+		$result = $this->executeCodeSnippet("'hello'->hydrateAs(type{ByteArray});");
+		$this->assertEquals('"hello"', $result);
+	}
+
 
 	public function testHydrateAsStringFromOther(): void {
 		$result = $this->executeCodeSnippet("null->hydrateAs(type{String});");

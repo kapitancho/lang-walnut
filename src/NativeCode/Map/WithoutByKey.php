@@ -33,7 +33,6 @@ final readonly class WithoutByKey implements NativeMethod {
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		$parameterType = $this->toBaseType($parameterType);
-		$recordReturnType = null;
 		if ($targetType instanceof RecordType) {
 			if ($parameterType instanceof StringSubsetType) {
 				$recordTypes = $targetType->types;

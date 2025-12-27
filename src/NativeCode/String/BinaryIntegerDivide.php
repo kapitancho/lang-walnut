@@ -68,7 +68,7 @@ final readonly class BinaryIntegerDivide implements NativeMethod {
 				$splitLength = (int)(string)$parameter->literalValue;
 				if ($splitLength > 0) {
 					$result = mb_str_split($target->literalValue, $splitLength);
-					if (mb_strlen($result[array_key_last($result)]) < $splitLength) {
+					if (count($result) > 0 && mb_strlen($result[array_key_last($result)]) < $splitLength) {
 						array_pop($result);
 					}
 					return $programRegistry->valueRegistry->tuple(

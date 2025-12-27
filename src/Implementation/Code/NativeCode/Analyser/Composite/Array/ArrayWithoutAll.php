@@ -1,20 +1,20 @@
 <?php
 
-namespace Walnut\Lang\NativeCode\Type;
+namespace Walnut\Lang\Implementation\Code\NativeCode\Analyser\Composite\Array;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Type\ArrayType;
+use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Type\TypeType;
-use Walnut\Lang\Blueprint\Value\TypeValue;
+use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
-final readonly class BinaryBitwiseOr implements NativeMethod {
+trait ArrayWithoutAll {
 	use BaseType;
 
 	public function analyse(
@@ -24,17 +24,13 @@ final readonly class BinaryBitwiseOr implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof TypeType) {
-			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof TypeType) {
-				return $typeRegistry->type(
-					$typeRegistry->union([
-						$targetType->refType,
-						$parameterType->refType
-					])
-				);
-			}
-			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
+		$targetType = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
+		if ($targetType instanceof ArrayType) {
+			return $typeRegistry->array(
+				$targetType->itemType,
+				0,
+				$targetType->range->maxLength
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -46,18 +42,10 @@ final readonly class BinaryBitwiseOr implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		if ($target instanceof TypeValue) {
-			if ($parameter instanceof TypeValue) {
-	            return $programRegistry->valueRegistry->type(
-		            $programRegistry->typeRegistry->union([
-						$target->typeValue,
-						$parameter->typeValue
-					])
-	            );
-			}
-			// @codeCoverageIgnoreStart
-			throw new ExecutionException("Invalid parameter value");
-			// @codeCoverageIgnoreEnd
+		if ($target instanceof TupleValue) {
+			$values = $target->values;
+			$values = array_values(array_filter($values, static fn($value) => !$value->equals($parameter)));
+			return $programRegistry->valueRegistry->tuple($values);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");
