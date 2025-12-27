@@ -6,4 +6,5 @@ enum FunctionCompositionMode {
 	case direct;
 	case bypassErrors;
 	case bypassExternalErrors;
+	case orElse;
 }

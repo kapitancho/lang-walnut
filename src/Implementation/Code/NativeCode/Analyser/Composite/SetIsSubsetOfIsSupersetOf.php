@@ -30,11 +30,12 @@ trait SetIsSubsetOfIsSupersetOf {
 		// @codeCoverageIgnoreEnd
 	}
 
-	private function isSubset(SetValue $type, SetValue $ofType): bool {
-		return !array_any(
-			array_keys($type->valueSet),
-			fn($key) => !array_key_exists($key, $ofType->valueSet)
+	private function isSubset(SetValue $value, SetValue $ofValue, bool $strict = false): bool {
+		$isSubset = !array_any(
+			array_keys($value->valueSet),
+			fn($key) => !array_key_exists($key, $ofValue->valueSet)
 		);
+		return $isSubset && (!$strict || count($value->values) < count($ofValue->values));
 	}
 
 }

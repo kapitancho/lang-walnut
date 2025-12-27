@@ -73,6 +73,11 @@ final class CompositeFunctionValue implements FunctionValueInterface, JsonSerial
 
 	public function execute(ExecutionContext $executionContext, Value $parameterValue): Value {
 		$intermediateValue = $this->first->execute($executionContext, $parameterValue);
+		if ($this->compositionMode === FunctionCompositionMode::orElse) {
+			return $intermediateValue instanceof ErrorValue ?
+				$this->second->execute($executionContext, $parameterValue) :
+				$intermediateValue;
+		}
 		if ($intermediateValue instanceof ErrorValue) {
 			if ($this->compositionMode === FunctionCompositionMode::bypassErrors || (
 				$this->compositionMode === FunctionCompositionMode::bypassExternalErrors &&
@@ -101,6 +106,7 @@ final class CompositeFunctionValue implements FunctionValueInterface, JsonSerial
 				FunctionCompositionMode::direct => '+',
 				FunctionCompositionMode::bypassErrors => '&',
 				FunctionCompositionMode::bypassExternalErrors => '*',
+				FunctionCompositionMode::orElse => '|',
 			},
 			$this->second,
 		);

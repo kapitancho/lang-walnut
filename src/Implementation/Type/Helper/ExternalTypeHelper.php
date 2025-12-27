@@ -4,6 +4,7 @@ namespace Walnut\Lang\Implementation\Type\Helper;
 
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Type\AnyType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\SealedType;
@@ -12,7 +13,10 @@ use Walnut\Lang\Blueprint\Type\UnionType;
 
 trait ExternalTypeHelper {
 
-	private function withoutExternalError(TypeRegistry $typeRegistry, ResultType $resultType): Type {
+	private function withoutExternalError(TypeRegistry $typeRegistry, ResultType|AnyType $resultType): Type {
+		if ($resultType instanceof AnyType) {
+			return $resultType;
+		}
 		$errorType = $resultType->errorType;
 		$errorType = match(true) {
 			$errorType instanceof SealedType && $errorType->name->equals(

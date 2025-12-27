@@ -16,6 +16,6 @@ use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Implementation\Code\NativeCode\Analyser\Composite\Array\ArrayReverse;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
-final readonly class Reverse implements NativeMethod {
+final readonly class UnaryMinus implements NativeMethod {
 	use ArrayReverse;
 }

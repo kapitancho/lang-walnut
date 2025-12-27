@@ -12,41 +12,9 @@ use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Implementation\Code\NativeCode\Analyser\String\StringReverse;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class Reverse implements NativeMethod {
-	use BaseType;
-
-	public function analyse(
-		TypeRegistry $typeRegistry,
-		MethodFinder $methodFinder,
-		Type $targetType,
-		Type $parameterType,
-	): Type {
-		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof StringType) {
-			return $targetType;
-		}
-		// @codeCoverageIgnoreStart
-		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
-		// @codeCoverageIgnoreEnd
-	}
-
-	private function reverse(string $str): string {
-		preg_match_all('/./us', $str, $matches);
-		return implode('', array_reverse($matches[0]));
-	}
-
-	public function execute(
-		ProgramRegistry $programRegistry,
-		Value $target,
-		Value $parameter
-	): Value {
-		if ($target instanceof StringValue) {
-			return $programRegistry->valueRegistry->string($this->reverse($target->literalValue));
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid target value");
-		// @codeCoverageIgnoreEnd
-	}
+	use StringReverse;
 }
