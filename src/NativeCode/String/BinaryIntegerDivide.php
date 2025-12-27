@@ -46,7 +46,9 @@ final readonly class BinaryIntegerDivide implements NativeMethod {
 						$targetType->range->minLength > 0 ? 1 : 0,
 						default => $targetType->range->minLength->div($parameterType->numberRange->max->value)->floor()
 					},
-					$targetType->range->maxLength->div($parameterType->numberRange->min->value)->floor()
+					$targetType->range->maxLength === PlusInfinity::value ?
+						PlusInfinity::value :
+						$targetType->range->maxLength->div($parameterType->numberRange->min->value)->floor()
 				);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));

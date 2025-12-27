@@ -45,7 +45,9 @@ trait StringChunk {
 							$targetType->range->minLength > 0 ? 1 : 0,
 						default => $targetType->range->minLength->div($parameterType->numberRange->max->value)->ceil()
 					},
-					$targetType->range->maxLength->div($parameterType->numberRange->min->value)->ceil()
+					$targetType->range->maxLength === PlusInfinity::value ?
+						PlusInfinity::value :
+						$targetType->range->maxLength->div($parameterType->numberRange->min->value)->ceil()
 				);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
