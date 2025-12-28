@@ -321,6 +321,18 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@ExternalError[\n	errorType: 'NotANumber',\n	originalError: @NotANumber,\n	errorMessage: 'not a number'\n]", $result);
 	}
 
+	public function testResultAny(): void {
+		$result = $this->executeCodeSnippet(
+			"fnC('-3');",
+			valueDeclarations: "
+				fn1 = ^s: String => Any :: s->asInteger *> ('invalid number');
+				fn2 = ^i: Any => *Real<0..> :: {i->as(`Integer) *> ('not an integer')}->sqrt *> ('not a number');
+				fnC = ^s: String => *Real<0..> :: {fn1 * fn2}(s);
+			"
+		);
+		$this->assertEquals("@ExternalError[\n	errorType: 'NotANumber',\n	originalError: @NotANumber,\n	errorMessage: 'not a number'\n]", $result);
+	}
+
 	public function testResultIncompatibleTypes(): void {
 		$this->executeErrorCodeSnippet(
 			"return type Result<Integer, HydrationError> of first function is not a subtype of parameter type Integer of second function",

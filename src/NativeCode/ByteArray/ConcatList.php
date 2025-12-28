@@ -37,11 +37,11 @@ final readonly class ConcatList implements NativeMethod {
 				$itemType = $this->toBaseType($parameterType->itemType);
 				if ($itemType instanceof ByteArrayType) {
 					return $typeRegistry->byteArray(
-						$targetType->range->minLength +  $parameterType->range->minLength * $itemType->range->minLength,
+						$targetType->range->minLength + $parameterType->range->minLength * $itemType->range->minLength,
 						$targetType->range->maxLength === PlusInfinity::value ||
 						$parameterType->range->maxLength === PlusInfinity::value ||
 						$itemType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
-						$targetType->range->maxLength +  $parameterType->range->maxLength * $itemType->range->maxLength,
+						$targetType->range->maxLength + $parameterType->range->maxLength * $itemType->range->maxLength,
 					);
 				}
 				if ($itemType->isSubtypeOf($typeRegistry->byteArray())) {

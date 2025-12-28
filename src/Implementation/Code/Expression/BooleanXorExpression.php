@@ -61,7 +61,7 @@ final readonly class BooleanXorExpression implements BooleanXorExpressionInterfa
 			return $secondAnalyserContext;
 		}
 
-		return $analyserContext->asAnalyserResult(
+		return $secondAnalyserContext->asAnalyserResult(
 			match(true) {
 				$firstBooleanType instanceof FalseType && $secondBooleanType instanceof FalseType,
 				$firstBooleanType instanceof TrueType && $secondBooleanType instanceof TrueType =>

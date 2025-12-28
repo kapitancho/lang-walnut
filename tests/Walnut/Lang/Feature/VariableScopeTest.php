@@ -51,6 +51,18 @@ final class VariableScopeTest extends CodeExecutionTestHelper {
 		$this->assertEquals("1", $result);
 	}
 
+	public function testVariableScopeBooleanOrNoVars(): void {
+		$result = $this->executeCodeSnippet("[fn(0), fn(5)];",
+			valueDeclarations: "
+			fn = ^v: Integer => Integer :: {
+				a = 1;
+				a > v || 'hello';
+				a
+			};
+		");
+		$this->assertEquals("[1, 1]", $result);
+	}
+
 	public function testVariableScopeBooleanOr(): void {
 		$result = $this->executeCodeSnippet("[fn(0), fn(5)];",
 			valueDeclarations: "
@@ -99,6 +111,18 @@ final class VariableScopeTest extends CodeExecutionTestHelper {
 				[a, b]
 			};
 		");
+	}
+
+	public function testVariableScopeBooleanXor(): void {
+		$result = $this->executeCodeSnippet("[fn(0), fn(5)];",
+			valueDeclarations: "
+			fn = ^v: Integer => [Integer, Integer|String] :: {
+				a = 1;
+				a > v ^^ {a = 3; b = 'hello'};
+				[a, b]
+			};
+		");
+		$this->assertEquals("[[3, 'hello'], [3, 'hello']]", $result);
 	}
 
 	public function testVariableScopeScoped(): void {

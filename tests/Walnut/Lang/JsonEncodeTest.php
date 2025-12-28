@@ -38,6 +38,7 @@ final class JsonEncodeTest extends BaseProgramTestHelper {
 			'{"valueType":"Integer","value":123}' => $vr->integer(123),
 			'{"valueType":"Real","value":123.456}' => $vr->real(123.456),
 			'{"valueType":"String","value":"abc"}' => $vr->string('abc'),
+			'{"valueType":"ByteArray","value":"abc"}' => $vr->byteArray('abc'),
 			'{"valueType":"Tuple","value":[]}' => $vr->tuple([]),
 			'{"valueType":"Tuple","value":[{"valueType":"Integer","value":1},{"valueType":"String","value":"abc"}]}'
 				=> $vr->tuple([$vr->integer(1), $vr->string('abc')]),
@@ -117,6 +118,10 @@ final class JsonEncodeTest extends BaseProgramTestHelper {
 			'{"type":"String","range":{"minLength":3,"maxLength":5}}' => $tr->string(3, 5),
 			'{"type":"String","range":{"minLength":0,"maxLength":5}}' => $tr->string(0, 5),
 	        '{"type":"StringSubset","values":["","test"]}' => $tr->stringSubset(['', 'test']),
+	        '{"type":"ByteArray","range":{"minLength":0,"maxLength":"+Infinity"}}' => $tr->byteArray(),
+	        '{"type":"ByteArray","range":{"minLength":3,"maxLength":"+Infinity"}}' => $tr->byteArray(3),
+	        '{"type":"ByteArray","range":{"minLength":3,"maxLength":5}}' => $tr->byteArray(3, 5),
+	        '{"type":"ByteArray","range":{"minLength":0,"maxLength":5}}' => $tr->byteArray(0, 5),
 			'{"type":"Array","itemType":{"type":"Any"},"range":{"minLength":0,"maxLength":"+Infinity"}}' => $tr->array(),
 			'{"type":"Array","itemType":{"type":"Any"},"range":{"minLength":3,"maxLength":"+Infinity"}}' => $tr->array($tr->any, 3),
 			'{"type":"Array","itemType":{"type":"Any"},"range":{"minLength":3,"maxLength":5}}' => $tr->array($tr->any, 3, 5),

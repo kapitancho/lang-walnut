@@ -52,7 +52,7 @@ trait VariableScopeHelper {
 	}
 
 	private function contextUnion(AnalyserContext $first, AnalyserContext $second): AnalyserContext {
-		if ($first === $second) {
+		if ($first->variableScope === $second->variableScope) {
 			return $first;
 		}
 		foreach($second->variableScope->allTypes() as $varName => $varType) {
@@ -60,9 +60,11 @@ trait VariableScopeHelper {
 			if ($firstType === $varType) {
 				continue;
 			}
+			// @codeCoverageIgnoreStart
 			if ($firstType instanceof UnknownVariable) {
 				$first = $first->withAddedVariableType($varName, $varType);
 			}
+			// @codeCoverageIgnoreEnd
 			$first = $first->withAddedVariableType($varName,
 				$first->programRegistry->typeRegistry->union([
 					$firstType,

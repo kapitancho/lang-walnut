@@ -57,6 +57,9 @@ AllTypes = [
     stringLengthRange: String<5..10>,
     stringSubset: String['hi', 'hello'],
 
+    byteArray: ByteArray,
+    byteArrayLengthRange: ByteArray<5..10>,
+
     array: Array,
     arrayWithType: Array<Integer>,
     arrayWithLengthRange: Array<1..10>,
@@ -171,6 +174,8 @@ AllTypes = [
         string: 'hello',
         stringLengthRange: 'hello',
         stringSubset: 'hello',
+        byteArray: "hello",
+        byteArrayLengthRange: "hello",
 
         array: [],
         arrayWithType: [1, 5],
@@ -237,6 +242,7 @@ AllTypes = [
         integer: 42,
         real: 3.14,
         string: 'hi!',
+        byteArray: "hi!",
         null: null,
         emptyTuple: [],
         tuple: [1, 'hi!'],
@@ -258,6 +264,7 @@ AllTypes = [
         integer: 42,
         real: 3.14,
         string: 'hi!',
+        byteArray: "hi!",
         null: null,
         emptyTuple: [],
         tuple: [1, 'hi!'],
