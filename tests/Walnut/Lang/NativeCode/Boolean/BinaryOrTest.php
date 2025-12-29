@@ -57,4 +57,12 @@ final class BinaryOrTest extends CodeExecutionTestHelper {
 		$this->assertEquals("true", $result);
 	}
 
+	public function testBinaryOrEarlyReturn(): void {
+		$result = $this->executeCodeSnippet(
+			"or(2);",
+			valueDeclarations: "or = ^x: Integer<0..4> => Integer<0..4> :: { => x } || true;"
+		);
+		$this->assertEquals("2", $result);
+	}
+
 }

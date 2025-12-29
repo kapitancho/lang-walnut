@@ -13,12 +13,12 @@ final class UnaryBitwiseNotTest extends CodeExecutionTestHelper {
 
 	public function testUnaryBitwiseNot(): void {
 		$result = $this->executeCodeSnippet('~"A";');
-		$this->assertEquals('"' . chr(0xBE) . '"', $result);
+		$this->assertEquals('"\BE"', $result);
 	}
 
 	public function testUnaryBitwiseNotMultipleBytes(): void {
 		$result = $this->executeCodeSnippet('~"AB";');
-		$this->assertEquals('"' . chr(0xBE) . chr(0xBD) . '"', $result);
+		$this->assertEquals('"\BE\BD"', $result);
 	}
 
 	public function testUnaryBitwiseNotDoubleInversion(): void {

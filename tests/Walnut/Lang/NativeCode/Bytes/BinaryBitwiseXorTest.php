@@ -8,22 +8,22 @@ final class BinaryBitwiseXorTest extends CodeExecutionTestHelper {
 
 	public function testBinaryBitwiseXorEqual(): void {
 		$result = $this->executeCodeSnippet('"A" ^ "A";');
-		$this->assertEquals('"' . chr(0) . '"', $result);
+		$this->assertEquals('"\00"', $result);
 	}
 
 	public function testBinaryBitwiseXor(): void {
 		$result = $this->executeCodeSnippet('"A" ^ "C";');
-		$this->assertEquals('"' . chr(2) . '"', $result);
+		$this->assertEquals('"\02"', $result);
 	}
 
 	public function testBinaryBitwiseXorMultipleBytes(): void {
 		$result = $this->executeCodeSnippet('"AB" ^ "CD";');
-		$this->assertEquals('"' . chr(2) . chr(6) . '"', $result);
+		$this->assertEquals('"\02\06"', $result);
 	}
 
 	public function testBinaryBitwiseXorSelf(): void {
 		$result = $this->executeCodeSnippet('"AB" ^ "AB";');
-		$this->assertEquals('"' . chr(0) . chr(0) . '"', $result);
+		$this->assertEquals('"\00\00"', $result);
 	}
 
 	public function testBinaryBitwiseXorInvalidParameter(): void {
@@ -32,12 +32,12 @@ final class BinaryBitwiseXorTest extends CodeExecutionTestHelper {
 
 	public function testBinaryBitwiseXorLengthMismatch(): void {
 		$result = $this->executeCodeSnippet('"A" ^ "BC";');
-		$this->assertEquals('"B' . chr(2) . '"', $result);
+		$this->assertEquals('"B\02"', $result);
 	}
 
 	public function testBinaryBitwiseXorLengthMismatchReversed(): void {
 		$result = $this->executeCodeSnippet('"BC" ^ "A";');
-		$this->assertEquals('"B' . chr(2) . '"', $result);
+		$this->assertEquals('"B\02"', $result);
 	}
 
 }

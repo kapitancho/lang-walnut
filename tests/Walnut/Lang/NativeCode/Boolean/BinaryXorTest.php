@@ -54,4 +54,20 @@ final class BinaryXorTest extends CodeExecutionTestHelper {
 		$this->assertEquals("true", $result);
 	}
 
+	public function testBinaryOrEarlyReturnFirst(): void {
+		$result = $this->executeCodeSnippet(
+			"or(2);",
+			valueDeclarations: "or = ^x: Integer<0..4> => Integer<0..4> :: { => x } ^^ true;"
+		);
+		$this->assertEquals("2", $result);
+	}
+
+	public function testBinaryOrEarlyReturnSecond(): void {
+		$result = $this->executeCodeSnippet(
+			"or(2);",
+			valueDeclarations: "or = ^x: Integer<0..4> => Integer<0..4> :: true ^^ { => x };"
+		);
+		$this->assertEquals("2", $result);
+	}
+
 }

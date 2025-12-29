@@ -57,4 +57,12 @@ final class BinaryAndTest extends CodeExecutionTestHelper {
 		$this->assertEquals("false", $result);
 	}
 
+	public function testBinaryAndEarlyReturn(): void {
+		$result = $this->executeCodeSnippet(
+			"and(2);",
+			valueDeclarations: "and = ^x: Integer<0..4> => Integer<0..4> :: { => x } && false;"
+		);
+		$this->assertEquals("2", $result);
+	}
+
 }

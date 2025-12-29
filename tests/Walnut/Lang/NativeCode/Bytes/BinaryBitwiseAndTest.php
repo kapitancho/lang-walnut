@@ -22,12 +22,12 @@ final class BinaryBitwiseAndTest extends CodeExecutionTestHelper {
 
 	public function testBinaryBitwiseAndLengthMismatch(): void {
 		$result = $this->executeCodeSnippet('"W" & "GH";');
-		$this->assertEquals('"' . chr(0) . '@"', $result);
+		$this->assertEquals('"\00@"', $result);
 	}
 
 	public function testBinaryBitwiseAndLengthMismatchReversed(): void {
 		$result = $this->executeCodeSnippet('"GH" & "W";');
-		$this->assertEquals('"' . chr(0) . '@"', $result);
+		$this->assertEquals('"\00@"', $result);
 	}
 
 }
