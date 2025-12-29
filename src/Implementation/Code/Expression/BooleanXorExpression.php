@@ -15,31 +15,17 @@ use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Type\FalseType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\TrueType;
-use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Implementation\Code\NativeCode\CastAsBoolean;
 use Walnut\Lang\Implementation\Type\Helper\BaseTypeHelper;
 
 final readonly class BooleanXorExpression implements BooleanXorExpressionInterface, JsonSerializable {
 
 	use BaseTypeHelper;
-
-	private CastAsBoolean $castAsBoolean;
+	use BooleanExpressionHelper;
 
 	public function __construct(
 		public Expression $first,
 		public Expression $second,
-	) {
-		$this->castAsBoolean = new CastAsBoolean();
-	}
-
-	private function analyseType(AnalyserContext $analyserContext, Type $type): Type {
-		return $this->castAsBoolean->analyseType(
-			$analyserContext->programRegistry->typeRegistry->boolean,
-			$analyserContext->programRegistry->typeRegistry->true,
-			$analyserContext->programRegistry->typeRegistry->false,
-			$type
-		);
-	}
+	) {}
 
 	/** @throws AnalyserException */
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
@@ -47,7 +33,7 @@ final readonly class BooleanXorExpression implements BooleanXorExpressionInterfa
 		$firstExpressionType = $firstAnalyserContext->expressionType;
 		$firstReturnType = $firstAnalyserContext->returnType;
 
-		$firstBooleanType = $this->analyseType($analyserContext, $firstExpressionType);
+		$firstBooleanType = $this->getBooleanType($analyserContext, $firstExpressionType);
 		if ($firstExpressionType instanceof NothingType) {
 			return $firstAnalyserContext;
 		}
@@ -56,7 +42,7 @@ final readonly class BooleanXorExpression implements BooleanXorExpressionInterfa
 		$secondExpressionType = $secondAnalyserContext->expressionType;
 		$secondReturnType = $secondAnalyserContext->returnType;
 
-		$secondBooleanType = $this->analyseType($analyserContext, $secondExpressionType);
+		$secondBooleanType = $this->getBooleanType($analyserContext, $secondExpressionType);
 		if ($secondExpressionType instanceof NothingType) {
 			return $secondAnalyserContext;
 		}
@@ -90,9 +76,9 @@ final readonly class BooleanXorExpression implements BooleanXorExpressionInterfa
 	/** @throws ExecutionException */
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
 		$firstExecutionContext = $this->first->execute($executionContext);
-		$firstValue = $this->castAsBoolean->evaluate($firstExecutionContext->value);
+		$firstValue = $this->getBooleanValue($firstExecutionContext, $firstExecutionContext->value);
 		$secondExecutionContext = $this->second->execute($firstExecutionContext);
-		$secondValue = $this->castAsBoolean->evaluate($secondExecutionContext->value);
+		$secondValue = $this->getBooleanValue($secondExecutionContext, $secondExecutionContext->value);
 
 		return $secondExecutionContext->withValue(
 			($firstValue && !$secondValue) || (!$firstValue && $secondValue) ?

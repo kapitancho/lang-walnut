@@ -14,28 +14,23 @@ use Walnut\Lang\Blueprint\Code\Expression\BooleanNotExpression as BooleanNotExpr
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Type\FalseType;
 use Walnut\Lang\Blueprint\Type\TrueType;
-use Walnut\Lang\Implementation\Code\NativeCode\CastAsBoolean;
 use Walnut\Lang\Implementation\Type\Helper\BaseTypeHelper;
 
 final readonly class BooleanNotExpression implements BooleanNotExpressionInterface, JsonSerializable {
 
 	use BaseTypeHelper;
-
-	private CastAsBoolean $castAsBoolean;
+	use BooleanExpressionHelper;
 
 	public function __construct(
 		public Expression $expression
-	) {
-		$this->castAsBoolean = new CastAsBoolean();
-	}
+	) {}
 
 	/** @throws AnalyserException */
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
 		$analyserResult = $this->expression->analyse($analyserContext);
-		$expressionType = $this->castAsBoolean->analyseType(
-			$analyserContext->programRegistry->typeRegistry->boolean,
-			$analyserContext->programRegistry->typeRegistry->true,
-			$analyserContext->programRegistry->typeRegistry->false,
+
+		$expressionType = $this->getBooleanType(
+			$analyserContext,
 			$analyserResult->expressionType
 		);
 
@@ -54,10 +49,11 @@ final readonly class BooleanNotExpression implements BooleanNotExpressionInterfa
 	/** @throws ExecutionException */
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
 		$executionContext = $this->expression->execute($executionContext);
-		$value = $this->castAsBoolean->evaluate($executionContext->value);
 
 		return $executionContext->withValue(
-			$executionContext->programRegistry->valueRegistry->boolean(!$value)
+			$executionContext->programRegistry->valueRegistry->boolean(
+				!$this->getBooleanValue($executionContext, $executionContext->value)
+			)
 		);
 	}
 

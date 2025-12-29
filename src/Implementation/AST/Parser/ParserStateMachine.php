@@ -737,7 +737,7 @@ final readonly class ParserStateMachine {
 			216 => ['name' => 'type expression', 'transitions' => [
 				T::boolean_op_not->name => function (LT $token) {
 					$this->s->push(215);
-					$this->s->move(3000);
+					$this->s->move(3160);
 				},
 				T::property_accessor->name => function(LT $token) {
 					$this->s->push(220);
@@ -1859,7 +1859,7 @@ final readonly class ParserStateMachine {
 			342 => ['name' => 'error value value start', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->push(343);
-					$this->s->stay(3000);
+					$this->s->stay(3160);
 				},
 			]],
 			343 => ['name' => 'error value type return', 'transitions' => [

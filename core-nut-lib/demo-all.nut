@@ -178,7 +178,7 @@ AllTypes = [
         string: 'hello',
         stringLengthRange: 'hello',
         stringSubset: 'hello',
-        bytes: "hello",
+        bytes: "hello\20world",
         bytesLengthRange: "hello",
 
         array: [],

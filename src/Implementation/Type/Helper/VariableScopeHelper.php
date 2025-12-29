@@ -5,9 +5,6 @@ namespace Walnut\Lang\Implementation\Type\Helper;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Scope\UnknownVariable;
 use Walnut\Lang\Blueprint\Code\Scope\VariableScope as VariableScopeInterface;
-use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
-use Walnut\Lang\Implementation\Code\Scope\VariableScope;
 
 trait VariableScopeHelper {
 

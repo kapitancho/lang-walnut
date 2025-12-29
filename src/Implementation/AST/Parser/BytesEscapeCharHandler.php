@@ -33,14 +33,12 @@ final readonly class BytesEscapeCharHandler implements EscapeCharHandlerInterfac
 
 		return preg_replace_callback(
 			'/\\\\(\\\\|n|t|``|[0-9A-F]{2})/',
-			static function(array $matches): string {
-				return match($matches[1]) {
-					'\\' => '\\',
-					'n' => "\n",
-					't' => "\t",
-					'``' => '"',
-					default => chr(hexdec($matches[1]))
-				};
+			static fn(array $matches): string => match($matches[1]) {
+				'\\' => '\\',
+				'n' => "\n",
+				't' => "\t",
+				'``' => '"',
+				default => chr(hexdec($matches[1]))
 			},
 			$withoutQuotes
 		) ?? $withoutQuotes;

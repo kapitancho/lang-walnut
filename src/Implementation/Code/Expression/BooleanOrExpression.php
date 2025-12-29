@@ -14,33 +14,19 @@ use Walnut\Lang\Blueprint\Code\Expression\BooleanOrExpression as BooleanOrExpres
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\TrueType;
-use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Implementation\Code\NativeCode\CastAsBoolean;
 use Walnut\Lang\Implementation\Type\Helper\BaseTypeHelper;
 use Walnut\Lang\Implementation\Type\Helper\VariableScopeHelper;
 
 final readonly class BooleanOrExpression implements BooleanOrExpressionInterface, JsonSerializable {
 
 	use BaseTypeHelper;
+	use BooleanExpressionHelper;
 	use VariableScopeHelper;
-
-	private CastAsBoolean $castAsBoolean;
 
 	public function __construct(
 		public Expression $first,
 		public Expression $second,
-	) {
-		$this->castAsBoolean = new CastAsBoolean();
-	}
-
-	private function analyseType(AnalyserContext $analyserContext, Type $type): Type {
-		return $this->castAsBoolean->analyseType(
-			$analyserContext->programRegistry->typeRegistry->boolean,
-			$analyserContext->programRegistry->typeRegistry->true,
-			$analyserContext->programRegistry->typeRegistry->false,
-			$type
-		);
-	}
+	) {}
 
 	/** @throws AnalyserException */
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
@@ -50,7 +36,7 @@ final readonly class BooleanOrExpression implements BooleanOrExpressionInterface
 			return $firstAnalyserContext;
 		}
 		$firstReturnType = $firstAnalyserContext->returnType;
-		$firstBooleanType = $this->analyseType($analyserContext, $firstExpressionType);
+		$firstBooleanType = $this->getBooleanType($analyserContext, $firstExpressionType);
 		if ($firstBooleanType instanceof TrueType) {
 			return $firstAnalyserContext->withExpressionType($firstBooleanType);
 		}
@@ -59,7 +45,7 @@ final readonly class BooleanOrExpression implements BooleanOrExpressionInterface
 		$secondExpressionType = $secondAnalyserContext->expressionType;
 		$secondReturnType = $secondAnalyserContext->returnType;
 
-		$secondBooleanType = $this->analyseType($analyserContext, $secondExpressionType);
+		$secondBooleanType = $this->getBooleanType($analyserContext, $secondExpressionType);
 
 		if (!$this->scopeVariablesMatch(
 			$firstAnalyserContext->variableScope,
@@ -90,7 +76,7 @@ final readonly class BooleanOrExpression implements BooleanOrExpressionInterface
 	/** @throws ExecutionException */
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
 		$firstExecutionContext = $this->first->execute($executionContext);
-		$firstValue = $this->castAsBoolean->evaluate($firstExecutionContext->value);
+		$firstValue = $this->getBooleanValue($firstExecutionContext, $firstExecutionContext->value);
 
 		if ($firstValue) {
 			return $firstExecutionContext->withValue(
@@ -100,7 +86,7 @@ final readonly class BooleanOrExpression implements BooleanOrExpressionInterface
 		$secondExecutionContext = $this->second->execute($firstExecutionContext);
 		return $secondExecutionContext->withValue(
 			$secondExecutionContext->programRegistry->valueRegistry->boolean(
-				$this->castAsBoolean->evaluate($secondExecutionContext->value)
+				$this->getBooleanValue($secondExecutionContext, $secondExecutionContext->value)
 			)
 		);
 	}
