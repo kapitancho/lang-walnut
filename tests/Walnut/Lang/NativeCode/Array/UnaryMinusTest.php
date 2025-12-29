@@ -24,10 +24,18 @@ final class UnaryMinusTest extends CodeExecutionTestHelper {
 		$this->assertEquals("['bye', 'hello']", $result);
 	}
 
-	public function testUnaryMinusTypeSubset(): void {
+	public function testUnaryMinusTypeTuple(): void {
 		$result = $this->executeCodeSnippet(
 			"myMinus['hello', 3.14, -42];",
 			valueDeclarations: "myMinus = ^arr: [String<5>, Real<(0..)>, Real] => [Real, Real<(0..)>, String<5>] :: -arr;"
+		);
+		$this->assertEquals("[-42, 3.14, 'hello']", $result);
+	}
+
+	public function testUnaryMinusTypeWithRest(): void {
+		$result = $this->executeCodeSnippet(
+			"myMinus['hello', 3.14, -42];",
+			valueDeclarations: "myMinus = ^arr: [String<5>, Real<(0..)>, ...Real] => Array<String<5>|Real, 2..> :: -arr;"
 		);
 		$this->assertEquals("[-42, 3.14, 'hello']", $result);
 	}

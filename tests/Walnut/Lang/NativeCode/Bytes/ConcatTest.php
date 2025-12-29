@@ -11,7 +11,7 @@ final class ConcatTest extends CodeExecutionTestHelper {
 		$this->assertEquals('"hello world"', $result);
 	}
 
-	public function testConcatAliasType(): void {
+	public function testConcatUnionType(): void {
 		$result = $this->executeCodeSnippet(
 			'c("world");',
 			valueDeclarations: 'c = ^b: Bytes<5>|Bytes<10> => Bytes :: "hello "->concat(b);'

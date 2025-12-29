@@ -11,6 +11,14 @@ final class BinaryPlusTest extends CodeExecutionTestHelper {
 		$this->assertEquals('"hello world"', $result);
 	}
 
+	public function testBinaryPlusUnionType(): void {
+		$result = $this->executeCodeSnippet(
+			'c("world");',
+			valueDeclarations: 'c = ^b: Bytes<5>|Bytes<10> => Bytes :: "hello " + b;'
+		);
+		$this->assertEquals('"hello world"', $result);
+	}
+
 	public function testBinaryPlusInteger(): void {
 		$result = $this->executeCodeSnippet('"hello" + 33;');
 		$this->assertEquals('"hello!"', $result);

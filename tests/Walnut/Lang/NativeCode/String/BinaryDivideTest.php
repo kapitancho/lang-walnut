@@ -41,6 +41,16 @@ final class BinaryDivideTest extends CodeExecutionTestHelper {
 		$this->assertEquals("['he', 'll', 'o ', 'wo', 'rl', 'd']", $result);
 	}
 
+	public function testBinaryDivideReturnTypeInfinity(): void {
+		$result = $this->executeCodeSnippet(
+			"c(2);",
+			valueDeclarations: "
+				c = ^size: Integer<2..> => Array<String<1..>, 1..6> :: 'hello world' / size;
+			"
+		);
+		$this->assertEquals("['he', 'll', 'o ', 'wo', 'rl', 'd']", $result);
+	}
+
 	public function testBinaryDivideInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet('Invalid parameter type', "'hello' / false;");
 	}

@@ -131,14 +131,29 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@HydrationError![\n\tvalue: null,\n\thydrationPath: 'value',\n\terrorMessage: 'The value should be a string with a length between 0 and +Infinity'\n]", $result);
 	}
 
+	public function testHydrateAsBytesFromOther(): void {
+		$result = $this->executeCodeSnippet("null->hydrateAs(type{Bytes});");
+		$this->assertEquals("@HydrationError![\n\tvalue: null,\n\thydrationPath: 'value',\n\terrorMessage: 'The value should be a string with a raw length between 0 and +Infinity'\n]", $result);
+	}
+
 	public function testHydrateAsStringRangeFromStringInRange(): void {
 		$result = $this->executeCodeSnippet("'hello'->hydrateAs(type{String<2..10>});");
 		$this->assertEquals("'hello'", $result);
 	}
 
+	public function testHydrateAsBytesRangeFromStringInRange(): void {
+		$result = $this->executeCodeSnippet("'hello'->hydrateAs(type{Bytes<2..10>});");
+		$this->assertEquals('"hello"', $result);
+	}
+
 	public function testHydrateAsStringRangeFromStringOutOfRange(): void {
 		$result = $this->executeCodeSnippet("'hello'->hydrateAs(type{String<2..4>});");
 		$this->assertEquals("@HydrationError![\n\tvalue: 'hello',\n\thydrationPath: 'value',\n\terrorMessage: 'The string value should be with a length between 2 and 4'\n]", $result);
+	}
+
+	public function testHydrateAsBytesRangeFromStringOutOfRange(): void {
+		$result = $this->executeCodeSnippet("'hello'->hydrateAs(type{Bytes<2..4>});");
+		$this->assertEquals("@HydrationError![\n\tvalue: 'hello',\n\thydrationPath: 'value',\n\terrorMessage: 'The string value should be with a raw length between 2 and 4'\n]", $result);
 	}
 
 	public function testHydrateAsStringSubsetFromStringInSubset(): void {

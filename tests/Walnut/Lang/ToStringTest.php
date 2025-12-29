@@ -202,7 +202,11 @@ final class ToStringTest extends BaseProgramTestHelper {
 			'0->construct(type{MyOpen})' => $er->constructorCall(new TypeNameIdentifier('MyOpen'), $c0),
 			'x->method(0)' => $er->methodCall($x, new MethodNameIdentifier('method'), $c0),
 			'x->method' => $er->methodCall($x, new MethodNameIdentifier('method'), $er->constant($this->valueRegistry->null)),
-			'?whenIsTrue { x->asBoolean: 0, ~: 0 }' => $er->matchTrue([
+	        "{0} && {x}" => $er->booleanAnd($c0, $x),
+			"{0} || {x}" => $er->booleanOr($c0, $x),
+			"{0} ^^ {x}" => $er->booleanXor($c0, $x),
+			'!{x}' => $er->booleanNot($x),
+	        '?whenIsTrue { x->asBoolean: 0, ~: 0 }' => $er->matchTrue([
 				$er->matchPair($x, $c0),
 				$er->matchDefault($c0)
 			]),

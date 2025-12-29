@@ -115,7 +115,7 @@ final readonly class BooleanOrExpression implements BooleanOrExpressionInterface
 
 	public function jsonSerialize(): array {
 		return [
-			'expressionType' => 'booleanOr',
+			'expressionType' => 'BooleanOr',
 			'first' => $this->first,
 			'second' => $this->second
 		];

@@ -103,7 +103,7 @@ final readonly class BooleanXorExpression implements BooleanXorExpressionInterfa
 
 	public function __toString(): string {
 		return sprintf(
-			"{%s} || {%s}",
+			"{%s} ^^ {%s}",
 			$this->first,
 			$this->second
 		);
