@@ -48,7 +48,7 @@ use Walnut\Lang\Blueprint\AST\Node\NameAndTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\AnyTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\ArrayTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\BooleanTypeNode;
-use Walnut\Lang\Blueprint\AST\Node\Type\ByteArrayTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\BytesTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\EnumerationSubsetTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\FalseTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\FunctionTypeNode;
@@ -81,7 +81,7 @@ use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\UnionTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\AtomValueNode;
-use Walnut\Lang\Blueprint\AST\Node\Value\ByteArrayValueNode;
+use Walnut\Lang\Blueprint\AST\Node\Value\BytesValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\DataValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\EnumerationValueNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\ErrorValueNode;
@@ -270,10 +270,10 @@ interface NodeBuilder {
 	/** @param list<string> $values */
 	public function stringSubsetType(array $values): StringSubsetTypeNode;
 
-	public function byteArrayType(
+	public function bytesType(
 		Number $minLength = new Number(0),
 		PlusInfinity|Number $maxLength = PlusInfinity::value
-	): ByteArrayTypeNode;
+	): BytesTypeNode;
 
 	public function arrayType(
 		TypeNode|null $itemType = null,
@@ -306,7 +306,7 @@ interface NodeBuilder {
 	public function integerValue(Number $value): IntegerValueNode;
 	public function realValue(Number $value): RealValueNode;
 	public function stringValue(string $value): StringValueNode;
-	public function byteArrayValue(string $value): ByteArrayValueNode;
+	public function bytesValue(string $value): BytesValueNode;
 	public function typeValue(TypeNode $type): TypeValueNode;
 	public function errorValue(ValueNode $value): ErrorValueNode;
 	public function mutableValue(TypeNode $type, ValueNode $value): MutableValueNode;

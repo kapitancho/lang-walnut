@@ -8,7 +8,7 @@ use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Type\BooleanType;
-use Walnut\Lang\Blueprint\Type\ByteArrayType;
+use Walnut\Lang\Blueprint\Type\BytesType;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\FalseType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
@@ -22,7 +22,7 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Value\AtomValue;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
-use Walnut\Lang\Blueprint\Value\ByteArrayValue;
+use Walnut\Lang\Blueprint\Value\BytesValue;
 use Walnut\Lang\Blueprint\Value\DataValue;
 use Walnut\Lang\Blueprint\Value\EnumerationValue;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
@@ -67,7 +67,7 @@ final readonly class CastAsString {
 		return match(true) {
 			$targetType instanceof AliasType => $this->detectRangedType($targetType->aliasedType),
 			$targetType instanceof MutableType => $this->detectRangedType($targetType->valueType),
-			$targetType instanceof ByteArrayType => [$targetType->range->minLength, $targetType->range->maxLength],
+			$targetType instanceof BytesType => [$targetType->range->minLength, $targetType->range->maxLength],
 			$targetType instanceof IntegerType => [
 				1,
 				($max = $targetType->numberRange->max) instanceof NumberIntervalEndpoint &&
@@ -89,7 +89,7 @@ final readonly class CastAsString {
 			$value instanceof IntegerValue => (string)$value->literalValue,
 			$value instanceof RealValue => (string) $value->literalValue,
 			$value instanceof StringValue => $value->literalValue,
-			$value instanceof ByteArrayValue => $value->literalValue,
+			$value instanceof BytesValue => $value->literalValue,
 			$value instanceof BooleanValue => $value->literalValue ? 'true' : 'false',
 			$value instanceof NullValue => 'null',
 			$value instanceof TypeValue => (string)$value->typeValue,

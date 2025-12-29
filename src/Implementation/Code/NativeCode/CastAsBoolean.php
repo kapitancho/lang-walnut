@@ -9,7 +9,7 @@ use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\BooleanType;
-use Walnut\Lang\Blueprint\Type\ByteArrayType;
+use Walnut\Lang\Blueprint\Type\BytesType;
 use Walnut\Lang\Blueprint\Type\FalseType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
@@ -53,7 +53,7 @@ final readonly class CastAsBoolean {
 			($type instanceof RealType && $type->numberRange->min instanceof NumberIntervalEndpoint && $type->numberRange->max instanceof NumberIntervalEndpoint && (float)(string)$type->numberRange->min->value === 0.0 && (float)(string)$type->numberRange->max->value === 0.0),
 			($type instanceof StringSubsetType && count($type->subsetValues) === 1 && $type->subsetValues[0] === ''),
 			($type instanceof StringType && $type->range->maxLength instanceof Number && (int)(string)$type->range->maxLength === 0),
-			($type instanceof ByteArrayType && $type->range->maxLength instanceof Number && (int)(string)$type->range->maxLength === 0),
+			($type instanceof BytesType && $type->range->maxLength instanceof Number && (int)(string)$type->range->maxLength === 0),
 			($type instanceof RecordType && count($type->types) === 0),
 			($type instanceof TupleType && count($type->types) === 0),
 			($type instanceof SetType && ($setLength = $type->range->maxLength) instanceof Number && ((int)(string)$setLength) === 0),
@@ -69,7 +69,7 @@ final readonly class CastAsBoolean {
 			($type instanceof RealType && $type->numberRange->max !== PlusInfinity::value && $type->numberRange->max->value < 0),
 			($type instanceof StringSubsetType && !in_array('', array_map(fn(string $v) => $v, $type->subsetValues))),
 			($type instanceof StringType && $type->range->minLength > 0),
-			($type instanceof ByteArrayType && $type->range->minLength > 0),
+			($type instanceof BytesType && $type->range->minLength > 0),
 				/*$type instanceof SealedType,
 				($type instanceof RecordType && count($type->types) > 0),
 				($type instanceof TupleType && count($type->types) > 0),

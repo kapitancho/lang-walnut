@@ -13,7 +13,7 @@ use Walnut\Lang\Blueprint\Type\AnyType;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Type\BooleanType;
-use Walnut\Lang\Blueprint\Type\ByteArrayType;
+use Walnut\Lang\Blueprint\Type\BytesType;
 use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
@@ -43,7 +43,7 @@ use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Type\UnionType;
 use Walnut\Lang\Blueprint\Type\UnknownProperty;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
-use Walnut\Lang\Blueprint\Value\ByteArrayValue;
+use Walnut\Lang\Blueprint\Value\BytesValue;
 use Walnut\Lang\Blueprint\Value\EnumerationValue;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
@@ -87,7 +87,7 @@ final readonly class Hydrator {
 			$targetType instanceof RecordType => $this->hydrateRecord(...),
 			$targetType instanceof StringSubsetType => $this->hydrateStringSubset(...),
 			$targetType instanceof StringType => $this->hydrateString(...),
-			$targetType instanceof ByteArrayType => $this->hydrateByteArray(...),
+			$targetType instanceof BytesType => $this->hydrateBytes(...),
 			$targetType instanceof TupleType => $this->hydrateTuple(...),
 			$targetType instanceof TypeType => $this->hydrateType(...),
 			$targetType instanceof UnionType => $this->hydrateUnion(...),
@@ -465,14 +465,14 @@ final readonly class Hydrator {
 		);
 	}
 
-	private function hydrateByteArray(Value $value, ByteArrayType $targetType, string $hydrationPath): ByteArrayValue {
+	private function hydrateBytes(Value $value, BytesType $targetType, string $hydrationPath): BytesValue {
 		if ($value instanceof StringValue) {
 			$l = strlen($value->literalValue);
 			if ($targetType->range->minLength <= $l && (
 					$targetType->range->maxLength === PlusInfinity::value ||
 					$targetType->range->maxLength >= $l
 			)) {
-				return $this->programRegistry->valueRegistry->byteArray($value->literalValue);
+				return $this->programRegistry->valueRegistry->bytes($value->literalValue);
 			}
 			throw new HydrationException(
 				$value,

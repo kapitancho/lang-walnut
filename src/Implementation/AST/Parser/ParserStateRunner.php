@@ -20,7 +20,8 @@ final readonly class ParserStateRunner implements ParserStateRunnerInterface {
 		$stateMachine = new ParserStateMachine(
 			$s,
 			$nodeBuilder,
-			new StringEscapeCharHandler()
+			new StringEscapeCharHandler(),
+			new BytesEscapeCharHandler()
 		);
 		$states = $stateMachine->getAllStates();
 

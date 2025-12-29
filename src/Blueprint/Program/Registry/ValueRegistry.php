@@ -12,7 +12,7 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnknownEnumerationValue;
 use Walnut\Lang\Blueprint\Value\AtomValue;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
-use Walnut\Lang\Blueprint\Value\ByteArrayValue;
+use Walnut\Lang\Blueprint\Value\BytesValue;
 use Walnut\Lang\Blueprint\Value\DataValue;
 use Walnut\Lang\Blueprint\Value\EnumerationValue;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
@@ -39,7 +39,7 @@ interface ValueRegistry {
 	public function integer(Number|int $value): IntegerValue;
 	public function real(Number|float $value): RealValue;
 	public function string(string $value): StringValue;
-	public function byteArray(string $value): ByteArrayValue;
+	public function bytes(string $value): BytesValue;
 
 	/** @param list<Value> $values */
 	public function tuple(array $values): TupleValue;

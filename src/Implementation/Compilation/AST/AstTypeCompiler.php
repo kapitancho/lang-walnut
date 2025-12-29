@@ -5,7 +5,7 @@ namespace Walnut\Lang\Implementation\Compilation\AST;
 use Walnut\Lang\Blueprint\AST\Node\Type\AnyTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\ArrayTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\BooleanTypeNode;
-use Walnut\Lang\Blueprint\AST\Node\Type\ByteArrayTypeNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\BytesTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\EnumerationSubsetTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\FalseTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\FunctionTypeNode;
@@ -170,7 +170,7 @@ final readonly class AstTypeCompiler implements AstTypeCompilerInterface {
 				),
 				$typeNode instanceof StringSubsetTypeNode => $this->typeRegistry->stringSubset($typeNode->values),
 
-				$typeNode instanceof ByteArrayTypeNode => $this->typeRegistry->byteArray(
+				$typeNode instanceof BytesTypeNode => $this->typeRegistry->bytes(
 					$typeNode->minLength, $typeNode->maxLength
 				),
 

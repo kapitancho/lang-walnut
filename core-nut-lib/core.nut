@@ -78,7 +78,7 @@ IndexOutOfRange := [index: Integer];
 MapItemNotFound := [key: String];
 ItemNotFound := ();
 SubstringNotInString := ();
-SliceNotInByteArray := ();
+SliceNotInBytes := ();
 
 /* casts */
 CastNotAvailable := [from: Type, to: Type];

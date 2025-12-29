@@ -30,7 +30,8 @@ final readonly class ParserStateMachine {
 	public function __construct(
 		private ParserStateInterface $s,
 		private NodeBuilder          $nodeBuilder,
-		private EscapeCharHandler    $escapeCharHandler
+		private EscapeCharHandler $stringEscapeCharHandler,
+		private EscapeCharHandler $bytesEscapeCharHandler
 	) {}
 
 	public function getAllStates(): array {
@@ -824,7 +825,7 @@ final readonly class ParserStateMachine {
 					$this->s->result['first_token'] = new LT(
 						$token->rule,
 						new PatternMatch(
-							$this->escapeCharHandler->unescape(
+							$this->stringEscapeCharHandler->unescape(
 								$token->patternMatch->text
 							)
 						),
@@ -879,7 +880,7 @@ final readonly class ParserStateMachine {
 			]],
 			228 => ['name' => 'dict expression dict expression key', 'transitions' => [
 				T::string_value->name => function(LT $token) {
-					$this->s->result['current_key'] = $this->escapeCharHandler->unescape(
+					$this->s->result['current_key'] = $this->stringEscapeCharHandler->unescape(
 						$token->patternMatch->text);
 					$this->s->move(241);
 				},
@@ -1612,7 +1613,7 @@ final readonly class ParserStateMachine {
 				T::string_value->name => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->propertyAccess(
 						$this->s->generated,
-						$this->escapeCharHandler->unescape( $token->patternMatch->text)
+						$this->stringEscapeCharHandler->unescape( $token->patternMatch->text)
 					);
 					$this->s->moveAndPop();
 				},
@@ -2057,15 +2058,15 @@ final readonly class ParserStateMachine {
 			408 => ['name' => 'string value', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->stringValue(
-						$this->escapeCharHandler->unescape( $token->patternMatch->text)
+						$this->stringEscapeCharHandler->unescape( $token->patternMatch->text)
 					);
 					$this->s->moveAndPop();
 				},
 			]],
 			4081 => ['name' => 'byte array value', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->byteArrayValue(
-						$this->escapeCharHandler->unescape( $token->patternMatch->text)
+					$this->s->generated = $this->nodeBuilder->bytesValue(
+						$this->bytesEscapeCharHandler->unescape( $token->patternMatch->text)
 					);
 					$this->s->moveAndPop();
 				},
@@ -2142,7 +2143,7 @@ final readonly class ParserStateMachine {
 					$this->s->result['first_token'] = new LT(
 						$token->rule,
 						new PatternMatch(
-							$this->escapeCharHandler->unescape( $token->patternMatch->text)
+							$this->stringEscapeCharHandler->unescape( $token->patternMatch->text)
 						),
 						$token->sourcePosition
 					);
@@ -2195,7 +2196,7 @@ final readonly class ParserStateMachine {
 			]],
 			426 => ['name' => 'dict value dict value key', 'transitions' => [
 				T::string_value->name => function(LT $token) {
-					$this->s->result['current_key'] = $this->escapeCharHandler->unescape(
+					$this->s->result['current_key'] = $this->stringEscapeCharHandler->unescape(
 						$token->patternMatch->text);
 					$this->s->move(421);
 				},
@@ -2650,7 +2651,7 @@ final readonly class ParserStateMachine {
 					$this->s->move(620);
 				},
 				T::string_value->name => function(LT $token) {
-					$this->s->result['next_variable_key'] = $this->escapeCharHandler->unescape(
+					$this->s->result['next_variable_key'] = $this->stringEscapeCharHandler->unescape(
 						$token->patternMatch->text);
 					$this->s->move(623);
 				},
@@ -2729,7 +2730,7 @@ final readonly class ParserStateMachine {
 				T::mutable->name => $c,
 				T::when_value_is->name => $c,
 				T::string_value->name => function(LT $token) {
-					$this->s->result['next_variable_key'] = $this->escapeCharHandler->unescape(
+					$this->s->result['next_variable_key'] = $this->stringEscapeCharHandler->unescape(
 						$token->patternMatch->text);
 					$this->s->move(623);
 				},
@@ -2813,7 +2814,7 @@ final readonly class ParserStateMachine {
 						'Integer' => 709,
 						'Real' => 718,
 						'String' => 727,
-						'ByteArray' => 7271,
+						'Bytes' => 7271,
 						'Array' => 735,
 						'Set' => 827,
 						'Map' => 745,
@@ -2836,7 +2837,7 @@ final readonly class ParserStateMachine {
 						'Integer' => 709,
 						'Real' => 718,
 						'String' => 727,
-						'ByteArray' => 7271,
+						'Bytes' => 7271,
 						'Array' => 735,
 						'Set' => 827,
 						'Map' => 745,
@@ -3162,7 +3163,7 @@ final readonly class ParserStateMachine {
 			7271 => ['name' => 'type byte array', 'transitions' => [
 				T::type_start->name => 7272,
 				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->byteArrayType();
+					$this->s->generated = $this->nodeBuilder->bytesType();
 					$this->s->pop();
 				},
 			]],
@@ -3192,7 +3193,7 @@ final readonly class ParserStateMachine {
 			]],
 			7276 => ['name' => 'type string return', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->byteArrayType(
+					$this->s->generated = $this->nodeBuilder->bytesType(
 						isset($this->s->result['minLength']) ? new Number($this->s->result['minLength']) : new Number(0),
 						isset($this->s->result['maxLength']) ? new Number($this->s->result['maxLength']) : PlusInfinity::value
 					);
@@ -3250,7 +3251,7 @@ final readonly class ParserStateMachine {
 			733 => ['name' => 'type string subset value', 'transitions' => [
 				T::string_value->name => function(LT $token) {
 					$this->s->result['subsetValues'] ??= [];
-					$this->s->result['subsetValues'][] = $this->escapeCharHandler->unescape(
+					$this->s->result['subsetValues'][] = $this->stringEscapeCharHandler->unescape(
 						$token->patternMatch->text);
 					$this->s->move(734);
 				},
@@ -3909,7 +3910,7 @@ final readonly class ParserStateMachine {
 					$this->s->result['first_token'] = new LT(
 						$token->rule,
 						new PatternMatch(
-							$this->escapeCharHandler->unescape( $token->patternMatch->text)
+							$this->stringEscapeCharHandler->unescape( $token->patternMatch->text)
 						),
 						$token->sourcePosition
 					);
@@ -3984,7 +3985,7 @@ final readonly class ParserStateMachine {
 			]],
 			846 => ['name' => 'module level record key', 'transitions' => [
 				T::string_value->name => function(LT $token) {
-					$this->s->result['current_key'] = $this->escapeCharHandler->unescape( $token->patternMatch->text);
+					$this->s->result['current_key'] = $this->stringEscapeCharHandler->unescape( $token->patternMatch->text);
 					$this->s->move(841);
 				},
 				T::word->name => $c = function(LT $token) {

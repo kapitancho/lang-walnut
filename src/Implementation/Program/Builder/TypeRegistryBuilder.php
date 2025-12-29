@@ -44,7 +44,7 @@ use Walnut\Lang\Implementation\Type\AnyType;
 use Walnut\Lang\Implementation\Type\ArrayType;
 use Walnut\Lang\Implementation\Type\AtomType;
 use Walnut\Lang\Implementation\Type\BooleanType;
-use Walnut\Lang\Implementation\Type\ByteArrayType;
+use Walnut\Lang\Implementation\Type\BytesType;
 use Walnut\Lang\Implementation\Type\DataType;
 use Walnut\Lang\Implementation\Type\EnumerationType;
 use Walnut\Lang\Implementation\Type\FunctionType;
@@ -289,11 +289,11 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 	}
 
 	/** @throws InvalidLengthRange */
-	public function byteArray(
+	public function bytes(
 		int|Number $minLength = 0,
 		int|Number|PlusInfinity $maxLength = PlusInfinity::value
-	): ByteArrayType {
-		return new ByteArrayType(new LengthRange(
+	): BytesType {
+		return new BytesType(new LengthRange(
 			is_int($minLength) ? new Number($minLength) : $minLength,
 			is_int($maxLength) ? new Number($maxLength) : $maxLength
 		));
@@ -350,7 +350,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 			'Integer' => $this->integer(),
 			'Real' => $this->real(),
 			'String' => $this->string(),
-			'ByteArray' => $this->byteArray(),
+			'Bytes' => $this->bytes(),
 		    'Shape' => $this->shape($this->any),
 		    'Atom' => $this->metaType(MetaTypeValue::Atom),
 		    //'Record' => $this->metaType(MetaTypeValue::Record),

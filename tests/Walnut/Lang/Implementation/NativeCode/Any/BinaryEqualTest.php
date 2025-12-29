@@ -52,6 +52,14 @@ final class BinaryEqualTest extends BaseProgramTestHelper {
 		$this->callBinaryEqual($c, $c2, false);
 		$this->callBinaryEqual($c, $z, false);
 
+		$c1 = $this->valueRegistry->bytes("Hi");
+		$c2 = $this->valueRegistry->bytes("Hello");
+		$c = $this->valueRegistry->bytes("Hi");
+
+		$this->callBinaryEqual($c, $c1, true);
+		$this->callBinaryEqual($c, $c2, false);
+		$this->callBinaryEqual($c, $z, false);
+
 		$c1 = $this->valueRegistry->boolean(true);
 		$c2 = $this->valueRegistry->boolean(false);
 		$c = $this->valueRegistry->boolean(true);

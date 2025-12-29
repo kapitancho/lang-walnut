@@ -34,7 +34,7 @@ final readonly class Chr implements NativeMethod {
 		) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof NullType) {
-				return $typeRegistry->byteArray(1, 1);
+				return $typeRegistry->bytes(1, 1);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}
@@ -48,7 +48,7 @@ final readonly class Chr implements NativeMethod {
 	): Value {
 		if ($target instanceof IntegerValue && ($v = (int)(string)$target->literalValue) >= 0 && $v <= 255) {
 			if ($parameter instanceof NullValue) {
-				return $programRegistry->valueRegistry->byteArray(
+				return $programRegistry->valueRegistry->bytes(
 					chr((int)(string)$target->literalValue)
 				);
 			}

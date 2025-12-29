@@ -20,7 +20,7 @@ use Walnut\Lang\Blueprint\Value\NullValue;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Function\FunctionContextFiller;
 use Walnut\Lang\Implementation\Function\UserlandFunction;
-use Walnut\Lang\Implementation\Value\ByteArrayValue;
+use Walnut\Lang\Implementation\Value\BytesValue;
 use Walnut\Lang\Implementation\Value\DataValue;
 use Walnut\Lang\Implementation\Value\ErrorValue;
 use Walnut\Lang\Implementation\Value\FunctionValue;
@@ -42,7 +42,7 @@ final class ValueRegistry implements ValueRegistryInterface {
 	public function __construct(
 		private readonly TypeRegistry      $typeRegistry,
 		private readonly EscapeCharHandler $stringEscapeCharHandler,
-		private readonly EscapeCharHandler $byteArrayEscapeCharHandler,
+		private readonly EscapeCharHandler $bytesEscapeCharHandler,
 	) {
 		$this->contextFiller = new FunctionContextFiller();
 	}
@@ -77,8 +77,8 @@ final class ValueRegistry implements ValueRegistryInterface {
 	    return new StringValue($this->typeRegistry, $this->stringEscapeCharHandler, $value);
 	}
 
-	public function byteArray(string $value): ByteArrayValue {
-	    return new ByteArrayValue($this->typeRegistry, $this->byteArrayEscapeCharHandler, $value);
+	public function bytes(string $value): BytesValue {
+	    return new BytesValue($this->typeRegistry, $this->bytesEscapeCharHandler, $value);
 	}
 
 	/** @param list<Value> $values */
