@@ -561,10 +561,9 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 		$this->assertEquals("42", $result);
 	}
 
-	// TODO - maybe show all errors
 	public function testHydrateAsUnionWithIncorrectCorrectType(): void {
 		$result = $this->executeCodeSnippet("3.14->hydrateAs(type{String|Integer});");
-		$this->assertEquals("@HydrationError![\n\tvalue: 3.14,\n\thydrationPath: 'value',\n\terrorMessage: 'The value should be a string with a length between 0 and +Infinity'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: 3.14,\n\thydrationPath: 'value',\n\terrorMessage: 'The value could not be hydrated to any of the union types. The following errors occurred: \\n- The value should be a string with a length between 0 and +Infinity\\n- The value should be an integer in (-Infinity..+Infinity)\\n'\n]", $result);
 	}
 
 
@@ -589,10 +588,9 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@42", $result);
 	}
 
-	// TODO - maybe show all errors
 	public function testHydrateAsResultWithIncorrectCorrectType(): void {
 		$result = $this->executeCodeSnippet("3.14->hydrateAs(type{String|Integer});");
-		$this->assertEquals("@HydrationError![\n\tvalue: 3.14,\n\thydrationPath: 'value',\n\terrorMessage: 'The value should be a string with a length between 0 and +Infinity'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: 3.14,\n\thydrationPath: 'value',\n\terrorMessage: 'The value could not be hydrated to any of the union types. The following errors occurred: \\n- The value should be a string with a length between 0 and +Infinity\\n- The value should be an integer in (-Infinity..+Infinity)\\n'\n]", $result);
 	}
 
 

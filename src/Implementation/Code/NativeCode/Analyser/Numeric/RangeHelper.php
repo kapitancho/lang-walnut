@@ -107,25 +107,53 @@ trait RangeHelper {
 		IntegerType|RealType $targetType,
 		IntegerType|RealType $parameterType
 	): NumberInterval|null {
-		if (
-			$targetType->numberRange->min instanceof NumberIntervalEndpointInterface && $targetType->numberRange->min->value >= 0 &&
-			$parameterType->numberRange->min instanceof NumberIntervalEndpointInterface && $parameterType->numberRange->min->value >= 0
-		) {
-			$min = new NumberIntervalEndpoint(
-				$targetType->numberRange->min->value->mul($parameterType->numberRange->min->value),
-				$targetType->numberRange->min->inclusive && $parameterType->numberRange->min->inclusive
-			);
-			$max =
-				$targetType->numberRange->max === PlusInfinity::value ||
-				$parameterType->numberRange->max === PlusInfinity::value ?
-					PlusInfinity::value :
-					new NumberIntervalEndpoint(
-						$targetType->numberRange->max->value->mul($parameterType->numberRange->max->value),
-						$targetType->numberRange->max->inclusive && $parameterType->numberRange->max->inclusive
+		$tMin = $targetType->numberRange->min;
+		$tMax = $targetType->numberRange->max;
+		$pMin = $parameterType->numberRange->min;
+		$pMax = $parameterType->numberRange->max;
+
+		$hasPlusInfinity = false;
+		$hasMinusInfinity = false;
+		$values = [];
+
+		$bitCode = fn(NumberIntervalEndpointInterface|MinusInfinity|PlusInfinity $num): int =>
+			$num instanceof NumberIntervalEndpointInterface ? (
+				match(true) {
+					$num->inclusive && (string)$num->value === '0' => 0,
+					$num->value >= 0 => 1,
+					default => 2,
+				}
+			) : (
+			3 * ($num === PlusInfinity::value) +
+			4 * ($num === MinusInfinity::value)
+		);
+
+		foreach ([$tMin, $tMax] as $num1) {
+			foreach([$pMin, $pMax] as $num2) {
+				$b1 = $bitCode($num1);
+				$b2 = $bitCode($num2);
+				if ($b1 === 0 || $b2 === 0) {
+					$values[] = new NumberIntervalEndpoint(new Number(0), true);
+				} elseif ($b1 > 2 || $b2 > 2) {
+					if (($b1 + $b2) % 2 === 1) {
+						$hasMinusInfinity = true;
+					} else {
+						$hasPlusInfinity = true;
+					}
+				} else {
+					$values[] = new NumberIntervalEndpoint(
+						$num1->value->mul($num2->value),
+						$num1->inclusive && $num2->inclusive
 					);
-			return new NumberInterval($min, $max);
+				};
+			}
 		}
-		return null;
+		usort($values,
+			fn(NumberIntervalEndpointInterface $a, NumberIntervalEndpointInterface $b): int => $a->value <=> $b->value
+		);
+		$min = $hasMinusInfinity ? MinusInfinity::value : $values[array_key_first($values)];
+		$max = $hasPlusInfinity ? PlusInfinity::value : $values[array_key_last($values)];
+		return new NumberInterval($min, $max);
 	}
 
 	private function getSquareRange(

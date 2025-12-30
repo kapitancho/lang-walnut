@@ -97,9 +97,6 @@ final readonly class CastAsString {
 			$value instanceof DataValue => $this->evaluate($value->value),
 			$value instanceof AtomValue => $value->type->name,
 			$value instanceof EnumerationValue => $value->name,
-			//TODO: check for cast to jsonValue (+subtype as well)
-			//TODO: error values
-			//default => throw new ExecutionException("Invalid target value")
 			default => null
 		};
 	}

@@ -70,23 +70,8 @@ final readonly class CastAsBoolean {
 			($type instanceof StringSubsetType && !in_array('', array_map(fn(string $v) => $v, $type->subsetValues))),
 			($type instanceof StringType && $type->range->minLength > 0),
 			($type instanceof BytesType && $type->range->minLength > 0),
-				/*$type instanceof SealedType,
-				($type instanceof RecordType && count($type->types) > 0),
-				($type instanceof TupleType && count($type->types) > 0),
-				($type instanceof ArrayType && $type->range->minLength > 0),
-				($type instanceof MapType && $type->range->minLength > 0)*/
 			=> $true,
 			default => $boolean,
-			/*$type instanceof IntegerType,
-			$type instanceof IntegerSubsetType,
-			$type instanceof RealType,
-			$type instanceof RealSubsetType,
-			$type instanceof StringType,
-			$type instanceof StringSubsetType,
-			$type instanceof BooleanValue,
-			$type instanceof TupleType, $type instanceof ArrayType,
-			$type instanceof RecordType, $type instanceof MapType
-				=> $programRegistry->typeRegistry()->boolean(),*/
 		};
 	}
 
@@ -102,7 +87,6 @@ final readonly class CastAsBoolean {
 			$value instanceof RecordValue => $value->values !== [],
 			$value instanceof SetValue => $value->values !== [],
 			$value instanceof MutableValue => $this->evaluate($value->value),
-			//TODO: check for cast to boolean
 			default => true
 		};
 	}

@@ -25,17 +25,19 @@ final readonly class NoExternalErrorExpression implements NoExternalErrorExpress
 	) {}
 
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
+		$ex = $analyserContext->programRegistry->typeRegistry->withName(
+			new TypeNameIdentifier('ExternalError')
+		);
+
 		$ret = $this->targetExpression->analyse($analyserContext);
 		$expressionType = $ret->expressionType;
-		if ($expressionType instanceof ResultType) {
+		if ($expressionType instanceof ResultType && $ex->isSubtypeOf($expressionType->errorType)) {
 			return $ret->withExpressionType(
 				$this->withoutExternalError($analyserContext->programRegistry->typeRegistry, $expressionType)
 			)->withReturnType(
 				$analyserContext->programRegistry->typeRegistry->result(
 					$ret->returnType,
-					$analyserContext->programRegistry->typeRegistry->withName(
-						new TypeNameIdentifier('ExternalError')
-					)
+					$ex
 				)
 			);
 		}

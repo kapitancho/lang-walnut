@@ -37,12 +37,36 @@ final class BinaryDivideTest extends CodeExecutionTestHelper {
 		$this->assertEquals("3", $result);
 	}
 
-	public function testBinaryDividePositiveTargetFinite(): void {
+	public function testBinaryDividePositiveTargetFiniteBothPositive(): void {
 		$result = $this->executeCodeSnippet(
 			"divide(5.75);",
 			valueDeclarations: "divide = ^p: Real<3.14..10> => Real<[1.256..4]> :: p / 2.5;"
 		);
 		$this->assertEquals("2.3", $result);
+	}
+
+	public function testBinaryDividePositiveTargetFiniteBothNegative(): void {
+		$result = $this->executeCodeSnippet(
+			"divide(-5.75);",
+			valueDeclarations: "divide = ^p: Real<-10..-3.14> => Real<[1.256..4]> :: p / -2.5;"
+		);
+		$this->assertEquals("2.3", $result);
+	}
+
+	public function testBinaryDividePositiveTargetFiniteParameterNegative(): void {
+		$result = $this->executeCodeSnippet(
+			"divide(5.75);",
+			valueDeclarations: "divide = ^p: Real<3.14..10> => Real<[-4..-1.256]> :: p / -2.5;"
+		);
+		$this->assertEquals("-2.3", $result);
+	}
+
+	public function testBinaryDividePositiveTargetFiniteTargetNegative(): void {
+		$result = $this->executeCodeSnippet(
+			"divide(-5.75);",
+			valueDeclarations: "divide = ^p: Real<-10..-3.14> => Real<[-4..-1.256]> :: p / 2.5;"
+		);
+		$this->assertEquals("-2.3", $result);
 	}
 
 	public function testBinaryDividePositiveParameterFinite(): void {

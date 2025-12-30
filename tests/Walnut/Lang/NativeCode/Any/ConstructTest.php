@@ -40,17 +40,6 @@ final class ConstructTest extends CodeExecutionTestHelper {
 		$this->assertEquals("MyOpen{'112'}", $result);
 	}
 
-	/* TODO - it doesn't cover rows 57:65
-	public function testConstructOpenConstructorAndValidatorInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet(
-			"Error in the constructor of MyOpen : Invalid return type: Real is not a open of String   ",
-			"MyOpen(42);",
-			"MyOpen <: String @ Integer :: ?when ({#->length} > 10) { => @{#->length} };" .
-			"MyOpen(Integer) :: #->asReal;"
-		);
-	}
-	*/
-
 	public function testConstructOpenConstructorAndValidatorError(): void {
 		$result = $this->executeCodeSnippet("MyOpen(123456789012345);",
 			"MyOpen := #String @ Integer :: ?when ({#->length} > 10) { => @{#->length} };" .

@@ -109,7 +109,6 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 				$retTargetValue,
 				$retParameterTypedValue
 			);
-			//TODO - DependencyContainerError
 			return $executionContext->asExecutionResult($retReturnTypedValue);
             // @codeCoverageIgnoreStart
 		} catch (ExecutionException $e) {

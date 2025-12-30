@@ -248,8 +248,20 @@ final readonly class Hydrator {
 				$exceptions[] = $ex;
 			}
 		}
-		/** @noinspection PhpUnhandledExceptionInspection */
-		throw $exceptions[0];
+		throw new HydrationException(
+			$value,
+			$hydrationPath,
+			sprintf(
+				"The value could not be hydrated to any of the union types. The following errors occurred: \n%s",
+				implode(array_map(
+					fn(HydrationException $ex): string => sprintf(
+						"- %s\n",
+						$ex->errorMessage
+					),
+					$exceptions
+				))
+			)
+		);
 	}
 
 	private function hydrateAlias(Value $value, AliasType $targetType, string $hydrationPath): Value {

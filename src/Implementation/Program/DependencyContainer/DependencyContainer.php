@@ -83,16 +83,6 @@ final class DependencyContainer implements DependencyContainerInterface {
 					sprintf("Error while creating value for field %d", $index)
 				);
 			}
-			/*if ($foundValue instanceof ErrorValue &&
-				($err = $foundValue->errorValue) instanceof SealedValue &&
-				$err->type->name->equals(new TypeNameIdentifier('DependencyContainerError'))
-			) {
-				return new DependencyError(
-					UnresolvableDependency::errorWhileCreatingValue,
-					$err->value->values['errorOnType']->typeValue(),
-					sprintf("Nested DependencyContainerError while creating value for field %d", $index)
-				);
-			}*/
 			$found[$index] = $foundValue;
 		}
 
@@ -111,17 +101,6 @@ final class DependencyContainer implements DependencyContainerInterface {
 					sprintf("Error while creating value for field %s", $key)
 				);
 			}
-			//TODO: improve
-			/*if ($foundValue instanceof ErrorValue &&
-				($err = $foundValue->errorValue) instanceof SealedValue &&
-				$err->type->name->equals(new TypeNameIdentifier('DependencyContainerError'))
-			) {
-				return new DependencyError(
-					UnresolvableDependency::errorWhileCreatingValue,
-					$err->value->values['errorOnType']->typeValue(),
-					sprintf("Nested DependencyContainerError while creating value for field %s", $key)
-				);
-			}*/
 			$found[$key] = $foundValue;
 		}
 		return $this->programRegistry->valueRegistry->record($found);

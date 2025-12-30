@@ -38,10 +38,9 @@ final class NoExternalErrorExpressionTest extends CodeExecutionTestHelper {
 		$this->assertEquals("true", $result);
 	}
 
-	//TODO - better analysis may find out the ExternalError is not possible
 	public function testNoExternalErrorOtherErrorType(): void {
 		$declaration = <<<NUT
-			noExternalError = ^Result<String, Real> => Result<String, Real|ExternalError> :: ?noExternalError(#);
+			noExternalError = ^v: Result<String, Real> => Result<String, Real> :: ?noExternalError(v);
 		NUT;
 		$result = $this->executeCodeSnippet("noExternalError('ok');", valueDeclarations: $declaration);
 		$this->assertEquals("'ok'", $result);

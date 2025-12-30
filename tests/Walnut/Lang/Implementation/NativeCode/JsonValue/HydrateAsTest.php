@@ -638,7 +638,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				$this->typeRegistry->string(),
 				$this->typeRegistry->integer(),
 			]),
-			"@HydrationError![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a string with a length between 0 and +Infinity'\n]"
+			"@HydrationError![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value could not be hydrated to any of the union types. The following errors occurred: \\n- The value should be a string with a length between 0 and +Infinity\\n- The value should be an integer in (-Infinity..+Infinity)\\n'\n]"
 		);
 
 		//Intersection

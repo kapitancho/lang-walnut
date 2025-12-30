@@ -3,9 +3,11 @@
 namespace Walnut\Lang\NativeCode\Real;
 
 use BcMath\Number;
+use RoundingMode;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
+use Walnut\Lang\Blueprint\Common\Range\NumberInterval as NumberIntervalInterface;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
@@ -40,20 +42,23 @@ final readonly class AsInteger implements NativeMethod {
 			);
 		}
 		if ($targetType instanceof IntegerType || $targetType instanceof RealType) {
-			return $typeRegistry->integerFull(
-				new NumberInterval(
-					$targetType->numberRange->min === MinusInfinity::value ? MinusInfinity::value :
+			return $typeRegistry->integerFull(... array_map(
+				fn(NumberIntervalInterface $interval) => new NumberInterval(
+					$interval->start === MinusInfinity::value ? MinusInfinity::value :
 						new NumberIntervalEndpoint(
-							new Number((int)(string)$targetType->numberRange->min->value),
-							true // TODO: yyy - can this be false?
+							$interval->start->value->round(0, RoundingMode::TowardsZero),
+							(string)$interval->start->value !== (string)$interval->start->value->round(0, RoundingMode::TowardsZero) ||
+							$interval->start->inclusive
 						),
-					$targetType->numberRange->max === PlusInfinity::value ? PlusInfinity::value :
+					$interval->end === PlusInfinity::value ? PlusInfinity::value :
 						new NumberIntervalEndpoint(
-							new Number((int)(string)$targetType->numberRange->max->value),
-							$targetType->numberRange->max->inclusive // TODO: yyy - polish
-						),
-				)
-			);
+							$interval->end->value->round(0, RoundingMode::TowardsZero),
+							(string)$interval->end->value !== (string)$interval->end->value->round(0, RoundingMode::TowardsZero) ||
+							$interval->end->inclusive
+						)
+				),
+				$targetType->numberRange->intervals
+			));
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -66,7 +71,9 @@ final readonly class AsInteger implements NativeMethod {
 		Value $parameter
 	): Value {
 		if ($target instanceof RealValue || $target instanceof IntegerValue) {
-			return $programRegistry->valueRegistry->integer((int)(string)$target->literalValue);
+			return $programRegistry->valueRegistry->integer(
+				$target->literalValue->round(0, RoundingMode::TowardsZero)
+			);
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

@@ -32,7 +32,7 @@ final readonly class MaxValue implements NativeMethod {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof IntegerType) {
 				return $typeRegistry->union([
-					$typeRegistry->integerFull(),
+					$typeRegistry->integer(),
 					$typeRegistry->withName(new TypeNameIdentifier('PlusInfinity'))
 				]);
 			}
