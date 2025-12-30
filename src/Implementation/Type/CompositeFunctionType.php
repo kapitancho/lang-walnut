@@ -61,9 +61,8 @@ final readonly class CompositeFunctionType implements FunctionType {
 		$firstErrorType = match($this->compositionMode) {
 			FunctionCompositionMode::orElse, FunctionCompositionMode::direct => null,
 			FunctionCompositionMode::bypassErrors => $fError,
-			FunctionCompositionMode::bypassExternalErrors => $fError?->isSubtypeOf($exe) ? $exe : null,
+			FunctionCompositionMode::bypassExternalErrors => $fError && $exe->isSubtypeOf($fError) ? $exe : null,
 		};
-
 		if (!$firstCheckType->isSubtypeOf($this->second->parameterType)) {
 			throw new AnalyserException(
 				sprintf(

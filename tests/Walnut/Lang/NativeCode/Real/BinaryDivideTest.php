@@ -117,4 +117,25 @@ final class BinaryDivideTest extends CodeExecutionTestHelper {
 		$this->assertEquals("2.4", $result);
 	}
 
+	public function testBinaryDivideReturnTypeTargetWithZeroPositiveParameter(): void {
+		$result = $this->executeCodeSnippet("div[7.2, 2.5];", valueDeclarations: <<<NUT
+			div = ^[a: Real<0..>, b: Real<2..4>] => Real<0..> :: #a / #b;
+		NUT);
+		$this->assertEquals("2.88", $result);
+	}
+
+	public function testBinaryDivideReturnTypeTargetPlusInfinityPositiveParameter(): void {
+		$result = $this->executeCodeSnippet("div[7.2, 2.5];", valueDeclarations: <<<NUT
+			div = ^[a: Real<4..>, b: Real<2..4>] => Real<1..> :: #a / #b;
+		NUT);
+		$this->assertEquals("2.88", $result);
+	}
+
+	public function testBinaryDivideReturnTypeTargetPlusInfinityNegativeParameter(): void {
+		$result = $this->executeCodeSnippet("div[7.2, -2.5];", valueDeclarations: <<<NUT
+			div = ^[a: Real<4..>, b: Real<-4..-2>] => Real<..-1> :: #a / #b;
+		NUT);
+		$this->assertEquals("-2.88", $result);
+	}
+
 }

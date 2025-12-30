@@ -202,13 +202,6 @@ trait RangeHelper {
 		$min = $hasMinusInfinity ? MinusInfinity::value : $values[array_key_first($values)];
 		$max = $hasPlusInfinity ? PlusInfinity::value : $values[array_key_last($values)];
 
-		// If min and max are the same value and both exclusive, make them inclusive to avoid invalid interval
-		if ($min instanceof NumberIntervalEndpointInterface && $max instanceof NumberIntervalEndpointInterface &&
-			(string)$min->value === (string)$max->value && !$min->inclusive && !$max->inclusive) {
-			$min = new NumberIntervalEndpoint($min->value, true);
-			$max = new NumberIntervalEndpoint($max->value, true);
-		}
-
 		return new NumberInterval($min, $max);
 	}
 

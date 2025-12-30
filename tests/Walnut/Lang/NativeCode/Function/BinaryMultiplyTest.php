@@ -361,6 +361,22 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 		$this->assertEquals("30", $result);
 	}
 
+	public function testMixedResultNoExternalError(): void {
+		$result = $this->executeCodeSnippet(
+			"fnC('25');",
+			"MyError := ();",
+			"
+				fn1 = ^s: String => Result<Integer> :: s->asInteger;
+				fn2 = ^i: Result<Integer> => Result<Integer, MyError> :: ?whenTypeOf(i) is {
+					`Integer: i + 5,
+					`Error: @MyError
+				};
+				fnC = ^s: String => Result<Integer> :: {fn1 * fn2}(s);
+			"
+		);
+		$this->assertEquals("30", $result);
+	}
+
 	public function testMixedResultError1(): void {
 		$result = $this->executeCodeSnippet(
 			"fnC(true);",
