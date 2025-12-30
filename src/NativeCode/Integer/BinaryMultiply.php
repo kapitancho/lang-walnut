@@ -36,21 +36,13 @@ final readonly class BinaryMultiply implements NativeMethod {
 				}
 
 				$interval = $this->getMultiplyRange($targetType, $parameterType);
-				if ($interval !== null) {
-					return $parameterType instanceof IntegerType ?
-						$typeRegistry->integerFull($interval) :
-						$typeRegistry->realFull($interval);
-				}
-
-				$containsZero = $targetType->contains(0) || $parameterType->contains(0);
-				if ($parameterType instanceof IntegerType) {
-					return $containsZero ?
-						$typeRegistry->integer() :
-						$typeRegistry->nonZeroInteger();
-				}
-				return $containsZero ?
-					$typeRegistry->real() :
-					$typeRegistry->nonZeroReal();
+				$intervals = $this->getSplitInterval(
+					$interval,
+					!$targetType->contains(0) && !$parameterType->contains(0)
+				);
+				return $parameterType instanceof IntegerType ?
+					$typeRegistry->integerFull(... $intervals) :
+					$typeRegistry->realFull(... $intervals);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}

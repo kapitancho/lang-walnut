@@ -4,6 +4,7 @@ namespace Walnut\Lang\Implementation\Code\NativeCode\Analyser\Numeric;
 
 use BcMath\Number;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
+use Walnut\Lang\Blueprint\Common\Range\NumberInterval as NumberIntervalInterface;
 use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint as NumberIntervalEndpointInterface;
 use Walnut\Lang\Blueprint\Common\Range\NumberRange;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
@@ -17,6 +18,19 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 trait RangeHelper {
 	use BaseType;
+
+	private function numberBitCode(NumberIntervalEndpointInterface|MinusInfinity|PlusInfinity $num): int {
+		return $num instanceof NumberIntervalEndpointInterface ? (
+			match(true) {
+				$num->inclusive && (string)$num->value === '0' => 0,
+				$num->value >= 0 => 1,
+				default => 2,
+			}
+		) : (
+			3 * ($num === PlusInfinity::value) +
+			4 * ($num === MinusInfinity::value)
+		);
+	}
 
 	private function getMinusRange(
 		IntegerType|RealType $targetType,
@@ -103,10 +117,105 @@ trait RangeHelper {
 		return null;
 	}
 
+	/** @return list<NumberIntervalInterface> */
+	private function getSplitInterval(
+		NumberIntervalInterface $interval,
+		bool $doSplit
+	): array {
+		if ($interval->contains(new Number(0)) && $doSplit) {
+			$negativeInterval = new NumberInterval(
+				$interval->start, new NumberIntervalEndpoint(new Number(0), false)
+			);
+			$positiveInterval = new NumberInterval(
+				new NumberIntervalEndpoint(new Number(0), false), $interval->end
+			);
+			return [$negativeInterval, $positiveInterval];
+		} else {
+			return [$interval];
+		}
+
+	}
+
+	private function getDivideRange(
+		IntegerType|RealType $targetType,
+		IntegerType|RealType $parameterType
+	): NumberInterval {
+		$tMin = $targetType->numberRange->min;
+		$tMax = $targetType->numberRange->max;
+		$pMin = $parameterType->numberRange->min;
+		$pMax = $parameterType->numberRange->max;
+
+		$pMinValue = $pMin === MinusInfinity::value ? -1 : $pMin->value;
+		$pMaxValue = $pMax === PlusInfinity::value ? 1 : $pMax->value;
+
+		if ($pMinValue < 0 && $pMaxValue > 0) {
+			return new NumberInterval(MinusInfinity::value, PlusInfinity::value);
+		}
+
+		$hasPlusInfinity = false;
+		$hasMinusInfinity = false;
+		$values = [];
+
+		foreach ([$tMin, $tMax] as $num1) {
+			foreach([$pMin, $pMax] as $num2) {
+				$b1 = $this->numberBitCode($num1);
+				$b2 = $this->numberBitCode($num2);
+				if ($b2 === 0) {
+					continue;
+				} elseif ($b1 === 0) {
+					$values[] = new NumberIntervalEndpoint(new Number(0), true);
+				} elseif ($b2 > 2) {
+					$values[] = new NumberIntervalEndpoint(new Number(0), false);
+				} elseif ($b1 > 2) {
+					if (($b1 + $b2) % 2 === 1) {
+						$hasMinusInfinity = true;
+					} else {
+						$hasPlusInfinity = true;
+					}
+				} else {
+					$values[] = new NumberIntervalEndpoint(
+						$num1->value->div($num2->value),
+						$num1->inclusive && $num2->inclusive
+					);
+				};
+			}
+		}
+
+		if (empty($values)) {
+			return new NumberInterval(MinusInfinity::value, PlusInfinity::value);
+		}
+
+		usort($values,
+			fn(NumberIntervalEndpointInterface $a, NumberIntervalEndpointInterface $b): int => $a->value <=> $b->value
+		);
+
+		// Deduplicate values: for each unique value, keep the most inclusive endpoint
+		$deduplicated = [];
+		foreach ($values as $value) {
+			$key = (string)$value->value;
+			if (!isset($deduplicated[$key]) || ($value->inclusive && !$deduplicated[$key]->inclusive)) {
+				$deduplicated[$key] = $value;
+			}
+		}
+		$values = array_values($deduplicated);
+
+		$min = $hasMinusInfinity ? MinusInfinity::value : $values[array_key_first($values)];
+		$max = $hasPlusInfinity ? PlusInfinity::value : $values[array_key_last($values)];
+
+		// If min and max are the same value and both exclusive, make them inclusive to avoid invalid interval
+		if ($min instanceof NumberIntervalEndpointInterface && $max instanceof NumberIntervalEndpointInterface &&
+			(string)$min->value === (string)$max->value && !$min->inclusive && !$max->inclusive) {
+			$min = new NumberIntervalEndpoint($min->value, true);
+			$max = new NumberIntervalEndpoint($max->value, true);
+		}
+
+		return new NumberInterval($min, $max);
+	}
+
 	private function getMultiplyRange(
 		IntegerType|RealType $targetType,
 		IntegerType|RealType $parameterType
-	): NumberInterval|null {
+	): NumberInterval {
 		$tMin = $targetType->numberRange->min;
 		$tMax = $targetType->numberRange->max;
 		$pMin = $parameterType->numberRange->min;
@@ -116,22 +225,10 @@ trait RangeHelper {
 		$hasMinusInfinity = false;
 		$values = [];
 
-		$bitCode = fn(NumberIntervalEndpointInterface|MinusInfinity|PlusInfinity $num): int =>
-			$num instanceof NumberIntervalEndpointInterface ? (
-				match(true) {
-					$num->inclusive && (string)$num->value === '0' => 0,
-					$num->value >= 0 => 1,
-					default => 2,
-				}
-			) : (
-			3 * ($num === PlusInfinity::value) +
-			4 * ($num === MinusInfinity::value)
-		);
-
 		foreach ([$tMin, $tMax] as $num1) {
 			foreach([$pMin, $pMax] as $num2) {
-				$b1 = $bitCode($num1);
-				$b2 = $bitCode($num2);
+				$b1 = $this->numberBitCode($num1);
+				$b2 = $this->numberBitCode($num2);
 				if ($b1 === 0 || $b2 === 0) {
 					$values[] = new NumberIntervalEndpoint(new Number(0), true);
 				} elseif ($b1 > 2 || $b2 > 2) {

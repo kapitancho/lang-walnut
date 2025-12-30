@@ -158,4 +158,11 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 		$this->assertEquals("0", $result);
 	}
 
+	public function testBinaryMultiplyNonZeroResult(): void {
+		$result = $this->executeCodeSnippet("mulZero[-4, 2];", valueDeclarations: <<<NUT
+			mulZero = ^[x: Integer<[-5..-1], [3..8]>, y: Integer[-3, 2, 11]] => Integer<[-55..0), (0..88]> :: #x * #y;
+		NUT);
+		$this->assertEquals("-8", $result);
+	}
+
 }

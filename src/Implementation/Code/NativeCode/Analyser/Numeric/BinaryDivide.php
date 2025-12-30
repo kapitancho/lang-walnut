@@ -2,13 +2,9 @@
 
 namespace Walnut\Lang\Implementation\Code\NativeCode\Analyser\Numeric;
 
-use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
-use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint as NumberIntervalEndpointInterface;
-use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerType;
@@ -16,13 +12,12 @@ use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\Value;
-use Walnut\Lang\Implementation\Common\Range\NumberInterval;
-use Walnut\Lang\Implementation\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 use Walnut\Lang\Implementation\Value\IntegerValue;
 
 trait BinaryDivide {
 	use BaseType;
+	use RangeHelper;
 
 	private function analyseHelper(
 		TypeRegistry $typeRegistry,
@@ -35,99 +30,9 @@ trait BinaryDivide {
 			if ($parameterType instanceof IntegerType && (string)$parameterType->numberRange === '1') {
 				return $targetType;
 			}
-
-			$real = $typeRegistry->real();
-			// +/+ case: positive / positive = positive
-			if (
-				$targetType->numberRange->min instanceof NumberIntervalEndpointInterface && $targetType->numberRange->min->value >= 0 &&
-				$parameterType->numberRange->min instanceof NumberIntervalEndpointInterface && $parameterType->numberRange->min->value > 0
-			) {
-				$min = $parameterType->numberRange->max === PlusInfinity::value ?
-					new NumberIntervalEndpoint(
-						new Number(0),
-						false
-					):
-					new NumberIntervalEndpoint(
-						$targetType->numberRange->min->value->div($parameterType->numberRange->max->value),
-						true
-					);
-				$max = $targetType->numberRange->max === PlusInfinity::value ? PlusInfinity::value :
-					new NumberIntervalEndpoint(
-						$targetType->numberRange->max->value->div($parameterType->numberRange->min->value),
-						true
-					);
-				$interval = new NumberInterval($min, $max);
-				$real = $typeRegistry->realFull($interval);
-			}
-			// +/- case: positive / negative = negative
-			if (
-				$targetType->numberRange->min instanceof NumberIntervalEndpointInterface && $targetType->numberRange->min->value >= 0 &&
-				$parameterType->numberRange->max instanceof NumberIntervalEndpointInterface && $parameterType->numberRange->max->value < 0
-			) {
-				$min = $targetType->numberRange->max === PlusInfinity::value ?
-					MinusInfinity::value :
-					new NumberIntervalEndpoint(
-						$targetType->numberRange->max->value->div($parameterType->numberRange->max->value),
-						true
-					);
-				$max = $parameterType->numberRange->min === MinusInfinity::value ?
-					new NumberIntervalEndpoint(
-						new Number(0),
-						false
-					) :
-					new NumberIntervalEndpoint(
-						$targetType->numberRange->min->value->div($parameterType->numberRange->min->value),
-						true
-					);
-				$interval = new NumberInterval($min, $max);
-				$real = $typeRegistry->realFull($interval);
-			}
-			// -/+ case: negative / positive = negative
-			if (
-				$targetType->numberRange->max instanceof NumberIntervalEndpointInterface && $targetType->numberRange->max->value < 0 &&
-				$parameterType->numberRange->min instanceof NumberIntervalEndpointInterface && $parameterType->numberRange->min->value > 0
-			) {
-				$min = $targetType->numberRange->min === MinusInfinity::value ?
-					MinusInfinity::value :
-					new NumberIntervalEndpoint(
-						$targetType->numberRange->min->value->div($parameterType->numberRange->min->value),
-						true
-					);
-				$max = $parameterType->numberRange->max === PlusInfinity::value ?
-					new NumberIntervalEndpoint(
-						new Number(0),
-						false
-					) :
-					new NumberIntervalEndpoint(
-						$targetType->numberRange->max->value->div($parameterType->numberRange->max->value),
-						true
-					);
-				$interval = new NumberInterval($min, $max);
-				$real = $typeRegistry->realFull($interval);
-			}
-			// -/- case: negative / negative = positive
-			if (
-				$targetType->numberRange->max instanceof NumberIntervalEndpointInterface && $targetType->numberRange->max->value < 0 &&
-				$parameterType->numberRange->max instanceof NumberIntervalEndpointInterface && $parameterType->numberRange->max->value < 0
-			) {
-				$min = $parameterType->numberRange->min === MinusInfinity::value ?
-					PlusInfinity::value :
-					new NumberIntervalEndpoint(
-						$targetType->numberRange->max->value->div($parameterType->numberRange->min->value),
-						true
-					);
-				$max = $targetType->numberRange->min === MinusInfinity::value ?
-					new NumberIntervalEndpoint(
-						new Number(0),
-						false
-					) :
-					new NumberIntervalEndpoint(
-						$targetType->numberRange->min->value->div($parameterType->numberRange->max->value),
-						true
-					);
-				$interval = new NumberInterval($min, $max);
-				$real = $typeRegistry->realFull($interval);
-			}
+			$interval = $this->getDivideRange($targetType, $parameterType);
+			$intervals = $this->getSplitInterval($interval, !$targetType->contains(0));
+			$real = $typeRegistry->realFull(...$intervals);
 			return $parameterType->contains(0) ?
 				$typeRegistry->result(
 					$real,

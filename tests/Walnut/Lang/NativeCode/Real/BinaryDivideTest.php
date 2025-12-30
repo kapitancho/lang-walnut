@@ -80,7 +80,7 @@ final class BinaryDivideTest extends CodeExecutionTestHelper {
 	public function testBinaryDividePositiveParameterInfinite(): void {
 		$result = $this->executeCodeSnippet(
 			"divide(3.5);",
-			valueDeclarations: "divide = ^p: Real<3.14..> => Real<(0..4]> :: 8.05 / p;"
+			valueDeclarations: "divide = ^p: Real<3.14..> => Real<(0..2.57]> :: 8.05 / p;"
 		);
 		$this->assertEquals("2.3", $result);
 	}
@@ -92,6 +92,27 @@ final class BinaryDivideTest extends CodeExecutionTestHelper {
 	public function testBinaryDivideReturnTypeOk(): void {
 		$result = $this->executeCodeSnippet("div[3.6, 1.5];", valueDeclarations: <<<NUT
 			div = ^[a: Real, b: Real<(..0), (0..)>] => Real :: #a / #b;
+		NUT);
+		$this->assertEquals("2.4", $result);
+	}
+
+	public function testBinaryDivideReturnTypeResultOk(): void {
+		$result = $this->executeCodeSnippet("div[3.6, 1.5];", valueDeclarations: <<<NUT
+			div = ^[a: Real, b: Real] => Result<Real, NotANumber> :: #a / #b;
+		NUT);
+		$this->assertEquals("2.4", $result);
+	}
+
+	public function testBinaryDivideReturnTypeOkNonZero(): void {
+		$result = $this->executeCodeSnippet("div[-3.6, 1.5];", valueDeclarations: <<<NUT
+			div = ^[a: Real<..-3>, b: Real<(..0), (0..)>] => Real :: #a / #b;
+		NUT);
+		$this->assertEquals("-2.4", $result);
+	}
+
+	public function testBinaryDivideReturnTypeResultOkNonZero(): void {
+		$result = $this->executeCodeSnippet("div[3.6, 1.5];", valueDeclarations: <<<NUT
+			div = ^[a: Real<3..>, b: Real] => Result<Real, NotANumber> :: #a / #b;
 		NUT);
 		$this->assertEquals("2.4", $result);
 	}

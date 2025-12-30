@@ -79,9 +79,23 @@ final class BinaryDivideTest extends CodeExecutionTestHelper {
 
 	public function testBinaryDivideInfinityParameter(): void {
 		$result = $this->executeCodeSnippet("div(20);", valueDeclarations: <<<NUT
-			div = ^x: Integer<3..> => Real<(0..)> :: 5 / x;
+			div = ^x: Integer<3..> => Real<(0..1.67)> :: 5 / x;
 		NUT);
 		$this->assertEquals("0.25", $result);
+	}
+
+	public function testBinaryDivideNonZeroTargetFiniteParameter(): void {
+		$result = $this->executeCodeSnippet("div[x: 4, y: 2];", valueDeclarations: <<<NUT
+			div = ^[x: Integer<3..>, y: Real<-5..5>] => Result<NonZeroReal, NotANumber> :: #x / #y;
+		NUT);
+		$this->assertEquals("2", $result);
+	}
+
+	public function testBinaryDivideNonZeroTargetInfiniteParameter(): void {
+		$result = $this->executeCodeSnippet("div[x: 4, y: 2];", valueDeclarations: <<<NUT
+			div = ^[x: Integer<3..>, y: Real] => Result<NonZeroReal, NotANumber> :: #x / #y;
+		NUT);
+		$this->assertEquals("2", $result);
 	}
 
 }
