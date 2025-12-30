@@ -30,4 +30,9 @@ final class BinaryBitwiseOrTest extends CodeExecutionTestHelper {
 		$this->assertEquals('"BG"', $result);
 	}
 
+	public function testBinaryBitwiseOrSpecialChars(): void {
+		$result = $this->executeCodeSnippet('"\00\00\00\00" | "\\\\\\n\\t\\``";');
+		$this->assertEquals('"\\\\\n\t\``"', $result);
+	}
+
 }
