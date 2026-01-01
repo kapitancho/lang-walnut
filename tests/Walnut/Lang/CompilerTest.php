@@ -85,7 +85,7 @@ final class CompilerTest extends TestCase {
 	public function testBrokenSafeCompilationAst(): void {
 		$compiler = $this->getSafeCompiler(<<<NUT
 			module main:
-			>>> { myFn = ^Null => MissingType :: 1; ''; };
+			::> { myFn = ^Null => MissingType :: 1; ''; };
 		NUT);
 		$result = $compiler->safeCompile('main');
 		$this->assertNotInstanceOf(SuccessfulCompilationResult::class, $result);
@@ -96,7 +96,7 @@ final class CompilerTest extends TestCase {
 	public function testBrokenSafeCompilationAnalyse(): void {
 		$compiler = $this->getSafeCompiler(<<<NUT
 			module main:
-			>>> { myFn = ^Null => NotANumber :: 1; ''; };
+			::> { myFn = ^Null => NotANumber :: 1; ''; };
 		NUT);
 		$result = $compiler->safeCompile('main');
 		$this->assertNotInstanceOf(SuccessfulCompilationResult::class, $result);
@@ -107,7 +107,7 @@ final class CompilerTest extends TestCase {
 	public function testSuccessfulSafeCompilation(): void {
 		$compiler = $this->getSafeCompiler(<<<NUT
 			module main:
-			>>> { myFn = ^Null => NotANumber :: NotANumber; ''; };
+			::> { myFn = ^Null => NotANumber :: NotANumber; ''; };
 		NUT);
 		$result = $compiler->safeCompile('main');
 		$this->assertInstanceOf(SuccessfulCompilationResult::class, $result);

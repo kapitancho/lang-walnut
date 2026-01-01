@@ -564,13 +564,13 @@ class ParserTest extends TestCase {
 		];
 
 
-		yield ['>>> null;', AddMethodNode::class, fn(AddMethodNode $d) =>
+		yield ['::> null;', AddMethodNode::class, fn(AddMethodNode $d) =>
 			$d->targetType instanceof NamedTypeNode && $d->targetType->name->equals(new TypeNameIdentifier('DependencyContainer')) &&
 			$d->methodName->equals(new MethodNameIdentifier('asCliEntryPoint')) &&
 			$d->parameter->type instanceof NullTypeNode && $d->parameter->name === null &&
 			$d->dependency->type instanceof NothingTypeNode &&
 			$d->returnType instanceof NamedTypeNode && $d->returnType->name->equals(new TypeNameIdentifier('CliEntryPoint'))];
-		yield ['%% D >>> null;', AddMethodNode::class, fn(AddMethodNode $d) =>
+		yield ['%% D ::> null;', AddMethodNode::class, fn(AddMethodNode $d) =>
 			$d->targetType instanceof NamedTypeNode && $d->targetType->name->equals(new TypeNameIdentifier('DependencyContainer')) &&
 			$d->methodName->equals(new MethodNameIdentifier('asCliEntryPoint')) &&
 			$d->parameter->type instanceof NullTypeNode && $d->parameter->name === null &&
@@ -580,7 +580,7 @@ class ParserTest extends TestCase {
 			$d->functionBody->expression->value->dependency->type instanceof NamedTypeNode && $d->functionBody->expression->value->dependency->type->name->equals(new TypeNameIdentifier('D')) &&
 			$d->functionBody->expression->value->dependency->name === null
 		];
-		yield ['%% ~D >>> null;', AddMethodNode::class, fn(AddMethodNode $d) =>
+		yield ['%% ~D ::> null;', AddMethodNode::class, fn(AddMethodNode $d) =>
 			$d->targetType instanceof NamedTypeNode && $d->targetType->name->equals(new TypeNameIdentifier('DependencyContainer')) &&
 			$d->methodName->equals(new MethodNameIdentifier('asCliEntryPoint')) &&
 			$d->parameter->type instanceof NullTypeNode && $d->parameter->name === null &&
@@ -590,7 +590,7 @@ class ParserTest extends TestCase {
 			$d->functionBody->expression->value->dependency->type instanceof NamedTypeNode && $d->functionBody->expression->value->dependency->type->name->equals(new TypeNameIdentifier('D')) &&
 			$d->functionBody->expression->value->dependency->name instanceof VariableNameIdentifier && $d->functionBody->expression->value->dependency->name->equals(new VariableNameIdentifier('d'))
 		];
-		yield ['%% d: D >>> null;', AddMethodNode::class, fn(AddMethodNode $d) =>
+		yield ['%% d: D ::> null;', AddMethodNode::class, fn(AddMethodNode $d) =>
 			$d->targetType instanceof NamedTypeNode && $d->targetType->name->equals(new TypeNameIdentifier('DependencyContainer')) &&
 			$d->methodName->equals(new MethodNameIdentifier('asCliEntryPoint')) &&
 			$d->parameter->type instanceof NullTypeNode && $d->parameter->name === null &&
@@ -600,7 +600,7 @@ class ParserTest extends TestCase {
 			$d->functionBody->expression->value->dependency->type instanceof NamedTypeNode && $d->functionBody->expression->value->dependency->type->name->equals(new TypeNameIdentifier('D')) &&
 			$d->functionBody->expression->value->dependency->name instanceof VariableNameIdentifier && $d->functionBody->expression->value->dependency->name->equals(new VariableNameIdentifier('d'))
 		];
-		yield ['%% [D] >>> null;', AddMethodNode::class, fn(AddMethodNode $d) =>
+		yield ['%% [D] ::> null;', AddMethodNode::class, fn(AddMethodNode $d) =>
 			$d->targetType instanceof NamedTypeNode && $d->targetType->name->equals(new TypeNameIdentifier('DependencyContainer')) &&
 			$d->methodName->equals(new MethodNameIdentifier('asCliEntryPoint')) &&
 			$d->parameter->type instanceof NullTypeNode && $d->parameter->name === null &&
@@ -1363,6 +1363,7 @@ class ParserTest extends TestCase {
 	}
 
 	public static function types(): iterable {
+
 		yield ['Nothing', NothingTypeNode::class];
 		yield ['\\Nothing', NothingTypeNode::class];
 		yield ['True', TrueTypeNode::class];
@@ -1370,6 +1371,7 @@ class ParserTest extends TestCase {
 		yield ['False', FalseTypeNode::class];
 		yield ['\\False', FalseTypeNode::class];
 		yield ['Boolean', BooleanTypeNode::class];
+		yield ['(Boolean)', BooleanTypeNode::class];
 		yield ['\\Boolean', BooleanTypeNode::class];
 		yield ['Any', AnyTypeNode::class];
 		yield ['\\Any', AnyTypeNode::class];
@@ -1540,6 +1542,19 @@ class ParserTest extends TestCase {
 			$t->left->left instanceof BooleanTypeNode && $t->left->right instanceof NullTypeNode];
 		yield ['(Boolean&Null)|Type', UnionTypeNode::class, fn($t) => $t->left instanceof IntersectionTypeNode && $t->right instanceof TypeTypeNode &&
 			$t->left->left instanceof BooleanTypeNode && $t->left->right instanceof NullTypeNode];
+
+		yield ['^Boolean&*{Null}|Type=>^String=>Real', FunctionTypeNode::class, fn($t) =>
+			$t->parameterType instanceof UnionTypeNode &&
+			$t->parameterType->left instanceof IntersectionTypeNode &&
+			$t->parameterType->left->left instanceof BooleanTypeNode &&
+			$t->parameterType->left->right instanceof ImpureTypeNode &&
+			$t->parameterType->left->right->valueType instanceof ShapeTypeNode &&
+			$t->parameterType->left->right->valueType->refType instanceof NullTypeNode &&
+			$t->parameterType->right instanceof TypeTypeNode &&
+			$t->returnType instanceof FunctionTypeNode &&
+			$t->returnType->parameterType instanceof StringTypeNode &&
+			$t->returnType->returnType instanceof RealTypeNode
+		];
 
 		//yield ["['a': Null, 'b': Any, ... Boolean]", RecordTypeNode::class, fn($t) => count($t->types) === 2 && $t->types['a'] instanceof NullTypeNode && $t->types[1] instanceof AnyTypeNode && $t->restType instanceOf BooleanTypeNode];
 		//yield ['OptionalKey', OptionalKeyTypeNode::class, fn($t) => $t->valueType instanceOf AnyTypeNode];

@@ -9,7 +9,7 @@ final readonly class TypeNameIdentifier implements JsonSerializable {
 	public function __construct(
 		public string $identifier
 	) {
-		preg_match('/^[A-Z][a-zA-Z0-9]*$/', $identifier) ||
+		preg_match('/^[A-Z][a-zA-Z0-9_]*$/', $identifier) ||
 			IdentifierException::invalidTypeNameIdentifier($identifier);
 	}
 

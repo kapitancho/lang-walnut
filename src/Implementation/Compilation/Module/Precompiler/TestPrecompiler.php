@@ -27,7 +27,7 @@ final readonly class TestPrecompiler implements CodePrecompiler {
 		);
 		$sourceCode .= <<<CODE
 		
-			%% [~TestCases] >>> {
+			%% [~TestCases] ::> {
 				%testCases->map(^ ~TestCase => String :: {
 					testResult = testCase->invoke;
 					before = testResult.before;

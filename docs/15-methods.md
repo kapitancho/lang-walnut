@@ -457,7 +457,7 @@ Person->askQuestion(^String) :: ?whenValueOf(#) is {
     ~: 'I do not understand the question'
 };
 
->>> {
+::> {
     person = Person['Alice', 27];
     [
         greetAlice: person->greet,
@@ -483,7 +483,7 @@ Person->item(^String => Result<String|Integer, String>) ::
         ~: @{'Property not found: ' + #}
     };
 
->>> {
+::> {
     /* Property access for union types */
     getPropertyOfUnionType = ^Person|Map<String> => Result<String|Integer, String|MapItemNotFound> ::
         #name;  /* Union of return types from both ->item methods */

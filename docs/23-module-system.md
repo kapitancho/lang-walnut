@@ -407,7 +407,7 @@ JsonValue ==> User @ HydrationError :: {
 
 **Entry points (CLI only):**
 ```walnut
->>> {
+::> {
     /* CLI entry point logic */
 };
 ```

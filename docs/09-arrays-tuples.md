@@ -966,7 +966,7 @@ Walnut provides special mutable operations for arrays. These modify the array in
 ^[Mutable<Array<T>>, T] => Null
 
 /* Example */
->>> {
+::> {
     mut arr = [1, 2, 3];
     PUSH(arr, 4);
     arr->printed;                        /* [1, 2, 3, 4] */
@@ -979,7 +979,7 @@ Walnut provides special mutable operations for arrays. These modify the array in
 ^Mutable<Array<T>> => T | Null
 
 /* Example */
->>> {
+::> {
     mut arr = [1, 2, 3];
     last = POP(arr);                     /* 3 */
     arr->printed;                        /* [1, 2] */
@@ -994,7 +994,7 @@ Walnut provides special mutable operations for arrays. These modify the array in
 ^[Mutable<Array<T>>, T] => Null
 
 /* Example */
->>> {
+::> {
     mut arr = [2, 3, 4];
     UNSHIFT(arr, 1);
     arr->printed;                        /* [1, 2, 3, 4] */
@@ -1007,7 +1007,7 @@ Walnut provides special mutable operations for arrays. These modify the array in
 ^Mutable<Array<T>> => T | Null
 
 /* Example */
->>> {
+::> {
     mut arr = [1, 2, 3];
     first = SHIFT(arr);                  /* 1 */
     arr->printed;                        /* [2, 3] */
@@ -1376,7 +1376,7 @@ colors = [255, 128, 0];                      /* Type: Array<Integer, 3> */
 newArray = oldArray->append(newItem);
 
 /* Avoid: Mutable operations unless necessary */
->>> {
+::> {
     mut arr = oldArray;
     PUSH(arr, newItem);
 };
@@ -1392,7 +1392,7 @@ result = data
     ->sort();
 
 /* Avoid: Imperative loops */
->>> {
+::> {
     mut result = [];
     ?forEach(data) as item {
         ?when(item.active) {
@@ -1460,7 +1460,7 @@ Immutable append operations create new arrays. For building large arrays, consid
 ```walnut
 /* For many appends, use mutable operations */
 buildLargeArray = ^Integer => Array<Integer> :: {
-    >>> {
+    ::> {
         mut result = [];
         0->upTo($ - 1)->forEach(^item :: {
             PUSH(result, item * item);

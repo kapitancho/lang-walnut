@@ -868,7 +868,7 @@ E := ();
 P := (a, b, c);
 Q := (d, e);
 
->>> {
+::> {
     myFn = ^ pl: Array<P> => Result<Array<Q>, E> :: {
         pl->map(^~P => Result<Q, E> :: ?whenValueOf(p) is {
             P.a: Q.d,

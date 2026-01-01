@@ -78,7 +78,7 @@ Create a file `hello.nut`:
 ```walnut
 module hello:
 
->>> 'Hello, World!';
+::> 'Hello, World!';
 ```
 
 Run it:
@@ -340,7 +340,7 @@ analyzeTransactions = ^transactions: Array<Transaction> :: {
     [total: total, byCategory: categoryTotals]
 };
 
->>> {
+::> {
     transactions = [
         [id: 1, amount: 100.0, category: 'food'],
         [id: 2, amount: 50.0, category: 'transport'],

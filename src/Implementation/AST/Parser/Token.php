@@ -4,7 +4,7 @@ namespace Walnut\Lang\Implementation\AST\Parser;
 
 enum Token: string {
 	case code_comment = '\/\*.*?\*\/';
-	case cli_entry_point = '\>\>\>';
+	case cli_entry_point = '\:\:\>';
 	case dependency_marker = '\%\%';
 	case function_body_marker = '\:\:';
 	case cast_marker = '\=\=\>';
@@ -62,7 +62,7 @@ enum Token: string {
 	case string_value = '\'.*?\'';
 	case byte_array_value = '\".*?\"';
 	//TOOD: allow forward slash but not two consecutive forward slashes
-	case module_identifier = 'module \$?[a-z][a-z0-9_-]*(\/[a-z][a-z0-9_-]*)*(\s*\%\%\s+\$?[a-z][a-z0-9_-]*(\/[a-z][a-z0-9_-]*)*(\s*\,\s*\$?[a-z][a-z0-9_-]*(\/[a-z][a-z0-9_-]*)*)*)?\:';
+	case module_identifier = 'module\s+\$?[a-z][a-z0-9_-]*(\/[a-z][a-z0-9_-]*)*(\s*\%\%\s*\$?[a-z][a-z0-9_-]*(\/[a-z][a-z0-9_-]*)*(\s*\,\s*\$?[a-z][a-z0-9_-]*(\/[a-z][a-z0-9_-]*)*)*)?\s*\:';
 	case type_short = '`';
 	case type_keyword = '[A-Z][a-zA-Z0-9_]*';
 	case var_keyword = '[a-z][a-zA-Z0-9_]*';

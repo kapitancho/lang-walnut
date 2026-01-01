@@ -34,7 +34,7 @@ class CliEntryPointTest extends BaseProgramTestHelper {
 		$moduleLookupContext->method('sourceOf')
 			->willReturnCallback(fn(string $module) => match($module) {
 				'core/core' => 'module $core: DependencyContainer := (); CliEntryPoint = ^Array<String> => String;',
-				'test' => 'module test: >>> args->printed;',
+				'test' => 'module test: ::> args->printed;',
 				default => ''
 			});
 

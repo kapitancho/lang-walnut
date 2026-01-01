@@ -9,7 +9,7 @@ final readonly class VariableNameIdentifier implements JsonSerializable {
 	public function __construct(
 		public string $identifier
 	) {
-		preg_match('/^(([a-z][a-zA-Z0-9]*)|#|%(\d+)|%(\w+)|%|#(\w+)|#(\d+)|\$(\d+)|\$|\$\$|\$(\w+)|_)$/', $identifier) ||
+		preg_match('/^(([a-z][a-zA-Z0-9_]*)|#|%(\d+)|%(\w+)|%|#(\w+)|#(\d+)|\$(\d+)|\$|\$\$|\$(\w+)|_)$/', $identifier) ||
 			IdentifierException::invalidVariableNameIdentifier($identifier);
 	}
 
