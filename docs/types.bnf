@@ -1,0 +1,146 @@
+<NonZeroDigit> ::= "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+<Digit> ::= "0" | <NonZeroDigit>
+<LowerCaseLetter> ::= "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+<UpperCaseLetter> ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z"
+<Char> ::= <Letter> | <Digit> | "_"
+<WS> ::= " " | "\t" | "\n" | "\r"
+<SpecialChar> ::= "!" | "#" | "$" | "%" | "&" | "(" | ")" | "*" | "+" | "," | "-" | "." | "/" | ":" | ";" | "<" | "=" | ">" | "?" | "@" | "[" | "\\" | "]" | "^" | "_" | "`" | "{" | "|" | "}" | "~"
+<Letter> ::= <LowerCaseLetter> | <UpperCaseLetter>
+
+<TypeName> ::= <UpperCaseLetter> <Char>*
+<FieldName> ::= <LowerCaseLetter> <Char>*
+
+<Characters> ::= <Character>*
+<Character> ::= <Letter> | <Digit> | <SpecialChar> | " "
+
+
+<NegativeInteger> ::= "-" <NonZeroDigit> <Digit>*
+<PositiveInteger> ::= <NonZeroDigit> <Digit>*
+<NonZeroInteger> ::= "-"? <NonZeroDigit> <Digit>*
+<NonNegativeInteger> ::= <PositiveInteger>
+                      | "0"
+<Integer> ::= <NegativeInteger>
+              | <PositiveInteger>
+              | "0"
+
+<NegativeReal> ::= "-" <Digit>+ "." <Digit>+
+                 | <NegativeInteger>
+<PositiveReal> ::= <Digit>+ "." <Digit>+
+                 | <PositiveInteger>
+<NonZeroReal> ::= "-"? <Digit>+ "." <Digit>+
+                 | <NonZeroInteger>
+
+<Real> ::= <NegativeReal>
+          | <PositiveReal>
+          | "0"
+
+<StringLiteral> ::= "'" <Characters> "'"
+<LengthRange> ::= <NonNegativeInteger>
+                | <NonNegativeInteger>? ".." <NonNegativeInteger>?
+
+<TypeExpr> ::= <TypeName>
+             | <CompositeType>
+             | <UnionType>
+             | <IntersectionType>
+             | <FunctionType>
+             | <ConstrainedType>
+             | <GenericType>
+             | <ImpureType>
+             | <ShapeType>
+             | <GroupTypeExpr>
+
+<GroupTypeExpr> = "(" <TypeExpr> ")"
+
+<GenericType> ::= <TypeType>
+                | <ResultType>
+                | <ErrorType>
+                | <MutableType>
+
+<TypeType> ::= "Type" "<" <TypeExpr> ">"
+<ResultType> ::= "Result" "<" <OkType> ("," <ErrorType>)? ">"
+<ErrorType> ::= "Error" "<" <TypeExpr> ">"
+<MutableType> ::= "Mutable" "<" <TypeExpr> ">"
+
+<ConstrainedType> ::= "Integer" "<" <IntegerConstraint> ">"
+                    | "Integer" "[" <IntegerSubset> "]"
+                    | "Real" "<" <RealConstraint> ">"
+                    | "Real" "[" <RealSubset> "]"
+                    | "Bytes" "<" <StringConstraint> ">"
+                    | "String" "<" <StringConstraint> ">"
+                    | "String" "[" <StringSubset> "]"
+
+<CompositeType> ::= <TupleTypeExpr>
+                  | <RecordTypeExpr>
+                  | "Array" ("<" <TypeAndLengthSpec> ">")?
+                  | "Map" ("<" <MapTypeAndLengthSpec> ">")?
+                  | "Set" ("<" <TypeAndLengthSpec> ">")?
+
+<UnionType> ::= <TypeExpr> "|" <TypeExpr> ("|" <TypeExpr>)*
+
+<IntersectionType> ::= <TypeExpr> "&" <TypeExpr> ("&" <TypeExpr>)*
+
+<FunctionType> ::= "^" <TypeExpr> ("=" ">" <TypeExpr>)?
+                 | "^" "=" ">" <TypeExpr>
+
+<ImpureType> ::= "*" <TypeExpr>
+                | "Impure" "<" <TypeExpr> ">"
+
+<ShapeType> ::= "{" <TypeExpr> "}"
+                | "Shape" "<" <TypeExpr> ">"
+
+<ReturnType> ::= <TypeExpr>
+
+<ErrorType> ::= <TypeExpr>
+
+<TargetType> ::= <TypeExpr>
+
+<OkType> ::= <TypeExpr>
+
+
+
+<TypeAndLengthSpec> ::= <TypeExpr> ("," <LengthRange>)?
+                      | <LengthRange>
+
+<MapTypeAndLengthSpec> ::= (<TypeExpr> ":")? <TypeExpr> ("," <LengthRange>)?
+                         | <LengthRange>
+
+<TupleTypeExpr> ::= "[" "..."? "]"
+                  | "[" <TypeExpr> ("," <TypeExpr>)+ ("," "...")? "]"
+<RecordTypeExpr> ::= "[" ":" "..."? "]"
+                   | "[" <RecordTypeItem> ("," <RecordTypeItem>)* ("," "...")? "]"
+<RecordTypeItem> ::= <FieldName> ":" <RecordFieldTypeExpr>
+<RecordFieldTypeExpr> ::= <TypeExpr>
+                   | "?"? <TypeExpr>
+                   | "OptionalKey" "<" <TypeExpr> ">"
+
+<IntegerConstraint> ::= <IntegerRangeConstraint>
+                      | <IntegerIntervalList>
+
+<IntegerRangeConstraint> ::= <Integer>? ".." <Integer>?
+
+<IntegerIntervalList> ::= <IntegerInterval> ("," <IntegerInterval>)*
+
+<IntegerInterval> ::= "[" <Integer> ".." <Integer> "]"
+                    | "(" <Integer>? ".." <Integer>? ")"
+                    | "[" <Integer> ".." <Integer>? ")"
+                    | "(" <Integer>? ".." <Integer> "]"
+
+<IntegerSubset> ::= <Integer> ("," <Integer>)*
+
+<RealConstraint> ::= <RealRangeConstraint>
+                   | <RealIntervalList>
+
+<RealRangeConstraint> ::= <Real>? ".." <Real>?
+
+<RealIntervalList> ::= <RealInterval> ("," <RealInterval>)*
+
+<RealInterval> ::= "[" <Real> ".." <Real> "]"
+                 | "(" <Real>? ".." <Real>? ")"
+                 | "[" <Real> ".." <Real>? ")"
+                 | "(" <Real>? ".." <Real> "]"
+
+<RealSubset> ::= <Real> ("," <Real>)*
+
+<StringConstraint> ::= <NonNegativeInteger>? ".." <NonNegativeInteger>?
+
+<StringSubset> ::= <StringLiteral> ("," <StringLiteral>)*

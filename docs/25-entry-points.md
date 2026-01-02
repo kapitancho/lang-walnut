@@ -10,10 +10,10 @@ A Walnut module can have multiple entry points of different types, allowing a si
 
 ### Basic Syntax
 
-The CLI entry point uses the `::>` operator, which is shorthand for defining a function that matches the `CliEntryPoint` type:
+The CLI entry point uses the `=>` operator, which is shorthand for defining a function that matches the `CliEntryPoint` type:
 
 ```walnut
-::> expression
+=> expression
 ```
 
 This is equivalent to:
@@ -36,7 +36,7 @@ The simplest CLI entry point:
 ```walnut
 module hello:
 
-::> 'Hello, World!'
+=> 'Hello, World!'
 ```
 
 When executed, this outputs: `Hello, World!`
@@ -48,7 +48,7 @@ Use the `args` variable to access command-line arguments:
 ```walnut
 module greet:
 
-::> {
+=> {
     name = ?noError(args->item(0));
     ?whenIsError(name) {
         'Please provide a name'
@@ -97,7 +97,7 @@ module calc:
 CLI entry points can declare dependencies using the `%%` syntax:
 
 ```walnut
-%% DepType ::> expression
+%% DepType => expression
 ```
 
 Full form:
@@ -111,7 +111,7 @@ Full form:
 ```walnut
 module timestamp:
 
-%% ~Clock ::> {
+%% ~Clock => {
     currentTime = %clock->now;
     'Current timestamp: ' + currentTime->asString
 }
@@ -122,7 +122,7 @@ module timestamp:
 ```walnut
 module user-manager %% [~Database, ~Logger]:
 
-::> {
+=> {
     %logger.log('Starting user manager');
 
     userId = ?noError(?noError(args->item(0))->asInteger);
@@ -146,7 +146,7 @@ Real-world calculator example:
 ```walnut
 module demo-cli:
 
-::> {
+=> {
     calc = ^Array<String> => Result<Integer, Any> ::
         ?noError(?noError(#->item(0))->asInteger) +
         ?noError(?noError(#->item(1))->asInteger);
@@ -202,10 +202,10 @@ AlternativeCli = ^Array<String> => String;
 ==> AlternativeCli :: ^args: Array<String> => String :: 'Alt: ' + args->printed;
 
 /* Default CLI entry point */
-::> args->printed
+=> args->printed
 ```
 
-However, the `::>` operator defines the **default** CLI entry point.
+However, the `=>` operator defines the **default** CLI entry point.
 
 ## HTTP Entry Point
 
@@ -407,7 +407,7 @@ A module can have multiple entry points of different types:
 module user-service %% [~Database, ~Logger]:
 
 /* CLI Entry Point */
-::> {
+=> {
     command = ?noError(args->item(0));
     ?whenValueOf(command) is {
         'list': listUsers(),
@@ -437,7 +437,7 @@ Entry points are differentiated by:
 
 1. **Type signature**: CLI uses `^Array<String> => String`, HTTP uses `^{HttpRequest} => {HttpResponse}`
 2. **Declaration method**:
-   - `::>` for default CLI entry point
+   - `=>` for default CLI entry point
    - `==>` with type name for named entry points
 3. **Runtime selection**: The runtime decides which entry point to use based on execution context
 
@@ -447,7 +447,7 @@ Entry points are differentiated by:
 module todo-app %% [~Database, ~Clock]:
 
 /* CLI: Manage todos from command line */
-::> {
+=> {
     action = ?noError(args->item(0));
     ?whenValueOf(action) is {
         'add': addTodo(args->slice[1, 999]),
@@ -512,7 +512,7 @@ $ walnut demo-cli 10 20
 Flow:
 1. Load `demo-cli` module
 2. Resolve dependencies (none in this case)
-3. Find `::> { ... }` entry point
+3. Find `=> { ... }` entry point
 4. Create `args = ['10', '20']`
 5. Execute the function body
 6. Return `'30'`
@@ -554,7 +554,7 @@ Dependencies declared with `%%` are resolved at entry point invocation:
 ```walnut
 module app %% [~Database, ~Clock, ~Logger]:
 
-::> {
+=> {
     /* All three dependencies are available here */
     %logger.log('Application started at ' + {%clock->now->asString});
 
@@ -582,7 +582,7 @@ Errors at the entry point level are handled gracefully:
 ```walnut
 module safe-cli:
 
-::> {
+=> {
     value = ?noError(?noError(args->item(0))->asInteger);
     ?whenIsError(value) {
         'Error: Please provide a valid integer'
@@ -635,7 +635,7 @@ If an uncaught error occurs:
 module broken-app:
 
 /* Dependency that doesn't exist */
-::> %nonExistentService.doSomething()
+=> %nonExistentService.doSomething()
 ```
 
 Error at startup:
@@ -666,7 +666,7 @@ DependencyContainerError := [
 
 Entry points provide three main ways to execute Walnut code:
 
-1. **CLI Entry Points** (`::>`):
+1. **CLI Entry Points** (`=>`):
    - Simple command-line tools
    - Takes string array arguments
    - Returns string output

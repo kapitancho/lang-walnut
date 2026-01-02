@@ -1,0 +1,159 @@
+<NonZeroDigit> ::= "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+<Digit> ::= "0" | <NonZeroDigit>
+<LowerCaseLetter> ::= "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+<UpperCaseLetter> ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z"
+<Char> ::= <Letter> | <Digit> | "_"
+<SpecialChar> ::= "!" | "#" | "$" | "%" | "&" | "(" | ")" | "*" | "+" | "," | "-" | "." | "/" | ":" | ";" | "<" | "=" | ">" | "?" | "@" | "[" | "\\" | "]" | "^" | "_" | "`" | "{" | "|" | "}" | "~"
+<WS> ::= " " | "\t" | "\n" | "\r"
+<Letter> ::= <LowerCaseLetter> | <UpperCaseLetter>
+
+<PropertyName> ::= <LowerCaseLetter> <Char>*
+                 | <StringLiteral>
+<IntegerLiteral> ::= "-"? <Digit>+
+<StringLiteral> ::= "'" <Characters> "'"
+
+<Characters> ::= <Character>*
+<Character> ::= <Letter> | <Digit> | <SpecialChar> | " "
+
+<TypeName> ::= <UpperCaseLetter> <Char>*
+<MethodName> ::= <Letter> <Char>*
+
+
+
+
+<Expression> ::= <ScopedExpression>
+               | <ReturnExpression>
+               | <OrExpression>
+<ScopedExpression> ::= ":" ":" <Expression>
+<ReturnExpression> ::= "=" ">" <OrExpression>
+
+<OrExpression> ::= <XorExpression> ("||" <XorExpression>)*
+<XorExpression> ::= <OrElseExpression> ("^^" <OrElseExpression>)*
+<OrElseExpression> ::= <AndExpression> ("??" <AndExpression>)*
+<AndExpression> ::= <EqExpression> ("==" <EqExpression>)*
+
+<EqExpression> ::= <RelExpression> (<EqOp> <RelExpression>)?
+<EqOp> ::= "==" | "!="
+
+<RelExpression> ::= <BitwiseOrExpression> (<RelOp> <BitwiseOrExpression>)*
+<RelOp> ::= "<" | "<=" | ">" | ">="
+
+<BitwiseOrExpression> ::= <BitwiseXorExpression> ("|" <BitwiseXorExpression>)*
+<BitwiseXorExpression> ::= <BitwiseAndExpression> ("^" <BitwiseAndExpression>)*
+<BitwiseAndExpression> ::= <AdditiveExpression> ("&" <AdditiveExpression>)*
+
+<AdditiveExpression> ::= <MultiplicativeExpression> (<AdditiveOp> <MultiplicativeExpression>)*
+<AdditiveOp> ::= "+" | "-"
+
+<MultiplicativeExpression> ::= <PowerExpression> (<MultiplicativeOp> <PowerExpression>)*
+<MultiplicativeOp> ::= "*" | "/" | "%" | "//"
+
+<PowerExpression> ::= <UnaryExpression> ("**" <UnaryExpression>)*
+
+<UnaryExpression> ::= (<UnaryOp>)* <PostfixExpression>
+<UnaryOp> ::= "!" | "-" | "+" | "~"
+
+<PostfixExpression> ::= <SquareBracketCallExpression> <PostfixOp>*
+<PostfixOp> ::= <PropertyAccessExpression> | <MethodCallExpression> | <ErrorAsExternalExpression> | <FunctionCallExpression>
+
+<PropertyAccessExpression> ::= "." <PropertyAccessIdentifier>
+<PropertyAccessIdentifier> ::= <PropertyName> | <IntegerLiteral> | <StringLiteral>
+
+<MethodCallExpression> ::= <MethodCallOperator> <MethodName> <MethodCallArgument>?
+<MethodCallOperator> ::= "-" ">"
+                       | "=" ">"
+                       | "|" ">"
+<MethodCallArgument> ::= "(" <Expression> ")"
+                        | <SquareBracketExpression>
+
+<ErrorAsExternalExpression> ::= ">" "(" <Expression> ")"
+
+<FunctionCallExpression> ::= "(" <Expression>? ")"
+                           | <SquareBracketExpression>
+
+<SquareBracketCallExpression> ::= <BasicExpression> (<SquareBracketExpression>)*
+
+<BasicExpression> ::= <ConstantExpression>
+                    | <VariableAssignment>
+                    | <MultiVariableAssignment>
+                    | <VariableExpression>
+                    | <ValExpression>
+                    | <ErrorExpression>
+                    | <NoErrorExpression>
+                    | <NoExternalErrorExpression>
+                    | <MutableExpression>
+                    | <DataExpression>
+                    | <GroupExpression>
+                    | <SequenceExpression>
+                    | <ConstructorCallExpression>
+                    | <SquareBracketExpression>
+                    | <MatchExpression>
+
+<Identifier> ::= <LowerCaseLetter> (<Letter> | <Digit> | "_")*
+<InFunctionVar> ::= <Identifier>
+                 | "$"
+                 | "$" <Identifier>
+                 | "#" <Identifier>
+                 | "%" <Identifier>
+                 | "$" <IntegerLiteral>
+                 | "#" <IntegerLiteral>
+                 | "%" <IntegerLiteral>
+                 | "$" "$"
+                 | "$" "_"
+<VarName> ::= <Identifier>
+
+<VariableAssignment> ::= <VarName> "=" <Expression>
+<MultiVariableAssignment> ::= "var" "{" <MultiVarItems> "}" "=" <Expression>
+<MultiVarItems> ::= <TupleVarItems> | <RecordVarItems>
+<TupleVarItems> ::= <VarName> ("," <VarName>)*
+<RecordVarItems> ::= <RecordVarItem> ("," <RecordVarItem>)*
+<RecordVarItem> ::= "~" <VarName>
+                  | <FieldName> ":" <VarName>
+                  | <StringLiteral> ":" <VarName>
+<FieldName> ::= <LowerCaseLetter> (<Letter> | <Digit> | "_")*
+
+<VariableExpression> ::= <InFunctionVar>
+<ErrorExpression> ::= "@" <BasicExpression>
+<NoErrorExpression> ::= "?noError(" <Expression> ")"
+<NoExternalErrorExpression> ::= "?noExternalError(" <Expression> ")"
+<MutableExpression> ::= "mutable" "{" <TypeExpr> "," <Expression> "}"
+
+<DataExpression> ::= <TypeName> "!" <BasicExpression>
+<GroupExpression> ::= "(" (<Expression> ")"
+<SequenceExpression> ::= "{" (<Expression> (";" <Expression>)* ";"?)? "}"
+<ConstructorCallExpression> ::= <TypeName> "(" <Expression>? ")"
+                              | <TypeName> <SquareBracketExpression>
+
+<SquareBracketExpression> ::= <TupleExpression>
+                            | <SetExpression>
+                            | <RecordExpression>
+<TupleExpression> ::= "[" "]"
+                    | "[" <Expression> ("," <Expression>)+ "]"
+<SetExpression> ::= "[" ";" "]"
+                  | "[" <Expression> ";" "]"
+                  | "[" <Expression> ";" <Expression> (";" <Expression>)* "]"
+<RecordExpression> ::= "[" ":" "]"
+                     | "[" <RecordItem> ("," <RecordItem>)* "]"
+<RecordItem> ::= <FieldName> ":" <Expression>
+               | <StringLiteral> ":" <Expression>
+
+<ConstantExpression> ::= "'constant expression'"
+<ConstantValue> ::= "'constant value'"
+<TupleConstant> ::= "[" "'tuple constant value'" "]"
+<RecordConstant> ::= "[" "'record constant value'" "]"
+<ValExpression> ::= "val" "{" <ConstantValue> "}"
+                  | "val" <TupleConstant>
+                  | "val" <RecordConstant>
+
+<MatchExpression> ::= <MatchIf> | <MatchError> | <MatchValue> | <MatchType> | <MatchTrue>
+
+<MatchIf> ::= "?when" "(" <Expression> ")" "{" <Expression> "}" ("~" "{" <Expression> "}")?
+<MatchError> ::= "?whenIsError" "(" <Expression> ")" "{" <Expression> "}" ("~" "{" <Expression> "}")?
+<MatchValue> ::= "?whenValueOf" "(" <Expression> ")" "is" "{" <MatchPairs> "}"
+<MatchType> ::= "?whenTypeOf" "(" <Expression> ")" "is" "{" <MatchPairs> "}"
+<MatchTrue> ::= "?whenIsTrue" "{" <MatchPairs> "}"
+<MatchPairs> ::= <Expression> ":" <Expression> ("," <Expression> ":" <Expression>)* ("," "~" ":" <Expression>)?
+               | "~" ":" <Expression>
+
+
+<TypeExpr> ::= "Null"

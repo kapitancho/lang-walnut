@@ -1,0 +1,51 @@
+
+
+<Constant> ::= <Literal>
+                       | <TupleConstant>
+                       | <RecordConstant>
+                       | <SetConstant>
+                       | <EnumValueLiteral>
+                       | <AtomValueLiteral>
+                       | <DataConstant>
+                       | <FunctionValue>
+                       | <TypeValue>
+
+<Literal> ::= <IntegerLiteral>
+            | <RealLiteral>
+            | <StringLiteral>
+            | <BooleanLiteral>
+            | <NullLiteral>
+
+<IntegerLiteral> ::= "-"? <Digit>+
+<RealLiteral> ::= "-"? <Digit>+ "." <Digit>+
+<StringLiteral> ::= "'" <Characters> "'"
+<BytesLiteral> ::= '"' <Characters> '"'
+<BooleanLiteral> ::= "true" | "false"
+<NullLiteral> ::= "null"
+
+<TupleConstant> ::= "[" "]"
+                  | "[" <ConstantExpression> ("," <ConstantExpression>)+ "]"
+
+<SetConstant> ::= "[" ";" "]"
+                | "[" <ConstantExpression> ";" "]"
+                | "[" <ConstantExpression> ";" <ConstantExpression> (";" <ConstantExpression>)* "]"
+
+<RecordConstant> ::= "[" ":" "]"
+                   | "[" <RecordConstantItem> ("," <RecordConstantItem>)* "]"
+
+<RecordConstantItem> ::= <FieldName> ":" <ConstantExpression>
+                       | <StringLiteral> ":" <ConstantExpression>
+
+<EnumValueLiteral> ::= <TypeName> "." <EnumValue>
+
+<AtomValueLiteral> ::= <TypeName>
+
+<DataConstant> ::= <TypeName> "!" <ConstantExpression>
+
+<FunctionValue> ::= "^" <ParameterSpec> ("=" ">" <ReturnType>)? ("@" <ErrorType>)? ("%" "%" <DependencySpec>)? "::" <Expression>
+
+<TypeValue> ::= "type" "{" <TypeExpr> "}"
+              | "type" <TupleTypeExpr>
+              | "type" <RecordTypeExpr>
+              | "`" <TypeExpr>
+

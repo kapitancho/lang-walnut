@@ -56,7 +56,7 @@ final readonly class ParserStateMachine {
 				}
 			]],
 			102 => ['name' => 'module content start', 'transitions' => [
-				T::cli_entry_point->name => function(LT $token) {
+				T::lambda_return->name => function(LT $token) {
 					$this->s->result['dependencyName'] = null;
 					$this->s->result['dependencyType'] = $this->nodeBuilder->nothingType;
 					$this->s->result['startPosition'] = $token->sourcePosition;
@@ -228,7 +228,7 @@ final readonly class ParserStateMachine {
 				},
 			]],
 			113 => ['name' => 'module level cli entry point dependency type return', 'transitions' => [
-				T::cli_entry_point->name => function(LT $token) {
+				T::lambda_return->name => function(LT $token) {
 					$this->s->result['dependencyName'] = $this->s->generated['dependency_name'];
 					$this->s->result['dependencyType'] = $this->s->generated['dependency_type'];
 					$this->s->push(112);

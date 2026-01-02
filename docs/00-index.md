@@ -182,7 +182,7 @@ Walnut is a strongly typed, functional programming language designed for modelin
     - DependencyContainer
 
 25. [**Entry Points**](25-entry-points.md)
-    - CLI entry points (`::>`)
+    - CLI entry points (`=>`)
     - HTTP entry points
     - Function invocation interface
 
@@ -218,7 +218,7 @@ getDiscount = ^price: Real<0..> => Real<0..> :: ?when(price > 100) {
 } ~ { 0 };
 
 /* Entry point */
-::> {
+=> {
     p = Product[1, 'Apple', 1.50];
     p->as(`String)
 };

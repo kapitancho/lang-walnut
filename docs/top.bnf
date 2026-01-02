@@ -1,0 +1,94 @@
+<NonZeroDigit> ::= "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+<Digit> ::= "0" | <NonZeroDigit>
+<LowerCaseLetter> ::= "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+<UpperCaseLetter> ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z"
+<Char> ::= <Letter> | <Digit> | "_"
+<SpecialChar> ::= "!" | "#" | "$" | "%" | "&" | "(" | ")" | "*" | "+" | "," | "-" | "." | "/" | ":" | ";" | "<" | "=" | ">" | "?" | "@" | "[" | "\\" | "]" | "^" | "_" | "`" | "{" | "|" | "}" | "~"
+<WS> ::= " " | "\t" | "\n" | "\r"
+<Letter> ::= <LowerCaseLetter> | <UpperCaseLetter>
+
+<StringLiteral> ::= "'" <Characters> "'"
+<Characters> ::= <Character>*
+<Character> ::= <Letter> | <Digit> | <SpecialChar> | " "
+
+<TypeName> ::= <UpperCaseLetter> <Char>*
+<MethodName> ::= <Letter> <Char>*
+<VarName> ::= <LowerCaseLetter> <Char>*
+<PropertyName> ::= <LowerCaseLetter> <Char>*
+                 | <StringLiteral>
+<EnumValueIdentifier> ::= <Letter> <Char>*
+
+
+
+<Program> ::= <Module>+
+
+<Module> ::= "module" <WS>+ <ModuleName> (<WS>* "%" "%" <ModuleDependencyList>)? <WS>* ":" <WS>* <ModuleBody>
+<ModuleName> ::= "$"? <ModuleNameFragment> ("/" <ModuleNameFragment>)*
+<ModuleNameFragment> ::= <LowerCaseLetter>+
+<ModuleDependencyList> ::= <ModuleNameFragment> ("," <ModuleNameFragment>)*
+
+<ModuleBody> ::= (<ModuleDefinition> ";")*
+
+<ModuleDefinition> ::= <TypeDefinition>
+                     | <ConstructorDefinition>
+                     | <MethodDefinition>
+                     | <CastDefinition>
+                     | <CliEntryPoint>
+
+<TypeDefinition> ::= <AtomTypeDefinition>
+                   | <EnumTypeDefinition>
+                   | <AliasTypeDefinition>
+                   | <DataTypeDefinition>
+                   | <SealedOrOpenTypeDefinition>
+
+<AtomTypeDefinition>         ::= <TypeName> <WS>* ":=" <WS>* "(" ")"
+<EnumTypeDefinition>         ::= <TypeName> <WS>* ":=" <WS>* "(" <WS>*  <EnumValues> <WS>* ")"
+<AliasTypeDefinition>        ::= <TypeName> <WS>* "=" <WS>* <TypeExpr>
+<DataTypeDefinition>         ::= <TypeName> <WS>* ":=" <WS>* <TypeExpr>
+<SealedOrOpenTypeDefinition> ::= <TypeName> <WS>* ":=" <WS>* <SealedOrOpenChar> <WS>* <TypeExpr> (<ErrorTypeSection> <FunctionBodySection>)?
+
+<ConstructorDefinition> ::= <TypeName> <WS>* <ConstructorParamSpec> <ErrorTypeSection> <DependencySection>? <FunctionBodySection>
+<MethodDefinition> ::= <TypeName> <WS>* "-" ">" <WS>* <MethodName> <WS>* <MethodParamSpec> <ErrorTypeSection> <DependencySection>? <FunctionBodySection>
+<CastDefinition> ::= <CastFromType>? <WS>* "=" "=" ">" <WS>* <CastToType> <ErrorTypeSection> (<DependencySection> <WS>* ";" | <DependencySection>? <FunctionBodySection>)
+<CliEntryPoint> ::= <DependencySection>? <WS>* "=" ">" <WS>* <FunctionBody>
+
+<EnumValues> ::= <EnumValue> (<WS>* "," <EnumValue>)*
+<EnumValue> ::= <EnumValueIdentifier>
+
+<SealedOrOpenChar> ::= "$" | "#"
+
+<ErrorTypeSection> ::= (<WS>* "@" <WS>* <ErrorType>)?
+<DependencySection> ::= <WS>* "%" "%" <DependencySpec>
+<FunctionBodySection> ::= <WS>* "::" <WS>* <FunctionBody>
+
+<ConstructorParamSpec> ::= "(" <WS>* <ParamSpec> <WS>* ")"
+                  | "(" <WS>* ")"
+                  | <TupleTypeExpr>
+                  | <RecordTypeExpr>
+
+<DependencySpec> ::= <TypeExpr>
+                   | "~" <WS>* <TypeName>
+                   | <VarName> <WS>* ":" <WS>* <TypeExpr>
+
+<MethodParamSpec> ::= "(" <WS>* ("^" <WS>* <ParamSpec>)? (<WS>* "=" ">" <WS>* <ReturnType>)? <WS>* ")"
+<ParamSpec> ::= <TypeExpr>
+              | "~" <WS>* <TypeName>
+              | <VarName> <WS>* ":" <WS>* <TypeExpr>
+              | <VarName>
+
+<CastFromType> ::= <TypeName>
+<CastToType> ::= <TypeName>
+<ReturnType> ::= <TypeExpr>
+<ErrorType> ::= <TypeExpr>
+<FunctionBody> ::= <Expression>
+
+<TypeExpr> ::= "Null"
+<Expression> ::= "null"
+<TupleTypeExpr> ::= "[" <WS>* "..."? <WS>* "]"
+                  | "[" <TypeExpr> (<WS>* "," <WS>* <TypeExpr>)+ (<WS>* "," <WS>* "...")? <WS>* "]"
+<RecordTypeExpr> ::= "[" <WS>* ":" <WS>* "..."? <WS>* "]"
+                   | "[" <WS>* <RecordTypeItem> (<WS>* "," <WS>* <RecordTypeItem>)* (<WS>* "," <WS>* "...")? <WS>* "]"
+<RecordTypeItem> ::= <PropertyName> <WS>* ":" <WS>* <RecordFieldTypeExpr>
+<RecordFieldTypeExpr> ::= <TypeExpr>
+                   | "?"? <WS>* <TypeExpr>
+                   | "OptionalKey" <WS>* "<" <WS>* <TypeExpr> <WS>* ">"

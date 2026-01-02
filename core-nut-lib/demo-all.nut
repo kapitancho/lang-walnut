@@ -119,7 +119,7 @@ AllTypes = [
     anyUnion: Type<Union>
 ];
 
-::> {
+=> {
 
     functionName = ^Any => String :: 'function call result';
 

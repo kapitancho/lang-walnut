@@ -144,8 +144,8 @@ Examples:
 CliEntryPoint ::= ('%' '%' DependencyList)? '>' '>' '>' Expression
 
 Examples:
-  >>> 'hello'
-  %% D >>> 'hello'
+  => 'hello'
+  %% D => 'hello'
 
 ================================================================================
 ## EXPRESSIONS
@@ -441,7 +441,7 @@ TypeExpr ::= BasicType
            | ShapeType
            | '(' TypeExpr ')'   // Parenthesized for precedence
 
-BasicType ::= 'Integer' | 'Real' | 'String' | 'Boolean'
+BasicType ::= 'Integer' | 'Real' | 'String' | 'Bytes' | 'Boolean'
             | 'Null' | 'Nothing' | 'Any'
             | 'JsonValue' | 'NotANumber'
             | TypeName
@@ -472,15 +472,17 @@ RecordTypeExpr ::= '[' ':' '...'? ']'  // Empty record type or just rest
 RecordTypeItem ::= FieldName ':' '?'? TypeExpr
 
 GenericType ::= 'Type' '<' TypeExpr '>'
-              | 'Result' '<' OkType ',' ErrorType '>'
+              | 'Result' '<' OkType (',' ErrorType)? '>'
               | 'Error' '<' TypeExpr '>'
               | 'Mutable' '<' TypeExpr '>'
+              | 'Shape' '<' TypeExpr '>'
               | 'OptionalKey' '<' TypeExpr '>'
 
 ConstrainedType ::= 'Integer' '<' IntegerConstraint '>'
                   | 'Integer' '[' IntegerSubset ']'
                   | 'Real' '<' RealConstraint '>'
                   | 'Real' '[' RealSubset ']'
+                  | 'Bytes' '<' StringConstraint '>'
                   | 'String' '<' StringConstraint '>'
                   | 'String' '[' StringSubset ']'
 

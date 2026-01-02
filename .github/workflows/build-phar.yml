@@ -34,7 +34,7 @@ jobs:
 
       - name: Test PHAR
         run: |
-          php build/walnut.phar stdin <<< 'module test: ::> 42->asString;'
+          php build/walnut.phar stdin <<< 'module test: => 42->asString;'
 
       - name: Copy assets (not inside PHAR)
         run: |
