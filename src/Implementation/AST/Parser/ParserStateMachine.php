@@ -1160,10 +1160,6 @@ final readonly class ParserStateMachine {
 					$this->s->generated = $this->nodeBuilder->recordType([]);
 					$this->s->moveAndPop();
 				},
-				T::empty_set->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->setType([]);
-					$this->s->moveAndPop();
-				},
 				T::tuple_start->name => function(LT $token) {
 					$this->s->result['compositeValues'] = [];
 					$this->s->result['startPosition'] = $token->sourcePosition;
@@ -1705,13 +1701,6 @@ final readonly class ParserStateMachine {
 					$this->s->result['expression_left'] = $this->s->generated;
 					$this->s->move(3311);
 				},
-				T::tuple_start->name => $c = function(LT $token) {
-					$this->s->push(3141);
-					$this->s->stay(3151);
-				},
-				T::empty_tuple->name => $c,
-				T::empty_record->name => $c,
-				T::empty_set->name => $c,
 				'' => function(LT $token) {
 					$this->s->pop();
 				}
