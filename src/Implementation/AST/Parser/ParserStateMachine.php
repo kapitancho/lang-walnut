@@ -842,11 +842,10 @@ final readonly class ParserStateMachine {
 					);
 					$this->s->move(223);
 				},
-				T::word->name => $c = function(LT $token) {
+				T::var_keyword->name => $c = function(LT $token) {
 					$this->s->result['first_token'] = $token;
 					$this->s->move(223);
 				},
-				T::var_keyword->name => $c,
 				T::type_keyword->name => $c,
 				T::null->name => $c,
 				T::true->name => $c,
@@ -893,11 +892,10 @@ final readonly class ParserStateMachine {
 						$token->patternMatch->text);
 					$this->s->move(241);
 				},
-				T::word->name => $c = function(LT $token) {
+				T::var_keyword->name => $c = function(LT $token) {
 					$this->s->result['current_key'] = $token->patternMatch->text;
 					$this->s->move(241);
 				},
-				T::var_keyword->name => $c,
 				T::type_keyword->name => $c,
 				T::null->name => $c,
 				T::true->name => $c,
@@ -2373,11 +2371,10 @@ final readonly class ParserStateMachine {
 					);
 					$this->s->move(421);
 				},
-				T::word->name => $c = function(LT $token) {
+				T::var_keyword->name => $c = function(LT $token) {
 					$this->s->result['first_token'] = $token;
 					$this->s->move(421);
 				},
-				T::var_keyword->name => $c,
 				T::type_keyword->name => $c,
 				T::null->name => $c,
 				T::true->name => $c,
@@ -2424,11 +2421,10 @@ final readonly class ParserStateMachine {
 						$token->patternMatch->text);
 					$this->s->move(421);
 				},
-				T::word->name => $c = function(LT $token) {
+				T::var_keyword->name => $c = function(LT $token) {
 					$this->s->result['current_key'] = $token->patternMatch->text;
 					$this->s->move(421);
 				},
-				T::var_keyword->name => $c,
 				T::val->name => $c,
 				T::type_keyword->name => $c,
 				T::mutable->name => $c,
@@ -3911,11 +3907,10 @@ final readonly class ParserStateMachine {
 				T::type_proxy_keyword->name => $t,
 				T::arithmetic_op_multiply->name => $t,
 				T::sequence_start->name => $t, 
-				T::word->name => $c = function(LT $token) {
+				T::var_keyword->name => $c = function(LT $token) {
 					$this->s->result['first_token'] = $token;
 					$this->s->move(841);
 				},
-				T::var_keyword->name => $c,
 				T::type->name => $c,
 				T::rest_type->name => 856,
 				T::default_match->name => 851,
@@ -3976,11 +3971,10 @@ final readonly class ParserStateMachine {
 					$this->s->result['current_key'] = $this->stringEscapeCharHandler->unescape( $token->patternMatch->text);
 					$this->s->move(841);
 				},
-				T::word->name => $c = function(LT $token) {
+				T::var_keyword->name => $c = function(LT $token) {
 					$this->s->result['current_key'] = $token->patternMatch->text;
 					$this->s->move(841);
 				},
-				T::var_keyword->name => $c,
 				T::type_keyword->name => $c,
 				T::type->name => $c,
 				T::mutable->name => $c,

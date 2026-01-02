@@ -82,5 +82,4 @@ enum Token: string {
 	case default_match = '\~';
 	case property_accessor = '\.';
 	case error_marker = '\@';
-	case word = '[a-zA-Z]+';
 }
