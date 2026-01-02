@@ -33,6 +33,7 @@ use Walnut\Lang\Implementation\AST\Node\Expression\BooleanXorExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\ConstantExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\ConstructorCallExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\DataExpressionNode;
+use Walnut\Lang\Implementation\AST\Node\Expression\GroupExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\ScopedExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\FunctionCallExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\MatchErrorExpressionNode;
@@ -273,6 +274,10 @@ final class NodeBuilder implements NodeBuilderInterface {
 
 	public function return(ExpressionNode $returnedExpression): ReturnExpressionNode {
 		return new ReturnExpressionNode($this->getSourceLocation(), $returnedExpression);
+	}
+
+	public function group(ExpressionNode $innerExpression): GroupExpressionNode {
+		return new GroupExpressionNode($this->getSourceLocation(), $innerExpression);
 	}
 
 	/** @param list<ExpressionNode> $expressions */

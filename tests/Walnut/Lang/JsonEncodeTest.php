@@ -212,6 +212,7 @@ final class JsonEncodeTest extends BaseProgramTestHelper {
 			'{"expressionType":"return","returnedExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->return($c0),
 			'{"expressionType":"noError","targetExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->noError($c0),
 			'{"expressionType":"noExternalError","targetExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->noExternalError($c0),
+			'{"expressionType":"group","innerExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->group($c0),
 			'{"expressionType":"sequence","expressions":[{"expressionType":"constant","value":{"valueType":"Integer","value":0}},{"expressionType":"constant","value":{"valueType":"Integer","value":0}}]}' => $er->sequence([$c0, $c0]),
 			'{"expressionType":"methodCall","target":{"expressionType":"variableName","variableName":"x"},"methodName":"item","parameter":{"expressionType":"constant","value":{"valueType":"String","value":"a"}}}' => $er->propertyAccess($x, 'a'),
 			'{"expressionType":"methodCall","target":{"expressionType":"variableName","variableName":"x"},"methodName":"item","parameter":{"expressionType":"constant","value":{"valueType":"String","value":"0"}}}' => $er->propertyAccess($x, '0'),

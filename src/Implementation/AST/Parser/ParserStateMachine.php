@@ -668,6 +668,18 @@ final readonly class ParserStateMachine {
 					$this->s->moveAndPop();
 				}
 			]],
+			206 => ['name' => 'expression group', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(207);
+					$this->s->stay(201);
+				}
+			]],
+			207 => ['name' => 'expression sequence separator', 'transitions' => [
+				T::call_end->name => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->group($this->s->generated);
+					$this->s->moveAndPop();
+				}
+			]],
 			208 => ['name' => 'expression no error', 'transitions' => [
 				T::call_start->name => function(LT $token) {
 					$this->s->result['sequence_expressions'] = [];
@@ -1143,9 +1155,6 @@ final readonly class ParserStateMachine {
 						default => 785
 					};
 					$this->s->i++;
-				},
-				T::lambda_param->name => function(LT $token) {
-					$this->s->stay(4000);
 				},
 				T::call_start->name => function(LT $token) {
 					$this->s->result['startPosition'] = $token->sourcePosition;
@@ -1757,6 +1766,7 @@ final readonly class ParserStateMachine {
 				T::mutable->name => function(LT $token) { $this->s->move(344); },
 				T::val->name => function(LT $token) { $this->s->move(359); },
 
+				T::call_start->name => -206,
 				T::sequence_start->name => -204,
 				T::sequence_end->name => function(LT $token) { $this->s->stay(318); },
 				T::no_error->name => -208,
@@ -4258,7 +4268,7 @@ final readonly class ParserStateMachine {
 		$this->s->generated = $this->nodeBuilder->methodCall(
 			$parameter,
 			new MethodNameIdentifier($this->s->result['method_name']),
-			$useGenerated ? $this->nodeBuilder->sequence([$this->s->generated]) :
+			$useGenerated ? $this->s->generated :
 				$this->nodeBuilder->constant($this->nodeBuilder->nullValue)
 		);
 		if ($this->s->result['is_no_external_error'] ?? false) {

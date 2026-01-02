@@ -195,6 +195,7 @@ final class ToStringTest extends BaseProgramTestHelper {
 			'=> 0' => $er->return($c0),
 			'?noError(0)' => $er->noError($c0),
 			'?noExternalError(0)' => $er->noExternalError($c0),
+			'(0)' => $er->group($c0),
 			'{0; 0}' => $er->sequence([$c0, $c0]),
 			"x->item('a')" => $er->propertyAccess($x, 'a'),
 			"x->item('0')" => $er->propertyAccess($x, '0'),

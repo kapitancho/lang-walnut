@@ -9,6 +9,7 @@ use Walnut\Lang\Blueprint\AST\Node\Expression\BooleanXorExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ConstantExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ConstructorCallExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\DataExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\GroupExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ScopedExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\FunctionCallExpressionNode;
@@ -218,6 +219,10 @@ final readonly class AstExpressionCompiler implements AstExpressionCompilerInter
 			$expressionNode instanceof SetExpressionNode =>
 				$this->expressionRegistry->set(
 					array_map($this->expression(...), $expressionNode->values)
+				),
+			$expressionNode instanceof GroupExpressionNode =>
+				$this->expressionRegistry->group(
+					$this->expression($expressionNode->innerExpression)
 				),
 			$expressionNode instanceof SequenceExpressionNode =>
 				$this->expressionRegistry->sequence(

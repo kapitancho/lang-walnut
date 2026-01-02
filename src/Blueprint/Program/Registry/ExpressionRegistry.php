@@ -8,6 +8,7 @@ use Walnut\Lang\Blueprint\Code\Expression\BooleanOrExpression;
 use Walnut\Lang\Blueprint\Code\Expression\BooleanXorExpression;
 use Walnut\Lang\Blueprint\Code\Expression\ConstantExpression;
 use Walnut\Lang\Blueprint\Code\Expression\DataExpression;
+use Walnut\Lang\Blueprint\Code\Expression\GroupExpression;
 use Walnut\Lang\Blueprint\Code\Expression\ScopedExpression;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MatchErrorExpression;
@@ -43,8 +44,9 @@ interface ExpressionRegistry {
 	/** @param list<Expression> $values */
 	public function set(array $values): SetExpression;
 
-	/** @param list<Expression> $values */
-	public function sequence(array $values): SequenceExpression;
+	public function group(Expression $innerExpression): GroupExpression;
+	/** @param list<Expression> $expressions */
+	public function sequence(array $expressions): SequenceExpression;
 
 	public function scoped(Expression $targetExpression): ScopedExpression;
 

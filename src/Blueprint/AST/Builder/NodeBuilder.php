@@ -10,6 +10,7 @@ use Walnut\Lang\Blueprint\AST\Node\Expression\BooleanXorExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ConstantExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ConstructorCallExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\DataExpressionNode;
+use Walnut\Lang\Blueprint\AST\Node\Expression\GroupExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ScopedExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\FunctionCallExpressionNode;
@@ -142,6 +143,8 @@ interface NodeBuilder {
 	public function propertyAccess(ExpressionNode $target, int|string $propertyName): PropertyAccessExpressionNode;
 
 	public function return(ExpressionNode $returnedExpression): ReturnExpressionNode;
+
+	public function group(ExpressionNode $innerExpression): GroupExpressionNode;
 
 	/** @param list<ExpressionNode> $expressions */
 	public function sequence(array $expressions): SequenceExpressionNode;

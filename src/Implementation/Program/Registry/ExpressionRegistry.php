@@ -20,6 +20,7 @@ use Walnut\Lang\Implementation\Code\Expression\BooleanOrExpression;
 use Walnut\Lang\Implementation\Code\Expression\BooleanXorExpression;
 use Walnut\Lang\Implementation\Code\Expression\ConstantExpression;
 use Walnut\Lang\Implementation\Code\Expression\DataExpression;
+use Walnut\Lang\Implementation\Code\Expression\GroupExpression;
 use Walnut\Lang\Implementation\Code\Expression\ScopedExpression;
 use Walnut\Lang\Implementation\Code\Expression\MatchErrorExpression;
 use Walnut\Lang\Implementation\Code\Expression\MatchExpression;
@@ -155,9 +156,13 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 		return new SetExpression($values);
 	}
 
-	/** @param list<Expression> $values */
-	public function sequence(array $values): SequenceExpression {
-		return new SequenceExpression($values);
+	public function group(Expression $innerExpression): GroupExpression {
+		return new GroupExpression($innerExpression);
+	}
+
+	/** @param list<Expression> $expressions */
+	public function sequence(array $expressions): SequenceExpression {
+		return new SequenceExpression($expressions);
 	}
 
 	public function scoped(Expression $targetExpression): ScopedExpression {

@@ -77,8 +77,13 @@ AllTypes = [
 
     function: ^Any => Any,
     mutable: Mutable,
+
     result: Result,
+    resultWithOneType: Result<Integer>,
     resultWithType: Result<Integer, String>,
+
+    error: Error,
+    errorWithType: Error<String>,
 
     impure: Impure,
     impureWithType: Impure<Integer>,
@@ -123,6 +128,7 @@ AllTypes = [
         tuple: ['tuple', 1, 2, 3],
         record: [key: 'tuple', a: 1, b: 2, c: 3],
         set: ['set'; 1; 2; 3],
+        group: ('evaluated'),
         sequence: {
             'evaluated'; 'evaluated and used'
         },
@@ -198,8 +204,13 @@ AllTypes = [
 
         function: ^Any => Any :: 'any',
         mutable: mutable{Any, 'hello'},
+
         result: 'result',
+        resultWithOneType: @'error',
         resultWithType: @'error',
+
+        error: @'error',
+        errorWithType: @'error',
 
         impure: 'impure',
         impureWithType: @ExternalError[errorType: 'Error', originalError: 'Error', errorMessage: 'Error'],
