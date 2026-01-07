@@ -144,6 +144,7 @@ final readonly class ParserStateMachine {
 			108 => ['name' => 'module level enum separator', 'transitions' => [
 				T::value_separator->name => 107,
 				T::call_end->name => function(LT $token) {
+				$this->s->i++;
 					$this->nodeBuilder->definition(
 						$this->s->generated = $this->nodeBuilder->addEnumeration(
 							new TypeNameIdentifier($this->s->result['typeName']),
@@ -153,7 +154,7 @@ final readonly class ParserStateMachine {
 							)
 						)
 					);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				}
 			]],
 			109 => ['name' => 'sealed type type', 'transitions' => [
