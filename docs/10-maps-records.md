@@ -1207,23 +1207,11 @@ validateEmail = ^String => Boolean ::
 validateAge = ^Integer => Boolean ::
     # >= 0 && # <= 150;
 
-validateUser = ^[name: String, email: String, age: Integer] => Array<String> :: {
-    mut errors = [];
-
-    ?when($->name->length < 1) {
-        PUSH(errors, 'Name is required');
-    };
-
-    ?when(!validateEmail($->email)) {
-        PUSH(errors, 'Invalid email address');
-    };
-
-    ?when(!validateAge($->age)) {
-        PUSH(errors, 'Age must be between 0 and 150');
-    };
-
-    errors
-};
+validateUser = ^[name: String, email: String, age: Integer] => Array<String> :: [
+    ?when($->name->length < 1) { 'Name is required' } ~ { '' };
+    ?when(!validateEmail($->email)) { 'Invalid email address' } ~ { '' };
+    ?when(!validateAge($->age)) { 'Age must be between 0 and 150' } ~ { '' };
+]->filter(^# != '');
 
 user = [name: 'Alice', email: 'invalid', age: 30];
 errors = validateUser(user);                  /* ['Invalid email address'] */

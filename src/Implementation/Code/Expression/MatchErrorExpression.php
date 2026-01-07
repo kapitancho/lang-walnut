@@ -27,22 +27,24 @@ final readonly class MatchErrorExpression implements MatchErrorExpressionInterfa
 		$retTarget = $this->target->analyse($analyserContext);
 		$bType = $this->toBaseType($retTarget->expressionType);
 
+		$any = $analyserContext->programRegistry->typeRegistry->any;
+
 		$returnTypes = [$retTarget->returnType];
 		$onErrorExpressionType = $analyserContext->programRegistry->typeRegistry->nothing;
 		$elseExpressionType = $bType instanceof ResultType ? $bType->returnType :
-			$analyserContext->programRegistry->typeRegistry->any;
+			$any;
 
 		if ($retTarget->expressionType->isSubtypeOf(
 			$analyserContext->programRegistry->typeRegistry->result(
-				$analyserContext->programRegistry->typeRegistry->any,
-				$analyserContext->programRegistry->typeRegistry->any
+				$any,
+				$any
 			)
 		)) {
 			$innerContext = $retTarget;
 			if ($this->target instanceof VariableNameExpression) {
 				$errorType = $bType instanceof ResultType ? $bType->errorType :
 					// @codeCoverageIgnoreStart
-					$analyserContext->programRegistry->typeRegistry->any;
+					$any;
 					// @codeCoverageIgnoreEnd
 
 				$innerContext = $innerContext->withAddedVariableType(

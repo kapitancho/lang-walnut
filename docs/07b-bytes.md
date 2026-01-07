@@ -444,15 +444,15 @@ length = packet->substring[start: 2, length: 2];
 encrypt = ^[plaintext: Bytes, key: Bytes] => Bytes :: {
     /* Repeat key to match plaintext length */
     keyLength = key->length;
-    repeatedKey = "";
-    i = 0;
-    ?while (i < plaintext->length) {
-        repeatedKey = repeatedKey->concat(
-            key->substring[start: i % keyLength, length: 1]
-        );
-        i = i + 1;
+    repeatedKey = mutable{Bytes, ""};
+    i = mutable{Integer, 0};
+    ?while (i->value < plaintext->length) {
+        repeatedKey->SET(repeatedKey->value->concat(
+            key->substring[start: i->value % keyLength, length: 1]
+        ));
+        i->SET(i->value + 1);
     };
-    plaintext ^ repeatedKey
+    plaintext ^ repeatedKey->value
 };
 
 plaintext = "Hello, World!";
@@ -485,14 +485,14 @@ result = data & clearMask;  /* "\xF0" */
 ```walnut
 /* Simple XOR checksum */
 calculateChecksum = ^data: Bytes => Integer :: {
-    checksum = 0;
-    i = 0;
-    ?while (i < data->length) {
-        byte = data->substring[start: i, length: 1];
+    checksum = mutable{Integer, 0};
+    i = mutable{Integer, 0};
+    ?while (i->value < data->length) {
+        byte = data->substring[start: i->value, length: 1];
         /* Would need byte to integer conversion here */
-        i = i + 1;
+        i->SET(i->value + 1);
     };
-    checksum
+    checksum->value
 };
 ```
 

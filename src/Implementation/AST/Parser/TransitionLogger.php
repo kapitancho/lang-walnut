@@ -10,6 +10,10 @@ final class TransitionLogger {
 
 	private array $steps = [];
 
+	public function clear(): void {
+		$this->steps = [];
+	}
+
 	public function logStep(ParserStateInterface $s, Token $token, mixed $transition): void {
 		$this->steps[] = [
             $s->i, $s->state, $token, $transition ?? 'n/a', $s->depth(), $token->rule->tag

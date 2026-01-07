@@ -158,7 +158,7 @@ json = x->asJsonValue;
 Any->asMutableOfType(Type<T> => Result<Mutable<T>, CastNotAvailable>)
 
 x = 42;
-mut = x->asMutableOfType(`Integer);  /* Mutable<Integer> */
+mutableInt = x->asMutableOfType(`Integer);  /* Mutable<Integer> */
 ```
 
 ## 16.2 Integer Methods

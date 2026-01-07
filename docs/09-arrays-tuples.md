@@ -967,7 +967,7 @@ Walnut provides special mutable operations for arrays. These modify the array in
 
 /* Example */
 => {
-    mut arr = [1, 2, 3];
+    arr = mutable{Array<Integer>, [1, 2, 3]};
     PUSH(arr, 4);
     arr->printed;                        /* [1, 2, 3, 4] */
 };
@@ -980,7 +980,7 @@ Walnut provides special mutable operations for arrays. These modify the array in
 
 /* Example */
 => {
-    mut arr = [1, 2, 3];
+    arr = mutable{Array<Integer>, [1, 2, 3]};
     last = POP(arr);                     /* 3 */
     arr->printed;                        /* [1, 2] */
 };
@@ -995,7 +995,7 @@ Walnut provides special mutable operations for arrays. These modify the array in
 
 /* Example */
 => {
-    mut arr = [2, 3, 4];
+    arr = mutable{Array<Integer>, [2, 3, 4]};
     UNSHIFT(arr, 1);
     arr->printed;                        /* [1, 2, 3, 4] */
 };
@@ -1008,7 +1008,7 @@ Walnut provides special mutable operations for arrays. These modify the array in
 
 /* Example */
 => {
-    mut arr = [1, 2, 3];
+    arr = mutable{Array<Integer>, [1, 2, 3]};
     first = SHIFT(arr);                  /* 1 */
     arr->printed;                        /* [2, 3] */
 };
@@ -1255,13 +1255,13 @@ fibonacci = ^Integer => Array<Integer> :: {
     } ~ ?when($ == 1) {
         [0]
     } ~ {
-        mut result = [0, 1];
-        mut i = 2;
-        ?whileTrue(^ :: i < $) {
-            a = result->item(i - 2);
-            b = result->item(i - 1);
+        result = mutable{Array<Integer>, [0, 1]};
+        i = mutable{Integer, 2};
+        ?whileTrue(^ :: i->value < $) {
+            a = result->item(i->value - 2);
+            b = result->item(i->value - 1);
             PUSH(result, a + b);
-            i = i + 1;
+            i->SET(i->value + 1);
         };
         result
     }
@@ -1377,7 +1377,7 @@ newArray = oldArray->append(newItem);
 
 /* Avoid: Mutable operations unless necessary */
 => {
-    mut arr = oldArray;
+    arr = mutable{Array<Any>, oldArray};
     PUSH(arr, newItem);
 };
 ```
@@ -1391,16 +1391,7 @@ result = data
     ->map(^#.name)
     ->sort();
 
-/* Avoid: Imperative loops */
-=> {
-    mut result = [];
-    ?forEach(data) as item {
-        ?when(item.active) {
-            PUSH(result, item.name);
-        };
-    };
-    result->sort()
-};
+/* Avoid: Imperative loops with mutable state - use functional transformations instead */
 ```
 
 ### 25.8.4 Handle Empty Arrays

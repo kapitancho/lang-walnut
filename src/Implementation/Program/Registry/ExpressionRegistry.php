@@ -96,7 +96,7 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 				$then
 			),
 			new MatchExpressionDefault($else)
-            ]);
+        ]);
 	}
 
 	public function data(TypeNameIdentifier $typeName, Expression $parameter): DataExpression {
