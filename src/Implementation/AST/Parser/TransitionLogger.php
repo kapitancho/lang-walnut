@@ -10,9 +10,11 @@ final class TransitionLogger {
 
 	private array $steps = [];
 
+	// @codeCoverageIgnoreStart
 	public function clear(): void {
 		$this->steps = [];
 	}
+	// @codeCoverageIgnoreEnd
 
 	public function logStep(ParserStateInterface $s, Token $token, mixed $transition): void {
 		$this->steps[] = [

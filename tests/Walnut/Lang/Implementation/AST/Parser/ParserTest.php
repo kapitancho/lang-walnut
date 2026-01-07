@@ -632,7 +632,7 @@ class ParserTest extends TestCase {
 
 	#[DataProvider('expressions')]
 	public function testParseExpressions(string $code, string $className, callable|null $checker = null): void {
-		[$s] = $this->runParserTest($code, 201);
+		[$s] = $this->runParserTest($code, 3000);
 		self::assertInstanceOf($className, $s->generated);
 		if (is_callable($checker)) {
 			self::assertTrue($checker($s->generated));
