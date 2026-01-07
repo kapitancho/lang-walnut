@@ -124,7 +124,7 @@ class ParserTest extends TestCase {
 	}
 
 	/** @return array{0: ParserState, 1: ModuleNode} */
-	protected function runParserTest(string $sourceCode, int $initialState = 101): array {
+	protected function runParserTest(string $sourceCode, int $initialState = 100): array {
 		$s = new ParserState;
 		$s->push(-1);
 		$s->state = $initialState;
@@ -166,7 +166,7 @@ class ParserTest extends TestCase {
 
 	#[DataProvider('moduleLevelDefinitions')]
 	public function testModuleLevelDefinitions(string $code, string $className, callable|null $checker = null): void {
-		[$s, $moduleNode] = $this->runParserTest($code, 102);
+		[$s, $moduleNode] = $this->runParserTest($code, 101);
 		self::assertInstanceOf($className, $moduleNode->definitions[0]);
 		if (is_callable($checker)) {
 			self::assertTrue($checker($moduleNode->definitions[0]));
@@ -1353,7 +1353,7 @@ class ParserTest extends TestCase {
 	#[DataProvider('types')]
 	public function testParseTypes(string $code, string $className, callable|null $checker = null): void {
 		//$code .= ';';
-		[$s] = $this->runParserTest($code, 701);
+		[$s] = $this->runParserTest($code, 4000);
 		self::assertInstanceOf($className, $s->generated);
 		if (is_callable($checker)) {
 			self::assertTrue($checker($s->generated));

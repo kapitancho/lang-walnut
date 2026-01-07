@@ -24,7 +24,7 @@ final readonly class Parser implements ParserInterface {
 	): ModuleNode {
 		$s = new ParserState;
 		$s->push(-1);
-		$s->state = 101;
+		$s->state = 100;
 
 		$sourceLocator = new SourceLocator($moduleName, $tokens, $s);
 		return $this->parserStateRunner->run($sourceLocator);

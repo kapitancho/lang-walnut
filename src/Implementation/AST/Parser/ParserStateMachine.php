@@ -38,7 +38,7 @@ final readonly class ParserStateMachine {
 					$this->s->move(-1);
 				},
 			]],
-			101 => ['name' => 'module start', 'transitions' => [
+			100 => ['name' => 'module start', 'transitions' => [
 				T::module_identifier->name => function(LT $token) {
 					$moduleId = substr($token->patternMatch->text, 7, -1);
 					if (str_contains($moduleId, '%%')) {
@@ -52,16 +52,26 @@ final readonly class ParserStateMachine {
 						->moduleName($moduleName)
 						->moduleDependencies($dependencyNames);
 
-					$this->s->move(102);
+					$this->s->move(101);
 				}
 			]],
-			102 => ['name' => 'module content start', 'transitions' => [
+			101 => ['name' => 'module content', 'transitions' => [
+				'EOF' => -1,
+				'' => function (LT $token) {
+					$this->s->push(102);
+					$this->s->stay(103);
+				}
+			]],
+			102 => ['name' => 'module content separator', 'transitions' => [
+				T::expression_separator->name => 101
+			]],
+			103 => ['name' => 'module content start', 'transitions' => [
 				T::lambda_return->name => function(LT $token) {
 					$this->s->result['dependencyName'] = null;
 					$this->s->result['dependencyType'] = $this->nodeBuilder->nothingType;
 					$this->s->result['startPosition'] = $token->sourcePosition;
 					$this->s->push(112);
-					$this->s->move(3000);
+					$this->s->move(2000);
 				},
 				T::dependency_marker->name => function(LT $token) {
 					$this->s->result['startPosition'] = $token->sourcePosition;
@@ -72,7 +82,7 @@ final readonly class ParserStateMachine {
 					$this->s->result = [];
 					$this->s->result['startPosition'] = $token->sourcePosition;
 					$this->s->result['typeName'] = $token->patternMatch->text;
-					$this->s->move(103);
+					$this->s->move(104);
 				},
 				T::cast_marker->name => function(LT $token) {
 					$this->s->result = [];
@@ -80,11 +90,10 @@ final readonly class ParserStateMachine {
 					$this->s->result['typeName'] = 'DependencyContainer';
 					$this->s->move(116);
 				},
-				'EOF' => -1
 			]],
-			103 => ['name' => 'module level type definition', 'transitions' => [
+			104 => ['name' => 'module level type definition', 'transitions' => [
 				T::named_type->name => 114,
-				T::assign->name => 104,
+				T::assign->name => 105,
 				T::cast_marker->name => 116,
 				T::method_marker->name => 119,
 				T::call_start->name => function(LT $token) {
@@ -101,10 +110,10 @@ final readonly class ParserStateMachine {
 				},
 				T::tuple_start->name => 130,
 			]],
-			104 => ['name' => 'module level type assignment', 'transitions' => [
+			105 => ['name' => 'module level type assignment', 'transitions' => [
 				T::type_keyword->name => $c = function(LT $token) {
 					$this->s->push(126);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 				T::arithmetic_op_multiply->name => $c,
 				T::sequence_start->name => $c, 
@@ -114,30 +123,27 @@ final readonly class ParserStateMachine {
 				T::empty_tuple->name => 837,
 				T::empty_record->name => 838,
 			]],
-			105 => ['name' => 'module level atom', 'transitions' => [
-				T::expression_separator->name => function(LT $token) {
+			106 => ['name' => 'module level atom', 'transitions' => [
+				'' => function(LT $token) {
 					$this->nodeBuilder->definition(
 						$this->s->generated = $this->nodeBuilder->addAtom(
 							new TypeNameIdentifier($this->s->result['typeName'])
 						)
 					);
-					$this->s->move(102);
+					$this->s->pop();
 				}
 			]],
-			106 => ['name' => 'module level enum', 'transitions' => [
+			107 => ['name' => 'module level enum', 'transitions' => [
 				T::type_keyword->name => $c = function(LT $token) {
 					$this->s->result['enumerationValues'] ??= [];
 					$this->s->result['enumerationValues'][] = $token->patternMatch->text;
-					$this->s->move(107);
+					$this->s->move(108);
 				},
 				T::var_keyword->name => $c
 			]],
-			107 => ['name' => 'module level enum separator', 'transitions' => [
-				T::value_separator->name => 106,
-				T::call_end->name => 108
-			]],
-			108 => ['name' => 'module level enum end', 'transitions' => [
-				T::expression_separator->name => function(LT $token) {
+			108 => ['name' => 'module level enum separator', 'transitions' => [
+				T::value_separator->name => 107,
+				T::call_end->name => function(LT $token) {
 					$this->nodeBuilder->definition(
 						$this->s->generated = $this->nodeBuilder->addEnumeration(
 							new TypeNameIdentifier($this->s->result['typeName']),
@@ -147,13 +153,13 @@ final readonly class ParserStateMachine {
 							)
 						)
 					);
-					$this->s->move(102);
+					$this->s->moveAndPop();
 				}
 			]],
 			109 => ['name' => 'sealed type type', 'transitions' => [
 				T::tuple_start->name => $c = function(LT $token) {
 					$this->s->push(147);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 				T::arithmetic_op_multiply->name => $c,
 				T::type_keyword->name => $c,
@@ -163,7 +169,7 @@ final readonly class ParserStateMachine {
 			110 => ['name' => 'open type type', 'transitions' => [
 				T::tuple_start->name => $c = function(LT $token) {
 					$this->s->push(142);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 				T::arithmetic_op_multiply->name => $c,
 				T::type_keyword->name => $c,
@@ -173,7 +179,7 @@ final readonly class ParserStateMachine {
 			111 => ['name' => 'data type type', 'transitions' => [
 				T::tuple_start->name => $c = function(LT $token) {
 					$this->s->push(139);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 				T::empty_tuple->name => $c,
 				T::empty_record->name => $c,
@@ -184,7 +190,7 @@ final readonly class ParserStateMachine {
 				T::lambda_param->name => $c,
 			]],
 			112 => ['name' => 'module level cli entry point return', 'transitions' => [
-				T::expression_separator->name => function(LT $token) {
+				'' => function(LT $token) {
 					$this->nodeBuilder->definition(
 						$this->s->generated = $this->nodeBuilder->addMethod(
 							$this->nodeBuilder->namedType(
@@ -224,7 +230,7 @@ final readonly class ParserStateMachine {
 							),
 						)
 					);
-					$this->s->move(102);
+					$this->s->pop();
 				},
 			]],
 			113 => ['name' => 'module level cli entry point dependency type return', 'transitions' => [
@@ -232,7 +238,7 @@ final readonly class ParserStateMachine {
 					$this->s->result['dependencyName'] = $this->s->generated['dependency_name'];
 					$this->s->result['dependencyType'] = $this->s->generated['dependency_type'];
 					$this->s->push(112);
-					$this->s->move(3000);
+					$this->s->move(2000);
 				},
 			]],
 			114 => ['name' => 'module level named type creation', 'transitions' => [
@@ -244,10 +250,10 @@ final readonly class ParserStateMachine {
 				},
 			]],
 			115 => ['name' => 'module level atom or enum', 'transitions' => [
-				T::call_end->name => 105,
+				T::call_end->name => 106,
 				'' => function(LT $token) {
 					$this->s->result['enumerationValues'] = [];
-					$this->s->stay(106);
+					$this->s->stay(107);
 				},
 			]],
 			116 => ['name' => 'cast base type', 'transitions' => [
@@ -259,14 +265,14 @@ final readonly class ParserStateMachine {
 			117 => ['name' => 'cast body marker', 'transitions' => [
 				T::error_marker->name => function(LT $token) {
 					$this->s->push(124);
-					$this->s->move(701);
+					$this->s->move(4000);
 				},
 				T::dependency_marker->name => function(LT $token) {
 					$this->s->move(141);
 				},
 				T::function_body_marker->name => function(LT $token) {
 					$this->s->push(118);
-					$this->s->move(3000);
+					$this->s->move(2000);
 				},
 			]],
 			118 => ['name' => 'cast body result', 'transitions' => [
@@ -297,7 +303,7 @@ final readonly class ParserStateMachine {
 							$this->nodeBuilder->functionBody($this->s->generated),
 						)
 					);
-					$this->s->move(102);
+					$this->s->pop();
 				}
 			]],
 			119 => ['name' => 'method definition start', 'transitions' => [
@@ -331,7 +337,7 @@ final readonly class ParserStateMachine {
 				},
 				T::function_body_marker->name => function(LT $token) {
 					$this->s->push(123);
-					$this->s->move(3000);
+					$this->s->move(2000);
 				},
 			]],
 			123 => ['name' => 'method name result', 'transitions' => [
@@ -355,7 +361,7 @@ final readonly class ParserStateMachine {
 							$this->nodeBuilder->functionBody($this->s->generated),
 						)
 					);
-					$this->s->move(102);
+					$this->s->pop();
 				}
 			]],
 			124 => ['name' => 'cast error type return', 'transitions' => [
@@ -370,7 +376,7 @@ final readonly class ParserStateMachine {
 				},
 				T::function_body_marker->name => function(LT $token) {
 					$this->s->push(118);
-					$this->s->move(3000);
+					$this->s->move(2000);
 				},
 			]],
 			126 => ['name' => 'module level type alias end', 'transitions' => [
@@ -381,14 +387,8 @@ final readonly class ParserStateMachine {
 							$this->s->generated
 						)
 					);
-					$this->s->stay(127);
+					$this->s->pop();
 				},
-			]],
-			127 => ['name' => 'module level separator', 'transitions' => [
-				T::expression_separator->name => 102
-			]],
-			128 => ['name' => 'variable name separator', 'transitions' => [
-				T::expression_separator->name => 102
 			]],
 			129 => ['name' => 'constructor method parameter', 'transitions' => [
 				T::call_end->name => function(LT $token) {
@@ -400,13 +400,13 @@ final readonly class ParserStateMachine {
 			130 => ['name' => 'constructor method parameter tuple or record', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->push(133);
-					$this->s->back(701);
+					$this->s->back(4000);
 				}
 			]],
 			131 => ['name' => 'constructor method body', 'transitions' => [
 				T::error_marker->name => function(LT $token) {
 					$this->s->push(134);
-					$this->s->move(701);
+					$this->s->move(4000);
 				},
 				T::dependency_marker->name => function(LT $token) {
 					$this->s->push(137);
@@ -414,7 +414,7 @@ final readonly class ParserStateMachine {
 				},
 				T::function_body_marker->name => function(LT $token) {
 					$this->s->push(132);
-					$this->s->move(3000);
+					$this->s->move(2000);
 				},
 			]],
 			132 => ['name' => 'constructor method result', 'transitions' => [
@@ -435,7 +435,7 @@ final readonly class ParserStateMachine {
 							$this->nodeBuilder->functionBody($this->s->generated)
 						)
 					);
-					$this->s->move(102);
+					$this->s->pop();
 				}
 			]],
 			133 => ['name' => 'constructor method tuple or record parameter return', 'transitions' => [
@@ -457,7 +457,7 @@ final readonly class ParserStateMachine {
 				},
 				T::function_body_marker->name => function(LT $token) {
 					$this->s->push(132);
-					$this->s->move(3000);
+					$this->s->move(2000);
 				},
 			]],
 			136 => ['name' => 'method dependency result', 'transitions' => [
@@ -465,7 +465,7 @@ final readonly class ParserStateMachine {
 					$this->s->result['dependency_type'] = $this->s->generated['dependency_type'];
 					$this->s->result['dependency_name'] = $this->s->generated['dependency_name'];
 					$this->s->push(123);
-					$this->s->move(3000);
+					$this->s->move(2000);
 				},
 			]],
 			137 => ['name' => 'constructor dependency result', 'transitions' => [
@@ -473,7 +473,7 @@ final readonly class ParserStateMachine {
 					$this->s->result['dependency_type'] = $this->s->generated['dependency_type'];
 					$this->s->result['dependency_name'] = $this->s->generated['dependency_name'];
 					$this->s->push(132);
-					$this->s->move(3000);
+					$this->s->move(2000);
 				},
 			]],
 			138 => ['name' => 'cast dependency result', 'transitions' => [
@@ -481,25 +481,25 @@ final readonly class ParserStateMachine {
 					$this->s->result['dependency_type'] = $this->s->generated['dependency_type'];
 					$this->s->result['dependency_name'] = $this->s->generated['dependency_name'];
 					$this->s->push(118);
-					$this->s->move(3000);
+					$this->s->move(2000);
 				}
 			]],
 			139 => ['name' => 'data base type return', 'transitions' => [
-				T::expression_separator->name => function(LT $token) {
+				'' => function(LT $token) {
 					$this->nodeBuilder->definition(
 						$this->s->generated = $this->nodeBuilder->addData(
 							new TypeNameIdentifier($this->s->result['typeName']),
 							$this->s->generated,
 						)
 					);
-					$this->s->move(102);
+					$this->s->pop();
 				}
 			]],
 			140 => ['name' => 'cast dependency result shortcut', 'transitions' => [
 				T::function_body_marker->name => function(LT $token) {
 					$this->s->result['dependency_type'] = $this->s->generated;
 					$this->s->push(118);
-					$this->s->move(3000);
+					$this->s->move(2000);
 				},
 				T::expression_separator->name => function(LT $token) {
 					$this->s->result['dependency_type'] = $this->s->generated;
@@ -522,7 +522,7 @@ final readonly class ParserStateMachine {
 			141 => ['name' => 'cast dependency type', 'transitions' => [
 				T::type_keyword->name => function(LT $token) {
 					$this->s->push(140);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 				'' => function(LT $token) {
 					$this->s->push(138);
@@ -538,11 +538,11 @@ final readonly class ParserStateMachine {
 			143 => ['name' => 'open error type', 'transitions' => [
 				T::error_marker->name => function(LT $token) {
 					$this->s->push(144);
-					$this->s->move(701);
+					$this->s->move(4000);
 				},
 				T::function_body_marker->name => function(LT $token) {
 					$this->s->push(146);
-					$this->s->move(3000);
+					$this->s->move(2000);
 				},
 				T::expression_separator->name => function(LT $token) {
 					$this->s->generated = null; /*$this->nodeBuilder->constant(
@@ -560,7 +560,7 @@ final readonly class ParserStateMachine {
 			145 => ['name' => 'open error type body start', 'transitions' => [
 				T::function_body_marker->name => function(LT $token) {
 					$this->s->push(146);
-					$this->s->move(3000);
+					$this->s->move(2000);
 				},
 			]],
 			146 => ['name' => 'open result', 'transitions' => [
@@ -573,7 +573,7 @@ final readonly class ParserStateMachine {
 							$this->s->result['error_type'] ?? null,
 						)
 					);
-					$this->s->move(102);
+					$this->s->pop();
 				}
 			]],
 			147 => ['name' => 'sealed base type return', 'transitions' => [
@@ -585,11 +585,11 @@ final readonly class ParserStateMachine {
 			148 => ['name' => 'sealed error type', 'transitions' => [
 				T::error_marker->name => function(LT $token) {
 					$this->s->push(149);
-					$this->s->move(701);
+					$this->s->move(4000);
 				},
 				T::function_body_marker->name => function(LT $token) {
 					$this->s->push(151);
-					$this->s->move(3000);
+					$this->s->move(2000);
 				},
 				T::expression_separator->name => function(LT $token) {
 					$this->s->generated = null;/*$this->nodeBuilder->constant(
@@ -607,7 +607,7 @@ final readonly class ParserStateMachine {
 			150 => ['name' => 'sealed error type body start', 'transitions' => [
 				T::function_body_marker->name => function(LT $token) {
 					$this->s->push(151);
-					$this->s->move(3000);
+					$this->s->move(2000);
 				},
 			]],
 			151 => ['name' => 'sealed result', 'transitions' => [
@@ -620,7 +620,7 @@ final readonly class ParserStateMachine {
 							$this->s->result['error_type'] ?? null,
 						)
 					);
-					$this->s->move(102);
+					$this->s->pop();
 				}
 			]],
 			202 => ['name' => 'constant expression', 'transitions' => [
@@ -1189,6 +1189,12 @@ final readonly class ParserStateMachine {
 						$this->s->generated = $new;
 					}
 					$this->s->moveAndPop();
+				},
+			]],
+
+			2000 => ['name' => 'function body midpoint', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->stay(3000);
 				},
 			]],
 
@@ -2101,7 +2107,7 @@ final readonly class ParserStateMachine {
 			345 => ['name' => 'mutable value type', 'transitions' => [
 				T::type_keyword->name => $c = function(LT $token) {
 					$this->s->push(346);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 				T::tuple_start->name => $c,
 				T::lambda_param->name => $c,
@@ -2315,7 +2321,7 @@ final readonly class ParserStateMachine {
 			412 => ['name' => 'mutable constant value type', 'transitions' => [
 				T::type_keyword->name => $c = function(LT $token) {
 					$this->s->push(413);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 				T::tuple_start->name => $c,
 				T::lambda_param->name => $c,
@@ -2525,7 +2531,7 @@ final readonly class ParserStateMachine {
 			4383 => ['name' => 'type value short type optional type', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->push(4384);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 			]],
 			4384 => ['name' => 'type value short type optional return point', 'transitions' => [
@@ -2538,7 +2544,7 @@ final readonly class ParserStateMachine {
 			439 => ['name' => 'type value short', 'transitions' => [
 				T::optional_key->name => function(LT $token) {
 					$this->s->push(4381);
-					$this->s->move(701);
+					$this->s->move(4000);
 				},
 				T::type_keyword->name => $c = function(LT $token) {
 					if ($token->rule->tag === T::type_keyword->name && $token->patternMatch->text === 'OptionalKey') {
@@ -2557,7 +2563,7 @@ final readonly class ParserStateMachine {
 						return;
 					}
 					$this->s->push(443);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 				T::call_start->name => $c,
 				T::sequence_start->name => $c, 
@@ -2571,7 +2577,7 @@ final readonly class ParserStateMachine {
 			440 => ['name' => 'type value', 'transitions' => [
 				T::tuple_start->name => function(LT $token) {
 					$this->s->push(443);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 				T::sequence_start->name => 441,
 			]],
@@ -2594,7 +2600,7 @@ final readonly class ParserStateMachine {
 			4403 => ['name' => 'type value type type optional type', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->push(4404);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 			]],
 			4404 => ['name' => 'type value type optional return point', 'transitions' => [
@@ -2608,7 +2614,7 @@ final readonly class ParserStateMachine {
 			441 => ['name' => 'type value type', 'transitions' => [
 				T::optional_key->name => function(LT $token) {
 					$this->s->push(4401);
-					$this->s->move(701);
+					$this->s->move(4000);
 				},
 				T::type_keyword->name => $c = function(LT $token) {
 					if ($token->rule->tag === T::type_keyword->name && $token->patternMatch->text === 'OptionalKey') {
@@ -2627,7 +2633,7 @@ final readonly class ParserStateMachine {
 						return;
 					}
 					$this->s->push(442);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 				T::call_start->name => $c,
 				T::sequence_start->name => $c, 
@@ -2703,7 +2709,7 @@ final readonly class ParserStateMachine {
 			504 => ['name' => 'function value body return', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->push(505);
-					$this->s->stay(3000);
+					$this->s->stay(2000);
 				},
 			]],
 			505 => ['name' => 'function value body return', 'transitions' => [
@@ -2779,7 +2785,7 @@ final readonly class ParserStateMachine {
 				T::arithmetic_op_multiply->name => $c = function(LT $token) {
 					$this->s->result['parameter_name'] = null;
 					$this->s->push(609);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 				T::type_proxy_keyword->name => $c,
 				T::type_keyword->name => $c,
@@ -2803,7 +2809,7 @@ final readonly class ParserStateMachine {
 			607 => ['name' => 'function value parameter type', 'transitions' => [
 				T::arithmetic_op_multiply->name => $c = function(LT $token) {
 					$this->s->push(609);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 				T::type_proxy_keyword->name => $c,
 				T::type_keyword->name => $c,
@@ -2819,7 +2825,7 @@ final readonly class ParserStateMachine {
 						lcfirst($token->patternMatch->text)
 					);
 					$this->s->push(609);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 			]],
 			609 => ['name' => 'function value parameter return', 'transitions' => [
@@ -2840,7 +2846,7 @@ final readonly class ParserStateMachine {
 			611 => ['name' => 'function or method value return', 'transitions' => [
 				T::lambda_return->name => function(LT $token) {
 					$this->s->push(612);
-					$this->s->move(701);
+					$this->s->move(4000);
 				},
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->anyType;
@@ -2970,7 +2976,7 @@ final readonly class ParserStateMachine {
 				'' => function(LT $token) {
 					$this->s->result['dependency_name'] = null;
 					$this->s->push(629);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 			]],
 			626 => ['name' => 'dependency parameter name', 'transitions' => [
@@ -2979,7 +2985,7 @@ final readonly class ParserStateMachine {
 			627 => ['name' => 'dependency parameter name type', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->push(629);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 			]],
 			628 => ['name' => 'dependency parameter name from type', 'transitions' => [
@@ -2988,7 +2994,7 @@ final readonly class ParserStateMachine {
 						lcfirst($token->patternMatch->text)
 					);
 					$this->s->push(629);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 			]],
 			629 => ['name' => 'function value parameter return', 'transitions' => [
@@ -3005,12 +3011,6 @@ final readonly class ParserStateMachine {
 					];
 					$this->s->pop();
 				},
-			]],
-			701 => ['name' => 'type adt start', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->result['startPosition'] = $token->sourcePosition;
-					$this->s->stay(4000);
-				}
 			]],
 			706 => ['name' => 'type basic', 'transitions' => [
 				'' => function(LT $token) {
@@ -3328,7 +3328,7 @@ final readonly class ParserStateMachine {
 				T::range_dots->name => 739,
 				'' => function(LT $token) {
 					$this->s->push(742);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 			]],
 			737 => ['name' => 'type array range', 'transitions' => [
@@ -3394,7 +3394,7 @@ final readonly class ParserStateMachine {
 				T::range_dots->name => 749,
 				'' => function(LT $token) {
 					$this->s->push(752);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 			]],
 			747 => ['name' => 'type map range', 'transitions' => [
@@ -3435,7 +3435,7 @@ final readonly class ParserStateMachine {
 				T::colon->name => function(LT $token) {
 					$this->s->result['keyType'] = $this->s->generated;
 					$this->s->push(753);
-					$this->s->move(701);
+					$this->s->move(4000);
 				},
 				'' => function(LT $token) {
 					$this->s->result['type'] = $this->s->generated;
@@ -3486,7 +3486,7 @@ final readonly class ParserStateMachine {
 			7563 => ['name' => 'type type optional type', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->push(7564);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 			]],
 			7564 => ['name' => 'type type optional return point', 'transitions' => [
@@ -3499,7 +3499,7 @@ final readonly class ParserStateMachine {
 			757 => ['name' => 'type type type', 'transitions' => [
 				T::optional_key->name => function(LT $token) {
 					$this->s->push(7561);
-					$this->s->move(701);
+					$this->s->move(4000);
 				},
 				T::type_keyword->name => function(LT $token) {
 					if ($token->rule->tag === T::type_keyword->name && $token->patternMatch->text === 'OptionalKey') {
@@ -3518,11 +3518,11 @@ final readonly class ParserStateMachine {
 						return;
 					}
 					$this->s->push(758);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 				'' => function(LT $token) {
 					$this->s->push(758);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 			]],
 			758 => ['name' => 'type type return point', 'transitions' => [
@@ -3554,7 +3554,7 @@ final readonly class ParserStateMachine {
 			762 => ['name' => 'type impure type', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->push(763);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 			]],
 			763 => ['name' => 'type impure return point', 'transitions' => [
@@ -3586,7 +3586,7 @@ final readonly class ParserStateMachine {
 			767 => ['name' => 'type mutable type', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->push(768);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 			]],
 			768 => ['name' => 'type mutable return point', 'transitions' => [
@@ -3619,7 +3619,7 @@ final readonly class ParserStateMachine {
 			772 => ['name' => 'type error type', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->push(773);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 			]],
 			773 => ['name' => 'type error return point', 'transitions' => [
@@ -3653,7 +3653,7 @@ final readonly class ParserStateMachine {
 			777 => ['name' => 'type result type', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->push(778);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 			]],
 			778 => ['name' => 'type result return point', 'transitions' => [
@@ -3672,7 +3672,7 @@ final readonly class ParserStateMachine {
 			780 => ['name' => 'type result error type', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->push(781);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 			]],
 			781 => ['name' => 'type result error return point', 'transitions' => [
@@ -3745,7 +3745,7 @@ final readonly class ParserStateMachine {
 			790 => ['name' => 'type optional type', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->push(791);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 			]],
 			791 => ['name' => 'type optional return point', 'transitions' => [
@@ -3783,7 +3783,7 @@ final readonly class ParserStateMachine {
 			821 => ['name' => 'type shape type', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->push(822);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 			]],
 			822 => ['name' => 'type shape return point', 'transitions' => [
@@ -3817,7 +3817,7 @@ final readonly class ParserStateMachine {
 				T::range_dots->name => 831,
 				'' => function(LT $token) {
 					$this->s->push(834);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 			]],
 			829 => ['name' => 'type set range', 'transitions' => [
@@ -3870,25 +3870,25 @@ final readonly class ParserStateMachine {
 				T::range_dots->name => 831,
 			]],
 			837 => ['name' => 'module level empty tuple', 'transitions' => [
-				T::expression_separator->name => function(LT $token) {
+				'' => function(LT $token) {
 					$this->nodeBuilder->definition(
 						$this->s->generated = $this->nodeBuilder->addAlias(
 							new TypeNameIdentifier($this->s->result['typeName']),
 							$this->nodeBuilder->tupleType([])
 						)
 					);
-					$this->s->move(102);
+					$this->s->pop();
 				}
 			]],
 			838 => ['name' => 'module level empty record', 'transitions' => [
-				T::expression_separator->name => function(LT $token) {
+				'' => function(LT $token) {
 					$this->nodeBuilder->definition(
 						$this->s->generated = $this->nodeBuilder->addAlias(
 							new TypeNameIdentifier($this->s->result['typeName']),
 							$this->nodeBuilder->recordType([])
 						)
 					);
-					$this->s->move(102);
+					$this->s->pop();
 				}
 			]],
 			839 => ['name' => 'module level tuple or record', 'transitions' => [
@@ -3937,7 +3937,7 @@ final readonly class ParserStateMachine {
 					$this->s->result['current_key'] ??=
                         $this->s->result['first_token']->patternMatch->text;
 					$this->s->push(794);
-					$this->s->move(701);
+					$this->s->move(4000);
 				},
 				'' => function(LT $token) {
 					$this->s->result['current_key'] ??=
@@ -3947,7 +3947,7 @@ final readonly class ParserStateMachine {
 						return;
 					}
 					$this->s->push(843);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 			]],
 			843 => ['name' => 'module level record value return point', 'transitions' => [
@@ -3991,7 +3991,7 @@ final readonly class ParserStateMachine {
 				T::tuple_end->name => 850,
 				'' => function(LT $token) {
 					$this->s->push(848);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 			]],
 			848 => ['name' => 'module level record value rest return point', 'transitions' => [
@@ -4027,7 +4027,7 @@ final readonly class ParserStateMachine {
 				T::rest_type->name => 856,
 				'' => function(LT $token) {
 					$this->s->push(853);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 			]],
 			853 => ['name' => 'module level tuple value return point', 'transitions' => [
@@ -4052,7 +4052,7 @@ final readonly class ParserStateMachine {
 				T::tuple_end->name => 859,
 				'' => function(LT $token) {
 					$this->s->push(857);
-					$this->s->stay(701);
+					$this->s->stay(4000);
 				},
 			]],
 			857 => ['name' => 'module level tuple value rest return point', 'transitions' => [
