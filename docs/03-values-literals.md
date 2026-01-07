@@ -791,8 +791,8 @@ result = someValue=>methodThatMayFail;  /* Returns early if error */
 };
 
 /* No error assertion */
-?noError(result)               /* Returns early if result is error */
-?noExternalError(result)       /* Returns early if result is external error */
+result?                        /* Returns early if result is error */
+result*?                       /* Returns early if result is external error */
 ```
 
 ## 3.13 Constant Expressions

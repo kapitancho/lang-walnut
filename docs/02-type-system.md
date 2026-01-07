@@ -504,7 +504,7 @@ divide = ^numerator: Real, denominator: Real => Result<Real, String> ::
 **Notes:**
 - Informally, `Result<T, E>` corresponds to `T|Error<E>`
 - Error values can be created with `@errorValue`
-- The `?noError` expression unwraps successful results or returns early on error
+- The `?` operator unwraps successful results or returns early on error
 
 ### Error&lt;T&gt;
 
@@ -586,7 +586,7 @@ A shorthand for operations that may fail with external errors.
 **Notes:**
 - Represents side effects that may fail
 - Commonly used for I/O operations
-- The `?noExternalError` expression handles external errors
+- The `*?` operator handles external errors
 
 ### Shape&lt;T&gt;
 

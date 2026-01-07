@@ -49,7 +49,7 @@ Use the `args` variable to access command-line arguments:
 module greet:
 
 => {
-    name = ?noError(args->item(0));
+    name = args->item(0)?;
     ?whenIsError(name) {
         'Please provide a name'
     } ~ {
@@ -78,8 +78,8 @@ The complete syntax for a CLI entry point includes the full type signature:
 module calc:
 
 ==> CliEntryPoint :: ^args: Array<String> => String :: {
-    a = ?noError(?noError(args->item(0))->asInteger);
-    b = ?noError(?noError(args->item(1))->asInteger);
+    a = args->item(0)?->asInteger?;
+    b = args->item(1)?->asInteger?;
 
     ?whenIsError(a) {
         'Error: First argument must be an integer'
@@ -125,7 +125,7 @@ module user-manager %% [~Database, ~Logger]:
 => {
     %logger.log('Starting user manager');
 
-    userId = ?noError(?noError(args->item(0))->asInteger);
+    userId = args->item(0)?->asInteger?;
     ?whenIsError(userId) {
         'Error: Provide a valid user ID'
     } ~ {
@@ -408,7 +408,7 @@ module user-service %% [~Database, ~Logger]:
 
 /* CLI Entry Point */
 => {
-    command = ?noError(args->item(0));
+    command = args->item(0)?;
     ?whenValueOf(command) {
         'list': listUsers(),
         'add': addUser(args),
@@ -448,7 +448,7 @@ module todo-app %% [~Database, ~Clock]:
 
 /* CLI: Manage todos from command line */
 => {
-    action = ?noError(args->item(0));
+    action = args->item(0)?;
     ?whenValueOf(action) {
         'add': addTodo(args->slice[1, 999]),
         'list': listTodos(),
@@ -583,7 +583,7 @@ Errors at the entry point level are handled gracefully:
 module safe-cli:
 
 => {
-    value = ?noError(?noError(args->item(0))->asInteger);
+    value = args->item(0)?->asInteger?;
     ?whenIsError(value) {
         'Error: Please provide a valid integer'
     } ~ {

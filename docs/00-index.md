@@ -143,8 +143,8 @@ Walnut is a strongly typed, functional programming language designed for modelin
 
 19. [**Early Returns and Error Handling**](19-early-returns-errors.md)
     - Unconditional return (`=>`)
-    - Error returns (`?noError`, `?noExternalError`)
-    - Shorthand operators (`=>`, `|>`, `*>`)
+    - Error propagation operators (`?`, `*?`)
+    - Error conversion operator (`*>`)
     - Result types
 
 ### Part IV: Built-in Library

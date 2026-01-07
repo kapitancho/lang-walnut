@@ -124,17 +124,17 @@ findUser = ^id: Integer => Result<User, String> ::
 ;
 ```
 
-## 11.3 Conditional Error Return: ?noError
+## 11.3 Conditional Error Return: The ? Operator
 
 ### 11.3.1 Basic Usage
 
-The `?noError(expr)` operator checks if `expr` is an error value. If it is, it immediately returns that error from the current function. Otherwise, it evaluates to the success value.
+The `expr?` operator (postfix `?`) checks if `expr` is an error value. If it is, it immediately returns that error from the current function. Otherwise, it evaluates to the success value.
 
-**Syntax:** `?noError(expression)`
+**Syntax:** `expression?`
 
 **Examples:**
 ```walnut
-/* Without ?noError */
+/* Without ? operator */
 processData = ^input: String => Result<Integer, String> :: {
     parsed = parse(input);  /* Returns Result<Integer, String> */
     ?whenIsError(parsed) {
@@ -147,17 +147,17 @@ processData = ^input: String => Result<Integer, String> :: {
     validated
 };
 
-/* With ?noError */
+/* With ? operator */
 processData = ^input: String => Result<Integer, String> :: {
-    parsed = ?noError(parse(input));      /* Returns error or unwraps */
-    validated = ?noError(validate(parsed));  /* Returns error or unwraps */
+    parsed = parse(input)?;      /* Returns error or unwraps */
+    validated = validate(parsed)?;  /* Returns error or unwraps */
     validated
 };
 ```
 
 ### 11.3.2 Error Propagation
 
-`?noError` automatically propagates errors up the call stack.
+The `?` operator automatically propagates errors up the call stack.
 
 **Example:**
 ```walnut
@@ -170,53 +170,50 @@ parseJson = ^content: String => Result<JsonValue, String> ::
 ;
 
 processFile = ^path: String => Result<JsonValue, String> :: {
-    content = ?noError(readFile(path));   /* Propagate read errors */
-    json = ?noError(parseJson(content));  /* Propagate parse errors */
+    content = readFile(path)?;   /* Propagate read errors */
+    json = parseJson(content)?;  /* Propagate parse errors */
     json
 };
 ```
 
-### 11.3.3 Chaining with ?noError
+### 11.3.3 Chaining with the ? Operator
 
-Multiple operations can be chained with `?noError`.
+Multiple operations can be chained with the `?` operator.
 
 **Example:**
 ```walnut
 pipeline = ^input: String => Result<Integer, String> :: {
-    step1 = ?noError(parseInput(input));
-    step2 = ?noError(validateInput(step1));
-    step3 = ?noError(transformInput(step2));
-    step4 = ?noError(finalizeInput(step3));
+    step1 = parseInput(input)?;
+    step2 = validateInput(step1)?;
+    step3 = transformInput(step2)?;
+    step4 = finalizeInput(step3)?;
     step4
 };
 ```
 
-## 11.4 The => Shorthand Operator
+## 11.4 Method Call with Automatic Error Propagation
 
-### 11.4.1 Method Call with Error Check
+### 11.4.1 The ->method()? Pattern
 
-The `=>` operator can be used as a shorthand for method calls with `?noError`.
+Method calls can be combined with the `?` operator for automatic error propagation.
 
-**Syntax:** `target => methodName(parameter)`
+**Syntax:** `target->methodName(parameter)?`
 
-**Equivalent to:** `?noError(target->methodName(parameter))`
+**Equivalent to:** `(target->methodName(parameter))?`
 
 **Examples:**
 ```walnut
-/* Using ?noError explicitly */
-result = ?noError(file->read());
+/* Explicit error unwrapping */
+result = file->read()?;
 
-/* Using => shorthand */
-result = file => read();
+/* Chaining method calls */
+content = file->read()->parse()->validate()?;
 
-/* Chaining */
-content = file => read() => parse() => validate();
-
-/* Equivalent to */
+/* Each method call is checked */
 content = {
-    temp1 = ?noError(file->read());
-    temp2 = ?noError(temp1->parse());
-    ?noError(temp2->validate())
+    temp1 = file->read()?;
+    temp2 = temp1->parse()?;
+    temp2->validate()?
 };
 ```
 
@@ -224,23 +221,17 @@ content = {
 
 ```walnut
 processOrder = ^orderId: Integer => Result<Response, Error> :: {
-    /* Traditional style */
-    order = ?noError(database->findOrder(orderId));
-    validated = ?noError(order->validate());
-    processed = ?noError(validated->process());
-    ?noError(processed->save());
-
-    /* Using => shorthand */
-    order = database => findOrder(orderId);
-    validated = order => validate();
-    processed = validated => process();
-    processed => save();
+    /* Step by step with error propagation */
+    order = database->findOrder(orderId)?;
+    validated = order->validate()?;
+    processed = validated->process()?;
+    processed->save()?;
 
     /* Fully chained */
-    database => findOrder(orderId)
-             => validate()
-             => process()
-             => save()
+    database->findOrder(orderId)?
+            ->validate()?
+            ->process()?
+            ->save()?
 };
 ```
 
@@ -297,50 +288,47 @@ readFile: ^String => Result<String, ExternalError>;
 queryDatabase: ^String => Result<Array<Record>, ExternalError>;
 ```
 
-## 11.6 Conditional External Error Return: ?noExternalError
+## 11.6 Conditional External Error Return: The *? Operator
 
 ### 11.6.1 Basic Usage
 
-The `?noExternalError(expr)` operator checks if `expr` is an external error value. If it is, it immediately returns that error. Otherwise, it evaluates to the value (which may still be a regular error).
+The `expr*?` operator (postfix `*?`) checks if `expr` is an external error value. If it is, it immediately returns that error. Otherwise, it evaluates to the value (which may still be a regular error).
 
-**Syntax:** `?noExternalError(expression)`
+**Syntax:** `expression*?`
 
 **Examples:**
 ```walnut
 processFile = ^path: String => Result<String, ExternalError|String> :: {
     /* Read file (may return ExternalError) */
-    content = ?noExternalError(file->read(path));
+    content = file->read(path)*?;
 
     /* Parse content (may return regular error) */
-    parsed = ?noError(content->parse());
+    parsed = content->parse()?;
 
     parsed
 };
 ```
 
-### 11.6.2 The |> Shorthand Operator
+### 11.6.2 Method Calls with External Error Checking
 
-The `|>` operator is a shorthand for method calls with `?noExternalError`.
+The `*?` operator can be combined with method calls for external error propagation.
 
-**Syntax:** `target |> methodName(parameter)`
+**Syntax:** `target->methodName(parameter)*?`
 
-**Equivalent to:** `?noExternalError(target->methodName(parameter))`
+**Equivalent to:** `(target->methodName(parameter))*?`
 
 **Examples:**
 ```walnut
-/* Using ?noExternalError explicitly */
-content = ?noExternalError(file->read());
-
-/* Using |> shorthand */
-content = file |> read();
+/* Explicit external error checking */
+content = file->read()*?;
 
 /* Chaining */
-data = file |> read() |> decode() |> validate();
+data = file->read()*?->decode()*?->validate()*?;
 
-/* Mixed with => */
-result = file |> read()      /* Handle external errors */
-              => parse()      /* Handle all errors */
-              => validate();  /* Handle all errors */
+/* Mixed with regular error checking */
+result = file->read()*?      /* Handle external errors */
+             ->parse()?       /* Handle all errors */
+             ->validate()?;   /* Handle all errors */
 ```
 
 ### 11.6.3 Impure Operations Example
@@ -348,13 +336,13 @@ result = file |> read()      /* Handle external errors */
 ```walnut
 loadUserData = ^userId: Integer => *UserData %% [~Database, ~FileSystem] :: {
     /* Read from database (impure) */
-    dbRecord = %database |> query(userId);
+    dbRecord = %database->query(userId)*?;
 
     /* Read from file system (impure) */
-    fileData = %fileSystem |> readFile(dbRecord.path);
+    fileData = %fileSystem->readFile(dbRecord.path)*?;
 
     /* Parse (pure, may have regular errors) */
-    parsed = fileData => parseJson();
+    parsed = fileData->parseJson()?;
 
     /* Construct result */
     UserData![
@@ -653,9 +641,9 @@ This combines mapping, transformation, and fallback handling in a functional sty
 
 ```walnut
 validateUser = ^input: Map => Result<User, ValidationError> :: {
-    email = ?noError(validateEmail(input->item('email')));
-    age = ?noError(validateAge(input->item('age')));
-    name = ?noError(validateName(input->item('name')));
+    email = validateEmail(input->item('email'))?;
+    age = validateAge(input->item('age'))?;
+    name = validateName(input->item('name'))?;
 
     User![email: email, age: age, name: name]
 };
@@ -666,16 +654,16 @@ validateUser = ^input: Map => Result<User, ValidationError> :: {
 ```walnut
 findAndUpdateUser = ^id: Integer, updates: Map => *User %% [~Database] :: {
     /* Query database (impure) */
-    user = %database |> findById(id);
+    user = %database->findById(id)*?;
 
     /* Validate updates (pure) */
-    validated = updates => validate();
+    validated = updates->validate()?;
 
     /* Update user */
     updated = user->applyUpdates(validated);
 
     /* Save to database (impure) */
-    %database |> save(updated);
+    %database->save(updated)*?;
 
     updated
 };
@@ -686,16 +674,16 @@ findAndUpdateUser = ^id: Integer, updates: Map => *User %% [~Database] :: {
 ```walnut
 processOrder = ^orderId: Integer => Result<Receipt, Error> %% [~Database, ~Payment] :: {
     /* Load order (impure) */
-    order = %database |> loadOrder(orderId);
+    order = %database->loadOrder(orderId)*?;
 
     /* Validate order (pure) */
-    validated = order => validate();
+    validated = order->validate()?;
 
     /* Calculate total (pure) */
-    total = validated => calculateTotal();
+    total = validated->calculateTotal()?;
 
     /* Process payment (impure) */
-    paymentResult = %payment |> charge(total);
+    paymentResult = %payment->charge(total)*?;
 
     /* Create receipt */
     receipt = Receipt![
@@ -705,7 +693,7 @@ processOrder = ^orderId: Integer => Result<Receipt, Error> %% [~Database, ~Payme
     ];
 
     /* Save receipt (impure) */
-    %database |> saveReceipt(receipt);
+    %database->saveReceipt(receipt)*?;
 
     receipt
 };
@@ -724,7 +712,7 @@ loadConfig = ^path: String => Config :: {
     };
 
     /* Parse config */
-    parsed = result => parseJson();
+    parsed = result->parseJson()?;
     Config(parsed)
 };
 ```
@@ -734,12 +722,12 @@ loadConfig = ^path: String => Config :: {
 ```walnut
 processNestedData = ^input: String => Result<Output, String> :: {
     /* Parse outer structure */
-    outer = ?noError(parseOuter(input));
+    outer = parseOuter(input)?;
 
     /* Process each inner item */
     processed = outer->items->map(^item => Result<ProcessedItem, String> :: {
-        validated = ?noError(validate(item));
-        transformed = ?noError(transform(validated));
+        validated = validate(item)?;
+        transformed = transform(validated)?;
         transformed
     });
 
@@ -779,20 +767,19 @@ readFile = ^path: String => *String ::
 ;
 
 /* Clear: Caller knows this may have external errors */
-content = file |> read();
+content = file->read()*?;
 ```
 
-### 11.11.3 Propagate Errors with => and |>
+### 11.11.3 Propagate Errors with ? and *?
 
 ```walnut
-/* Good: Use shorthand operators */
-result = database => query(id)
-                  => validate()
-                  => transform();
+/* Good: Use postfix operators */
+result = database->query(id)?
+                 ->validate()?
+                 ->transform()?;
 
 /* Avoid: Verbose error checking */
-/* result = ?noError(?noError(?noError(
-    database->query(id))->validate())->transform()); */
+/* Explicit checks are no longer needed with ? operator */
 ```
 
 ### 11.11.4 Handle Errors at Appropriate Level
@@ -800,7 +787,7 @@ result = database => query(id)
 ```walnut
 /* Good: Handle errors where you can recover */
 loadUserOrDefault = ^id: Integer => User :: {
-    result = database |> findUser(id);
+    result = database->findUser(id)*?;
     ?whenIsError(result) {
         => DefaultUser
     };
@@ -809,7 +796,7 @@ loadUserOrDefault = ^id: Integer => User :: {
 
 /* Good: Propagate errors when you can't recover */
 strictLoadUser = ^id: Integer => *User :: {
-    database |> findUser(id)
+    database->findUser(id)*?
 };
 ```
 
@@ -914,9 +901,9 @@ Walnut's error handling system provides:
 - **Pattern matching** with `when` for handling both success and error cases
 - **Error fallback operator** (`??`) via `binaryOrElse`
 - **Early returns** with `=>` for explicit control flow
-- **?noError** for automatic error propagation
-- **?noExternalError** for handling external errors separately
-- **Shorthand operators** (`=>`, `|>`) for concise error handling
+- **Postfix `?` operator** for automatic error propagation
+- **Postfix `*?` operator** for handling external errors separately
+- **Method chaining** with `->method()?` and `->method()*?` for concise error handling
 - **Error conversion** with `*>` operator
 - **Type safety** through compile-time checking
 - **Explicit error types** for clear error contracts

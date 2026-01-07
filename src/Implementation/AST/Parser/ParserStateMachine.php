@@ -756,15 +756,6 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				}
 			]],
-			221 => ['name' => 'constructor call empty value', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->constructorCall(
-						new TypeNameIdentifier($this->s->result['type_name']),
-						$this->s->generated
-					);
-					$this->s->pop();
-				}
-			]],
 			222 => ['name' => 'list or dict expression', 'transitions' => [
 				T::tuple_end->name => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->tuple([]);
@@ -3757,7 +3748,6 @@ final readonly class ParserStateMachine {
 					$this->s->generated = $this->nodeBuilder->tupleType([]);
 					$this->s->moveAndPop();
 				},
-				T::colon->name => 861,
 				T::string_value->name => function(LT $token) {
 					$this->s->result['first_token'] = new LT(
 						$token->rule,
@@ -3934,12 +3924,6 @@ final readonly class ParserStateMachine {
 			]],
 			860 => ['name' => 'module level tuple value rest', 'transitions' => [
 				T::rest_type->name => 847,
-				T::tuple_end->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->recordType([]);
-					$this->s->moveAndPop();
-				},
-			]],
-			861 => ['name' => 'empty record end', 'transitions' => [
 				T::tuple_end->name => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->recordType([]);
 					$this->s->moveAndPop();

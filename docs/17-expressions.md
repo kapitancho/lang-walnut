@@ -216,7 +216,7 @@ An early return exits the sequence immediately, bypassing remaining expressions:
 
 {
     value = calculateValue();
-    ?noError(value);   /* Returns error if value is an error */
+    value?;   /* Returns error if value is an error */
     value->process     /* Only executes if no error */
 }
 ```
@@ -248,12 +248,8 @@ calculateDiscount = ^price: Real => Real :: {
 
 /* Sequence with early returns */
 processOrder = ^order: Order => Result<Receipt, OrderError> :: {
-    validatedOrder = validateOrder(order);
-    ?noError(validatedOrder);
-
-    payment = processPayment(validatedOrder);
-    ?noError(payment);
-
+    validatedOrder = validateOrder(order)?;
+    payment = processPayment(validatedOrder)?;
     generateReceipt(validatedOrder, payment)
 };
 ```
@@ -491,24 +487,24 @@ tuple->item(0)
 
 Special method call operators combine invocation with error checking:
 
-#### `=>` - No Error Check
+#### `?` - No Error Check
 
 Calls the method and immediately returns if the result is any error:
 
 ```walnut
-obj => method(arg)
-/* Desugars to: */
-?noError(obj->method(arg))
+obj->method(arg)?
+/* Equivalent to: */
+(obj->method(arg))?
 ```
 
-#### `|>` - No External Error Check
+#### `*?` - No External Error Check
 
 Calls the method and immediately returns if the result is an external error:
 
 ```walnut
-obj |> method(arg)
-/* Desugars to: */
-?noExternalError(obj->method(arg))
+obj->method(arg)*?
+/* Equivalent to: */
+(obj->method(arg))*?
 ```
 
 #### `*>` - Error to External Error

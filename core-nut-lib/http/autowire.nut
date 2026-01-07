@@ -29,16 +29,16 @@ HttpAutoWireRoute->handleRequest(^request: {HttpRequest} => Result<{HttpResponse
                 matchResult = $pattern->matchAgainst(request.target);
                 ?whenTypeOf(matchResult) {
                     `Map<String|Integer<0..>>: {
-                        bodyArg = $requestBody->shape(`HttpAutoWireRequestBodyToParameter)=>invoke(request);
+                        bodyArg = $requestBody->shape(`HttpAutoWireRequestBodyToParameter)(request)?;
                         callParams = matchResult->mergeWith(bodyArg);
                         callParams = callParams->as(`JsonValue);
                         handlerType = $handler;
                         handlerParameterType = handlerType->parameterType;
                         handlerReturnType = handlerType->returnType;
-                        handlerParams = callParams=>hydrateAs(handlerParameterType);
-                        handlerInstance = dependencyContainer=>valueOf(handlerType);
-                        handlerResult = handlerInstance=>forceInvoke(handlerParams);
-                        $response->shape(`HttpAutoWireResponseBodyFromParameter)=>invoke(handlerResult)
+                        handlerParams = callParams->hydrateAs(handlerParameterType)?;
+                        handlerInstance = dependencyContainer->valueOf(handlerType)?;
+                        handlerResult = handlerInstance->forceInvoke(handlerParams)?;
+                        $response->shape(`HttpAutoWireResponseBodyFromParameter)(handlerResult)?
                     },
                     ~: @HttpAutoWireRouteDoesNotMatch
                 }

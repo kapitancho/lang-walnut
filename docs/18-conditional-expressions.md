@@ -12,8 +12,8 @@ Walnut provides five conditional expressions for control flow and pattern matchi
 - `?whenIsError` - Error checking
 
 **Early Return Expressions:**
-- `?noError` - Early return on error
-- `?noExternalError` - Early return on external error
+- `?` (postfix) - Early return on error
+- `*?` (postfix) - Early return on external error
 
 ## `?when` - If-Then-Else
 

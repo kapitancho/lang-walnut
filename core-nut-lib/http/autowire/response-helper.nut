@@ -8,7 +8,7 @@ NoResponseBody ==> HttpAutoWireResponseBodyFromParameter ::
 RedirectResponseBody := $[statusCode: HttpResponseStatusCode];
 RedirectResponseBody ==> HttpAutoWireResponseBodyFromParameter ::
     ^result: Any => Result<HttpResponse, Any> %% ~HttpResponseBuilder :: {
-        redirectValue = result=>as(`String);
+        redirectValue = result->as(`String)?;
         httpResponseBuilder($statusCode)
             ->withHeader[headerName: 'Location', values: [redirectValue]]
     };
@@ -29,4 +29,4 @@ ContentResponseBody ==> HttpAutoWireResponseBodyFromParameter ::
     ^result: Any => Result<HttpResponse, Any> %% ~HttpResponseBuilder ::
         {httpResponseBuilder($statusCode)
             ->withHeader[headerName: 'Content-Type', values: [$contentType]]}
-            ->withBody(result => asString);
+            ->withBody(result -> asString?);

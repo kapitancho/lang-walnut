@@ -97,8 +97,8 @@ The following are reserved keywords in Walnut:
 - `?whenTypeOf` - Type matching
 - `?whenIsTrue` - Boolean condition matching
 - `?whenIsError` - Error checking
-- `?noError` - Error early return
-- `?noExternalError` - External error early return
+- `?` (postfix) - Error early return
+- `*?` (postfix) - External error early return
 
 ### Declaration Keywords
 - `module` - Module declaration

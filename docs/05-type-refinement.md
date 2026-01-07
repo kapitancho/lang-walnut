@@ -472,14 +472,14 @@ fullRange = IntegerRange[MinusInfinity, PlusInfinity];
 
 /* Real range with intervals */
 complexRange = RealNumberRange![intervals: [
-    ?noError(RealNumberInterval[
+    RealNumberInterval[
         start: MinusInfinity,
         end: RealNumberIntervalEndpoint![value: -17.3, inclusive: true]
-    ]),
-    ?noError(RealNumberInterval[
+    ]?,
+    RealNumberInterval[
         start: RealNumberIntervalEndpoint![value: 3.14, inclusive: true],
         end: RealNumberIntervalEndpoint![value: 10, inclusive: false]
-    ])
+    ]?
 ]];
 ```
 
