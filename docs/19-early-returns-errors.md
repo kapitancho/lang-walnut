@@ -870,7 +870,7 @@ Q := (d, e);
 
 => {
     myFn = ^ pl: Array<P> => Result<Array<Q>, E> :: {
-        pl->map(^~P => Result<Q, E> :: ?whenValueOf(p) is {
+        pl->map(^~P => Result<Q, E> :: ?whenValueOf(p) {
             P.a: Q.d,
             P.b: Q.e,
             ~: @E

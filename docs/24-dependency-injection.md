@@ -255,8 +255,8 @@ ExchangeRateProvider = ^[fromCurrency: Currency, toCurrency: Currency] => *Real;
 
 /* Mock implementation */
 ==> ExchangeRateProvider :: ^[fromCurrency: Currency, toCurrency: Currency] => *Real ::
-    ?whenValueOf(#fromCurrency) is {
-        Currency.Euro: ?whenValueOf(#toCurrency) is {
+    ?whenValueOf(#fromCurrency) {
+        Currency.Euro: ?whenValueOf(#toCurrency) {
             Currency.Dollar: 1.2,
             Currency.Yen: 130.0
         }
@@ -521,7 +521,7 @@ Person->message(^String => String) %% CommunicationProtocol ::
 Person->age() :: $age;
 
 /* Method with parameter, no return type */
-Person->askQuestion(^String) :: ?whenValueOf(#) is {
+Person->askQuestion(^String) :: ?whenValueOf(#) {
     'How old are you?': $age,
     'What is your name?': $name,
     ~: 'I do not understand the question'
@@ -542,7 +542,7 @@ module demo-money:
 Amount = Real;
 Currency := (Euro, Dollar, Yen);
 
-Currency ==> String :: ?whenValueOf($) is {
+Currency ==> String :: ?whenValueOf($) {
     Currency.Euro: '€',
     Currency.Dollar: '$',
     Currency.Yen: '¥'
@@ -565,13 +565,13 @@ MoneyCurrencyConvertor = ^[money: Money, toCurrency: Currency] => *Money;
 
 /* Mock exchange rate provider */
 ==> ExchangeRateProvider :: ^[fromCurrency: Currency, toCurrency: Currency] => *Real ::
-    ?whenValueOf(#fromCurrency) is {
-        Currency.Euro: ?whenValueOf(#toCurrency) is {
+    ?whenValueOf(#fromCurrency) {
+        Currency.Euro: ?whenValueOf(#toCurrency) {
             Currency.Euro: 1,
             Currency.Dollar: 1.2,
             Currency.Yen: 130.0
         },
-        Currency.Dollar: ?whenValueOf(#toCurrency) is {
+        Currency.Dollar: ?whenValueOf(#toCurrency) {
             Currency.Euro: 0.8,
             Currency.Dollar: 1,
             Currency.Yen: 105.0

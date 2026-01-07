@@ -36,7 +36,7 @@ final class VariableScopeTest extends CodeExecutionTestHelper {
 	public function testVariableScopeWhenTypeOf(): void {
 		$result = $this->executeCodeSnippet("
 			a = 1;
-			?whenTypeOf(a) is { `Integer: {a = 3; b = 1}, ~: {a = 4; b = 2} };
+			?whenTypeOf(a) { `Integer: {a = 3; b = 1}, ~: {a = 4; b = 2} };
 			a;
 		");
 		$this->assertEquals("1", $result);
@@ -45,7 +45,7 @@ final class VariableScopeTest extends CodeExecutionTestHelper {
 	public function testVariableScopeWhenValueOf(): void {
 		$result = $this->executeCodeSnippet("
 			a = 1; b = 0;
-			?whenValueOf(a) is { 1: {a = 3; b = 1}, ~: {a = 4; b = 2} };
+			?whenValueOf(a) { 1: {a = 3; b = 1}, ~: {a = 4; b = 2} };
 			a;
 		");
 		$this->assertEquals("1", $result);

@@ -688,7 +688,7 @@ parseInteger = ^text: String => Result<Integer, String> :: {
 
 /* Or use pattern matching */
 result = text->asInteger;
-?whenTypeOf(result) is {
+?whenTypeOf(result) {
     `Integer: result->printed,
     `NotANumber: 'Parse error'
 };

@@ -58,7 +58,7 @@ final readonly class NoErrorExpression implements NoErrorExpressionInterface, Js
 
 	public function __toString(): string {
 		return sprintf(
-			"?noError(%s)",
+			"(%s)?",
 			$this->targetExpression
 		);
 	}

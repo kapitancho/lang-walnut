@@ -51,7 +51,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 	public function testConstructOpenConstructorWithErrorAndValidatorOk(): void {
 		$result = $this->executeCodeSnippet("MyOpen(112);",
 			"MyOpen := #String @ Integer :: ?when ({#->length} > 10) { => @{#->length} };" .
-			"MyOpen(Integer) @ Boolean :: ?whenValueOf(#) is {0 : @false, ~ : #->asString};"
+			"MyOpen(Integer) @ Boolean :: ?whenValueOf(#) {0 : @false, ~ : #->asString};"
 		);
 		$this->assertEquals("MyOpen{'112'}", $result);
 	}
@@ -59,7 +59,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 	public function testConstructOpenConstructorWithErrorAndValidatorError(): void {
 		$result = $this->executeCodeSnippet("MyOpen(0);",
 			"MyOpen := #String @ Integer :: ?when ({#->length} > 10) { => @{#->length} };" .
-			"MyOpen(Integer) @ Boolean :: ?whenValueOf(#) is {0 : @false, ~ : #->asString};"
+			"MyOpen(Integer) @ Boolean :: ?whenValueOf(#) {0 : @false, ~ : #->asString};"
 		);
 		$this->assertEquals("@false", $result);
 	}
@@ -118,7 +118,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 	public function testConstructSealedConstructorWithErrorAndValidatorOk(): void {
 		$result = $this->executeCodeSnippet("MySealed(112);",
 			"MySealed := $[a: String] @ Integer :: ?when ({#a->length} > 10) { => @{#a->length} };" .
-			"MySealed(Integer) @ Boolean :: ?whenValueOf(#) is {0 : @false, ~ : [a: #->asString]};"
+			"MySealed(Integer) @ Boolean :: ?whenValueOf(#) {0 : @false, ~ : [a: #->asString]};"
 		);
 		$this->assertEquals("MySealed[a: '112']", $result);
 	}
@@ -126,7 +126,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 	public function testConstructSealedConstructorWithErrorAndValidatorError(): void {
 		$result = $this->executeCodeSnippet("MySealed(0);",
 			"MySealed := $[a: String] @ Integer :: ?when ({#a->length} > 10) { => @{#a->length} };" .
-			"MySealed(Integer) @ Boolean :: ?whenValueOf(#) is {0 : @false, ~ : [a: #->asString]};"
+			"MySealed(Integer) @ Boolean :: ?whenValueOf(#) {0 : @false, ~ : [a: #->asString]};"
 		);
 		$this->assertEquals("@false", $result);
 	}

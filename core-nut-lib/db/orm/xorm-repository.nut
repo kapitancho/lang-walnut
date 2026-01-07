@@ -27,7 +27,7 @@ OxRepository->one(^v: DatabaseValue => *Result<Any, EntryNotFound>) %% ~Database
         } *> ('Failed to get entry from the database')
           ->map(^row: DatabaseQueryDataRow => Result<Any, HydrationError> :: row->hydrateAs($type))
           *> ('Failed to hydrate entries');
-    ?whenTypeOf(entries) is {
+    ?whenTypeOf(entries) {
         `Array<1..>: entries.0,
         ~: @EntryNotFound![key: v]
     }
@@ -40,7 +40,7 @@ OxRepository->insertOne(^v: {DatabaseQueryDataRow} => *Result<Null, DuplicateEnt
         *> ('Failed to get query for orm model');
     result = {databaseConnector->execute[query: query, boundParameters: v]}
         /* *> ('Failed to insert entry into the database') */;
-    ?whenTypeOf(result) is {
+    ?whenTypeOf(result) {
         `Error<DatabaseQueryFailure> : ?whenIsTrue {
             result->error.error->contains('SQLSTATE[23'): @DuplicateEntry![key: entryId],
             ~: result *> ('Failed to insert entry into the database')
@@ -60,7 +60,7 @@ OxRepository->deleteOne(^v: DatabaseValue => *Result<Null, EntryNotFound>) %% ~D
         *> ('Failed to get query for orm model');
     result = {databaseConnector->execute[query: query, boundParameters: [:]->withKeyValue[key: $ox->keyField, value: v]]}
         -> errorAsExternal('Failed to delete entry from the database');
-    ?whenTypeOf(result) is {
+    ?whenTypeOf(result) {
         `Integer<1..1> : null,
         ~: @EntryNotFound![key: v]
     }
@@ -73,7 +73,7 @@ OxRepository->updateOne(^v: {DatabaseQueryDataRow} => *Result<Null, EntryNotFoun
         *> ('Failed to get query for orm model');
     result = {%databaseConnector->execute[query: query, boundParameters: v]}
         *> ('Failed to update entry in the database');
-    ?whenTypeOf(result) is {
+    ?whenTypeOf(result) {
         `Integer<1..1> : null,
         ~: @EntryNotFound![key: entryId]
     }

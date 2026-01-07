@@ -29,7 +29,7 @@ TableField ==> SqlString %% ~SqlQuoter ::
     sqlQuoter.quoteIdentifier($tableAlias) + '.' + sqlQuoter.quoteIdentifier($fieldName);
 
 SqlFieldExpressionOperation := (Equals, NullSafeEquals, NotEquals, LessThan, LessOrEquals, GreaterThan, GreaterOrEquals, Like, NotLike, Regexp);
-SqlFieldExpressionOperation ==> SqlString :: ?whenValueOf($) is {
+SqlFieldExpressionOperation ==> SqlString :: ?whenValueOf($) {
 	SqlFieldExpressionOperation.Equals: '=',
 	SqlFieldExpressionOperation.NullSafeEquals: '<=>',
 	SqlFieldExpressionOperation.NotEquals: '!=',
@@ -59,11 +59,11 @@ SqlFieldExpression ==> SqlString :: [
     $value->as(`SqlString)
 ]->combineAsString(' ');
 SqlRawExpression ==> SqlString :: $expression;
-SqlAndExpression ==> SqlString :: ?whenTypeOf($expressions) is {
+SqlAndExpression ==> SqlString :: ?whenTypeOf($expressions) {
     `Array<SqlExpression, 1..>: '(' + $expressions->map(^SqlExpression => String :: #->asSqlString)->combineAsString(' AND ') + ')',
     ~: '1'
 };
-SqlOrExpression ==> SqlString :: ?whenTypeOf($expressions) is {
+SqlOrExpression ==> SqlString :: ?whenTypeOf($expressions) {
     `Array<SqlExpression, 1..>: '(' + $expressions->map(^SqlExpression => String :: #->asSqlString)->combineAsString(' OR ') + ')',
     ~: '0'
 };
@@ -96,7 +96,7 @@ SqlSelectLimit := $[limit: Integer<1..>, offset: Integer<0..>];
 SqlSelectLimit ==> SqlString :: ['LIMIT', $limit->asString, 'OFFSET', $offset->asString]->combineAsString(' ');
 
 SqlOrderByDirection := (Asc, Desc);
-SqlOrderByDirection ==> SqlString :: ?whenValueOf($) is {
+SqlOrderByDirection ==> SqlString :: ?whenValueOf($) {
     SqlOrderByDirection.Asc: 'ASC',
     SqlOrderByDirection.Desc: 'DESC'
 };
@@ -111,7 +111,7 @@ SqlOrderByFields ==> SqlString :: 'ORDER BY '->concat(
 );
 
 SqlTableJoinType := (Inner, Left, Right, Full);
-SqlTableJoinType ==> SqlString :: ?whenValueOf($) is {
+SqlTableJoinType ==> SqlString :: ?whenValueOf($) {
     SqlTableJoinType.Inner: 'JOIN',
     SqlTableJoinType.Left: 'LEFT JOIN',
     SqlTableJoinType.Right: 'RIGHT JOIN',
@@ -131,7 +131,7 @@ SqlTableJoin ==> SqlString %% ~SqlQuoter :: [
 
 SqlSelectFieldList := $[fields: Map<DatabaseFieldName|TableField|QueryValue>];
 SqlSelectFieldList ==> SqlString %% ~SqlQuoter :: $fields->mapKeyValue(^[key: String, value: DatabaseFieldName|TableField|QueryValue] => String :: ''->concatList[
-    ?whenTypeOf(#value) is {
+    ?whenTypeOf(#value) {
         `DatabaseFieldName: sqlQuoter.quoteIdentifier(#value),
         `TableField|QueryValue: #value->asSqlString
     },
@@ -151,11 +151,11 @@ SelectQuery ==> DatabaseSqlQuery %% ~SqlQuoter ::
     ' FROM ' + sqlQuoter.quoteIdentifier($tableName) +
     $joins->map(^SqlTableJoin => String :: #->asSqlString)->combineAsString(' ') +
     ' WHERE ' + $queryFilter->asSqlString +
-    ?whenTypeOf($orderBy) is {
+    ?whenTypeOf($orderBy) {
         `SqlOrderByFields: $orderBy->asSqlString,
         ~: ''
     } +
-    ?whenTypeOf($limit) is {
+    ?whenTypeOf($limit) {
         `SqlSelectLimit: $limit->asSqlString,
         ~: ''
     };

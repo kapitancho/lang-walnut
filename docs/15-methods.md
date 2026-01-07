@@ -406,7 +406,7 @@ obj.field  /* Equivalent to: obj->item('field') */
 ```walnut
 Person := $[name: String, age: Integer];
 Person->item(^String => Result<String|Integer, String>) ::
-    ?whenValueOf(#) is {
+    ?whenValueOf(#) {
         'name': $name,
         'age': $age,
         ~: @{'Property not found: ' + #}
@@ -451,7 +451,7 @@ Person->message(^String => String) %% CommunicationProtocol ::
 Person->age() :: $age;
 
 /* Method with parameter but no return type (=> Any) */
-Person->askQuestion(^String) :: ?whenValueOf(#) is {
+Person->askQuestion(^String) :: ?whenValueOf(#) {
     'How old are you?': $age,
     'What is your name?': $name,
     ~: 'I do not understand the question'
@@ -477,7 +477,7 @@ module demo-properties:
 
 Person := $[name: String<1..>, age: Integer<0..>];
 Person->item(^String => Result<String|Integer, String>) ::
-    ?whenValueOf(#) is {
+    ?whenValueOf(#) {
         'name': $name,
         'age': $age,
         ~: @{'Property not found: ' + #}

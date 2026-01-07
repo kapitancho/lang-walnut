@@ -114,8 +114,8 @@
 
 <VariableExpression> ::= <InFunctionVar>
 <ErrorExpression> ::= "@" <BasicExpression>
-<NoErrorExpression> ::= "?noError(" <Expression> ")"
-<NoExternalErrorExpression> ::= "?noExternalError(" <Expression> ")"
+<NoErrorExpression> ::= <Expression> "?"
+<NoExternalErrorExpression> ::= <Expression> "*" "?"
 <MutableExpression> ::= "mutable" "{" <TypeExpr> "," <Expression> "}"
 
 <DataExpression> ::= <TypeName> "!" <BasicExpression>

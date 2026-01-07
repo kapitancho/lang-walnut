@@ -828,7 +828,7 @@ byLength = words->groupBy(^s: String => String :: s->length->asString);
 /* Group by type */
 mixedData = [1, 'hello', 2.5, 'world', 3];
 byType = mixedData->groupBy(^v: Real|String => String ::
-    ?whenTypeOf(v) is {
+    ?whenTypeOf(v) {
         `String: 'string',
         `Integer: 'integer',
         `Real: 'real'

@@ -279,7 +279,7 @@ Suit := (Clubs, Diamonds, Hearts, Spades);
 
 /* Add method to get suit color */
 Suit->getSuitColor(=> String['black', 'red']) ::
-    ?whenTypeOf($) is {
+    ?whenTypeOf($) {
         `Suit[Clubs, Spades]: 'black',
         `Suit[Diamonds, Hearts]: 'red'
     };
@@ -294,7 +294,7 @@ color = mySuit->getSuitColor; /* 'black' */
 ```walnut
 /* Define cast from Suit to Integer */
 Suit ==> Integer ::
-    ?whenValueOf($) is {
+    ?whenValueOf($) {
         Suit.Clubs: 1,
         Suit.Diamonds: 2,
         Suit.Hearts: 3,
@@ -499,7 +499,7 @@ MyOpen1 := #[a: Integer, b: Integer];
 /* From demo-constructor.nut */
 P := #[x: Integer, y: Integer] @ Q :: {
     z = #y - #x;
-    ?whenTypeOf(z) is { `Integer<10..>: null, ~: => @Q }
+    ?whenTypeOf(z) { `Integer<10..>: null, ~: => @Q }
 };
 
 /* From demo-type.nut */
@@ -554,7 +554,7 @@ Q := ();
 /* Define open type with validator */
 P := #[x: Integer, y: Integer] @ Q :: {
     z = #y - #x;
-    ?whenTypeOf(z) is {
+    ?whenTypeOf(z) {
         `Integer<10..>: null,
         ~: => @Q
     }
@@ -575,23 +575,23 @@ K := ();
 
 L := $[x: Integer, y: Integer] @ K :: {
     z = #y - #x;
-    ?whenTypeOf(z) is { `Integer<1..>: null, ~: => @K }
+    ?whenTypeOf(z) { `Integer<1..>: null, ~: => @K }
 };
 
 L[t: Integer, u: Integer] @ J :: {
-    ?whenTypeOf(#u) is { `Integer<1..>: null, ~: => @J };
+    ?whenTypeOf(#u) { `Integer<1..>: null, ~: => @J };
     [x: #t, y: #u]
 };
 
 /* From demo-constructor.nut */
 P := #[x: Integer, y: Integer] @ Q :: {
     z = #y - #x;
-    ?whenTypeOf(z) is { `Integer<10..>: null, ~: => @Q }
+    ?whenTypeOf(z) { `Integer<10..>: null, ~: => @Q }
 };
 
 P[t: String, u: Integer] @ R :: {
     z = #u - #t->length;
-    ?whenTypeOf(z) is { `Integer<1..>: null, ~: => @R };
+    ?whenTypeOf(z) { `Integer<1..>: null, ~: => @R };
     [x: #t->length, y: #u]
 };
 
@@ -657,7 +657,7 @@ C := $[x: Integer, y: Integer];
 D := $[x: Integer, y: Integer];
 H := $[x: Integer, y: Integer] @ G :: {
     z = #y - #x;
-    ?whenTypeOf(z) is { `Integer<1..>: null, ~: => @G }
+    ?whenTypeOf(z) { `Integer<1..>: null, ~: => @G }
 };
 
 /* From demo-type.nut */
@@ -758,7 +758,7 @@ G := ();
 /* Define sealed type with validator */
 H := $[x: Integer, y: Integer] @ G :: {
     z = #y - #x;
-    ?whenTypeOf(z) is { `Integer<1..>: null, ~: => @G }
+    ?whenTypeOf(z) { `Integer<1..>: null, ~: => @G }
 };
 
 /* Usage */
@@ -774,12 +774,12 @@ J := ();
 
 L := $[x: Integer, y: Integer] @ K :: {
     z = #y - #x;
-    ?whenTypeOf(z) is { `Integer<1..>: null, ~: => @K }
+    ?whenTypeOf(z) { `Integer<1..>: null, ~: => @K }
 };
 
 /* Constructor with its own validator */
 L[t: Integer, u: Integer] @ J :: {
-    ?whenTypeOf(#u) is { `Integer<1..>: null, ~: => @J };
+    ?whenTypeOf(#u) { `Integer<1..>: null, ~: => @J };
     [x: #t, y: #u]
 };
 
@@ -787,7 +787,7 @@ L[t: Integer, u: Integer] @ J :: {
 D := $[x: Integer, y: Integer];
 D[t: Integer, u: Integer] @ E :: {
     z = #u - #t;
-    ?whenTypeOf(z) is { `Integer<1..>: null, ~: => @E };
+    ?whenTypeOf(z) { `Integer<1..>: null, ~: => @E };
     [x: #t, y: #u]
 };
 ```
@@ -989,7 +989,7 @@ TypeName[InputType] @ ConstructorError :: {
 D := $[x: Integer, y: Integer];
 D[t: Integer, u: Integer] @ E :: {
     z = #u - #t;
-    ?whenTypeOf(z) is { `Integer<1..>: null, ~: => @E };
+    ?whenTypeOf(z) { `Integer<1..>: null, ~: => @E };
     [x: #t, y: #u]
 };
 

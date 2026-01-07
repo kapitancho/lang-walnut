@@ -133,8 +133,8 @@ AllTypes = [
             'evaluated'; 'evaluated and used'
         },
         return: ?when(0) { => 'return' },
-        noError: ?noError('no error'),
-        noExternalError: ?noExternalError('no external error'),
+        noError: 'no error'?,
+        noExternalError: 'no external error'*?,
         variableAssignment: variableName = 'variable assignment',
         multiVariableAssignmentList: var{ variableName1, variableName2 } = [1, 2],
         multiVariableAssignmentDict: var{ key: variableName1, ~variableName2 } = [key: 1, variableName2: 2],
@@ -149,8 +149,8 @@ AllTypes = [
         not: !'left',
         mutable: mutable{String, 'mutable'},
         matchTrue: ?whenIsTrue { 'then 1': 'then 1', 'then 2': 'then 2', ~: 'default' },
-        matchType: ?whenTypeOf ('type') is { `String['type']: 'then 1', `String['other type']: 'then 2', ~: 'default' },
-        matchValue: ?whenValueOf ('value') is { 'value': 'then 1', 'other value': 'then 2', ~: 'default' },
+        matchType: ?whenTypeOf ('type') { `String['type']: 'then 1', `String['other type']: 'then 2', ~: 'default' },
+        matchValue: ?whenValueOf ('value') { 'value': 'then 1', 'other value': 'then 2', ~: 'default' },
         matchIfThenElse: ?when('condition') { 'then' } ~ { 'else' },
         matchIfThen: ?when('condition') { 'then' },
         matchIsErrorElse: ?whenIsError('condition') { 'then' } ~ { 'else' },
@@ -300,6 +300,8 @@ AllTypes = [
     c = `String;
     d = val{false};
     e = :: => 5;
+    f = type{True};
+    g = val{type{False}};
 
     [
         allExpressions: getAllExpressions(),

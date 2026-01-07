@@ -7,13 +7,13 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 final class NoExternalErrorExpressionTest extends CodeExecutionTestHelper {
 
 	public function testNoExternalErrorSimple(): void {
-		$result = $this->executeCodeSnippet("?noExternalError('ok');");
+		$result = $this->executeCodeSnippet("'ok'*?;");
 		$this->assertEquals("'ok'", $result);
 	}
 
 	public function testNoExternalErrorResultReturn(): void {
 		$declaration = <<<NUT
-			noExternalError = ^Impure<String> => Impure<Integer> :: {?noExternalError(#)}->length;
+			noExternalError = ^v: Impure<String> => Impure<Integer> :: v *?->length;
 		NUT;
 		$result = $this->executeCodeSnippet("noExternalError('ok');", valueDeclarations: $declaration);
 		$this->assertEquals("2", $result);
@@ -21,17 +21,17 @@ final class NoExternalErrorExpressionTest extends CodeExecutionTestHelper {
 
 	public function testNoExternalErrorResult(): void {
 		$declaration = <<<NUT
-			noExternalError = ^Impure<String> => Impure<Integer> :: {?noExternalError(#)}->length;
+			noExternalError = ^Impure<String> => Impure<Integer> :: #*?->length;
 		NUT;
 
-		$result = $this->executeCodeSnippet("noExternalError(@ExternalError[errorType: 'Error', originalError: 'Error', errorMessage: 'Error']);", valueDeclarations: $declaration);
+		$result = $this->executeCodeSnippet("@ExternalError[errorType: 'Error', originalError: 'Error', errorMessage: 'Error']*?;", valueDeclarations: $declaration);
 		$this->assertEquals("@ExternalError[errorType: 'Error',originalError: 'Error',errorMessage: 'Error']",
 			str_replace(["\n", "\t"], "", $result));
 	}
 
 	public function testNoExternalErrorUnion(): void {
 		$declaration = <<<NUT
-			noExternalError = ^Impure<Result<String, Integer>> => Impure<Boolean> :: {?noExternalError(#)}->asBoolean;
+			noExternalError = ^v: Impure<Result<String, Integer>> => Impure<Boolean> :: v*?->asBoolean;
 		NUT;
 
 		$result = $this->executeCodeSnippet("noExternalError(@0);", valueDeclarations: $declaration);
@@ -40,7 +40,7 @@ final class NoExternalErrorExpressionTest extends CodeExecutionTestHelper {
 
 	public function testNoExternalErrorOtherErrorType(): void {
 		$declaration = <<<NUT
-			noExternalError = ^v: Result<String, Real> => Result<String, Real> :: ?noExternalError(v);
+			noExternalError = ^v: Result<String, Real> => Result<String, Real> :: v*?;
 		NUT;
 		$result = $this->executeCodeSnippet("noExternalError('ok');", valueDeclarations: $declaration);
 		$this->assertEquals("'ok'", $result);
@@ -48,7 +48,7 @@ final class NoExternalErrorExpressionTest extends CodeExecutionTestHelper {
 
 	public function testNoExternalErrorOtherType(): void {
 		$declaration = <<<NUT
-			noExternalError = ^String => Integer :: {?noExternalError(#)}->length;
+			noExternalError = ^s: String => Integer :: s*?->length;
 		NUT;
 		$result = $this->executeCodeSnippet("noExternalError('ok');", valueDeclarations: $declaration);
 		$this->assertEquals("2", $result);

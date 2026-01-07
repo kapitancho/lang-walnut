@@ -518,7 +518,7 @@ result = castTo(x, `Integer);
 /* Inspect tuple values based on their type */
 inspectTuple = ^v: Array => Any :: {
     t = v->type;
-    ?whenTypeOf(t) is {
+    ?whenTypeOf(t) {
         `Type<Tuple>: {
             itemTypes = t->itemTypes;
             itemTypes->mapIndexValue(^[index: Integer, valueType: Type] => Any ::
@@ -540,7 +540,7 @@ values = inspectTuple(tuple);
 /* Inspect record values based on their type */
 inspectRecord = ^v: Map => Any :: {
     t = v->type;
-    ?whenTypeOf(t) is {
+    ?whenTypeOf(t) {
         `Type<Record>: {
             itemTypes = t->itemTypes;
             itemTypes->mapKeyValue(^[key: String, valueType: Type] => Any ::
@@ -562,7 +562,7 @@ values = inspectRecord(record);
 /* Get function signature information */
 getFunctionSignature = ^f: ^Any => Any => [Type, Type] :: {
     t = f->type;
-    ?whenTypeOf(t) is {
+    ?whenTypeOf(t) {
         `Type<Function>: [t->parameterType, t->returnType],
         ~: [null, null]
     }
@@ -579,7 +579,7 @@ signature = getFunctionSignature(myFunc);
 /* Serialize based on type information */
 serialize = ^value: Any => String :: {
     t = value->type;
-    ?whenTypeOf(t) is {
+    ?whenTypeOf(t) {
         `Type<Integer>: 'int:' + value->asString,
         `Type<String>: 'str:' + value,
         `Type<Array>: 'arr:[' + value->map(serialize)->combineAsString(',') + ']',
@@ -614,7 +614,7 @@ validateValue(name, `String<3..20>);   /* true */
 ```walnut
 /* Generate validator code based on type */
 generateValidator = ^t: Type => String ::
-    ?whenTypeOf(t) is {
+    ?whenTypeOf(t) {
         `Type<Integer>: {
             min = t->minValue;
             max = t->maxValue;
@@ -640,7 +640,7 @@ getElementType = ^t: Type<Array> => Type ::
 
 /* Check if type is optional (union with Null) */
 isOptional = ^t: Type => Boolean ::
-    ?whenTypeOf(t) is {
+    ?whenTypeOf(t) {
         `Type<Union>: t->itemTypes->contains(`Null),
         ~: false
     };
@@ -651,7 +651,7 @@ isOptional = ^t: Type => Boolean ::
 ```walnut
 /* Process value based on its runtime type */
 processValue = ^value: Any => String ::
-    ?whenTypeOf(value->type) is {
+    ?whenTypeOf(value->type) {
         `Type<Integer>: 'Processing integer: ' + value->asString,
         `Type<String>: 'Processing string: ' + value,
         `Type<Array>: 'Processing array of length: ' + value->length->asString,
@@ -668,7 +668,7 @@ arrayToSetType = ^t: Type<Array> => Type<Set> ::
 
 /* Unwrap optional type */
 unwrapOptional = ^t: Type => Type ::
-    ?whenTypeOf(t) is {
+    ?whenTypeOf(t) {
         `Type<Union>: {
             types = t->itemTypes->without(`Null);
             ?when(types->length == 1) {
@@ -691,7 +691,7 @@ getRecordKeys = ^t: Type<Record> => Array<String> ::
 /* Get function parameter count */
 getFunctionArity = ^t: Type<Function> => Integer ::
     paramType = t->parameterType;
-    ?whenTypeOf(paramType) is {
+    ?whenTypeOf(paramType) {
         `Type<Tuple>: paramType->itemTypes->length,
         `Type<Null>: 0,
         ~: 1
@@ -730,7 +730,7 @@ processEnum = ^et: Type<Enumeration> => Array ::
 ```walnut
 /* Good: Use type inspection with pattern matching */
 handleValue = ^value: Any => String ::
-    ?whenTypeOf(value->type) is {
+    ?whenTypeOf(value->type) {
         `Type<Integer>: handleInteger(value),
         `Type<String>: handleString(value),
         ~: 'Unknown'

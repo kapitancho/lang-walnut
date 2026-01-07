@@ -351,7 +351,7 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 			"MyError := ();",
 			"
 				fn1 = ^s: JsonValue => *Result<Integer, NotANumber> :: s->hydrateAs(`String) *> ('Hydration failed')->asInteger;
-				fn2 = ^i: Result<Integer, NotANumber> => Result<Integer, MyError> :: ?whenTypeOf(i) is {
+				fn2 = ^i: Result<Integer, NotANumber> => Result<Integer, MyError> :: ?whenTypeOf(i) {
 					`Integer: i + 5,
 					`Error<NotANumber>: @MyError
 				};
@@ -367,7 +367,7 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 			"MyError := ();",
 			"
 				fn1 = ^s: String => Result<Integer> :: s->asInteger;
-				fn2 = ^i: Result<Integer> => Result<Integer, MyError> :: ?whenTypeOf(i) is {
+				fn2 = ^i: Result<Integer> => Result<Integer, MyError> :: ?whenTypeOf(i) {
 					`Integer: i + 5,
 					`Error: @MyError
 				};
@@ -383,7 +383,7 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 			"MyError := ();",
 			"
 				fn1 = ^s: JsonValue => *Result<Integer, NotANumber> :: s->hydrateAs(`String) *> ('Hydration failed')->asInteger;
-				fn2 = ^i: Result<Integer, NotANumber> => Result<Integer, MyError> :: ?whenTypeOf(i) is {
+				fn2 = ^i: Result<Integer, NotANumber> => Result<Integer, MyError> :: ?whenTypeOf(i) {
 					`Integer: i + 5,
 					`Error<NotANumber>: @MyError
 				};
@@ -399,7 +399,7 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 			"MyError := ();",
 			"
 				fn1 = ^s: JsonValue => *Result<Integer, NotANumber> :: s->hydrateAs(`String) *> ('Hydration failed')->asInteger;
-				fn2 = ^i: Result<Integer, NotANumber> => Result<Integer, MyError> :: ?whenTypeOf(i) is {
+				fn2 = ^i: Result<Integer, NotANumber> => Result<Integer, MyError> :: ?whenTypeOf(i) {
 					`Integer: i + 5,
 					`Error<NotANumber>: @MyError
 				};

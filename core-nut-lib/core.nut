@@ -10,17 +10,17 @@ PlusInfinity := ();
 NegativeValue := ();
 InvalidIntegerRange := [min: Integer, max: Integer];
 IntegerRange := #[minValue: Integer|MinusInfinity, maxValue: Integer|PlusInfinity] @ InvalidIntegerRange ::
-    ?whenTypeOf(#) is { `[minValue: Integer, maxValue: Integer]:
+    ?whenTypeOf(#) { `[minValue: Integer, maxValue: Integer]:
         ?when (#.minValue > #.maxValue) { => @InvalidIntegerRange![min: #.minValue, max: #.maxValue] }};
 
 InvalidRealRange := [min: Real, max: Real];
 RealRange := #[minValue: Real|MinusInfinity, maxValue: Real|PlusInfinity] @ InvalidRealRange ::
-    ?whenTypeOf(#) is { `[minValue: Real, maxValue: Real]:
+    ?whenTypeOf(#) { `[minValue: Real, maxValue: Real]:
         ?when (#.minValue > #.maxValue) { => @InvalidRealRange![min: #.minValue, max: #.maxValue] }};
 
 InvalidLengthRange := [min: Integer<0..>, max: Integer<0..>];
 LengthRange := #[minLength: Integer<0..>, maxLength: Integer<0..>|PlusInfinity] @ InvalidLengthRange ::
-    ?whenTypeOf(#) is { `[minLength: Integer<0..>, maxLength: Integer<0..>]:
+    ?whenTypeOf(#) { `[minLength: Integer<0..>, maxLength: Integer<0..>]:
         ?when (#.minLength > #.maxLength) { => @InvalidLengthRange![min: #.minLength, max: #.maxLength] }};
 
 PositiveInteger = Integer<1..>;
@@ -33,7 +33,7 @@ IntegerNumberIntervalEndpoint := [value: Integer, inclusive: Boolean];
 IntegerNumberInterval := #[
     start: MinusInfinity|IntegerNumberIntervalEndpoint,
     end: PlusInfinity|IntegerNumberIntervalEndpoint
-] @ InvalidIntegerRange :: ?whenTypeOf(#) is {
+] @ InvalidIntegerRange :: ?whenTypeOf(#) {
     `[start: IntegerNumberIntervalEndpoint, end: IntegerNumberIntervalEndpoint]:
         ?when (
             #.start.value > #.end.value ||
@@ -52,7 +52,7 @@ RealNumberIntervalEndpoint := [value: Real, inclusive: Boolean];
 RealNumberInterval := #[
     start: MinusInfinity|RealNumberIntervalEndpoint,
     end: PlusInfinity|RealNumberIntervalEndpoint
-] @ InvalidRealRange :: ?whenTypeOf(#) is {
+] @ InvalidRealRange :: ?whenTypeOf(#) {
     `[start: RealNumberIntervalEndpoint, end: RealNumberIntervalEndpoint]:
         ?when (
             {#.start.value > #.end.value} ||

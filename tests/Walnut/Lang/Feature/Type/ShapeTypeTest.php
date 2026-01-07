@@ -51,7 +51,7 @@ final class ShapeTypeTest extends CodeExecutionTestHelper {
 	public function testShapeAsRefinedType(): void {
 		$result = $this->executeCodeSnippet("useReal(getReal());",
 			valueDeclarations: "
-				useReal = ^p: Any => Any :: ?whenTypeOf(p) is {
+				useReal = ^p: Any => Any :: ?whenTypeOf(p) {
 					type{Shape<Real>}: p->shape(`Real)->ceil,
 					type{String}: p
 				};

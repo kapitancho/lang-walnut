@@ -62,7 +62,7 @@ D := $[x: Integer, y: Integer];
 /* Constructor that converts Integers */
 D[t: Integer, u: Integer] @ E :: {
     z = #u - #t;
-    ?whenTypeOf(z) is { `Integer<1..>: null, ~: => @E };
+    ?whenTypeOf(z) { `Integer<1..>: null, ~: => @E };
     [x: #t, y: #u]
 };
 
@@ -123,13 +123,13 @@ Constructors can return errors when conversion fails:
 R := ();
 P := #[x: Integer, y: Integer] @ Q :: {
     z = #y - #x;
-    ?whenTypeOf(z) is { `Integer<10..>: null, ~: => @Q }
+    ?whenTypeOf(z) { `Integer<10..>: null, ~: => @Q }
 };
 
 /* Constructor with validation */
 P[t: String, u: Integer] @ R :: {
     z = #u - #t->length;
-    ?whenTypeOf(z) is { `Integer<1..>: null, ~: => @R };
+    ?whenTypeOf(z) { `Integer<1..>: null, ~: => @R };
     [x: #t->length, y: #u]
 };
 
@@ -205,7 +205,7 @@ This ensures type invariants are never violated.
 NotAnOddInteger := ();
 
 OddInteger := #Integer @ NotAnOddInteger :: {
-    ?whenValueOf(# % 2) is {
+    ?whenValueOf(# % 2) {
         1: #,
         ~: @NotAnOddInteger
     }
@@ -258,7 +258,7 @@ r = Range2([14, 23]); /* OK: 14 < 23 */
 InvalidRange := ();
 
 IntegerRange := #[minValue: Integer|MinusInfinity, maxValue: Integer|PlusInfinity] @ InvalidRange ::
-    ?whenTypeOf(#) is {
+    ?whenTypeOf(#) {
         `[minValue: Integer, maxValue: Integer]:
             ?when (#minValue > #maxValue) { => @InvalidRange }
     };
@@ -273,7 +273,7 @@ Use the `=> @ErrorType` syntax to return errors:
 InvalidPoint := ();
 
 Point := #[x: Real, y: Real] @ InvalidPoint ::
-    ?whenValueOf([#x, #y]) is {
+    ?whenValueOf([#x, #y]) {
         [0, 0]: => @InvalidPoint
     };
 
@@ -307,7 +307,7 @@ Unlike constructors, validators **cannot be bypassed**:
 D := $[x: Integer, y: Integer];
 D[t: Integer, u: Integer] @ E :: {
     z = #u - #t;
-    ?whenTypeOf(z) is { `Integer<1..>: null, ~: => @E };
+    ?whenTypeOf(z) { `Integer<1..>: null, ~: => @E };
     [x: #t, y: #u]
 };
 
@@ -332,12 +332,12 @@ K := ();
 /* Validator checks y - x >= 1 */
 L := $[x: Integer, y: Integer] @ K :: {
     z = #y - #x;
-    ?whenTypeOf(z) is { `Integer<1..>: null, ~: => @K }
+    ?whenTypeOf(z) { `Integer<1..>: null, ~: => @K }
 };
 
 /* Constructor checks u >= 1 */
 L[t: Integer, u: Integer] @ J :: {
-    ?whenTypeOf(#u) is { `Integer<1..>: null, ~: => @J };
+    ?whenTypeOf(#u) { `Integer<1..>: null, ~: => @J };
     [x: #t, y: #u]
 };
 
@@ -364,12 +364,12 @@ R := ();  /* Constructor error */
 
 P := #[x: Integer, y: Integer] @ Q :: {
     z = #y - #x;
-    ?whenTypeOf(z) is { `Integer<10..>: null, ~: => @Q }
+    ?whenTypeOf(z) { `Integer<10..>: null, ~: => @Q }
 };
 
 P[t: String, u: Integer] @ R :: {
     z = #u - #t->length;
-    ?whenTypeOf(z) is { `Integer<1..>: null, ~: => @R };
+    ?whenTypeOf(z) { `Integer<1..>: null, ~: => @R };
     [x: #t->length, y: #u]
 };
 
@@ -727,7 +727,7 @@ ExchangeRateProvider := ^[from: Currency, to: Currency] => Real;
 ==> BookByIsbn %% [~Library] ::
     ^Isbn => Result<Book, UnknownBook> :: {
         book = %library.books->value->item(#->asString);
-        ?whenTypeOf(book) is {
+        ?whenTypeOf(book) {
             `Book: book,
             ~: @UnknownBook[#]
         }
@@ -824,7 +824,7 @@ D := $[x: Integer, y: Integer];
 
 D[t: Integer, u: Integer] @ E :: {
     z = #u - #t;
-    ?whenTypeOf(z) is { `Integer<1..>: null, ~: => @E };
+    ?whenTypeOf(z) { `Integer<1..>: null, ~: => @E };
     [x: #t, y: #u]
 };
 
@@ -841,7 +841,7 @@ d2 = [x: 3, y: 8]->hydrateAs(`D);  /* Constructor SKIPPED */
 /* Type with validator */
 H := $[x: Integer, y: Integer] @ G :: {
     z = #y - #x;
-    ?whenTypeOf(z) is { `Integer<1..>: null, ~: => @G }
+    ?whenTypeOf(z) { `Integer<1..>: null, ~: => @G }
 };
 
 /* Using constructor */
@@ -907,7 +907,7 @@ p2 = Product[id: '', title: 'Widget', price: 9.99];       /* Error */
 NotAnOddInteger := ();
 
 OddInteger := #Integer @ NotAnOddInteger :: {
-    ?whenValueOf(# % 2) is {
+    ?whenValueOf(# % 2) {
         1: #,      /* Return value if odd */
         ~: @NotAnOddInteger  /* Return error if even */
     }
@@ -915,7 +915,7 @@ OddInteger := #Integer @ NotAnOddInteger :: {
 
 /* Usage in function */
 oddOnly = ^Integer => Result<Integer, NotAnOddInteger> :: {
-    ?whenValueOf(# % 2) is {
+    ?whenValueOf(# % 2) {
         1: #,
         ~: @NotAnOddInteger
     }
@@ -1028,12 +1028,12 @@ R := ();
 
 P := #[x: Integer, y: Integer] @ Q :: {
     z = #y - #x;
-    ?whenTypeOf(z) is { `Integer<10..>: null, ~: => @Q }
+    ?whenTypeOf(z) { `Integer<10..>: null, ~: => @Q }
 };
 
 P[t: String, u: Integer] @ R :: {
     z = #u - #t->length;
-    ?whenTypeOf(z) is { `Integer<1..>: null, ~: => @R };
+    ?whenTypeOf(z) { `Integer<1..>: null, ~: => @R };
     [x: #t->length, y: #u]
 };
 
@@ -1052,7 +1052,7 @@ CastNotAvailable := [from: Type, to: Type];
 value = getSomeValue();  /* Type: Any */
 result = value->as(`String);
 
-?whenTypeOf(result) is {
+?whenTypeOf(result) {
     `Ok<String>: {
         /* Use result.value */
     },

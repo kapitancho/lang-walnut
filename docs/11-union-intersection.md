@@ -50,7 +50,7 @@ JsonValue = String | Integer | Real | Boolean | Null |
 ```walnut
 /* Accept multiple input types */
 format = ^ value: Integer | String => String :: {
-    ?whenTypeOf(value) is {
+    ?whenTypeOf(value) {
         `Integer: value->asString,
         `String: value,
         ~: 'unknown'
@@ -60,7 +60,7 @@ format = ^ value: Integer | String => String :: {
 /* Return multiple possible types */
 parse = ^ input: String => Integer | String :: {
     result = input->asInteger;
-    ?whenTypeOf(result) is {
+    ?whenTypeOf(result) {
         `Integer: result,
         `NotANumber: input
     }
@@ -92,7 +92,7 @@ RedOrBlackAce = Suit[Hearts, Diamonds] | Suit[Clubs, Spades];
 
 /* Function using subset union */
 cardColor = ^ card: Suit[Hearts, Diamonds] | Suit[Clubs, Spades] => String :: {
-    ?whenTypeOf(card) is {
+    ?whenTypeOf(card) {
         `Suit[Hearts, Diamonds]: 'red',
         `Suit[Clubs, Spades]: 'black'
     }
@@ -134,7 +134,7 @@ ErrorResponse = [status: 'error', message: String];
 Response = SuccessResponse | ErrorResponse;
 
 handleResponse = ^ ~Response => String :: {
-    ?whenTypeOf(response) is {
+    ?whenTypeOf(response) {
         `[status: 'success', data: String]: response.data,
         `[status: 'error', message: String]: 'Error: ' + response.message
     }
@@ -163,7 +163,7 @@ items = [1, 'two', 3, 'four'];  /* Type: MixedArray */
 /* Process mixed array */
 process = ^ arr: Array<Integer | String> => Array<String> :: {
     arr->map(^item => String :: {
-        ?whenTypeOf(item) is {
+        ?whenTypeOf(item) {
             `Integer: item->asString,
             `String: item
         }
@@ -365,7 +365,7 @@ Pattern matching with union types requires type guards to narrow the type.
 **Basic type narrowing:**
 ```walnut
 process = ^ value: Integer | String => String :: {
-    ?whenTypeOf(value) is {
+    ?whenTypeOf(value) {
         `Integer: 'Number: ' + value->asString,
         `String: 'Text: ' + value,
         ~: 'Unknown'
@@ -379,7 +379,7 @@ result2 = process('hello'); /* 'Text: hello' */
 **Narrowing with type literals:**
 ```walnut
 getValue = ^ value: Integer | String | Boolean => String :: {
-    ?whenTypeOf(value) is {
+    ?whenTypeOf(value) {
         type{Integer}: 'int: ' + value->asString,
         type{String}: 'str: ' + value,
         type{Boolean}: 'bool: ' + value->asString
@@ -398,7 +398,7 @@ ErrorResult = [status: 'error', message: String];
 Result = SuccessResult | ErrorResult;
 
 handleResult = ^ ~Result => String :: {
-    ?whenTypeOf(result) is {
+    ?whenTypeOf(result) {
         `[status: 'success', value: Integer]: {
             'Success: ' + result.value->asString
         },
@@ -416,7 +416,7 @@ Rectangle = [type: 'rectangle', width: Real<0..>, height: Real<0..>];
 Shape = Circle | Rectangle;
 
 area = ^ ~Shape => Real<0..> :: {
-    ?whenTypeOf(shape) is {
+    ?whenTypeOf(shape) {
         `[type: 'circle', radius: Real<0..>]: {
             3.14159 * shape.radius * shape.radius
         },
@@ -449,7 +449,7 @@ findUser = ^ userId: Integer => Result<User, NotFound | InvalidInput | Unauthori
 
 /* Handle all error cases */
 result = findUser(42);
-?whenTypeOf(result) is {
+?whenTypeOf(result) {
     `User: result.name->OUT_TXT,
     `NotFound: 'User not found'->OUT_TXT,
     `InvalidInput: 'Invalid user ID'->OUT_TXT,
@@ -477,7 +477,7 @@ createUser = ^[name: String, email: String] =>
 
 /* Caller handles union of error types */
 userResult = createUser([name: 'Al', email: 'invalid']);
-?whenTypeOf(userResult) is {
+?whenTypeOf(userResult) {
     `User: 'Created: ' + userResult.name,
     `ValidationError: 'Validation failed',
     `DatabaseError: 'Database error'
@@ -496,7 +496,7 @@ HasNameOrTitle = Shape<[name: String, ...] | [title: String, ...]>;
 
 getDisplayName = ^ obj: HasNameOrTitle => String :: {
     s = obj->shape(`[name: String, ...] | [title: String, ...]);
-    ?whenTypeOf(s) is {
+    ?whenTypeOf(s) {
         `[name: String, ...]: s.name,
         `[title: String, ...]: s.title
     }
@@ -515,7 +515,7 @@ HasNameOrFn = Shape<NamedRecord | NameProviderRecord>;
 
 getName = ^ obj: HasNameOrFn => String :: {
     s = obj->shape(`NamedRecord | NameProviderRecord);
-    ?whenTypeOf(s) is {
+    ?whenTypeOf(s) {
         `NamedRecord: s.name,
         `NameProviderRecord: s.name(),
         ~: 'Unknown'
@@ -609,7 +609,7 @@ ApiError = [status: Integer<400..599>, error: String];
 ApiResponse = ApiSuccess | ApiError;
 
 handleApiResponse = ^ ~ApiResponse => String :: {
-    ?whenTypeOf(apiResponse) is {
+    ?whenTypeOf(apiResponse) {
         `[status: Integer<200..299>, data: Array<User>]: {
             'Received ' + apiResponse.data->length->asString + ' users'
         },
@@ -641,7 +641,7 @@ ScrollEvent = [type: 'scroll', scrollY: Integer, timestamp: Integer];
 Event = ClickEvent | KeyEvent | ScrollEvent;
 
 handleEvent = ^ ~Event => String :: {
-    ?whenTypeOf(event) is {
+    ?whenTypeOf(event) {
         `[type: 'click', x: Integer, y: Integer, timestamp: Integer]: {
             'Clicked at (' + event.x->asString + ', ' + event.y->asString + ')'
         },
@@ -676,7 +676,7 @@ State = IdleState | LoadingState | SuccessState | ErrorState;
 
 /* State transitions */
 transition = ^[from: State, action: String] => State :: {
-    ?whenTypeOf(from) is {
+    ?whenTypeOf(from) {
         `[state: 'idle']: {
             ?when(action == 'start') {
                 [state: 'loading', progress: 0.0]
@@ -745,7 +745,7 @@ validateUsername = ^ username: String =>
 /* Handle validation */
 handleValidation = ^ username: String => String :: {
     result = validateUsername(username);
-    ?whenTypeOf(result) is {
+    ?whenTypeOf(result) {
         `String: 'Valid username: ' + result,
         `TooShort: 'Username too short (min 3 characters)',
         `TooLong: 'Username too long (max 20 characters)',
@@ -777,7 +777,7 @@ FullEntity = VersionedEntity & SoftDeletable;
 getEntityId = ^ ~Identifiable => Integer<1..> :: identifiable.id;
 getVersion = ^ ~Versioned => Integer<1..> :: versioned.version;
 isDeleted = ^ ~SoftDeletable => Boolean :: {
-    ?whenTypeOf(softDeletable.deletedAt) is {
+    ?whenTypeOf(softDeletable.deletedAt) {
         `Null: false,
         `Integer: true
     }
@@ -829,10 +829,10 @@ parseSequence = ^[input: String, parsers: Array<String>] => ParseResult :: {
 
     parsers->forEach(^expected :: {
         current = result->value;
-        ?whenTypeOf(current) is {
+        ?whenTypeOf(current) {
             `[success: true, value: String, rest: String]: {
                 next = parseString([input: current.rest, expected: expected]);
-                ?whenTypeOf(next) is {
+                ?whenTypeOf(next) {
                     `[success: true, value: String, rest: String]: {
                         result->SET([
                             success: true,
@@ -857,7 +857,7 @@ result = parseSequence([
     parsers: ['hello', ' ', 'world']
 ]);
 
-?whenTypeOf(result) is {
+?whenTypeOf(result) {
     `[success: true, value: String, rest: String]: {
         'Parsed: ' + result.value  /* 'hello world' */
     },
@@ -918,7 +918,7 @@ Post = Entity & [title: String, content: String, ...];
 ```walnut
 /* Good: Handle all cases explicitly */
 process = ^ value: Integer | String | Boolean => String :: {
-    ?whenTypeOf(value) is {
+    ?whenTypeOf(value) {
         `Integer: 'int',
         `String: 'string',
         `Boolean: 'bool'
@@ -928,7 +928,7 @@ process = ^ value: Integer | String | Boolean => String :: {
 
 /* Avoid: Missing cases */
 /* process = ^Integer | String | Boolean => String :: {
-    ?whenTypeOf($) is {
+    ?whenTypeOf($) {
         `Integer: 'int',
         ~: 'other'  /* Boolean and String lumped together */
     }
@@ -954,7 +954,7 @@ validateAge = ^ person: [age: Integer<0..150>] & [age: Integer<18..>] => Boolean
 Result<User, NotFound | Unauthorized | ValidationError>
 
 /* Allows precise error handling */
-?whenTypeOf(result) is {
+?whenTypeOf(result) {
     `User: processUser(result),
     `NotFound: handle404(),
     `Unauthorized: handle401(),

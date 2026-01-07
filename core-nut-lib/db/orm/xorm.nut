@@ -5,7 +5,7 @@ UnknownFieldTypes := ();
 
 UnknownOrmModel := Type;
 OrmModel := #[table: DatabaseTableName, keyField: DatabaseFieldName, sequenceField: ?DatabaseFieldName];
-OrmModel->orderBy(=> SqlOrderByFields|Null) :: ?whenTypeOf($sequenceField) is {
+OrmModel->orderBy(=> SqlOrderByFields|Null) :: ?whenTypeOf($sequenceField) {
     `String<1..>: SqlOrderByFields[[SqlOrderByField[$sequenceField, SqlOrderByDirection.Asc]]]
 };
 OrmModel->filterByKeyField(=> SqlQueryFilter) :: SqlQueryFilter[SqlFieldExpression[
@@ -16,13 +16,13 @@ OrmModel->filterByKeyField(=> SqlQueryFilter) :: SqlQueryFilter[SqlFieldExpressi
 Ox := $[~OrmModel, ~FieldTypes];
 Ox[~Type] @ UnknownOrmModel|UnknownFieldTypes :: {
     ormModel = #type->as(`OrmModel);
-    ormModel = ?whenTypeOf(ormModel) is {
+    ormModel = ?whenTypeOf(ormModel) {
         `OrmModel: ormModel,
         ~: => @UnknownOrmModel!#type
     };
 
     fieldTypesHelper = ^ t: Type => Result<Map<Type>, UnknownFieldTypes> :: {
-        ?whenTypeOf(t) is {
+        ?whenTypeOf(t) {
             `Type<Data>: fieldTypesHelper=>invoke(t->valueType),
             `Type<Open>: fieldTypesHelper=>invoke(t->valueType),
             `Type<Record>: t->itemTypes,
@@ -37,14 +37,14 @@ Ox[~Type] @ UnknownOrmModel|UnknownFieldTypes :: {
 Ox->keyField(=> DatabaseFieldName) :: $ormModel.keyField;
 
 FieldTypes->forSelect(^[table: DatabaseTableName] => SqlSelectFieldList) :: {
-    fields = $->mapKeyValue(^[key: String, value: Any] => TableField|String<1..> :: ?whenTypeOf(#key) is {
+    fields = $->mapKeyValue(^[key: String, value: Any] => TableField|String<1..> :: ?whenTypeOf(#key) {
         `DatabaseFieldName: TableField[#table, #key],
         ~: '1'
     });
     SqlSelectFieldList[fields]
 };
 FieldTypes->forWrite(=> Map<QueryValue>) :: {
-    $->mapKeyValue(^[key: String, value: Any] => QueryValue :: ?whenTypeOf(#key) is {
+    $->mapKeyValue(^[key: String, value: Any] => QueryValue :: ?whenTypeOf(#key) {
         `DatabaseFieldName: PreparedValue[#key],
         ~: SqlValue['1']
     })

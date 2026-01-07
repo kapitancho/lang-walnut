@@ -349,7 +349,7 @@ Pattern match on boolean values:
 ```walnut
 flag = true;
 
-result = ?whenValueOf(flag) is {
+result = ?whenValueOf(flag) {
     true: 'Enabled',
     false: 'Disabled'
 };
@@ -360,7 +360,7 @@ result = ?whenValueOf(flag) is {
 Match on True or False types:
 
 ```walnut
-?whenTypeOf(value) is {
+?whenTypeOf(value) {
     `True: 'It is true',
     `False: 'It is false',
     ~: 'Not a boolean'
@@ -482,7 +482,7 @@ xorEquiv = ^[a: Boolean, b: Boolean] => Boolean :: {
 State = (Idle, Loading, Success, Error);
 
 canTransition = ^[from: State, to: State] => Boolean :: {
-    ?whenValueOf([from: #from, to: #to]) is {
+    ?whenValueOf([from: #from, to: #to]) {
         [from: State.Idle, to: State.Loading]: true,
         [from: State.Loading, to: State.Success]: true,
         [from: State.Loading, to: State.Error]: true,

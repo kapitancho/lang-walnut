@@ -24,7 +24,7 @@ SpecialServiceError := $[message: String];
 SpecialServiceError ==> HttpResponse %% ~HttpResponseBuilder :: {
     httpResponseBuilder(400)->withBody($message)
 };
-SpecialService->invoke(^param: String => Result<String, SpecialServiceError>) :: ?whenValueOf(param) is {
+SpecialService->invoke(^param: String => Result<String, SpecialServiceError>) :: ?whenValueOf(param) {
     '': @SpecialServiceError['Empty string'],
     ~: param->reverse
 };
@@ -66,7 +66,7 @@ MyBrokenViewRenderer = ^[:] => MyBrokenView;
 ==> MyBrokenViewRenderer :: ^[:] => MyBrokenView :: MyBrokenView('Broken View Response');
 
 MyView := #String;
-MyView ==> Template @ UnableToRenderTemplate :: ?whenValueOf($$) is {
+MyView ==> Template @ UnableToRenderTemplate :: ?whenValueOf($$) {
     '': @UnableToRenderTemplate[$->type],
     ~: {
         v = mutable{String, ''};

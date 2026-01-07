@@ -32,7 +32,7 @@ final class ReduceTest extends CodeExecutionTestHelper {
 			"doArray[2, 5, 3];",
 			valueDeclarations: "
 				doArray = ^a: Result<Array<Integer>, Null> => Result<Integer, Null|NotANumber> ::
-					a->reduce[initial: 0, reducer: ^[result: Integer, item: Integer] => Result<Integer, NotANumber> :: #result + ?noError(10 // #item)];
+					a->reduce[initial: 0, reducer: ^[result: Integer, item: Integer] => Result<Integer, NotANumber> :: #result + (10 // #item)?];
 			"
 		);
 		$this->assertEquals("10", $result);
@@ -42,7 +42,7 @@ final class ReduceTest extends CodeExecutionTestHelper {
 			"doArray[2, 0, 3];",
 			valueDeclarations: "
 				doArray = ^a: Result<Array<Integer>, Null> => Result<Integer, Null|NotANumber> ::
-					a->reduce[initial: 0, reducer: ^[result: Integer, item: Integer] => Result<Integer, NotANumber> :: #result + ?noError(10 // #item)];
+					a->reduce[initial: 0, reducer: ^[result: Integer, item: Integer] => Result<Integer, NotANumber> :: #result + (10 // #item)?];
 			"
 		);
 		$this->assertEquals("@NotANumber", $result);

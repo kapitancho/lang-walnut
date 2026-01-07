@@ -241,7 +241,7 @@ module api-server:
 handleRequest = ^{HttpRequest} => {HttpResponse} :: {
     request = $->shape(`HttpRequest);
 
-    response = ?whenValueOf(request.method) is {
+    response = ?whenValueOf(request.method) {
         'GET': handleGet(request),
         'POST': handlePost(request),
         ~: HttpResponse[
@@ -650,7 +650,7 @@ module api %% [~UserService]:
 handleRequest = ^{HttpRequest} => {HttpResponse} :: {
     request = $->shape(`HttpRequest);
 
-    response = ?whenValueOf(request.path) is {
+    response = ?whenValueOf(request.path) {
         '/users': handleUsers(request),
         ~: {
             /* Try pattern matching */
@@ -668,7 +668,7 @@ handleRequest = ^{HttpRequest} => {HttpResponse} :: {
 };
 
 handleUsers = ^HttpRequest => HttpResponse :: {
-    ?whenValueOf($.method->shape(`String)) is {
+    ?whenValueOf($.method->shape(`String)) {
         'GET': {
             /* List users */
             HttpResponse[status: 200, headers: [:], body: '[]']

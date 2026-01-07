@@ -7,7 +7,7 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 final class WithLengthRangeTest extends CodeExecutionTestHelper {
 
 	public function testWithLengthRangeString(): void {
-		$result = $this->executeCodeSnippet("type{String}->withLengthRange(?noError(LengthRange[2, 9]));");
+		$result = $this->executeCodeSnippet("type{String}->withLengthRange(LengthRange[2, 9]?);");
 		$this->assertEquals("type{String<2..9>}", $result);
 	}
 
@@ -18,7 +18,7 @@ final class WithLengthRangeTest extends CodeExecutionTestHelper {
 
 	public function testWithLengthRangeStringSubsetMetaType(): void {
 		$result = $this->executeCodeSnippet("getWithLengthRange(type{String});",
-			valueDeclarations: "getWithLengthRange = ^Type<String> => Result<Type<String>, InvalidLengthRange> :: #->withLengthRange(?noError(LengthRange[2, 9]));");
+			valueDeclarations: "getWithLengthRange = ^Type<String> => Result<Type<String>, InvalidLengthRange> :: #->withLengthRange(LengthRange[2, 9]?);");
 		$this->assertEquals("type{String<2..9>}", $result);
 	}
 
@@ -28,7 +28,7 @@ final class WithLengthRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithLengthRangeArray(): void {
-		$result = $this->executeCodeSnippet("type{Array<Boolean>}->withLengthRange(?noError(LengthRange[2, 9]));");
+		$result = $this->executeCodeSnippet("type{Array<Boolean>}->withLengthRange(LengthRange[2, 9]?);");
 		$this->assertEquals("type{Array<Boolean, 2..9>}", $result);
 	}
 
@@ -39,7 +39,7 @@ final class WithLengthRangeTest extends CodeExecutionTestHelper {
 
 	public function testWithLengthRangeArraySubsetMetaType(): void {
 		$result = $this->executeCodeSnippet("getWithLengthRange(type{Array<Boolean>});",
-			valueDeclarations: "getWithLengthRange = ^Type<Array> => Result<Type<Array>, InvalidLengthRange> :: #->withLengthRange(?noError(LengthRange[2, 9]));");
+			valueDeclarations: "getWithLengthRange = ^Type<Array> => Result<Type<Array>, InvalidLengthRange> :: #->withLengthRange(LengthRange[2, 9]?);");
 		$this->assertEquals("type{Array<Boolean, 2..9>}", $result);
 	}
 
@@ -49,12 +49,12 @@ final class WithLengthRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithLengthRangeMap(): void {
-		$result = $this->executeCodeSnippet("type{Map<Boolean>}->withLengthRange(?noError(LengthRange[2, 9]));");
+		$result = $this->executeCodeSnippet("type{Map<Boolean>}->withLengthRange(LengthRange[2, 9]?);");
 		$this->assertEquals("type{Map<Boolean, 2..9>}", $result);
 	}
 
 	public function testWithLengthRangeMapKeyType(): void {
-		$result = $this->executeCodeSnippet("type{Map<String['a', 'b']:Boolean, 1..7>}->withLengthRange(?noError(LengthRange[2, 9]));");
+		$result = $this->executeCodeSnippet("type{Map<String['a', 'b']:Boolean, 1..7>}->withLengthRange(LengthRange[2, 9]?);");
 		$this->assertEquals("type{Map<String['a', 'b']:Boolean, 2..9>}", $result);
 	}
 
@@ -65,7 +65,7 @@ final class WithLengthRangeTest extends CodeExecutionTestHelper {
 
 	public function testWithLengthRangeMapSubsetMetaType(): void {
 		$result = $this->executeCodeSnippet("getWithLengthRange(type{Map<Boolean>});",
-			valueDeclarations: "getWithLengthRange = ^Type<Map> => Result<Type<Map>, InvalidLengthRange> :: #->withLengthRange(?noError(LengthRange[2, 9]));");
+			valueDeclarations: "getWithLengthRange = ^Type<Map> => Result<Type<Map>, InvalidLengthRange> :: #->withLengthRange(LengthRange[2, 9]?);");
 		$this->assertEquals("type{Map<Boolean, 2..9>}", $result);
 	}
 
@@ -75,7 +75,7 @@ final class WithLengthRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithLengthRangeSet(): void {
-		$result = $this->executeCodeSnippet("type{Set<Boolean>}->withLengthRange(?noError(LengthRange[2, 9]));");
+		$result = $this->executeCodeSnippet("type{Set<Boolean>}->withLengthRange(LengthRange[2, 9]?);");
 		$this->assertEquals("type{Set<Boolean, 2..9>}", $result);
 	}
 
@@ -86,7 +86,7 @@ final class WithLengthRangeTest extends CodeExecutionTestHelper {
 
 	public function testWithLengthRangeSetSubsetMetaType(): void {
 		$result = $this->executeCodeSnippet("getWithLengthRange(type{Set<Boolean>});",
-			valueDeclarations: "getWithLengthRange = ^Type<Set> => Result<Type<Set>, InvalidLengthRange> :: #->withLengthRange(?noError(LengthRange[2, 9]));");
+			valueDeclarations: "getWithLengthRange = ^Type<Set> => Result<Type<Set>, InvalidLengthRange> :: #->withLengthRange(LengthRange[2, 9]?);");
 		$this->assertEquals("type{Set<Boolean, 2..9>}", $result);
 	}
 
@@ -96,12 +96,12 @@ final class WithLengthRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithLengthRangeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "type{Integer}->withLengthRange(?noError(LengthRange[2, 9]));");
+		$this->executeErrorCodeSnippet('Invalid target type', "type{Integer}->withLengthRange(LengthRange[2, 9]?);");
 	}
 
 	public function testWithLengthRangeMetaTypeInvalidTargetType(): void {
 		$this->executeErrorCodeSnippet('Invalid target type',
-			"getWithLengthRange(type{Integer});", valueDeclarations:  "getWithLengthRange = ^Type<Integer> => Type :: #->withLengthRange(?noError(LengthRange[2, 9]));");
+			"getWithLengthRange(type{Integer});", valueDeclarations:  "getWithLengthRange = ^Type<Integer> => Type :: #->withLengthRange(LengthRange[2, 9]?);");
 	}
 
 }

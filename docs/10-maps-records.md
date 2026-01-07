@@ -748,7 +748,7 @@ getEmail2 = ^User => Result<String, MapItemNotFound> :: $->item('email');
 
 /* Handle with pattern matching */
 displayEmail = ^User => String :: {
-    ?whenTypeOf($.email) is {
+    ?whenTypeOf($.email) {
         `String: 'Email: ' + $.email,
         `MapItemNotFound: 'No email provided'
     }
@@ -794,7 +794,7 @@ getUserEmail = ^User => String :: {
 
 /* Check if optional field is present */
 hasEmail = ^User => Boolean :: {
-    ?whenTypeOf($.email) is {
+    ?whenTypeOf($.email) {
         `String: true,
         `MapItemNotFound: false
     }
@@ -804,11 +804,11 @@ hasEmail = ^User => Boolean :: {
 getContactMethods = ^User => Array<String> :: {
     methods = mutable{Array<String>, []};
 
-    ?whenTypeOf($.email) is {
+    ?whenTypeOf($.email) {
         `String: methods->PUSH('Email: ' + $.email)
     };
 
-    ?whenTypeOf($.phone) is {
+    ?whenTypeOf($.phone) {
         `String: methods->PUSH('Phone: ' + $.phone)
     };
 

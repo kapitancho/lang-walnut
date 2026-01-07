@@ -545,7 +545,7 @@ ProductNotInCart := #[productId: ProductId];
 
 ShoppingCart->item(^productId: ProductId => Result<ShoppingCartItemData, ProductNotInCart>) :: {
     existingItem = $items->value->item(productId->asString);
-    ?whenTypeOf(existingItem) is {
+    ?whenTypeOf(existingItem) {
         `ShoppingCartItem: [product: existingItem.product, quantity: existingItem.quantity->value],
         ~: @ProductNotInCart[productId]
     }

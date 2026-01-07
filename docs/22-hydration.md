@@ -53,7 +53,7 @@ The `hydrateAs` method is available on `JsonValue` and converts runtime values t
 jsonString = '{"x": 10, "y": 20}';
 result = jsonString->parseJson->hydrateAs(`[x: Integer, y: Integer]);
 
-?whenTypeOf(result) is {
+?whenTypeOf(result) {
     `[x: Integer, y: Integer]: result->printed,
     `HydrationError: result.message->OUT_TXT
 };
@@ -79,7 +79,7 @@ HydrationError := $[
 jsonString = '{"age": "not a number"}';
 result = jsonString->parseJson->hydrateAs(`[age: Integer]);
 
-?whenTypeOf(result) is {
+?whenTypeOf(result) {
     `HydrationError: {
         result.message->OUT_TXT;
         /* Output: "Expected Integer at path 'age', got String" */
@@ -468,7 +468,7 @@ Status := (Pending, Active, Completed);
 
 /* Define custom cast from JSON */
 Status.JsonValue = ^JsonValue => Result<Status, HydrationError> :: {
-    ?whenTypeOf($) is {
+    ?whenTypeOf($) {
         `JsonValueString: {
             map = [
                 'P': Status.Pending,
@@ -709,7 +709,7 @@ Temperature := #Real;
 
 /* Custom hydration: convert Fahrenheit to Celsius */
 Temperature.JsonValue = ^JsonValue => Result<Temperature, HydrationError> :: {
-    ?whenTypeOf($) is {
+    ?whenTypeOf($) {
         `JsonValueNumber: {
             celsius = ($.value - 32) * 5 / 9;
             Temperature(celsius)
@@ -766,7 +766,7 @@ userId1 = '42'->parseJson->hydrateAs(`UserId);
 
 /* With JsonValue cast: custom logic */
 UserId.JsonValue = ^JsonValue => Result<UserId, HydrationError> :: {
-    ?whenTypeOf($) is {
+    ?whenTypeOf($) {
         `JsonValueString: UserId($.value->parseInt),
         `JsonValueNumber: UserId($.value),
         ~: @HydrationError([
@@ -894,7 +894,7 @@ data = '[{"id": 1, "name": "Alice"}, {"id": "two", "name": "Bob"}]'
 ```walnut
 result = jsonData->parseJson->hydrateAs(`User);
 
-?whenTypeOf(result) is {
+?whenTypeOf(result) {
     `User: {
         /* Success case */
         result.name->OUT_TXT
@@ -934,7 +934,7 @@ ApiResponse := [
 response = httpClient->get('/api/users');
 parsed = response.body->parseJson->hydrateAs(`ApiResponse);
 
-?whenTypeOf(parsed) is {
+?whenTypeOf(parsed) {
     `ApiResponse: {
         parsed.data.users->forEach(^user :: {
             user.name->OUT_TXT;
@@ -974,7 +974,7 @@ loadConfig = ^path: String => Result<Config, String> :: {
 };
 
 config = loadConfig('config.json');
-?whenTypeOf(config) is {
+?whenTypeOf(config) {
     `Config: {
         'Connected to: '->OUT_TXT;
         config.database.host->OUT_TXT
@@ -1038,7 +1038,7 @@ Company := [
 jsonData = /* complex nested JSON */;
 company = jsonData->parseJson->hydrateAs(`Company);
 
-?whenTypeOf(company) is {
+?whenTypeOf(company) {
     `Company: {
         company.departments->forEach(^dept :: {
             dept.name->OUT_TXT;
@@ -1065,12 +1065,12 @@ UserV3 := [id: Integer, firstName: String, lastName: String, email: String];
 loadUser = ^jsonData: JsonValue => Result<UserV3, String> :: {
     /* Try latest version first */
     v3 = jsonData->hydrateAs(`UserV3);
-    ?whenTypeOf(v3) is {
+    ?whenTypeOf(v3) {
         `UserV3: v3,
         ~: {
             /* Try V2 */
             v2 = jsonData->hydrateAs(`UserV2);
-            ?whenTypeOf(v2) is {
+            ?whenTypeOf(v2) {
                 `UserV2: [
                     id: v2.id,
                     firstName: v2.firstName,
@@ -1080,7 +1080,7 @@ loadUser = ^jsonData: JsonValue => Result<UserV3, String> :: {
                 ~: {
                     /* Try V1 */
                     v1 = jsonData->hydrateAs(`UserV1);
-                    ?whenTypeOf(v1) is {
+                    ?whenTypeOf(v1) {
                         `UserV1: {
                             parts = v1.name->split(' ');
                             [
@@ -1147,7 +1147,7 @@ User := [
 
 /* Handle missing values */
 user = jsonData->parseJson->hydrateAs(`User);
-?whenTypeOf(user) is {
+?whenTypeOf(user) {
     `User: {
         emailDisplay = ?whenIsError(user.email) { 'No email provided' };
         emailDisplay->OUT_TXT
@@ -1199,7 +1199,7 @@ handleRequest = ^request: HttpRequest => HttpResponse :: {
     /* Hydrate and validate immediately */
     userData = request.body->parseJson->hydrateAs(`UserInput);
 
-    ?whenTypeOf(userData) is {
+    ?whenTypeOf(userData) {
         `UserInput: processUser(userData),
         `HydrationError: HttpResponse([
             status: 400,
@@ -1218,7 +1218,7 @@ handleRequest = ^request: HttpRequest => HttpResponse :: {
 Date := #[year: Integer, month: Integer, day: Integer];
 
 Date.JsonValue = ^JsonValue => Result<Date, HydrationError> :: {
-    ?whenTypeOf($) is {
+    ?whenTypeOf($) {
         `JsonValueString: {
             /* Parse "YYYY-MM-DD" format */
             parts = $.value->split('-');

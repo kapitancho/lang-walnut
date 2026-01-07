@@ -60,7 +60,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 	public function testEnumWithConstructorWithEnumValues(): void {
 		$result = $this->executeCodeSnippet("Suit(2);", <<<NUT
 		Suit := (Spades, Hearts, Diamonds, Clubs);
-		Suit(i: Integer<1..4>) :: ?whenValueOf(i) is {
+		Suit(i: Integer<1..4>) :: ?whenValueOf(i) {
 			1: Suit.Spades,
 			2: Suit.Hearts,
 			3: Suit.Diamonds,
@@ -73,7 +73,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 	public function testEnumWithConstructorWithStrings(): void {
 		$result = $this->executeCodeSnippet("Suit(2);", <<<NUT
 		Suit := (Spades, Hearts, Diamonds, Clubs);
-		Suit(i: Integer<1..4>) :: ?whenValueOf(i) is {
+		Suit(i: Integer<1..4>) :: ?whenValueOf(i) {
 			1: 'Spades',
 			2: 'Hearts',
 			3: 'Diamonds',
@@ -86,7 +86,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 	public function testEnumWithConstructorWithStringsAndInvalidValueOk(): void {
 		$result = $this->executeCodeSnippet("Suit(2);", <<<NUT
 		Suit := (Spades, Hearts, Diamonds, Clubs);
-		Suit(i: Integer<1..5>) :: ?whenValueOf(i) is {
+		Suit(i: Integer<1..5>) :: ?whenValueOf(i) {
 			1: 'Spades',
 			2: 'Hearts',
 			3: 'Diamonds',
@@ -100,7 +100,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 	public function testEnumWithConstructorWithStringsAndInvalidValueWrongValue(): void {
 		$result = $this->executeCodeSnippet("Suit(5);", <<<NUT
 		Suit := (Spades, Hearts, Diamonds, Clubs);
-		Suit(i: Integer<1..5>) :: ?whenValueOf(i) is {
+		Suit(i: Integer<1..5>) :: ?whenValueOf(i) {
 			1: 'Spades',
 			2: 'Hearts',
 			3: 'Diamonds',

@@ -433,10 +433,10 @@ MySealed := $String;
         ^ => TestResult :: TestResult[
             name: 'Type<Integer>->numberRange',
             expected: :: IntegerNumberRange![intervals: [
-                ?noError(IntegerNumberInterval[
+                IntegerNumberInterval[
                     start: IntegerNumberIntervalEndpoint![value: -3, inclusive: true],
                     end: IntegerNumberIntervalEndpoint![value: 42, inclusive: false]
-                ])
+                ]?
             ]],
             actual: ^ :: {
                 fn = ^ t: Type<Integer> => IntegerNumberRange :: t->numberRange;
@@ -470,10 +470,10 @@ MySealed := $String;
         ^ => TestResult :: TestResult[
             name: 'Type<Real>->numberRange',
             expected: :: RealNumberRange![intervals: [
-                ?noError(RealNumberInterval[
+                RealNumberInterval[
                     start: RealNumberIntervalEndpoint![value: -3.14, inclusive: true],
                     end: RealNumberIntervalEndpoint![value: 42, inclusive: false]
-                ])
+                ]?
             ]],
             actual: ^ :: {
                 fn = ^ t: Type<Real> => RealNumberRange :: t->numberRange;

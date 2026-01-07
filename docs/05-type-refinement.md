@@ -514,7 +514,7 @@ PositivePrice := #Real<0..>;
 
 /* Validator automatically checks range */
 PositivePrice(price: Real) @ String ::
-    ?whenTypeOf(price) is {
+    ?whenTypeOf(price) {
         `Real<0..>: price,
         ~ : @'Price must be positive'
     };

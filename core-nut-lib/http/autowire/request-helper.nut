@@ -9,12 +9,12 @@ JsonRequestBody ==> HttpAutoWireRequestBodyToParameter ::
     ^request: {HttpRequest} => Result<Map<JsonValue>, InvalidJsonString> :: {
         request = request->shape(`HttpRequest);
         body = request.body;
-        body = ?whenTypeOf(body) is {
+        body = ?whenTypeOf(body) {
             `String: body,
             ~: ''
         };
         value = body=>jsonDecode;
-        ?whenTypeOf(value) is {
+        ?whenTypeOf(value) {
             `Error<InvalidJsonString>: value,
             `JsonValue: [:]->withKeyValue[key: $valueKey, value: value]
         }

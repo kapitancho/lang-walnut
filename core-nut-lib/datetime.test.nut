@@ -87,7 +87,7 @@ test $datetime:
         ^ => TestResult :: TestResult[
             name: 'Valid DateAndTime Test',
             expected: '2024-02-29 14:30:00',
-            actual : ^ :: {DateAndTime[?noError(Date[2024, 2, 29]), Time[14, 30, 0]]}->asString
+            actual : ^ :: {DateAndTime[Date[2024, 2, 29]?, Time[14, 30, 0]]}->asString
         ],
         ^ => TestResult :: TestResult[
             name: 'Valid DateAndTime From String Test',
@@ -110,7 +110,7 @@ test $datetime:
                 date: [year: 2024, month: 2, day: 29],
                 time: [hour: 14, minute: 30, second: 0]
             ],
-            actual : ^ :: {DateAndTime[?noError(Date[2024, 2, 29]), Time[14, 30, 0]]}->asJsonValue
+            actual : ^ :: {DateAndTime[Date[2024, 2, 29]?, Time[14, 30, 0]]}->asJsonValue
         ],
         ^ => TestResult :: TestResult[
             name: 'Invalid DateAndTime Date From String Test',

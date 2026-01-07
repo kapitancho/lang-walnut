@@ -175,13 +175,13 @@ final readonly class MatchExpression implements MatchExpressionInterface, JsonSe
 
 		return match(true) {
 			$this->operation instanceof MatchExpressionIsSubtypeOf =>
-				sprintf("?whenTypeOf (%s) is { %s }", $this->target, $pairs),
+				sprintf("?whenTypeOf (%s) { %s }", $this->target, $pairs),
 			$isMatchTrue =>
 				sprintf("?whenIsTrue { %s }", $pairs),
 			$isIf =>
 				sprintf("?when (%s) { %s }%s", $this->target->target, $this->pairs[0]->valueExpression, $else),
 			default =>
-				sprintf("?whenValueOf (%s) is { %s }", $this->target, $pairs),
+				sprintf("?whenValueOf (%s) { %s }", $this->target, $pairs),
 		};
 	}
 

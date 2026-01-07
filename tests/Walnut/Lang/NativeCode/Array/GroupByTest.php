@@ -51,7 +51,7 @@ final class GroupByTest extends CodeExecutionTestHelper {
 			"groupBy[];",
 			valueDeclarations: "
 				groupBy = ^a: Array<String|Real, ..7> => Map<Array<String|Real, ..7>, ..7> :: 
-					a->groupBy(^v: Real|String => String :: ?whenTypeOf(v) is { `String: 'string', `Integer: 'integer', `Real: 'real' });
+					a->groupBy(^v: Real|String => String :: ?whenTypeOf(v) { `String: 'string', `Integer: 'integer', `Real: 'real' });
 			"
 		);
 		$this->assertEquals("[:]", $result);
@@ -62,7 +62,7 @@ final class GroupByTest extends CodeExecutionTestHelper {
 			"groupBy[1, 'hello', 'world', 2, 3.14, 'foo', 4];",
 			valueDeclarations: "
 				groupBy = ^a: Array<String|Real, 3..7> => Map<Array<String|Real, 1..7>, 1..7> :: 
-					a->groupBy(^v: Real|String => String :: ?whenTypeOf(v) is { `String: 'string', `Integer: 'integer', `Real: 'real' });
+					a->groupBy(^v: Real|String => String :: ?whenTypeOf(v) { `String: 'string', `Integer: 'integer', `Real: 'real' });
 			"
 		);
 		$this->assertEquals("[\n	integer: [1, 2, 4],\n	string: ['hello', 'world', 'foo'],\n	real: [3.14]\n]", $result);

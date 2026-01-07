@@ -61,7 +61,7 @@ return: ?when(0) { => 'return' }
 ```walnut
 /* From core.nut - Validation in constructor */
 IntegerRange := #[minValue: Integer|MinusInfinity, maxValue: Integer|PlusInfinity] @ InvalidRange ::
-    ?whenTypeOf(#) is { `[minValue: Integer, maxValue: Integer]:
+    ?whenTypeOf(#) { `[minValue: Integer, maxValue: Integer]:
         ?when (#minValue > #maxValue) { => @InvalidRange }
     };
 
@@ -69,7 +69,7 @@ IntegerRange := #[minValue: Integer|MinusInfinity, maxValue: Integer|PlusInfinit
 RealNumberInterval := #[
     start: MinusInfinity|RealNumberIntervalEndpoint,
     end: PlusInfinity|RealNumberIntervalEndpoint
-] @ InvalidRange :: ?whenTypeOf(#) is {
+] @ InvalidRange :: ?whenTypeOf(#) {
     `[start: RealNumberIntervalEndpoint, end: RealNumberIntervalEndpoint]:
         ?when (
             {#.start.value > #.end.value} ||
@@ -94,7 +94,7 @@ The `?whenValueOf` expression matches the value of an expression against a set o
 ### Syntax
 
 ```walnut
-?whenValueOf(expr) is {
+?whenValueOf(expr) {
     matchExpr1: resultExpr1,
     matchExpr2: resultExpr2,
     ...
@@ -116,14 +116,14 @@ The `?whenValueOf` expression matches the value of an expression against a set o
 
 ```walnut
 /* Basic value matching */
-?whenValueOf(x) is {
+?whenValueOf(x) {
     42: x + 1,
     1000: 2,
     ~: 0
 }
 
 /* From demo-all.nut */
-matchValue: ?whenValueOf('value') is {
+matchValue: ?whenValueOf('value') {
     'value': 'then 1',
     'other value': 'then 2',
     ~: 'default'
@@ -131,7 +131,7 @@ matchValue: ?whenValueOf('value') is {
 
 /* Enumeration to integer cast */
 Suit ==> Integer ::
-    ?whenValueOf($) is {
+    ?whenValueOf($) {
         Suit.Clubs: 1,
         Suit.Diamonds: 2,
         Suit.Hearts: 3,
@@ -144,16 +144,16 @@ Suit ==> Integer ::
 ```walnut
 /* From datetime.nut - Date validation */
 Date := #[year: Integer, month: Integer<1..12>, day: Integer<1..31>] @ InvalidDate :: {
-    ?whenValueOf(#day) is {
-        31: ?whenTypeOf(#month) is {
+    ?whenValueOf(#day) {
+        31: ?whenTypeOf(#month) {
             `Integer[2, 4, 6, 9, 11]: => @InvalidDate,
             ~: null
         },
-        30: ?whenTypeOf(#month) is {
+        30: ?whenTypeOf(#month) {
             `Integer[2]: => @InvalidDate,
             ~: null
         },
-        29: ?whenTypeOf(#month) is {
+        29: ?whenTypeOf(#month) {
             `Integer[2]: ?whenIsTrue {
                 {#year % 4} > 0: => @InvalidDate,
                 {#year % 100} == 0: ?whenIsTrue {
@@ -169,23 +169,23 @@ Date := #[year: Integer, month: Integer<1..12>, day: Integer<1..31>] @ InvalidDa
 };
 
 /* From datetime.nut - Handling zero-padded strings */
-dropZeroes = ^s: String => Result<Integer, NotANumber> :: ?whenValueOf(s) is {
+dropZeroes = ^s: String => Result<Integer, NotANumber> :: ?whenValueOf(s) {
     '00': 0,
     ~: s->trimLeft('0')->asInteger
 };
 
 /* From http/all.test.nut - Service method dispatch */
 SpecialService->invoke(^param: String => Result<String, SpecialServiceError>) ::
-    ?whenValueOf(param) is {
+    ?whenValueOf(param) {
         '': @SpecialServiceError['Empty string'],
         ~: param->reverse
     };
 
 /* From db/sql/quoter-mysql.nut - Boolean to SQL string */
-`Boolean: ?whenValueOf(v) is { true: '1', false: '0' }
+`Boolean: ?whenValueOf(v) { true: '1', false: '0' }
 
 /* From db/sql/query-builder.nut - Enum to SQL */
-SqlFieldExpressionOperation ==> SqlString :: ?whenValueOf($) is {
+SqlFieldExpressionOperation ==> SqlString :: ?whenValueOf($) {
     SqlFieldExpressionOperation.Equal: '=',
     SqlFieldExpressionOperation.NotEqual: '!=',
     SqlFieldExpressionOperation.LessThan: '<',
@@ -200,7 +200,7 @@ When `expr` is a variable, its type is automatically refined in each `resultExpr
 
 ```walnut
 /* Type refinement example */
-?whenValueOf(x) is {
+?whenValueOf(x) {
     42: x + 1,  /* Compiler knows x is 42 (Integer) */
     ~: 0
 }
@@ -219,7 +219,7 @@ The `?whenTypeOf` expression matches the type of an expression against a set of 
 ### Syntax
 
 ```walnut
-?whenTypeOf(expr) is {
+?whenTypeOf(expr) {
     matchExpr1: resultExpr1,
     matchExpr2: resultExpr2,
     ...
@@ -266,14 +266,14 @@ type[Integer, Integer] /* shorter form */
 
 ```walnut
 /* Basic type matching */
-?whenTypeOf(x) is {
+?whenTypeOf(x) {
     `Integer<1..>: 1,
     `Real: x + 3.14,
     ~: 0
 }
 
 /* From demo-all.nut */
-matchType: ?whenTypeOf('type') is {
+matchType: ?whenTypeOf('type') {
     `String['type']: 'then 1',
     `String['other type']: 'then 2',
     ~: 'default'
@@ -281,7 +281,7 @@ matchType: ?whenTypeOf('type') is {
 
 /* Enumeration method */
 Suit->getSuitColor(=> String['black', 'red']) ::
-    ?whenTypeOf($) is {
+    ?whenTypeOf($) {
         `Suit[Clubs, Spades]: 'black',
         `Suit[Diamonds, Hearts]: 'red'
     };
@@ -292,14 +292,14 @@ Suit->getSuitColor(=> String['black', 'red']) ::
 ```walnut
 /* From core.nut - Type-specific range creation */
 IntegerRange := #[minValue: Integer|MinusInfinity, maxValue: Integer|PlusInfinity] @ InvalidRange ::
-    ?whenTypeOf(#) is {
+    ?whenTypeOf(#) {
         `[minValue: Integer, maxValue: Integer]:
             ?when (#minValue > #maxValue) { => @InvalidRange }
     };
 
 /* From datetime.nut - Polymorphic cast */
 JsonValue ==> Date @ InvalidDate :: {
-    ?whenTypeOf($) is {
+    ?whenTypeOf($) {
         `String: $->asDate,
         `[Integer, Integer<1..12>, Integer<1..31>]: Date($),
         `[year: Integer, month: Integer<1..12>, day: Integer<1..31>]: Date($),
@@ -310,14 +310,14 @@ JsonValue ==> Date @ InvalidDate :: {
 /* From datetime.nut - String parsing with refinement */
 String ==> Date @ InvalidDate :: {
     pieces = $->split('-');
-    ?whenTypeOf(pieces) is {
+    ?whenTypeOf(pieces) {
         type[String<4>, String<2>, String<2>]: {
             dateValue = [
                 year: pieces.0->asInteger,
                 month: pieces.1->trimLeft('0')->asInteger,
                 day: pieces.2->trimLeft('0')->asInteger
             ];
-            ?whenTypeOf(dateValue) is {
+            ?whenTypeOf(dateValue) {
                 type[year: Integer, month: Integer<1..12>, day: Integer<1..31>]: Date(dateValue),
                 ~: @InvalidDate
             }
@@ -327,29 +327,29 @@ String ==> Date @ InvalidDate :: {
 };
 
 /* From db/sql/quoter-mysql.nut - Type-based SQL quoting */
-quoteValue: ^v: String|Integer|Real|Boolean|Null => String :: ?whenTypeOf(v) is {
+quoteValue: ^v: String|Integer|Real|Boolean|Null => String :: ?whenTypeOf(v) {
     `String: {'\'' + v->replace['\'', '\\\''] + '\''},
     `Integer: v->asString,
     `Real: v->asString,
-    `Boolean: ?whenValueOf(v) is { true: '1', false: '0' },
+    `Boolean: ?whenValueOf(v) { true: '1', false: '0' },
     `Null: 'NULL'
 };
 
 /* From db/sql/query-builder.nut - Array handling */
-SqlAndExpression ==> SqlString :: ?whenTypeOf($expressions) is {
+SqlAndExpression ==> SqlString :: ?whenTypeOf($expressions) {
     `Array<SqlStringExpression, 0>: SqlString(''),
     ~: $expressions->map(^e: SqlStringExpression => String :: e->asString)->combineAsString(' AND ')
 };
 
 /* From http/autowire.nut - Response type handling */
-?whenTypeOf(httpResponse) is {
+?whenTypeOf(httpResponse) {
     `{HttpResponse}: httpResponse,
     `Type<Function>: runHandler(httpResponse),
     ~: @UnknownHandlerReturnType[httpResponse->type]
 }
 
 /* From http/router.nut - Optional value handling */
-?whenTypeOf(kv) is {
+?whenTypeOf(kv) {
     `HttpLookupRouterPath: run[request: withUpdatedRequestPath(kv.path), type: kv.type],
     ~: #handler->shape(`HttpRequestHandler)(request)
 }
@@ -361,13 +361,13 @@ When `expr` is a variable, its type is automatically refined in each `resultExpr
 
 ```walnut
 /* Type refinement enables operation */
-?whenTypeOf(x) is {
+?whenTypeOf(x) {
     `Real: x + 3.14,  /* Compiler knows x is Real, so addition is valid */
     ~: 0
 }
 
 /* Complex refinement example */
-?whenTypeOf(pieces) is {
+?whenTypeOf(pieces) {
     type[String<4>, String<2>, String<2>]: {
         /* Compiler knows pieces is a 3-element tuple */
         /* with specific string length constraints */
@@ -384,13 +384,13 @@ When all cases are exhaustively handled, the return type does not include `Null`
 
 ```walnut
 /* Exhaustive matching (no default needed if all cases covered) */
-?whenTypeOf(result) is {
+?whenTypeOf(result) {
     `Integer: result + 1,
     `String: result->length
 }  /* Return type: Integer (no Null because exhaustive) */
 
 /* Non-exhaustive (needs default or returns Null) */
-?whenTypeOf(result) is {
+?whenTypeOf(result) {
     `Integer: result + 1
 }  /* Return type: Integer|Null */
 ```
@@ -703,7 +703,7 @@ When not all cases are covered:
 ```walnut
 /* Exhaustive enumeration matching */
 Suit := (Clubs, Diamonds, Hearts, Spades);
-color = ?whenValueOf(suit) is {
+color = ?whenValueOf(suit) {
     Suit.Clubs: 'black',
     Suit.Diamonds: 'red',
     Suit.Hearts: 'red',
@@ -711,13 +711,13 @@ color = ?whenValueOf(suit) is {
 };  /* Return type: String['black', 'red'] (no Null) */
 
 /* Non-exhaustive matching */
-result = ?whenValueOf(x) is {
+result = ?whenValueOf(x) {
     42: 'the answer',
     0: 'zero'
 };  /* Return type: String|Null */
 
 /* With default branch */
-result = ?whenValueOf(x) is {
+result = ?whenValueOf(x) {
     42: 'the answer',
     0: 'zero',
     ~: 'other'
@@ -742,7 +742,7 @@ Type refinement allows the compiler to narrow types within conditional branches,
 
 **Value-based refinement:**
 ```walnut
-?whenValueOf(x) is {
+?whenValueOf(x) {
     42: x + 1,      /* x is refined to Integer with value 42 */
     "hello": x->length,  /* x is refined to String with value "hello" */
     ~: 0
@@ -751,7 +751,7 @@ Type refinement allows the compiler to narrow types within conditional branches,
 
 **Type-based refinement:**
 ```walnut
-?whenTypeOf(x) is {
+?whenTypeOf(x) {
     `Integer<1..>: x * 2,     /* x is refined to Integer<1..> */
     `String: x->length,        /* x is refined to String */
     ~: 0
@@ -812,7 +812,7 @@ Always consider whether a default branch is needed:
 
 ```walnut
 /* Exhaustive - no default needed */
-?whenValueOf(suit) is {
+?whenValueOf(suit) {
     Suit.Clubs: 1,
     Suit.Diamonds: 2,
     Suit.Hearts: 3,
@@ -820,7 +820,7 @@ Always consider whether a default branch is needed:
 }
 
 /* Non-exhaustive - default recommended */
-?whenValueOf(statusCode) is {
+?whenValueOf(statusCode) {
     200: 'OK',
     404: 'Not Found',
     ~: 'Unknown'  /* Good practice */
@@ -834,12 +834,12 @@ Conditionals can be nested for complex logic:
 ```walnut
 /* From datetime.nut - Complex validation */
 Date := #[year: Integer, month: Integer<1..12>, day: Integer<1..31>] @ InvalidDate :: {
-    ?whenValueOf(#day) is {
-        31: ?whenTypeOf(#month) is {
+    ?whenValueOf(#day) {
+        31: ?whenTypeOf(#month) {
             `Integer[2, 4, 6, 9, 11]: => @InvalidDate,
             ~: null
         },
-        29: ?whenTypeOf(#month) is {
+        29: ?whenTypeOf(#month) {
             `Integer[2]: ?whenIsTrue {
                 {#year % 4} > 0: => @InvalidDate,
                 {#year % 100} == 0: ?whenIsTrue {
@@ -890,7 +890,7 @@ queryDb = ^id: Integer => *Result<User, NotFound> :: {
 
 ```walnut
 /* Pattern: Polymorphic processing */
-process = ^value: Integer|String|Boolean => String :: ?whenTypeOf(value) is {
+process = ^value: Integer|String|Boolean => String :: ?whenTypeOf(value) {
     `Integer: value->asString + ' is a number',
     `String: value + ' is a string',
     `Boolean: ?when(value) { 'true' } ~ { 'false' }
@@ -902,14 +902,14 @@ process = ^value: Integer|String|Boolean => String :: ?whenTypeOf(value) is {
 ```walnut
 /* Pattern 1: Enumeration to string */
 Color := (Red, Green, Blue);
-Color ==> String :: ?whenValueOf($) is {
+Color ==> String :: ?whenValueOf($) {
     Color.Red: 'red',
     Color.Green: 'green',
     Color.Blue: 'blue'
 };
 
 /* Pattern 2: Subset checking */
-Color->isPrimary(=> Boolean) :: ?whenTypeOf($) is {
+Color->isPrimary(=> Boolean) :: ?whenTypeOf($) {
     `Color[Red, Green, Blue]: true,
     ~: false
 };

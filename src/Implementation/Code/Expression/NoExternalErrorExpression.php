@@ -73,7 +73,7 @@ final readonly class NoExternalErrorExpression implements NoExternalErrorExpress
 
 	public function __toString(): string {
 		return sprintf(
-			"?noExternalError(%s)",
+			"(%s)*?",
 			$this->targetExpression
 		);
 	}

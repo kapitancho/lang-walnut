@@ -915,7 +915,7 @@ Person := $[name: String, age: Integer];
 
 /* Define item method for property access */
 Person->item(^String => Result<String|Integer, String>) ::
-    ?whenValueOf(#) is {
+    ?whenValueOf(#) {
         'name': $name,
         'age': $age,
         ~: @{'Property not found: ' + #}
@@ -1118,7 +1118,7 @@ Walnut provides several conditional expression forms for pattern matching and co
 #### `?whenValueOf` - Value Matching
 
 ```walnut
-?whenValueOf(expression) is {
+?whenValueOf(expression) {
     value1: result1,
     value2: result2,
     ~: defaultResult
@@ -1128,7 +1128,7 @@ Walnut provides several conditional expression forms for pattern matching and co
 #### `?whenTypeOf` - Type Matching
 
 ```walnut
-?whenTypeOf(expression) is {
+?whenTypeOf(expression) {
     `Type1: result1,
     `Type2: result2,
     ~: defaultResult
@@ -1158,8 +1158,8 @@ Walnut provides several conditional expression forms for pattern matching and co
 /* From demo-all.nut */
 getAllExpressions = ^Any => Any :: [
     matchTrue: ?whenIsTrue { 'then 1': 'then 1', 'then 2': 'then 2', ~: 'default' },
-    matchType: ?whenTypeOf ('type') is { `String['type']: 'then 1', `String['other type']: 'then 2', ~: 'default' },
-    matchValue: ?whenValueOf ('value') is { 'value': 'then 1', 'other value': 'then 2', ~: 'default' },
+    matchType: ?whenTypeOf ('type') { `String['type']: 'then 1', `String['other type']: 'then 2', ~: 'default' },
+    matchValue: ?whenValueOf ('value') { 'value': 'then 1', 'other value': 'then 2', ~: 'default' },
     matchIfThenElse: ?when('condition') { 'then' } ~ { 'else' },
     matchIfThen: ?when('condition') { 'then' },
     matchIsErrorElse: ?whenIsError('condition') { 'then' } ~ { 'else' },
@@ -1323,7 +1323,7 @@ Type narrowing occurs in conditional branches:
 
 ```walnut
 process = ^value: Integer|String => String :: {
-    ?whenTypeOf(value) is {
+    ?whenTypeOf(value) {
         `Integer: {
             /* value is narrowed to Integer here */
             value->asString
@@ -1388,8 +1388,8 @@ getAllExpressions = ^Any => Any :: [
 
     /* Conditionals */
     matchTrue: ?whenIsTrue { 'then 1': 'then 1', 'then 2': 'then 2', ~: 'default' },
-    matchType: ?whenTypeOf ('type') is { `String['type']: 'then 1', `String['other type']: 'then 2', ~: 'default' },
-    matchValue: ?whenValueOf ('value') is { 'value': 'then 1', 'other value': 'then 2', ~: 'default' },
+    matchType: ?whenTypeOf ('type') { `String['type']: 'then 1', `String['other type']: 'then 2', ~: 'default' },
+    matchValue: ?whenValueOf ('value') { 'value': 'then 1', 'other value': 'then 2', ~: 'default' },
     matchIfThenElse: ?when('condition') { 'then' } ~ { 'else' },
     matchIfThen: ?when('condition') { 'then' },
     matchIsErrorElse: ?whenIsError('condition') { 'then' } ~ { 'else' },

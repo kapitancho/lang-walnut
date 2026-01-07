@@ -7,12 +7,12 @@ use Walnut\Lang\Blueprint\Compilation\AST\AstProgramCompilationException;
 final class CodeExecutionTest extends CodeExecutionTestHelper {
 
 	public function testCodeExecutionOk(): void {
-		$result = $this->executeCodeSnippet('{#=>item(0)=>asInteger} + {#=>item(1)=>asInteger};', parameters: [2, 3]);
+		$result = $this->executeCodeSnippet('{#->item(0)?->asInteger?} + {#->item(1)?->asInteger?};', parameters: [2, 3]);
 		$this->assertEquals('5', $result);
 	}
 
 	public function testCodeExecutionContextOk(): void {
-		$result = $this->executeCodeSnippet('{#=>item(0)=>asInteger} + getConst();', valueDeclarations: 'getConst = ^Any => Integer :: 7;', parameters: [5]);
+		$result = $this->executeCodeSnippet('{#->item(0)?->asInteger?} + getConst();', valueDeclarations: 'getConst = ^Any => Integer :: 7;', parameters: [5]);
 		$this->assertEquals('12', $result);
 	}
 

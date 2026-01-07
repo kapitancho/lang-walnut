@@ -152,7 +152,7 @@ module demo-cli:
         ?noError(?noError(#->item(1))->asInteger);
 
     s = calc(args);
-    ?whenTypeOf(s) is {
+    ?whenTypeOf(s) {
         `Integer: s->asString,
         ~: 'Invalid parameters'
     }
@@ -409,7 +409,7 @@ module user-service %% [~Database, ~Logger]:
 /* CLI Entry Point */
 => {
     command = ?noError(args->item(0));
-    ?whenValueOf(command) is {
+    ?whenValueOf(command) {
         'list': listUsers(),
         'add': addUser(args),
         ~: 'Unknown command'
@@ -449,7 +449,7 @@ module todo-app %% [~Database, ~Clock]:
 /* CLI: Manage todos from command line */
 => {
     action = ?noError(args->item(0));
-    ?whenValueOf(action) is {
+    ?whenValueOf(action) {
         'add': addTodo(args->slice[1, 999]),
         'list': listTodos(),
         'done': markDone(args),
@@ -462,7 +462,7 @@ TodoApiHandler := ();
 TodoApiHandler ==> HttpRequestHandler %% [~HttpResponseBuilder, ~Database] ::
     ^request: {HttpRequest} => {HttpResponse} :: {
         req = request->shape(`HttpRequest);
-        ?whenValueOf(req.method) is {
+        ?whenValueOf(req.method) {
             HttpRequestMethod.get: listTodosHttp(),
             HttpRequestMethod.post: createTodoHttp(req.body),
             ~: %httpResponseBuilder(405)->withBody('Method not allowed')

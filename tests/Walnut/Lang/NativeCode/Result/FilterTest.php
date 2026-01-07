@@ -33,7 +33,7 @@ final class FilterTest extends CodeExecutionTestHelper {
 			"doArray[2, 5, 3];",
 			valueDeclarations: "
 				doArray = ^a: Result<Array<Integer, 2..5>, Null> => Result<Array<Integer, ..5>, NotANumber|Null> ::
-					a->filter(^item: Integer => Result<Boolean, NotANumber> :: ?noError(9 // item) > 2);
+					a->filter(^item: Integer => Result<Boolean, NotANumber> :: (9 // item)? > 2);
 			"
 		);
 		$this->assertEquals("[2, 3]", $result);
@@ -44,7 +44,7 @@ final class FilterTest extends CodeExecutionTestHelper {
 			"doArray[2, 0, 3];",
 			valueDeclarations: "
 				doArray = ^a: Result<Array<Integer, 2..5>, Null> => Result<Array<Integer, ..5>, NotANumber|Null> ::
-					a->filter(^item: Integer => Result<Boolean, NotANumber> :: ?noError(9 // item) > 2);
+					a->filter(^item: Integer => Result<Boolean, NotANumber> :: (9 // item)? > 2);
 			"
 		);
 		$this->assertEquals("@NotANumber", $result);
@@ -78,7 +78,7 @@ final class FilterTest extends CodeExecutionTestHelper {
 			"doMap[a: 2, b: 5, c: 3];",
 			valueDeclarations: "
 				doMap = ^a: Result<Map<Integer, 2..5>, Null> => Result<Map<Integer, ..5>, NotANumber|Null> ::
-					a->filter(^item: Integer => Result<Boolean, NotANumber> :: ?noError(9 // item) > 2);
+					a->filter(^item: Integer => Result<Boolean, NotANumber> :: (9 // item)? > 2);
 			"
 		);
 		$this->assertEquals("[a: 2, c: 3]", $result);
@@ -89,7 +89,7 @@ final class FilterTest extends CodeExecutionTestHelper {
 			"doMap[a: 2, b: 0, c: 3];",
 			valueDeclarations: "
 				doMap = ^a: Result<Map<Integer, 2..5>, Null> => Result<Map<Integer, ..5>, NotANumber|Null> ::
-					a->filter(^item: Integer => Result<Boolean, NotANumber> :: ?noError(9 // item) > 2);
+					a->filter(^item: Integer => Result<Boolean, NotANumber> :: (9 // item)? > 2);
 			"
 		);
 		$this->assertEquals("@NotANumber", $result);
@@ -123,7 +123,7 @@ final class FilterTest extends CodeExecutionTestHelper {
 			"doSet[2; 5; 3];",
 			valueDeclarations: "
 				doSet = ^a: Result<Set<Integer, 2..5>, Null> => Result<Set<Integer, ..5>, NotANumber|Null> ::
-					a->filter(^item: Integer => Result<Boolean, NotANumber> :: ?noError(9 // item) > 2);
+					a->filter(^item: Integer => Result<Boolean, NotANumber> :: (9 // item)? > 2);
 			"
 		);
 		$this->assertEquals("[2; 3]", $result);
@@ -134,7 +134,7 @@ final class FilterTest extends CodeExecutionTestHelper {
 			"doSet[2; 0; 3];",
 			valueDeclarations: "
 				doSet = ^a: Result<Set<Integer, 2..5>, Null> => Result<Set<Integer, ..5>, NotANumber|Null> ::
-					a->filter(^item: Integer => Result<Boolean, NotANumber> :: ?noError(9 // item) > 2);
+					a->filter(^item: Integer => Result<Boolean, NotANumber> :: (9 // item)? > 2);
 			"
 		);
 		$this->assertEquals("@NotANumber", $result);

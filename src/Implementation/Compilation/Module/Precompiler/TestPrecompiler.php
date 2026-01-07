@@ -31,7 +31,7 @@ final readonly class TestPrecompiler implements CodePrecompiler {
 				%testCases->map(^ ~TestCase => String :: {
 					testResult = testCase->invoke;
 					before = testResult.before;
-					beforeResult = ?whenTypeOf(before) is {
+					beforeResult = ?whenTypeOf(before) {
 						`^Null => Any: before()
 					};
 					?whenIsError(beforeResult) {
@@ -40,7 +40,7 @@ final readonly class TestPrecompiler implements CodePrecompiler {
 					};
 					actualResult = testResult.actual();
 					after = testResult.after;
-					afterResult = ?whenTypeOf(after) is {
+					afterResult = ?whenTypeOf(after) {
 						`^Null => Any: after()
 					};
 					?whenIsError(afterResult) {

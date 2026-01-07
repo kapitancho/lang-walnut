@@ -141,7 +141,7 @@ final class ReduceTest extends CodeExecutionTestHelper {
 	public function testReduceTypeTransformStringToIntegerResultOk(): void {
 		$result = $this->executeCodeSnippet(
 			"countChars['3', '7', '-2']",
-			valueDeclarations: "countChars = ^arr: Array<String, 3> => Result<Integer, NotANumber> :: arr->reduce[reducer: ^[result: Integer, item: String] => Result<Integer, NotANumber> :: #result + #item=>asInteger, initial: 0];"
+			valueDeclarations: "countChars = ^arr: Array<String, 3> => Result<Integer, NotANumber> :: arr->reduce[reducer: ^[result: Integer, item: String] => Result<Integer, NotANumber> :: #result + #item->asInteger?, initial: 0];"
 		);
 		$this->assertEquals("8", $result);
 	}
@@ -149,7 +149,7 @@ final class ReduceTest extends CodeExecutionTestHelper {
 	public function testReduceTypeTransformStringToIntegerResultError(): void {
 		$result = $this->executeCodeSnippet(
 			"countChars['3', 'hello', '-2']",
-			valueDeclarations: "countChars = ^arr: Array<String, 3> => Result<Integer, NotANumber> :: arr->reduce[reducer: ^[result: Integer, item: String] => Result<Integer, NotANumber> :: #result + #item=>asInteger, initial: 0];"
+			valueDeclarations: "countChars = ^arr: Array<String, 3> => Result<Integer, NotANumber> :: arr->reduce[reducer: ^[result: Integer, item: String] => Result<Integer, NotANumber> :: #result + #item->asInteger?, initial: 0];"
 		);
 		$this->assertEquals("@NotANumber", $result);
 	}

@@ -193,8 +193,8 @@ final class ToStringTest extends BaseProgramTestHelper {
 			'var{a: x, ~y} = 0' => $er->multiVariableAssignment(['a' => new VariableNameIdentifier('x'), 'y' => new VariableNameIdentifier('y')], $c0),
 			':: 0' => $er->scoped($c0),
 			'=> 0' => $er->return($c0),
-			'?noError(0)' => $er->noError($c0),
-			'?noExternalError(0)' => $er->noExternalError($c0),
+			'(0)?' => $er->noError($c0),
+			'(0)*?' => $er->noExternalError($c0),
 			'(0)' => $er->group($c0),
 			'{0; 0}' => $er->sequence([$c0, $c0]),
 			"x->item('a')" => $er->propertyAccess($x, 'a'),
@@ -211,11 +211,11 @@ final class ToStringTest extends BaseProgramTestHelper {
 				$er->matchPair($x, $c0),
 				$er->matchDefault($c0)
 			]),
-	        '?whenTypeOf (x) is { x: 0, ~: 0 }' => $er->matchType($x, [
+	        '?whenTypeOf (x) { x: 0, ~: 0 }' => $er->matchType($x, [
                 $er->matchPair($x, $c0),
                 $er->matchDefault($c0)
             ]),
-			'?whenValueOf (x) is { x: 0, ~: 0 }' => $er->matchValue($x, [
+			'?whenValueOf (x) { x: 0, ~: 0 }' => $er->matchValue($x, [
 				$er->matchPair($x, $c0),
 				$er->matchDefault($c0)
 			]),

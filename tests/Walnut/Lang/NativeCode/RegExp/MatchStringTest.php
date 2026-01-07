@@ -24,7 +24,7 @@ final class MatchStringTest extends CodeExecutionTestHelper {
 
 	public function testMatchStringInvalidRegExp(): void {
 		$result = $this->executeCodeSnippet(
-			"?noError(RegExp('^he'))->matchString('hello 42');",
+			"RegExp('^he')?->matchString('hello 42');",
 			typeDeclarations: 'RegExp := $String; InvalidRegExp := [expression: String];'
 		);
 		$this->assertEquals("@InvalidRegExp!'^he'", $result);

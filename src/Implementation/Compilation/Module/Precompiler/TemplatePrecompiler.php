@@ -33,7 +33,7 @@ final readonly class TemplatePrecompiler implements CodePrecompiler {
 		CODE;
 		$sourceCode = (string)preg_replace('/<!--\[(.*?)]-->/s', "<!-- e({ $1 }->asString);\n -->", $sourceCode);
 		$sourceCode = (string)preg_replace('/<!--\{(.*?)}-->/s', "<!-- h({ $1 }->asString);\n -->", $sourceCode);
-		$sourceCode = (string)preg_replace('/<!--%(.*?)%-->/s', "<!-- e(%templateRenderer=>render($1));\n -->", $sourceCode);
+		$sourceCode = (string)preg_replace('/<!--%(.*?)%-->/s', "<!-- e(%templateRenderer->render($1)?);\n -->", $sourceCode);
 		return (string)preg_replace_callback('/-->(.*?)<!--/s', function($matches) {
 			$modifiedString = $this->escapeCharHandler->escape($matches[1]);
 			return "e($modifiedString);\n";

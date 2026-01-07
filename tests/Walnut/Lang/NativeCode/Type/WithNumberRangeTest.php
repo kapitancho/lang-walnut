@@ -7,20 +7,20 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 final class WithNumberRangeTest extends CodeExecutionTestHelper {
 
 	public function testWithNumberRangeReal(): void {
-		$result = $this->executeCodeSnippet("`Real->withNumberRange(?noError(RealNumberRange![intervals: [
-	?noError(RealNumberInterval[
+		$result = $this->executeCodeSnippet("`Real->withNumberRange(RealNumberRange![intervals: [
+	RealNumberInterval[
 		start: MinusInfinity,
 		end: RealNumberIntervalEndpoint![value: 10.7, inclusive: true]
-	]),
-	?noError(RealNumberInterval[
+	]?,
+	RealNumberInterval[
 		start: RealNumberIntervalEndpoint![value: 13.9, inclusive: true],
 		end: RealNumberIntervalEndpoint![value: 13.9, inclusive: true]
-	]),
-	?noError(RealNumberInterval[
+	]?,
+	RealNumberInterval[
 		start: RealNumberIntervalEndpoint![value: 20.0001, inclusive: true],
 		end: RealNumberIntervalEndpoint![value: 25, inclusive: false]
-	])
-]]));");
+	]?
+]]?);");
 		$this->assertEquals("type{Real<(..10.7], 13.9, [20.0001..25)>}", $result);
 	}
 
@@ -33,10 +33,10 @@ final class WithNumberRangeTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("getWithRange(type{Real});",
 			valueDeclarations: "getWithRange = ^Type<Real> => Result<Type<Real>, InvalidRealRange> :: #->withNumberRange(
 				RealNumberRange![intervals: [
-					?noError(RealNumberInterval[
+					RealNumberInterval[
 						start: RealNumberIntervalEndpoint![value: 3.14, inclusive: true],
 						end: RealNumberIntervalEndpoint![value: 10, inclusive: true]
-					])
+					]?
 				]]
 			);");
 		$this->assertEquals("type{Real<3.14..10>}", $result);
@@ -48,22 +48,22 @@ final class WithNumberRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithNumberRangeInteger(): void {
-		$result = $this->executeCodeSnippet("type{Integer}->withNumberRange(?noError(
+		$result = $this->executeCodeSnippet("type{Integer}->withNumberRange(
 			IntegerNumberRange![intervals: [
-				?noError(IntegerNumberInterval[
+				IntegerNumberInterval[
 					start: MinusInfinity,
 					end: IntegerNumberIntervalEndpoint![value: 10, inclusive: true]
-				]),
-				?noError(IntegerNumberInterval[
+				]?,
+				IntegerNumberInterval[
 					start: IntegerNumberIntervalEndpoint![value: 13, inclusive: true],
 					end: IntegerNumberIntervalEndpoint![value: 13, inclusive: true]
-				]),
-				?noError(IntegerNumberInterval[
+				]?,
+				IntegerNumberInterval[
 					start: IntegerNumberIntervalEndpoint![value: 20, inclusive: true],
 					end: IntegerNumberIntervalEndpoint![value: 25, inclusive: false]
-				])
+				]?
 			]]
-		));");
+		?);");
 		$this->assertEquals("type{Integer<(..10], 13, [20..25)>}", $result);
 	}
 
@@ -76,10 +76,10 @@ final class WithNumberRangeTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("getWithRange(type{Integer});",
 			valueDeclarations: "getWithRange = ^Type<Integer> => Result<Type<Integer>, InvalidIntegerRange> :: #->withNumberRange(
 			IntegerNumberRange![intervals: [
-				?noError(IntegerNumberInterval[
+				IntegerNumberInterval[
 					start: IntegerNumberIntervalEndpoint![value: -2, inclusive: true],
 					end: IntegerNumberIntervalEndpoint![value: 9, inclusive: true]
-				])
+				]?
 			]]);");
 		$this->assertEquals("type{Integer<-2..9>}", $result);
 	}
@@ -90,12 +90,12 @@ final class WithNumberRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithNumberRangeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "type{Array}->withNumberRange(?noError(IntegerRange[-2, 9]));");
+		$this->executeErrorCodeSnippet('Invalid target type', "type{Array}->withNumberRange(IntegerRange[-2, 9]?);");
 	}
 
 	public function testWithNumberRangeMetaTypeInvalidTargetType(): void {
 		$this->executeErrorCodeSnippet('Invalid target type',
-			"getWithRange(type[Integer]);", valueDeclarations:  "getWithRange = ^Type<Tuple> => Type :: #->withNumberRange(?noError(IntegerRange[-2, 9]));");
+			"getWithRange(type[Integer]);", valueDeclarations:  "getWithRange = ^Type<Tuple> => Type :: #->withNumberRange(IntegerRange[-2, 9]?);");
 	}
 
 }

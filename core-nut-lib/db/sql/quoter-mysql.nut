@@ -10,7 +10,7 @@ module $db/sql/quoter-mysql %% $db/sql/query-builder:
         quoteIdentifier: ^s: String => String :: [
             identifier, s->replace[match: '`', replacement: '``'], identifier
         ]->combineAsString(''),
-        quoteValue: ^v: String|Integer|Real|Boolean|Null => String :: ?whenTypeOf(v) is {
+        quoteValue: ^v: String|Integer|Real|Boolean|Null => String :: ?whenTypeOf(v) {
             `String: [
                 value,
                 {{v
@@ -20,7 +20,7 @@ module $db/sql/quoter-mysql %% $db/sql/query-builder:
                 value
             ]->combineAsString(''),
             `Integer|Real: v->asString,
-            `Boolean: ?whenValueOf(v) is { true: '1', false: '0' },
+            `Boolean: ?whenValueOf(v) { true: '1', false: '0' },
             `Null: 'NULL'
         }
     ]

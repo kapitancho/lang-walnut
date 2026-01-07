@@ -8,7 +8,7 @@ final class ErrorCoalesceExpressionTest extends CodeExecutionTestHelper {
 
 	public function testErrorCoalesceWorkaround(): void {
 		$result = $this->executeCodeSnippet("[errorCoalesce(true), errorCoalesce(@'hello')];", valueDeclarations: <<<NUT
-			errorCoalesce = ^Result<Boolean, String> => Boolean|Integer :: ?whenTypeOf(#) is {
+			errorCoalesce = ^Result<Boolean, String> => Boolean|Integer :: ?whenTypeOf(#) {
 				type{Boolean}: #,
 				type{Error<String>}: #->error->length
 			};

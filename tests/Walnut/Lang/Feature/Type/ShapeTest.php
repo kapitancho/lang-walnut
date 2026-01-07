@@ -79,13 +79,13 @@ final class ShapeTest extends CodeExecutionTestHelper {
 
 	public function testStrictSupersetCastOk(): void {
 		// The cast may return an error and therefore only explicit usage is allowed.
-		$result = $this->executeCodeSnippet("useIntPair(getIntPair=>invoke(IntPairType![a: 1, b: 5]));", <<<NUT
+		$result = $this->executeCodeSnippet("useIntPair(getIntPair(IntPairType![a: 1, b: 5])?);", <<<NUT
 			IntPairType := [a: Integer, b: Integer];
 			IntPair = [first: Integer, second: Integer];
 			Incompatible := ();
 			IntPairType ==> IntPair :: [first: \$a, second: \$b];
 		NUT, <<<NUT
-			getIntPair = ^p: IntPairType => Result<Shape<IntPair>, Incompatible> :: p=>as(`IntPair);
+			getIntPair = ^p: IntPairType => Result<Shape<IntPair>, Incompatible> :: p->as(`IntPair)?;
 			useIntPair = ^p: Shape<IntPair> => Integer :: p->shape(`IntPair).first + p->shape(`IntPair).second;
 		NUT);
 		$this->assertEquals("6", $result);

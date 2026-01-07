@@ -3,7 +3,7 @@ module $http/request-handler/composite %% $http/request-handler, $http/middlewar
 HttpCompositeRequestHandler := #[defaultHandler: {HttpRequestHandler}, middlewares: Array<{HttpMiddleware}>];
 HttpCompositeRequestHandler ==> HttpRequestHandler :: {
     ^request: {HttpRequest} => {HttpResponse} :: {
-        ?whenTypeOf($middlewares) is {
+        ?whenTypeOf($middlewares) {
             `Array<{HttpMiddleware}, 1..>: {
                 var{element: middleware, array: remainingMiddlewares} = $middlewares => withoutFirst;
                 {middleware->shape(`HttpMiddleware)} [

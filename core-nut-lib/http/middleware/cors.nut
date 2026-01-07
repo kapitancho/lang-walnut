@@ -12,13 +12,13 @@ CorsAllowedMethods = Array<HttpRequestMethod>;
 HttpCorsMiddleware := ();
 HttpCorsMiddleware ==> HttpMiddleware %% [~CorsAllowedOrigins, ~CorsAllowedHeaders, ~CorsAllowedMethods, ~CorsExposedHeaders] :: {
     applyHeader = ^[headerName: String, values: Array<String>, response: {HttpResponse}] => {HttpResponse} :: {
-        ?whenTypeOf(#values) is {
+        ?whenTypeOf(#values) {
             `Array<String, 1..>: #response->shape(`HttpResponse)->withHeader[headerName: #headerName, values: [#values->combineAsString(', ')]],
             ~: #response
         }
     };
     ^[request: {HttpRequest}, handler: {HttpRequestHandler}] => {HttpResponse} :: {
-        response = ?whenValueOf(#request->shape(`HttpRequest).method) is {
+        response = ?whenValueOf(#request->shape(`HttpRequest).method) {
             HttpRequestMethod.options: [
                 statusCode: 200,
                 protocolVersion: HttpProtocolVersion.http_1_1,

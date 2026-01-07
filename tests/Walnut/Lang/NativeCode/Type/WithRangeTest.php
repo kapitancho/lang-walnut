@@ -7,7 +7,7 @@ use Walnut\Lang\Test\CodeExecutionTestHelper;
 final class WithRangeTest extends CodeExecutionTestHelper {
 
 	public function testWithRangeReal(): void {
-		$result = $this->executeCodeSnippet("type{Real}->withRange(?noError(RealRange[3.14, 10]));");
+		$result = $this->executeCodeSnippet("type{Real}->withRange(RealRange[3.14, 10]?);");
 		$this->assertEquals("type{Real<3.14..10>}", $result);
 	}
 
@@ -18,7 +18,7 @@ final class WithRangeTest extends CodeExecutionTestHelper {
 
 	public function testWithRangeRealMetaType(): void {
 		$result = $this->executeCodeSnippet("getWithRange(type{Real});",
-			valueDeclarations: "getWithRange = ^Type<Real> => Result<Type<Real>, InvalidRealRange> :: #->withRange(?noError(RealRange[3.14, 10]));");
+			valueDeclarations: "getWithRange = ^Type<Real> => Result<Type<Real>, InvalidRealRange> :: #->withRange(RealRange[3.14, 10]?);");
 		$this->assertEquals("type{Real<3.14..10>}", $result);
 	}
 
@@ -28,7 +28,7 @@ final class WithRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithRangeInteger(): void {
-		$result = $this->executeCodeSnippet("type{Integer}->withRange(?noError(IntegerRange[-2, 9]));");
+		$result = $this->executeCodeSnippet("type{Integer}->withRange(IntegerRange[-2, 9]?);");
 		$this->assertEquals("type{Integer<-2..9>}", $result);
 	}
 
@@ -39,7 +39,7 @@ final class WithRangeTest extends CodeExecutionTestHelper {
 
 	public function testWithRangeIntegerSubsetMetaType(): void {
 		$result = $this->executeCodeSnippet("getWithRange(type{Integer});",
-			valueDeclarations: "getWithRange = ^Type<Integer> => Result<Type<Integer>, InvalidIntegerRange> :: #->withRange(?noError(IntegerRange[-2, 9]));");
+			valueDeclarations: "getWithRange = ^Type<Integer> => Result<Type<Integer>, InvalidIntegerRange> :: #->withRange(IntegerRange[-2, 9]?);");
 		$this->assertEquals("type{Integer<-2..9>}", $result);
 	}
 
@@ -49,12 +49,12 @@ final class WithRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithRangeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "type{Array}->withRange(?noError(IntegerRange[-2, 9]));");
+		$this->executeErrorCodeSnippet('Invalid target type', "type{Array}->withRange(IntegerRange[-2, 9]?);");
 	}
 
 	public function testWithRangeMetaTypeInvalidTargetType(): void {
 		$this->executeErrorCodeSnippet('Invalid target type',
-			"getWithRange(type[Integer]);", valueDeclarations:  "getWithRange = ^Type<Tuple> => Type :: #->withRange(?noError(IntegerRange[-2, 9]));");
+			"getWithRange(type[Integer]);", valueDeclarations:  "getWithRange = ^Type<Tuple> => Type :: #->withRange(IntegerRange[-2, 9]?);");
 	}
 
 }

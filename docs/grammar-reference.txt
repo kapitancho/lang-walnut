@@ -379,9 +379,9 @@ Examples:
   ?when(x) { y } ~ { z }                          // If with else
   ?whenIsError(x) { y }                           // Error match
   ?whenIsError(x) { y } ~ { z }                   // Error with else
-  ?whenValueOf(#day) is { 31: ..., ~: null }      // Value match
-  ?whenTypeOf($) is { `String: ..., ~: @InvalidDate }  // Type match with type literal
-  ?whenTypeOf($) is { type[Integer, String]: ..., ~: ... }  // Type match with type tuple
+  ?whenValueOf(#day) { 31: ..., ~: null }      // Value match
+  ?whenTypeOf($) { `String: ..., ~: @InvalidDate }  // Type match with type literal
+  ?whenTypeOf($) { type[Integer, String]: ..., ~: ... }  // Type match with type tuple
   ?whenIsTrue { x > 0: ..., ~: null }             // Boolean match
 
 ================================================================================

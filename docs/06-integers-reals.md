@@ -932,7 +932,7 @@ safeDivide = ^[numerator: Real, denominator: Real] => Result<Real, String> :: {
 
 /* Or use Result type returned by / operator */
 result = 10 / 0;  /* Result<Real, NotANumber> */
-?whenTypeOf(result) is {
+?whenTypeOf(result) {
     `Real: result->printed,
     `NotANumber: 'Cannot divide by zero'
 };

@@ -29,7 +29,7 @@ final class MatchExpressionTest extends CodeExecutionTestHelper {
 
 	public function testMatchType(): void {
 		$result = $this->executeCodeSnippet("matchType('str');", valueDeclarations: <<<NUT
-			matchType = ^Any => String :: ?whenTypeOf(#) is {
+			matchType = ^Any => String :: ?whenTypeOf(#) {
 			    type{String}: 'string',
 			    ~: 'not a string'
 			};
@@ -40,7 +40,7 @@ final class MatchExpressionTest extends CodeExecutionTestHelper {
 
 	public function testMatchTypeWithDynamicTypes(): void {
 		$result = $this->executeCodeSnippet("matchType('str');", valueDeclarations: <<<NUT
-			matchType = ^Any => String :: ?whenTypeOf(#) is {
+			matchType = ^Any => String :: ?whenTypeOf(#) {
 			    #->type: 'string',
 			    ~: 'not a string'
 			};
@@ -51,7 +51,7 @@ final class MatchExpressionTest extends CodeExecutionTestHelper {
 
 	public function testMatchValue(): void {
 		$result = $this->executeCodeSnippet("matchValue('hello');", valueDeclarations: <<<NUT
-			matchValue = ^Any => String :: ?whenValueOf(#) is {
+			matchValue = ^Any => String :: ?whenValueOf(#) {
 			    'hello': 'hello',
 			    ~: 'not hello'
 			};			

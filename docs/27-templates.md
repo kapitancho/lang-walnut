@@ -186,7 +186,7 @@ module demo-tpl %% $tpl, demo-tpl-product-list, demo-tpl-product-page:
     };
 
     x = myFn();
-    ?whenTypeOf(x) is {
+    ?whenTypeOf(x) {
         `String: x->OUT_TXT,
         ~: x->printed
     }
