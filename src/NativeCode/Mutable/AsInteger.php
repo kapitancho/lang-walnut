@@ -5,9 +5,9 @@ namespace Walnut\Lang\NativeCode\Mutable;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
-use Walnut\Lang\Blueprint\Function\Method;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
+use Walnut\Lang\Blueprint\Function\UnknownMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\MutableType;
@@ -21,19 +21,20 @@ final readonly class AsInteger implements NativeMethod {
 
 	public function analyse(
 		TypeRegistry $typeRegistry,
-		MethodFinder $methodFinder,
+		MethodAnalyser $methodAnalyser,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof MutableType) {
 			$valueType = $targetType->valueType;
-			$method = $methodFinder->methodForType(
+			$result = $methodAnalyser->safeAnalyseMethod(
 				$valueType,
-				new MethodNameIdentifier('asInteger')
+				new MethodNameIdentifier('asInteger'),
+				$parameterType
 			);
-			if ($method instanceof Method) {
-				return $method->analyse($typeRegistry, $methodFinder, $valueType, $parameterType);
+			if ($result !== UnknownMethod::value) {
+				return $result;
 			}
 		}
 		// @codeCoverageIgnoreStart
@@ -48,17 +49,11 @@ final readonly class AsInteger implements NativeMethod {
 	): Value {
 		if ($target instanceof MutableValue) {
 			$value = $target->value;
-			$method = $programRegistry->methodFinder->methodForType(
-				$target->targetType,
-				new MethodNameIdentifier('asInteger')
+			return $programRegistry->methodContext->executeMethod(
+				$value,
+				new MethodNameIdentifier('asInteger'),
+				$parameter
 			);
-			if ($method instanceof Method) {
-				return $method->execute(
-					$programRegistry,
-					($value),
-					$parameter
-				);
-			}
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid target value");

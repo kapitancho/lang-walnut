@@ -5,7 +5,7 @@ namespace Walnut\Lang\Implementation\Code\NativeCode;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Blueprint\Function\Method;
+use Walnut\Lang\Blueprint\Function\UnknownMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\UnknownType;
 use Walnut\Lang\Blueprint\Type\AliasType;
@@ -320,18 +320,14 @@ final readonly class Hydrator {
 		string $hydrationPath,
 		string $hydrationErrorMessage
 	): Value|null {
-		$method = $this->programRegistry->methodFinder->methodForType(
-			$this->programRegistry->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
+		$result = $this->programRegistry->methodContext->safeExecuteMethod(
+			$value,
 			new MethodNameIdentifier(
 				sprintf('as%s', $targetType->name)
-			)
+			),
+			$this->programRegistry->valueRegistry->null
 		);
-		if ($method instanceof Method) {
-			$result = $method->execute(
-				$this->programRegistry,
-				($value),
-				($this->programRegistry->valueRegistry->null)
-			);
+		if ($result !== UnknownMethod::value) {
 			$resultValue = $result;
 			if ($resultValue instanceof ErrorValue) {
 				throw new HydrationException(

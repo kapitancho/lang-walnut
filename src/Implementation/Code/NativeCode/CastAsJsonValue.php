@@ -6,7 +6,8 @@ use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\Method;
-use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
+use Walnut\Lang\Blueprint\Function\UnknownMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\BooleanType;
@@ -42,14 +43,14 @@ final readonly class CastAsJsonValue {
 	public function __construct(
 	) {}
 
-	public function isSafeToCastType(TypeRegistry $typeRegistry, MethodFinder $methodFinder, Type $type): bool {
+	public function isSafeToCastType(TypeRegistry $typeRegistry, MethodAnalyser $methodAnalyser, Type $type): bool {
 		if ($type instanceof TupleType || $type instanceof RecordType) {
 			foreach($type->types as $item) {
-				if (!$this->isSafeToCastType($typeRegistry, $methodFinder, $item)) {
+				if (!$this->isSafeToCastType($typeRegistry, $methodAnalyser, $item)) {
 					return false;
 				}
 			}
-			return $type->restType instanceof NothingType || $this->isSafeToCastType($typeRegistry, $methodFinder, $type->restType);
+			return $type->restType instanceof NothingType || $this->isSafeToCastType($typeRegistry, $methodAnalyser, $type->restType);
 		}
 		if (
 			($type instanceof AliasType && $type->name->equals(
@@ -65,14 +66,15 @@ final readonly class CastAsJsonValue {
 			return true;
 		}
 
-		$method = $methodFinder->methodForType(
+
+		$method = $methodAnalyser->methodForType(
 			$type,
 			new MethodNameIdentifier('asJsonValue')
 		);
 		if ($method instanceof Method && !($method instanceof AsJsonValue)) {
 			$result = $method->analyse(
 				$typeRegistry,
-				$methodFinder,
+				$methodAnalyser,
 				$type,
 				$typeRegistry->null
 			);
@@ -81,7 +83,7 @@ final readonly class CastAsJsonValue {
 			}
 		}
 		if ($type instanceof MutableType || $type instanceof CompositeNamedType) {
-			return $this->isSafeToCastType($typeRegistry, $methodFinder, $type->valueType);
+			return $this->isSafeToCastType($typeRegistry, $methodAnalyser, $type->valueType);
 		}
 		return false;
 	}
@@ -107,16 +109,20 @@ final readonly class CastAsJsonValue {
 		) {
 			return $value;
 		}
-		$method = $programRegistry->methodFinder->methodForValue(
+
+		$method = $programRegistry->methodContext->methodForValue(
 			$value,
 			new MethodNameIdentifier('asJsonValue')
 		);
 		if ($method instanceof Method && !($method instanceof AsJsonValue)) {
-			return $method->execute(
-				$programRegistry,
+			$result = $programRegistry->methodContext->safeExecuteMethod(
 				$value,
+				new MethodNameIdentifier('asJsonValue'),
 				$programRegistry->valueRegistry->null
 			);
+			if ($result !== UnknownMethod::value) {
+				return $result;
+			}
 		}
 		if ($value instanceof MutableValue || $value instanceof OpenValue || $value instanceof SealedValue || $value instanceof DataValue) {
 			return $this->getJsonValue($programRegistry, $value->value);

@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
-use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
+use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ResultType;
@@ -20,7 +20,7 @@ trait ResultProxy {
 
 	private function analyseHelper(
 		TypeRegistry $typeRegistry,
-		MethodFinder $methodFinder,
+		MethodAnalyser $methodAnalyser,
 		Type $targetType,
 		Type $parameterType,
 		MethodNameIdentifier $methodName,
@@ -28,10 +28,14 @@ trait ResultProxy {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof ResultType) {
 			$arrayType = $this->toBaseType($targetType->returnType);
-			$method = $methodFinder->methodForType($arrayType, $methodName);
-			if ($method !== UnknownMethod::value) {
+			$result = $methodAnalyser->safeAnalyseMethod(
+				$arrayType,
+				$methodName,
+				$parameterType
+			);
+			if ($result !== UnknownMethod::value) {
 				return $typeRegistry->result(
-					$method->analyse($typeRegistry, $methodFinder, $arrayType, $parameterType),
+					$result,
 					$targetType->errorType
 				);
 			}

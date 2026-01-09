@@ -7,8 +7,7 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Function\UnknownMethod;
-use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
+use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\OpenType;
@@ -25,7 +24,7 @@ final readonly class With implements NativeMethod {
 
 	public function analyse(
 		TypeRegistry $typeRegistry,
-		MethodFinder $methodFinder,
+		MethodAnalyser $methodAnalyser,
 		Type $targetType,
 		Type $parameterType
 	): Type {
@@ -33,19 +32,14 @@ final readonly class With implements NativeMethod {
 		if ($type instanceof OpenType) {
 			$valueType = $this->toBaseType($type->valueType);
 
-			$alignTypeWithValidator = static function() use ($typeRegistry, $methodFinder, $targetType, $valueType) {
+			$alignTypeWithValidator = static function() use ($typeRegistry, $methodAnalyser, $targetType, $valueType) {
 				$constructorType = $typeRegistry->atom(
 					new TypeNameIdentifier('Constructor')
 				);
-				$validatorMethod = $methodFinder->methodForType(
-					$constructorType,
-					new MethodNameIdentifier('as' . $targetType->name->identifier)
-				);
-				if ($validatorMethod !== UnknownMethod::value) {
-					$validatorResultType = $validatorMethod->analyse(
-						$typeRegistry,
-						$methodFinder,
+				try {
+					$validatorResultType = $methodAnalyser->analyseMethod(
 						$constructorType,
+						new MethodNameIdentifier('as' . $targetType->name->identifier),
 						$valueType
 					);
 					if ($validatorResultType instanceof ResultType) {
@@ -53,6 +47,8 @@ final readonly class With implements NativeMethod {
 							$targetType, $validatorResultType->errorType
 						);
 					}
+				} catch (AnalyserException) {
+					// Intentionally left blank as no validator is found
 				}
 				return $targetType;
 			};

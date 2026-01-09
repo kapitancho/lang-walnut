@@ -4,7 +4,7 @@ namespace Walnut\Lang\NativeCode\Integer;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
+use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -15,7 +15,7 @@ final readonly class BinaryDivide implements NativeMethod {
 
 	public function analyse(
 		TypeRegistry $typeRegistry,
-		MethodFinder $methodFinder,
+		MethodAnalyser $methodAnalyser,
 		Type $targetType,
 		Type $parameterType,
 	): Type {

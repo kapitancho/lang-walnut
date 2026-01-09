@@ -29,7 +29,7 @@ final readonly class MultiVariableAssignmentExpression implements MultiVariableA
 		foreach ($this->variableNames as $key => $variableName) {
 			$ret = $ret->withAddedVariableType(
 				$variableName,
-				$analyserContext->methodContext->analyseMethod(
+				$analyserContext->methodAnalyser->analyseMethod(
 					$retType,
 					$methodName,
 					($isList ?

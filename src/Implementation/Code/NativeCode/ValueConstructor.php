@@ -7,8 +7,8 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Function\Method;
-use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
+use Walnut\Lang\Blueprint\Function\UnknownMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
@@ -59,7 +59,7 @@ final readonly class ValueConstructor {
 	/** @throws AnalyserException */
 	public function analyseConstructor(
 		TypeRegistry $typeRegistry,
-		MethodFinder $methodFinder,
+		MethodAnalyser $methodAnalyser,
 		Type $resultType,
 		Type $parameterType
 	): Type {
@@ -68,17 +68,12 @@ final readonly class ValueConstructor {
 		$errorType = null;
 		$validatorInputType = $parameterType;
 		if ($resultType instanceof NamedType) {
-			$constructorMethod = $methodFinder->methodForType(
-				$this->getConstructorType($typeRegistry),
-				new MethodNameIdentifier($resultType->name->identifier)
+			$constructorResult = $methodAnalyser->safeAnalyseMethod(
+				$constructorType,
+				new MethodNameIdentifier($resultType->name->identifier),
+				$parameterType
 			);
-			if ($constructorMethod instanceof Method) {
-				$constructorResult = $constructorMethod->analyse(
-					$typeRegistry,
-					$methodFinder,
-					$constructorType,
-					$parameterType
-				);
+			if ($constructorResult !== UnknownMethod::value) {
 				if ($constructorResult instanceof ResultType) {
 					$validatorInputType = $constructorResult->returnType;
 					$errorType = $constructorResult->errorType;
@@ -89,7 +84,7 @@ final readonly class ValueConstructor {
 		}
 		$validatorType = $this->analyseValidator(
 			$typeRegistry,
-			$methodFinder,
+			$methodAnalyser,
 			$resultType,
 			$validatorInputType
 		);
@@ -102,7 +97,7 @@ final readonly class ValueConstructor {
 
 	public function analyseValidator(
 		TypeRegistry $typeRegistry,
-		MethodFinder $methodFinder,
+		MethodAnalyser $methodAnalyser,
 		Type $resultType,
 		Type $parameterType
 	): Type {
@@ -131,22 +126,20 @@ final readonly class ValueConstructor {
 				)
 			);
 		}
-		$validatorMethod = $resultType instanceof NamedType ? $methodFinder->methodForType(
-			$constructorType,
-			new MethodNameIdentifier('as' . $resultType->name->identifier)
-		) : null;
+
 		$errorType = null;
-		if ($validatorMethod instanceof Method) {
-			$validatorResult = $validatorMethod->analyse(
-				$typeRegistry,
-				$methodFinder,
+		$validatorResult = null;
+		if ($resultType instanceof NamedType) {
+			$validatorResult = $methodAnalyser->safeAnalyseMethod(
 				$constructorType,
+				new MethodNameIdentifier('as' . $resultType->name->identifier),
 				$parameterType
 			);
 			if ($validatorResult instanceof ResultType) {
 				$errorType = $validatorResult->errorType;
 			}
-		} elseif ($resultType instanceof EnumerationType) {
+		}
+		if ($validatorResult !== UnknownMethod::value && $resultType instanceof EnumerationType) {
 			$matchType = $typeRegistry->union([
 				$resultType,
 				$typeRegistry->stringSubset(
@@ -223,16 +216,12 @@ final readonly class ValueConstructor {
 			return $valueRegistry->error($parameterValue);
 		}
 		return match(true) {
-			/*$type instanceof DataType => $valueRegistry->dataValue(
-				$type->name, $parameterValue
-			),*/
 			$type instanceof OpenType => $valueRegistry->openValue(
 				$type->name, $parameterValue
 			),
 			$type instanceof SealedType => $valueRegistry->sealedValue(
 				$type->name, $parameterValue
 			),
-			//$type instanceof AtomType => $type->value,
 			$type instanceof EnumerationType => $et($type, $parameterValue),
 			default => throw new ExecutionException(
 				sprintf("Cannot construct a value of type: %s", $type)
@@ -246,22 +235,21 @@ final readonly class ValueConstructor {
 		Value $parameter
 	): Value {
 		$constructorType = $this->getConstructorType($programRegistry->typeRegistry);
-		$constructorMethod = $resultType instanceof NamedType ? $programRegistry->methodFinder->methodForType(
-			$constructorType,
-			new MethodNameIdentifier($resultType->name->identifier)
-		) : null;
 
-		if ($constructorMethod instanceof Method) {
-			$parameter = $constructorMethod->execute(
-				$programRegistry,
+		if ($resultType instanceof NamedType) {
+			$constructed = $programRegistry->methodContext->safeExecuteMethod(
 				$constructorType->value,
-				$parameter,
+				new MethodNameIdentifier($resultType->name->identifier),
+				$parameter
 			);
-			$resultValue = $parameter;
-			if ($resultValue instanceof ErrorValue) {
-				return $parameter;
+			if ($constructed !== UnknownMethod::value) {
+				if ($constructed instanceof ErrorValue) {
+					return $constructed;
+				}
+				$parameter = $constructed;
 			}
 		}
+
 		return $this->executeValidator(
 			$programRegistry,
 			$resultType,
@@ -279,11 +267,6 @@ final readonly class ValueConstructor {
 			$resultType,
 			$parameter->type
 		);
-		$constructorType = $this->getConstructorType($programRegistry->typeRegistry);
-		$validatorMethod = $resultType instanceof NamedType ? $programRegistry->methodFinder->methodForType(
-			$constructorType,
-			new MethodNameIdentifier('as' . $resultType->name->identifier)
-		) : null;
 
 		$parameter = $this->adjustParameterValue(
 			$programRegistry->valueRegistry,
@@ -291,15 +274,16 @@ final readonly class ValueConstructor {
 			$parameter
 		);
 
-		if ($validatorMethod instanceof Method) {
-			$result = $validatorMethod->execute(
-				$programRegistry,
-				($constructorType->value),
+		$constructorType = $this->getConstructorType($programRegistry->typeRegistry);
+
+		if ($resultType instanceof NamedType) {
+			$constructed = $programRegistry->methodContext->safeExecuteMethod(
+				$constructorType->value,
+				new MethodNameIdentifier('as' . $resultType->name->identifier),
 				$parameter
 			);
-			$resultValue = $result;
-			if ($resultValue instanceof ErrorValue) {
-				return $result;
+			if ($constructed instanceof ErrorValue) {
+				return $constructed;
 			}
 		}
 		return $this->getValidatorOutputValue(

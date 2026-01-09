@@ -6,6 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
+use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Value\Value;
 
@@ -13,6 +14,7 @@ interface ExecutionContext extends AnalyserContext {
 	public DependencyContainer $dependencyContainer { get; }
 	public ValueRegistry $valueRegistry { get; }
 	public VariableValueScope $variableValueScope { get; }
+	public MethodAnalyser $methodContext { get; }
 
 	public function withAddedVariableValue(
 		VariableNameIdentifier $variableName,

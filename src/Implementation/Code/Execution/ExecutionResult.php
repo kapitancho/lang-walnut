@@ -8,6 +8,7 @@ use Walnut\Lang\Blueprint\Code\Scope\VariableScope;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
+use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\MethodContext;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
@@ -18,6 +19,7 @@ use Walnut\Lang\Implementation\Code\Analyser\AnalyserResult;
 final class ExecutionResult implements ExecutionResultInterface {
 
 	public readonly VariableScope $variableScope;
+	public readonly MethodAnalyser $methodAnalyser;
 
 	public function __construct(
 		public readonly DependencyContainer $dependencyContainer,
@@ -28,6 +30,7 @@ final class ExecutionResult implements ExecutionResultInterface {
 		public readonly Value $typedValue
 	) {
 		$this->variableScope = $variableValueScope;
+		$this->methodAnalyser = $methodContext;
 	}
 
 	public function withAddedVariableValue(VariableNameIdentifier $variableName, Value $value): self {

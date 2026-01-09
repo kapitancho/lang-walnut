@@ -15,6 +15,7 @@ use Walnut\Lang\Blueprint\Type\ShapeType as ShapeTypeInterface;
 use Walnut\Lang\Blueprint\Type\SupertypeChecker;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnionType;
+use Walnut\Lang\Implementation\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 /** @psalm-immutable */
@@ -22,12 +23,19 @@ final class ShapeType implements ShapeTypeInterface, JsonSerializable {
 	use BaseType;
 
 	private readonly Type $realValueType;
+	private readonly MethodAnalyser $methodAnalyser;
 
     public function __construct(
 		private readonly TypeRegistry $typeRegistry,
-		private readonly MethodFinder $methodFinder,
+		MethodFinder $methodFinder,
 		public readonly Type $declaredValueType,
-    ) {}
+    ) {
+		//TODO: keep this for now in order to avoid circular dependency, refactor later
+		$this->methodAnalyser = new MethodAnalyser(
+			$this->typeRegistry,
+			$methodFinder
+		);
+    }
 
 	public Type $refType {
 		get => $this->realValueType ??= $this->declaredValueType instanceof ProxyNamedType ?
@@ -54,7 +62,7 @@ final class ShapeType implements ShapeTypeInterface, JsonSerializable {
 				$methodName = new MethodNameIdentifier(
 					sprintf("as%s", $checkType) // this is ugly
 				);
-				$method = $this->methodFinder->methodForType(
+				$method = $this->methodAnalyser->methodForType(
 					$ofType,
 					$methodName
 				);
@@ -65,7 +73,7 @@ final class ShapeType implements ShapeTypeInterface, JsonSerializable {
 				} elseif ($method instanceof NativeMethod) {
 					$detectedType = $method->analyse(
 						$this->typeRegistry,
-						$this->methodFinder,
+						$this->methodAnalyser,
 						$ofType,
 						$this->typeRegistry->null,
 					);

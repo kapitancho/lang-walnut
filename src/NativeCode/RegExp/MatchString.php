@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
+use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\SealedType;
@@ -20,7 +20,7 @@ use Walnut\Lang\Implementation\Type\Helper\BaseType;
 final readonly class MatchString implements NativeMethod {
 	use BaseType;
 
-	public function analyse(TypeRegistry $typeRegistry, MethodFinder $methodFinder, Type $targetType, Type $parameterType): Type {
+	public function analyse(TypeRegistry $typeRegistry, MethodAnalyser $methodAnalyser, Type $targetType, Type $parameterType): Type {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof SealedType && $targetType->name->equals(new TypeNameIdentifier('RegExp'))) {
 			if ($parameterType instanceof StringType) {

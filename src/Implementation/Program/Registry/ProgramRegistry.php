@@ -6,6 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext as AnalyserContextInterf
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext as ExecutionContextInterface;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope as VariableValueScopeInterface;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer as DependencyContainerInterface;
+use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\MethodContext as MethodContextInterface;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry as ProgramRegistryInterface;
@@ -25,7 +26,8 @@ final class ProgramRegistry implements ProgramRegistryInterface {
 	public function __construct(
 		public readonly TypeRegistry                 $typeRegistry,
 		public readonly ValueRegistry                $valueRegistry,
-		public readonly MethodFinder                 $methodFinder,
+		private readonly MethodFinder                $methodFinder,
+		private readonly MethodAnalyser              $methodAnalyser,
 		private readonly VariableValueScopeInterface $variableValueScope,
 	) {}
 
@@ -34,6 +36,7 @@ final class ProgramRegistry implements ProgramRegistryInterface {
 			return $this->methodContextInstance ??= new MethodContext(
 				$this,
 				$this->methodFinder,
+				$this->methodAnalyser
 			);
 		}
 	}

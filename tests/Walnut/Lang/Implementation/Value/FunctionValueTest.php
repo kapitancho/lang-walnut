@@ -28,7 +28,7 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 				$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
 			)
 		);
-		$fn->selfAnalyse($this->programRegistry->analyserContext);
+		$fn->selfAnalyse($this->analyserContext);
 	}
 
 	public function testReturnTypeWithContextOk(): void {
@@ -56,7 +56,7 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 				$this->valueRegistry->integer(15)
 			)
 		);
-		$fn->selfAnalyse($this->programRegistry->analyserContext->withAddedVariableType(
+		$fn->selfAnalyse($this->analyserContext->withAddedVariableType(
 			new VariableNameIdentifier('y'),
 			$this->typeRegistry->integer()
 		));
@@ -81,7 +81,7 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 			)
 		)->withSelfReferenceAs(new VariableNameIdentifier('self'));
 		$result = $fn->execute(
-			$this->programRegistry->executionContext
+			$this->executionContext
 				->withAddedVariableValue(
 					new VariableNameIdentifier('y'),
 					$this->valueRegistry->integer(15)
@@ -112,7 +112,7 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 				$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
 			)
 		);
-		$fn->selfAnalyse($this->programRegistry->analyserContext);
+		$fn->selfAnalyse($this->analyserContext);
 	}
 
 	public function testReturnValueOk(): void {
@@ -131,7 +131,7 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 			)
 		);
 		$result = $fn->execute(
-			$this->programRegistry->executionContext,
+			$this->executionContext,
 			$int = $this->valueRegistry->integer(15)
 		);
 		$this->assertTrue($result->equals($int));
@@ -155,7 +155,7 @@ final class FunctionValueTest extends BaseProgramTestHelper {
 			)
 		);
 		$result = $fn->execute(
-			$this->programRegistry->executionContext,
+			$this->executionContext,
 			$int = $this->valueRegistry->integer(15)
 		);
 		$this->assertTrue($result->equals($int));

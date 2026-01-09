@@ -11,6 +11,7 @@ use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Registry\ExpressionRegistry;
 use Walnut\Lang\Implementation\Program\Registry\MainMethodRegistry;
+use Walnut\Lang\Implementation\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
 
 final class ProgramContextFactory implements ProgramContextFactoryInterface {
@@ -39,6 +40,10 @@ final class ProgramContextFactory implements ProgramContextFactoryInterface {
 			),
 			new ExpressionRegistry($typeRegistryBuilder, $valueRegistry),
 			$methodFinder,
+			new MethodAnalyser(
+				$typeRegistryBuilder,
+				$methodFinder
+			),
 			VariableValueScope::empty(),
 			$nativeCodeTypeMapper
 		);

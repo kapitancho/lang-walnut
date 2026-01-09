@@ -10,6 +10,7 @@ use Walnut\Lang\Blueprint\Program\ProgramAnalyserException;
 use Walnut\Lang\Blueprint\Program\ProgramContext as ProgramContextInterface;
 use Walnut\Lang\Blueprint\Program\Registry\CustomMethodRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ExpressionRegistry as ExpressionRegistryInterface;
+use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry as ProgramRegistryInterface;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
@@ -28,13 +29,15 @@ final readonly class ProgramContext implements ProgramContextInterface {
 		public ValueRegistryInterface                    $valueRegistry,
 		public ExpressionRegistryInterface               $expressionRegistry,
 		public MethodFinder                              $methodRegistry,
-		private VariableValueScope                        $variableValueScope,
+		public MethodAnalyser                            $methodAnalyser,
+		private VariableValueScope                       $variableValueScope,
 		private NativeCodeTypeMapper                     $nativeCodeTypeMapper,
 	) {
 		$this->programRegistry = new ProgramRegistry(
 			$this->typeRegistry,
 			$this->valueRegistry,
 			$this->methodRegistry,
+			$this->methodAnalyser,
 			$this->variableValueScope,
 		);
 	}

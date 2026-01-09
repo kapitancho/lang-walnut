@@ -60,7 +60,7 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 					$customizedTypeCandidateType = $this->typeByName(
 						new TypeNameIdentifier($customizedTypeCandidate)
 					);
-					$baseMethod = $this->programRegistry->methodFinder->methodForType(
+					$baseMethod = $this->programRegistry->methodContext->methodForType(
 						$customizedTypeCandidateType,
 						$methodName
 					);
@@ -72,7 +72,7 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 						try {
 							$baseReturnType = $baseMethod->analyse(
 								$this->programRegistry->typeRegistry,
-								$this->programRegistry->methodFinder,
+								$this->programRegistry->methodContext,
 								$methodTargetType,
 								$method->parameterType,
 							);

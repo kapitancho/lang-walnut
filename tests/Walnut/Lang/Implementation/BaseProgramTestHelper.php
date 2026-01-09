@@ -27,7 +27,7 @@ abstract class BaseProgramTestHelper extends \Walnut\Lang\Test\BaseProgramTestHe
             )
         );
         $result = $call->analyse(
-	        $this->programRegistry->analyserContext->withAddedVariableType(
+	        $this->analyserContext->withAddedVariableType(
 						        new VariableNameIdentifier('x'),
 		        $targetType
 	        )->withAddedVariableType(
@@ -48,10 +48,10 @@ abstract class BaseProgramTestHelper extends \Walnut\Lang\Test\BaseProgramTestHe
 			new MethodNameIdentifier($methodName),
 			$parameter
 		);
-		$call->analyse($this->programRegistry->analyserContext);
+		$call->analyse($this->analyserContext);
 		$this->assertTrue(
 			($r = $call
-				->execute($this->programRegistry->executionContext)
+				->execute($this->executionContext)
 				->value)->equals($expectedValue),
 			sprintf("'%s' is not equal to '%s'; %s", $r, $expectedValue, $additionalMessage)
 		);

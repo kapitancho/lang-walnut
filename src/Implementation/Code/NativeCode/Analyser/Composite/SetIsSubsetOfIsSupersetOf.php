@@ -3,7 +3,7 @@
 namespace Walnut\Lang\Implementation\Code\NativeCode\Analyser\Composite;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
-use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
+use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\SetType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -15,7 +15,7 @@ trait SetIsSubsetOfIsSupersetOf {
 
 	public function analyse(
 		TypeRegistry $typeRegistry,
-		MethodFinder $methodFinder,
+		MethodAnalyser $methodAnalyser,
 		Type $targetType,
 		Type $parameterType,
 	): Type {

@@ -6,8 +6,8 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Function\Method;
-use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
+use Walnut\Lang\Blueprint\Function\UnknownMethod;
+use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ResultType;
@@ -23,7 +23,7 @@ final readonly class ValueConverter {
 
 	public function analyseConvertValueToShape(
 		TypeRegistry $typeRegistry,
-		MethodFinder $methodFinder,
+		MethodAnalyser $methodAnalyser,
 		Type $sourceType,
 		Type $targetType,
 	): Type {
@@ -35,16 +35,14 @@ final readonly class ValueConverter {
 
 		$methodNameString = sprintf('as%s', $targetType);
 		if (MethodNameIdentifier::isValidIdentifier($methodNameString)) {
-			//TODO - consider dropping this completely
 			$methodName = new MethodNameIdentifier($methodNameString);
-			$method = $methodFinder->methodForType($sourceType, $methodName);
-			if ($method instanceof Method) {
-				$returnType = $method->analyse(
-					$typeRegistry,
-					$methodFinder,
-					$sourceType,
-					$typeRegistry->null
-				);
+
+			$returnType = $methodAnalyser->safeAnalyseMethod(
+				$sourceType,
+				$methodName,
+				$typeRegistry->null
+			);
+			if ($returnType !== UnknownMethod::value) {
 				if ($returnType instanceof ResultType) {
 					throw new AnalyserException(
 						sprintf(
@@ -68,16 +66,6 @@ final readonly class ValueConverter {
 				// @codeCoverageIgnoreEnd
 			}
 		}
-
-		/*
-		$bType = $this->toBaseType($sourceType);
-		if ($bType instanceof OpenType) {
-			try {
-				return $this->analyseConvertValueToShape($programRegistry, $bType->valueType, $targetType);
-			} catch (AnalyserException) {}
-		}
-		*/
-
 		throw new AnalyserException(
 			sprintf(
 				"Cannot convert value of type '%s' to shape '%s'",
@@ -128,7 +116,7 @@ final readonly class ValueConverter {
 
 	public function analyseConvertValueToType(
 		TypeRegistry $typeRegistry,
-		MethodFinder $methodFinder,
+		MethodAnalyser $methodAnalyser,
 		Type $sourceType,
 		Type $targetType,
 	): Type {
@@ -138,15 +126,13 @@ final readonly class ValueConverter {
 		$methodNameString = sprintf('as%s', $targetType);
 		if (MethodNameIdentifier::isValidIdentifier($methodNameString)) {
 			$methodName = new MethodNameIdentifier($methodNameString);
-			$method = $methodFinder->methodForType($sourceType, $methodName);
 
-			if ($method instanceof Method) {
-				$returnType = $method->analyse(
-					$typeRegistry,
-					$methodFinder,
-					$sourceType,
-					$typeRegistry->null
-				);
+			$returnType = $methodAnalyser->safeAnalyseMethod(
+				$sourceType,
+				$methodName,
+				$typeRegistry->null
+			);
+			if ($returnType !== UnknownMethod::value) {
 				$errorType = $returnType instanceof ResultType ? $returnType->errorType : null;
 				$returnType = $returnType instanceof ResultType ? $returnType->returnType : $returnType;
 				if (!$returnType->isSubtypeOf($targetType)) {
@@ -181,14 +167,14 @@ final readonly class ValueConverter {
 		$methodNameString = sprintf('as%s', $targetType);
 		if (MethodNameIdentifier::isValidIdentifier($methodNameString)) {
 			$methodName = new MethodNameIdentifier($methodNameString);
-			$method = $programRegistry->methodFinder->methodForValue($sourceValue, $methodName);
 
-			if ($method instanceof Method) {
-				return $method->execute(
-					$programRegistry,
-					$sourceValue,
-					$programRegistry->valueRegistry->null
-				);
+			$result = $programRegistry->methodContext->safeExecuteMethod(
+				$sourceValue,
+				$methodName,
+				$programRegistry->valueRegistry->null
+			);
+			if ($result !== UnknownMethod::value) {
+				return $result;
 			}
 		}
 

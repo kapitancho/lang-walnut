@@ -6,7 +6,7 @@ use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
-use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
+use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -17,7 +17,7 @@ final readonly class JsonStringify implements NativeMethod {
 
 	public function analyse(
 		TypeRegistry $typeRegistry,
-		MethodFinder $methodFinder,
+		MethodAnalyser $methodAnalyser,
 		Type $targetType,
 		Type $parameterType,
 	): Type {
@@ -39,25 +39,28 @@ final readonly class JsonStringify implements NativeMethod {
 		Value $target,
 		Value $parameter
 	): Value {
-		$method0 = $programRegistry->methodFinder->methodForValue(
-			$target, new MethodNameIdentifier('stringify')
+		$step0 = $programRegistry->methodContext->safeExecuteMethod(
+			$target,
+			new MethodNameIdentifier('stringify'),
+			$parameter
 		);
-		if ($method0 !== UnknownMethod::value) {
-			return $method0->execute($programRegistry, $target, $parameter);
+		if ($step0 !== UnknownMethod::value) {
+			return $step0;
 		}
 
-		$method1 = $programRegistry->methodFinder->methodForValue(
-			$target, new MethodNameIdentifier('asJsonValue')
+		$step1 = $programRegistry->methodContext->executeMethod(
+			$target,
+			new MethodNameIdentifier('asJsonValue'),
+			$parameter
 		);
-		$step1 = $method1->execute($programRegistry, $target, $parameter);
 		if ($step1 instanceof ErrorValue) {
 			return $step1;
 		}
-		$method2 = $programRegistry->methodFinder->methodForType(
-			$programRegistry->typeRegistry->alias(new TypeNameIdentifier('JsonValue')),
-			new MethodNameIdentifier('stringify')
+		return $programRegistry->methodContext->executeMethod(
+			$step1,
+			new MethodNameIdentifier('stringify'),
+			$parameter
 		);
-		return $method2->execute($programRegistry, $step1, $parameter);
 	}
 
 }

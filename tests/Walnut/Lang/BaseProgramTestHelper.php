@@ -3,6 +3,8 @@
 namespace Walnut\Lang\Test;
 
 use PHPUnit\Framework\TestCase;
+use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
+use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
@@ -47,6 +49,14 @@ abstract class BaseProgramTestHelper extends TestCase {
 
 	protected ProgramRegistry $programRegistry {
 		get => $this->programContext->programRegistry;
+	}
+
+	protected AnalyserContext $analyserContext {
+		get => $this->programRegistry->analyserContext;
+	}
+
+	protected ExecutionContext $executionContext {
+		get => $this->programRegistry->executionContext;
 	}
 
 	protected ProgramInterface $program {

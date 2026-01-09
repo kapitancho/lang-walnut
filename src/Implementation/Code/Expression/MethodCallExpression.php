@@ -36,7 +36,7 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 			$retParameterType = $analyserContext->expressionType;
 			$parameterReturnType = $analyserContext->returnType;
 
-			$retReturnType = $analyserContext->methodContext->analyseMethod(
+			$retReturnType = $analyserContext->methodAnalyser->analyseMethod(
 				$retTargetType,
 				$this->methodName,
 				$retParameterType
