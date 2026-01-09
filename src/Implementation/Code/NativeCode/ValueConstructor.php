@@ -139,7 +139,7 @@ final readonly class ValueConstructor {
 				$errorType = $validatorResult->errorType;
 			}
 		}
-		if ($validatorResult !== UnknownMethod::value && $resultType instanceof EnumerationType) {
+		if ($validatorResult === UnknownMethod::value && $resultType instanceof EnumerationType) {
 			$matchType = $typeRegistry->union([
 				$resultType,
 				$typeRegistry->stringSubset(

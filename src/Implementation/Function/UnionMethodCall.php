@@ -35,6 +35,8 @@ final readonly class UnionMethodCall implements Method {
 		);
 	}
 
+	// It should never happen
+	// @codeCoverageIgnoreStart
 	public function execute(
 		ProgramRegistry $programRegistry,
 		Value           $target,
@@ -45,10 +47,8 @@ final readonly class UnionMethodCall implements Method {
                 return $method->execute($programRegistry, $target, $parameter);
             }
 		}
-		// It should never happen
-		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Union method call is not executable");
-		// @codeCoverageIgnoreEnd
 	}
+	// @codeCoverageIgnoreEnd
 
 }
