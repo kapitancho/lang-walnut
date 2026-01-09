@@ -72,12 +72,11 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 	
 	public function testAnalyseDefault(): void {
 		$result = $this->recordPropertyAccessExpression->analyse(
-			new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder,
-				new VariableScope([
-					'#' => $this->typeRegistry->record([
-						'x' => $this->typeRegistry->integer(),
-						'y' => $this->typeRegistry->string(),
-					])
+			$this->programRegistry->analyserContext->withAddedVariableType(
+				new VariableNameIdentifier('#'),
+				$this->typeRegistry->record([
+					'x' => $this->typeRegistry->integer(),
+					'y' => $this->typeRegistry->string(),
 				])
 			)
 		);
@@ -87,12 +86,11 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 		);
 
 		$result = $this->tuplePropertyAccessExpression->analyse(
-			new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder,
-				new VariableScope([
-					'#' => $this->typeRegistry->tuple([
-						$this->typeRegistry->integer(),
-						$this->typeRegistry->string(),
-					])
+			$this->programRegistry->analyserContext->withAddedVariableType(
+				new VariableNameIdentifier('#'),
+				$this->typeRegistry->tuple([
+					$this->typeRegistry->integer(),
+					$this->typeRegistry->string(),
 				])
 			)
 		);
@@ -104,68 +102,36 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 
 	public function testAnalyseOnSubtypes(): void {
 		$result = $this->recordPropertyAccessExpression->analyse(
-			new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder,
-				new VariableScope([
-					'#' => $this->typeRegistry->withName(new TypeNameIdentifier('MyRecord'))
-				]
+			$this->programRegistry->analyserContext->withAddedVariableType(
+				new VariableNameIdentifier('#'),
+				$this->typeRegistry->withName(new TypeNameIdentifier('MyRecord'))
 			)
-		));
+		);
 		self::assertEquals(
 			$this->typeRegistry->string(),
 			$result->expressionType
 		);
 
 		$result = $this->tuplePropertyAccessExpression->analyse(
-			new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder,
-				new VariableScope([
-					'#' => $this->typeRegistry->withName(new TypeNameIdentifier('MyTuple'))
-				]
+			$this->programRegistry->analyserContext->withAddedVariableType(
+				new VariableNameIdentifier('#'),
+				$this->typeRegistry->withName(new TypeNameIdentifier('MyTuple'))
 			)
-		));
+		);
 		self::assertEquals(
 			$this->typeRegistry->string(),
 			$result->expressionType
 		);
 	}
 
-	/*
-	public function testAnalyseFailWrongRecordProperty(): void {
-		$this->expectException(AnalyserException::class);
-		$this->recordPropertyAccessExpression->analyse(
-			new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder,
-				new VariableScope([
-					'#' => $this->typeRegistry->record([
-						'a' => $this->typeRegistry->integer(),
-						'b' => $this->typeRegistry->string(),
-					])
-				])
-			)
-		);
-	}
-
-	public function testAnalyseFailWrongTupleProperty(): void {
-		$this->expectException(AnalyserException::class);
-		$this->tuplePropertyAccessExpression->analyse(
-			new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder,
-				new VariableScope([
-					'#' => $this->typeRegistry->tuple([
-						$this->typeRegistry->integer(),
-					])
-				])
-			)
-		);
-	}
-	*/
-
 	public function testAnalyseFailStringPropertyOnTuple(): void {
 		$this->expectException(AnalyserException::class);
 		$this->recordPropertyAccessExpression->analyse(
-			new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder,
-				new VariableScope([
-					'#' => $this->typeRegistry->tuple([
-						$this->typeRegistry->integer(),
-						$this->typeRegistry->string(),
-					])
+			$this->programRegistry->analyserContext->withAddedVariableType(
+				new VariableNameIdentifier('#'),
+				$this->typeRegistry->tuple([
+					$this->typeRegistry->integer(),
+					$this->typeRegistry->string(),
 				])
 			)
 		);
@@ -174,38 +140,31 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 	public function testAnalyseFailWrongType(): void {
 		$this->expectException(AnalyserException::class);
 		$this->recordPropertyAccessExpression->analyse(
-			new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder,
-				new VariableScope([
-					'#' => $this->typeRegistry->integer()
-				])
+			$this->programRegistry->analyserContext->withAddedVariableType(
+				new VariableNameIdentifier('#'),
+				$this->typeRegistry->integer()
 			)
 		);
 	}
 
 	public function testExecuteDefault(): void {
 		$result = $this->recordPropertyAccessExpression->execute(
-			new ExecutionContext($this->programRegistry,
-				new VariableValueScope([
-					'#' => (
-						$this->valueRegistry->record([
-							'x' => $this->valueRegistry->integer(1),
-							'y' => $this->valueRegistry->string("hi"),
-						])
-					)
+			$this->programRegistry->executionContext->withAddedVariableValue(
+				new VariableNameIdentifier('#'),
+				$this->valueRegistry->record([
+					'x' => $this->valueRegistry->integer(1),
+					'y' => $this->valueRegistry->string("hi"),
 				])
 			)
 		);
 		self::assertTrue($result->value->equals($this->valueRegistry->string("hi")));
 
 		$result = $this->tuplePropertyAccessExpression->execute(
-			new ExecutionContext($this->programRegistry,
-				new VariableValueScope([
-					'#' => (
-						$this->valueRegistry->tuple([
-							$this->valueRegistry->integer(1),
-							$this->valueRegistry->string("hi"),
-						])
-					)
+			$this->programRegistry->executionContext->withAddedVariableValue(
+				new VariableNameIdentifier('#'),
+				$this->valueRegistry->tuple([
+					$this->valueRegistry->integer(1),
+					$this->valueRegistry->string("hi"),
 				])
 			)
 		);
@@ -214,28 +173,22 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 
 	public function testExecuteOnSubtypes(): void {
 		$result = $this->recordPropertyAccessExpression->execute(
-			new ExecutionContext($this->programRegistry,
-				new VariableValueScope([
-					'#' => (
-						$this->valueRegistry->record([
-							'x' => $this->valueRegistry->integer(1),
-							'y' => $this->valueRegistry->string("hi"),
-						])
-					)
+			$this->programRegistry->executionContext->withAddedVariableValue(
+				new VariableNameIdentifier('#'),
+				$this->valueRegistry->record([
+					'x' => $this->valueRegistry->integer(1),
+					'y' => $this->valueRegistry->string("hi"),
 				])
 			)
 		);
 		self::assertTrue($result->value->equals($this->valueRegistry->string("hi")));
 
 		$result = $this->tuplePropertyAccessExpression->execute(
-			new ExecutionContext($this->programRegistry,
-				new VariableValueScope([
-					'#' => (
-						$this->valueRegistry->tuple([
-							$this->valueRegistry->integer(1),
-							$this->valueRegistry->string("hi"),
-						])
-					)
+			$this->programRegistry->executionContext->withAddedVariableValue(
+				new VariableNameIdentifier('#'),
+				$this->valueRegistry->tuple([
+					$this->valueRegistry->integer(1),
+					$this->valueRegistry->string("hi"),
 				])
 			)
 		);
@@ -245,12 +198,9 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 	public function testExecuteFailWrongType(): void {
 		$this->expectException(ExecutionException::class);
 		$this->recordPropertyAccessExpression->execute(
-			new ExecutionContext($this->programRegistry,
-				new VariableValueScope([
-					'#' => (
-						$this->valueRegistry->integer(1)
-					)
-				])
+			$this->programRegistry->executionContext->withAddedVariableValue(
+				new VariableNameIdentifier('#'),
+				$this->valueRegistry->integer(1)
 			)
 		);
 	}

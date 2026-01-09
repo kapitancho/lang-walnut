@@ -43,9 +43,7 @@ final class RecordExpressionTest extends TestCase {
 
 	public function testAnalyse(): void {
 		$result = $this->recordExpression->analyse(
-			new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder,
-				new VariableScope([])
-			)
+			$this->programRegistry->analyserContext
 		);
 		self::assertTrue($result->expressionType->isSubtypeOf(
 			$this->typeRegistry->record([
@@ -57,9 +55,7 @@ final class RecordExpressionTest extends TestCase {
 
 	public function testExecute(): void {
 		$result = $this->recordExpression->execute(
-			new ExecutionContext($this->programRegistry,
-				new VariableValueScope([])
-			)
+			$this->programRegistry->executionContext
 		);
 		self::assertEquals(
 			(string)$this->valueRegistry->record([

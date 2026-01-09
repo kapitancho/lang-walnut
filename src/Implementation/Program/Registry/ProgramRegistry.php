@@ -40,6 +40,9 @@ final class ProgramRegistry implements ProgramRegistryInterface {
 		get {
 			return $this->executionContextInstance ??= new ExecutionContext(
 				$this,
+				$this->valueRegistry,
+				$this->typeRegistry,
+				$this->methodFinder,
 				$this->variableValueScope,
 			);
 		}

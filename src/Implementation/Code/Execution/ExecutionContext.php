@@ -20,23 +20,23 @@ use Walnut\Lang\Implementation\Code\Analyser\AnalyserResult;
 final readonly class ExecutionContext implements ExecutionContextInterface {
 
 	public VariableScope $variableScope;
-	public TypeRegistry $typeRegistry;
-	public ValueRegistry $valueRegistry;
-	public MethodFinder $methodFinder;
 
 	public function __construct(
 		public ProgramRegistry $programRegistry,
+		public ValueRegistry $valueRegistry,
+		public TypeRegistry $typeRegistry,
+		public MethodFinder $methodFinder,
 		public VariableValueScope $variableValueScope
 	) {
 		$this->variableScope = $this->variableValueScope;
-		$this->valueRegistry = $this->programRegistry->valueRegistry;
-		$this->typeRegistry = $this->programRegistry->typeRegistry;
-		$this->methodFinder = $this->programRegistry->methodFinder;
 	}
 
 	public function withAddedVariableValue(VariableNameIdentifier $variableName, Value $value): self {
 		return new self(
 			$this->programRegistry,
+			$this->valueRegistry,
+			$this->typeRegistry,
+			$this->methodFinder,
 			$this->variableValueScope->withAddedVariableValue($variableName, $value)
 		);
 	}
@@ -53,8 +53,8 @@ final readonly class ExecutionContext implements ExecutionContextInterface {
 	// @codeCoverageIgnoreStart
 	public function withAddedVariableType(VariableNameIdentifier $variableName, Type $variableType): AnalyserContextInterface {
 		return new AnalyserContext(
-			$this->programRegistry->typeRegistry,
-			$this->programRegistry->methodFinder,
+			$this->typeRegistry,
+			$this->methodFinder,
 			$this->variableScope->withAddedVariableType($variableName, $variableType),
 		);
 	}

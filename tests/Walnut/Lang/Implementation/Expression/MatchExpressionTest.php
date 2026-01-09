@@ -74,7 +74,7 @@ final class MatchExpressionTest extends TestCase {
 	}
 
 	public function testAnalyse(): void {
-		$result = $this->matchExpression->analyse(new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder, new VariableScope([])));
+		$result = $this->matchExpression->analyse($this->programRegistry->analyserContext);
 		self::assertTrue($result->expressionType->isSubtypeOf(
 			$this->typeRegistry->union([
 				$this->typeRegistry->string(),
@@ -84,7 +84,7 @@ final class MatchExpressionTest extends TestCase {
 	}
 
 	public function testExecute(): void {
-		$result = $this->matchExpression->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])));
+		$result = $this->matchExpression->execute($this->programRegistry->executionContext);
 		self::assertTrue(
 			$this->valueRegistry->true->equals($result->value)
 		);
@@ -118,7 +118,7 @@ final class MatchExpressionTest extends TestCase {
 					)
 				),
 			]
-		)->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])));
+		)->execute($this->programRegistry->executionContext);
 		self::assertTrue($result->value->equals(
 			$this->valueRegistry->true
 		));
@@ -145,7 +145,7 @@ final class MatchExpressionTest extends TestCase {
 					)
 				),
 			],
-		)->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])));
+		)->execute($this->programRegistry->executionContext);
 		self::assertTrue($result->value->equals(
 			$this->valueRegistry->true
 		));
@@ -175,7 +175,7 @@ final class MatchExpressionTest extends TestCase {
 					)
 				),
 			],
-		)->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])));
+		)->execute($this->programRegistry->executionContext);
 		self::assertTrue($result->value->equals(
 			$this->valueRegistry->null
 		));

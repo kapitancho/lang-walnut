@@ -82,13 +82,18 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 	}
 	
 	public function testAnalyseDefault(): void {
-		$result = $this->functionCallExpression->analyse(new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder, new VariableScope([
-			'a' => $this->typeRegistry->function(
-				$this->typeRegistry->integer(),
-				$this->typeRegistry->string(),
-			),
-			'b' => $this->typeRegistry->integer()
-		])));
+		$result = $this->functionCallExpression->analyse(
+			$this->programRegistry->analyserContext->withAddedVariableType(
+				new VariableNameIdentifier('a'),
+				$this->typeRegistry->function(
+					$this->typeRegistry->integer(),
+					$this->typeRegistry->string(),
+				)
+			)->withAddedVariableType(
+				new VariableNameIdentifier('b'),
+				$this->typeRegistry->integer()
+			)
+		);
 		self::assertEquals(
 			$this->typeRegistry->string(),
 			$result->expressionType
@@ -96,65 +101,89 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 	}
 
 	public function testAnalyseOnCustomType(): void {
-		$result = $this->functionCallExpression->analyse(new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder, new VariableScope([
-			'a' => $this->typeRegistry->withName(new TypeNameIdentifier('MyCustomType')),
-			'b' => $this->typeRegistry->integer()
-		])));
+		$result = $this->functionCallExpression->analyse(
+			$this->programRegistry->analyserContext->withAddedVariableType(
+				new VariableNameIdentifier('a'),
+				$this->typeRegistry->withName(new TypeNameIdentifier('MyCustomType'))
+			)->withAddedVariableType(
+				new VariableNameIdentifier('b'),
+				$this->typeRegistry->integer()
+			)
+		);
 		self::assertTrue($result->expressionType->isSubtypeOf($this->typeRegistry->string()));
 	}
 
 	public function testAnalyseFailWrongParameter(): void {
 		$this->expectException(AnalyserException::class);
-		$this->functionCallExpression->analyse(new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder, new VariableScope([
-			'a' => $this->typeRegistry->function(
-				$this->typeRegistry->integer(),
-				$this->typeRegistry->string(),
-			),
-			'b' => $this->typeRegistry->boolean
-		])));
+		$this->functionCallExpression->analyse(
+			$this->programRegistry->analyserContext->withAddedVariableType(
+				new VariableNameIdentifier('a'),
+				$this->typeRegistry->function(
+					$this->typeRegistry->integer(),
+					$this->typeRegistry->string(),
+				)
+			)->withAddedVariableType(
+				new VariableNameIdentifier('b'),
+				$this->typeRegistry->boolean
+			)
+		);
 	}
 
 	public function testAnalyseFailWrongType(): void {
 		$this->expectException(AnalyserException::class);
-		$this->functionCallExpression->analyse(new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder, new VariableScope([
-			'a' => $this->typeRegistry->integer(),
-			'b' => $this->typeRegistry->integer()
-		])));
+		$this->functionCallExpression->analyse(
+			$this->programRegistry->analyserContext->withAddedVariableType(
+				new VariableNameIdentifier('a'),
+				$this->typeRegistry->integer()
+			)->withAddedVariableType(
+				new VariableNameIdentifier('b'),
+				$this->typeRegistry->integer()
+			)
+		);
 	}
 	public function testExecuteDefault(): void {
-		$result = $this->functionCallExpression->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([
-			'a' => ($this->functionValue),
-			'b' => (
-				$this->valueRegistry->integer(1)
-			)
-		])));
+		$result = $this->functionCallExpression->execute(
+			$this->programRegistry->executionContext
+				->withAddedVariableValue(
+					new VariableNameIdentifier('a'),
+					$this->functionValue
+				)
+				->withAddedVariableValue(
+					new VariableNameIdentifier('b'),
+					$this->valueRegistry->integer(1)
+				)
+		);
 		self::assertTrue($result->value->equals($this->valueRegistry->string("hi")));
 	}
 
 	public function testExecuteOnCustomType(): void {
-		$result = $this->functionCallExpression->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([
-			'a' => (
-				$this->valueRegistry->sealedValue(
-					new TypeNameIdentifier('MyCustomType'),
-					$this->valueRegistry->record(['x' => $this->valueRegistry->integer(1)])
+		$result = $this->functionCallExpression->execute(
+			$this->programRegistry->executionContext
+				->withAddedVariableValue(
+					new VariableNameIdentifier('a'),
+					$this->valueRegistry->sealedValue(
+						new TypeNameIdentifier('MyCustomType'),
+						$this->valueRegistry->record(['x' => $this->valueRegistry->integer(1)])
+					)
+				)->withAddedVariableValue(
+					new VariableNameIdentifier('b'),
+					$this->valueRegistry->integer(1)
 				)
-			),
-			'b' => (
-				$this->valueRegistry->integer(1)
-			)
-		])));
+		);
 		self::assertTrue($result->value->equals($this->valueRegistry->string("hi")));
 	}
 
 	public function testExecuteFailWrongType(): void {
 		$this->expectException(ExecutionException::class);
-		$this->functionCallExpression->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([
-			'a' => (
-				$this->valueRegistry->integer(1)
-			),
-			'b' => (
-				$this->valueRegistry->integer(1)
-			)
-		])));
+		$this->functionCallExpression->execute(
+			$this->programRegistry->executionContext
+				->withAddedVariableValue(
+					new VariableNameIdentifier('a'),
+					$this->valueRegistry->integer(1)
+				)->withAddedVariableValue(
+					new VariableNameIdentifier('b'),
+					$this->valueRegistry->integer(1)
+				)
+		);
 	}
 }

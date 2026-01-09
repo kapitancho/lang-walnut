@@ -110,6 +110,8 @@ final class CustomMethod implements CustomMethodInterface {
 			=> sprintf("the validator of %s", substr($this->methodName, 2)),
 			(string)$this->targetType === 'Constructor'
 			=> sprintf("the constructor of %s", $this->methodName),
+			(string)$this->targetType === 'DependencyContainer' && substr($this->methodName, 2) === 'CliEntryPoint'
+			=> "the CLI entry point",
 			(string)$this->targetType === 'DependencyContainer'
 			=> sprintf("the dependency builder of %s", substr($this->methodName, 2)),
 			str_starts_with($this->methodName->identifier, 'as')

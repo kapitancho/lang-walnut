@@ -47,7 +47,7 @@ final class NoErrorExpressionTest extends TestCase {
 	}
 
 	public function testAnalyse(): void {
-		$result = $this->noErrorExpression->analyse(new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder, new VariableScope([])));
+		$result = $this->noErrorExpression->analyse($this->programRegistry->analyserContext);
 		self::assertTrue($result->returnType()->isSubtypeOf(
 			$this->typeRegistry->integer()
 		));
@@ -55,17 +55,17 @@ final class NoErrorExpressionTest extends TestCase {
 
 	public function testExecute(): void {
 		$this->expectNotToPerformAssertions();
-		$this->noErrorExpression->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])));
+		$this->noErrorExpression->execute($this->programRegistry->executionContext);
 	}
 
 	public function testExecuteOnError(): void {
 		$this->expectException(FunctionReturn::class);
-		$this->errorExpression->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])));
+		$this->errorExpression->execute($this->programRegistry->executionContext);
 	}
 
 	public function testExecuteResult(): void {
 		try {
-			$this->errorExpression->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])));
+			$this->errorExpression->execute($this->programRegistry->executionContext);
 		} catch (FunctionReturn $e) {
 			self::assertEquals(
 				$this->valueRegistry->error(

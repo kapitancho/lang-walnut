@@ -49,10 +49,9 @@ final class VariableAssignmentExpressionTest extends TestCase {
 
 	public function testAnalyse(): void {
 		$result = $this->variableAssignmentExpression->analyse(
-			new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder,
-				new VariableScope([
-					'x' => $this->typeRegistry->integer()
-				])
+			$this->programRegistry->analyserContext->withAddedVariableType(
+				new VariableNameIdentifier('x'),
+				$this->typeRegistry->integer()
 			)
 		);
 		self::assertTrue($result->expressionType->isSubtypeOf($this->typeRegistry->integer()));
@@ -65,14 +64,11 @@ final class VariableAssignmentExpressionTest extends TestCase {
 
 	public function testExecute(): void {
 		$result = $this->variableAssignmentExpression->execute(
-			new ExecutionContext($this->programRegistry,
-				new VariableValueScope([
-					'x' =>
-						(
-							$this->valueRegistry->integer(123)
-						)
-				])
-			)
+			$this->programRegistry->executionContext
+				->withAddedVariableValue(
+					new VariableNameIdentifier('x'),
+					$this->valueRegistry->integer(123)
+				)
 		);
 		self::assertEquals($this->valueRegistry->integer(123), $result->value);
 	}

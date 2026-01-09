@@ -42,7 +42,7 @@ final class TupleExpressionTest extends TestCase {
 	}
 
 	public function testAnalyse(): void {
-		$result = $this->tupleExpression->analyse(new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder, VariableScope::empty()));
+		$result = $this->tupleExpression->analyse($this->programRegistry->analyserContext);
 		self::assertTrue($result->expressionType->isSubtypeOf(
 			$this->typeRegistry->tuple([
 				$this->typeRegistry->integer(),
@@ -52,7 +52,7 @@ final class TupleExpressionTest extends TestCase {
 	}
 
 	public function testExecute(): void {
-		$result = $this->tupleExpression->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])));
+		$result = $this->tupleExpression->execute($this->programRegistry->executionContext);
 		self::assertEquals(
 			(string)$this->valueRegistry->tuple([
 				$this->valueRegistry->integer(123),

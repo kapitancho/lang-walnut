@@ -59,9 +59,9 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			new MethodNameIdentifier('hydrateAs'),
 			$this->expressionRegistry->constant($this->valueRegistry->type($type))
 		);
-		$call->analyse(new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder, new VariableScope([])));
+		$call->analyse($this->programRegistry->analyserContext);
 		$this->assertEquals($expected, (string)
-			$call->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])))->value
+			$call->execute($this->programRegistry->executionContext)->value
 		);
 	}
 
@@ -839,7 +839,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 					]),
 				])
 			))
-		)->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])));
+		)->execute($this->programRegistry->executionContext);
 		$this->assertEquals(
 			"[\n\ta: true,\n\tb: 123,\n\tc: [MySealed[x: 15], MySealed[x: 20]],\n\td: [x: MyCustomEnum.B, y: MyAtom]\n]",
 			(string)$result->value
@@ -855,7 +855,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			),
 			new MethodNameIdentifier('stringify'),
 			$this->expressionRegistry->constant($this->valueRegistry->null)
-		)->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])));
+		)->execute($this->programRegistry->executionContext);
 
 		$this->assertEquals(
 			"'" . $value . "'",
@@ -866,7 +866,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			$this->expressionRegistry->constant($this->valueRegistry->string('invalid json')),
 			new MethodNameIdentifier('jsonDecode'),
 			$this->expressionRegistry->constant($this->valueRegistry->null)
-		)->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])));
+		)->execute($this->programRegistry->executionContext);
 
 		$this->assertEquals(
 			"@InvalidJsonString![value: 'invalid json']",

@@ -330,19 +330,21 @@ final class CastAsTest extends BaseProgramTestHelper {
 				$this->valueRegistry->type($enumType)
 			)
 		);
-		$call->analyse(new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder, new VariableScope(['x' => $jv])));
+		$call->analyse($this->programRegistry->analyserContext->withAddedVariableType(
+			new VariableNameIdentifier('x'),
+			$jv
+		));
 		$this->assertTrue($call->execute(
-			new ExecutionContext($this->programRegistry,
-				new VariableValueScope([
-					'x' => 	($this->valueRegistry->integer(1))
-				])))
-				->value->equals(
-					$this->valueRegistry->enumerationValue(
-						new TypeNameIdentifier('OrderStatus'),
-						new EnumValueIdentifier('Draft')
-					)
-				)
-		);
+			$this->programRegistry->executionContext->withAddedVariableValue(
+				new VariableNameIdentifier('x'),
+				$this->valueRegistry->integer(1)
+			)
+		)->value->equals(
+			$this->valueRegistry->enumerationValue(
+				new TypeNameIdentifier('OrderStatus'),
+				new EnumValueIdentifier('Draft')
+			)
+		));
 
 	}
 }

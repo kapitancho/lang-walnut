@@ -17,11 +17,8 @@ final readonly class ProgramEntryPoint implements ProgramEntryPointInterface {
 
 	public function call(Value $parameter): Value {
 		return $this->value->execute(
-			new ExecutionContext(
-				$this->programRegistry,
-				VariableValueScope::empty()
-			),
-			($parameter)
+			$this->programRegistry->executionContext,
+			$parameter
 		);
 	}
 }

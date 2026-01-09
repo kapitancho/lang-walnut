@@ -26,10 +26,15 @@ abstract class BaseProgramTestHelper extends \Walnut\Lang\Test\BaseProgramTestHe
                 new VariableNameIdentifier('y')
             )
         );
-        $result = $call->analyse(new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder, new VariableScope([
-			'x' => $targetType,
-            'y' => $parameterType
-        ])));
+        $result = $call->analyse(
+	        $this->programRegistry->analyserContext->withAddedVariableType(
+						        new VariableNameIdentifier('x'),
+		        $targetType
+	        )->withAddedVariableType(
+		        new VariableNameIdentifier('y'),
+		        $parameterType
+	        )
+        );
         $this->assertTrue(
             $result->expressionType->isSubtypeOf($expectedType)
         );
@@ -43,10 +48,10 @@ abstract class BaseProgramTestHelper extends \Walnut\Lang\Test\BaseProgramTestHe
 			new MethodNameIdentifier($methodName),
 			$parameter
 		);
-		$call->analyse(new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder, VariableScope::empty()));
+		$call->analyse($this->programRegistry->analyserContext);
 		$this->assertTrue(
 			($r = $call
-				->execute(new ExecutionContext($this->programRegistry, VariableValueScope::empty()))
+				->execute($this->programRegistry->executionContext)
 				->value)->equals($expectedValue),
 			sprintf("'%s' is not equal to '%s'; %s", $r, $expectedValue, $additionalMessage)
 		);

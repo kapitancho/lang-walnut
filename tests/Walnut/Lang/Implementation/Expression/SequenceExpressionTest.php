@@ -43,7 +43,7 @@ final class SequenceExpressionTest extends TestCase {
 	}
 
 	public function testAnalyse(): void {
-		$result = $this->sequenceExpression->analyse(new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder, new VariableScope([])));
+		$result = $this->sequenceExpression->analyse($this->programRegistry->analyserContext);
 		self::assertTrue($result->expressionType->isSubtypeOf(
 			$this->typeRegistry->string()
 		));
@@ -51,7 +51,7 @@ final class SequenceExpressionTest extends TestCase {
 
 	public function testExecute(): void {
 		$result = $this->sequenceExpression->execute(
-			new ExecutionContext($this->programRegistry, new VariableValueScope([]))
+			$this->programRegistry->executionContext
 		);
 		self::assertEquals(
 			$this->valueRegistry->string("456"),
@@ -71,7 +71,7 @@ final class SequenceExpressionTest extends TestCase {
 					$this->valueRegistry->string("456")
 				)
 			]
-		)->analyse(new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder, new VariableScope([])));
+		)->analyse($this->programRegistry->analyserContext);
 		self::assertTrue($result->expressionType->isSubtypeOf(
 			$this->typeRegistry->integer()
 		));
