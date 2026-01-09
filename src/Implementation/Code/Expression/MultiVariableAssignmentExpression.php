@@ -5,16 +5,13 @@ namespace Walnut\Lang\Implementation\Code\Expression;
 use BcMath\Number;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
-use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserResult;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
-use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MultiVariableAssignmentExpression as MultiVariableAssignmentExpressionInterface;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
-use Walnut\Lang\Blueprint\Function\UnknownMethod;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 
 final readonly class MultiVariableAssignmentExpression implements MultiVariableAssignmentExpressionInterface, JsonSerializable {
@@ -28,28 +25,13 @@ final readonly class MultiVariableAssignmentExpression implements MultiVariableA
 		$methodName = new MethodNameIdentifier('item');
 		$ret = $this->assignedExpression->analyse($analyserContext);
 		$retType = $ret->expressionType;
-		$method = $analyserContext->methodFinder->methodForType(
-			$retType,
-			$methodName
-		);
-		if ($method instanceof UnknownMethod) {
-			throw new AnalyserException(
-				sprintf(
-					"Cannot call method '%s' on type '%s'",
-					$methodName,
-					$retType,
-				),
-				$this
-			);
-		}
 		$isList = array_is_list($this->variableNames);
 		foreach ($this->variableNames as $key => $variableName) {
 			$ret = $ret->withAddedVariableType(
 				$variableName,
-				$method->analyse(
-					$analyserContext->typeRegistry,
-					$analyserContext->methodFinder,
+				$analyserContext->methodContext->analyseMethod(
 					$retType,
+					$methodName,
 					($isList ?
 						$analyserContext->typeRegistry->integerSubset([new Number($key)]) :
 						$analyserContext->typeRegistry->stringSubset([$key])
@@ -71,28 +53,12 @@ final readonly class MultiVariableAssignmentExpression implements MultiVariableA
 		$val = $ret->value;
 		$isList = array_is_list($this->variableNames);
 
-		$method = $executionContext->methodFinder->methodForValue(
-			$val,
-			$methodName
-		);
-		// @codeCoverageIgnoreStart
-		if ($method instanceof UnknownMethod) {
-			throw new ExecutionException(
-				sprintf(
-					"Execution error in method call '%s' on value '%s'",
-					$methodName,
-					$val,
-				)
-			);
-		}
-		// @codeCoverageIgnoreEnd
-
 		foreach ($this->variableNames as $key => $variableName) {
 			$ret = $ret->withAddedVariableValue(
 				$variableName,
-				$method->execute(
-					$executionContext->programRegistry,
+				$executionContext->methodContext->executeMethod(
 					$val,
+					$methodName,
 					($isList ?
 						$executionContext->valueRegistry->integer($key) :
 						$executionContext->valueRegistry->string($key)

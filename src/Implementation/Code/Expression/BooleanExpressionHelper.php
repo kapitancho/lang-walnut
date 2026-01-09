@@ -11,23 +11,19 @@ use Walnut\Lang\Blueprint\Value\Value;
 trait BooleanExpressionHelper {
 
 	private function getBooleanType(AnalyserContext $analyserContext, Type $expressionType): Type {
-		$mf = $analyserContext->methodFinder;
-		$tr = $analyserContext->typeRegistry;
-		$method = $mf->methodForType(
+		return $analyserContext->methodContext->analyseMethod(
 			$expressionType,
-			new MethodNameIdentifier('asBoolean')
+			new MethodNameIdentifier('asBoolean'),
+			$analyserContext->typeRegistry->null
 		);
-		return $method->analyse($tr, $mf, $expressionType, $tr->null);
 	}
 
 	private function getBooleanValue(ExecutionContext $executionContext, Value $value): bool {
-		$pr = $executionContext->programRegistry;
-		$mf = $executionContext->methodFinder;
-		$method = $mf->methodForType(
-			$value->type,
-			new MethodNameIdentifier('asBoolean')
-		);
-		return $method->execute($pr, $value, $pr->valueRegistry->null)->equals(
+		return $executionContext->methodContext->executeMethod(
+			$value,
+			new MethodNameIdentifier('asBoolean'),
+			$executionContext->valueRegistry->null
+		)->equals(
 			$executionContext->valueRegistry->true
 		);
 	}

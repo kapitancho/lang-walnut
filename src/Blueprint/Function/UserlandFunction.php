@@ -37,9 +37,9 @@ interface UserlandFunction {
 
 	/** @throws ExecutionException */
 	public function execute(
-		ExecutionContext            $executionContext,
+		ExecutionContext $executionContext,
 		Value|null $targetValue,
-		Value      $parameterValue,
+		Value $parameterValue,
 	): Value;
 
 }

@@ -7,7 +7,6 @@ namespace Walnut\Lang\Implementation\AST\Parser;
 use BcMath\Number;
 use ReflectionClass;
 use Walnut\Lang\Blueprint\AST\Builder\NodeBuilder;
-use Walnut\Lang\Blueprint\AST\Node\Expression\SequenceExpressionNode;
 use Walnut\Lang\Blueprint\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Blueprint\AST\Parser\ParserState as ParserStateInterface;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;

@@ -7,8 +7,8 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult as ExecutionResultInter
 use Walnut\Lang\Blueprint\Code\Scope\VariableScope;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
-use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
+use Walnut\Lang\Blueprint\Program\Registry\MethodContext;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -18,24 +18,24 @@ use Walnut\Lang\Implementation\Code\Analyser\AnalyserResult;
 final class ExecutionResult implements ExecutionResultInterface {
 
 	public readonly VariableScope $variableScope;
-	public TypeRegistry $typeRegistry;
-	public MethodFinder $methodFinder;
 
 	public function __construct(
-		public readonly ProgramRegistry $programRegistry,
+		public readonly DependencyContainer $dependencyContainer,
 		public readonly ValueRegistry $valueRegistry,
+		public readonly TypeRegistry $typeRegistry,
+		public readonly MethodContext $methodContext,
 		public readonly VariableValueScope $variableValueScope,
 		public readonly Value $typedValue
 	) {
 		$this->variableScope = $variableValueScope;
-		$this->typeRegistry = $this->programRegistry->typeRegistry;
-		$this->methodFinder = $this->programRegistry->methodFinder;
 	}
 
 	public function withAddedVariableValue(VariableNameIdentifier $variableName, Value $value): self {
 		return new self(
-			$this->programRegistry,
+			$this->dependencyContainer,
 			$this->valueRegistry,
+			$this->typeRegistry,
+			$this->methodContext,
 			$this->variableValueScope->withAddedVariableValue($variableName, $value),
 			$this->typedValue
 		);
@@ -43,8 +43,10 @@ final class ExecutionResult implements ExecutionResultInterface {
 
 	public function asExecutionResult(Value $typedValue): ExecutionResult {
 		return new self(
-			$this->programRegistry,
+			$this->dependencyContainer,
 			$this->valueRegistry,
+			$this->typeRegistry,
+			$this->methodContext,
 			$this->variableValueScope,
 			$typedValue
 		);
@@ -61,7 +63,7 @@ final class ExecutionResult implements ExecutionResultInterface {
 	public function withAddedVariableType(VariableNameIdentifier $variableName, Type $variableType): AnalyserResultInterface {
 		return new AnalyserResult(
 			$this->typeRegistry,
-			$this->methodFinder,
+			$this->methodContext,
 			$this->variableScope->withAddedVariableType($variableName, $variableType),
 			$this->typedValue->type,
 			$this->typedValue->type,
@@ -71,7 +73,7 @@ final class ExecutionResult implements ExecutionResultInterface {
 	public function asAnalyserResult(Type $expressionType, Type $returnType): AnalyserResultInterface {
 		return new AnalyserResult(
 			$this->typeRegistry,
-			$this->methodFinder,
+			$this->methodContext,
 			$this->variableScope,
 			$expressionType,
 			$returnType

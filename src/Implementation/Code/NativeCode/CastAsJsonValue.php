@@ -107,8 +107,8 @@ final readonly class CastAsJsonValue {
 		) {
 			return $value;
 		}
-		$method = $programRegistry->methodFinder->methodForType(
-			$value->type,
+		$method = $programRegistry->methodFinder->methodForValue(
+			$value,
 			new MethodNameIdentifier('asJsonValue')
 		);
 		if ($method instanceof Method && !($method instanceof AsJsonValue)) {

@@ -8,8 +8,8 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext as ExecutionContextInt
 use Walnut\Lang\Blueprint\Code\Scope\VariableScope;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
-use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
+use Walnut\Lang\Blueprint\Program\Registry\MethodContext;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -22,10 +22,10 @@ final readonly class ExecutionContext implements ExecutionContextInterface {
 	public VariableScope $variableScope;
 
 	public function __construct(
-		public ProgramRegistry $programRegistry,
+		public DependencyContainer $dependencyContainer,
 		public ValueRegistry $valueRegistry,
 		public TypeRegistry $typeRegistry,
-		public MethodFinder $methodFinder,
+		public MethodContext $methodContext,
 		public VariableValueScope $variableValueScope
 	) {
 		$this->variableScope = $this->variableValueScope;
@@ -33,18 +33,20 @@ final readonly class ExecutionContext implements ExecutionContextInterface {
 
 	public function withAddedVariableValue(VariableNameIdentifier $variableName, Value $value): self {
 		return new self(
-			$this->programRegistry,
+			$this->dependencyContainer,
 			$this->valueRegistry,
 			$this->typeRegistry,
-			$this->methodFinder,
+			$this->methodContext,
 			$this->variableValueScope->withAddedVariableValue($variableName, $value)
 		);
 	}
 
 	public function asExecutionResult(Value $typedValue): ExecutionResult {
 		return new ExecutionResult(
-			$this->programRegistry,
+			$this->dependencyContainer,
 			$this->valueRegistry,
+			$this->typeRegistry,
+			$this->methodContext,
 			$this->variableValueScope,
 			$typedValue
 		);
@@ -54,7 +56,7 @@ final readonly class ExecutionContext implements ExecutionContextInterface {
 	public function withAddedVariableType(VariableNameIdentifier $variableName, Type $variableType): AnalyserContextInterface {
 		return new AnalyserContext(
 			$this->typeRegistry,
-			$this->methodFinder,
+			$this->methodContext,
 			$this->variableScope->withAddedVariableType($variableName, $variableType),
 		);
 	}
@@ -62,7 +64,7 @@ final readonly class ExecutionContext implements ExecutionContextInterface {
 	public function asAnalyserResult(Type $expressionType, Type $returnType): AnalyserResultInterface {
 		return new AnalyserResult(
 			$this->typeRegistry,
-			$this->methodFinder,
+			$this->methodContext,
 			$this->variableScope,
 			$expressionType,
 			$returnType

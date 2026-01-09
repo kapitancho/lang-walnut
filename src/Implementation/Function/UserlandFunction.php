@@ -109,7 +109,7 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 		$this->checkValueType('parameter', $parameterValue, $this->parameter->type);
 
 		$dependencyValue = $this->dependency->type instanceof NothingType ? null :
-			$executionContext->programRegistry->dependencyContainer->valueByType($this->dependency->type);
+			$executionContext->dependencyContainer->valueByType($this->dependency->type);
 
 		if ($dependencyValue instanceof DependencyError) {
 			// @codeCoverageIgnoreStart
@@ -149,20 +149,6 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 			$dependencyValue,
 		);
 		$returnValue = $this->functionBody->execute($executionContext);
-		/*
-		try {
-			$returnValue = $this->functionBody->execute($executionContext);
-		// @codeCoverageIgnoreStart
-		} catch (UnknownContextVariable $e) {
-			throw new ExecutionException(
-				sprintf(
-					"Error in %s: unknown variable '%s' in function body",
-					$this->displayName, $e->variableName
-				)
-			);
-		}
-		// @codeCoverageIgnoreEnd
-		*/
 		$this->checkValueType('return', $returnValue, $this->returnType);
 		return $returnValue;
 	}

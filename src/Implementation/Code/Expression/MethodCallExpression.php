@@ -12,7 +12,6 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\MethodCallExpression as MethodCallExpressionInterface;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
-use Walnut\Lang\Blueprint\Function\UnknownMethod;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Implementation\Type\Helper\BaseTypeHelper;
 
@@ -37,24 +36,9 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 			$retParameterType = $analyserContext->expressionType;
 			$parameterReturnType = $analyserContext->returnType;
 
-			$method = $analyserContext->methodFinder->methodForType(
+			$retReturnType = $analyserContext->methodContext->analyseMethod(
 				$retTargetType,
-				$this->methodName
-			);
-			if ($method instanceof UnknownMethod) {
-				throw new AnalyserException(
-					sprintf(
-						"Cannot call method '%s' on type '%s'",
-						$this->methodName,
-						$retTargetType,
-					),
-					$this
-				);
-			}
-			$retReturnType = $method->analyse(
-				$analyserContext->typeRegistry,
-				$analyserContext->methodFinder,
-				$retTargetType,
+				$this->methodName,
 				$retParameterType
 			);
 			return $analyserContext->asAnalyserResult(
@@ -84,29 +68,14 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
 		$executionContext = $this->target->execute($executionContext);
 		$retTargetValue = $executionContext->value;
-		$retTargetType = $retTargetValue->type;
 
 		$executionContext = $this->parameter->execute($executionContext);
 		$retParameterTypedValue = $executionContext->value;
 
-		$method = $executionContext->methodFinder->methodForValue(
-			$retTargetValue,
-			$this->methodName
-		);
-		if ($method instanceof UnknownMethod) {
-			throw new ExecutionException(
-				sprintf(
-					"Cannot call method '%s' on type '%s' for value '%s'",
-					$this->methodName,
-					$retTargetType,
-					$retTargetValue
-				)
-			);
-		}
 		try {
-			$retReturnTypedValue = $method->execute(
-				$executionContext->programRegistry,
+			$retReturnTypedValue = $executionContext->methodContext->executeMethod(
 				$retTargetValue,
+				$this->methodName,
 				$retParameterTypedValue
 			);
 			return $executionContext->asExecutionResult($retReturnTypedValue);

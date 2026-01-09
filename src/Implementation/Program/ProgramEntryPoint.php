@@ -6,8 +6,6 @@ use Walnut\Lang\Blueprint\Program\ProgramEntryPoint as ProgramEntryPointInterfac
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Value\FunctionValue;
 use Walnut\Lang\Blueprint\Value\Value;
-use Walnut\Lang\Implementation\Code\Execution\ExecutionContext;
-use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
 
 final readonly class ProgramEntryPoint implements ProgramEntryPointInterface {
 	public function __construct(

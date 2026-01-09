@@ -6,6 +6,7 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext as AnalyserContextInterf
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext as ExecutionContextInterface;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope as VariableValueScopeInterface;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer as DependencyContainerInterface;
+use Walnut\Lang\Blueprint\Program\Registry\MethodContext as MethodContextInterface;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry as ProgramRegistryInterface;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
@@ -19,6 +20,7 @@ final class ProgramRegistry implements ProgramRegistryInterface {
 	private readonly AnalyserContextInterface $analyserContextInstance;
 	private readonly ExecutionContextInterface $executionContextInstance;
 	private readonly DependencyContainerInterface $dependencyContainerInstance;
+	private readonly MethodContextInterface $methodContextInstance;
 
 	public function __construct(
 		public readonly TypeRegistry                 $typeRegistry,
@@ -27,22 +29,32 @@ final class ProgramRegistry implements ProgramRegistryInterface {
 		private readonly VariableValueScopeInterface $variableValueScope,
 	) {}
 
+	public MethodContextInterface $methodContext {
+		get {
+			return $this->methodContextInstance ??= new MethodContext(
+				$this,
+				$this->methodFinder,
+			);
+		}
+	}
+
 	public AnalyserContextInterface $analyserContext {
 		get {
 			return $this->analyserContextInstance ??= new AnalyserContext(
 				$this->typeRegistry,
-				$this->methodFinder,
+				$this->methodContext,
 				$this->variableValueScope,
 			);
 		}
 	}
+
 	public ExecutionContextInterface $executionContext {
 		get {
 			return $this->executionContextInstance ??= new ExecutionContext(
-				$this,
+				$this->dependencyContainer,
 				$this->valueRegistry,
 				$this->typeRegistry,
-				$this->methodFinder,
+				$this->methodContext,
 				$this->variableValueScope,
 			);
 		}
