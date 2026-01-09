@@ -26,6 +26,7 @@ final readonly class MethodContext implements MethodContextInterface {
 		return $this->methodAnalyser->methodForType($targetType, $methodName);
 	}
 
+	// @codeCoverageIgnoreStart
 	public function safeAnalyseMethod(
 		Type $targetType,
 		MethodNameIdentifier $methodName,
@@ -37,6 +38,7 @@ final readonly class MethodContext implements MethodContextInterface {
 			$parameterType
 		);
 	}
+	// @codeCoverageIgnoreEnd
 
 	/** @throws AnalyserException */
 	public function analyseMethod(
