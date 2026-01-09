@@ -42,7 +42,7 @@ final class TupleExpressionTest extends TestCase {
 	}
 
 	public function testAnalyse(): void {
-		$result = $this->tupleExpression->analyse(new AnalyserContext($this->programRegistry, VariableScope::empty()));
+		$result = $this->tupleExpression->analyse(new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder, VariableScope::empty()));
 		self::assertTrue($result->expressionType->isSubtypeOf(
 			$this->typeRegistry->tuple([
 				$this->typeRegistry->integer(),

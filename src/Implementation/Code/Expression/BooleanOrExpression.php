@@ -58,7 +58,7 @@ final readonly class BooleanOrExpression implements BooleanOrExpressionInterface
 
 		return $this->contextUnion($firstAnalyserContext, $secondAnalyserContext)->asAnalyserResult(
 			$secondBooleanType,
-			$analyserContext->programRegistry->typeRegistry->union([
+			$analyserContext->typeRegistry->union([
 				$firstReturnType,
 				$secondReturnType
 			])

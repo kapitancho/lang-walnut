@@ -25,7 +25,7 @@ final readonly class FunctionBody implements FunctionBodyInterface {
 		$analyserResult = $this->expression->analyse(
 			$analyserContext
 		);
-		return $analyserContext->programRegistry->typeRegistry->union([
+		return $analyserContext->typeRegistry->union([
 			$analyserResult->expressionType,
 			$analyserResult->returnType
 		]);

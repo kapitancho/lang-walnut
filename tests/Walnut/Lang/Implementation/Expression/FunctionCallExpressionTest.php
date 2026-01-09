@@ -82,7 +82,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 	}
 	
 	public function testAnalyseDefault(): void {
-		$result = $this->functionCallExpression->analyse(new AnalyserContext($this->programRegistry, new VariableScope([
+		$result = $this->functionCallExpression->analyse(new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder, new VariableScope([
 			'a' => $this->typeRegistry->function(
 				$this->typeRegistry->integer(),
 				$this->typeRegistry->string(),
@@ -96,7 +96,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 	}
 
 	public function testAnalyseOnCustomType(): void {
-		$result = $this->functionCallExpression->analyse(new AnalyserContext($this->programRegistry, new VariableScope([
+		$result = $this->functionCallExpression->analyse(new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder, new VariableScope([
 			'a' => $this->typeRegistry->withName(new TypeNameIdentifier('MyCustomType')),
 			'b' => $this->typeRegistry->integer()
 		])));
@@ -105,7 +105,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 
 	public function testAnalyseFailWrongParameter(): void {
 		$this->expectException(AnalyserException::class);
-		$this->functionCallExpression->analyse(new AnalyserContext($this->programRegistry, new VariableScope([
+		$this->functionCallExpression->analyse(new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder, new VariableScope([
 			'a' => $this->typeRegistry->function(
 				$this->typeRegistry->integer(),
 				$this->typeRegistry->string(),
@@ -116,7 +116,7 @@ final class FunctionCallExpressionTest extends BaseProgramTestHelper {
 
 	public function testAnalyseFailWrongType(): void {
 		$this->expectException(AnalyserException::class);
-		$this->functionCallExpression->analyse(new AnalyserContext($this->programRegistry, new VariableScope([
+		$this->functionCallExpression->analyse(new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder, new VariableScope([
 			'a' => $this->typeRegistry->integer(),
 			'b' => $this->typeRegistry->integer()
 		])));

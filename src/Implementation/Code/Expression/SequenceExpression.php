@@ -19,7 +19,7 @@ final readonly class SequenceExpression implements SequenceExpressionInterface, 
 	) {}
 
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
-		$expressionType = $analyserContext->programRegistry->typeRegistry->null;
+		$expressionType = $analyserContext->typeRegistry->null;
 		$returnTypes = [];
 		foreach($this->expressions as $expression) {
 			$analyserContext = $expression->analyse($analyserContext);
@@ -32,7 +32,7 @@ final readonly class SequenceExpression implements SequenceExpressionInterface, 
 		}
 		return $analyserContext->asAnalyserResult(
 			$expressionType,
-			$analyserContext->programRegistry->typeRegistry->union($returnTypes),
+			$analyserContext->typeRegistry->union($returnTypes),
 		);
 	}
 

@@ -25,7 +25,7 @@ final readonly class DataExpression implements DataExpressionInterface, JsonSeri
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
 		$analyserContext = $this->value->analyse($analyserContext);
 		try {
-			$dataType = $analyserContext->programRegistry->typeRegistry->data($this->typeName);
+			$dataType = $analyserContext->typeRegistry->data($this->typeName);
 		} catch (UnknownType) {
 			throw new AnalyserException(
 				sprintf("The data type '%s' is not defined.", $this->typeName),
@@ -44,7 +44,7 @@ final readonly class DataExpression implements DataExpressionInterface, JsonSeri
 			);
 		}
 		return $analyserContext->withExpressionType(
-			$analyserContext->programRegistry->typeRegistry->data(
+			$analyserContext->typeRegistry->data(
 				$this->typeName
 			)
 		);

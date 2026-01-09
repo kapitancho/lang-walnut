@@ -32,7 +32,8 @@ final class ProgramRegistry implements ProgramRegistryInterface {
 	public AnalyserContextInterface $analyserContext {
 		get {
 			return $this->analyserContextInstance ??= new AnalyserContext(
-				$this,
+				$this->typeRegistry,
+				$this->methodFinder,
 				$this->variableValueScope,
 			);
 		}

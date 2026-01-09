@@ -27,15 +27,15 @@ final readonly class MatchErrorExpression implements MatchErrorExpressionInterfa
 		$retTarget = $this->target->analyse($analyserContext);
 		$bType = $this->toBaseType($retTarget->expressionType);
 
-		$any = $analyserContext->programRegistry->typeRegistry->any;
+		$any = $analyserContext->typeRegistry->any;
 
 		$returnTypes = [$retTarget->returnType];
-		$onErrorExpressionType = $analyserContext->programRegistry->typeRegistry->nothing;
+		$onErrorExpressionType = $analyserContext->typeRegistry->nothing;
 		$elseExpressionType = $bType instanceof ResultType ? $bType->returnType :
 			$any;
 
 		if ($retTarget->expressionType->isSubtypeOf(
-			$analyserContext->programRegistry->typeRegistry->result(
+			$analyserContext->typeRegistry->result(
 				$any,
 				$any
 			)
@@ -49,8 +49,8 @@ final readonly class MatchErrorExpression implements MatchErrorExpressionInterfa
 
 				$innerContext = $innerContext->withAddedVariableType(
 					$this->target->variableName,
-					$analyserContext->programRegistry->typeRegistry->result(
-						$analyserContext->programRegistry->typeRegistry->nothing,
+					$analyserContext->typeRegistry->result(
+						$analyserContext->typeRegistry->nothing,
 						$errorType
 					),
 				);
@@ -74,11 +74,11 @@ final readonly class MatchErrorExpression implements MatchErrorExpressionInterfa
 		}
 
 		return $retTarget->asAnalyserResult(
-			$analyserContext->programRegistry->typeRegistry->union([
+			$analyserContext->typeRegistry->union([
 				$onErrorExpressionType,
 				$elseExpressionType
 			]),
-			$analyserContext->programRegistry->typeRegistry->union($returnTypes)
+			$analyserContext->typeRegistry->union($returnTypes)
 		);
 	}
 

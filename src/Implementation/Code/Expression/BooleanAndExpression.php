@@ -58,7 +58,7 @@ final readonly class BooleanAndExpression implements BooleanAndExpressionInterfa
 
 		return $this->contextUnion($firstAnalyserContext, $secondAnalyserContext)->asAnalyserResult(
 			$secondBooleanType,
-			$analyserContext->programRegistry->typeRegistry->union([
+			$analyserContext->typeRegistry->union([
 				$firstReturnType,
 				$secondReturnType
 			])

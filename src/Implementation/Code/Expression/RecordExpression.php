@@ -27,8 +27,8 @@ final readonly class RecordExpression implements RecordExpressionInterface, Json
 			$returnTypes[] = $analyserContext->returnType;
 		}
 		return $analyserContext->asAnalyserResult(
-			$analyserContext->programRegistry->typeRegistry->record($subtypes),
-			$analyserContext->programRegistry->typeRegistry->union($returnTypes),
+			$analyserContext->typeRegistry->record($subtypes),
+			$analyserContext->typeRegistry->union($returnTypes),
 		);
 	}
 

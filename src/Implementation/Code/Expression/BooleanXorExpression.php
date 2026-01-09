@@ -51,14 +51,14 @@ final readonly class BooleanXorExpression implements BooleanXorExpressionInterfa
 			match(true) {
 				$firstBooleanType instanceof FalseType && $secondBooleanType instanceof FalseType,
 				$firstBooleanType instanceof TrueType && $secondBooleanType instanceof TrueType =>
-					$analyserContext->programRegistry->typeRegistry->false,
+					$analyserContext->typeRegistry->false,
 				$firstBooleanType instanceof FalseType && $secondBooleanType instanceof TrueType,
 				$firstBooleanType instanceof TrueType && $secondBooleanType instanceof FalseType =>
-					$analyserContext->programRegistry->typeRegistry->true,
+					$analyserContext->typeRegistry->true,
 				default =>
-					$analyserContext->programRegistry->typeRegistry->boolean,
+					$analyserContext->typeRegistry->boolean,
 			},
-			$analyserContext->programRegistry->typeRegistry->union([
+			$analyserContext->typeRegistry->union([
 				$firstReturnType,
 				$secondReturnType
 			])

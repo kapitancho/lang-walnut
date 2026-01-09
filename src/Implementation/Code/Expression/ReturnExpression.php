@@ -20,8 +20,8 @@ final readonly class ReturnExpression implements ReturnExpressionInterface, Json
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
 		$ret = $this->returnedExpression->analyse($analyserContext);
 		return $ret->withExpressionType(
-			$analyserContext->programRegistry->typeRegistry->nothing
-		)->withReturnType($analyserContext->programRegistry->typeRegistry->union(
+			$analyserContext->typeRegistry->nothing
+		)->withReturnType($analyserContext->typeRegistry->union(
 			[$ret->returnType, $ret->expressionType]
 		));
 	}

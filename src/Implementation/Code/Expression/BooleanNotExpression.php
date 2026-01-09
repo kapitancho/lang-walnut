@@ -35,9 +35,9 @@ final readonly class BooleanNotExpression implements BooleanNotExpressionInterfa
 		);
 
 		return $analyserResult->withExpressionType(match(true) {
-			$expressionType instanceof FalseType => $analyserContext->programRegistry->typeRegistry->true,
-			$expressionType instanceof TrueType => $analyserContext->programRegistry->typeRegistry->false,
-			default => $analyserContext->programRegistry->typeRegistry->boolean
+			$expressionType instanceof FalseType => $analyserContext->typeRegistry->true,
+			$expressionType instanceof TrueType => $analyserContext->typeRegistry->false,
+			default => $analyserContext->typeRegistry->boolean
 		});
 	}
 

@@ -74,7 +74,7 @@ final class MatchExpressionTest extends TestCase {
 	}
 
 	public function testAnalyse(): void {
-		$result = $this->matchExpression->analyse(new AnalyserContext($this->programRegistry, new VariableScope([])));
+		$result = $this->matchExpression->analyse(new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder, new VariableScope([])));
 		self::assertTrue($result->expressionType->isSubtypeOf(
 			$this->typeRegistry->union([
 				$this->typeRegistry->string(),

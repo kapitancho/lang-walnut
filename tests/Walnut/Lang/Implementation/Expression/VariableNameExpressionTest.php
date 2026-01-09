@@ -55,7 +55,7 @@ final class VariableNameExpressionTest extends TestCase {
 
 	public function testAnalyse(): void {
 		$result = $this->variableNameExpression->analyse(
-			new AnalyserContext($this->programRegistry, new VariableScope([
+			new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder, new VariableScope([
 				'x' => $this->typeRegistry->integer()
 			]))
 		);

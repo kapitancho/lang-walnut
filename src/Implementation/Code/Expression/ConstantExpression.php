@@ -21,7 +21,7 @@ final readonly class ConstantExpression implements ConstantExpressionInterface, 
 		$this->value->selfAnalyse($analyserContext);
 		return $analyserContext->asAnalyserResult(
 			$this->value->type,
-			$analyserContext->programRegistry->typeRegistry->nothing
+			$analyserContext->typeRegistry->nothing
 		);
 	}
 

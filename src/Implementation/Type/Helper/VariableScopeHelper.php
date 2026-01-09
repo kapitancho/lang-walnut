@@ -63,7 +63,7 @@ trait VariableScopeHelper {
 			}
 			// @codeCoverageIgnoreEnd
 			$first = $first->withAddedVariableType($varName,
-				$first->programRegistry->typeRegistry->union([
+				$first->typeRegistry->union([
 					$firstType,
 					$varType
 				])

@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Code\Expression;
 
+use BcMath\Number;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
@@ -27,7 +28,7 @@ final readonly class MultiVariableAssignmentExpression implements MultiVariableA
 		$methodName = new MethodNameIdentifier('item');
 		$ret = $this->assignedExpression->analyse($analyserContext);
 		$retType = $ret->expressionType;
-		$method = $analyserContext->programRegistry->methodFinder->methodForType(
+		$method = $analyserContext->methodFinder->methodForType(
 			$retType,
 			$methodName
 		);
@@ -46,13 +47,13 @@ final readonly class MultiVariableAssignmentExpression implements MultiVariableA
 			$ret = $ret->withAddedVariableType(
 				$variableName,
 				$method->analyse(
-					$analyserContext->programRegistry->typeRegistry,
-					$analyserContext->programRegistry->methodFinder,
+					$analyserContext->typeRegistry,
+					$analyserContext->methodFinder,
 					$retType,
 					($isList ?
-						$analyserContext->programRegistry->valueRegistry->integer($key) :
-						$analyserContext->programRegistry->valueRegistry->string($key)
-					)->type
+						$analyserContext->typeRegistry->integerSubset([new Number($key)]) :
+						$analyserContext->typeRegistry->stringSubset([$key])
+					)
 				)
 			);
 		}

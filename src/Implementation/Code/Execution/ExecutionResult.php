@@ -7,7 +7,9 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult as ExecutionResultInter
 use Walnut\Lang\Blueprint\Code\Scope\VariableScope;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
+use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Code\Analyser\AnalyserResult;
@@ -15,6 +17,8 @@ use Walnut\Lang\Implementation\Code\Analyser\AnalyserResult;
 final class ExecutionResult implements ExecutionResultInterface {
 
 	public readonly VariableScope $variableScope;
+	public TypeRegistry $typeRegistry;
+	public MethodFinder $methodFinder;
 
 	public function __construct(
 		public readonly ProgramRegistry $programRegistry,
@@ -22,6 +26,8 @@ final class ExecutionResult implements ExecutionResultInterface {
 		public readonly Value $typedValue
 	) {
 		$this->variableScope = $variableValueScope;
+		$this->typeRegistry = $this->programRegistry->typeRegistry;
+		$this->methodFinder = $this->programRegistry->methodFinder;
 	}
 
 	public function withAddedVariableValue(VariableNameIdentifier $variableName, Value $value): self {
@@ -50,7 +56,8 @@ final class ExecutionResult implements ExecutionResultInterface {
 	// @codeCoverageIgnoreStart
 	public function withAddedVariableType(VariableNameIdentifier $variableName, Type $variableType): AnalyserResultInterface {
 		return new AnalyserResult(
-			$this->programRegistry,
+			$this->typeRegistry,
+			$this->methodFinder,
 			$this->variableScope->withAddedVariableType($variableName, $variableType),
 			$this->typedValue->type,
 			$this->typedValue->type,
@@ -59,7 +66,8 @@ final class ExecutionResult implements ExecutionResultInterface {
 
 	public function asAnalyserResult(Type $expressionType, Type $returnType): AnalyserResultInterface {
 		return new AnalyserResult(
-			$this->programRegistry,
+			$this->typeRegistry,
+			$this->methodFinder,
 			$this->variableScope,
 			$expressionType,
 			$returnType

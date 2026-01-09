@@ -25,7 +25,7 @@ final readonly class MutableExpression implements MutableExpressionInterface, Js
 		$analyserResult = $this->value->analyse($analyserContext);
 		if ($analyserResult->expressionType->isSubtypeOf($this->type)) {
 			return $analyserResult->withExpressionType(
-				$analyserContext->programRegistry->typeRegistry->mutable($this->type)
+				$analyserContext->typeRegistry->mutable($this->type)
 			);
 		}
 		throw new AnalyserException(

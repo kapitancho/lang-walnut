@@ -27,8 +27,8 @@ final readonly class TupleExpression implements TupleExpressionInterface, JsonSe
 			$returnTypes[] = $analyserContext->returnType;
 		}
 		return $analyserContext->asAnalyserResult(
-			$analyserContext->programRegistry->typeRegistry->tuple($subtypes),
-			$analyserContext->programRegistry->typeRegistry->union($returnTypes)
+			$analyserContext->typeRegistry->tuple($subtypes),
+			$analyserContext->typeRegistry->union($returnTypes)
 		);
 	}
 

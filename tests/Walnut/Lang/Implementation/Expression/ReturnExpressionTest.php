@@ -39,7 +39,7 @@ final class ReturnExpressionTest extends TestCase {
 	}
 
 	public function testAnalyse(): void {
-		$result = $this->returnExpression->analyse(new AnalyserContext($this->programRegistry, new VariableScope([])));
+		$result = $this->returnExpression->analyse(new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder, new VariableScope([])));
 		self::assertTrue($result->returnType()->isSubtypeOf(
 			$this->typeRegistry->integer()
 		));

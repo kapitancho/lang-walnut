@@ -52,8 +52,8 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 		$dependencyType = $dependency->type;
 
 		$tConv = fn(Type $type): Type => $type instanceof OptionalKeyType ?
-			$analyserContext->programRegistry->typeRegistry->result($type->valueType, $this->getMapItemNotFound(
-				$analyserContext->programRegistry->typeRegistry
+			$analyserContext->typeRegistry->result($type->valueType, $this->getMapItemNotFound(
+				$analyserContext->typeRegistry
 			)) :
 			$type;
 
@@ -93,7 +93,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 					if (!$t->restType instanceof NothingType) {
 						$analyserContext = $analyserContext->withAddedVariableType(
 							new VariableNameIdentifier($variableName . '_'),
-							$analyserContext->programRegistry->typeRegistry->array($t->restType)
+							$analyserContext->typeRegistry->array($t->restType)
 						);
 					}
 				}
@@ -109,7 +109,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 					if (!$t->restType instanceof NothingType) {
 						$analyserContext = $analyserContext->withAddedVariableType(
 							new VariableNameIdentifier($variableName . '_'),
-							$analyserContext->programRegistry->typeRegistry->map($t->restType)
+							$analyserContext->typeRegistry->map($t->restType)
 						);
 					}
 				}
@@ -129,9 +129,9 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 				$analyserContext = $analyserContext->withAddedVariableType(
 					new VariableNameIdentifier('$_'),
 					$targetType->valueType instanceof RecordType ?
-						$analyserContext->programRegistry->typeRegistry->map(
+						$analyserContext->typeRegistry->map(
 							$targetType->valueType->restType
-						) : $analyserContext->programRegistry->typeRegistry->array(
+						) : $analyserContext->typeRegistry->array(
 							$targetType->valueType->restType
 						)
 				);

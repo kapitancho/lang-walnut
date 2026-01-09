@@ -26,7 +26,7 @@ final readonly class NoErrorExpression implements NoErrorExpressionInterface, Js
 			return $ret->withExpressionType(
 				$expressionType->returnType
 			)->withReturnType(
-				$analyserContext->programRegistry->typeRegistry->result(
+				$analyserContext->typeRegistry->result(
 					$ret->returnType,
 					$expressionType->errorType
 				)

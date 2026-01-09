@@ -49,7 +49,7 @@ final class VariableAssignmentExpressionTest extends TestCase {
 
 	public function testAnalyse(): void {
 		$result = $this->variableAssignmentExpression->analyse(
-			new AnalyserContext($this->programRegistry,
+			new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder,
 				new VariableScope([
 					'x' => $this->typeRegistry->integer()
 				])

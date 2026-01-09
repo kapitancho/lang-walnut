@@ -30,7 +30,7 @@ final readonly class VariableNameExpression implements VariableNameExpressionInt
 				$this
 			);
 		}
-		return $analyserContext->asAnalyserResult($type, $analyserContext->programRegistry->typeRegistry->nothing);
+		return $analyserContext->asAnalyserResult($type, $analyserContext->typeRegistry->nothing);
 	}
 
 	/** @return list<string> */

@@ -37,7 +37,7 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 			$retParameterType = $analyserContext->expressionType;
 			$parameterReturnType = $analyserContext->returnType;
 
-			$method = $analyserContext->programRegistry->methodFinder->methodForType(
+			$method = $analyserContext->methodFinder->methodForType(
 				$retTargetType,
 				$this->methodName
 			);
@@ -52,14 +52,14 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 				);
 			}
 			$retReturnType = $method->analyse(
-				$analyserContext->programRegistry->typeRegistry,
-				$analyserContext->programRegistry->methodFinder,
+				$analyserContext->typeRegistry,
+				$analyserContext->methodFinder,
 				$retTargetType,
 				$retParameterType
 			);
 			return $analyserContext->asAnalyserResult(
 				$retReturnType,
-				$analyserContext->programRegistry->typeRegistry->union([
+				$analyserContext->typeRegistry->union([
 					$targetReturnType,
 					$parameterReturnType
 				])

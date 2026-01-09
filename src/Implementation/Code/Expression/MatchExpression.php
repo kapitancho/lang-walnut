@@ -65,7 +65,7 @@ final readonly class MatchExpression implements MatchExpressionInterface, JsonSe
 					if ($this->operation instanceof MatchExpressionIsSubtypeOf && $matchResult->expressionType instanceof TypeType) {
 						$innerContext = $innerContext->withAddedVariableType(
 							$this->target->variableName,
-							$analyserContext->programRegistry->typeRegistry->intersection([
+							$analyserContext->typeRegistry->intersection([
 								$matchResult->expressionType->refType,
 								$innerContext->variableScope->typeOf($this->target->variableName),
 							])
@@ -74,7 +74,7 @@ final readonly class MatchExpression implements MatchExpressionInterface, JsonSe
 					if ($this->operation instanceof MatchExpressionEquals) {
 						$innerContext = $innerContext->withAddedVariableType(
 							$this->target->variableName,
-							$analyserContext->programRegistry->typeRegistry->intersection([
+							$analyserContext->typeRegistry->intersection([
 								$matchResult->expressionType,
 								$innerContext->variableScope->typeOf($this->target->variableName),
 							])
@@ -91,14 +91,14 @@ final readonly class MatchExpression implements MatchExpressionInterface, JsonSe
 		}
 		if (!$hasDefaultMatch) {
 			if ($hasDynamicTypes || !$retTarget->expressionType->isSubtypeOf(
-				$analyserContext->programRegistry->typeRegistry->union($refTypes)
+				$analyserContext->typeRegistry->union($refTypes)
 			)) {
-				$expressionTypes[] = $analyserContext->programRegistry->typeRegistry->null;
+				$expressionTypes[] = $analyserContext->typeRegistry->null;
 			}
 		}
 		return $retTarget->asAnalyserResult(
-			$analyserContext->programRegistry->typeRegistry->union($expressionTypes),
-			$analyserContext->programRegistry->typeRegistry->union($returnTypes)
+			$analyserContext->typeRegistry->union($expressionTypes),
+			$analyserContext->typeRegistry->union($returnTypes)
 		);
 	}
 

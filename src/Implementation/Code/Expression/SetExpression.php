@@ -34,15 +34,15 @@ final readonly class SetExpression implements SetExpressionInterface, JsonSerial
 			$subtypes[] = $analyserContext->expressionType;
 			$returnTypes[] = $analyserContext->returnType;
 		}
-		$subtype = $analyserContext->programRegistry->typeRegistry->union($subtypes);
+		$subtype = $analyserContext->typeRegistry->union($subtypes);
 
 		return $analyserContext->asAnalyserResult(
-			$analyserContext->programRegistry->typeRegistry->set(
+			$analyserContext->typeRegistry->set(
 				$subtype,
 				min(max(1, count($set)), count($this->values)),
 				count($set) + $dynamic
 			),
-			$analyserContext->programRegistry->typeRegistry->union($returnTypes)
+			$analyserContext->typeRegistry->union($returnTypes)
 		);
 	}
 

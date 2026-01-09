@@ -59,7 +59,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			new MethodNameIdentifier('hydrateAs'),
 			$this->expressionRegistry->constant($this->valueRegistry->type($type))
 		);
-		$call->analyse(new AnalyserContext($this->programRegistry, new VariableScope([])));
+		$call->analyse(new AnalyserContext($this->programRegistry->typeRegistry, $this->programRegistry->methodFinder, new VariableScope([])));
 		$this->assertEquals($expected, (string)
 			$call->execute(new ExecutionContext($this->programRegistry, new VariableValueScope([])))->value
 		);

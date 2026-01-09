@@ -11,9 +11,8 @@ use Walnut\Lang\Blueprint\Value\Value;
 trait BooleanExpressionHelper {
 
 	private function getBooleanType(AnalyserContext $analyserContext, Type $expressionType): Type {
-		$pr = $analyserContext->programRegistry;
-		$mf = $pr->methodFinder;
-		$tr = $pr->typeRegistry;
+		$mf = $analyserContext->methodFinder;
+		$tr = $analyserContext->typeRegistry;
 		$method = $mf->methodForType(
 			$expressionType,
 			new MethodNameIdentifier('asBoolean')

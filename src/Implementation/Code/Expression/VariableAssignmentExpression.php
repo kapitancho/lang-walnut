@@ -29,7 +29,7 @@ final readonly class VariableAssignmentExpression implements VariableAssignmentE
 			$innerFn = $this->variableName;
 			$analyserContext = $analyserContext->withAddedVariableType(
 				$this->variableName,
-				$analyserContext->programRegistry->typeRegistry->function(
+				$analyserContext->typeRegistry->function(
 					$v->type->parameterType,
 					$v->type->returnType,
 				)
