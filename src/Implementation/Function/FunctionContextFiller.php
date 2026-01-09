@@ -202,7 +202,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 					if (!$t->restType instanceof NothingType) {
 						$executionContext = $executionContext->withAddedVariableValue(
 							new VariableNameIdentifier($variableName . '_'),
-							$executionContext->programRegistry->valueRegistry->tuple(array_slice($v->values, count($t->types)))
+							$executionContext->valueRegistry->tuple(array_slice($v->values, count($t->types)))
 						);
 					}
 				} elseif ($t instanceof RecordType && $v instanceof RecordValue) {
@@ -212,11 +212,11 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 						unset($recordValues[$fieldName]);
 						try {
 							$rValue = $values[$fieldName] ??
-								$executionContext->programRegistry->valueRegistry->error(
-									$executionContext->programRegistry->valueRegistry->dataValue(
+								$executionContext->valueRegistry->error(
+									$executionContext->valueRegistry->dataValue(
 										new TypeNameIdentifier('MapItemNotFound'),
-										$executionContext->programRegistry->valueRegistry->record([
-											'key' => $executionContext->programRegistry->valueRegistry->string($fieldName)
+										$executionContext->valueRegistry->record([
+											'key' => $executionContext->valueRegistry->string($fieldName)
 										])
 									)
 								);
@@ -231,7 +231,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 					if (!$t->restType instanceof NothingType) {
 						$executionContext = $executionContext->withAddedVariableValue(
 							new VariableNameIdentifier($variableName . '_'),
-							$executionContext->programRegistry->valueRegistry->record($recordValues)
+							$executionContext->valueRegistry->record($recordValues)
 						);
 					}
 				}
@@ -246,11 +246,11 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 			foreach($targetType->valueType->types /*?? $tv->type->types*/ as $fieldName => $fieldType) {
 				unset($restValues[$fieldName]);
 				$value = $values[$fieldName] ??
-					$executionContext->programRegistry->valueRegistry->error(
-						$executionContext->programRegistry->valueRegistry->dataValue(
+					$executionContext->valueRegistry->error(
+						$executionContext->valueRegistry->dataValue(
 							new TypeNameIdentifier('MapItemNotFound'),
-							$executionContext->programRegistry->valueRegistry->record([
-								'key' => $executionContext->programRegistry->valueRegistry->string($fieldName)
+							$executionContext->valueRegistry->record([
+								'key' => $executionContext->valueRegistry->string($fieldName)
 							])
 						)
 					)
@@ -265,8 +265,8 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 					new VariableNameIdentifier('$_'),
 					$tv instanceof RecordValue ?
 						/** @phpstan-ignore-next-line argument.type */
-						$executionContext->programRegistry->valueRegistry->record($restValues) :
-						$executionContext->programRegistry->valueRegistry->tuple(array_values($restValues))
+						$executionContext->valueRegistry->record($restValues) :
+						$executionContext->valueRegistry->tuple(array_values($restValues))
 				);
 			}
 		}

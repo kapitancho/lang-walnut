@@ -51,7 +51,7 @@ final readonly class BooleanNotExpression implements BooleanNotExpressionInterfa
 		$executionContext = $this->expression->execute($executionContext);
 
 		return $executionContext->withValue(
-			$executionContext->programRegistry->valueRegistry->boolean(
+			$executionContext->valueRegistry->boolean(
 				!$this->getBooleanValue($executionContext, $executionContext->value)
 			)
 		);

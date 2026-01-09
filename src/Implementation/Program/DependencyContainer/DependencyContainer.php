@@ -12,6 +12,7 @@ use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyError;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\UnresolvableDependency;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Type\DataType;
@@ -35,6 +36,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 
 	public function __construct(
 		private readonly ProgramRegistry   $programRegistry,
+		private readonly ValueRegistry     $valueRegistry,
 		private readonly MethodFinder      $methodFinder,
 		private readonly ValueConstructor  $valueConstructor,
 	) {
@@ -44,8 +46,8 @@ final class DependencyContainer implements DependencyContainerInterface {
 
 	private function findValueByNamedType(NamedType $type): Value|DependencyError {
 		try {
-			$sType = $this->programRegistry->valueRegistry->type($type);
-			$dependencyContainer = $this->programRegistry->valueRegistry->atom(new TypeNameIdentifier('DependencyContainer'));
+			$sType = $this->valueRegistry->type($type);
+			$dependencyContainer = $this->valueRegistry->atom(new TypeNameIdentifier('DependencyContainer'));
 			$method = $this->methodFinder->methodForType($dependencyContainer->type,
 				new MethodNameIdentifier('as'));
 
@@ -85,8 +87,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 			}
 			$found[$index] = $foundValue;
 		}
-
-		return $this->programRegistry->valueRegistry->tuple($found);
+		return $this->valueRegistry->tuple($found);
 	}
 
 	private function findRecordValue(RecordType $recordType): Value|DependencyError {
@@ -103,7 +104,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 			}
 			$found[$key] = $foundValue;
 		}
-		return $this->programRegistry->valueRegistry->record($found);
+		return $this->valueRegistry->record($found);
 	}
 
 	private function findDataValue(DataType $type): Value|DependencyError {
@@ -111,7 +112,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 		if ($found instanceof DependencyError) {
 			$baseValue = $this->findValueByType($type->valueType);
 			if ($baseValue instanceof Value) {
-				return $this->programRegistry->valueRegistry->dataValue(
+				return $this->valueRegistry->dataValue(
 					$type->name,
 					$baseValue
 				);
@@ -123,7 +124,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 	private function findSealedOrOpenType(SealedType|OpenType $type): Value|DependencyError {
 		$found = $this->findValueByNamedType($type);
 		if ($found instanceof DependencyError) {
-			$constructor = $this->programRegistry->valueRegistry->atom(new TypeNameIdentifier('Constructor'));
+			$constructor = $this->valueRegistry->atom(new TypeNameIdentifier('Constructor'));
 			$method = $this->methodFinder->methodForType($constructor->type,
 				new MethodNameIdentifier($type->name->identifier));
 			if ($method instanceof CustomMethod) {

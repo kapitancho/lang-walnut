@@ -32,6 +32,8 @@ use Walnut\Lang\Implementation\Type\Helper\TupleAsRecord;
 final readonly class ValueConstructor {
 	use TupleAsRecord;
 
+	public function __construct() {}
+
 	private function getConstructorType(TypeRegistry $typeRegistry): AtomType {
 		return $typeRegistry->atom(
 			new TypeNameIdentifier('Constructor')
@@ -240,7 +242,7 @@ final readonly class ValueConstructor {
 
 	public function executeConstructor(
 		ProgramRegistry $programRegistry,
-		Type                   $resultType,
+		Type $resultType,
 		Value $parameter
 	): Value {
 		$constructorType = $this->getConstructorType($programRegistry->typeRegistry);
@@ -252,7 +254,7 @@ final readonly class ValueConstructor {
 		if ($constructorMethod instanceof Method) {
 			$parameter = $constructorMethod->execute(
 				$programRegistry,
-				($constructorType->value),
+				$constructorType->value,
 				$parameter,
 			);
 			$resultValue = $parameter;
@@ -269,7 +271,7 @@ final readonly class ValueConstructor {
 
 	public function executeValidator(
 		ProgramRegistry $programRegistry,
-		Type                   $resultType,
+		Type $resultType,
 		Value $parameter
 	): Value {
 		$constructingType = $this->getConstructingType(

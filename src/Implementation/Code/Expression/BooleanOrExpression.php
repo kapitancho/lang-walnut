@@ -80,12 +80,12 @@ final readonly class BooleanOrExpression implements BooleanOrExpressionInterface
 
 		if ($firstValue) {
 			return $firstExecutionContext->withValue(
-				$firstExecutionContext->programRegistry->valueRegistry->boolean(true)
+				$firstExecutionContext->valueRegistry->boolean(true)
 			);
 		}
 		$secondExecutionContext = $this->second->execute($firstExecutionContext);
 		return $secondExecutionContext->withValue(
-			$secondExecutionContext->programRegistry->valueRegistry->boolean(
+			$secondExecutionContext->valueRegistry->boolean(
 				$this->getBooleanValue($secondExecutionContext, $secondExecutionContext->value)
 			)
 		);

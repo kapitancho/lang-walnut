@@ -113,7 +113,7 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 
 		if ($dependencyValue instanceof DependencyError) {
 			// @codeCoverageIgnoreStart
-			$vr = $executionContext->programRegistry->valueRegistry;
+			$vr = $executionContext->valueRegistry;
 			return $vr->error(
 				$vr->dataValue(
 					new TypeNameIdentifier('DependencyContainerError'),

@@ -11,6 +11,7 @@ use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Code\Analyser\AnalyserContext;
@@ -20,6 +21,7 @@ final readonly class ExecutionContext implements ExecutionContextInterface {
 
 	public VariableScope $variableScope;
 	public TypeRegistry $typeRegistry;
+	public ValueRegistry $valueRegistry;
 	public MethodFinder $methodFinder;
 
 	public function __construct(
@@ -27,6 +29,7 @@ final readonly class ExecutionContext implements ExecutionContextInterface {
 		public VariableValueScope $variableValueScope
 	) {
 		$this->variableScope = $this->variableValueScope;
+		$this->valueRegistry = $this->programRegistry->valueRegistry;
 		$this->typeRegistry = $this->programRegistry->typeRegistry;
 		$this->methodFinder = $this->programRegistry->methodFinder;
 	}
@@ -41,6 +44,7 @@ final readonly class ExecutionContext implements ExecutionContextInterface {
 	public function asExecutionResult(Value $typedValue): ExecutionResult {
 		return new ExecutionResult(
 			$this->programRegistry,
+			$this->valueRegistry,
 			$this->variableValueScope,
 			$typedValue
 		);

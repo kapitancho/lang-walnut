@@ -35,7 +35,6 @@ final readonly class ProgramContext implements ProgramContextInterface {
 			$this->typeRegistry,
 			$this->valueRegistry,
 			$this->methodRegistry,
-			$this->expressionRegistry,
 			$this->variableValueScope,
 		);
 	}

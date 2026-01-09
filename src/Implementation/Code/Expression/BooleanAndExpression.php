@@ -80,12 +80,12 @@ final readonly class BooleanAndExpression implements BooleanAndExpressionInterfa
 
 		if (!$firstValue) {
 			return $firstExecutionContext->withValue(
-				$firstExecutionContext->programRegistry->valueRegistry->boolean(false)
+				$firstExecutionContext->valueRegistry->boolean(false)
 			);
 		}
 		$secondExecutionContext = $this->second->execute($firstExecutionContext);
 		return $secondExecutionContext->withValue(
-			$secondExecutionContext->programRegistry->valueRegistry->boolean(
+			$secondExecutionContext->valueRegistry->boolean(
 				$this->getBooleanValue($secondExecutionContext, $secondExecutionContext->value)
 			)
 		);

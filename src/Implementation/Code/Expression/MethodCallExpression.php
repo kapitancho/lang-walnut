@@ -89,7 +89,7 @@ final readonly class MethodCallExpression implements MethodCallExpressionInterfa
 		$executionContext = $this->parameter->execute($executionContext);
 		$retParameterTypedValue = $executionContext->value;
 
-		$method = $executionContext->programRegistry->methodFinder->methodForValue(
+		$method = $executionContext->methodFinder->methodForValue(
 			$retTargetValue,
 			$this->methodName
 		);

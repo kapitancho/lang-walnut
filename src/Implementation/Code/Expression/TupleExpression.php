@@ -48,7 +48,7 @@ final readonly class TupleExpression implements TupleExpressionInterface, JsonSe
 		}
 		return $executionContext->asExecutionResult(
 			(
-				$executionContext->programRegistry->valueRegistry->tuple($values)
+				$executionContext->valueRegistry->tuple($values)
 			)
 		);
 	}

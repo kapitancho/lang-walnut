@@ -61,7 +61,7 @@ final readonly class SetExpression implements SetExpressionInterface, JsonSerial
 			$values[] = $executionContext->value;
 		}
 		return $executionContext->asExecutionResult((
-			$executionContext->programRegistry->valueRegistry->set($values)
+			$executionContext->valueRegistry->set($values)
 		));
 	}
 

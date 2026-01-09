@@ -71,7 +71,7 @@ final readonly class MultiVariableAssignmentExpression implements MultiVariableA
 		$val = $ret->value;
 		$isList = array_is_list($this->variableNames);
 
-		$method = $executionContext->programRegistry->methodFinder->methodForValue(
+		$method = $executionContext->methodFinder->methodForValue(
 			$val,
 			$methodName
 		);
@@ -94,8 +94,8 @@ final readonly class MultiVariableAssignmentExpression implements MultiVariableA
 					$executionContext->programRegistry,
 					$val,
 					($isList ?
-						$executionContext->programRegistry->valueRegistry->integer($key) :
-						$executionContext->programRegistry->valueRegistry->string($key)
+						$executionContext->valueRegistry->integer($key) :
+						$executionContext->valueRegistry->string($key)
 					)
 				)
 			);

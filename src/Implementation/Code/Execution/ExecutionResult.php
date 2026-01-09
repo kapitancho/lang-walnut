@@ -10,6 +10,7 @@ use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Code\Analyser\AnalyserResult;
@@ -22,6 +23,7 @@ final class ExecutionResult implements ExecutionResultInterface {
 
 	public function __construct(
 		public readonly ProgramRegistry $programRegistry,
+		public readonly ValueRegistry $valueRegistry,
 		public readonly VariableValueScope $variableValueScope,
 		public readonly Value $typedValue
 	) {
@@ -33,6 +35,7 @@ final class ExecutionResult implements ExecutionResultInterface {
 	public function withAddedVariableValue(VariableNameIdentifier $variableName, Value $value): self {
 		return new self(
 			$this->programRegistry,
+			$this->valueRegistry,
 			$this->variableValueScope->withAddedVariableValue($variableName, $value),
 			$this->typedValue
 		);
@@ -41,6 +44,7 @@ final class ExecutionResult implements ExecutionResultInterface {
 	public function asExecutionResult(Value $typedValue): ExecutionResult {
 		return new self(
 			$this->programRegistry,
+			$this->valueRegistry,
 			$this->variableValueScope,
 			$typedValue
 		);

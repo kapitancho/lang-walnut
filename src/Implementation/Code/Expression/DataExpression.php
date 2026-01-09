@@ -58,7 +58,7 @@ final readonly class DataExpression implements DataExpressionInterface, JsonSeri
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
 		$executionContext = $this->value->execute($executionContext);
-		$dataType = $executionContext->programRegistry->typeRegistry->data($this->typeName);
+		$dataType = $executionContext->typeRegistry->data($this->typeName);
 		if (!$executionContext->value->type->isSubtypeOf($dataType->valueType)) {
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException(
@@ -72,7 +72,7 @@ final readonly class DataExpression implements DataExpressionInterface, JsonSeri
 			// @codeCoverageIgnoreEnd
 		}
 		return $executionContext->withValue(
-			$executionContext->programRegistry->valueRegistry->dataValue(
+			$executionContext->valueRegistry->dataValue(
 				$this->typeName,
 				$executionContext->value
 			)

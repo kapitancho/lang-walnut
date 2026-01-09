@@ -150,7 +150,7 @@ final readonly class MatchExpression implements MatchExpressionInterface, JsonSe
 			}
 		}
 		return $executionContext->asExecutionResult(
-			$executionContext->programRegistry->valueRegistry->null
+			$executionContext->valueRegistry->null
 		);
 	}
 

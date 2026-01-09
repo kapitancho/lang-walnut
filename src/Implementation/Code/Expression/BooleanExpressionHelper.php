@@ -22,13 +22,13 @@ trait BooleanExpressionHelper {
 
 	private function getBooleanValue(ExecutionContext $executionContext, Value $value): bool {
 		$pr = $executionContext->programRegistry;
-		$mf = $pr->methodFinder;
+		$mf = $executionContext->methodFinder;
 		$method = $mf->methodForType(
 			$value->type,
 			new MethodNameIdentifier('asBoolean')
 		);
 		return $method->execute($pr, $value, $pr->valueRegistry->null)->equals(
-			$executionContext->programRegistry->valueRegistry->true
+			$executionContext->valueRegistry->true
 		);
 	}
 

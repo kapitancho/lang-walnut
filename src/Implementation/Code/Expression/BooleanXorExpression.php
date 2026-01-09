@@ -82,8 +82,8 @@ final readonly class BooleanXorExpression implements BooleanXorExpressionInterfa
 
 		return $secondExecutionContext->withValue(
 			($firstValue && !$secondValue) || (!$firstValue && $secondValue) ?
-				$executionContext->programRegistry->valueRegistry->true :
-				$executionContext->programRegistry->valueRegistry->false
+				$executionContext->valueRegistry->true :
+				$executionContext->valueRegistry->false
 		);
 	}
 

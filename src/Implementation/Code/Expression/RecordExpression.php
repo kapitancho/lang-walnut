@@ -50,7 +50,7 @@ final readonly class RecordExpression implements RecordExpressionInterface, Json
 		}
 		return $executionContext->asExecutionResult(
 			(
-				$executionContext->programRegistry->valueRegistry->record($values)
+				$executionContext->valueRegistry->record($values)
 			)
 		);
 	}
