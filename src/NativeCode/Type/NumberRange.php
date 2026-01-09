@@ -34,14 +34,10 @@ final readonly class NumberRange implements NativeMethod {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof IntegerType) {
-				return $typeRegistry->data(
-					new TypeNameIdentifier('IntegerNumberRange')
-				);
+				return $typeRegistry->core->integerNumberRange;
 			}
 			if ($refType instanceof RealType) {
-				return $typeRegistry->data(
-					new TypeNameIdentifier('RealNumberRange')
-				);
+				return $typeRegistry->core->realNumberRange;
 			}
 		}
 		// @codeCoverageIgnoreStart
@@ -74,10 +70,10 @@ final readonly class NumberRange implements NativeMethod {
 				$intervals = [];
 				foreach ($numberRange->intervals as $interval) {
 					$start = $interval->start instanceof MinusInfinity ?
-						$programRegistry->valueRegistry->atom(new TypeNameIdentifier('MinusInfinity')) :
+						$programRegistry->valueRegistry->core->minusInfinity :
 						$data($interval->start);
 					$end = $interval->end instanceof PlusInfinity ?
-						$programRegistry->valueRegistry->atom(new TypeNameIdentifier('PlusInfinity')) :
+						$programRegistry->valueRegistry->core->plusInfinity :
 						$data($interval->end);
 					$intervals[] = $programRegistry->valueRegistry->openValue(
 						new TypeNameIdentifier($prefix . 'NumberInterval'),

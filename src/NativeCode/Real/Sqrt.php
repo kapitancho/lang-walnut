@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\Real;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
@@ -34,9 +33,7 @@ final readonly class Sqrt implements NativeMethod {
 			return $minValue === MinusInfinity::value || $minValue->value < 0 ?
 				$typeRegistry->result(
 					$real,
-					$typeRegistry->atom(
-						new TypeNameIdentifier('NotANumber')
-					)
+					$typeRegistry->core->notANumber
 				) :
 				$real;
 		}
@@ -55,9 +52,7 @@ final readonly class Sqrt implements NativeMethod {
 			return $val >= 0 ?
 				$programRegistry->valueRegistry->real($target->literalValue->sqrt()) :
 				$programRegistry->valueRegistry->error(
-					$programRegistry->valueRegistry->atom(
-		                new TypeNameIdentifier("NotANumber")
-                    )
+					$programRegistry->valueRegistry->core->notANumber
 				);
 		}
 		// @codeCoverageIgnoreStart

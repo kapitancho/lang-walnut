@@ -2,9 +2,9 @@
 
 namespace Walnut\Lang\Implementation\Type\Helper;
 
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\AnyType;
+use Walnut\Lang\Blueprint\Type\CoreType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\SealedType;
@@ -20,11 +20,12 @@ trait ExternalTypeHelper {
 		$errorType = $resultType->errorType;
 		$errorType = match(true) {
 			$errorType instanceof SealedType && $errorType->name->equals(
-				new TypeNameIdentifier('ExternalError')) => $typeRegistry->nothing,
+				CoreType::ExternalError->typeName()
+			) => $typeRegistry->nothing,
 			$errorType instanceof UnionType => $typeRegistry->union(
 				array_filter($errorType->types, static fn(Type $t): bool => !(
 					$t instanceof SealedType && $t->name->equals(
-						new TypeNameIdentifier('ExternalError')
+						CoreType::ExternalError->typeName()
 					)
 				))
 			),

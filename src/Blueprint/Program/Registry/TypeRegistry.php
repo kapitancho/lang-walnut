@@ -54,6 +54,8 @@ use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Type\UnknownEnumerationValue;
 
 interface TypeRegistry {
+	public TypeRegistryCore $core { get; }
+
 	public AnyType $any { get; }
 	public NothingType $nothing { get; }
 

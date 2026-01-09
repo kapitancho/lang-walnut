@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\Mutable;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -31,7 +30,7 @@ final readonly class POP implements NativeMethod {
 		    if ($valueType instanceof ArrayType && (int)(string)$valueType->range->minLength === 0) {
                 return $typeRegistry->result(
                     $valueType->itemType,
-                    $typeRegistry->atom(new TypeNameIdentifier("ItemNotFound"))
+                    $typeRegistry->core->itemNotFound
                 );
             }
 		}
@@ -57,7 +56,7 @@ final readonly class POP implements NativeMethod {
 					return $value;
 				}
 				return $programRegistry->valueRegistry->error(
-					$programRegistry->valueRegistry->atom(new TypeNameIdentifier("ItemNotFound"))
+					$programRegistry->valueRegistry->core->itemNotFound
 				);
 			}
 		}

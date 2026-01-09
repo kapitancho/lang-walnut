@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\Array;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
@@ -52,9 +51,7 @@ final readonly class WithoutByIndex implements NativeMethod {
 				return $hasError ?
 					$typeRegistry->result(
 						$returnType,
-						$typeRegistry->data(
-							new TypeNameIdentifier("IndexOutOfRange")
-						)
+						$typeRegistry->core->indexOutOfRange
 					) :
 					$returnType;
 			}
@@ -80,9 +77,7 @@ final readonly class WithoutByIndex implements NativeMethod {
 						$returnType :
 						$typeRegistry->result(
 							$returnType,
-							$typeRegistry->data(
-								new TypeNameIdentifier("IndexOutOfRange")
-							)
+							$typeRegistry->core->indexOutOfRange
 					);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -103,8 +98,7 @@ final readonly class WithoutByIndex implements NativeMethod {
 				$p = (string)$parameter->literalValue;
 				if (!array_key_exists($p, $values)) {
 					return $programRegistry->valueRegistry->error(
-						$programRegistry->valueRegistry->dataValue(
-							new TypeNameIdentifier('IndexOutOfRange'),
+						$programRegistry->valueRegistry->core->indexOutOfRange(
 							$programRegistry->valueRegistry->record(['index' => $parameter])
 						)
 					);

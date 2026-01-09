@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Implementation\Type;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\AnyType;
 use Walnut\Lang\Blueprint\Type\FunctionType;
@@ -26,7 +25,7 @@ final readonly class CompositeFunctionType implements FunctionType {
 		private FunctionType $second,
 		private FunctionCompositionMode $compositionMode
 	) {
-		$exe = $this->typeRegistry->withName(new TypeNameIdentifier('ExternalError'));
+		$exe = $this->typeRegistry->core->externalError;
 
 		$this->parameterType = $this->first->parameterType;
 		$r = $this->first->returnType;

@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\Any;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
@@ -27,7 +26,7 @@ final readonly class AsMutableOfType implements NativeMethod {
 				//$typeRegistry->type(
 					$typeRegistry->metaType(MetaTypeValue::MutableValue)
 				/*)*/,
-				$typeRegistry->data(new TypeNameIdentifier("CastNotAvailable"))
+				$typeRegistry->core->castNotAvailable
 			);
 		}
 		throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -46,8 +45,7 @@ final readonly class AsMutableOfType implements NativeMethod {
 				);
 			}
 			return $programRegistry->valueRegistry->error(
-				$programRegistry->valueRegistry->dataValue(
-					new TypeNameIdentifier("CastNotAvailable"),
+				$programRegistry->valueRegistry->core->castNotAvailable(
 					$programRegistry->valueRegistry->record([
 						'from' => $programRegistry->valueRegistry->type($target->type),
 						'to' => $programRegistry->valueRegistry->type($parameter->typeValue)

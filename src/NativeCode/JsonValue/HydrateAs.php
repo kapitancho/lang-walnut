@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\JsonValue;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -27,7 +26,7 @@ final readonly class HydrateAs implements NativeMethod {
 		if ($parameterType instanceof TypeType) {
 			return $typeRegistry->result(
 				$parameterType->refType,
-				$typeRegistry->withName(new TypeNameIdentifier("HydrationError"))
+				$typeRegistry->core->hydrationError
 			);
 		}
 		throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -45,8 +44,7 @@ final readonly class HydrateAs implements NativeMethod {
 				)->hydrate($target, $parameter->typeValue, 'value');
 			} catch (HydrationException $e) {
 				return $programRegistry->valueRegistry->error(
-					$programRegistry->valueRegistry->dataValue(
-						new TypeNameIdentifier("HydrationError"),
+					$programRegistry->valueRegistry->core->hydrationError(
 						$programRegistry->valueRegistry->record([
 							'value' => $e->value,
 							'hydrationPath' => $programRegistry->valueRegistry->string($e->hydrationPath),

@@ -16,6 +16,7 @@ use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
+use Walnut\Lang\Blueprint\Type\CoreType;
 use Walnut\Lang\Implementation\AST\Node\SourceLocation;
 use Walnut\Lang\Implementation\AST\Parser\Token as T;
 use Walnut\Lang\Implementation\Common\Range\NumberIntervalEndpoint;
@@ -182,7 +183,7 @@ final readonly class ParserStateMachine {
 					$this->nodeBuilder->definition(
 						$this->s->generated = $this->nodeBuilder->addMethod(
 							$this->nodeBuilder->namedType(
-								new TypeNameIdentifier('DependencyContainer')
+								CoreType::DependencyContainer->typeName()
 							),
 							new MethodNameIdentifier('asCliEntryPoint'),
 							$this->nodeBuilder->nameAndType(
@@ -194,7 +195,7 @@ final readonly class ParserStateMachine {
 								null
 							),
 							$this->nodeBuilder->namedType(
-								new TypeNameIdentifier('CliEntryPoint')
+								CoreType::CliEntryPoint->typeName()
 							),
 							$this->nodeBuilder->functionBody(
 								$this->nodeBuilder->constant(

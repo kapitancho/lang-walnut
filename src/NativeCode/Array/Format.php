@@ -5,7 +5,6 @@ namespace Walnut\Lang\NativeCode\Array;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -68,7 +67,7 @@ final readonly class Format implements NativeMethod {
 				$returnType = $typeRegistry->string();
 				return $isSafe ? $returnType : $typeRegistry->result(
 					$returnType,
-					$typeRegistry->data(new TypeNameIdentifier("CannotFormatString"))
+					$typeRegistry->core->cannotFormatString
 				);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -109,8 +108,7 @@ final readonly class Format implements NativeMethod {
 							$index = (int)$matches[1];
 							return $stringValues[$index] ?? throw new FunctionReturn(
 								$programRegistry->valueRegistry->error(
-									$programRegistry->valueRegistry->dataValue(
-										new TypeNameIdentifier("CannotFormatString"),
+									$programRegistry->valueRegistry->core->cannotFormatString(
 										$programRegistry->valueRegistry->record([
 											'values' => $target,
 											'format' => $parameter,

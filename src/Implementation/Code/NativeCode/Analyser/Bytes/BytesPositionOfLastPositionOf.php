@@ -4,7 +4,6 @@ namespace Walnut\Lang\Implementation\Code\NativeCode\Analyser\Bytes;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -33,9 +32,7 @@ trait BytesPositionOfLastPositionOf {
 						$targetType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
 						$targetType->range->maxLength - $parameterType->range->minLength
 					),
-					$typeRegistry->withName(
-						new TypeNameIdentifier("SliceNotInBytes")
-					)
+					$typeRegistry->core->sliceNotInBytes
 				);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -59,9 +56,7 @@ trait BytesPositionOfLastPositionOf {
 				$result = $posFn($target->literalValue, $parameter->literalValue);
 				return $result === false ?
 					$programRegistry->valueRegistry->error(
-						$programRegistry->valueRegistry->atom(
-							new TypeNameIdentifier('SliceNotInBytes')
-						)
+						$programRegistry->valueRegistry->core->sliceNotInBytes
 					) : $programRegistry->valueRegistry->integer($result);
 			}
 			// @codeCoverageIgnoreStart

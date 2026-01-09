@@ -15,7 +15,6 @@ use Walnut\Lang\Blueprint\AST\Node\Module\ModuleDefinitionNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\ModuleNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Compilation\AST\AstCodeMapper;
 use Walnut\Lang\Blueprint\Compilation\AST\AstCompilationException;
 use Walnut\Lang\Blueprint\Compilation\AST\AstFunctionBodyCompiler;
@@ -91,7 +90,7 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 			// @codeCoverageIgnoreEnd
 		};
 		return $this->programContext->customMethodRegistryBuilder->addMethod(
-			$this->programContext->typeRegistry->typeByName(new TypeNameIdentifier('Constructor')),
+			$this->programContext->typeRegistry->core->constructor,
 			new MethodNameIdentifier($typeName),
 			$this->programContext->typeRegistry->nameAndType(
 				$parameterType,

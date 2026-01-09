@@ -4,12 +4,12 @@ namespace Walnut\Lang\NativeCode\Bytes;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\BytesType;
+use Walnut\Lang\Blueprint\Type\CoreType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\SealedValue;
@@ -32,7 +32,7 @@ final readonly class Replace implements NativeMethod {
 				$typeRegistry->record([
 					'match' => $typeRegistry->union([
 						$typeRegistry->bytes(),
-						$typeRegistry->sealed(new TypeNameIdentifier('RegExp'))
+						$typeRegistry->core->regExp
 					]),
 					'replacement' => $typeRegistry->bytes()
 				])
@@ -62,7 +62,7 @@ final readonly class Replace implements NativeMethod {
 							str_replace($match->literalValue, $replacement->literalValue, $source)
 						);
 					}
-					if ($match instanceof SealedValue && $match->type->name->equals(new TypeNameIdentifier('RegExp'))) {
+					if ($match instanceof SealedValue && $match->type->name->equals(CoreType::RegExp->typeName())) {
 						return $programRegistry->valueRegistry->bytes(
 							(string)preg_replace($match->value->literalValue, $replacement->literalValue, $source)
 						);

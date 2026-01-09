@@ -3,11 +3,11 @@
 namespace Walnut\Lang\NativeCode\Any;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Type\CoreType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
@@ -22,8 +22,7 @@ final readonly class ErrorAsExternal implements NativeMethod {
 	private Type $externalErrorType;
 
 	private function externalErrorType(TypeRegistry $typeRegistry): Type {
-		return $this->externalErrorType ??= $typeRegistry
-			->withName(new TypeNameIdentifier("ExternalError"));
+		return $this->externalErrorType ??= $typeRegistry->core->externalError;
 	}
 
 	public function analyse(
@@ -56,14 +55,13 @@ final readonly class ErrorAsExternal implements NativeMethod {
 		if ($target instanceof ErrorValue) {
 			$errorValue = $target->errorValue;
 			if (!($errorValue instanceof SealedValue && $errorValue->type->name->equals(
-				new TypeNameIdentifier("ExternalError")
+				CoreType::ExternalError->typeName()
 			))) {
 				$errorMessage = $parameter instanceof StringValue ? $parameter :
 					$programRegistry->valueRegistry->string('Error');
 
 				return $programRegistry->valueRegistry->error(
-					$programRegistry->valueRegistry->sealedValue(
-						new TypeNameIdentifier("ExternalError"),
+					$programRegistry->valueRegistry->core->externalError(
 						$programRegistry->valueRegistry->record([
 							'errorType' => $programRegistry->valueRegistry->string((string)$errorValue->type),
 							'originalError' => $target,

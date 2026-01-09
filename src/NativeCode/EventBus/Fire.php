@@ -31,7 +31,7 @@ final readonly class Fire implements NativeMethod {
 		)) {
 			return $typeRegistry->result(
 				$parameterType,
-				$typeRegistry->withName(new TypeNameIdentifier('ExternalError'))
+				$typeRegistry->core->externalError
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -57,7 +57,7 @@ final readonly class Fire implements NativeMethod {
 							if ($result->type->isSubtypeOf(
 								$programRegistry->typeRegistry->result(
 									$programRegistry->typeRegistry->nothing,
-									$programRegistry->typeRegistry->withName(new TypeNameIdentifier('ExternalError'))
+									$programRegistry->typeRegistry->core->externalError
 								)
 							)) {
 								return $result;

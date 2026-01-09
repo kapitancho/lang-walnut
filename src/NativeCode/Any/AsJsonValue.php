@@ -3,7 +3,6 @@
 namespace Walnut\Lang\NativeCode\Any;
 
 use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -26,14 +25,14 @@ final readonly class AsJsonValue implements NativeMethod {
 		Type $targetType,
 		Type $parameterType
 	): Type {
-		$resultType = $typeRegistry->alias(new TypeNameIdentifier('JsonValue'));
+		$resultType = $typeRegistry->core->jsonValue;
 		return $this->castAsJsonValue->isSafeToCastType(
 			$typeRegistry,
 			$methodAnalyser,
 			$targetType
 		) ? $resultType : $typeRegistry->result(
 			$resultType,
-			$typeRegistry->withName(new TypeNameIdentifier('InvalidJsonValue'))
+			$typeRegistry->core->invalidJsonValue
 		);
 	}
 

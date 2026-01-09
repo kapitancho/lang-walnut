@@ -4,11 +4,11 @@ namespace Walnut\Lang\NativeCode\RegExp;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Type\CoreType;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -22,15 +22,11 @@ final readonly class MatchString implements NativeMethod {
 
 	public function analyse(TypeRegistry $typeRegistry, MethodAnalyser $methodAnalyser, Type $targetType, Type $parameterType): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof SealedType && $targetType->name->equals(new TypeNameIdentifier('RegExp'))) {
+		if ($targetType instanceof SealedType && $targetType->name->equals(CoreType::RegExp->typeName())) {
 			if ($parameterType instanceof StringType) {
 				return $typeRegistry->result(
-					$typeRegistry->data(
-						new TypeNameIdentifier('RegExpMatch')
-					),
-					$typeRegistry->atom(
-						new TypeNameIdentifier('NoRegExpMatch')
-					)
+					$typeRegistry->core->regExpMatch,
+					$typeRegistry->core->noRegExpMatch
 				);
 			}
 			// @codeCoverageIgnoreStart
@@ -44,7 +40,7 @@ final readonly class MatchString implements NativeMethod {
 
 	public function execute(ProgramRegistry $programRegistry, Value $target, Value $parameter): Value {
 		if ($target instanceof SealedValue && $target->type->name->equals(
-			new TypeNameIdentifier('RegExp')
+			CoreType::RegExp->typeName()
 		)) {
 			$v = $parameter;
 			if ($v instanceof StringValue) {
@@ -54,8 +50,7 @@ final readonly class MatchString implements NativeMethod {
 					$matches
 				);
 				if ($result) {
-					return $programRegistry->valueRegistry->dataValue(
-						new TypeNameIdentifier('RegExpMatch'),
+					return $programRegistry->valueRegistry->core->regExpMatch(
 						$programRegistry->valueRegistry->record([
 							'match' => $programRegistry->valueRegistry->string($matches[0]),
 							'groups' => $programRegistry->valueRegistry->tuple(
@@ -66,13 +61,11 @@ final readonly class MatchString implements NativeMethod {
 							)
 						])
 					);
-				} else {
-					return $programRegistry->valueRegistry->error(
-						$programRegistry->valueRegistry->atom(
-							new TypeNameIdentifier('NoRegExpMatch'),
-						)
-					);
 				}
+
+				return $programRegistry->valueRegistry->error(
+					$programRegistry->valueRegistry->core->noRegExpMatch
+				);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

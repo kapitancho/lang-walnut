@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\NativeCode\Any;
 
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -54,7 +53,7 @@ final readonly class AsString implements NativeMethod {
 		/** @var ResultType */
 		return $typeRegistry->result(
 			$typeRegistry->string(),
-			$typeRegistry->data(new TypeNameIdentifier("CastNotAvailable"))
+			$typeRegistry->core->castNotAvailable
 		);
 	}
 
@@ -66,8 +65,7 @@ final readonly class AsString implements NativeMethod {
 		$result = $this->castAsString->evaluate($target);
         return $result === null ?
 	        $programRegistry->valueRegistry->error(
-				$programRegistry->valueRegistry->dataValue(
-					new TypeNameIdentifier("CastNotAvailable"),
+				$programRegistry->valueRegistry->core->castNotAvailable(
 					$programRegistry->valueRegistry->record([
 						'from' => $programRegistry->valueRegistry->type($target->type),
 						'to' => $programRegistry->valueRegistry->type($programRegistry->typeRegistry->string())

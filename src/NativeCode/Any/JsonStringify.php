@@ -3,7 +3,6 @@
 namespace Walnut\Lang\NativeCode\Any;
 
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
@@ -24,13 +23,13 @@ final readonly class JsonStringify implements NativeMethod {
 		$resultType = $typeRegistry->string();
 		return $this->isSafeConversion($typeRegistry, $targetType) ? $resultType : $typeRegistry->result(
 			$resultType,
-			$typeRegistry->withName(new TypeNameIdentifier('InvalidJsonValue'))
+			$typeRegistry->core->invalidJsonValue
 		);
 	}
 
 	private function isSafeConversion(TypeRegistry $typeRegistry, Type $fromType): bool {
 		return $fromType->isSubtypeOf(
-			$typeRegistry->withName(new TypeNameIdentifier('JsonValue'))
+			$typeRegistry->core->jsonValue
 		);
 	}
 

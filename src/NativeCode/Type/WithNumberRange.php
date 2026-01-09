@@ -36,7 +36,7 @@ final readonly class WithNumberRange implements NativeMethod {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof IntegerType) {
 				if ($parameterType->isSubtypeOf(
-					$typeRegistry->withName(new TypeNameIdentifier('IntegerNumberRange'))
+					$typeRegistry->core->integerNumberRange
 				)) {
 					return $typeRegistry->type($typeRegistry->integer());
 				}
@@ -46,7 +46,7 @@ final readonly class WithNumberRange implements NativeMethod {
 			}
 			if ($refType instanceof RealType) {
 				if ($parameterType->isSubtypeOf(
-					$typeRegistry->withName(new TypeNameIdentifier('RealNumberRange'))
+					$typeRegistry->core->realNumberRange
 				)) {
 					return $typeRegistry->type($typeRegistry->real());
 				}

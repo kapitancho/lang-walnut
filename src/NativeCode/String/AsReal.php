@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\String;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -28,7 +27,7 @@ final readonly class AsReal implements NativeMethod {
 		if ($targetType instanceof StringType) {
 			return $typeRegistry->result(
 				$typeRegistry->real(),
-				$typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
+				$typeRegistry->core->notANumber
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -45,7 +44,7 @@ final readonly class AsReal implements NativeMethod {
 			return (string)($result = (float)$target->literalValue) === $target->literalValue ?
 				$programRegistry->valueRegistry->real($result) :
 				$programRegistry->valueRegistry->error(
-					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
+					$programRegistry->valueRegistry->core->notANumber
 				);
 		}
 		// @codeCoverageIgnoreStart

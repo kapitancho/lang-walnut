@@ -4,12 +4,12 @@ namespace Walnut\Lang\NativeCode\Constructor;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\AtomType;
+use Walnut\Lang\Blueprint\Type\CoreType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -23,7 +23,7 @@ final readonly class AsRegExp implements NativeMethod {
 
 	public function analyse(TypeRegistry $typeRegistry, MethodAnalyser $methodAnalyser, Type $targetType, Type $parameterType): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof AtomType && $targetType->name->equals(new TypeNameIdentifier('Constructor'))) {
+		if ($targetType instanceof AtomType && $targetType->name->equals(CoreType::Constructor->typeName())) {
 			if ($parameterType instanceof StringType) {
 				$mayBeInvalid = true;
 				$resultType = $typeRegistry->string();
@@ -42,9 +42,7 @@ final readonly class AsRegExp implements NativeMethod {
 				if ($mayBeInvalid) {
 					$resultType = $typeRegistry->result(
 						$resultType,
-						$typeRegistry->data(
-							new TypeNameIdentifier('InvalidRegExp')
-						)
+						$typeRegistry->core->invalidRegExp
 					);
 				}
 				return $resultType;
@@ -60,7 +58,7 @@ final readonly class AsRegExp implements NativeMethod {
 
 	public function execute(ProgramRegistry $programRegistry, Value $target, Value $parameter): Value {
 		if ($target instanceof AtomValue && $target->type->name->equals(
-			new TypeNameIdentifier('Constructor')
+			CoreType::Constructor->typeName()
 		)) {
 			$v = $parameter;
 			if ($v instanceof StringValue) {
@@ -68,8 +66,7 @@ final readonly class AsRegExp implements NativeMethod {
 					return $parameter;
 				}
 				return $programRegistry->valueRegistry->error(
-					$programRegistry->valueRegistry->dataValue(
-						new TypeNameIdentifier('InvalidRegExp'),
+					$programRegistry->valueRegistry->core->invalidRegExp(
 						$v
 					)
 				);

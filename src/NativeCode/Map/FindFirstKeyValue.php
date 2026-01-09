@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\Map;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -48,9 +47,7 @@ final readonly class FindFirstKeyValue implements NativeMethod {
 						'key' => $targetType->keyType,
 						'value' => $targetType->itemType
 					]),
-					$typeRegistry->atom(
-						new TypeNameIdentifier('ItemNotFound')
-					)
+					$typeRegistry->core->itemNotFound
 				);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -82,9 +79,7 @@ final readonly class FindFirstKeyValue implements NativeMethod {
 					}
 				}
 				return $programRegistry->valueRegistry->error(
-					$programRegistry->valueRegistry->atom(
-						new TypeNameIdentifier('ItemNotFound'),
-					)
+					$programRegistry->valueRegistry->core->itemNotFound
 				);
 			}
 			// @codeCoverageIgnoreStart

@@ -7,10 +7,10 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Scope\VariableValueScope as VariableValueScopeInterface;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Type\CoreType;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\FunctionCompositionMode;
@@ -83,7 +83,7 @@ final class CompositeFunctionValue implements FunctionValueInterface, JsonSerial
 				$this->compositionMode === FunctionCompositionMode::bypassExternalErrors &&
 				$intermediateValue->errorValue instanceof SealedValue &&
 				$intermediateValue->errorValue->type->name->equals(
-					new TypeNameIdentifier('ExternalError')
+					CoreType::ExternalError->typeName()
 				)
 			)) {
 				return $intermediateValue;

@@ -4,12 +4,12 @@ namespace Walnut\Lang\NativeCode\Random;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\AtomType;
+use Walnut\Lang\Blueprint\Type\CoreType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
@@ -25,8 +25,8 @@ final readonly class Uuid implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof AtomType && $targetType->name->equals(new TypeNameIdentifier('Random'))) {
-			return $typeRegistry->open(new TypeNameIdentifier('Uuid'));
+		if ($targetType instanceof AtomType && $targetType->name->equals(CoreType::Random->typeName())) {
+			return $typeRegistry->core->uuid;
 		}
 		// @codeCoverageIgnoreStart
 		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
@@ -39,7 +39,7 @@ final readonly class Uuid implements NativeMethod {
 		Value $parameter
 	): Value {
 		if ($target instanceof AtomValue && $target->type->name->equals(
-			new TypeNameIdentifier('Random')
+			CoreType::Random->typeName()
 		)) {
 			/** @noinspection PhpUnhandledExceptionInspection */
 			$arr = array_values((array)unpack('N1a/n4b/N1c', random_bytes(16)));
@@ -49,8 +49,7 @@ final readonly class Uuid implements NativeMethod {
 			$arr[2] = ($arr[2] & 0x0fff) | 0x4000;
 			$arr[3] = ($arr[3] & 0x3fff) | 0x8000;
 			$uuid = vsprintf('%08x-%04x-%04x-%04x-%04x%08x', $arr);
-			return $programRegistry->valueRegistry->openValue(
-				new TypeNameIdentifier('Uuid'),
+			return $programRegistry->valueRegistry->core->uuid(
 				$programRegistry->valueRegistry->string($uuid)
 			);
 		}

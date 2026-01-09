@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\Type;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
@@ -38,7 +37,7 @@ final readonly class MaxLength implements NativeMethod {
 			) {
 				return $typeRegistry->union([
 					$typeRegistry->integer(0),
-					$typeRegistry->withName(new TypeNameIdentifier('PlusInfinity'))
+					$typeRegistry->core->plusInfinity
 				]);
 			}
 		}
@@ -59,7 +58,7 @@ final readonly class MaxLength implements NativeMethod {
 				$typeValue instanceof MapType || $typeValue instanceof SetType
 			) {
 				return $typeValue->range->maxLength === PlusInfinity::value ?
-					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('PlusInfinity')) :
+					$programRegistry->valueRegistry->core->plusInfinity :
 					$programRegistry->valueRegistry->integer($typeValue->range->maxLength);
 			}
 		}

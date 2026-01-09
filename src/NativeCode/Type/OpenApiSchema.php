@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\Type;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
@@ -14,6 +13,7 @@ use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\BooleanType;
+use Walnut\Lang\Blueprint\Type\CoreType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\IntersectionType;
 use Walnut\Lang\Blueprint\Type\MapType;
@@ -45,8 +45,8 @@ final readonly class OpenApiSchema implements NativeMethod {
 	): Type {
 		if ($targetType instanceof TypeType) {
 			$refType = $targetType->refType;
-			if ($refType->isSubtypeOf($typeRegistry->alias(new TypeNameIdentifier('JsonValue')))) {
-				return $typeRegistry->alias(new TypeNameIdentifier('JsonValue'));
+			if ($refType->isSubtypeOf($typeRegistry->core->jsonValue)) {
+				return $typeRegistry->core->jsonValue;
 			}
 		}
 		// @codeCoverageIgnoreStart
@@ -103,7 +103,7 @@ final readonly class OpenApiSchema implements NativeMethod {
 	private function typeToOpenApiSchema(ProgramRegistry $programRegistry, Type $type): Value {
 		/** @noinspection PhpParamsInspection */
 		return match(true) {
-			$type instanceof AliasType && $type->name->equals(new TypeNameIdentifier('JsonValue')) =>
+			$type instanceof AliasType && $type->name->equals(CoreType::JsonValue->typeName()) =>
 				$programRegistry->valueRegistry->record([
 					'type' => $programRegistry->valueRegistry->string('any')
 				]),

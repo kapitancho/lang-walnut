@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Implementation\Code\NativeCode\Analyser\Composite\Array;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
@@ -29,7 +28,7 @@ trait ArrayFindFirstIFindLast {
 				if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
 					return $typeRegistry->result(
 						$type->itemType,
-						$typeRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
+						$typeRegistry->core->itemNotFound
 					);
 				}
 				throw new AnalyserException(

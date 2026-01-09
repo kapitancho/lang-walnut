@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\DependencyContainer;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\UnresolvableDependency;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
@@ -26,9 +25,7 @@ final readonly class ValueOf implements NativeMethod {
 		if ($parameterType instanceof TypeType) {
 			return $typeRegistry->result(
 				$parameterType->refType,
-				$typeRegistry->withName(
-					new TypeNameIdentifier('DependencyContainerError')
-				)
+				$typeRegistry->core->dependencyContainerError
 			);
 		}
 		throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -46,8 +43,7 @@ final readonly class ValueOf implements NativeMethod {
 				return $result;
 			}
 			return $programRegistry->valueRegistry->error(
-				$programRegistry->valueRegistry->dataValue(
-					new TypeNameIdentifier('DependencyContainerError'),
+				$programRegistry->valueRegistry->core->dependencyContainerError(
 					$programRegistry->valueRegistry->record([
 						'targetType' => $programRegistry->valueRegistry->type($type),
 						'errorOnType' => $programRegistry->valueRegistry->type($result->type),

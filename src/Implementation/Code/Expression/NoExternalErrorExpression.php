@@ -10,8 +10,8 @@ use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
 use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Code\Expression\NoExternalErrorExpression as NoExternalErrorExpressionInterface;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer;
+use Walnut\Lang\Blueprint\Type\CoreType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\SealedValue;
@@ -25,9 +25,7 @@ final readonly class NoExternalErrorExpression implements NoExternalErrorExpress
 	) {}
 
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
-		$ex = $analyserContext->typeRegistry->withName(
-			new TypeNameIdentifier('ExternalError')
-		);
+		$ex = $analyserContext->typeRegistry->core->externalError;
 
 		$ret = $this->targetExpression->analyse($analyserContext);
 		$expressionType = $ret->expressionType;
@@ -55,8 +53,8 @@ final readonly class NoExternalErrorExpression implements NoExternalErrorExpress
 		if ($value instanceof ErrorValue) {
 			$errorValue = $value->errorValue;
 			if ($errorValue instanceof SealedValue && $errorValue->type->name->equals(
-				new TypeNameIdentifier('ExternalError'))
-			) {
+				CoreType::ExternalError->typeName()
+			)) {
 				throw new FunctionReturn($result->value);
 			}
 		}

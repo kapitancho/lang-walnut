@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\Type;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
@@ -34,7 +33,7 @@ final readonly class WithLengthRange implements NativeMethod {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($parameterType->isSubtypeOf(
-				$typeRegistry->withName(new TypeNameIdentifier('LengthRange'))
+				$typeRegistry->core->lengthRange
 			)) {
 				if ($refType instanceof StringType) {
 					return $typeRegistry->type($typeRegistry->string());
@@ -67,7 +66,7 @@ final readonly class WithLengthRange implements NativeMethod {
 		if ($target instanceof TypeValue) {
 			$typeValue = $this->toBaseType($target->typeValue);
 			if ($parameter->type->isSubtypeOf(
-				$programRegistry->typeRegistry->withName(new TypeNameIdentifier('LengthRange'))
+				$programRegistry->typeRegistry->core->lengthRange
 			)) {
 				if ($typeValue instanceof StringType) {
 					$range = $parameter->value->values;

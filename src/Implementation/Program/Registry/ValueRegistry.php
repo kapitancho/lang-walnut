@@ -38,6 +38,7 @@ use Walnut\Lang\Implementation\Value\TypeValue;
 final class ValueRegistry implements ValueRegistryInterface {
 
 	private readonly FunctionContextFiller $contextFiller;
+	public readonly ValueRegistryCore $core;
 
 	public function __construct(
 		private readonly TypeRegistry      $typeRegistry,
@@ -45,6 +46,7 @@ final class ValueRegistry implements ValueRegistryInterface {
 		private readonly EscapeCharHandler $bytesEscapeCharHandler,
 	) {
 		$this->contextFiller = new FunctionContextFiller();
+		$this->core = new ValueRegistryCore($this);
 	}
 
 	public NullValue $null {

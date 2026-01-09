@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Implementation\Code\NativeCode\Analyser\Composite\Array;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
@@ -31,9 +30,7 @@ trait ArrayIndexOfLastIndexOf {
 				$maxLength === PlusInfinity::value ? $maxLength : max($maxLength - 1, 0));
 			return $typeRegistry->result(
 				$returnType,
-				$typeRegistry->atom(
-					new TypeNameIdentifier("ItemNotFound")
-				)
+				$typeRegistry->core->itemNotFound
 			);
 		}
 		// @codeCoverageIgnoreStart

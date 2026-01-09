@@ -3,7 +3,6 @@
 namespace Walnut\Lang\NativeCode\Array;
 
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Value\TupleValue;
@@ -26,9 +25,7 @@ final readonly class LastIndexOf implements NativeMethod {
 				}
 			}
 			return $programRegistry->valueRegistry->error(
-				$programRegistry->valueRegistry->atom(
-					new TypeNameIdentifier('ItemNotFound'),
-				)
+				$programRegistry->valueRegistry->core->itemNotFound
 			);
 		}
 		// @codeCoverageIgnoreStart

@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\Real;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
@@ -37,9 +36,7 @@ final readonly class Ln implements NativeMethod {
 	            $real :
                 $typeRegistry->result(
                     $real,
-                    $typeRegistry->atom(
-                        new TypeNameIdentifier('NotANumber')
-                    )
+                    $typeRegistry->core->notANumber
                 );
 		}
 		// @codeCoverageIgnoreStart
@@ -57,9 +54,7 @@ final readonly class Ln implements NativeMethod {
 			return $val > 0 ? $programRegistry->valueRegistry->real(
 				log((float)$val)
 			) : $programRegistry->valueRegistry->error(
-                $programRegistry->valueRegistry->atom(
-                    new TypeNameIdentifier("NotANumber")
-                )
+                $programRegistry->valueRegistry->core->notANumber
             );
 		}
 		// @codeCoverageIgnoreStart

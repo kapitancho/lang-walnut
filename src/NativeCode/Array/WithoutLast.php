@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\NativeCode\Array;
 
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -35,9 +34,7 @@ final readonly class WithoutLast implements NativeMethod {
 							'element' => $type->restType,
 							'array' => $typeRegistry->tuple([], $type->restType)
 						]),
-					$typeRegistry->atom(
-						new TypeNameIdentifier("ItemNotFound")
-					)
+					$typeRegistry->core->itemNotFound
 				);
 			}
 			$tupleTypes = $type->types;

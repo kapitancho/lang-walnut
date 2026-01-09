@@ -4,7 +4,6 @@ namespace Walnut\Lang\Implementation\Code\NativeCode;
 
 use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\Method;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
@@ -12,6 +11,7 @@ use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\BooleanType;
 use Walnut\Lang\Blueprint\Type\CompositeNamedType;
+use Walnut\Lang\Blueprint\Type\CoreType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\NothingType;
@@ -53,9 +53,7 @@ final readonly class CastAsJsonValue {
 			return $type->restType instanceof NothingType || $this->isSafeToCastType($typeRegistry, $methodAnalyser, $type->restType);
 		}
 		if (
-			($type instanceof AliasType && $type->name->equals(
-				new TypeNameIdentifier('JsonValue')
-			)) ||
+			($type instanceof AliasType && $type->name->equals(CoreType::JsonValue->typeName())) ||
 			$type instanceof NullType ||
 			$type instanceof BooleanType ||
 			$type instanceof IntegerType ||
@@ -131,10 +129,9 @@ final readonly class CastAsJsonValue {
 			return $programRegistry->valueRegistry->string($value->name->identifier);
 		}
 		throw new FunctionReturn((
-		$programRegistry->valueRegistry->error(
-			$programRegistry->valueRegistry->dataValue(
-					new TypeNameIdentifier('InvalidJsonValue'),
-				$programRegistry->valueRegistry->record(['value' => $value])
+			$programRegistry->valueRegistry->error(
+			$programRegistry->valueRegistry->core->invalidJsonValue(
+					$programRegistry->valueRegistry->record(['value' => $value])
 				)
 			)
 		));

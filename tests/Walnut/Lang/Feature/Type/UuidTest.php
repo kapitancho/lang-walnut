@@ -17,7 +17,7 @@ final class UuidTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("getUuid();", valueDeclarations: <<<NUT
 		getUuid = ^ => Result<Uuid, InvalidUuid> :: Uuid('00000000-0000-4000-0000-000000000000');
 	NUT);
-		$this->assertEquals("@InvalidUuid!'00000000-0000-4000-0000-000000000000'", $result);
+		$this->assertEquals("@InvalidUuid![\n	value: '00000000-0000-4000-0000-000000000000'\n]", $result);
 	}
 
 	public function testUuidFromStringFixInvalidError(): void {
@@ -39,7 +39,7 @@ final class UuidTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("getUuid('00000000-0000-4000-0000-000000000000');", valueDeclarations: <<<NUT
 		getUuid = ^uuid: String<36> => Result<Uuid, InvalidUuid> :: Uuid(uuid);
 	NUT);
-		$this->assertEquals("@InvalidUuid!'00000000-0000-4000-0000-000000000000'", $result);
+		$this->assertEquals("@InvalidUuid![\n	value: '00000000-0000-4000-0000-000000000000'\n]", $result);
 	}
 
 }

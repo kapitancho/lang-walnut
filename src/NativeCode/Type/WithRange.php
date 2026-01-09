@@ -4,13 +4,13 @@ namespace Walnut\Lang\NativeCode\Type;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Type\CoreType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\Type as TypeInterface;
@@ -35,7 +35,7 @@ final readonly class WithRange implements NativeMethod {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof IntegerType) {
 				if ($parameterType->isSubtypeOf(
-					$typeRegistry->withName(new TypeNameIdentifier('IntegerRange'))
+					$typeRegistry->withName(CoreType::IntegerRange->typeName())
 				)) {
 					return $typeRegistry->type($typeRegistry->integer());
 				}
@@ -45,7 +45,7 @@ final readonly class WithRange implements NativeMethod {
 			}
 			if ($refType instanceof RealType) {
 				if ($parameterType->isSubtypeOf(
-					$typeRegistry->withName(new TypeNameIdentifier('RealRange'))
+					$typeRegistry->withName(CoreType::RealRange->typeName())
 				)) {
 					return $typeRegistry->type($typeRegistry->real());
 				}
@@ -68,7 +68,7 @@ final readonly class WithRange implements NativeMethod {
 			$typeValue = $this->toBaseType($target->typeValue);
 			if ($typeValue instanceof IntegerType) {
 				if ($parameter->type->isSubtypeOf(
-					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('IntegerRange'))
+					$programRegistry->typeRegistry->withName(CoreType::IntegerRange->typeName())
 				)) {
 					$range = $parameter->value->values;
 					$minValue = $range['minValue'];
@@ -82,7 +82,7 @@ final readonly class WithRange implements NativeMethod {
 			}
 			if ($typeValue instanceof RealType) {
 				if ($parameter->type->isSubtypeOf(
-					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('RealRange'))
+					$programRegistry->typeRegistry->withName(CoreType::RealRange->typeName())
 				)) {
 					$range = $parameter->value->values;
 					$minValue = $range['minValue'];

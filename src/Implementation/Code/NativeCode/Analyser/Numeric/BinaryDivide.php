@@ -4,7 +4,6 @@ namespace Walnut\Lang\Implementation\Code\NativeCode\Analyser\Numeric;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\IntegerType;
@@ -36,7 +35,7 @@ trait BinaryDivide {
 			return $parameterType->contains(0) ?
 				$typeRegistry->result(
 					$real,
-					$typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
+					$typeRegistry->core->notANumber
 				) : $real;
 		}
 		throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -51,7 +50,7 @@ trait BinaryDivide {
 			if ($parameter instanceof IntegerValue || $parameter instanceof RealValue) {
 				if ((float)(string)$parameter->literalValue === 0.0) {
 					return $programRegistry->valueRegistry->error(
-						$programRegistry->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
+						$programRegistry->valueRegistry->core->notANumber
 					);
 				}
 				// Special case: Integer / 1 = Integer

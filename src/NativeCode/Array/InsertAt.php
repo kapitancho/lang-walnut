@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\Array;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
@@ -52,7 +51,7 @@ final readonly class InsertAt implements NativeMethod {
 					$parameterType->types['index']->numberRange->max->value >= 0 &&
 					$parameterType->types['index']->numberRange->max->value <= $targetType->range->minLength ?
 					$returnType : $typeRegistry->result($returnType,
-						$typeRegistry->data(new TypeNameIdentifier('IndexOutOfRange'))
+						$typeRegistry->core->indexOutOfRange
 					);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -84,8 +83,7 @@ final readonly class InsertAt implements NativeMethod {
 						return $programRegistry->valueRegistry->tuple($values);
 					}
 					return $programRegistry->valueRegistry->error(
-						$programRegistry->valueRegistry->dataValue(
-							new TypeNameIdentifier('IndexOutOfRange'),
+						$programRegistry->valueRegistry->core->indexOutOfRange(
 							$programRegistry->valueRegistry->record([
 								'index' => $index
 							])

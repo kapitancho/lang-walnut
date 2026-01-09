@@ -3,13 +3,13 @@
 namespace Walnut\Lang\Implementation\Code\NativeCode\Analyser\Numeric;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\InvalidNumberInterval;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint as NumberIntervalEndpointInterface;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Type\CoreType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\OptionalKeyType;
 use Walnut\Lang\Blueprint\Type\RealType;
@@ -114,11 +114,7 @@ trait Clamp {
 			}
 
 			$isIntRange = $minType instanceof IntegerType && $maxType instanceof IntegerType;
-			$errorType = $typeRegistry->data(
-				$isIntRange ?
-					new TypeNameIdentifier('InvalidIntegerRange') :
-					new TypeNameIdentifier('InvalidRealRange')
-			);
+			$errorType = $isIntRange ? $typeRegistry->core->invalidIntegerRange : $typeRegistry->core->invalidRealRange;
 			try {
 				$interval = new NumberInterval($from, $to);
 			} catch (InvalidNumberInterval) {
@@ -144,24 +140,22 @@ trait Clamp {
 		$maxValue = $parameter->values['max'] ?? null;
 
 		$minClamp = $minValue === null || (
-			$minValue instanceof AtomValue && $minValue->type->name->equals(new TypeNameIdentifier('MinusInfinity'))
+			$minValue instanceof AtomValue && $minValue->type->name->equals(CoreType::MinusInfinity->typeName())
 		) ? null : $minValue;
 		$maxClamp = $maxValue === null || (
-			$maxValue instanceof AtomValue && $maxValue->type->name->equals(new TypeNameIdentifier('PlusInfinity'))
+			$maxValue instanceof AtomValue && $maxValue->type->name->equals(CoreType::PlusInfinity->typeName())
 		) ? null : $maxValue;
 
 		// Check for invalid range
 		if ($minClamp !== null && $maxClamp !== null && $minClamp->literalValue > $maxClamp->literalValue) {
+			$rec = $programRegistry->valueRegistry->record([
+				'min' => $minValue,
+				'max' => $maxValue
+			]);
 			return $programRegistry->valueRegistry->error(
-				$programRegistry->valueRegistry->dataValue(
-					$minValue instanceof IntegerValue && $maxValue instanceof IntegerValue
-						? new TypeNameIdentifier('InvalidIntegerRange')
-						: new TypeNameIdentifier('InvalidRealRange'),
-					$programRegistry->valueRegistry->record([
-						'min' => $minValue,
-						'max' => $maxValue
-					])
-				)
+				$minValue instanceof IntegerValue && $maxValue instanceof IntegerValue ?
+					$programRegistry->valueRegistry->core->invalidIntegerRange($rec) :
+					$programRegistry->valueRegistry->core->invalidRealRange($rec)
 			);
 		}
 		$clamped = $maxClamp === null || ($maxClamp->literalValue > $value->literalValue) ? $value : $maxClamp;

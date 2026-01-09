@@ -4,7 +4,6 @@ namespace Walnut\Lang\Implementation\Code\NativeCode\Analyser\Composite\Array;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
@@ -40,9 +39,7 @@ trait ArrayWithoutFirstIWithoutLast {
 				]);
 				return $targetType->range->minLength > 0 ? $returnType :
 					$typeRegistry->result($returnType,
-						$typeRegistry->atom(
-							new TypeNameIdentifier("ItemNotFound")
-						)
+						$typeRegistry->core->itemNotFound
 					);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -66,9 +63,7 @@ trait ArrayWithoutFirstIWithoutLast {
 				$values = $target->values;
 				if (count($values) === 0) {
 					return $programRegistry->valueRegistry->error(
-						$programRegistry->valueRegistry->atom(
-							new TypeNameIdentifier("ItemNotFound")
-						)
+						$programRegistry->valueRegistry->core->itemNotFound
 					);
 				}
 				[$element, $values] = $removeFn($values);

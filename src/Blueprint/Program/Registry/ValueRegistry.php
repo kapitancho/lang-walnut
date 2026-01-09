@@ -31,6 +31,8 @@ use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Blueprint\Value\Value;
 
 interface ValueRegistry {
+	public ValueRegistryCore $core { get; }
+
 	public NullValue $null { get; }
 	public BooleanValue $true { get; }
 	public BooleanValue $false { get; }

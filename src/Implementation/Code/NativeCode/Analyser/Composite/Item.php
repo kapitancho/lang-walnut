@@ -5,7 +5,6 @@ namespace Walnut\Lang\Implementation\Code\NativeCode\Analyser\Composite;
 use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
@@ -89,9 +88,7 @@ trait Item {
 				$returnType :
 				$typeRegistry->result(
 					$returnType,
-					$typeRegistry->data(
-						new TypeNameIdentifier("IndexOutOfRange")
-					)
+					$typeRegistry->core->indexOutOfRange
 				);
 		}
 		throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -119,7 +116,7 @@ trait Item {
 		if ($targetType instanceof MetaType && $targetType->value === MetaTypeValue::Record) {
 			$mapType = $typeRegistry->map($typeRegistry->any);
 		}
-		$mapItemNotFound = $typeRegistry->data(new TypeNameIdentifier("MapItemNotFound"));
+		$mapItemNotFound = $typeRegistry->core->mapItemNotFound;
 
 		$parameterType = $this->toBaseType($parameterType);
 		if ($parameterType instanceof StringType) {
@@ -177,8 +174,7 @@ trait Item {
 		if ($parameter instanceof IntegerValue) {
 			$values = $target->values;
 			return $values[(int)(string)$parameter->literalValue] ?? $programRegistry->valueRegistry->error(
-				$programRegistry->valueRegistry->dataValue(
-					new TypeNameIdentifier('IndexOutOfRange'),
+				$programRegistry->valueRegistry->core->indexOutOfRange(
 					$programRegistry->valueRegistry->record(['index' => $parameter])
 				)
 			);
@@ -196,8 +192,7 @@ trait Item {
 		if ($parameter instanceof StringValue) {
 			$values = $target->values;
 			return $values[$parameter->literalValue] ?? $programRegistry->valueRegistry->error(
-				$programRegistry->valueRegistry->dataValue(
-					new TypeNameIdentifier('MapItemNotFound'),
+				$programRegistry->valueRegistry->core->mapItemNotFound(
 					$programRegistry->valueRegistry->record(['key' => $parameter])
 				)
 			);

@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\Random;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
@@ -12,6 +11,7 @@ use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\AtomType;
+use Walnut\Lang\Blueprint\Type\CoreType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -32,7 +32,7 @@ final readonly class Integer implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof AtomType && $targetType->name->equals(new TypeNameIdentifier('Random'))) {
+		if ($targetType instanceof AtomType && $targetType->name->equals(CoreType::Random->typeName())) {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof RecordType) {
 				$fromType = $parameterType->types['min'] ?? null;
@@ -74,7 +74,7 @@ final readonly class Integer implements NativeMethod {
 		Value $parameter
 	): Value {
         if ($target instanceof AtomValue && $target->type->name->equals(
-			new TypeNameIdentifier('Random')
+			CoreType::Random->typeName()
 		)) {
 			if ($parameter instanceof RecordValue) {
 				$from = $parameter->valueOf('min');

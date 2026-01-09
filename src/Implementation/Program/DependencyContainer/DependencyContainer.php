@@ -5,7 +5,6 @@ namespace Walnut\Lang\Implementation\Program\DependencyContainer;
 use SplObjectStorage;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\CustomMethod;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyContainer as DependencyContainerInterface;
 use Walnut\Lang\Blueprint\Program\DependencyContainer\DependencyError;
@@ -15,6 +14,7 @@ use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AtomType;
+use Walnut\Lang\Blueprint\Type\CoreType;
 use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\NamedType;
 use Walnut\Lang\Blueprint\Type\OpenType;
@@ -47,14 +47,14 @@ final class DependencyContainer implements DependencyContainerInterface {
 	private function findValueByNamedType(NamedType $type): Value|DependencyError {
 		try {
 			$sType = $this->valueRegistry->type($type);
-			$dependencyContainer = $this->valueRegistry->atom(new TypeNameIdentifier('DependencyContainer'));
+			$dependencyContainer = $this->valueRegistry->core->dependencyContainer;
 			$method = $this->methodFinder->methodForType($dependencyContainer->type,
 				new MethodNameIdentifier('as'));
 
 			$result = $method->execute($this->programRegistry, $dependencyContainer, $sType);
 
 			if ($result instanceof ErrorValue && $result->errorValue instanceof DataValue &&
-				$result->errorValue->type->name->equals(new TypeNameIdentifier('CastNotAvailable'))
+				$result->errorValue->type->name->equals(CoreType::CastNotAvailable->typeName())
 			) {
 				if ($type instanceof AliasType) {
 					return $this->attemptToFindAlias($type);
@@ -124,7 +124,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 	private function findSealedOrOpenType(SealedType|OpenType $type): Value|DependencyError {
 		$found = $this->findValueByNamedType($type);
 		if ($found instanceof DependencyError) {
-			$constructor = $this->valueRegistry->atom(new TypeNameIdentifier('Constructor'));
+			$constructor = $this->valueRegistry->core->constructor;
 			$method = $this->methodFinder->methodForType($constructor->type,
 				new MethodNameIdentifier($type->name->identifier));
 			if ($method instanceof CustomMethod) {

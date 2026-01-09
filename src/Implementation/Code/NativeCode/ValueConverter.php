@@ -5,11 +5,11 @@ namespace Walnut\Lang\Implementation\Code\NativeCode;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Type\CoreType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnionType;
@@ -79,9 +79,7 @@ final readonly class ValueConverter {
 		return
 			$result instanceof ErrorValue &&
 			$result->errorValue instanceof DataValue &&
-			$result->errorValue->type->name->equals(
-				new TypeNameIdentifier('CastNotAvailable')
-			);
+			$result->errorValue->type->name->equals(CoreType::CastNotAvailable->typeName());
 	}
 
 	public function convertValueToShape(
@@ -179,8 +177,7 @@ final readonly class ValueConverter {
 		}
 
 		return $programRegistry->valueRegistry->error(
-			$programRegistry->valueRegistry->dataValue(
-				new TypeNameIdentifier('CastNotAvailable'),
+			$programRegistry->valueRegistry->core->castNotAvailable(
 				$programRegistry->valueRegistry->record([
 					'from' => $programRegistry->valueRegistry->type($sourceValue->type),
 					'to' => $programRegistry->valueRegistry->type($targetType)

@@ -7,7 +7,6 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Function\FunctionContextFiller;
 use Walnut\Lang\Blueprint\Function\UserlandFunction as UserlandFunctionInterface;
@@ -115,8 +114,7 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 			// @codeCoverageIgnoreStart
 			$vr = $executionContext->valueRegistry;
 			return $vr->error(
-				$vr->dataValue(
-					new TypeNameIdentifier('DependencyContainerError'),
+				$vr->core->dependencyContainerError(
 					$vr->record([
 						'targetType' => $vr->type($this->dependency->type),
 						'errorOnType' => $vr->type($dependencyValue->type),
@@ -129,8 +127,7 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 								UnresolvableDependency::errorWhileCreatingValue => 'Error returned while creating value',
 							}
 						),
-						'errorType' => $vr->enumerationValue(
-							new TypeNameIdentifier('DependencyContainerErrorType'),
+						'errorType' => $vr->core->dependencyContainerErrorType(
 							new EnumValueIdentifier(ucfirst($dependencyValue->unresolvableDependency->name))
 						),
 					])

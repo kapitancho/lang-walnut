@@ -5,7 +5,6 @@ namespace Walnut\Lang\Implementation\Function;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Common\Identifier\IdentifierException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\FunctionContextFiller as FunctionContextFillerInterface;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
@@ -39,7 +38,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 	use TupleAsRecord;
 
 	private function getMapItemNotFound(TypeRegistry $typeRegistry): DataType {
-		return $typeRegistry->data(new TypeNameIdentifier("MapItemNotFound"));
+		return $typeRegistry->core->mapItemNotFound;
 	}
 
 	public function fillAnalyserContext(
@@ -213,8 +212,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 						try {
 							$rValue = $values[$fieldName] ??
 								$executionContext->valueRegistry->error(
-									$executionContext->valueRegistry->dataValue(
-										new TypeNameIdentifier('MapItemNotFound'),
+									$executionContext->valueRegistry->core->mapItemNotFound(
 										$executionContext->valueRegistry->record([
 											'key' => $executionContext->valueRegistry->string($fieldName)
 										])
@@ -247,8 +245,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 				unset($restValues[$fieldName]);
 				$value = $values[$fieldName] ??
 					$executionContext->valueRegistry->error(
-						$executionContext->valueRegistry->dataValue(
-							new TypeNameIdentifier('MapItemNotFound'),
+						$executionContext->valueRegistry->core->mapItemNotFound(
 							$executionContext->valueRegistry->record([
 								'key' => $executionContext->valueRegistry->string($fieldName)
 							])

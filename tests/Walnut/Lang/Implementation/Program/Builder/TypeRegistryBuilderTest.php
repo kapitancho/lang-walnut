@@ -37,7 +37,10 @@ class TypeRegistryBuilderTest extends TestCase {
 			$this->createMock(MethodFinder::class),
 			new StringEscapeCharHandler(),
 		);
-		$this->typeRegistryBuilder->addAtom(new TypeNameIdentifier('ExternalError')); // Fake reference
+		$this->typeRegistryBuilder->addSealed(
+			new TypeNameIdentifier('ExternalError'),
+			$this->typeRegistryBuilder->null
+		); // Fake reference
 	}
 
 

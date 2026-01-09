@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\Type;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
@@ -33,13 +32,13 @@ final readonly class MinValue implements NativeMethod {
 			if ($refType instanceof IntegerType) {
 				return $typeRegistry->union([
 					$typeRegistry->integer(),
-					$typeRegistry->withName(new TypeNameIdentifier('MinusInfinity'))
+					$typeRegistry->core->minusInfinity
 				]);
 			}
 			if ($refType instanceof RealType) {
 				return $typeRegistry->union([
 					$typeRegistry->real(),
-					$typeRegistry->withName(new TypeNameIdentifier('MinusInfinity'))
+					$typeRegistry->core->minusInfinity
 				]);
 			}
 		}
@@ -57,12 +56,12 @@ final readonly class MinValue implements NativeMethod {
 			$typeValue = $this->toBaseType($target->typeValue);
 			if ($typeValue instanceof IntegerType) {
 				return $typeValue->numberRange->min === MinusInfinity::value ?
-					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('MinusInfinity')) :
+					$programRegistry->valueRegistry->core->minusInfinity :
 					$programRegistry->valueRegistry->integer($typeValue->numberRange->min->value);
 			}
 			if ($typeValue instanceof RealType) {
 				return $typeValue->numberRange->min === MinusInfinity::value ?
-					$programRegistry->valueRegistry->atom(new TypeNameIdentifier('MinusInfinity')) :
+					$programRegistry->valueRegistry->core->minusInfinity :
 					$programRegistry->valueRegistry->real($typeValue->numberRange->min->value);
 			}
 		}

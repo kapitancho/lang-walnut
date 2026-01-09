@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\Mutable;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -40,7 +39,7 @@ final readonly class REMOVE implements NativeMethod {
 		    if ($valueType instanceof SetType && (int)(string)$valueType->range->minLength === 0) {
                 return $typeRegistry->result(
                     $valueType->itemType,
-                    $typeRegistry->atom(new TypeNameIdentifier("ItemNotFound"))
+                    $typeRegistry->core->itemNotFound
                 );
             }
 		    if ($valueType instanceof RecordType) {
@@ -78,14 +77,14 @@ final readonly class REMOVE implements NativeMethod {
 							}
 							return $typeRegistry->result(
 								$typeRegistry->union($returnTypes),
-								$typeRegistry->data(new TypeNameIdentifier("MapItemNotFound"))
+								$typeRegistry->core->mapItemNotFound
 							);
 						}
 					}
 					if ($parameterType instanceof StringType) {
 						return $typeRegistry->result(
 							$valueType->asMapType()->itemType,
-							$typeRegistry->data(new TypeNameIdentifier("MapItemNotFound"))
+							$typeRegistry->core->mapItemNotFound
 						);
 					}
 				}
@@ -95,7 +94,7 @@ final readonly class REMOVE implements NativeMethod {
 				if ($pType->isSubtypeOf($valueType->keyType))    {
 					return $typeRegistry->result(
 						$valueType->itemType,
-						$typeRegistry->data(new TypeNameIdentifier("MapItemNotFound"))
+						$typeRegistry->core->mapItemNotFound
 					);
 				}
                 throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -123,7 +122,7 @@ final readonly class REMOVE implements NativeMethod {
 					return $parameter;
 				}
 				return $programRegistry->valueRegistry->error(
-					$programRegistry->valueRegistry->atom(new TypeNameIdentifier("ItemNotFound"))
+					$programRegistry->valueRegistry->core->itemNotFound
 				);
 			}
 			if (
@@ -140,8 +139,7 @@ final readonly class REMOVE implements NativeMethod {
 					return $item;
 				}
 				return $programRegistry->valueRegistry->error(
-					$programRegistry->valueRegistry->dataValue(
-						new TypeNameIdentifier("MapItemNotFound"),
+					$programRegistry->valueRegistry->core->mapItemNotFound(
 						$programRegistry->valueRegistry->record([
 							'key' => $programRegistry->valueRegistry->string($k)
 						])

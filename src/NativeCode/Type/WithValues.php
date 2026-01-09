@@ -5,7 +5,6 @@ namespace Walnut\Lang\NativeCode\Type;
 use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
@@ -111,9 +110,7 @@ final readonly class WithValues implements NativeMethod {
 						$typeRegistry->type(
 							$typeRegistry->metaType(MetaTypeValue::EnumerationSubset)
 						),
-						$typeRegistry->withName(
-							new TypeNameIdentifier('UnknownEnumerationValue')
-						)
+						$typeRegistry->core->unknownEnumerationValue
 					);
 				}
 				// @codeCoverageIgnoreStart
@@ -196,8 +193,7 @@ final readonly class WithValues implements NativeMethod {
 							$r[] = $value->name;
 						} else {
 							return $programRegistry->valueRegistry->error(
-								$programRegistry->valueRegistry->dataValue(
-									new TypeNameIdentifier('UnknownEnumerationValue'),
+								$programRegistry->valueRegistry->core->unknownEnumerationValue(
 									$programRegistry->valueRegistry->record([
 										'enumeration' => $programRegistry->valueRegistry->type($typeValue),
 										'value' => $value

@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\Integer;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -37,7 +36,7 @@ final readonly class BinaryModulo implements NativeMethod {
 
 				return $includesZero ? $typeRegistry->result(
 					$returnType,
-					$typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
+					$typeRegistry->core->notANumber
 				) : $returnType;
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -56,7 +55,7 @@ final readonly class BinaryModulo implements NativeMethod {
 			if ($parameter instanceof IntegerValue) {
 				if ((int)(string)$parameter->literalValue === 0) {
 					return $programRegistry->valueRegistry->error(
-						$programRegistry->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
+						$programRegistry->valueRegistry->core->notANumber
 					);
 				}
                 return $programRegistry->valueRegistry->integer(
@@ -66,7 +65,7 @@ final readonly class BinaryModulo implements NativeMethod {
 			if ($parameter instanceof RealValue) {
 				if ((float)(string)$parameter->literalValue === 0.0) {
 					return $programRegistry->valueRegistry->error(
-						$programRegistry->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
+						$programRegistry->valueRegistry->core->notANumber
 					);
 				}
                 return $programRegistry->valueRegistry->real(

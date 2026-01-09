@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\Array;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
@@ -37,9 +36,7 @@ final readonly class Without implements NativeMethod {
 			);
 			return $typeRegistry->result(
 				$returnType,
-				$typeRegistry->atom(
-					new TypeNameIdentifier("ItemNotFound")
-				)
+				$typeRegistry->core->itemNotFound
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -62,7 +59,7 @@ final readonly class Without implements NativeMethod {
 				}
 			}
 			return $programRegistry->valueRegistry->error(
-				$programRegistry->valueRegistry->atom(new TypeNameIdentifier("ItemNotFound"))
+				$programRegistry->valueRegistry->core->itemNotFound
 			);
 		}
 		// @codeCoverageIgnoreStart

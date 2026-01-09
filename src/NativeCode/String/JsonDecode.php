@@ -5,7 +5,6 @@ namespace Walnut\Lang\NativeCode\String;
 use JsonException;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -28,8 +27,8 @@ final readonly class JsonDecode implements NativeMethod {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof StringType) {
 			return $typeRegistry->result(
-				$typeRegistry->withName(new TypeNameIdentifier("JsonValue")),
-				$typeRegistry->withName(new TypeNameIdentifier("InvalidJsonString"))
+				$typeRegistry->core->jsonValue,
+				$typeRegistry->core->invalidJsonString
 			);
 		}
 		// @codeCoverageIgnoreStart
@@ -68,8 +67,7 @@ final readonly class JsonDecode implements NativeMethod {
 				return $this->phpToValue($programRegistry, $value);
 			} catch (JsonException) {
 				return $programRegistry->valueRegistry->error(
-					$programRegistry->valueRegistry->dataValue(
-						new TypeNameIdentifier("InvalidJsonString"),
+					$programRegistry->valueRegistry->core->invalidJsonString(
 						$programRegistry->valueRegistry->record(['value' => $target])
 					)
 				);

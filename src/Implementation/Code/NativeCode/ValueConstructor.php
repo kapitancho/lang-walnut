@@ -6,7 +6,6 @@ use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -35,9 +34,7 @@ final readonly class ValueConstructor {
 	public function __construct() {}
 
 	private function getConstructorType(TypeRegistry $typeRegistry): AtomType {
-		return $typeRegistry->atom(
-			new TypeNameIdentifier('Constructor')
-		);
+		return $typeRegistry->core->constructor;
 	}
 
 	private function getConstructingType(TypeRegistry $typeRegistry, Type $type, Type $parameterType): Type {
@@ -147,9 +144,7 @@ final readonly class ValueConstructor {
 				)
 			]);
 			if (!$parameterType->isSubtypeOf($matchType)) {
-				$errorType = $typeRegistry->data(
-					new TypeNameIdentifier('UnknownEnumerationValue')
-				);
+				$errorType = $typeRegistry->core->unknownEnumerationValue;
 			}
 		}
 		$outputType = $this->getValidatorOutputType(
@@ -177,7 +172,7 @@ final readonly class ValueConstructor {
 				) => $type,
 				default => $typeRegistry->result(
 					$type,
-					$typeRegistry->data(new TypeNameIdentifier('UnknownEnumerationValue'))
+					$typeRegistry->core->unknownEnumerationValue
 				)
 			},
 			default => $type
@@ -202,8 +197,7 @@ final readonly class ValueConstructor {
 			} catch (UnknownEnumerationValue) {}
 
 			return $valueRegistry->error(
-				$valueRegistry->dataValue(
-					new TypeNameIdentifier('UnknownEnumerationValue'),
+				$valueRegistry->core->unknownEnumerationValue(
 					$valueRegistry->record([
 						'enumeration' => $valueRegistry->type($type),
 						'value' => $parameterValue,

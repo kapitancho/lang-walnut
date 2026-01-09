@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\Function;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
@@ -37,7 +36,7 @@ final readonly class ForceInvoke implements NativeMethod {
 		/** @var FunctionType $baseTargetType */
 		return $typeRegistry->result(
 			$baseTargetType->returnType,
-			$typeRegistry->typeByName(new TypeNameIdentifier('InvocationError'))
+			$typeRegistry->core->invocationError
 		);
 	}
 
@@ -61,8 +60,7 @@ final readonly class ForceInvoke implements NativeMethod {
 		);
 		if (!$parameter->type->isSubtypeOf($v->type->parameterType)) {
 			return $programRegistry->valueRegistry->error(
-				$programRegistry->valueRegistry->dataValue(
-					new TypeNameIdentifier("InvocationError"),
+				$programRegistry->valueRegistry->core->invocationError(
 					$programRegistry->valueRegistry->record([
 						'functionType' => $programRegistry->valueRegistry->type($v->type),
 						'providedParameterType' => $programRegistry->valueRegistry->type($parameter->type),

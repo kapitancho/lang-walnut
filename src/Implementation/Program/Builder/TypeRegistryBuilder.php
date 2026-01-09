@@ -23,6 +23,7 @@ use Walnut\Lang\Blueprint\Program\UnknownType;
 use Walnut\Lang\Blueprint\Type\AliasType as AliasTypeInterface;
 use Walnut\Lang\Blueprint\Type\AtomType as AtomTypeInterface;
 use Walnut\Lang\Blueprint\Type\BooleanType as BooleanTypeInterface;
+use Walnut\Lang\Blueprint\Type\CoreType;
 use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\EnumerationType as EnumerationTypeInterface;
@@ -108,6 +109,8 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
     private const string nullTypeName = 'Null';
     private const string constructorTypeName = 'Constructor';
 
+	public TypeRegistryCore $core;
+
     public function __construct(
 		private readonly CustomMethodRegistryBuilderInterface $customMethodRegistryBuilder,
 	    private readonly MethodFinder $methodFinder,
@@ -115,6 +118,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
     ) {
         $this->unionTypeNormalizer = new UnionTypeNormalizer($this);
         $this->intersectionTypeNormalizer = new IntersectionTypeNormalizer($this);
+		$this->core = new TypeRegistryCore($this);
 
         $this->any = new AnyType;
         $this->nothing = new NothingType;
@@ -159,19 +163,20 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		$this->openTypes = [];
 		$this->sealedTypes = [];
 
+		$j = CoreType::JsonValue->typeName();
 		$this->aliasTypes['JsonValue'] = new AliasType(
-			new TypeNameIdentifier('JsonValue'),
+			$j,
 			$this->union([
 				$this->null,
 				$this->boolean,
 				$this->integer(),
 				$this->real(),
 				$this->string(),
-				$this->array($this->proxyType(new TypeNameIdentifier('JsonValue'))),
-				$this->map($this->proxyType(new TypeNameIdentifier('JsonValue'))),
-				$this->set($this->proxyType(new TypeNameIdentifier('JsonValue'))),
-				$this->mutable($this->proxyType(new TypeNameIdentifier('JsonValue'))),
-				//$this->shape($this->proxyType(new TypeNameIdentifier('JsonValue')))
+				$this->array($this->proxyType($j)),
+				$this->map($this->proxyType($j)),
+				$this->set($this->proxyType($j)),
+				$this->mutable($this->proxyType($j)),
+				//$this->shape($this->proxyType($j))
 			], false)
 		);
     }
@@ -305,7 +310,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 
     public function impure(Type $valueType): Type {
 		return $this->result($valueType,
-			$this->withName(new TypeNameIdentifier('ExternalError'))
+			$this->core->externalError
 		);
     }
 
@@ -614,7 +619,7 @@ final class TypeRegistryBuilder implements TypeRegistry, TypeRegistryBuilderInte
 		FunctionBody $constructorBody
 	): void {
 		$this->customMethodRegistryBuilder->addMethod(
-			$this->atom(new TypeNameIdentifier('Constructor')),
+			$this->core->constructor,
 			new MethodNameIdentifier('as' . $name->identifier),
 			$this->nameAndType($fromType, null),
 			$this->nameAndType($this->nothing, null),

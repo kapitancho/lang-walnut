@@ -5,7 +5,6 @@ namespace Walnut\Lang\NativeCode\Open;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -33,9 +32,7 @@ final readonly class With implements NativeMethod {
 			$valueType = $this->toBaseType($type->valueType);
 
 			$alignTypeWithValidator = static function() use ($typeRegistry, $methodAnalyser, $targetType, $valueType) {
-				$constructorType = $typeRegistry->atom(
-					new TypeNameIdentifier('Constructor')
-				);
+				$constructorType = $typeRegistry->core->constructor;
 				try {
 					$validatorResultType = $methodAnalyser->analyseMethod(
 						$constructorType,

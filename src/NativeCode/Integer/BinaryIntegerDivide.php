@@ -5,7 +5,6 @@ namespace Walnut\Lang\NativeCode\Integer;
 use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint as NumberIntervalEndpointInterface;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
@@ -75,7 +74,7 @@ final readonly class BinaryIntegerDivide implements NativeMethod {
 				return $parameterType->contains(0) ?
 					$typeRegistry->result(
 						$int,
-						$typeRegistry->atom(new TypeNameIdentifier('NotANumber'))
+						$typeRegistry->core->notANumber
 					) : $int;
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -94,7 +93,7 @@ final readonly class BinaryIntegerDivide implements NativeMethod {
 			if ($parameter instanceof IntegerValue) {
 				if ((int)(string)$parameter->literalValue === 0) {
 					return $programRegistry->valueRegistry->error(
-						$programRegistry->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
+						$programRegistry->valueRegistry->core->notANumber
 					);
 				}
                 return $programRegistry->valueRegistry->integer(

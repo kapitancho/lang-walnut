@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\Map;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
@@ -53,9 +52,7 @@ final readonly class ValuesWithoutKey implements NativeMethod {
 							PlusInfinity::value : max($targetType->range->maxLength - 1, 0),
 						$keyType
 					),
-					$typeRegistry->data(
-						new TypeNameIdentifier("MapItemNotFound")
-					)
+					$typeRegistry->core->mapItemNotFound
 				);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -75,8 +72,7 @@ final readonly class ValuesWithoutKey implements NativeMethod {
 				$values = $target->values;
 				if (!isset($values[$parameter->literalValue])) {
 					return $programRegistry->valueRegistry->error(
-						$programRegistry->valueRegistry->dataValue(
-							new TypeNameIdentifier('MapItemNotFound'),
+						$programRegistry->valueRegistry->core->mapItemNotFound(
 							$programRegistry->valueRegistry->record(['key' => $parameter])
 						)
 					);

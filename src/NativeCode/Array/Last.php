@@ -4,7 +4,6 @@ namespace Walnut\Lang\NativeCode\Array;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -43,13 +42,13 @@ final readonly class Last implements NativeMethod {
 					}
 					return $typeRegistry->result(
 						$targetType->restType,
-						$typeRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
+						$typeRegistry->core->itemNotFound
 					);
 				}
 				return $targetType->range->minLength > 0 ?
 					$targetType->itemType : $typeRegistry->result(
 						$targetType->itemType,
-						$typeRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
+						$typeRegistry->core->itemNotFound
 					);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
@@ -76,7 +75,7 @@ final readonly class Last implements NativeMethod {
 				return $values[$count - 1];
 			}
 			return $programRegistry->valueRegistry->error(
-				$programRegistry->valueRegistry->atom(new TypeNameIdentifier('ItemNotFound'))
+				$programRegistry->valueRegistry->core->itemNotFound
 			);
 		}
 		// @codeCoverageIgnoreStart

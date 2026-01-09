@@ -4,11 +4,11 @@ namespace Walnut\Lang\NativeCode\PasswordString;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Type\CoreType;
 use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\OpenValue;
@@ -26,7 +26,7 @@ final readonly class Hash implements NativeMethod {
 		Type $parameterType,
 	): Type {
 		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof OpenType && $targetType->name->equals(new TypeNameIdentifier('PasswordString'))) {
+		if ($targetType instanceof OpenType && $targetType->name->equals(CoreType::PasswordString->typeName())) {
 			return $typeRegistry->string(24, 255);
 		}
 		// @codeCoverageIgnoreStart
@@ -40,7 +40,7 @@ final readonly class Hash implements NativeMethod {
 		Value $parameter
 	): Value {
 		if ($target instanceof OpenValue && $target->type->name->equals(
-			new TypeNameIdentifier('PasswordString')
+			CoreType::PasswordString->typeName()
 		)) {
 			$passwordString = $target->value->valueOf('value');
 			if ($passwordString instanceof StringValue) {
