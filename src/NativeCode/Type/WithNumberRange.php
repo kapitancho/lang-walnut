@@ -99,36 +99,6 @@ final readonly class WithNumberRange implements NativeMethod {
 					return $programRegistry->valueRegistry->type($type);
 				}
 			}
-            /*
-			if ($typeValue instanceof IntegerType) {
-				if ($parameter->type->isSubtypeOf(
-					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('IntegerRange'))
-				)) {
-					$range = $parameter->value->values;
-					$minValue = $range['minValue'];
-					$maxValue = $range['maxValue'];
-					$result = $programRegistry->typeRegistry->integer(
-						$minValue instanceof IntegerValue ? $minValue->literalValue : MinusInfinity::value,
-						$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
-					);
-					return ($programRegistry->valueRegistry->type($result));
-				}
-			}
-			if ($typeValue instanceof RealType) {
-				if ($parameter->type->isSubtypeOf(
-					$programRegistry->typeRegistry->withName(new TypeNameIdentifier('RealRange'))
-				)) {
-					$range = $parameter->value->values;
-					$minValue = $range['minValue'];
-					$maxValue = $range['maxValue'];
-					$result = $programRegistry->typeRegistry->real(
-						$minValue instanceof RealValue || $minValue instanceof IntegerValue ? $minValue->literalValue : MinusInfinity::value,
-						$maxValue instanceof RealValue || $maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
-					);
-					return ($programRegistry->valueRegistry->type($result));
-				}
-			}
-            */
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid parameter value");

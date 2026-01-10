@@ -23,9 +23,9 @@ interface ValueRegistryCore {
 	public function hydrationError(RecordValue $value): DataValue;
 	public function indexOutOfRange(RecordValue $value): DataValue;
 	//public OpenValue        $integerRange                  { get; }
-	//public DataValue        $integerNumberIntervalEndpoint { get; }
-	//public OpenValue        $integerNumberInterval         { get; }
-	//public DataValue        $integerNumberRange            { get; }
+	public function integerNumberIntervalEndpoint(RecordValue $value): DataValue;
+	public function integerNumberInterval(RecordValue $value): OpenValue;
+	public function integerNumberRange(RecordValue $value): DataValue;
 	public function invalidIntegerRange(RecordValue $value): DataValue;
 	//public DataValue        $invalidLengthRange            { get; }
 	public function invalidJsonString(RecordValue $value): DataValue;
@@ -43,9 +43,9 @@ interface ValueRegistryCore {
 	//public DataValue        $passwordString                { get; }
 	public AtomValue        $plusInfinity                  { get; }
 	public AtomValue        $random                        { get; }
-	//public DataValue        $realNumberIntervalEndpoint    { get; }
-	//public OpenValue        $realNumberInterval            { get; }
-	//public DataValue        $realNumberRange               { get; }
+	public function realNumberIntervalEndpoint(RecordValue $value): DataValue;
+	public function realNumberInterval(RecordValue $value): OpenValue;
+	public function realNumberRange(RecordValue $value): DataValue;
 	//public OpenValue        $realRange                     { get; }
 	//public SealedValue      $regExp                        { get; }
 	public function regExpMatch(RecordValue $value): DataValue;

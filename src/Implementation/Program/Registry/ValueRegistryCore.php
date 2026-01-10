@@ -95,6 +95,16 @@ final class ValueRegistryCore implements ValueRegistryCoreInterface {
 		return $this->valueRegistry->dataValue(CoreType::IndexOutOfRange->typeName(), $value);
 	}
 
+	public function integerNumberIntervalEndpoint(RecordValue $value): DataValue {
+		return $this->valueRegistry->dataValue(CoreType::IntegerNumberIntervalEndpoint->typeName(), $value);
+	}
+	public function integerNumberInterval(RecordValue $value): OpenValue {
+		return $this->valueRegistry->openValue(CoreType::IntegerNumberInterval->typeName(), $value);
+	}
+	public function integerNumberRange(RecordValue $value): DataValue {
+		return $this->valueRegistry->dataValue(CoreType::IntegerNumberRange->typeName(), $value);
+	}
+
 	public function invalidIntegerRange(RecordValue $value): DataValue {
 		return $this->valueRegistry->dataValue(CoreType::InvalidIntegerRange->typeName(), $value);
 	}
@@ -126,6 +136,17 @@ final class ValueRegistryCore implements ValueRegistryCoreInterface {
 	public function mapItemNotFound(RecordValue $value): DataValue {
 		return $this->valueRegistry->dataValue(CoreType::MapItemNotFound->typeName(), $value);
 	}
+
+	public function realNumberIntervalEndpoint(RecordValue $value): DataValue {
+		return $this->valueRegistry->dataValue(CoreType::RealNumberIntervalEndpoint->typeName(), $value);
+	}
+	public function realNumberInterval(RecordValue $value): OpenValue {
+		return $this->valueRegistry->openValue(CoreType::RealNumberInterval->typeName(), $value);
+	}
+	public function realNumberRange(RecordValue $value): DataValue {
+		return $this->valueRegistry->dataValue(CoreType::RealNumberRange->typeName(), $value);
+	}
+
 
 	public function regExpMatch(RecordValue $value): DataValue {
 		return $this->valueRegistry->dataValue(CoreType::RegExpMatch->typeName(), $value);

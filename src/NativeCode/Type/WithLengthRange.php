@@ -68,49 +68,48 @@ final readonly class WithLengthRange implements NativeMethod {
 			if ($parameter->type->isSubtypeOf(
 				$programRegistry->typeRegistry->core->lengthRange
 			)) {
-				if ($typeValue instanceof StringType) {
+				if (
+					$typeValue instanceof StringType ||
+					$typeValue instanceof ArrayType ||
+					$typeValue instanceof MapType ||
+					$typeValue instanceof SetType
+				) {
 					$range = $parameter->value->values;
 					$minValue = $range['minLength'];
 					$maxValue = $range['maxLength'];
-					$result = $programRegistry->typeRegistry->string(
-						$minValue->literalValue,
-						$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
-					);
-					return $programRegistry->valueRegistry->type($result);
-				}
-				if ($typeValue instanceof ArrayType) {
-					$range = $parameter->value->values;
-					$minValue = $range['minLength'];
-					$maxValue = $range['maxLength'];
-					$result = $programRegistry->typeRegistry->array(
-						$typeValue->itemType,
-						$minValue->literalValue,
-						$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
-					);
-					return $programRegistry->valueRegistry->type($result);
-				}
-				if ($typeValue instanceof MapType) {
-					$range = $parameter->value->values;
-					$minValue = $range['minLength'];
-					$maxValue = $range['maxLength'];
-					$result = $programRegistry->typeRegistry->map(
-						$typeValue->itemType,
-						$minValue->literalValue,
-						$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
-						$typeValue->keyType
-					);
-					return $programRegistry->valueRegistry->type($result);
-				}
-				if ($typeValue instanceof SetType) {
-					$range = $parameter->value->values;
-					$minValue = $range['minLength'];
-					$maxValue = $range['maxLength'];
-					$result = $programRegistry->typeRegistry->set(
-						$typeValue->itemType,
-						$minValue->literalValue,
-						$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
-					);
-					return $programRegistry->valueRegistry->type($result);
+
+					if ($typeValue instanceof StringType) {
+						$result = $programRegistry->typeRegistry->string(
+							$minValue->literalValue,
+							$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
+						);
+						return $programRegistry->valueRegistry->type($result);
+					}
+					if ($typeValue instanceof ArrayType) {
+						$result = $programRegistry->typeRegistry->array(
+							$typeValue->itemType,
+							$minValue->literalValue,
+							$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
+						);
+						return $programRegistry->valueRegistry->type($result);
+					}
+					if ($typeValue instanceof MapType) {
+						$result = $programRegistry->typeRegistry->map(
+							$typeValue->itemType,
+							$minValue->literalValue,
+							$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
+							$typeValue->keyType
+						);
+						return $programRegistry->valueRegistry->type($result);
+					}
+					if ($typeValue instanceof SetType) {
+						$result = $programRegistry->typeRegistry->set(
+							$typeValue->itemType,
+							$minValue->literalValue,
+							$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
+						);
+						return $programRegistry->valueRegistry->type($result);
+					}
 				}
 			}
 		}

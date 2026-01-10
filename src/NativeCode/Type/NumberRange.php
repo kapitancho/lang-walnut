@@ -53,18 +53,21 @@ final readonly class NumberRange implements NativeMethod {
 		if ($target instanceof TypeValue) {
 			$typeValue = $this->toBaseType($target->typeValue);
 			if ($typeValue instanceof IntegerType || $typeValue instanceof RealType) {
-				$prefix = $typeValue instanceof IntegerType ? 'Integer' : 'Real';
-				$vb = $typeValue instanceof IntegerType ?
+				$isInteger = $typeValue instanceof IntegerType;
+
+				$vb = $isInteger ?
 					fn(Number $number) => $programRegistry->valueRegistry->integer($number) :
 					fn(Number $number) => $programRegistry->valueRegistry->real($number);
+				$r = fn(NumberIntervalEndpoint $e) =>
+					$programRegistry->valueRegistry->record([
+						'value' => $vb($e->value),
+						'inclusive' => $programRegistry->valueRegistry->boolean($e->inclusive)
+					]);
+
 				$data = fn(NumberIntervalEndpoint $e) =>
-					$programRegistry->valueRegistry->dataValue(
-						new TypeNameIdentifier($prefix . 'NumberIntervalEndpoint'),
-						$programRegistry->valueRegistry->record([
-							'value' => $vb($e->value),
-							'inclusive' => $programRegistry->valueRegistry->boolean($e->inclusive)
-						])
-					);
+					$isInteger ?
+						$programRegistry->valueRegistry->core->integerNumberIntervalEndpoint($r($e)) :
+						$programRegistry->valueRegistry->core->realNumberIntervalEndpoint($r($e));
 
 				$numberRange = $typeValue->numberRange;
 				$intervals = [];
@@ -75,20 +78,21 @@ final readonly class NumberRange implements NativeMethod {
 					$end = $interval->end instanceof PlusInfinity ?
 						$programRegistry->valueRegistry->core->plusInfinity :
 						$data($interval->end);
-					$intervals[] = $programRegistry->valueRegistry->openValue(
-						new TypeNameIdentifier($prefix . 'NumberInterval'),
-						$programRegistry->valueRegistry->record([
-							'start' => $start,
-							'end' => $end,
-						])
-					);
+					$interval = $programRegistry->valueRegistry->record([
+						'start' => $start,
+						'end' => $end,
+					]);
+					$intervals[] =
+						$isInteger ?
+						$programRegistry->valueRegistry->core->integerNumberInterval($interval) :
+						$programRegistry->valueRegistry->core->realNumberInterval($interval);
 				}
-				return $programRegistry->valueRegistry->dataValue(
-					new TypeNameIdentifier($prefix . 'NumberRange'),
-					$programRegistry->valueRegistry->record([
-						'intervals' => $programRegistry->valueRegistry->tuple($intervals)
-					])
-				);
+				$intervalsRec = $programRegistry->valueRegistry->record([
+					'intervals' => $programRegistry->valueRegistry->tuple($intervals)
+				]);
+				return $isInteger ?
+						$programRegistry->valueRegistry->core->integerNumberRange($intervalsRec) :
+						$programRegistry->valueRegistry->core->realNumberRange($intervalsRec);
 			}
 		}
 		// @codeCoverageIgnoreStart
