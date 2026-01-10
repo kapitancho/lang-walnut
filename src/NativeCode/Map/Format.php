@@ -5,6 +5,7 @@ namespace Walnut\Lang\NativeCode\Map;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
+use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -52,22 +53,36 @@ final readonly class Format implements NativeMethod {
 
 			// Parameter must be a String (the format template)
 			if ($parameterType instanceof StringType) {
+				$paramMin = false;
+				$paramMax = false;
 				$isSafe = false;
 				if ($targetType instanceof RecordType && $parameterType instanceof StringSubsetType) {
 					$isSafe = true;
 					foreach ($parameterType->subsetValues as $subsetValue) {
+						$l = mb_strlen($subsetValue);
 						if (preg_match_all('/\{([a-zA-Z_][a-zA-Z0-9_]*)\}/', $subsetValue, $matches)) {
-							foreach ($matches[1] as $key) {
+							foreach ($matches[1] as $idx => $key) {
+								$l -= mb_strlen($matches[0][$idx]);
 								// If any key is not in the map, it's not safe
 								if (($targetType->types[$key] ?? null) === null) {
 									$isSafe = false;
 									break 2;
 								}
 							}
+						} else {
+							if ($paramMax === false || $l > $paramMax) {
+								$paramMax = $l;
+							}
+						}
+						if ($paramMin === false || $l < $paramMin) {
+							$paramMin = $l;
 						}
 					}
 				}
-				$returnType = $typeRegistry->string();
+				$returnType = $typeRegistry->string(
+					$paramMin === false ? 0 : $paramMin,
+					$paramMax === false ? PlusInfinity::value : $paramMax
+				);
 				return $isSafe ? $returnType : $typeRegistry->result(
 					$returnType,
 					$typeRegistry->core->cannotFormatString

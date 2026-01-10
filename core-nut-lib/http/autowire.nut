@@ -3,8 +3,8 @@ module $http/autowire %% $http/message, $http/request-handler:
 RoutePattern := #String;
 RoutePatternDoesNotMatch := ();
 
-HttpAutoWireRequestBodyToParameter = ^{HttpRequest} => Result<Map<JsonValue>, Any>;
-HttpAutoWireResponseBodyFromParameter = ^Any => Result<{HttpResponse}, Any>;
+HttpAutoWireRequestBodyToParameter = ^{HttpRequest} => Result<Map<JsonValue>>;
+HttpAutoWireResponseBodyFromParameter = ^Any => Result<{HttpResponse}>;
 
 HttpAutoWireRouteDoesNotMatch := ();
 HttpAutoWireRoute := $[
@@ -23,7 +23,7 @@ HttpAutoWireRoute->handleRequest(^request: {HttpRequest} => Result<{HttpResponse
         }
     };
     request = request->shape(`HttpRequest);
-    runner = ^ => Result<{HttpResponse}, Any> :: {
+    runnerResult = :: {
         ?whenValueOf(request.method) {
             $method: {
                 matchResult = $pattern->matchAgainst(request.target);
@@ -46,7 +46,6 @@ HttpAutoWireRoute->handleRequest(^request: {HttpRequest} => Result<{HttpResponse
             ~: @HttpAutoWireRouteDoesNotMatch
         }
     };
-    runnerResult = runner(null);
     ?whenTypeOf(runnerResult) {
         `Error<HttpAutoWireRouteDoesNotMatch>: runnerResult,
         `Error: err(runnerResult->error),

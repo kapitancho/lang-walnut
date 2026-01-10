@@ -17,6 +17,8 @@ HttpCorsMiddleware ==> HttpMiddleware %% [~CorsAllowedOrigins, ~CorsAllowedHeade
             ~: #response
         }
     };
+    with = ^[headerName: String, values: Array<String>] => ^{HttpResponse} => {HttpResponse} ::
+        ^r: {HttpResponse} => {HttpResponse} :: applyHeader[headerName: #headerName, values: #values, response: r];
     ^[request: {HttpRequest}, handler: {HttpRequestHandler}] => {HttpResponse} :: {
         response = ?whenValueOf(#request->shape(`HttpRequest).method) {
             HttpRequestMethod.options: [
@@ -26,11 +28,10 @@ HttpCorsMiddleware ==> HttpMiddleware %% [~CorsAllowedOrigins, ~CorsAllowedHeade
                 body: null
             ],
             ~: #handler->shape(`HttpRequestHandler)(#request)
-        };
-        response = applyHeader['Access-Control-Allow-Origin', %corsAllowedOrigins, response];
-        response = applyHeader['Access-Control-Allow-Headers', %corsAllowedHeaders, response];
-        response = applyHeader['Access-Control-Expose-Headers', %corsExposedHeaders, response];
-        response = applyHeader['Access-Control-Allow-Methods', %corsAllowedMethods->map(^m: HttpRequestMethod => String :: m->asString), response];
-        response
+        }
+        ->apply(with['Access-Control-Allow-Origin', %corsAllowedOrigins])
+        ->apply(with['Access-Control-Allow-Headers', %corsAllowedHeaders])
+        ->apply(with['Access-Control-Expose-Headers', %corsExposedHeaders])
+        ->apply(with['Access-Control-Allow-Methods', %corsAllowedMethods->map(^m: HttpRequestMethod => String :: m->asString)]);
     }
 };

@@ -232,13 +232,13 @@ MyEmptyViewRenderer = ^[:] => MyView;
             name: 'Autowire Broken View response',
             expected: [
                 statusCode: 500,
-                body: 'Unable to render template of type MyBrokenView; Reason: @CastNotAvailable![\n\tfrom: type{MyBrokenView},\n\tto: type{Template}\n]'
+                body: 'Unable to render template of type MyBrokenView; Reason: CastNotAvailable![\n\tfrom: type{MyBrokenView},\n\tto: type{Template}\n]'
             ],
             actual : ^ :: call[HttpRequestMethod.get, '/view/broken', '']
         ],
         ^ => TestResult :: TestResult[
             name: 'Autowire View response not accepted',
-            expected: [statusCode: 500, body: 'Unable to render template of type MyView; Reason: @UnableToRenderTemplate[type: type{MyView}]'],
+            expected: [statusCode: 500, body: 'Unable to render template of type MyView; Reason: UnableToRenderTemplate[type: type{MyView}]'],
             actual : ^ :: call[HttpRequestMethod.get, '/view/abc/empty', '']
         ],
         ^ => TestResult :: TestResult[

@@ -37,7 +37,7 @@ IntegerNumberInterval := #[
     `[start: IntegerNumberIntervalEndpoint, end: IntegerNumberIntervalEndpoint]:
         ?when (
             #.start.value > #.end.value ||
-            #.start.value == #.end.value && {!#.start.inclusive || !#.end.inclusive}
+            #.start.value == #.end.value && (!#.start.inclusive || !#.end.inclusive)
         ) { => @InvalidIntegerRange![min: #.start.value, max: #.end.value] }
 };
 IntegerNumberRange := [intervals: Array<IntegerNumberInterval, 1..>];
@@ -55,8 +55,8 @@ RealNumberInterval := #[
 ] @ InvalidRealRange :: ?whenTypeOf(#) {
     `[start: RealNumberIntervalEndpoint, end: RealNumberIntervalEndpoint]:
         ?when (
-            {#.start.value > #.end.value} ||
-            {#.start.value == #.end.value && {{!#.start.inclusive} || {!#.end.inclusive}}}
+            #.start.value > #.end.value ||
+            #.start.value == #.end.value && (!#.start.inclusive || !#.end.inclusive)
         ) { => @InvalidRealRange![min: #.start.value, max: #.end.value] }
 };
 RealNumberRange := [intervals: Array<RealNumberInterval, 1..>];
@@ -91,9 +91,7 @@ UnknownEnumerationValue := [enumeration: Type, value: String];
 
 /* hydration */
 HydrationError := [value: Any, hydrationPath: String, errorMessage: String];
-HydrationError->errorMessage(=> String) :: ''->concatList[
-    'Error in ', $hydrationPath, ': ', $errorMessage
-];
+HydrationError->errorMessage(=> String) :: [$hydrationPath, $errorMessage]->format('Error in {0}: {1}');
 
 /* IO etc. */
 ExternalError := $[errorType: String, originalError: Any, errorMessage: String];

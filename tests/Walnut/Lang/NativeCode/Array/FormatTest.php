@@ -83,7 +83,7 @@ final class FormatTest extends CodeExecutionTestHelper {
 	public function testFormatArrayWithMinLength(): void {
 		$result = $this->executeCodeSnippet(
 			"fmt[1, 'hello', 42, -17]",
-			valueDeclarations: "fmt = ^v: Array<Integer|String, 3..> => String :: v->format('{0} / {1}');"
+			valueDeclarations: "fmt = ^v: Array<Integer|String, 3..> => String<3..> :: v->format('{0} / {1}');"
 		);
 		$this->assertEquals("'1 / hello'", $result);
 	}
@@ -92,9 +92,17 @@ final class FormatTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet(
 			"{D!'format 1: {0} / {1}'}->fmt[1, 'hello']",
 			"D := String['format 1: {0} / {1}', 'format 2: {0}', 'format 3: empty'];" .
-			"D->fmt(^v: [Integer, String] => String) :: v->format($->value);"
+			"D->fmt(^v: [Integer, String] => String<10..>) :: v->format($->value);"
 		);
 		$this->assertEquals("'format 1: 1 / hello'", $result);
+	}
+
+	public function testFormatStringNoPlaceholders(): void {
+		$result = $this->executeCodeSnippet(
+			"fmt['1']",
+			valueDeclarations: "fmt = ^a: [...String] => String<5> :: a->format('hello');"
+		);
+		$this->assertEquals("'hello'", $result);
 	}
 
 	public function testFormatStringSubsetUnsafe(): void {

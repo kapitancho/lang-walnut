@@ -14,15 +14,12 @@ DatabaseTableName = String<1..>;
 DatabaseFieldName = String<1..>;
 
 InsertQuery := $[tableName: DatabaseTableName, values: Map<QueryValue>];
-InsertQuery ==> DatabaseSqlQuery %% ~SqlQuoter :: 'INSERT INTO '
-    ->concatList[
-        sqlQuoter.quoteIdentifier($tableName),
-        ' (',
-        $values->keys->map(^String => String :: sqlQuoter.quoteIdentifier(#))->combineAsString(', '),
-        ') VALUES (',
-        $values->values->map(^QueryValue => String :: #->asSqlString)->combineAsString(', '),
-        ')'
-    ];
+InsertQuery ==> DatabaseSqlQuery %% ~SqlQuoter ::
+    [
+        tableName: sqlQuoter.quoteIdentifier($tableName),
+        columns: $values->keys->map(^k: String => String :: sqlQuoter.quoteIdentifier(k))->combineAsString(', '),
+        valueStrings: $values->values->map(^qv: QueryValue => String :: qv->asSqlString)->combineAsString(', ')
+    ]->format('INSERT INTO {tableName} ({columns}) VALUES ({valueStrings})');
 
 TableField := $[tableAlias: DatabaseTableName, fieldName: DatabaseFieldName];
 TableField ==> SqlString %% ~SqlQuoter ::
@@ -73,27 +70,22 @@ SqlQueryFilter := $[expression: SqlExpression];
 SqlQueryFilter ==> SqlString :: $expression->asSqlString;
 
 UpdateQuery := $[tableName: DatabaseTableName, values: Map<QueryValue>, queryFilter: SqlQueryFilter];
-UpdateQuery ==> DatabaseSqlQuery %% ~SqlQuoter :: 'UPDATE '
-    ->concatList[
-        sqlQuoter.quoteIdentifier($tableName),
-        ' SET ',
-        $values->mapKeyValue(^[key: String, value: QueryValue] => String :: ''->concatList[
-            sqlQuoter.quoteIdentifier(#key), ' = ', #value->asSqlString
-        ])->values->combineAsString(', '),
-        ' WHERE ',
-        $queryFilter->asSqlString
-    ];
+UpdateQuery ==> DatabaseSqlQuery %% ~SqlQuoter :: [
+    tableName: sqlQuoter.quoteIdentifier($tableName),
+    setClauses: $values->mapKeyValue(^[key: String, value: QueryValue] => String :: ''->concatList[
+        sqlQuoter.quoteIdentifier(#key), ' = ', #value->asSqlString
+    ])->values->combineAsString(', '),
+    whereClause: $queryFilter->asSqlString
+]->format('UPDATE {tableName} SET {setClauses} WHERE {whereClause}');
 
 DeleteQuery := $[tableName: DatabaseTableName, queryFilter: SqlQueryFilter];
-DeleteQuery ==> DatabaseSqlQuery %% ~SqlQuoter :: 'DELETE FROM '
-    ->concatList[
-        sqlQuoter.quoteIdentifier($tableName),
-        ' WHERE ',
-        $queryFilter->asSqlString
-    ];
+DeleteQuery ==> DatabaseSqlQuery %% ~SqlQuoter :: [
+    tableName: sqlQuoter.quoteIdentifier($tableName),
+    whereClause: $queryFilter->asSqlString
+]->format('DELETE FROM {tableName} WHERE {whereClause}');
 
 SqlSelectLimit := $[limit: Integer<1..>, offset: Integer<0..>];
-SqlSelectLimit ==> SqlString :: ['LIMIT', $limit->asString, 'OFFSET', $offset->asString]->combineAsString(' ');
+SqlSelectLimit ==> SqlString :: [limit: $limit, offset: $offset]->format('LIMIT {limit} OFFSET {offset}');
 
 SqlOrderByDirection := (Asc, Desc);
 SqlOrderByDirection ==> SqlString :: ?whenValueOf($) {
@@ -124,10 +116,11 @@ SqlTableJoin := $[
     queryFilter: SqlQueryFilter
 ];
 SqlTableJoin ==> SqlString %% ~SqlQuoter :: [
-    $joinType->asSqlString, ' ',
-    sqlQuoter.quoteIdentifier($tableName), ' AS ', sqlQuoter.quoteIdentifier($tableAlias),
-    ' ON ', $queryFilter->asSqlString
-]->combineAsString(' ');
+    joinType: $joinType->asSqlString,
+    tableName: sqlQuoter.quoteIdentifier($tableName),
+    tableAlias: sqlQuoter.quoteIdentifier($tableAlias),
+    queryFilter: $queryFilter->asSqlString
+]->format('{joinType} {tableName} AS {tableAlias} ON {queryFilter}');
 
 SqlSelectFieldList := $[fields: Map<DatabaseFieldName|TableField|QueryValue>];
 SqlSelectFieldList ==> SqlString %% ~SqlQuoter :: $fields->mapKeyValue(^[key: String, value: DatabaseFieldName|TableField|QueryValue] => String :: ''->concatList[
@@ -145,17 +138,18 @@ SelectQuery := $[
     orderBy: SqlOrderByFields|Null,
     limit: SqlSelectLimit|Null
 ];
-SelectQuery ==> DatabaseSqlQuery %% ~SqlQuoter ::
-    'SELECT ' +
-    $fields->asSqlString +
-    ' FROM ' + sqlQuoter.quoteIdentifier($tableName) +
-    $joins->map(^SqlTableJoin => String :: #->asSqlString)->combineAsString(' ') +
-    ' WHERE ' + $queryFilter->asSqlString +
-    ?whenTypeOf($orderBy) {
-        `SqlOrderByFields: $orderBy->asSqlString,
+SelectQuery ==> DatabaseSqlQuery %% ~SqlQuoter :: [
+    fields: $fields->asSqlString,
+    tableName: sqlQuoter.quoteIdentifier($tableName),
+    joins: ?whenTypeOf($joins) { `Array<1..> : ' ', ~: '' } +
+        $joins->map(^SqlTableJoin => SqlString :: #->asSqlString)->combineAsString(' '),
+    queryFilter: $queryFilter->asSqlString,
+    orderBy: ?whenTypeOf($orderBy) {
+        `SqlOrderByFields: ' ' + $orderBy->asSqlString,
         ~: ''
-    } +
-    ?whenTypeOf($limit) {
-        `SqlSelectLimit: $limit->asSqlString,
+    },
+    limit: ?whenTypeOf($limit) {
+        `SqlSelectLimit: ' ' + $limit->asSqlString,
         ~: ''
-    };
+    }
+]->format('SELECT {fields} FROM {tableName}{joins} WHERE {queryFilter}{orderBy}{limit}');

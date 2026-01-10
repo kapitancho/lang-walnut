@@ -10,8 +10,9 @@ Template := #Mutable<String>;
 TemplateRenderer := ();
 TemplateRenderer->render(^view => Result<String, UnableToRenderTemplate>) :: {
     tpl = view->as(`Template);
-    ?whenTypeOf(tpl) {
-        `Template: tpl->value->value,
-        ~: @UnableToRenderTemplate[type: view->type, reason: tpl->printed]
-    }
+    ?whenIsError(tpl) {
+        @UnableToRenderTemplate[type: view->type, reason: tpl->error->printed]
+    } ~ {
+        tpl->value->value
+    };
 };

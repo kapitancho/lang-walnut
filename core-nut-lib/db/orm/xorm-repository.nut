@@ -58,7 +58,7 @@ OxRepository->insertOne(^v: {DatabaseQueryDataRow} => *Result<Null, DuplicateEnt
 OxRepository->deleteOne(^v: DatabaseValue => *Result<Null, EntryNotFound>) %% ~DatabaseConnector :: {
     query = $ox->deleteQuery
         *> ('Failed to get query for orm model');
-    result = {databaseConnector->execute[query: query, boundParameters: [:]->withKeyValue[key: $ox->keyField, value: v]]}
+    result = databaseConnector->execute[query: query, boundParameters: [:]->withKeyValue[key: $ox->keyField, value: v]]
         -> errorAsExternal('Failed to delete entry from the database');
     ?whenTypeOf(result) {
         `Integer<1..1> : null,
@@ -71,7 +71,7 @@ OxRepository->updateOne(^v: {DatabaseQueryDataRow} => *Result<Null, EntryNotFoun
     entryId = v->item($ox->keyField) *> ('Failed to get entry key');
     query = $ox->updateQuery
         *> ('Failed to get query for orm model');
-    result = {%databaseConnector->execute[query: query, boundParameters: v]}
+    result = %databaseConnector->execute[query: query, boundParameters: v]
         *> ('Failed to update entry in the database');
     ?whenTypeOf(result) {
         `Integer<1..1> : null,

@@ -5,6 +5,7 @@ namespace Walnut\Lang\NativeCode\Array;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
 use Walnut\Lang\Blueprint\Code\Execution\FunctionReturn;
+use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -53,18 +54,32 @@ final readonly class Format implements NativeMethod {
 
 			// Parameter must be a String (the format template)
 			if ($parameterType instanceof StringType) {
+				$paramMin = false;
+				$paramMax = false;
 				$isSafe = false;
 				if ($parameterType instanceof StringSubsetType) {
 					$max = -1;
 					foreach ($parameterType->subsetValues as $subsetValue) {
+						$l = mb_strlen($subsetValue);
 						if (preg_match_all('/\{(\d+)\}/', $subsetValue, $matches)) {
+							foreach ($matches[0] as $matchPiece) { $l -= mb_strlen($matchPiece); }
 							$max = max($max, count($matches[1]) ? (int)max($matches[1]) : -1);
+						} else {
+							if ($paramMax === false || $l > $paramMax) {
+								$paramMax = $l;
+							}
+						}
+						if ($paramMin === false || $l < $paramMin) {
+							$paramMin = $l;
 						}
 					}
 					$isSafe = $targetType->range->minLength > $max;
 				}
 
-				$returnType = $typeRegistry->string();
+				$returnType = $typeRegistry->string(
+					$paramMin === false ? 0 : $paramMin,
+					$paramMax === false ? PlusInfinity::value : $paramMax
+				);
 				return $isSafe ? $returnType : $typeRegistry->result(
 					$returnType,
 					$typeRegistry->core->cannotFormatString

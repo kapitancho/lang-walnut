@@ -13,9 +13,9 @@ module $db/sql/quoter-mysql %% $db/sql/query-builder:
         quoteValue: ^v: String|Integer|Real|Boolean|Null => String :: ?whenTypeOf(v) {
             `String: [
                 value,
-                {{v
-                    ->replace[match: valueChars.0, replacement: escapedValueChars.0]}
-                    ->replace[match: valueChars.1, replacement: escapedValueChars.1]}
+                v
+                    ->replace[match: valueChars.0, replacement: escapedValueChars.0]
+                    ->replace[match: valueChars.1, replacement: escapedValueChars.1]
                     ->replace[match: valueChars.2, replacement: escapedValueChars.2],
                 value
             ]->combineAsString(''),

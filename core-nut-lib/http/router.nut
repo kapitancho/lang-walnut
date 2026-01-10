@@ -9,7 +9,11 @@ HttpLookupRouter ==> HttpMiddleware %% [~DependencyContainer, ~HttpResponseBuild
         handler = %dependencyContainer->valueOf(#type);
         rh = handler->as(`HttpRequestHandler);
         ?whenIsError(rh) {
-            %httpResponseBuilder(500)->withBody('Invalid handler type: ' + #type->asString + ' handler: ' + handler->printed + ', error: ' + rh->printed)
+            %httpResponseBuilder(500)->withBody(
+                [#type->asString, handler->printed, rh->printed]->format(
+                    'Invalid handler type: {0} handler: {1}, error: {2}'
+                )
+            )
         } ~ {
             rh(#request->shape(`HttpRequest))
         };

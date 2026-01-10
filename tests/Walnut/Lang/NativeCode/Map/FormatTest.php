@@ -88,11 +88,19 @@ final class FormatTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@CannotFormatString![\n\tvalues: [a: 1, b: 'hello'],\n\tformat: '{a} / {c}'\n]", $result);
 	}
 
+	public function testFormatStringNoPlaceholders(): void {
+		$result = $this->executeCodeSnippet(
+			"fmt[a: '1']",
+			valueDeclarations: "fmt = ^m: [: ...String] => String<5> :: m->format('hello');"
+		);
+		$this->assertEquals("'hello'", $result);
+	}
+
 	public function testFormatStringSubset(): void {
 		$result = $this->executeCodeSnippet(
 			"{D!'format 1: {a} / {b}'}->fmt[a: 1, b: 'hello']",
 			"D := String['format 1: {a} / {b}', 'format 2: {a}', 'format 3: empty'];" .
-			"D->fmt(^v: [a: Integer, b: String] => String) :: v->format($->value);"
+			"D->fmt(^v: [a: Integer, b: String] => String<10..>) :: v->format($->value);"
 		);
 		$this->assertEquals("'format 1: 1 / hello'", $result);
 	}
