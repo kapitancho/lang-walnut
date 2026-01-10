@@ -56,7 +56,7 @@ test $datetime:
         ^ => TestResult :: TestResult[
             name: 'Valid Time From String Test',
             expected: '14:30:00',
-            actual : ^ :: {'14:30:00'=>asTime}->asString
+            actual : ^ :: '14:30:00'->asTime?->asString
         ],
         ^ => TestResult :: TestResult[
             name: 'Valid Time From Json Array Test',

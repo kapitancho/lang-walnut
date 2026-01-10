@@ -31,7 +31,7 @@ final readonly class ParserStateRunner implements ParserStateRunnerInterface {
 		$stateRepeatProtection = 0;
 		while($s->i < $l) {
 			$token = $tokens[$s->i];
-			if (++$ctr > 20000) {
+			if (++$ctr > 200000) {
 				// @codeCoverageIgnoreStart
 				throw new ParserException($s, "Recursion limit reached", $token, $sourceLocator->moduleName);
 				// @codeCoverageIgnoreEnd

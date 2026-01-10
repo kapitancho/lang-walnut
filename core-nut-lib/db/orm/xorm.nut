@@ -23,15 +23,15 @@ Ox[~Type] @ UnknownOrmModel|UnknownFieldTypes :: {
 
     fieldTypesHelper = ^ t: Type => Result<Map<Type>, UnknownFieldTypes> :: {
         ?whenTypeOf(t) {
-            `Type<Data>: fieldTypesHelper=>invoke(t->valueType),
-            `Type<Open>: fieldTypesHelper=>invoke(t->valueType),
+            `Type<Data>: fieldTypesHelper(t->valueType)?,
+            `Type<Open>: fieldTypesHelper(t->valueType)?,
             `Type<Record>: t->itemTypes,
-            `Type<Alias>: fieldTypesHelper=>invoke(t->aliasedType),
-            `Type<Type>: fieldTypesHelper=>invoke(t->refType),
+            `Type<Alias>: fieldTypesHelper(t->aliasedType)?,
+            `Type<Type>: fieldTypesHelper(t->refType)?,
             ~: @UnknownFieldTypes
         }
     };
-    fieldTypes = fieldTypesHelper=>invoke(#type);
+    fieldTypes = fieldTypesHelper(#type)?;
     [ormModel: ormModel, fieldTypes: fieldTypes]
 };
 Ox->keyField(=> DatabaseFieldName) :: $ormModel.keyField;

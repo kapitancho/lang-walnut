@@ -13,7 +13,7 @@ JsonRequestBody ==> HttpAutoWireRequestBodyToParameter ::
             `String: body,
             ~: ''
         };
-        value = body=>jsonDecode;
+        value = body->jsonDecode;
         ?whenTypeOf(value) {
             `Error<InvalidJsonString>: value,
             `JsonValue: [:]->withKeyValue[key: $valueKey, value: value]
