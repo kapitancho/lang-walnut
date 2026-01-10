@@ -2,8 +2,10 @@
 <?php
 require __DIR__ . '/inc/autoload.php';
 
+use Walnut\Lang\Blueprint\AST\Parser\ParserException;
 use Walnut\Lang\Blueprint\Compilation\Module\ModuleDependencyException;
 use Walnut\Lang\Blueprint\Program\InvalidEntryPointDependency;
+use Walnut\Lang\Blueprint\Program\ProgramAnalyserException;
 use Walnut\Lang\Implementation\Compilation\CompilerFactory;
 use Walnut\Lang\Implementation\Compilation\Module\PackageConfiguration\JsonFilePackageConfigurationProvider;
 use Walnut\Lang\Implementation\Compilation\Module\SourceFinder\CallbackSourceFinder;
@@ -35,6 +37,12 @@ try {
     $ep = new CliEntryPoint(new CliEntryPointBuilder($compiler));
     $content = $ep->call($source, ... $input);
     echo $content, PHP_EOL;
+} catch (ParserException $m) {
+    echo "Parser Error: ", $m->getMessage(), PHP_EOL;
+    exit(1);
+} catch (ProgramAnalyserException $m) {
+    echo "Compilation Error: ", $m->getMessage(), PHP_EOL;
+    exit(1);
 } catch (ModuleDependencyException $m) {
     echo "Error: ", $m->getMessage(), PHP_EOL;
     exit(1);
