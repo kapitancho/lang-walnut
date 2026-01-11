@@ -33,19 +33,15 @@ final readonly class With implements NativeMethod {
 
 			$alignTypeWithValidator = static function() use ($typeRegistry, $methodAnalyser, $targetType, $valueType) {
 				$constructorType = $typeRegistry->core->constructor;
-				try {
-					$validatorResultType = $methodAnalyser->analyseMethod(
-						$constructorType,
-						new MethodNameIdentifier('as' . $targetType->name->identifier),
-						$valueType
+				$validatorResultType = $methodAnalyser->safeAnalyseMethod(
+					$constructorType,
+					new MethodNameIdentifier('as' . $targetType->name->identifier),
+					$valueType
+				);
+				if ($validatorResultType instanceof ResultType) {
+					return $typeRegistry->result(
+						$targetType, $validatorResultType->errorType
 					);
-					if ($validatorResultType instanceof ResultType) {
-						return $typeRegistry->result(
-							$targetType, $validatorResultType->errorType
-						);
-					}
-				} catch (AnalyserException) {
-					// Intentionally left blank as no validator is found
 				}
 				return $targetType;
 			};

@@ -2,14 +2,15 @@
 
 namespace Walnut\Lang\Blueprint\Compilation\AST;
 
-use RuntimeException;
 use Throwable;
 use Walnut\Lang\Blueprint\AST\Node\SourceNode;
+use Walnut\Lang\Blueprint\Compilation\CompilationException;
 
-final class AstCompilationException extends RuntimeException {
+final class AstCompilationException extends CompilationException {
 	public function __construct(public SourceNode $node, string $message, Throwable|null $previous = null) {
 		parent::__construct(
-			message: sprintf("[%s] at %s", $message, $this->node->sourceLocation->startPosition),
+			message: $message,
+			//message: sprintf("[%s] at %s", $message, $this->node->sourceLocation->startPosition),
 			previous: $previous
 		);
 	}

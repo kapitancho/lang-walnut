@@ -1694,7 +1694,10 @@ final readonly class ParserStateMachine {
 					} elseif (in_array($token->patternMatch->text, ['true', 'false', 'null', 'type'], true)) {
 						$this->s->stay(3301);
 					} else {
-						$this->s->result = ['var_name' => $token->patternMatch->text];
+						$this->s->result = [
+							'var_name' => $token->patternMatch->text,
+							'startPosition' => $token->sourcePosition
+						];
 						$this->s->move(212);
 					}
 				},

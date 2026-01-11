@@ -47,35 +47,38 @@ final readonly class Compiler implements CompilerInterface {
 				$this->moduleLookupContext
 			);
 		} catch (ModuleDependencyException|ParserException $e) {
-			return new CompilationResult(
-				$e,
+			return new FailedCompilationResult(
+				$programContext,
 				null,
-				$programContext
+				null,
+				$e,
 			);
 		}
 		$astCompiler = $this->getAstCompiler($programContext);
 		try {
 			$astCompiler->compileProgram($rootNode);
 		} catch (AstProgramCompilationException $e) {
-			return new CompilationResult(
+			return new FailedCompilationResult(
+				$programContext,
 				$rootNode,
+				null,
 				$e,
-				$programContext
 			);
 		}
 		try {
 			$program = $programContext->analyseAndBuildProgram();
 		} catch (ProgramAnalyserException $e) {
-			return new CompilationResult(
+			return new FailedCompilationResult(
+				$programContext,
 				$rootNode,
+				null,
 				$e,
-				$programContext
 			);
 		}
 		return new SuccessfulCompilationResult(
+			$programContext,
 			$rootNode,
 			$program,
-			$programContext
 		);
 	}
 
@@ -90,9 +93,9 @@ final readonly class Compiler implements CompilerInterface {
 			);
 		$program = $programContext->analyseAndBuildProgram();
 		return new SuccessfulCompilationResult(
+			$programContext,
 			$rootNode,
 			$program,
-			$programContext
 		);
 	}
 }

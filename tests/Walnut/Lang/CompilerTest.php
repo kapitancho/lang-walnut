@@ -5,9 +5,11 @@ namespace Walnut\Lang\Test;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\AST\Node\RootNode;
+use Walnut\Lang\Blueprint\AST\Node\SourceLocation;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Compilation\AST\AstProgramCompilationException;
 use Walnut\Lang\Blueprint\Compilation\CompilationResult;
+use Walnut\Lang\Blueprint\Compilation\FailedCompilationResult;
 use Walnut\Lang\Blueprint\Compilation\Module\ModuleDependencyException;
 use Walnut\Lang\Blueprint\Compilation\Module\ModuleLookupContext;
 use Walnut\Lang\Blueprint\Compilation\SuccessfulCompilationResult;
@@ -15,6 +17,8 @@ use Walnut\Lang\Blueprint\Program\Program;
 use Walnut\Lang\Blueprint\Program\ProgramAnalyserException;
 use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\AST\Parser\StringEscapeCharHandler;
+use Walnut\Lang\Implementation\Compilation\AST\NodeAstCodeMapper;
+use Walnut\Lang\Implementation\Compilation\CompilationErrorBuilder;
 use Walnut\Lang\Implementation\Compilation\Compiler;
 use Walnut\Lang\Implementation\Compilation\Module\PackageConfiguration\PackageConfiguration;
 use Walnut\Lang\Implementation\Compilation\Module\Precompiler\EmptyPrecompiler;
@@ -27,10 +31,12 @@ final class CompilerTest extends TestCase {
 	private const string PATH = __DIR__ . '/../../../core-nut-lib';
 
 	private Compiler $compiler;
+	private CompilationErrorBuilder $compilationErrorBuilder;
 
 	protected function setUp(): void {
 		parent::setUp();
 
+		$codeMapper = new NodeAstCodeMapper();
 		$this->compiler = new Compiler(
 			new PrecompilerModuleLookupContext(
 				new PackageBasedSourceFinder(
@@ -46,6 +52,7 @@ final class CompilerTest extends TestCase {
 				]
 			),
 		);
+		$this->compilationErrorBuilder = new CompilationErrorBuilder($codeMapper);
 	}
 
 	public function testBrokenCompilation(): void {
@@ -55,8 +62,12 @@ final class CompilerTest extends TestCase {
 
 	public function testBrokenSafeCompilationMissing(): void {
 		$result = $this->compiler->safeCompile('missing');
-		$this->assertNotInstanceOf(SuccessfulCompilationResult::class, $result);
-		$this->assertInstanceOf(ModuleDependencyException::class, $result->ast);
+		$this->assertInstanceOf(FailedCompilationResult::class, $result);
+		$this->assertInstanceOf(ModuleDependencyException::class, $result->errorState);
+		$errors = $this->compilationErrorBuilder->build($result->errorState);
+		$this->assertCount(1, $errors);
+		$this->assertEquals('Module not found: missing', $errors[0]->errorMessage);
+		$this->assertIsArray($errors[0]->location);
 	}
 
 	private function getSafeCompiler($mainSource): Compiler {
@@ -88,9 +99,15 @@ final class CompilerTest extends TestCase {
 			=> { myFn = ^Null => MissingType :: 1; ''; };
 		NUT);
 		$result = $compiler->safeCompile('main');
-		$this->assertNotInstanceOf(SuccessfulCompilationResult::class, $result);
+		$this->assertInstanceOf(FailedCompilationResult::class, $result);
 		$this->assertInstanceOf(RootNode::class, $result->ast);
-		$this->assertInstanceOf(AstProgramCompilationException::class, $result->program);
+		$this->assertInstanceOf(AstProgramCompilationException::class, $result->errorState);
+		$errors = $this->compilationErrorBuilder->build($result->errorState);
+		$this->assertCount(1, $errors);
+		$this->assertEquals('main', $errors[0]->moduleName);
+		$this->assertEquals("Type issue: Unknown type: 'MissingType'", $errors[0]->errorMessage);
+		$this->assertInstanceOf(SourceLocation::class, $errors[0]->location);
+		$this->assertEquals('function defined in module main, starting on line 2, column 23', (string)$errors[0]->location);
 	}
 
 	public function testBrokenSafeCompilationAnalyse(): void {
@@ -99,9 +116,13 @@ final class CompilerTest extends TestCase {
 			=> { myFn = ^Null => NotANumber :: 1; ''; };
 		NUT);
 		$result = $compiler->safeCompile('main');
-		$this->assertNotInstanceOf(SuccessfulCompilationResult::class, $result);
+		$this->assertInstanceOf(FailedCompilationResult::class, $result);
 		$this->assertInstanceOf(RootNode::class, $result->ast);
-		$this->assertInstanceOf(ProgramAnalyserException::class, $result->program);
+		$this->assertInstanceOf(ProgramAnalyserException::class, $result->errorState);
+		$errors = $this->compilationErrorBuilder->build($result->errorState);
+		$this->assertCount(1, $errors);
+		$this->assertEquals('the CLI entry point', $errors[0]->entryDescription);
+		$this->assertEquals("Error in function assigned to variable 'myFn': Error in function defined in module main, starting on line 2, column 14: expected a return value of type NotANumber, got Integer[1]", $errors[0]->errorMessage);
 	}
 
 	public function testSuccessfulSafeCompilation(): void {
@@ -113,6 +134,7 @@ final class CompilerTest extends TestCase {
 		$this->assertInstanceOf(SuccessfulCompilationResult::class, $result);
 		$this->assertInstanceOf(RootNode::class, $result->ast);
 		$this->assertInstanceOf(Program::class, $result->program);
+		$this->assertNull( $result->errorState);
 	}
 
 	#[DataProvider('sources')]
@@ -130,11 +152,6 @@ final class CompilerTest extends TestCase {
 				$program = $compilationResult->program;
 				$vr = $compilationResult->programContext->valueRegistry;
 				$ep = $program->getEntryPoint(new TypeNameIdentifier('CliEntryPoint'));
-				/*$ep = $program->getEntryPoint(
-					new VariableNameIdentifier('main'),
-					$tr->array($tr->string()),
-					$tr->string()
-				);*/
 				$value = $ep->call($vr->tuple([]));
 				$this->assertInstanceOf(Value::class, $value);
 

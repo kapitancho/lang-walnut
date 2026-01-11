@@ -2,9 +2,9 @@
 
 namespace Walnut\Lang\Blueprint\Compilation\Module;
 
-use RuntimeException;
+use Walnut\Lang\Blueprint\Compilation\CompilationException;
 
-final class ModuleDependencyException extends RuntimeException {
+final class ModuleDependencyException extends CompilationException {
 	/** @param string[] $path */
 	public function __construct(
 		public readonly string $module,

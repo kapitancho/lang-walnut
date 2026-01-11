@@ -23,6 +23,6 @@ final class ParserExceptionTest extends TestCase {
 			),
 			'Test module'
 		);
-		$this->assertEquals("Parser error in module Test module at token T at line: 2, column: 3, offset: 1: Test message", $parserException->getMessage());
+		$this->assertEquals("Parser error in module Test module at token T: Test message", $parserException->getMessage());
 	}
 }

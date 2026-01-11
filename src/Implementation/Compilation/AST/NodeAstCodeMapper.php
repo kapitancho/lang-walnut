@@ -6,13 +6,14 @@ use Walnut\Lang\Blueprint\AST\Node\Node;
 use Walnut\Lang\Blueprint\AST\Node\SourceLocation;
 use Walnut\Lang\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Blueprint\Compilation\AST\AstCodeMapper;
+use Walnut\Lang\Blueprint\Compilation\AST\AstSourceLocator;
 use Walnut\Lang\Blueprint\Function\CustomMethod;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
 use WeakMap;
 
-final class NodeAstCodeMapper implements AstCodeMapper {
+final class NodeAstCodeMapper implements AstCodeMapper, AstSourceLocator {
 
 	/** @var WeakMap<Expression|Value|Type|FunctionBody|CustomMethod, Node> */
 	private WeakMap $nodeMap;

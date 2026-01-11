@@ -8,7 +8,8 @@ use Walnut\Lang\Blueprint\Program\ProgramContext;
 use Walnut\Lang\Blueprint\Program\Program;
 
 interface SuccessfulCompilationResult extends CompilationResult, EntryPointProvider {
+	public ProgramContext $programContext { get; }
 	public RootNode $ast { get; }
 	public Program $program { get; }
-	public ProgramContext $programContext { get; }
+	public null $errorState { get; }
 }

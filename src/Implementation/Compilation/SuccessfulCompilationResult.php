@@ -11,9 +11,10 @@ use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 
 final class SuccessfulCompilationResult implements SuccessfulCompilationResultInterface {
 	public function __construct(
+		public ProgramContext $programContext,
 		public RootNode $ast,
 		public Program $program,
-		public ProgramContext $programContext
+		public null $errorState = null
 	) {}
 
 	public TypeRegistry $typeRegistry {

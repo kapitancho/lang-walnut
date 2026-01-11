@@ -2,16 +2,15 @@
 
 namespace Walnut\Lang\Blueprint\AST\Parser;
 
-use RuntimeException;
+use Walnut\Lang\Blueprint\Compilation\CompilationException;
 use Walnut\Lib\Walex\Token as LexerToken;
 
-final class ParserException extends RuntimeException {
-	public function __construct(public ParserState $state, string $message, public LexerToken $token, string $moduleName) {
+final class ParserException extends CompilationException {
+	public function __construct(public ParserState $state, string $message, public LexerToken $token, public string $moduleName) {
 		parent::__construct(
-            sprintf("Parser error in module %s at token %s at %s: %s",
+            sprintf("Parser error in module %s at token %s: %s",
 				$moduleName,
                 is_string($token->rule->tag) ? $token->rule->tag : $token->rule->tag->name,
-                $token->sourcePosition,
                 $message
             )
 		);

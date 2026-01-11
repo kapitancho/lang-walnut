@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Implementation\Compilation;
 
+use Walnut\Lang\Blueprint\Compilation\AST\AstCodeMapper;
 use Walnut\Lang\Blueprint\Compilation\CompilerFactory as CompilerFactoryInterface;
 use Walnut\Lang\Blueprint\Compilation\Module\PackageConfigurationProvider;
 use Walnut\Lang\Blueprint\Compilation\Module\SourceFinder;
@@ -15,15 +16,18 @@ use Walnut\Lang\Implementation\Compilation\Module\SourceFinder\PackageBasedSourc
 final readonly class CompilerFactory implements CompilerFactoryInterface {
 
 	public function defaultCompiler(
-		PackageConfigurationProvider $packageConfigurationProvider
+		PackageConfigurationProvider $packageConfigurationProvider,
+		AstCodeMapper|null $astCodeMapper = null
 	): Compiler {
 		return $this->customCompiler(
-			new PackageBasedSourceFinder($packageConfigurationProvider)
+			new PackageBasedSourceFinder($packageConfigurationProvider),
+			$astCodeMapper
 		);
 	}
 
 	public function customCompiler(
-		SourceFinder $sourceFinder
+		SourceFinder $sourceFinder,
+		AstCodeMapper|null $astCodeMapper = null
 	): Compiler {
 		$lookupContext = new PrecompilerModuleLookupContext(
 			$sourceFinder,
@@ -33,6 +37,6 @@ final readonly class CompilerFactory implements CompilerFactoryInterface {
 				new TemplatePrecompiler(new StringEscapeCharHandler()),
 			]
 		);
-		return new Compiler($lookupContext);
+		return new Compiler($lookupContext, $astCodeMapper);
 	}
 }

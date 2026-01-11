@@ -21,7 +21,7 @@ class AnalyserException extends LogicException {
 	public function withTarget(Type|Value|Expression|FunctionBody|CustomMethod $target): self {
 		return new self(
 			$this->message,
-			$target
+			$this->target,//$target
 		);
 	}
 

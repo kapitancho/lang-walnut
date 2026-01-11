@@ -4,11 +4,10 @@ namespace Walnut\Lang\Blueprint\Compilation;
 
 use Walnut\Lang\Blueprint\AST\Node\RootNode;
 use Walnut\Lang\Blueprint\Program\ProgramContext;
-use Walnut\Lang\Blueprint\Program\Program;
 
-interface CompilationResult {
+interface FailedCompilationResult extends CompilationResult {
 	public ProgramContext $programContext { get; }
 	public RootNode|null $ast { get; }
-	public Program|null $program { get; }
-	public CompilationException|null $errorState { get; }
+	public null $program { get; }
+	public CompilationException $errorState { get; }
 }

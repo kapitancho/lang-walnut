@@ -2,9 +2,9 @@
 
 namespace Walnut\Lang\Blueprint\Compilation\AST;
 
-use RuntimeException;
+use Walnut\Lang\Blueprint\Compilation\CompilationException;
 
-final class AstModuleCompilationException extends RuntimeException {
+final class AstModuleCompilationException extends CompilationException {
 	/** @param AstCompilationException[] $compilationExceptions */
 	public function __construct(public string $moduleName, public array $compilationExceptions) {
 		parent::__construct(
