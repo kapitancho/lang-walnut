@@ -30,7 +30,7 @@ final class LnTest extends CodeExecutionTestHelper {
 
 	public function testLnZeroInTypeClosed(): void {
 		$this->executeErrorCodeSnippet(
-			"expected a return value of type Real, got Result<Real, NotANumber>",
+			"Expected a return value of type Real, got Result<Real, NotANumber>",
 			"l(1);", valueDeclarations:  <<<NUT
 			l = ^v: Real<[0..)> => Real :: v->ln;
 		NUT);

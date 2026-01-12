@@ -35,6 +35,13 @@ final readonly class VariableAssignmentExpression implements VariableAssignmentE
 				)
 			);
 		}
+		$ret = $this->assignedExpression->analyse($analyserContext);
+		return $ret->withAddedVariableType(
+			$this->variableName,
+			$ret->expressionType
+		);
+
+		/*
 		try {
 			$ret = $this->assignedExpression->analyse($analyserContext);
 			return $ret->withAddedVariableType(
@@ -42,7 +49,6 @@ final readonly class VariableAssignmentExpression implements VariableAssignmentE
 				$ret->expressionType
 			);
 		} catch (AnalyserException $e) {
-			/** @noinspection PhpUnhandledExceptionInspection */
 			throw $innerFn ? new AnalyserException(
 				sprintf(
 					"Error in function assigned to variable '%s': %s",
@@ -52,6 +58,7 @@ final readonly class VariableAssignmentExpression implements VariableAssignmentE
 				$e->target ?? $this
 			) : $e;
 		}
+		*/
 	}
 
 	/** @return list<string> */

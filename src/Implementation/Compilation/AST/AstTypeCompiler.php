@@ -188,16 +188,8 @@ final readonly class AstTypeCompiler implements AstTypeCompilerInterface {
 			};
 			$this->astCodeMapper->mapNode($typeNode, $result);
 			return $result;
-		} catch (UnknownType $e) {
-			throw new AstCompilationException($typeNode, "Type issue: " . $e->getMessage(), $e);
-		} catch (DuplicateSubsetValue $e) {
-			throw new AstCompilationException($typeNode, "Duplication issue: " . $e->getMessage(), $e);
-		} catch (InvalidMapKeyType $e) {
-			throw new AstCompilationException($typeNode, "Map key type issue: " . $e->getMessage(), $e);
-		} catch (UnknownEnumerationValue $e) {
-			throw new AstCompilationException($typeNode, "Enumeration issue: " . $e->getMessage(), $e);
-		} catch (InvalidLengthRange|InvalidNumberInterval $e) {
-			throw new AstCompilationException($typeNode, "Range issue: " . $e->getMessage(), $e);
+		} catch (UnknownType|DuplicateSubsetValue|InvalidLengthRange|InvalidNumberInterval|InvalidMapKeyType|UnknownEnumerationValue $e) {
+			throw new AstCompilationException($typeNode, $e->getMessage(), $e);
 		}
 	}
 

@@ -88,7 +88,7 @@ final readonly class CustomMethodAnalyser implements CustomMethodAnalyserInterfa
 							$analyseErrors[] = new CustomMethodAnalyserException(
 								sprintf("Error in %s", $method->methodInfo),
 								sprintf(
-									"the method %s is already defined for %s but its return type < %s > is not a subtype of < %s > when called with parameter of type %s ",
+									"the method %s is already defined for %s but its return type '%s' is not a subtype of '%s' when called with parameter of type %s ",
 									$methodName,
 									$customizedTypeCandidateType,
 									$method->returnType,

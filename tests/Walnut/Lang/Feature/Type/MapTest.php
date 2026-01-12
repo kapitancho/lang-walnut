@@ -22,7 +22,7 @@ final class MapTest extends CodeExecutionTestHelper {
 	public function testStrictSupersetCastError(): void {
 		// The cast may return an error and therefore an implicit usage is not allowed.
 		$this->executeErrorCodeSnippet(
-			"Invalid map key type: 'Integer'",
+			"The map key type 'Integer' must be a subset of the String type",
 			"`Map<Integer:String>"
 		);
 	}

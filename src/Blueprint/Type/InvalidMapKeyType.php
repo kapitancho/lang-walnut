@@ -10,7 +10,7 @@ final class InvalidMapKeyType extends InvalidArgumentException {
     ) {
         parent::__construct(
             sprintf(
-                "Invalid map key type: '%s'. The key type must be a subset of the String type",
+                "The map key type '%s' must be a subset of the String type",
                 $type)
         );
     }

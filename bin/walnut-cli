@@ -1,11 +1,12 @@
 #!/usr/bin/env php
 <?php
 require __DIR__ . '/inc/autoload.php';
+require __DIR__ . '/inc/error-display.php';
 
-use Walnut\Lang\Blueprint\AST\Parser\ParserException;
-use Walnut\Lang\Blueprint\Compilation\Module\ModuleDependencyException;
+use Walnut\Lang\Blueprint\Compilation\CompilationException;
 use Walnut\Lang\Blueprint\Program\InvalidEntryPointDependency;
-use Walnut\Lang\Blueprint\Program\ProgramAnalyserException;
+use Walnut\Lang\Implementation\Compilation\AST\NodeAstCodeMapper;
+use Walnut\Lang\Implementation\Compilation\CompilationErrorBuilder;
 use Walnut\Lang\Implementation\Compilation\CompilerFactory;
 use Walnut\Lang\Implementation\Compilation\Module\PackageConfiguration\JsonFilePackageConfigurationProvider;
 use Walnut\Lang\Implementation\Compilation\Module\SourceFinder\CallbackSourceFinder;
@@ -23,30 +24,43 @@ if (!isset($source)) {
     exit(1);
 }
 
-try {
-    $compiler = new CompilerFactory()->customCompiler(
-            new CompositeSourceFinder(
-                    new CallbackSourceFinder([
-                            'stdin.nut' => fn() => file_get_contents('php://stdin')
-                    ]),
-                    new PackageBasedSourceFinder(
-                            new JsonFilePackageConfigurationProvider('nutcfg.json')
-                    )
-            )
+// Get package configuration
+$packageConfig = (new JsonFilePackageConfigurationProvider('nutcfg.json'))->packageConfiguration;
+$sourceRoot = $packageConfig->defaultRoot;
+
+// Create compiler with code mapper for error display
+$codeMapper = new NodeAstCodeMapper();
+$compiler = new CompilerFactory()->customCompiler(
+    new CompositeSourceFinder(
+        new CallbackSourceFinder([
+            'stdin.nut' => fn() => file_get_contents('php://stdin')
+        ]),
+        new PackageBasedSourceFinder(
+            new JsonFilePackageConfigurationProvider('nutcfg.json')
+        )
+    ),
+    $codeMapper
+);
+$errorBuilder = new CompilationErrorBuilder($codeMapper);
+
+// Try to compile the source
+$compilationResult = $compiler->safeCompile($source);
+
+if ($compilationResult->errorState instanceof CompilationException) {
+    displayErrorsWithPointers(
+        $errorBuilder->build($compilationResult->errorState),
+        $sourceRoot,
+        $source
     );
+    exit(1);
+}
+
+try {
     $ep = new CliEntryPoint(new CliEntryPointBuilder($compiler));
     $content = $ep->call($source, ... $input);
     echo $content, PHP_EOL;
-} catch (ParserException $m) {
-    echo "Parser Error: ", $m->getMessage(), PHP_EOL;
-    exit(1);
-} catch (ProgramAnalyserException $m) {
-    echo "Compilation Error: ", $m->getMessage(), PHP_EOL;
-    exit(1);
-} catch (ModuleDependencyException $m) {
-    echo "Error: ", $m->getMessage(), PHP_EOL;
-    exit(1);
 } catch (InvalidEntryPointDependency $d) {
-    echo "Error: ", $d->getMessage(), PHP_EOL;
+    echo "\033[0;31m✗ ERROR\033[0m", PHP_EOL;
+    echo "\033[0;34m", $d->getMessage(), "\033[0m", PHP_EOL, PHP_EOL;
     exit(1);
 }

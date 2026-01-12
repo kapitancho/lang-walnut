@@ -291,7 +291,7 @@ final class MapTest extends CodeExecutionTestHelper {
 
 	public function testMapArrayInvalidReturnType(): void {
 		$this->executeErrorCodeSnippet(
-			"expected a return value of type Array<Integer>, got Result<Array<Integer>, Null>",
+			"Expected a return value of type Array<Integer>, got Result<Array<Integer>, Null>",
 			"doMap([]);",
 			valueDeclarations: "
 				doMap = ^a: Result<Array<Integer>, Null> => Array<Integer> ::
@@ -302,7 +302,7 @@ final class MapTest extends CodeExecutionTestHelper {
 
 	public function testMapMapInvalidReturnType(): void {
 		$this->executeErrorCodeSnippet(
-			"expected a return value of type Map<Integer>, got Result<Map<Integer>, Null>",
+			"Expected a return value of type Map<Integer>, got Result<Map<Integer>, Null>",
 			"doMap([:]);",
 			valueDeclarations: "
 				doMap = ^m: Result<Map<Integer>, Null> => Map<Integer> ::
@@ -353,7 +353,7 @@ final class MapTest extends CodeExecutionTestHelper {
 
 	public function testMapSetInvalidReturnType(): void {
 		$this->executeErrorCodeSnippet(
-			"expected a return value of type Set<Integer>, got Result<Set<Integer>, Null>",
+			"Expected a return value of type Set<Integer>, got Result<Set<Integer>, Null>",
 			"doSet([;]);",
 			valueDeclarations: "
 				doSet = ^s: Result<Set<Integer>, Null> => Set<Integer> ::

@@ -85,7 +85,7 @@ final class MapIndexValueTest extends CodeExecutionTestHelper {
 
 	public function testMapIndexValueInvalidReturnType(): void {
 		$this->executeErrorCodeSnippet(
-			"expected a return value of type Array<Integer>, got Result<Array<Integer>, Null>",
+			"Expected a return value of type Array<Integer>, got Result<Array<Integer>, Null>",
 			"doArray([]);",
 			valueDeclarations: "
 				doArray = ^a: Result<Array<Integer>, Null> => Array<Integer> ::

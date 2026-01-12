@@ -105,9 +105,9 @@ final class CompilerTest extends TestCase {
 		$errors = $this->compilationErrorBuilder->build($result->errorState);
 		$this->assertCount(1, $errors);
 		$this->assertEquals('main', $errors[0]->moduleName);
-		$this->assertEquals("Type issue: Unknown type: 'MissingType'", $errors[0]->errorMessage);
+		$this->assertEquals("Cannot find type 'MissingType'", $errors[0]->errorMessage);
 		$this->assertInstanceOf(SourceLocation::class, $errors[0]->location);
-		$this->assertEquals('function defined in module main, starting on line 2, column 23', (string)$errors[0]->location);
+		$this->assertEquals('module main, starting on line 2, column 23, offset 36, ending on line 2, column 36, offset 49', (string)$errors[0]->location);
 	}
 
 	public function testBrokenSafeCompilationAnalyse(): void {
@@ -122,7 +122,7 @@ final class CompilerTest extends TestCase {
 		$errors = $this->compilationErrorBuilder->build($result->errorState);
 		$this->assertCount(1, $errors);
 		$this->assertEquals('the CLI entry point', $errors[0]->entryDescription);
-		$this->assertEquals("Error in function assigned to variable 'myFn': Error in function defined in module main, starting on line 2, column 14: expected a return value of type NotANumber, got Integer[1]", $errors[0]->errorMessage);
+		$this->assertEquals("Expected a return value of type NotANumber, got Integer[1]", $errors[0]->errorMessage);
 	}
 
 	public function testSuccessfulSafeCompilation(): void {

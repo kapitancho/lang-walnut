@@ -176,7 +176,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testOpenWithInvariantConstructorCallWrongReturnType(): void {
 		$this->executeErrorCodeSnippet(
-			"expected a return value of type A, got Result<A, Any>",
+			"Expected a return value of type A, got Result<A, Any>",
 			"[A[a: 1, b: 'hi'], getA[a: 1, b: 'hi']];",
 		<<<NUT
 			A := #[a: Integer, b: String] @ Any :: null;
@@ -224,7 +224,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testOpenWithConstructorCallOkErrorValueWrongConstructionType(): void {
 		$this->executeErrorCodeSnippet(
-			"expected a return value of type [a: Integer, b: String], got Integer[15]",
+			"Expected a return value of type [a: Integer, b: String], got Integer[15]",
 			"[A[f: 'hi', e: 1], getA[f: 'hi', e: 1]];",
 		<<<NUT
 			A := #[a: Integer, b: String];
@@ -234,7 +234,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testOpenWithConstructorCallOkErrorValueWrongReturnType(): void {
 		$this->executeErrorCodeSnippet(
-			"expected a return value of type A, got Result<A, Any>",
+			"Expected a return value of type A, got Result<A, Any>",
 			"[A[f: 'hi', e: 1], getA[f: 'hi', e: 1]];",
 		<<<NUT
 			A := #[a: Integer, b: String];
@@ -247,7 +247,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testOpenWithConstructorCallError(): void {
 		$this->executeErrorCodeSnippet(
-			"expected a parameter value of type",
+			"Expected a parameter value of type",
 			"A[f: 'hi', other: 3];",
 		<<<NUT
 			A := #[a: Integer, b: String];
@@ -291,7 +291,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testOpenWithTwoConstructorsCallErrorValueBothWrongReturnType(): void {
 		$this->executeErrorCodeSnippet(
-			"expected a return value of type A, got Result<A, String['error 2', 'error 1']>",
+			"Expected a return value of type A, got Result<A, String['error 2', 'error 1']>",
 			"[A[f: 'hi', e: 1], getA[f: 'hi', e: 1]];",
 		<<<NUT
 			A := #[a: Integer, b: String] @ String['error 1'] :: @'error 1';
@@ -304,7 +304,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testOpenWithTwoConstructorsCallError(): void {
 		$this->executeErrorCodeSnippet(
-			"expected a parameter value of type",
+			"Expected a parameter value of type",
 			"A[f: 'hi', other: 3];",
 		<<<NUT
 			A := #[a: Integer, b: String] @ Any :: null;
@@ -374,7 +374,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testSealedWithConstructorCallError(): void {
 		$this->executeErrorCodeSnippet(
-			"expected a parameter value of type",
+			"Expected a parameter value of type",
 			"A[f: 'hi', other: 3];",
 			<<<NUT
 			A := $[a: Integer, b: String];
@@ -416,7 +416,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testSealedWithTwoConstructorsCallError(): void {
 		$this->executeErrorCodeSnippet(
-			"expected a parameter value of type",
+			"Expected a parameter value of type",
 			"A[f: 'hi', other: 3];",
 			<<<NUT
 			A := $[a: Integer, b: String] @ Any :: null;

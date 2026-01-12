@@ -7,10 +7,10 @@ use InvalidArgumentException;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 
 final class DuplicateSubsetValue extends InvalidArgumentException {
-	private const string enumerationType = 'Enumeration';
-	private const string integerType = 'Integer';
-	private const string realType = 'Real';
-	private const string stringType = 'String';
+	private const string enumerationType = 'enumeration';
+	private const string integerType = 'integer';
+	private const string realType = 'real';
+	private const string stringType = 'string';
 
     public function __construct(
         public readonly string $subsetType,
@@ -19,7 +19,7 @@ final class DuplicateSubsetValue extends InvalidArgumentException {
     ) {
         parent::__construct(
             sprintf(
-                "Duplicate %s value: '%s' in type '%s'",
+                "Duplicate %s value '%s' in type '%s'",
 	            $subsetType, $valueName, $typeName)
         );
     }

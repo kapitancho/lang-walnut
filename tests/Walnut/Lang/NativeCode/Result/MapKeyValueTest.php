@@ -96,7 +96,7 @@ final class MapKeyValueTest extends CodeExecutionTestHelper {
 
 	public function testMapKeyValueInvalidReturnType(): void {
 		$this->executeErrorCodeSnippet(
-			"expected a return value of type Map<Integer>, got Result<Map<Integer>, Null>",
+			"Expected a return value of type Map<Integer>, got Result<Map<Integer>, Null>",
 			"doMap([:]);",
 			valueDeclarations: "
 				doMap = ^m: Result<Map<Integer>, Null> => Map<Integer> ::

@@ -13,7 +13,7 @@ final class UnknownEnumerationValue extends InvalidArgumentException {
     ) {
         parent::__construct(
             sprintf(
-                "Unknown enumeration value: '%s' for type '%s'",
+                "Unknown enumeration value '%s' for type '%s'",
                 $valueName, $typeName)
         );
     }

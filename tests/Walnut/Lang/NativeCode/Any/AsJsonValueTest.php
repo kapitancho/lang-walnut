@@ -36,7 +36,7 @@ final class AsJsonValueTest extends CodeExecutionTestHelper {
 
 	public function testAsJsonValueOpenBroken(): void {
 		$this->executeErrorCodeSnippet(
-			"expected a return value of type JsonValue, got Result<JsonValue, InvalidJsonValue>",
+			"Expected a return value of type JsonValue, got Result<JsonValue, InvalidJsonValue>",
 			"getJson(MyOpen[a: 1, b: ^ :: 1]);", "
 			MyOpen := #[a: Integer, b: ^Null => Any];
 		", "
@@ -57,7 +57,7 @@ final class AsJsonValueTest extends CodeExecutionTestHelper {
 
 	public function testAsJsonValueOpenSafeWithCastError(): void {
 		$this->executeErrorCodeSnippet(
-			"expected a return value of type JsonValue, got Result<JsonValue, InvalidJsonValue>",
+			"Expected a return value of type JsonValue, got Result<JsonValue, InvalidJsonValue>",
 			"getJson(MyOpen[a: 1, b: MyNested[x: ^ :: 1]]);", "
 			MyNested := #[x: ^Null => Any];
 			MyOpen := #[a: Integer, b: MyNested];

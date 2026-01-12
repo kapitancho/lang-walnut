@@ -109,10 +109,8 @@ final readonly class AstValueCompiler implements AstValueCompilerInterface {
 			};
 			$this->astCodeMapper->mapNode($valueNode, $result);
 			return $result;
-		} catch (UnknownType $e) {
-			throw new AstCompilationException($valueNode, "Type issue: " . $e->getMessage(), $e);
-		} catch (UnknownEnumerationValue $e) {
-			throw new AstCompilationException($valueNode, "Enumeration Issue: " . $e->getMessage(), $e);
+		} catch (UnknownType|UnknownEnumerationValue $e) {
+			throw new AstCompilationException($valueNode, $e->getMessage(), $e);
 		}
 	}
 

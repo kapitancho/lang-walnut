@@ -84,13 +84,15 @@ final readonly class CompilationErrorBuilder implements CompilationErrorBuilderI
 		return array_map(
 			fn (CustomMethodAnalyserException $entry): CompilationErrorEntry => new CompilationErrorEntry(
 				is_string($entry->error) ? $entry->error : $entry->error->getMessage(),
+				(
+					$node = ($entry->error instanceof AnalyserException && $entry->error->target ?
+						$this->astSourceLocator->getSourceNode($entry->error->target) : null) ??
+						$this->astSourceLocator->getSourceNode($entry->target)
+				)?->sourceLocation->moduleName,
 				null,
-				null,
-				null,
+				$node,
 				$entry->target->methodInfo,
-				($entry->error instanceof AnalyserException && $entry->error->target ?
-					$this->astSourceLocator->getSourceLocation($entry->error->target) : null) ??
-					$this->astSourceLocator->getSourceLocation($entry->target),
+				$node?->sourceLocation,
 			),
 			$exception->analyseErrors
 		);

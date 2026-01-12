@@ -17,7 +17,7 @@ final class VariableAssignmentExpressionTest extends CodeExecutionTestHelper {
 	}
 
 	public function testVariableAssignmentFunctionWithError(): void {
-		$this->executeErrorCodeSnippet("Error in function assigned to variable", "v = ^Any => Integer :: v;");
+		$this->executeErrorCodeSnippet("Expected a return value of type Integer, got ^Any => Integer", "v = ^Any => Integer :: v;");
 	}
 
 }

@@ -13,9 +13,10 @@ final readonly class SourceLocation implements SourceLocationInterface {
 	) {}
 
 	public function __toString(): string {
-		return sprintf("function defined in module %s, starting on line %d, column %d",
+		return sprintf("module %s, starting on line %d, column %d, offset %d, ending on line %d, column %d, offset %d",
 			$this->moduleName,
-			$this->startPosition->line, $this->startPosition->column
+			$this->startPosition->line, $this->startPosition->column, $this->startPosition->offset,
+			$this->endPosition->line, $this->endPosition->column, $this->endPosition->offset
 		);
 	}
 

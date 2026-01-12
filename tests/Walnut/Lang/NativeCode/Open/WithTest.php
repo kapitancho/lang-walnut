@@ -265,7 +265,7 @@ final class WithTest extends CodeExecutionTestHelper {
 
 	public function testWithValidatorWithErrorTypeWrongReturnType(): void {
 		$this->executeErrorCodeSnippet(
-			"expected a return value of type MyOpen, got Result<MyOpen, MyError>",
+			"Expected a return value of type MyOpen, got Result<MyOpen, MyError>",
 			"MyOpen[a:1,b:3,c:5]?->testWith[b:2,c:6];", <<<NUT
 			MyError := ();
 			MyOpen := #[a: Integer, b: Integer, c: Integer] @ MyError :: null;

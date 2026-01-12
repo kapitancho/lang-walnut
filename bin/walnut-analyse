@@ -1,11 +1,15 @@
 #!/usr/bin/env php
 <?php
 require __DIR__ . '/inc/autoload.php';
+require __DIR__ . '/inc/error-display.php';
 
-use Walnut\Lang\Blueprint\AST\Parser\ParserException;
-use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
+use Walnut\Lang\Blueprint\AST\Node\SourceLocation;
+use Walnut\Lang\Blueprint\Compilation\CompilationException;
+use Walnut\Lang\Implementation\Compilation\AST\NodeAstCodeMapper;
+use Walnut\Lang\Implementation\Compilation\CompilationErrorBuilder;
+use Walnut\Lang\Implementation\Compilation\CompilerFactory;
 use Walnut\Lang\Implementation\Compilation\Module\PackageConfiguration\JsonFilePackageConfigurationProvider;
-use Walnut\Lang\Implementation\Program\EntryPoint\Cli\CliEntryPointFactory;
+use Walnut\Lib\Walex\SourcePosition;
 
 // Parse arguments
 $showErrorsOnly = false;
@@ -20,16 +24,20 @@ for ($i = 1; $i < count($argv); $i++) {
 }
 
 /** @var string $sourceRoot */
-$epBuilder = new CliEntryPointFactory(
-        $cfg = new JsonFilePackageConfigurationProvider('nutcfg.json')
-)->entryPointBuilder;
+$cfg = new JsonFilePackageConfigurationProvider('nutcfg.json');
+$packageConfig = $cfg->packageConfiguration;
 
-$sourceRoot = $cfg->packageConfiguration->defaultRoot;
+$sourceRoot = $packageConfig->defaultRoot;
 $root = $sourceRoot . '/';
 if (!file_exists($root . $folder)) {
     echo "Folder $folder does not exist in $sourceRoot" . PHP_EOL;
     exit(1);
 }
+
+// Create compiler with code mapper
+$codeMapper = new NodeAstCodeMapper();
+$compiler = (new CompilerFactory())->defaultCompiler($packageConfig, $codeMapper);
+$errorBuilder = new CompilationErrorBuilder($codeMapper);
 
 $errorCount = 0;
 $fileCount = 0;
@@ -42,21 +50,28 @@ foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . $f
         if (!$showErrorsOnly) {
             echo PHP_EOL, "Analysing ", $source, PHP_EOL;
         }
-        try {
-            $epBuilder->build($source);
+
+        $compilationResult = $compiler->safeCompile($source);
+
+        if ($compilationResult->errorState instanceof CompilationException) {
+            $errors = $errorBuilder->build($compilationResult->errorState);
+
+            if (count($errors) > 0) {
+                $errorCount++;
+                if ($showErrorsOnly) {
+                    echo PHP_EOL, "Analysing ", $source, PHP_EOL;
+                }
+
+                displayErrorsWithPointers(
+                    $errors,
+                    $sourceRoot,
+                    $source
+                );
+            }
+        } else {
             if (!$showErrorsOnly) {
                 echo "\033[0;32m✓ OK\033[0m", PHP_EOL;
             }
-        } catch (AnalyserException|ParserException $analyserException) {
-            $errorCount++;
-            echo PHP_EOL, "Analysing ", $source, PHP_EOL;
-            echo "\033[0;31m✗ ERROR\033[0m", PHP_EOL;
-            echo "\033[0;34m", $analyserException->getMessage(), "\033[0m", PHP_EOL;
-        } catch (Throwable $exception) {
-            $errorCount++;
-            echo PHP_EOL, "Analysing ", $source, PHP_EOL;
-            echo "\033[0;31m✗ ERROR\033[0m", PHP_EOL;
-            echo $exception->getMessage(), PHP_EOL;
         }
     }
 }

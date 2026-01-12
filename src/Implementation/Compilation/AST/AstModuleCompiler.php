@@ -70,10 +70,11 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 
 		try {
 			$type = $this->programContext->typeRegistry->typeByName($typeName);
-		} catch (UnknownType) {
+		} catch (UnknownType $e) {
 			throw new AstCompilationException(
 				$moduleDefinition,
-				sprintf("Type %s not found", $typeName)
+				$e->getMessage(),
+				$e
 			);
 		}
 		$returnType = match(true) {

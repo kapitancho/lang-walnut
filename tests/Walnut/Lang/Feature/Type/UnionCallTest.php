@@ -24,7 +24,7 @@ final class UnionCallTest extends CodeExecutionTestHelper {
 
 	public function testUnionMethodCallWrongReturnType(): void {
 		$this->executeErrorCodeSnippet(
-			"expected a return value of type Boolean, got (Integer|String)",
+			"Expected a return value of type Boolean, got (Integer|String)",
 			"[ab(A(3)), ab(B('hello'))];",
 			<<<NUT
 				A := #Integer;
@@ -70,7 +70,7 @@ final class UnionCallTest extends CodeExecutionTestHelper {
 
 	public function testUnionPropertyAccessWrongReturnType(): void {
 		$this->executeErrorCodeSnippet(
-			"expected a return value of type Boolean, got (Integer|String)",
+			"Expected a return value of type Boolean, got (Integer|String)",
 			"[ab(A[42, 'hello']), ab(B['hello', 3.14])];",
 			<<<NUT
 				A := #[a: Integer, b: String];

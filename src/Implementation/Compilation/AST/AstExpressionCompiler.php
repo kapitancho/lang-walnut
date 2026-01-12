@@ -98,10 +98,11 @@ final readonly class AstExpressionCompiler implements AstExpressionCompilerInter
 				$expressionNode->typeName,
 				$this->expression($expressionNode->parameter)
 			);
-		} catch (UnknownType) {
+		} catch (UnknownType $e) {
 			throw new AstCompilationException(
 				$expressionNode,
-				sprintf("Type %s not found", $expressionNode->typeName)
+				$e->getMessage(),
+				$e
 			);
 		}
 	}

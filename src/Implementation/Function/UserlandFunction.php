@@ -35,8 +35,8 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 		if (!$actualType->isSubtypeOf($expectedType)) {
 			throw new AnalyserException(
 				sprintf(
-					"Error in %s: expected a %s value of type %s, got %s",
-					$this->displayName, $parameterName, $expectedType, $actualType
+					"Expected a %s value of type %s, got %s",
+					$parameterName, $expectedType, $actualType
 				)
 			);
 		}
@@ -56,8 +56,8 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 		if (!$returnType->isSubtypeOf($this->returnType)) {
 			throw new AnalyserException(
 				sprintf(
-					"Error in %s: expected a return value of type %s, got %s",
-					$this->displayName, $this->returnType, $returnType
+					"Expected a return value of type %s, got %s",
+					$this->returnType, $returnType
 				),
 				$this->functionBody
 			);
@@ -86,8 +86,8 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException(
 				sprintf(
-					"Error in %s: expected a %s value of type < %s >, got %s for value %s",
-						$this->displayName, $parameterName, $expectedType,
+					"Expected a %s value of type '%s', got '%s' for value %s",
+						$parameterName, $expectedType,
 						$value->type,
 						$value
 				)

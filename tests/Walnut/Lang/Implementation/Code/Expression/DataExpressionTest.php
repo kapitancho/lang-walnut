@@ -16,7 +16,7 @@ final class DataExpressionTest extends CodeExecutionTestHelper {
 	}
 
 	public function testDataUnknownType(): void {
-		$this->executeErrorCodeSnippet("Type issue: Unknown type: 'UnknownType'", "MyData!3.14;", "MyData := UnknownType;");
+		$this->executeErrorCodeSnippet("Cannot find type 'UnknownType'", "MyData!3.14;", "MyData := UnknownType;");
 	}
 
 	public function testDataUnknownDataType(): void {

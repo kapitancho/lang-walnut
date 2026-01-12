@@ -94,7 +94,7 @@ final class ShapeTest extends CodeExecutionTestHelper {
 	public function testStrictSupersetCastError(): void {
 		// The cast may return an error and therefore an implicit usage is not allowed.
 		$this->executeErrorCodeSnippet(
-			"expected a return value of type Shape<IntPair>, got IntPairType",
+			"Expected a return value of type Shape<IntPair>, got IntPairType",
 			"useIntPair(getIntPair(IntPairType[1, 5]));",
 		<<<NUT
 			IntPairType := [a: Integer, b: Integer];
