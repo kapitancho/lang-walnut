@@ -28,12 +28,19 @@ if (!isset($source)) {
 $packageConfig = (new JsonFilePackageConfigurationProvider('nutcfg.json'))->packageConfiguration;
 $sourceRoot = $packageConfig->defaultRoot;
 
+// Read stdin once if source is '$' or 'stdin' (avoids reading stdin multiple times during compilation)
+// This is needed because php://stdin can only be read once
+$stdinContent = null;
+if ($source === '$' || $source === 'stdin') {
+    $stdinContent = file_get_contents('php://stdin');
+}
+
 // Create compiler with code mapper for error display
 $codeMapper = new NodeAstCodeMapper();
 $compiler = new CompilerFactory()->customCompiler(
     new CompositeSourceFinder(
         new CallbackSourceFinder([
-            'stdin.nut' => fn() => file_get_contents('php://stdin')
+            'stdin.nut' => fn() => $stdinContent ?? file_get_contents('php://stdin')
         ]),
         new PackageBasedSourceFinder(
             new JsonFilePackageConfigurationProvider('nutcfg.json')
