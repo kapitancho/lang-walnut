@@ -29,6 +29,13 @@ trait BinaryDivide {
 			if ($parameterType instanceof IntegerType && (string)$parameterType->numberRange === '1') {
 				return $targetType;
 			}
+			$subsetType = $this->getDivideSubsetType(
+				$typeRegistry, $targetType, $parameterType
+			);
+			if ($subsetType !== null) {
+				return $subsetType;
+			}
+
 			$interval = $this->getDivideRange($targetType, $parameterType);
 			$intervals = $this->getSplitInterval($interval, !$targetType->contains(0));
 			$real = $typeRegistry->realFull(...$intervals);

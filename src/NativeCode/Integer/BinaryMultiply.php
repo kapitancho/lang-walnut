@@ -34,6 +34,12 @@ final readonly class BinaryMultiply implements NativeMethod {
 				if ($fixType !== null) {
 					return $fixType;
 				}
+				$subsetType = $this->getMultiplySubsetType(
+					$typeRegistry, $targetType, $parameterType
+				);
+				if ($subsetType !== null) {
+					return $subsetType;
+				}
 
 				$interval = $this->getMultiplyRange($targetType, $parameterType);
 				$intervals = $this->getSplitInterval(

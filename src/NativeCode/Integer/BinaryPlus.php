@@ -35,6 +35,12 @@ final readonly class BinaryPlus implements NativeMethod {
 				if ($fixType !== null) {
 					return $fixType;
 				}
+				$subsetType = $this->getPlusSubsetType(
+					$typeRegistry, $targetType, $parameterType
+				);
+				if ($subsetType !== null) {
+					return $subsetType;
+				}
 				$interval = $this->getPlusRange($targetType, $parameterType);
 				return $parameterType instanceof IntegerType ?
 					$typeRegistry->integerFull($interval) :

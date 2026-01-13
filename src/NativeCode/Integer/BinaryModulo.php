@@ -14,10 +14,12 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\IntegerValue;
 use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\Value;
+use Walnut\Lang\Implementation\Code\NativeCode\Analyser\Numeric\RangeHelper;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 final readonly class BinaryModulo implements NativeMethod {
 	use BaseType;
+	use RangeHelper;
 
 	public function analyse(
 		TypeRegistry $typeRegistry,
@@ -30,6 +32,13 @@ final readonly class BinaryModulo implements NativeMethod {
 			$parameterType = $this->toBaseType($parameterType);
 
 			if ($parameterType instanceof IntegerType || $parameterType instanceof RealType) {
+				$subsetType = $this->getModuloSubsetType(
+					$typeRegistry, $targetType, $parameterType
+				);
+				if ($subsetType !== null) {
+					return $subsetType;
+				}
+
 				$includesZero = $parameterType->contains(0);
 				$returnType = $parameterType instanceof IntegerType ?
 					$typeRegistry->integer() : $typeRegistry->real();

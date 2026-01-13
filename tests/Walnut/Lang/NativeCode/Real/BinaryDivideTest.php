@@ -37,6 +37,22 @@ final class BinaryDivideTest extends CodeExecutionTestHelper {
 		$this->assertEquals("3", $result);
 	}
 
+	public function testBinaryDivideSubsets(): void {
+		$result = $this->executeCodeSnippet(
+			"divide[5.4, -1];",
+			valueDeclarations: "divide = ^[a: Real[5.4, 2], b: Integer[2, -1]] => Real[-5.4, -2, 1, 2.7] :: #a / #b;"
+		);
+		$this->assertEquals("-5.4", $result);
+	}
+
+	public function testBinaryDivideSubsetsWithZero(): void {
+		$result = $this->executeCodeSnippet(
+			"divide[5.4, -0];",
+			valueDeclarations: "divide = ^[a: Real[5.4, 2], b: Integer[2, -1, 0]] => Result<Real[-5.4, -2, 1, 2.7], NotANumber> :: #a / #b;"
+		);
+		$this->assertEquals("@NotANumber", $result);
+	}
+
 	public function testBinaryDividePositiveTargetFiniteBothPositive(): void {
 		$result = $this->executeCodeSnippet(
 			"divide(5.75);",

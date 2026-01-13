@@ -10,8 +10,11 @@ use Walnut\Lang\Blueprint\Common\Range\NumberRange;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\ArrayType;
+use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
+use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
+use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Implementation\Common\Range\NumberInterval;
 use Walnut\Lang\Implementation\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
@@ -69,6 +72,116 @@ trait RangeHelper {
 			return $parameterType;
 		}
 		return null;
+	}
+
+	private function getResultSubsetType(
+		TypeRegistry $typeRegistry,
+		IntegerType|RealType $targetType,
+		IntegerType|RealType $parameterType,
+		callable $operation,
+		bool $forceRealType = false
+	): IntegerSubsetType|RealSubsetType|null {
+		if (
+			($targetType instanceof RealSubsetType || $targetType instanceof IntegerSubsetType) &&
+			($parameterType instanceof RealSubsetType || $parameterType instanceof IntegerSubsetType)
+		) {
+			$sumValues = [];
+			foreach ($targetType->subsetValues as $targetSubsetValue) {
+				foreach ($parameterType->subsetValues as $parameterSubsetValue) {
+					$sumValues[] = $operation($targetSubsetValue, $parameterSubsetValue);
+				}
+			}
+			$sumValues = array_values(array_unique($sumValues));
+			return !$forceRealType &&
+				$targetType instanceof IntegerSubsetType &&
+				$parameterType instanceof IntegerSubsetType ?
+					$typeRegistry->integerSubset($sumValues) :
+					$typeRegistry->realSubset($sumValues);
+		}
+		return null;
+	}
+
+	private function getPlusSubsetType(TypeRegistry $typeRegistry, IntegerType|RealType $targetType,
+		IntegerType|RealType $parameterType
+	): IntegerSubsetType|RealSubsetType|null {
+		return $this->getResultSubsetType(
+			$typeRegistry, $targetType, $parameterType,
+			fn(Number $a, Number $b): Number => $a->add($b)
+		);
+	}
+
+	private function getMinusSubsetType(TypeRegistry $typeRegistry, IntegerType|RealType $targetType,
+		IntegerType|RealType $parameterType
+	): IntegerSubsetType|RealSubsetType|null {
+		return $this->getResultSubsetType(
+			$typeRegistry, $targetType, $parameterType,
+			fn(Number $a, Number $b): Number => $a->sub($b)
+		);
+	}
+
+	private function getMultiplySubsetType(TypeRegistry $typeRegistry, IntegerType|RealType $targetType,
+		IntegerType|RealType $parameterType
+	): IntegerSubsetType|RealSubsetType|null {
+		return $this->getResultSubsetType(
+			$typeRegistry, $targetType, $parameterType,
+			fn(Number $a, Number $b): Number => $a->mul($b)
+		);
+	}
+
+	private function subsetWithoutZero(TypeRegistry $typeRegistry, RealSubsetType|IntegerSubsetType $type): RealSubsetType|IntegerSubsetType {
+		$values = array_filter(
+			$type->subsetValues,
+			fn(Number $value): bool => (string)$value !== '0'
+		);
+		if ($type instanceof IntegerSubsetType) {
+			return $typeRegistry->integerSubset(array_values($values));
+		} else {
+			return $typeRegistry->realSubset(array_values($values));
+		}
+	}
+
+	private function getModuloSubsetType(TypeRegistry $typeRegistry, IntegerType|RealType $targetType,
+		IntegerType|RealType $parameterType
+	): ResultType|IntegerSubsetType|RealSubsetType|null {
+		$hasZeroParameterValue = false;
+		if ($parameterType->contains(0)) {
+			if ($parameterType instanceof IntegerSubsetType || $parameterType instanceof RealSubsetType) {
+				if (count($parameterType->subsetValues) === 1) {
+					return null;
+				}
+				$hasZeroParameterValue = true;
+				$parameterType = $this->subsetWithoutZero($typeRegistry, $parameterType);
+			}
+		}
+		$type = $this->getResultSubsetType(
+			$typeRegistry, $targetType, $parameterType,
+			fn(Number $a, Number $b): Number => $a->mod($b)
+		);
+		return $type && $hasZeroParameterValue ? $typeRegistry->result(
+			$type, $typeRegistry->core->notANumber
+		) : $type;
+	}
+
+	private function getDivideSubsetType(TypeRegistry $typeRegistry, IntegerType|RealType $targetType,
+		IntegerType|RealType $parameterType
+	): ResultType|IntegerSubsetType|RealSubsetType|null {
+		$hasZeroParameterValue = false;
+		if ($parameterType->contains(0)) {
+			if ($parameterType instanceof IntegerSubsetType || $parameterType instanceof RealSubsetType) {
+				if (count($parameterType->subsetValues) === 1) {
+					return null;
+				}
+				$hasZeroParameterValue = true;
+				$parameterType = $this->subsetWithoutZero($typeRegistry, $parameterType);
+			}
+		}
+		$type = $this->getResultSubsetType(
+			$typeRegistry, $targetType, $parameterType,
+			fn(Number $a, Number $b): Number => $a->div($b), true
+		);
+		return $type && $hasZeroParameterValue ? $typeRegistry->result(
+			$type, $typeRegistry->core->notANumber
+		) : $type;
 	}
 
 	private function getPlusRange(

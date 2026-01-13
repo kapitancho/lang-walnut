@@ -16,6 +16,14 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 		$this->assertEquals("15.42", $result);
 	}
 
+	public function testBinaryMultiplySubsets(): void {
+		$result = $this->executeCodeSnippet(
+			"multiply[5, 3];",
+			valueDeclarations: "multiply = ^[a: Integer[5, 2], b: Integer[2, 3]] => Integer[4, 6, 10, 15] :: #a * #b;"
+		);
+		$this->assertEquals("15", $result);
+	}
+
 	public function testBinaryMultiplyZeroParameter(): void {
 		$result = $this->executeCodeSnippet(
 			"mul(0);",

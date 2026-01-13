@@ -16,6 +16,22 @@ final class BinaryModuloTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@NotANumber", $result);
 	}
 
+	public function testBinaryModuloSubsets(): void {
+		$result = $this->executeCodeSnippet(
+			"modulo[5, 3];",
+			valueDeclarations: "modulo = ^[a: Integer[5, 2], b: Integer[2, 3]] => Integer[0, 1, 2] :: #a % #b;"
+		);
+		$this->assertEquals("2", $result);
+	}
+
+	public function testBinaryModuloSubsetsWithZero(): void {
+		$result = $this->executeCodeSnippet(
+			"modulo[5, 0];",
+			valueDeclarations: "modulo = ^[a: Integer[5, 2], b: Integer[2, 3, 0]] => Result<Integer[0, 1, 2], NotANumber> :: #a % #b;"
+		);
+		$this->assertEquals("@NotANumber", $result);
+	}
+
 	public function testBinaryModuloZeroReal(): void {
 		$result = $this->executeCodeSnippet(
 			"modulo(3.27 - 3.27);",

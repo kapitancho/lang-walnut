@@ -21,12 +21,28 @@ final class BinaryDivideTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@NotANumber", $result);
 	}
 
-		public function testBinaryDivideOneParameter(): void {
+	public function testBinaryDivideOneParameter(): void {
 		$result = $this->executeCodeSnippet(
 			"divide(3);",
 			valueDeclarations: "divide = ^p: Integer<-1..3> => Integer<-1..3> :: p / 1;"
 		);
 		$this->assertEquals("3", $result);
+	}
+
+	public function testBinaryDivideSubsets(): void {
+		$result = $this->executeCodeSnippet(
+			"divide[5, -1];",
+			valueDeclarations: "divide = ^[a: Integer[5, 2], b: Integer[2, -1]] => Real[-5, -2, 1, 2.5] :: #a / #b;"
+		);
+		$this->assertEquals("-5", $result);
+	}
+
+	public function testBinaryDivideSubsetsWithZero(): void {
+		$result = $this->executeCodeSnippet(
+			"divide[5, 0];",
+			valueDeclarations: "divide = ^[a: Integer[5, 2], b: Integer[2, -1, 0]] => Result<Real[-5, -2, 1, 2.5], NotANumber> :: #a / #b;"
+		);
+		$this->assertEquals("@NotANumber", $result);
 	}
 
 	public function testBinaryDivideOneParameterInteger(): void {

@@ -16,6 +16,14 @@ final class BinaryMinusTest extends CodeExecutionTestHelper {
 		$this->assertEquals("-2", $result);
 	}
 
+	public function testBinaryMinusSubsets(): void {
+		$result = $this->executeCodeSnippet(
+			"minus[5.4, 3];",
+			valueDeclarations: "minus = ^[a: Real[5.4, 2], b: Integer[2, 3]] => Real[-1, 0, 2.4, 3.4] :: #a - #b;"
+		);
+		$this->assertEquals("2.4", $result);
+	}
+
 	public function testBinaryMinusZeroParameter(): void {
 		$result = $this->executeCodeSnippet(
 			"minus(0);",

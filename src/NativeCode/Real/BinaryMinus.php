@@ -34,6 +34,12 @@ final readonly class BinaryMinus implements NativeMethod {
 				if ((string)$parameterType->numberRange === '0') {
 					return $targetType;
 				}
+				$subsetType = $this->getMinusSubsetType(
+					$typeRegistry, $targetType, $parameterType
+				);
+				if ($subsetType !== null) {
+					return $subsetType;
+				}
 				$interval = $this->getMinusRange($targetType, $parameterType);
 				return $typeRegistry->realFull($interval);
 			}
