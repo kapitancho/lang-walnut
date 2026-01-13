@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Implementation\Compilation\AST;
 
 use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode;
+use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Compilation\AST\AstCodeMapper;
 use Walnut\Lang\Blueprint\Compilation\AST\AstCompilationException;
 use Walnut\Lang\Blueprint\Compilation\AST\AstExpressionCompiler;
@@ -26,4 +27,19 @@ final readonly class AstFunctionBodyCompiler implements AstFunctionBodyCompilerI
 		$this->astCodeMapper->mapNode($functionBodyNode, $result);
 		return $result;
 	}
+
+	/** @throws AstCompilationException */
+	public function validatorBody(
+		FunctionBodyNode $functionBodyNode
+	): FunctionBody {
+		return $this->expressionRegistry->functionBody(
+			$this->expressionRegistry->sequence([
+				$this->astExpressionCompiler->expression($functionBodyNode->expression),
+				$this->expressionRegistry->variableName(
+					new VariableNameIdentifier('#')
+				)
+			])
+		);
+	}
+
 }

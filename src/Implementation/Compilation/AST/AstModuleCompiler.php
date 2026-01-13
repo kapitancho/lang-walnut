@@ -152,7 +152,7 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 					$moduleDefinition->name,
 					$this->type($moduleDefinition->valueType),
 					$moduleDefinition->constructorBody ?
-						$this->functionBody(
+						$this->validatorBody(
 							$moduleDefinition->constructorBody
 						) : null,
 					$moduleDefinition->errorType ?
@@ -163,7 +163,7 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 					$moduleDefinition->name,
 					$this->type($moduleDefinition->valueType),
 					$moduleDefinition->constructorBody ?
-						$this->functionBody(
+						$this->validatorBody(
 							$moduleDefinition->constructorBody
 						) : null,
 					$moduleDefinition->errorType ?
@@ -198,6 +198,11 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 	/** @throws AstCompilationException */
 	private function functionBody(FunctionBodyNode $functionBodyNode): FunctionBody {
 		return $this->astFunctionBodyCompiler->functionBody($functionBodyNode);
+	}
+
+	/** @throws AstCompilationException */
+	private function validatorBody(FunctionBodyNode $functionBodyNode): FunctionBody {
+		return $this->astFunctionBodyCompiler->validatorBody($functionBodyNode);
 	}
 
 }

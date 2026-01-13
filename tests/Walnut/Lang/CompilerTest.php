@@ -6,6 +6,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\AST\Node\RootNode;
 use Walnut\Lang\Blueprint\AST\Node\SourceLocation;
+use Walnut\Lang\Blueprint\AST\Parser\ParserException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Compilation\AST\AstProgramCompilationException;
 use Walnut\Lang\Blueprint\Compilation\CompilationResult;
@@ -26,6 +27,7 @@ use Walnut\Lang\Implementation\Compilation\Module\Precompiler\TemplatePrecompile
 use Walnut\Lang\Implementation\Compilation\Module\Precompiler\TestPrecompiler;
 use Walnut\Lang\Implementation\Compilation\Module\PrecompilerModuleLookupContext;
 use Walnut\Lang\Implementation\Compilation\Module\SourceFinder\PackageBasedSourceFinder;
+use Walnut\Lib\Walex\SourcePosition;
 
 final class CompilerTest extends TestCase {
 	private const string PATH = __DIR__ . '/../../../core-nut-lib';
@@ -91,6 +93,23 @@ final class CompilerTest extends TestCase {
 			default => $original->sourceOf($source)
 		});
 		return new Compiler($l);
+	}
+
+	public function testBrokenParseError(): void {
+		$compiler = $this->getSafeCompiler(<<<NUT
+			module main:
+			=> { myFn = ^Null 23423/dfas MissingT
+		NUT);
+		$result = $compiler->safeCompile('main');
+		$this->assertInstanceOf(FailedCompilationResult::class, $result);
+		$this->assertNull( $result->ast);
+		$this->assertInstanceOf(ParserException::class, $result->errorState);
+		$errors = $this->compilationErrorBuilder->build($result->errorState);
+		$this->assertCount(1, $errors);
+		$this->assertEquals('main', $errors[0]->moduleName);
+		$this->assertStringContainsString("Parser error: No transition found", $errors[0]->errorMessage);
+		$this->assertInstanceOf(SourcePosition::class, $errors[0]->location);
+		$this->assertEquals('line: 2, column: 20, offset: 33', (string)$errors[0]->location);
 	}
 
 	public function testBrokenSafeCompilationAst(): void {

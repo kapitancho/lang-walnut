@@ -10,4 +10,9 @@ interface AstFunctionBodyCompiler {
 	public function functionBody(
 		FunctionBodyNode $functionBodyNode
 	): FunctionBody;
+
+	/** @throws AstCompilationException */
+	public function validatorBody(
+		FunctionBodyNode $functionBodyNode
+	): FunctionBody;
 }
