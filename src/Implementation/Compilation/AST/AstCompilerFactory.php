@@ -54,7 +54,10 @@ final readonly class AstCompilerFactory implements AstCompilerFactoryInterface, 
 		return $this->functionBodyCompiler->functionBody($functionBodyNode);
 	}
 
+	// Not really in use, but required by the interface
+	// @codeCoverageIgnoreStart
 	public function validatorBody(FunctionBodyNode $functionBodyNode): FunctionBody {
 		return $this->functionBodyCompiler->validatorBody($functionBodyNode);
 	}
+	// @codeCoverageIgnoreEnd
 }

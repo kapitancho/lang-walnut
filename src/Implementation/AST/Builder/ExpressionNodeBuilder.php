@@ -167,10 +167,6 @@ final readonly class ExpressionNodeBuilder implements ExpressionNodeBuilderInter
 		return new MethodCallExpressionNode($this->getSourceLocation(), $target, $methodName, $parameter);
 	}
 
-	public function functionBody(ExpressionNode $expression): FunctionBodyNode {
-		return new FunctionBodyNode($this->getSourceLocation(), $expression);
-	}
-
 	public function booleanOr(ExpressionNode $first, ExpressionNode $second): BooleanOrExpressionNode {
 		return new BooleanOrExpressionNode($this->getSourceLocation(), $first, $second);
 	}

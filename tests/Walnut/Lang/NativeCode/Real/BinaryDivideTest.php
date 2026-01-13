@@ -48,7 +48,7 @@ final class BinaryDivideTest extends CodeExecutionTestHelper {
 	public function testBinaryDivideSubsetsWithZero(): void {
 		$result = $this->executeCodeSnippet(
 			"divide[5.4, -0];",
-			valueDeclarations: "divide = ^[a: Real[5.4, 2], b: Integer[2, -1, 0]] => Result<Real[-5.4, -2, 1, 2.7], NotANumber> :: #a / #b;"
+			valueDeclarations: "divide = ^[a: Real[5.4, 2], b: Real[2.5, -1, 0]] => Result<Real[-5.4, -2, 0.8, 2.16], NotANumber> :: #a / #b;"
 		);
 		$this->assertEquals("@NotANumber", $result);
 	}

@@ -92,8 +92,6 @@ interface ExpressionNodeBuilder {
 		ExpressionNode $parameter
 	): MethodCallExpressionNode;
 
-	public function functionBody(ExpressionNode $expression): FunctionBodyNode;
-
 	public function booleanOr(ExpressionNode $first, ExpressionNode $second): BooleanOrExpressionNode;
 	public function booleanAnd(ExpressionNode $first, ExpressionNode $second): BooleanAndExpressionNode;
 	public function booleanXor(ExpressionNode $first, ExpressionNode $second): BooleanXorExpressionNode;

@@ -24,6 +24,14 @@ final class BinaryPlusTest extends CodeExecutionTestHelper {
 		$this->assertEquals("8.4", $result);
 	}
 
+	public function testBinaryPlusStandard(): void {
+		$result = $this->executeCodeSnippet(
+			"plus(0);",
+			valueDeclarations: "v = 3.14; plus = ^p: Real<0..5> => Real<3.14..8.14> :: p + v;"
+		);
+		$this->assertEquals("3.14", $result);
+	}
+
 	public function testBinaryPlusZeroParameter(): void {
 		$result = $this->executeCodeSnippet(
 			"plus(0);",
