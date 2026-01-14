@@ -2,4 +2,4 @@
 
 namespace Walnut\Lang\Blueprint\Type;
 
-interface AnyType extends Type {}
+interface AnyType extends SimpleType {}

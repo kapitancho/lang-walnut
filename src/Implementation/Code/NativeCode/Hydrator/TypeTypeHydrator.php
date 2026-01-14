@@ -2,6 +2,8 @@
 
 namespace Walnut\Lang\Implementation\Code\NativeCode\Hydrator;
 
+use Walnut\Lang\Blueprint\Code\NativeCode\Hydrator\HydrationException;
+use Walnut\Lang\Blueprint\Code\NativeCode\Hydrator\TypeTypeHydrator as TypeTypeHydratorInterface;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
@@ -10,16 +12,14 @@ use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Blueprint\Value\Value;
-use Walnut\Lang\Implementation\Code\NativeCode\HydrationException;
 
-final readonly class TypeTypeHydrator {
+final readonly class TypeTypeHydrator implements TypeTypeHydratorInterface {
 	public function __construct(
 		private TypeRegistry $typeRegistry,
 		private ValueRegistry $valueRegistry,
 	) {}
 
-
-	public function hydrateType(Value $value, TypeType $targetType, string $hydrationPath): TypeValue {
+	public function hydrate(Value $value, TypeType $targetType, string $hydrationPath): TypeValue {
 		if ($value instanceof StringValue) {
 			try {
 				$typeName = $value->literalValue;

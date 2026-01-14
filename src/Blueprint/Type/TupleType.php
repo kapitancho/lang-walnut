@@ -2,7 +2,7 @@
 
 namespace Walnut\Lang\Blueprint\Type;
 
-interface TupleType extends Type {
+interface TupleType extends CompositeType {
 	/**
       * @param non-empty-list<Type> $types
       */

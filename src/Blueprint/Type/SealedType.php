@@ -2,4 +2,4 @@
 
 namespace Walnut\Lang\Blueprint\Type;
 
-interface SealedType extends CustomType {}
+interface SealedType extends NamedType, ComplexType {}

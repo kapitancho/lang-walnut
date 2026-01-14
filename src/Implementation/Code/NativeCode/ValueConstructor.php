@@ -9,11 +9,9 @@ use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\MethodContext;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\AtomType;
-use Walnut\Lang\Blueprint\Type\CustomType;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
 use Walnut\Lang\Blueprint\Type\NamedType;
 use Walnut\Lang\Blueprint\Type\NothingType;
@@ -40,7 +38,7 @@ final readonly class ValueConstructor {
 
 	private function getConstructingType(TypeRegistry $typeRegistry, Type $type, Type $parameterType): Type {
 		return match(true) {
-			$type instanceof CustomType => $type->valueType,
+			$type instanceof SealedType, $type instanceof OpenType => $type->valueType,
 			//$type instanceof AtomType => $typeRegistry->null,
 			//$type instanceof AliasType => $type->aliasedType,
 			$type instanceof ResultType && $type->returnType instanceof NothingType => $parameterType,

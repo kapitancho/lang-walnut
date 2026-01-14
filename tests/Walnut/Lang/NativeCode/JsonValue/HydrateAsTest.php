@@ -21,6 +21,11 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@HydrationError![\n\tvalue: 42,\n\thydrationPath: 'value',\n\terrorMessage: 'Functions cannot be hydrated'\n]", $result);
 	}
 
+	public function testHydrateAsMeta(): void {
+		$result = $this->executeCodeSnippet("42->hydrateAs(type{Data});");
+		$this->assertEquals("@HydrationError![\n\tvalue: 42,\n\thydrationPath: 'value',\n\terrorMessage: 'Values of cannot be hydrated to type Data.'\n]", $result);
+	}
+
 	public function testHydrateAsIntersection(): void {
 		$result = $this->executeCodeSnippet("42->hydrateAs(type{[a: String, ... Real]&[b: Real, ... String]});");
 		$this->assertEquals("@HydrationError![\n\tvalue: 42,\n\thydrationPath: 'value',\n\terrorMessage: 'Intersection type values cannot be hydrated'\n]", $result);
@@ -29,6 +34,16 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 	public function testHydrateAsProxy(): void {
 		$result = $this->executeCodeSnippet("[42]->hydrateAs(type[\X]);", "X := Integer;");
 		$this->assertEquals("[X!42]", $result);
+	}
+
+	public function testHydrateAsShape(): void {
+		$result = $this->executeCodeSnippet("42->hydrateAs(type{Shape<X>});", "X := Integer;");
+		$this->assertEquals("X!42", $result);
+	}
+
+	public function testHydrateAsOptionalKey(): void {
+		$result = $this->executeCodeSnippet("42->hydrateAs(type{OptionalKey<X>});", "X := Integer;");
+		$this->assertEquals("X!42", $result);
 	}
 
 
@@ -61,7 +76,7 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 	public function testHydrateAsAtomFromNullCastError(): void {
 		$result = $this->executeCodeSnippet("null->hydrateAs(`MyAtom);",
 			"MyAtom := (); JsonValue ==> MyAtom @ String :: ?whenValueOf($) { true: MyAtom, ~ : @'error' };");
-		$this->assertEquals("@HydrationError![\n\tvalue: null,\n\thydrationPath: 'value',\n\terrorMessage: 'Atom hydration failed. Error: \`error\`'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: null,\n\thydrationPath: 'value',\n\terrorMessage: 'Type MyAtom hydration failed. Error: \`error\`'\n]", $result);
 	}
 
 	public function testHydrateAsAtomUnion(): void {
@@ -386,8 +401,8 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 
 
 	public function testHydrateAsRecordFromRecord(): void {
-		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type[a: Integer, b: Integer, c: String]);");
-		$this->assertEquals("[a: 1, b: 2, c: 'hello']", $result);
+		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello', f: 'world']->hydrateAs(type[a: Integer, b: Integer, c: String, d: ?Real, ... String]);");
+		$this->assertEquals("[a: 1, b: 2, c: 'hello', f: 'world']", $result);
 	}
 
 	public function testHydrateAsRecordFromRecordWrongPropertyType(): void {
@@ -433,8 +448,8 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 
 
 	public function testHydrateAsTupleFromTuple(): void {
-		$result = $this->executeCodeSnippet("[1, 2, 'hello']->hydrateAs(type[Integer, Integer, String]);");
-		$this->assertEquals("[1, 2, 'hello']", $result);
+		$result = $this->executeCodeSnippet("[1, 2, 'hello', 3.14]->hydrateAs(type[Integer, Integer, String, ...Real]);");
+		$this->assertEquals("[1, 2, 'hello', 3.14]", $result);
 	}
 
 	public function testHydrateAsTupleFromTupleWrongPropertyType(): void {
@@ -516,7 +531,7 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 	public function testHydrateAsEnumerationWithCastWrongValue(): void {
 		$result = $this->executeCodeSnippet("'X'->hydrateAs(type{MyEnumeration});",
 			"MyEnumeration := (A, B, C); JsonValue ==> MyEnumeration @ String :: ?whenValueOf($) { 'AA': MyEnumeration.A, 'BB': MyEnumeration.B, 'CC': MyEnumeration.C, ~: @'unknown value' };");
-		$this->assertEquals("@HydrationError![\n\tvalue: 'X',\n\thydrationPath: 'value',\n\terrorMessage: 'Enumeration hydration failed. Error: \`unknown value\`'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: 'X',\n\thydrationPath: 'value',\n\terrorMessage: 'Type MyEnumeration hydration failed. Error: \`unknown value\`'\n]", $result);
 	}
 
 	public function testHydrateAsEnumerationSubsetWithCastCorrectValue(): void {
@@ -534,7 +549,7 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 	public function testHydrateAsEnumerationSubsetWithCastWrongValue(): void {
 		$result = $this->executeCodeSnippet("'X'->hydrateAs(type{MyEnumeration[A, C]});",
 			"MyEnumeration := (A, B, C); JsonValue ==> MyEnumeration @ String :: ?whenValueOf($) { 'AA': MyEnumeration.A, 'BB': MyEnumeration.B, 'CC': MyEnumeration.C, ~: @'unknown value' };");
-		$this->assertEquals("@HydrationError![\n\tvalue: 'X',\n\thydrationPath: 'value',\n\terrorMessage: 'Enumeration hydration failed. Error: \`unknown value\`'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: 'X',\n\thydrationPath: 'value',\n\terrorMessage: 'Type MyEnumeration hydration failed. Error: \`unknown value\`'\n]", $result);
 	}
 
 
@@ -633,7 +648,7 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 			"MySealed := $[a: Integer, b: Integer, c: String];" .
 			"JsonValue ==> MySealed @ String :: ?whenTypeOf($) { type[a: Integer, b: Integer<0..>, c: String]: MySealed($), ~: @'invalid value' };"
 		);
-		$this->assertEquals("@HydrationError![\n\tvalue: [a: 1, b: -2, c: 'hello'],\n\thydrationPath: 'value',\n\terrorMessage: 'Sealed type hydration failed. Error: \`invalid value\`'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: [a: 1, b: -2, c: 'hello'],\n\thydrationPath: 'value',\n\terrorMessage: 'Type MySealed hydration failed. Error: \`invalid value\`'\n]", $result);
 	}
 
 	public function testHydrateAsSealedFromRecordWithValidatorAndCastCorrectValue(): void {
@@ -699,7 +714,7 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 			"MyOpen := #[a: Integer, b: Integer, c: String];" .
 			"JsonValue ==> MyOpen @ String :: ?whenTypeOf($) { type[a: Integer, b: Integer<0..>, c: String]: MyOpen($), ~: @'invalid value' };"
 		);
-		$this->assertEquals("@HydrationError![\n\tvalue: [a: 1, b: -2, c: 'hello'],\n\thydrationPath: 'value',\n\terrorMessage: 'Open type hydration failed. Error: \`invalid value\`'\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: [a: 1, b: -2, c: 'hello'],\n\thydrationPath: 'value',\n\terrorMessage: 'Type MyOpen hydration failed. Error: \`invalid value\`'\n]", $result);
 	}
 
 	public function testHydrateAsOpenFromRecordWithValidatorAndCastCorrectValue(): void {

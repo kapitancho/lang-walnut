@@ -44,7 +44,6 @@ use Walnut\Lang\Implementation\AST\Node\Expression\SetExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\TupleExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\VariableAssignmentExpressionNode;
 use Walnut\Lang\Implementation\AST\Node\Expression\VariableNameExpressionNode;
-use Walnut\Lang\Implementation\AST\Node\FunctionBodyNode;
 
 final readonly class ExpressionNodeBuilder implements ExpressionNodeBuilderInterface {
 	public function __construct(private readonly SourceLocator $sourceLocator) {}

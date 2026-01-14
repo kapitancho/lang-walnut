@@ -2,4 +2,10 @@
 
 namespace Walnut\Lang\Blueprint\AST\Node\Module;
 
-interface AddSealedTypeNode extends AddUserTypeNode {}
+use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode;
+use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
+
+interface AddSealedTypeNode extends AddCompositeNamedTypeNode {
+	public FunctionBodyNode|null $constructorBody { get; }
+	public TypeNode|null $errorType { get; }
+}

@@ -4,7 +4,6 @@ namespace Walnut\Lang\Implementation\Code\Expression;
 
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
-use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserResult;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionContext;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionResult;
@@ -22,11 +21,9 @@ final readonly class VariableAssignmentExpression implements VariableAssignmentE
 	) {}
 
 	public function analyse(AnalyserContext $analyserContext): AnalyserResult {
-		$innerFn = null;
 		if ($this->assignedExpression instanceof ConstantExpression &&
 			($v = $this->assignedExpression->value) instanceof FunctionValue
 		) {
-			$innerFn = $this->variableName;
 			$analyserContext = $analyserContext->withAddedVariableType(
 				$this->variableName,
 				$analyserContext->typeRegistry->function(
@@ -40,25 +37,6 @@ final readonly class VariableAssignmentExpression implements VariableAssignmentE
 			$this->variableName,
 			$ret->expressionType
 		);
-
-		/*
-		try {
-			$ret = $this->assignedExpression->analyse($analyserContext);
-			return $ret->withAddedVariableType(
-				$this->variableName,
-				$ret->expressionType
-			);
-		} catch (AnalyserException $e) {
-			throw $innerFn ? new AnalyserException(
-				sprintf(
-					"Error in function assigned to variable '%s': %s",
-					$this->variableName,
-					$e->getMessage()
-				),
-				$e->target ?? $this
-			) : $e;
-		}
-		*/
 	}
 
 	/** @return list<string> */

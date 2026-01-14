@@ -2,6 +2,6 @@
 
 namespace Walnut\Lang\Blueprint\Type;
 
-interface ShapeType extends Type, SupertypeChecker {
+interface ShapeType extends CompositeType {
 	public Type $refType { get; }
 }

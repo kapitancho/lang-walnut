@@ -2,10 +2,14 @@
 
 namespace Walnut\Lang\Implementation\Code\NativeCode\Hydrator;
 
+use Walnut\Lang\Blueprint\Code\NativeCode\Hydrator\CompositeTypeHydrator as CompositeTypeHydratorInterface;
+use Walnut\Lang\Blueprint\Code\NativeCode\Hydrator\HydrationException;
+use Walnut\Lang\Blueprint\Code\NativeCode\Hydrator\Hydrator;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
-use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\ArrayType;
+use Walnut\Lang\Blueprint\Type\CompositeType;
+use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\IntersectionType;
 use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\MutableType;
@@ -15,6 +19,7 @@ use Walnut\Lang\Blueprint\Type\ProxyNamedType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\ResultType;
 use Walnut\Lang\Blueprint\Type\SetType;
+use Walnut\Lang\Blueprint\Type\ShapeType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\UnionType;
 use Walnut\Lang\Blueprint\Type\UnknownProperty;
@@ -23,20 +28,46 @@ use Walnut\Lang\Blueprint\Value\RecordValue;
 use Walnut\Lang\Blueprint\Value\SetValue;
 use Walnut\Lang\Blueprint\Value\TupleValue;
 use Walnut\Lang\Blueprint\Value\Value;
-use Walnut\Lang\Implementation\Code\NativeCode\HydrationException;
 
-final readonly class CompositeTypeHydrator {
+final readonly class CompositeTypeHydrator implements CompositeTypeHydratorInterface {
 	public function __construct(
-		private Hydrator      $hydrator,
 		private ValueRegistry $valueRegistry,
 	) {}
-
-
-	public function hydrateProxyNamed(Value $value, ProxyNamedType $targetType, string $hydrationPath): Value {
-		return $this->hydrator->hydrate($value, $targetType->actualType, $hydrationPath);
+	
+	/** @throws HydrationException */
+	public function hydrate(Hydrator $hydrator, Value $value, CompositeType $targetType, string $hydrationPath): Value {
+		/** @phpstan-ignore-next-line var.type */
+		$fn = match(true) {
+			$targetType instanceof ArrayType => $this->hydrateArray(...),
+			$targetType instanceof FunctionType => $this->hydrateFunction(...),
+			$targetType instanceof SetType => $this->hydrateSet(...),
+			$targetType instanceof IntersectionType => $this->hydrateIntersection(...),
+			$targetType instanceof ShapeType => $this->hydrateShape(...),
+			$targetType instanceof OptionalKeyType => $this->hydrateOptionalKey(...),
+			$targetType instanceof MapType => $this->hydrateMap(...),
+			$targetType instanceof MutableType => $this->hydrateMutable(...),
+			$targetType instanceof RecordType => $this->hydrateRecord(...),
+			$targetType instanceof TupleType => $this->hydrateTuple(...),
+			$targetType instanceof UnionType => $this->hydrateUnion(...),
+			$targetType instanceof ResultType => $this->hydrateResult(...),
+			$targetType instanceof ProxyNamedType => $this->hydrateProxyNamed(...),
+			// @codeCoverageIgnoreStart
+			default => throw new HydrationException(
+				$value,
+				$hydrationPath,
+				"Unsupported type: " . $targetType::class
+			)
+			// @codeCoverageIgnoreEnd
+		};
+		/** @phpstan-ignore-next-line argument.type */
+		return $fn($hydrator, $value, $targetType, $hydrationPath);
 	}
 
-	public function hydrateIntersection(Value $value, IntersectionType $targetType, string $hydrationPath): Value {
+	private function hydrateProxyNamed(Hydrator $hydrator, Value $value, ProxyNamedType $targetType, string $hydrationPath): Value {
+		return $hydrator->hydrate($value, $targetType->actualType, $hydrationPath);
+	}
+
+	private function hydrateIntersection(Hydrator $hydrator, Value $value, IntersectionType $targetType, string $hydrationPath): Value {
 		throw new HydrationException(
 			$value,
 			$hydrationPath,
@@ -44,12 +75,19 @@ final readonly class CompositeTypeHydrator {
 		);
 	}
 
+	private function hydrateShape(Hydrator $hydrator, Value $value, ShapeType $targetType, string $hydrationPath): Value {
+		return $hydrator->hydrate($value, $targetType->refType, $hydrationPath);
+	}
 
-	public function hydrateUnion(Value $value, UnionType $targetType, string $hydrationPath): Value {
+	private function hydrateOptionalKey(Hydrator $hydrator, Value $value, OptionalKeyType $targetType, string $hydrationPath): Value {
+		return $hydrator->hydrate($value, $targetType->valueType, $hydrationPath);
+	}
+
+	private function hydrateUnion(Hydrator $hydrator, Value $value, UnionType $targetType, string $hydrationPath): Value {
 		$exceptions = [];
 		foreach($targetType->types as $type) {
 			try {
-				return $this->hydrator->hydrate($value, $type, $hydrationPath);
+				return $hydrator->hydrate($value, $type, $hydrationPath);
 			} catch (HydrationException $ex) {
 				$exceptions[] = $ex;
 			}
@@ -70,18 +108,22 @@ final readonly class CompositeTypeHydrator {
 		);
 	}
 
-	public function hydrateAlias(Value $value, AliasType $targetType, string $hydrationPath): Value {
-		return $this->hydrator->hydrate($value, $targetType->aliasedType, $hydrationPath);
-	}
-
-	public function hydrateMutable(Value $value, MutableType $targetType, string $hydrationPath): MutableValue {
+	private function hydrateMutable(Hydrator $hydrator, Value $value, MutableType $targetType, string $hydrationPath): MutableValue {
 		return $this->valueRegistry->mutable(
 			$targetType->valueType,
-			$this->hydrator->hydrate($value, $targetType->valueType, $hydrationPath)
+			$hydrator->hydrate($value, $targetType->valueType, $hydrationPath)
 		);
 	}
 
-	public function hydrateArray(Value $value, ArrayType $targetType, string $hydrationPath): TupleValue {
+	private function hydrateFunction(Hydrator $hydrator, Value $value, FunctionType $targetType, string $hydrationPath): Value {
+		throw new HydrationException(
+			$value,
+			$hydrationPath,
+			"Functions cannot be hydrated"
+		);
+	}
+
+	private function hydrateArray(Hydrator $hydrator, Value $value, ArrayType $targetType, string $hydrationPath): TupleValue {
 		if ($value instanceof TupleValue || $value instanceof SetValue) {
 			$l = count($value->values);
 			if ($targetType->range->minLength <= $l && (
@@ -91,7 +133,7 @@ final readonly class CompositeTypeHydrator {
 				$refType = $targetType->itemType;
 				$result = [];
 				foreach($value->values as $seq => $item) {
-					$result[] = $this->hydrator->hydrate($item, $refType, "{$hydrationPath}[$seq]");
+					$result[] = $hydrator->hydrate($item, $refType, "{$hydrationPath}[$seq]");
 				}
 				return $this->valueRegistry->tuple($result);
 			}
@@ -114,12 +156,12 @@ final readonly class CompositeTypeHydrator {
 		);
 	}
 
-	public function hydrateSet(Value $value, SetType $targetType, string $hydrationPath): SetValue {
+	private function hydrateSet(Hydrator $hydrator, Value $value, SetType $targetType, string $hydrationPath): SetValue {
 		if ($value instanceof TupleValue || $value instanceof SetValue) {
 			$refType = $targetType->itemType;
 			$result = [];
 			foreach($value->values as $seq => $item) {
-				$result[] = $this->hydrator->hydrate($item, $refType, "{$hydrationPath}[$seq]");
+				$result[] = $hydrator->hydrate($item, $refType, "{$hydrationPath}[$seq]");
 			}
 			$set = $this->valueRegistry->set($result);
 			$l = count($set->values);
@@ -148,7 +190,7 @@ final readonly class CompositeTypeHydrator {
 		);
 	}
 
-	public function hydrateTuple(Value $value, TupleType $targetType, string $hydrationPath): TupleValue {
+	private function hydrateTuple(Hydrator $hydrator, Value $value, TupleType $targetType, string $hydrationPath): TupleValue {
 		if ($value instanceof TupleValue) {
 			$l = count($targetType->types);
 			if ($targetType->restType instanceof NothingType && count($value->values) > $l) {
@@ -162,7 +204,7 @@ final readonly class CompositeTypeHydrator {
 			foreach($targetType->types as $seq => $refType) {
 				try {
 					$item = $value->valueOf($seq);
-					$result[] = $this->hydrator->hydrate($item, $refType, "{$hydrationPath}[$seq]");
+					$result[] = $hydrator->hydrate($item, $refType, "{$hydrationPath}[$seq]");
 				} catch (UnknownProperty) {
 					throw new HydrationException(
 						$value,
@@ -173,7 +215,7 @@ final readonly class CompositeTypeHydrator {
 			}
 			foreach($value->values as $seq => $val) {
 				if (!isset($result[$seq])) {
-					$result[] = $this->hydrator->hydrate($val,
+					$result[] = $hydrator->hydrate($val,
 						$targetType->types[$seq] ?? $targetType->restType, "{$hydrationPath}[$seq]");
 				}
 			}
@@ -189,7 +231,7 @@ final readonly class CompositeTypeHydrator {
 		);
 	}
 
-	public function hydrateMap(Value $value, MapType $targetType, string $hydrationPath): RecordValue {
+	private function hydrateMap(Hydrator $hydrator, Value $value, MapType $targetType, string $hydrationPath): RecordValue {
 		if ($value instanceof RecordValue) {
 			$l = count($value->values);
 			if ($targetType->range->minLength <= $l && (
@@ -199,7 +241,7 @@ final readonly class CompositeTypeHydrator {
 				$refType = $targetType->itemType;
 				$result = [];
 				foreach($value->values as $key => $item) {
-					$result[$key] = $this->hydrator->hydrate($item, $refType, "$hydrationPath.$key");
+					$result[$key] = $hydrator->hydrate($item, $refType, "$hydrationPath.$key");
 				}
 				return $this->valueRegistry->record($result);
 			}
@@ -222,7 +264,7 @@ final readonly class CompositeTypeHydrator {
 		);
 	}
 
-	public function hydrateRecord(Value $value, RecordType $targetType, string $hydrationPath): RecordValue {
+	private function hydrateRecord(Hydrator $hydrator, Value $value, RecordType $targetType, string $hydrationPath): RecordValue {
 		if ($value instanceof RecordValue) {
 			$usedKeys = [];
 			$result = [];
@@ -234,7 +276,7 @@ final readonly class CompositeTypeHydrator {
 				}
 				try {
 					$item = $value->valueOf($key);
-					$result[$key] = $this->hydrator->hydrate($item, $refType, "$hydrationPath.$key");
+					$result[$key] = $hydrator->hydrate($item, $refType, "$hydrationPath.$key");
 					$usedKeys[$key] = true;
 				} catch (UnknownProperty) {
 					if (!$isOptional) {
@@ -255,7 +297,7 @@ final readonly class CompositeTypeHydrator {
 							sprintf("The record value may not contain the key %s", $key)
 						);
 					}
-					$result[$key] = $this->hydrator->hydrate($val, $targetType->restType, "$hydrationPath.$key");
+					$result[$key] = $hydrator->hydrate($val, $targetType->restType, "$hydrationPath.$key");
 				}
 			}
 			return $this->valueRegistry->record( $result);
@@ -269,13 +311,13 @@ final readonly class CompositeTypeHydrator {
 		);
 	}
 
-	public function hydrateResult(Value $value, ResultType $targetType, string $hydrationPath): Value {
+	private function hydrateResult(Hydrator $hydrator, Value $value, ResultType $targetType, string $hydrationPath): Value {
 		try {
-			return $this->hydrator->hydrate($value, $targetType->returnType, $hydrationPath);
+			return $hydrator->hydrate($value, $targetType->returnType, $hydrationPath);
 		} catch (HydrationException $ex) {
 			try {
 				return $this->valueRegistry->error(
-					$this->hydrator->hydrate($value, $targetType->errorType, $hydrationPath)
+					$hydrator->hydrate($value, $targetType->errorType, $hydrationPath)
 				);
 			} catch (HydrationException) {
 				throw $ex;

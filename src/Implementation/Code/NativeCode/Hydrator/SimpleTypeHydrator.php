@@ -2,17 +2,19 @@
 
 namespace Walnut\Lang\Implementation\Code\NativeCode\Hydrator;
 
+use Walnut\Lang\Blueprint\Code\NativeCode\Hydrator\HydrationException;
+use Walnut\Lang\Blueprint\Code\NativeCode\Hydrator\SimpleTypeHydrator as SimpleTypeHydratorInterface;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
 use Walnut\Lang\Blueprint\Type\AnyType;
 use Walnut\Lang\Blueprint\Type\BooleanType;
 use Walnut\Lang\Blueprint\Type\BytesType;
 use Walnut\Lang\Blueprint\Type\FalseType;
-use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\NullType;
 use Walnut\Lang\Blueprint\Type\RealType;
+use Walnut\Lang\Blueprint\Type\SimpleType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\TrueType;
@@ -23,18 +25,45 @@ use Walnut\Lang\Blueprint\Value\NullValue;
 use Walnut\Lang\Blueprint\Value\RealValue;
 use Walnut\Lang\Blueprint\Value\StringValue;
 use Walnut\Lang\Blueprint\Value\Value;
-use Walnut\Lang\Implementation\Code\NativeCode\HydrationException;
 
-final readonly class SimpleTypeHydrator {
+final readonly class SimpleTypeHydrator implements SimpleTypeHydratorInterface {
 	public function __construct(
 		private ValueRegistry $valueRegistry,
 	) {}
 
-	public function hydrateAny(Value $value, AnyType $targetType, string $hydrationPath): Value {
+
+	/** @throws HydrationException */
+	public function hydrate(Value $value, SimpleType $targetType, string $hydrationPath): Value {
+		/** @phpstan-ignore-next-line var.type */
+		$fn = match(true) {
+			$targetType instanceof BooleanType => $this->hydrateBoolean(...),
+			$targetType instanceof FalseType => $this->hydrateFalse(...),
+			$targetType instanceof NullType => $this->hydrateNull(...),
+			$targetType instanceof TrueType => $this->hydrateTrue(...),
+			$targetType instanceof AnyType => $this->hydrateAny(...),
+			$targetType instanceof NothingType => $this->hydrateNothing(...),
+			$targetType instanceof IntegerType => $this->hydrateInteger(...),
+			$targetType instanceof RealType => $this->hydrateReal(...),
+			$targetType instanceof StringSubsetType => $this->hydrateStringSubset(...),
+			$targetType instanceof StringType => $this->hydrateString(...),
+			$targetType instanceof BytesType => $this->hydrateBytes(...),
+			// @codeCoverageIgnoreStart
+			default => throw new HydrationException(
+				$value,
+				$hydrationPath,
+				"Unsupported type: " . $targetType::class
+			)
+			// @codeCoverageIgnoreEnd
+		};
+		/** @phpstan-ignore-next-line argument.type */
+		return $fn($value, $targetType, $hydrationPath);
+	}
+
+	private function hydrateAny(Value $value, AnyType $targetType, string $hydrationPath): Value {
 		return $value;
 	}
 
-	public function hydrateNothing(Value $value, NothingType $targetType, string $hydrationPath): Value {
+	private function hydrateNothing(Value $value, NothingType $targetType, string $hydrationPath): Value {
 		throw new HydrationException(
 			$value,
 			$hydrationPath,
@@ -42,15 +71,7 @@ final readonly class SimpleTypeHydrator {
 		);
 	}
 
-	public function hydrateFunction(Value $value, FunctionType $targetType, string $hydrationPath): Value {
-		throw new HydrationException(
-			$value,
-			$hydrationPath,
-			"Functions cannot be hydrated"
-		);
-	}
-
-	public function hydrateInteger(Value $value, IntegerType $targetType, string $hydrationPath): IntegerValue {
+	private function hydrateInteger(Value $value, IntegerType $targetType, string $hydrationPath): IntegerValue {
 		if ($value instanceof IntegerValue) {
 			if ($targetType->contains($value->literalValue)) {
 				return $value;
@@ -72,7 +93,7 @@ final readonly class SimpleTypeHydrator {
 		);
 	}
 
-	public function hydrateBoolean(Value $value, BooleanType $targetType, string $hydrationPath): BooleanValue {
+	private function hydrateBoolean(Value $value, BooleanType $targetType, string $hydrationPath): BooleanValue {
 		if ($value instanceof BooleanValue) {
 			return $value;
 		}
@@ -83,7 +104,7 @@ final readonly class SimpleTypeHydrator {
 		);
 	}
 
-	public function hydrateNull(Value $value, NullType $targetType, string $hydrationPath): NullValue {
+	private function hydrateNull(Value $value, NullType $targetType, string $hydrationPath): NullValue {
 		if ($value instanceof NullValue) {
 			return $value;
 		}
@@ -94,7 +115,7 @@ final readonly class SimpleTypeHydrator {
 		);
 	}
 
-	public function hydrateTrue(Value $value, TrueType $targetType, string $hydrationPath): BooleanValue {
+	private function hydrateTrue(Value $value, TrueType $targetType, string $hydrationPath): BooleanValue {
 		if ($value instanceof BooleanValue) {
 			if ($value->literalValue === true) {
 				return $value;
@@ -112,7 +133,7 @@ final readonly class SimpleTypeHydrator {
 		);
 	}
 
-	public function hydrateFalse(Value $value, FalseType $targetType, string $hydrationPath): BooleanValue {
+	private function hydrateFalse(Value $value, FalseType $targetType, string $hydrationPath): BooleanValue {
 		if ($value instanceof BooleanValue) {
 			if ($value->literalValue === false) {
 				return $value;
@@ -130,7 +151,7 @@ final readonly class SimpleTypeHydrator {
 		);
 	}
 
-	public function hydrateString(Value $value, StringType $targetType, string $hydrationPath): StringValue {
+	private function hydrateString(Value $value, StringType $targetType, string $hydrationPath): StringValue {
 		if ($value instanceof StringValue) {
 			$l = mb_strlen($value->literalValue);
 			if ($targetType->range->minLength <= $l && (
@@ -158,7 +179,7 @@ final readonly class SimpleTypeHydrator {
 		);
 	}
 
-	public function hydrateBytes(Value $value, BytesType $targetType, string $hydrationPath): BytesValue {
+	private function hydrateBytes(Value $value, BytesType $targetType, string $hydrationPath): BytesValue {
 		if ($value instanceof StringValue) {
 			$l = strlen($value->literalValue);
 			if ($targetType->range->minLength <= $l && (
@@ -186,7 +207,7 @@ final readonly class SimpleTypeHydrator {
 		);
 	}
 
-	public function hydrateStringSubset(Value $value, StringSubsetType $targetType, string $hydrationPath): StringValue {
+	private function hydrateStringSubset(Value $value, StringSubsetType $targetType, string $hydrationPath): StringValue {
 		if ($value instanceof StringValue) {
 			if ($targetType->contains($value->literalValue)) {
 				return $value;
@@ -208,7 +229,7 @@ final readonly class SimpleTypeHydrator {
 		);
 	}
 
-	public function hydrateReal(Value $value, RealType $targetType, string $hydrationPath): RealValue {
+	private function hydrateReal(Value $value, RealType $targetType, string $hydrationPath): RealValue {
 		if ($value instanceof IntegerValue || $value instanceof RealValue) {
 			if ($targetType->contains($value->literalValue)) {
 				return $this->valueRegistry->real((float)(string)$value->literalValue);

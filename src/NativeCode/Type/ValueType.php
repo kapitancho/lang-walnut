@@ -9,7 +9,6 @@ use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
-use Walnut\Lang\Blueprint\Type\CompositeNamedType;
 use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\MutableType;
@@ -34,7 +33,10 @@ final readonly class ValueType implements NativeMethod {
 	): TypeInterface {
 		if ($targetType instanceof TypeType) {
 			$refType = $this->toBaseType($targetType->refType);
-			if ($refType instanceof CompositeNamedType || $refType instanceof MutableType || $refType instanceof OptionalKeyType) {
+			if ($refType instanceof OpenType || $refType instanceof SealedType ||
+				$refType instanceof DataType || $refType instanceof MutableType ||
+				$refType instanceof OptionalKeyType
+			) {
 				return $typeRegistry->type($refType->valueType);
 			}
 			if ($refType instanceof MetaType) {

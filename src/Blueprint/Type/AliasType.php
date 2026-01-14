@@ -2,6 +2,6 @@
 
 namespace Walnut\Lang\Blueprint\Type;
 
-interface AliasType extends NamedType {
+interface AliasType extends NamedType, ComplexType {
 	public Type $aliasedType { get; }
 }

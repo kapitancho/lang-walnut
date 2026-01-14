@@ -2,7 +2,7 @@
 
 namespace Walnut\Lang\Blueprint\Type;
 
-interface RecordType extends Type {
+interface RecordType extends CompositeType {
 	/**
       * @param non-empty-list<Type> $types
       */

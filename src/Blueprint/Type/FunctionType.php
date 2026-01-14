@@ -4,7 +4,7 @@ namespace Walnut\Lang\Blueprint\Type;
 
 use Walnut\Lang\Blueprint\Value\FunctionCompositionMode;
 
-interface FunctionType extends Type {
+interface FunctionType extends CompositeType {
 	public Type $parameterType { get; }
 	public Type $returnType { get; }
 

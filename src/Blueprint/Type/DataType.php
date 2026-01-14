@@ -2,4 +2,4 @@
 
 namespace Walnut\Lang\Blueprint\Type;
 
-interface DataType extends CompositeNamedType {}
+interface DataType extends NamedType, ComplexType {}

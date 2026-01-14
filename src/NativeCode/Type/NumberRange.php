@@ -5,7 +5,6 @@ namespace Walnut\Lang\NativeCode\Type;
 use BcMath\Number;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;

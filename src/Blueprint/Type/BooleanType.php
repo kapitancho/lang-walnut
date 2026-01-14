@@ -6,7 +6,7 @@ use InvalidArgumentException;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Value\BooleanValue;
 
-interface BooleanType extends EnumerationType {
+interface BooleanType extends EnumerationType, SimpleType {
 	public BooleanType $enumeration { get; }
 	/** @param array<string, BooleanType> $subsetValues */
 	public array $subsetValues { get; }

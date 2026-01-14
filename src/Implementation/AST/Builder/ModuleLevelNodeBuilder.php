@@ -4,7 +4,6 @@ namespace Walnut\Lang\Implementation\AST\Builder;
 
 use Walnut\Lang\Blueprint\AST\Builder\ModuleLevelNodeBuilder as ModuleLevelNodeBuilderInterface;
 use Walnut\Lang\Blueprint\AST\Builder\SourceLocator;
-use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode as FunctionBodyNodeInterface;
 use Walnut\Lang\Blueprint\AST\Node\Module\ModuleDefinitionNode;
 use Walnut\Lang\Blueprint\AST\Node\NameAndTypeNode as NameAndTypeNodeInterface;
@@ -13,8 +12,6 @@ use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
-use Walnut\Lang\Implementation\AST\Node\FunctionBodyNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddAliasTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddAtomTypeNode;
 use Walnut\Lang\Implementation\AST\Node\Module\AddConstructorMethodNode;

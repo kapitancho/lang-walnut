@@ -8,8 +8,6 @@ use Walnut\Lang\Blueprint\Common\Identifier\IdentifierException;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Function\FunctionContextFiller as FunctionContextFillerInterface;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
-use Walnut\Lang\Blueprint\Type\CompositeNamedType;
-use Walnut\Lang\Blueprint\Type\CustomType;
 use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\NameAndType;
 use Walnut\Lang\Blueprint\Type\NothingType;
@@ -21,7 +19,6 @@ use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\UnknownProperty;
-use Walnut\Lang\Blueprint\Value\CustomValue;
 use Walnut\Lang\Blueprint\Value\DataValue;
 use Walnut\Lang\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Blueprint\Value\OpenValue;
@@ -56,7 +53,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 			)) :
 			$type;
 
-		if ($targetType instanceof CompositeNamedType) {
+		if ($targetType instanceof OpenType || $targetType instanceof SealedType || $targetType instanceof DataType) {
 			$analyserContext = $analyserContext->withAddedVariableType(
 				new VariableNameIdentifier('$$'),
 				$targetType->valueType
@@ -150,7 +147,8 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 	): ExecutionContext {
 		$t = $this->toBaseType($targetType);
 		if (
-			($t instanceof CustomType && $targetValue instanceof CustomValue) ||
+			($t instanceof OpenType && $targetValue instanceof OpenValue) ||
+			($t instanceof SealedType && $targetValue instanceof SealedValue) ||
 			($t instanceof DataType && $targetValue instanceof DataValue)
 		) {
 			$executionContext = $executionContext->withAddedVariableValue(

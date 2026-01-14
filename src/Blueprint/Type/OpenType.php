@@ -2,4 +2,4 @@
 
 namespace Walnut\Lang\Blueprint\Type;
 
-interface OpenType extends CustomType {}
+interface OpenType extends NamedType, ComplexType {}

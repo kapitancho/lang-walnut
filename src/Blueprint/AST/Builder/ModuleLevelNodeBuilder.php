@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Blueprint\AST\Builder;
 
-use Walnut\Lang\Blueprint\AST\Node\Expression\ExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddAliasTypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Module\AddAtomTypeNode;

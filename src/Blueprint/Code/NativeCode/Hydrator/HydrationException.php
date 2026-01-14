@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Code\NativeCode;
+namespace Walnut\Lang\Blueprint\Code\NativeCode\Hydrator;
 
 use RuntimeException;
 use Walnut\Lang\Blueprint\Value\Value;

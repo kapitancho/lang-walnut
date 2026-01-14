@@ -26,10 +26,11 @@ use Walnut\Lang\Blueprint\Function\CustomMethod;
 use Walnut\Lang\Blueprint\Function\FunctionBody;
 use Walnut\Lang\Blueprint\Program\ProgramContext;
 use Walnut\Lang\Blueprint\Program\UnknownType;
-use Walnut\Lang\Blueprint\Type\CustomType;
 use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
 use Walnut\Lang\Blueprint\Type\NothingType;
+use Walnut\Lang\Blueprint\Type\OpenType;
+use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\Type;
 
 final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
@@ -78,7 +79,7 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 			);
 		}
 		$returnType = match(true) {
-			$type instanceof CustomType => $type->valueType,
+			$type instanceof OpenType, $type instanceof SealedType => $type->valueType,
 			$type instanceof EnumerationType => $this->programContext->typeRegistry->union([
 				$type,
 				$this->programContext->typeRegistry->string()
@@ -114,61 +115,61 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 		try {
 			$result = match(true) {
 				$moduleDefinition instanceof AddAliasTypeNode =>
-				$this->programContext->typeRegistryBuilder->addAlias(
-					$moduleDefinition->name,
-					$this->type($moduleDefinition->aliasedType)
-				),
+					$this->programContext->typeRegistryBuilder->addAlias(
+						$moduleDefinition->name,
+						$this->type($moduleDefinition->aliasedType)
+					),
 				$moduleDefinition instanceof AddAtomTypeNode =>
-				$this->programContext->typeRegistryBuilder->addAtom($moduleDefinition->name),
+					$this->programContext->typeRegistryBuilder->addAtom($moduleDefinition->name),
 				$moduleDefinition instanceof AddConstructorMethodNode =>
-				$this->addConstructorMethod($moduleDefinition),
+					$this->addConstructorMethod($moduleDefinition),
 				$moduleDefinition instanceof AddEnumerationTypeNode =>
-				$this->programContext->typeRegistryBuilder->addEnumeration(
-					$moduleDefinition->name,
-					$moduleDefinition->values
-				),
+					$this->programContext->typeRegistryBuilder->addEnumeration(
+						$moduleDefinition->name,
+						$moduleDefinition->values
+					),
 				$moduleDefinition instanceof AddMethodNode =>
-				$this->programContext->customMethodRegistryBuilder->addMethod(
-					$this->type($moduleDefinition->targetType),
-					$moduleDefinition->methodName,
-					$this->programContext->typeRegistry->nameAndType(
-						$this->type($moduleDefinition->parameter->type),
-						$moduleDefinition->parameter->name
+					$this->programContext->customMethodRegistryBuilder->addMethod(
+						$this->type($moduleDefinition->targetType),
+						$moduleDefinition->methodName,
+						$this->programContext->typeRegistry->nameAndType(
+							$this->type($moduleDefinition->parameter->type),
+							$moduleDefinition->parameter->name
+						),
+						$this->programContext->typeRegistry->nameAndType(
+							$this->type($moduleDefinition->dependency->type),
+							$moduleDefinition->dependency->name
+						),
+						$this->type($moduleDefinition->returnType),
+						$this->functionBody($moduleDefinition->functionBody),
 					),
-					$this->programContext->typeRegistry->nameAndType(
-						$this->type($moduleDefinition->dependency->type),
-						$moduleDefinition->dependency->name
-					),
-					$this->type($moduleDefinition->returnType),
-					$this->functionBody($moduleDefinition->functionBody),
-				),
 				$moduleDefinition instanceof AddDataTypeNode =>
-				$this->programContext->typeRegistryBuilder->addData(
-					$moduleDefinition->name,
-					$this->type($moduleDefinition->valueType),
-				),
+					$this->programContext->typeRegistryBuilder->addData(
+						$moduleDefinition->name,
+						$this->type($moduleDefinition->valueType),
+					),
 				$moduleDefinition instanceof AddOpenTypeNode =>
-				$this->programContext->typeRegistryBuilder->addOpen(
-					$moduleDefinition->name,
-					$this->type($moduleDefinition->valueType),
-					$moduleDefinition->constructorBody ?
-						$this->validatorBody(
-							$moduleDefinition->constructorBody
-						) : null,
-					$moduleDefinition->errorType ?
-						$this->type($moduleDefinition->errorType) : null
-				),
+					$this->programContext->typeRegistryBuilder->addOpen(
+						$moduleDefinition->name,
+						$this->type($moduleDefinition->valueType),
+						$moduleDefinition->constructorBody ?
+							$this->validatorBody(
+								$moduleDefinition->constructorBody
+							) : null,
+						$moduleDefinition->errorType ?
+							$this->type($moduleDefinition->errorType) : null
+					),
 				$moduleDefinition instanceof AddSealedTypeNode =>
-				$this->programContext->typeRegistryBuilder->addSealed(
-					$moduleDefinition->name,
-					$this->type($moduleDefinition->valueType),
-					$moduleDefinition->constructorBody ?
-						$this->validatorBody(
-							$moduleDefinition->constructorBody
-						) : null,
-					$moduleDefinition->errorType ?
-						$this->type($moduleDefinition->errorType) : null
-				),
+					$this->programContext->typeRegistryBuilder->addSealed(
+						$moduleDefinition->name,
+						$this->type($moduleDefinition->valueType),
+						$moduleDefinition->constructorBody ?
+							$this->validatorBody(
+								$moduleDefinition->constructorBody
+							) : null,
+						$moduleDefinition->errorType ?
+							$this->type($moduleDefinition->errorType) : null
+					),
 				// @codeCoverageIgnoreStart
 				true => throw new AstCompilationException(
 					$moduleDefinition,

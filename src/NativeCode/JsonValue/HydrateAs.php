@@ -4,6 +4,7 @@ namespace Walnut\Lang\NativeCode\JsonValue;
 
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
+use Walnut\Lang\Blueprint\Code\NativeCode\Hydrator\HydrationException;
 use Walnut\Lang\Blueprint\Function\NativeMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
@@ -12,8 +13,7 @@ use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Blueprint\Value\TypeValue;
 use Walnut\Lang\Blueprint\Value\Value;
-use Walnut\Lang\Implementation\Code\NativeCode\HydrationException;
-use Walnut\Lang\Implementation\Code\NativeCode\Hydrator\Hydrator;
+use Walnut\Lang\Implementation\Code\NativeCode\Hydrator\HydratorFactory;
 
 final readonly class HydrateAs implements NativeMethod {
 
@@ -39,11 +39,11 @@ final readonly class HydrateAs implements NativeMethod {
 	): Value {
 		if ($parameter instanceof TypeValue) {
 			try {
-				return new Hydrator(
+				return new HydratorFactory(
 					$programRegistry->typeRegistry,
 					$programRegistry->valueRegistry,
 					$programRegistry->methodContext,
-				)->hydrate($target, $parameter->typeValue, 'value');
+				)->hydrator->hydrate($target, $parameter->typeValue, 'value');
 			} catch (HydrationException $e) {
 				return $programRegistry->valueRegistry->error(
 					$programRegistry->valueRegistry->core->hydrationError(

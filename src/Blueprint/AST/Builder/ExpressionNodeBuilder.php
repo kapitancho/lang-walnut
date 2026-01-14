@@ -33,7 +33,6 @@ use Walnut\Lang\Blueprint\AST\Node\Expression\SetExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\TupleExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\VariableAssignmentExpressionNode;
 use Walnut\Lang\Blueprint\AST\Node\Expression\VariableNameExpressionNode;
-use Walnut\Lang\Blueprint\AST\Node\FunctionBodyNode;
 use Walnut\Lang\Blueprint\AST\Node\Type\TypeNode;
 use Walnut\Lang\Blueprint\AST\Node\Value\ValueNode;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;

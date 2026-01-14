@@ -19,7 +19,7 @@ use Walnut\Lang\Implementation\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Implementation\Type\Helper\BaseType;
 
 /** @psalm-immutable */
-final class ShapeType implements ShapeTypeInterface, JsonSerializable {
+final class ShapeType implements ShapeTypeInterface, SupertypeChecker, JsonSerializable {
 	use BaseType;
 
 	private readonly Type $realValueType;

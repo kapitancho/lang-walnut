@@ -10,15 +10,17 @@ use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\BooleanType;
-use Walnut\Lang\Blueprint\Type\CompositeNamedType;
 use Walnut\Lang\Blueprint\Type\CoreType;
+use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\IntegerType;
 use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\NullType;
+use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\ResultType;
+use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
@@ -80,7 +82,10 @@ final readonly class CastAsJsonValue {
 				return true;
 			}
 		}
-		if ($type instanceof MutableType || $type instanceof CompositeNamedType) {
+		if (
+			$type instanceof MutableType || $type instanceof OpenType ||
+			$type instanceof SealedType || $type instanceof DataType
+		) {
 			return $this->isSafeToCastType($typeRegistry, $methodAnalyser, $type->valueType);
 		}
 		return false;
