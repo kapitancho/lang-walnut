@@ -10,10 +10,10 @@ use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\TypeType;
-use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Blueprint\Value\TypeValue;
+use Walnut\Lang\Blueprint\Value\Value;
 use Walnut\Lang\Implementation\Code\NativeCode\HydrationException;
-use Walnut\Lang\Implementation\Code\NativeCode\Hydrator;
+use Walnut\Lang\Implementation\Code\NativeCode\Hydrator\Hydrator;
 
 final readonly class HydrateAs implements NativeMethod {
 
@@ -40,7 +40,9 @@ final readonly class HydrateAs implements NativeMethod {
 		if ($parameter instanceof TypeValue) {
 			try {
 				return new Hydrator(
-					$programRegistry,
+					$programRegistry->typeRegistry,
+					$programRegistry->valueRegistry,
+					$programRegistry->methodContext,
 				)->hydrate($target, $parameter->typeValue, 'value');
 			} catch (HydrationException $e) {
 				return $programRegistry->valueRegistry->error(

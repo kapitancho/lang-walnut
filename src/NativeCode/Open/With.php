@@ -69,7 +69,9 @@ final readonly class With implements NativeMethod {
 				$parameter,
 				static function(Value $parameter) use ($programRegistry, $target): Value {
 					return new ValueConstructor()->executeValidator(
-						$programRegistry,
+						$programRegistry->typeRegistry,
+						$programRegistry->valueRegistry,
+						$programRegistry->methodContext,
 						$target->type,
 						$parameter
 					);

@@ -134,7 +134,9 @@ final class DependencyContainer implements DependencyContainerInterface {
 			}
 			if ($baseValue instanceof Value) {
 				$result = $this->valueConstructor->executeConstructor(
-					$this->programRegistry,
+					$this->programRegistry->typeRegistry,
+					$this->programRegistry->valueRegistry,
+					$this->programRegistry->methodContext,
 					$type,
 					$baseValue
 				);

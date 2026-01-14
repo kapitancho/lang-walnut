@@ -50,7 +50,9 @@ final readonly class Construct implements NativeMethod {
 			$t = $parameter->typeValue;
 
 			return new ValueConstructor()->executeConstructor(
-				$programRegistry,
+				$programRegistry->typeRegistry,
+				$programRegistry->valueRegistry,
+				$programRegistry->methodContext,
 				$t,
 				$target
 			);

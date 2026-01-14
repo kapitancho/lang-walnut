@@ -8,6 +8,7 @@ use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Function\UnknownMethod;
 use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
+use Walnut\Lang\Blueprint\Program\Registry\MethodContext;
 use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry;
@@ -224,14 +225,16 @@ final readonly class ValueConstructor {
 	}
 
 	public function executeConstructor(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		ValueRegistry $valueRegistry,
+		MethodContext $methodContext,
 		Type $resultType,
 		Value $parameter
 	): Value {
-		$constructorType = $this->getConstructorType($programRegistry->typeRegistry);
+		$constructorType = $this->getConstructorType($typeRegistry);
 
 		if ($resultType instanceof NamedType) {
-			$constructed = $programRegistry->methodContext->safeExecuteMethod(
+			$constructed = $methodContext->safeExecuteMethod(
 				$constructorType->value,
 				new MethodNameIdentifier($resultType->name->identifier),
 				$parameter
@@ -245,33 +248,37 @@ final readonly class ValueConstructor {
 		}
 
 		return $this->executeValidator(
-			$programRegistry,
+			$typeRegistry,
+			$valueRegistry,
+			$methodContext,
 			$resultType,
 			$parameter
 		);
 	}
 
 	public function executeValidator(
-		ProgramRegistry $programRegistry,
+		TypeRegistry $typeRegistry,
+		ValueRegistry $valueRegistry,
+		MethodContext $methodContext,
 		Type $resultType,
 		Value $parameter
 	): Value {
 		$constructingType = $this->getConstructingType(
-			$programRegistry->typeRegistry,
+			$typeRegistry,
 			$resultType,
 			$parameter->type
 		);
 
 		$parameter = $this->adjustParameterValue(
-			$programRegistry->valueRegistry,
+			$valueRegistry,
 			$constructingType,
 			$parameter
 		);
 
-		$constructorType = $this->getConstructorType($programRegistry->typeRegistry);
+		$constructorType = $this->getConstructorType($typeRegistry);
 
 		if ($resultType instanceof NamedType) {
-			$constructed = $programRegistry->methodContext->safeExecuteMethod(
+			$constructed = $methodContext->safeExecuteMethod(
 				$constructorType->value,
 				new MethodNameIdentifier('as' . $resultType->name->identifier),
 				$parameter
@@ -281,7 +288,7 @@ final readonly class ValueConstructor {
 			}
 		}
 		return $this->getValidatorOutputValue(
-			$programRegistry->valueRegistry,
+			$valueRegistry,
 			$resultType,
 			$parameter
 		);
