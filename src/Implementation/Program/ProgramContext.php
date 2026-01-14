@@ -24,8 +24,8 @@ final readonly class ProgramContext implements ProgramContextInterface {
 	public function __construct(
 		public CustomMethodRegistryBuilderInterface      $customMethodRegistryBuilder,
 		public CustomMethodRegistry                      $customMethodRegistry,
-		public TypeRegistryBuilderInterface              $typeRegistryBuilder,
 		public TypeRegistry                              $typeRegistry,
+		public TypeRegistryBuilderInterface              $typeRegistryBuilder,
 		public ValueRegistryInterface                    $valueRegistry,
 		public ExpressionRegistryInterface               $expressionRegistry,
 		public MethodFinder                              $methodRegistry,

@@ -3,8 +3,6 @@
 namespace Walnut\Lang\Blueprint\Program\Registry;
 
 use BcMath\Number;
-use InvalidArgumentException;
-use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Range\InvalidLengthRange;
@@ -14,16 +12,12 @@ use Walnut\Lang\Blueprint\Common\Range\NumberInterval;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Common\Type\MetaTypeValue;
 use Walnut\Lang\Blueprint\Program\UnknownType;
-use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AnyType;
 use Walnut\Lang\Blueprint\Type\ArrayType;
 use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Type\BooleanType;
 use Walnut\Lang\Blueprint\Type\BytesType;
-use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
-use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
-use Walnut\Lang\Blueprint\Type\EnumerationType;
 use Walnut\Lang\Blueprint\Type\FalseType;
 use Walnut\Lang\Blueprint\Type\FunctionType;
 use Walnut\Lang\Blueprint\Type\IntegerSubsetType;
@@ -32,17 +26,14 @@ use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\NameAndType;
-use Walnut\Lang\Blueprint\Type\NamedType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\NullType;
-use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\OptionalKeyType;
 use Walnut\Lang\Blueprint\Type\ProxyNamedType;
 use Walnut\Lang\Blueprint\Type\RealSubsetType;
 use Walnut\Lang\Blueprint\Type\RealType;
 use Walnut\Lang\Blueprint\Type\RecordType;
 use Walnut\Lang\Blueprint\Type\ResultType;
-use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\SetType;
 use Walnut\Lang\Blueprint\Type\ShapeType;
 use Walnut\Lang\Blueprint\Type\StringSubsetType;
@@ -51,15 +42,15 @@ use Walnut\Lang\Blueprint\Type\TrueType;
 use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\TypeType;
-use Walnut\Lang\Blueprint\Type\UnknownEnumerationValue;
 
-interface TypeRegistry {
+interface TypeRegistry extends ComplexTypeRegistry {
 	public TypeRegistryCore $core { get; }
 
 	public AnyType $any { get; }
 	public NothingType $nothing { get; }
 
 	public NullType $null { get; }
+	public AtomType $constructor { get; }
 	public BooleanType $boolean { get; }
 	public TrueType $true { get; }
 	public FalseType $false { get; }
@@ -157,21 +148,4 @@ interface TypeRegistry {
 	public function metaType(MetaTypeValue $value): MetaType;
 	/** @throws UnknownType */
 	public function typeByName(TypeNameIdentifier $typeName): Type;
-	/** @throws UnknownType */
-	public function withName(TypeNameIdentifier $typeName): NamedType;
-	/** @throws UnknownType */
-	public function alias(TypeNameIdentifier $typeName): AliasType;
-	/** @throws UnknownType */
-	public function data(TypeNameIdentifier $typeName): DataType;
-	/** @throws UnknownType */
-	public function open(TypeNameIdentifier $typeName): OpenType;
-	public function sealed(TypeNameIdentifier $typeName): SealedType;
-	public function atom(TypeNameIdentifier $typeName): AtomType;
-	/** @throws UnknownType */
-	public function enumeration(TypeNameIdentifier $typeName): EnumerationType;
-	/**
-	  * @param non-empty-list<EnumValueIdentifier> $values
-	  * @throws UnknownEnumerationValue|DuplicateSubsetValue|InvalidArgumentException
-	  **/
-    public function enumerationSubsetType(TypeNameIdentifier $typeName, array $values): EnumerationSubsetType;
-}
+	}

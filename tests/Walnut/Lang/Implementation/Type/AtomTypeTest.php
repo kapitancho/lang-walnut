@@ -2,33 +2,16 @@
 
 namespace Walnut\Lang\Test\Implementation\Type;
 
-use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Program\UnknownType;
-use Walnut\Lang\Implementation\AST\Parser\StringEscapeCharHandler;
-use Walnut\Lang\Implementation\Code\NativeCode\NativeCodeTypeMapper;
-use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
-use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
-use Walnut\Lang\Implementation\Program\Registry\MainMethodRegistry;
-use Walnut\Lang\Implementation\Program\Registry\NestedMethodRegistry;
+use Walnut\Lang\Test\BaseProgramTestHelper;
 
-final class AtomTypeTest extends TestCase {
-
-	private readonly TypeRegistryBuilder $typeRegistry;
+final class AtomTypeTest extends BaseProgramTestHelper {
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->typeRegistry = new TypeRegistryBuilder(
-			new CustomMethodRegistryBuilder(),
-			new MainMethodRegistry(
-				new NativeCodeTypeMapper(),
-				new NestedMethodRegistry(),
-				[]
-			),
-			new StringEscapeCharHandler()
-		);
-		$this->typeRegistry->addAtom(new TypeNameIdentifier('MyAtom'));
-		$this->typeRegistry->addAtom(new TypeNameIdentifier('AnotherAtom'));
+		$this->typeRegistryBuilder->addAtom(new TypeNameIdentifier('MyAtom'));
+		$this->typeRegistryBuilder->addAtom(new TypeNameIdentifier('AnotherAtom'));
 	}
 
 	public function testAtomType(): void {

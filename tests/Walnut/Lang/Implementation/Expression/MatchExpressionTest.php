@@ -3,23 +3,19 @@
 namespace Walnut\Lang\Test\Implementation\Expression;
 
 use PHPUnit\Framework\TestCase;
-use Walnut\Lang\Implementation\Code\Analyser\AnalyserContext;
-use Walnut\Lang\Implementation\Code\Execution\ExecutionContext;
+use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
 use Walnut\Lang\Implementation\Code\Expression\ConstantExpression;
 use Walnut\Lang\Implementation\Code\Expression\MatchExpression;
 use Walnut\Lang\Implementation\Code\Expression\MatchExpressionDefault;
 use Walnut\Lang\Implementation\Code\Expression\MatchExpressionEquals;
 use Walnut\Lang\Implementation\Code\Expression\MatchExpressionIsSubtypeOf;
 use Walnut\Lang\Implementation\Code\Expression\MatchExpressionPair;
-use Walnut\Lang\Implementation\Code\Scope\VariableScope;
-use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
-use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
 use Walnut\Lang\Implementation\Program\ProgramContextFactory;
 use Walnut\Lang\Implementation\Program\Registry\ProgramRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
 
 final class MatchExpressionTest extends TestCase {
-	private readonly TypeRegistryBuilder $typeRegistry;
+	private readonly TypeRegistry $typeRegistry;
 	private readonly ValueRegistry $valueRegistry;
 	private readonly ProgramRegistry $programRegistry;
 	private readonly MatchExpression $matchExpression;

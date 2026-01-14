@@ -4,7 +4,7 @@ namespace Walnut\Lang\Test\Implementation\Program\Builder;
 
 use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Program\Builder\CustomMethodRegistryBuilder;
+use Walnut\Lang\Blueprint\Program\Registry\ComplexTypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Type\AnyType;
 use Walnut\Lang\Blueprint\Type\ArrayType;
@@ -23,29 +23,25 @@ use Walnut\Lang\Blueprint\Type\StringType;
 use Walnut\Lang\Blueprint\Type\TrueType;
 use Walnut\Lang\Blueprint\Type\TypeType;
 use Walnut\Lang\Implementation\AST\Parser\StringEscapeCharHandler;
-use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
+use Walnut\Lang\Implementation\Program\Registry\TypeRegistry;
 
 class TypeRegistryBuilderTest extends TestCase {
 
-	private TypeRegistryBuilder $typeRegistryBuilder;
+	private TypeRegistry $typeRegistry;
 
 	protected function setUp(): void {
 		parent::setUp();
 
-		$this->typeRegistryBuilder = new TypeRegistryBuilder(
-			$this->createMock(CustomMethodRegistryBuilder::class),
+		$this->typeRegistry = new TypeRegistry(
 			$this->createMock(MethodFinder::class),
 			new StringEscapeCharHandler(),
+			$this->createMock(ComplexTypeRegistry::class),
 		);
-		$this->typeRegistryBuilder->addSealed(
-			new TypeNameIdentifier('ExternalError'),
-			$this->typeRegistryBuilder->null
-		); // Fake reference
 	}
 
 
 	public function testTypeByName(): void {
-		$b = $this->typeRegistryBuilder;
+		$b = $this->typeRegistry;
 		$this->assertInstanceOf(AnyType::class, $b->typeByName(new TypeNameIdentifier('Any')));
 		$this->assertInstanceOf(NothingType::class, $b->typeByName(new TypeNameIdentifier('Nothing')));
 		$this->assertInstanceOf(ArrayType::class, $b->typeByName(new TypeNameIdentifier('Array')));

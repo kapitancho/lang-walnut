@@ -92,7 +92,7 @@ final readonly class AstModuleCompiler implements AstModuleCompilerInterface {
 			// @codeCoverageIgnoreEnd
 		};
 		return $this->programContext->customMethodRegistryBuilder->addMethod(
-			$this->programContext->typeRegistry->core->constructor,
+			$this->programContext->typeRegistry->constructor,
 			new MethodNameIdentifier($typeName),
 			$this->programContext->typeRegistry->nameAndType(
 				$parameterType,

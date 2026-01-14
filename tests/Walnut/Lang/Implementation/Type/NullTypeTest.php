@@ -2,30 +2,10 @@
 
 namespace Walnut\Lang\Test\Implementation\Type;
 
-use PHPUnit\Framework\TestCase;
-use Walnut\Lang\Implementation\AST\Parser\StringEscapeCharHandler;
-use Walnut\Lang\Implementation\Code\NativeCode\NativeCodeTypeMapper;
-use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
-use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
-use Walnut\Lang\Implementation\Program\Registry\MainMethodRegistry;
-use Walnut\Lang\Implementation\Program\Registry\NestedMethodRegistry;
+use Walnut\Lang\Test\BaseProgramTestHelper;
 
-final class NullTypeTest extends TestCase {
+final class NullTypeTest extends BaseProgramTestHelper {
 
-	private readonly TypeRegistryBuilder $typeRegistry;
-
-	protected function setUp(): void {
-		parent::setUp();
-		$this->typeRegistry = new TypeRegistryBuilder(
-			new CustomMethodRegistryBuilder(),
-			new MainMethodRegistry(
-				new NativeCodeTypeMapper(),
-				new NestedMethodRegistry(),
-				[]
-			),
-			new StringEscapeCharHandler()
-		);
-	}
 	public function testNullType(): void {
 		$nullType = $this->typeRegistry->null;
 		self::assertEquals('Null', $nullType->name->identifier);

@@ -13,7 +13,6 @@ interface TypeRegistryCore {
 	public DataType        $cannotFormatString            { get; }
 	public DataType        $castNotAvailable              { get; }
 	public AliasType       $cliEntryPoint                 { get; }
-	public AtomType        $constructor                   { get; }
 	public AtomType        $dependencyContainer           { get; }
 	public DataType        $dependencyContainerError      { get; }
 	public EnumerationType $dependencyContainerErrorType  { get; }

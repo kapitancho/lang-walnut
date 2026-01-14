@@ -9,10 +9,6 @@ use Walnut\Lang\Blueprint\Code\Expression\MethodCallExpression;
 use Walnut\Lang\Blueprint\Common\Identifier\MethodNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
-use Walnut\Lang\Implementation\Code\Analyser\AnalyserContext;
-use Walnut\Lang\Implementation\Code\Execution\ExecutionContext;
-use Walnut\Lang\Implementation\Code\Scope\VariableScope;
-use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
 use Walnut\Lang\Test\Implementation\BaseProgramTestHelper;
 
 final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
@@ -42,7 +38,7 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 			$this->expressionRegistry->variableName(new VariableNameIdentifier('#')),
 			1
 		);
-		$this->typeRegistry->addAlias(
+		$this->typeRegistryBuilder->addAlias(
 			new TypeNameIdentifier("MyRecord"),
 			$this->typeRegistry->record([
 				'x' => $this->typeRegistry->integer(),
@@ -55,7 +51,7 @@ final class PropertyAccessExpressionTest extends BaseProgramTestHelper {
 			),
 			$this->typeRegistry->nothing
 		);
-		$this->typeRegistry->addAlias(
+		$this->typeRegistryBuilder->addAlias(
 			new TypeNameIdentifier("MyTuple"),
 			$this->typeRegistry->tuple([
 				$this->typeRegistry->integer(),

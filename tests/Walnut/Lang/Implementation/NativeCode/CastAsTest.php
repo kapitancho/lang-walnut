@@ -8,10 +8,6 @@ use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
-use Walnut\Lang\Implementation\Code\Analyser\AnalyserContext;
-use Walnut\Lang\Implementation\Code\Execution\ExecutionContext;
-use Walnut\Lang\Implementation\Code\Scope\VariableScope;
-use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
 use Walnut\Lang\Test\Implementation\BaseProgramTestHelper;
 
 final class CastAsTest extends BaseProgramTestHelper {
@@ -260,29 +256,7 @@ final class CastAsTest extends BaseProgramTestHelper {
 			),
 		);
 
-		$j = new TypeNameIdentifier('JsonValue');
-		$aliasType = $this->typeRegistry->proxyType($j);
-	    //$jsonValueType =
-		$this->typeRegistry->addAlias($j,
-		    $this->typeRegistry->union([
-				$this->typeRegistry->null,
-			    $this->typeRegistry->boolean,
-			    $this->typeRegistry->integer(),
-			    $this->typeRegistry->real(),
-			    $this->typeRegistry->string(),
-			    $this->typeRegistry->array($aliasType),
-			    $this->typeRegistry->map($aliasType),
-			    $this->typeRegistry->result($this->typeRegistry->nothing, $aliasType),
-			    $this->typeRegistry->mutable($aliasType)
-		    ], false),
-	    );
-
-
-		//$this->callCastAs(
-		//	$this->valueRegistry->string("1"),
-			$jv = $this->typeRegistry->alias(new TypeNameIdentifier('JsonValue'));//,
-		//	$this->valueRegistry->string("1")
-		//);
+		$jv = $this->typeRegistry->alias(new TypeNameIdentifier('JsonValue'));
 
 		$this->customMethodRegistryBuilder->addMethod(
 			$enumType,

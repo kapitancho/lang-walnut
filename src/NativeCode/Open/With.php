@@ -32,7 +32,7 @@ final readonly class With implements NativeMethod {
 			$valueType = $this->toBaseType($type->valueType);
 
 			$alignTypeWithValidator = static function() use ($typeRegistry, $methodAnalyser, $targetType, $valueType) {
-				$constructorType = $typeRegistry->core->constructor;
+				$constructorType = $typeRegistry->constructor;
 				$validatorResultType = $methodAnalyser->safeAnalyseMethod(
 					$constructorType,
 					new MethodNameIdentifier('as' . $targetType->name->identifier),

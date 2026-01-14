@@ -33,7 +33,7 @@ final readonly class ValueConstructor {
 	public function __construct() {}
 
 	private function getConstructorType(TypeRegistry $typeRegistry): AtomType {
-		return $typeRegistry->core->constructor;
+		return $typeRegistry->constructor;
 	}
 
 	private function getConstructingType(TypeRegistry $typeRegistry, Type $type, Type $parameterType): Type {

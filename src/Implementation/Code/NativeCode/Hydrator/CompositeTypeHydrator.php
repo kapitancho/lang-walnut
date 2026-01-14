@@ -324,5 +324,4 @@ final readonly class CompositeTypeHydrator implements CompositeTypeHydratorInter
 			}
 		}
 	}
-
 }

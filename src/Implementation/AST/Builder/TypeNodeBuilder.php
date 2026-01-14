@@ -61,97 +61,61 @@ final class TypeNodeBuilder implements TypeNodeBuilderInterface {
 	}
 
 	public AnyTypeNode $anyType {
-		get {
-			return new AnyTypeNode($this->getSourceLocation());
-		}
+		get { return new AnyTypeNode($this->getSourceLocation()); }
 	}
 	public NothingTypeNode $nothingType {
-		get {
-			return new NothingTypeNode($this->getSourceLocation());
-		}
+		get { return new NothingTypeNode($this->getSourceLocation()); }
 	}
 	public NullTypeNode $nullType {
-		get {
-			return new NullTypeNode($this->getSourceLocation());
-		}
+		get { return new NullTypeNode($this->getSourceLocation()); }
 	}
 	public TrueTypeNode $trueType {
-		get {
-			return new TrueTypeNode($this->getSourceLocation());
-		}
+		get { return new TrueTypeNode($this->getSourceLocation()); }
 	}
 	public FalseTypeNode $falseType {
-		get {
-			return new FalseTypeNode($this->getSourceLocation());
-		}
+		get { return new FalseTypeNode($this->getSourceLocation()); }
 	}
 	public BooleanTypeNode $booleanType {
-		get {
-			return new BooleanTypeNode($this->getSourceLocation());
-		}
+		get { return new BooleanTypeNode($this->getSourceLocation()); }
 	}
 
 	/** @param array<string, TypeNode> $types */
 	public function recordType(array $types, TypeNode|null $restType = null): RecordTypeNode {
-		return new RecordTypeNode(
-			$this->getSourceLocation(),
-			$types,
-			$restType ?? $this->nothingType
+		return new RecordTypeNode($this->getSourceLocation(),
+			$types, $restType ?? $this->nothingType
 		);
 	}
 
 	/** @param list<TypeNode> $types */
 	public function tupleType(array $types, TypeNode|null $restType = null): TupleTypeNode {
-		return new TupleTypeNode(
-			$this->getSourceLocation(),
-			$types,
-			$restType ?? $this->nothingType
+		return new TupleTypeNode($this->getSourceLocation(),
+			$types, $restType ?? $this->nothingType
 		);
 	}
 
 	/** @param list<EnumValueIdentifier> $values */
 	public function enumerationSubsetType(TypeNameIdentifier $name, array $values): EnumerationSubsetTypeNode {
-		return new EnumerationSubsetTypeNode(
-			$this->getSourceLocation(),
-			$name,
-			$values
-		);
+		return new EnumerationSubsetTypeNode($this->getSourceLocation(), $name, $values);
 	}
 
 	public function namedType(TypeNameIdentifier $name): NamedTypeNode {
-		return new NamedTypeNode(
-			$this->getSourceLocation(),
-			$name
-		);
+		return new NamedTypeNode($this->getSourceLocation(), $name);
 	}
 
 	public function resultType(TypeNode $returnType, TypeNode $errorType): ResultTypeNode {
-		return new ResultTypeNode(
-			$this->getSourceLocation(),
-			$returnType,
-			$errorType
-		);
+		return new ResultTypeNode($this->getSourceLocation(), $returnType, $errorType);
 	}
 
 	public function impureType(TypeNode $valueType): ImpureTypeNode {
-		return new ImpureTypeNode(
-			$this->getSourceLocation(),
-			$valueType
-		);
+		return new ImpureTypeNode($this->getSourceLocation(), $valueType);
 	}
 
 	public function mutableType(TypeNode $valueType): MutableTypeNode {
-		return new MutableTypeNode(
-			$this->getSourceLocation(),
-			$valueType
-		);
+		return new MutableTypeNode($this->getSourceLocation(), $valueType);
 	}
 
 	public function metaTypeType(MetaTypeValue $value): MetaTypeTypeNode {
-		return new MetaTypeTypeNode(
-			$this->getSourceLocation(),
-			$value
-		);
+		return new MetaTypeTypeNode($this->getSourceLocation(), $value);
 	}
 
 	public function intersectionType(TypeNode $left, TypeNode $right): IntersectionTypeNode {
@@ -179,38 +143,32 @@ final class TypeNodeBuilder implements TypeNodeBuilderInterface {
 	}
 
 	public function shapeType(TypeNode $refType): ShapeTypeNode {
-		return new ShapeTypeNode(
-			$this->getSourceLocation(),
+		return new ShapeTypeNode($this->getSourceLocation(),
 			$refType
 		);
 	}
 
 	public function typeType(TypeNode $refType): TypeTypeNode {
-		return new TypeTypeNode(
-			$this->getSourceLocation(),
+		return new TypeTypeNode($this->getSourceLocation(),
 			$refType
 		);
 	}
 
 	public function proxyType(TypeNameIdentifier $typeName): ProxyTypeNode {
-		return new ProxyTypeNode(
-			$this->getSourceLocation(),
+		return new ProxyTypeNode($this->getSourceLocation(),
 			$typeName
 		);
 	}
 
 	public function optionalKeyType(TypeNode $valueType): OptionalKeyTypeNode {
-		return new OptionalKeyTypeNode(
-			$this->getSourceLocation(),
+		return new OptionalKeyTypeNode($this->getSourceLocation(),
 			$valueType
 		);
 	}
 
 	public function functionType(TypeNode $parameterType, TypeNode $returnType): FunctionTypeNode {
-		return new FunctionTypeNode(
-			$this->getSourceLocation(),
-			$parameterType,
-			$returnType
+		return new FunctionTypeNode($this->getSourceLocation(),
+			$parameterType, $returnType
 		);
 	}
 
@@ -273,11 +231,8 @@ final class TypeNodeBuilder implements TypeNodeBuilderInterface {
 		Number $minLength = new Number(0),
 		PlusInfinity|Number $maxLength = PlusInfinity::value
 	): ArrayTypeNode {
-		return new ArrayTypeNode(
-			$this->getSourceLocation(),
-			$itemType ?? $this->anyType,
-			$minLength,
-			$maxLength
+		return new ArrayTypeNode($this->getSourceLocation(),
+			$itemType ?? $this->anyType, $minLength, $maxLength
 		);
 	}
 
@@ -287,12 +242,9 @@ final class TypeNodeBuilder implements TypeNodeBuilderInterface {
 		Number $minLength = new Number(0),
 		PlusInfinity|Number $maxLength = PlusInfinity::value
 	): MapTypeNode {
-		return new MapTypeNode(
-			$this->getSourceLocation(),
-			$keyType ?? $this->stringType(),
-			$itemType ?? $this->anyType,
-			$minLength,
-			$maxLength
+		return new MapTypeNode($this->getSourceLocation(),
+			$keyType ?? $this->stringType(), $itemType ?? $this->anyType,
+			$minLength, $maxLength
 		);
 	}
 
@@ -301,16 +253,12 @@ final class TypeNodeBuilder implements TypeNodeBuilderInterface {
 		Number $minLength = new Number(0),
 		Number|PlusInfinity $maxLength = PlusInfinity::value
 	): SetTypeNode {
-		return new SetTypeNode(
-			$this->getSourceLocation(),
-			$itemType ?? $this->anyType,
-			$minLength,
-			$maxLength
+		return new SetTypeNode($this->getSourceLocation(),
+			$itemType ?? $this->anyType, $minLength, $maxLength
 		);
 	}
 
 	public function nameAndType(TypeNode $type, VariableNameIdentifier|null $name): NameAndTypeNode {
 		return new NameAndTypeNode($this->getSourceLocation(), $type, $name);
 	}
-
 }

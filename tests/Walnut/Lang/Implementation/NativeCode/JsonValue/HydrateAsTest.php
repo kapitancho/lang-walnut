@@ -11,10 +11,6 @@ use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\VariableNameIdentifier;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Value\Value;
-use Walnut\Lang\Implementation\Code\Analyser\AnalyserContext;
-use Walnut\Lang\Implementation\Code\Execution\ExecutionContext;
-use Walnut\Lang\Implementation\Code\Scope\VariableScope;
-use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
 use Walnut\Lang\Test\Implementation\BaseProgramTestHelper;
 
 final class HydrateAsTest extends BaseProgramTestHelper {
@@ -65,19 +61,8 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		);
 	}
 
-    private function analyseCallHydrateAs(Type $type): void {
-        $this->testMethodCallAnalyse(
-			$this->typeRegistry->withName(new TypeNameIdentifier('JsonValue')),
-	        'hydrateAs',
-            $this->typeRegistry->type($type),
-            $this->typeRegistry->result(
-				$type, $this->typeRegistry->withName(new TypeNameIdentifier("HydrationError"))
-            )
-        );
-    }
-
 	public function testHydrateAs(): void {
-		$this->typeRegistry->addAtom(
+		$this->typeRegistryBuilder->addAtom(
 			new TypeNameIdentifier('MyAtom'),
 		);
 
@@ -100,7 +85,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			)
 		);
 
-		$this->typeRegistry->addEnumeration(
+		$this->typeRegistryBuilder->addEnumeration(
 			new TypeNameIdentifier('MyEnum'),[
 				new EnumValueIdentifier('A'),
 				new EnumValueIdentifier('B'),
@@ -109,17 +94,17 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			]
 		);
 
-		$this->typeRegistry->addAlias(
+		$this->typeRegistryBuilder->addAlias(
 			new TypeNameIdentifier('MyAlias'),
 			$this->typeRegistry->integer(1, 5)
 		);
 
-		$this->typeRegistry->addData(
+		$this->typeRegistryBuilder->addData(
 			new TypeNameIdentifier('MyData'),
 			$this->typeRegistry->record(['x' => $this->typeRegistry->integer()]),
 		);
 
-		$this->typeRegistry->addOpen(
+		$this->typeRegistryBuilder->addOpen(
 			new TypeNameIdentifier('MyOpen'),
 			$this->typeRegistry->record(['x' => $this->typeRegistry->integer()]),
 			$this->expressionRegistry->functionBody(
@@ -128,7 +113,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			null
 		);
 
-		$this->typeRegistry->addSealed(
+		$this->typeRegistryBuilder->addSealed(
 			new TypeNameIdentifier('MySealed'),
 			$this->typeRegistry->record(['x' => $this->typeRegistry->integer()]),
 			$this->expressionRegistry->functionBody(
@@ -137,7 +122,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			null
 		);
 
-		$this->typeRegistry->addEnumeration(
+		$this->typeRegistryBuilder->addEnumeration(
 			new TypeNameIdentifier('MyCustomEnum'),[
 				new EnumValueIdentifier('A'),
 				new EnumValueIdentifier('B'),
@@ -187,7 +172,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 			)
 		);
 
-		$this->typeRegistry->addSealed(
+		$this->typeRegistryBuilder->addSealed(
 			new TypeNameIdentifier('MyCustomState'),
 			$this->typeRegistry->record(['x' => $this->typeRegistry->string()]),
 			$this->expressionRegistry->functionBody(

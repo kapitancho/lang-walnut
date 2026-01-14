@@ -45,7 +45,7 @@ final class FilterTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFilterArrayInvalidParameterRange(): void {
-		$result = $this->executeErrorCodeSnippet(
+		$this->executeErrorCodeSnippet(
 			"Invalid target type: Mutable<Array<Integer, 3..>>",
 			"testFn(mutable{Array<Integer, 3..>, [1, 2, 5, 10, 5]});",
 			valueDeclarations: "testFn = ^m: Mutable<Array<Integer, 3..>> => Mutable<Array<Integer, 3..>> :: m->FILTER(^i: Integer => Boolean :: i > 4);"

@@ -7,11 +7,14 @@ use Walnut\Lang\Implementation\AST\Parser\BytesEscapeCharHandler;
 use Walnut\Lang\Implementation\AST\Parser\StringEscapeCharHandler;
 use Walnut\Lang\Implementation\Code\NativeCode\NativeCodeTypeMapper;
 use Walnut\Lang\Implementation\Code\Scope\VariableValueScope;
-use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
+use Walnut\Lang\Implementation\Program\Builder\ComplexTypeBuilder;
+use Walnut\Lang\Implementation\Program\Builder\ComplexTypeStorage;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
+use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
 use Walnut\Lang\Implementation\Program\Registry\ExpressionRegistry;
 use Walnut\Lang\Implementation\Program\Registry\MainMethodRegistry;
 use Walnut\Lang\Implementation\Program\Registry\MethodAnalyser;
+use Walnut\Lang\Implementation\Program\Registry\TypeRegistry;
 use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
 
 final class ProgramContextFactory implements ProgramContextFactoryInterface {
@@ -21,8 +24,7 @@ final class ProgramContextFactory implements ProgramContextFactoryInterface {
 		get => new ProgramContext(
 			$customMethodRegistryBuilder = new CustomMethodRegistryBuilder(),
 			$customMethodRegistryBuilder,
-			$typeRegistryBuilder = new TypeRegistryBuilder(
-				$customMethodRegistryBuilder,
+			$typeRegistry = new TypeRegistry(
 				$methodFinder = new MainMethodRegistry(
 					$nativeCodeTypeMapper = new NativeCodeTypeMapper(),
 					$customMethodRegistryBuilder,
@@ -31,17 +33,23 @@ final class ProgramContextFactory implements ProgramContextFactoryInterface {
 					]
 				),
 				$ech = new StringEscapeCharHandler(),
+				$complexTypeStorage = new ComplexTypeStorage()
 			),
-			$typeRegistryBuilder,
+			new TypeRegistryBuilder(
+				$typeRegistry,
+				$customMethodRegistryBuilder,
+				new ComplexTypeBuilder(),
+				$complexTypeStorage
+			),
 			$valueRegistry = new ValueRegistry(
-				$typeRegistryBuilder,
+				$typeRegistry,
 				$ech,
 				new BytesEscapeCharHandler()
 			),
-			new ExpressionRegistry($typeRegistryBuilder, $valueRegistry),
+			new ExpressionRegistry($typeRegistry, $valueRegistry),
 			$methodFinder,
 			new MethodAnalyser(
-				$typeRegistryBuilder,
+				$typeRegistry,
 				$methodFinder
 			),
 			VariableValueScope::empty(),

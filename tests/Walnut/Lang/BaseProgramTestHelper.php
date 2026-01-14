@@ -75,7 +75,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 		);
 
 		foreach(['NotANumber', 'MinusInfinity', 'PlusInfinity', 'DependencyContainer', 'Constructor'] as $atomType) {
-			$this->typeRegistry->addAtom(
+			$this->typeRegistryBuilder->addAtom(
 				new TypeNameIdentifier($atomType)
 			);
 		}
@@ -83,14 +83,14 @@ abstract class BaseProgramTestHelper extends TestCase {
 			$this->expressionRegistry->variableName(new VariableNameIdentifier('#'))
 		);
 
-		$this->typeRegistry->addData(
+		$this->typeRegistryBuilder->addData(
 			new TypeNameIdentifier('IntegerNumberIntervalEndpoint'),
 			$this->typeRegistry->record([
 				'value' => $this->typeRegistry->integer(),
 				'inclusive' => $this->typeRegistry->boolean
 			]),
 		);
-		$this->typeRegistry->addOpen(
+		$this->typeRegistryBuilder->addOpen(
 			new TypeNameIdentifier('IntegerNumberInterval'),
 			$this->typeRegistry->record([
 				'start' => $this->typeRegistry->union([
@@ -107,7 +107,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 				]),
 			]),
 		);
-		$this->typeRegistry->addData(
+		$this->typeRegistryBuilder->addData(
 			new TypeNameIdentifier('IntegerNumberRange'),
 			$this->typeRegistry->record(
 				['intervals' => $this->typeRegistry->array(
@@ -116,14 +116,14 @@ abstract class BaseProgramTestHelper extends TestCase {
 				)]
 			)
 		);
-		$this->typeRegistry->addData(
+		$this->typeRegistryBuilder->addData(
 			new TypeNameIdentifier('RealNumberIntervalEndpoint'),
 			$this->typeRegistry->record([
 				'value' => $this->typeRegistry->real(),
 				'inclusive' => $this->typeRegistry->boolean
 			]),
 		);
-		$this->typeRegistry->addOpen(
+		$this->typeRegistryBuilder->addOpen(
 			new TypeNameIdentifier('RealNumberInterval'),
 			$this->typeRegistry->record([
 				'start' => $this->typeRegistry->union([
@@ -140,7 +140,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 				]),
 			]),
 		);
-		$this->typeRegistry->addData(
+		$this->typeRegistryBuilder->addData(
 			new TypeNameIdentifier('RealNumberRange'),
 			$this->typeRegistry->record(
 				['intervals' => $this->typeRegistry->array(
@@ -152,38 +152,38 @@ abstract class BaseProgramTestHelper extends TestCase {
 
 
 
-		$this->typeRegistry->addData(
+		$this->typeRegistryBuilder->addData(
 			new TypeNameIdentifier('IndexOutOfRange'),
 			$this->typeRegistry->record([
 				'index' => $this->typeRegistry->integer()
 			]),
 		);
-		$this->typeRegistry->addData(
+		$this->typeRegistryBuilder->addData(
 			new TypeNameIdentifier('CastNotAvailable'),
 			$this->typeRegistry->record([
 				'from' => $this->typeRegistry->type($this->typeRegistry->any),
 				'to' => $this->typeRegistry->type($this->typeRegistry->any),
 			]),
 		);
-		$this->typeRegistry->addData(
+		$this->typeRegistryBuilder->addData(
 			new TypeNameIdentifier('MapItemNotFound'),
 			$this->typeRegistry->record([
 				'key' => $this->typeRegistry->string()
 			]),
 		);
-		$this->typeRegistry->addData(
+		$this->typeRegistryBuilder->addData(
 			new TypeNameIdentifier('InvalidJsonValue'),
 			$this->typeRegistry->record([
 				'value' => $this->typeRegistry->any
 			]),
 		);
-		$this->typeRegistry->addData(
+		$this->typeRegistryBuilder->addData(
 			new TypeNameIdentifier('InvalidJsonString'),
 			$this->typeRegistry->record([
 				'value' => $this->typeRegistry->string()
 			]),
 		);
-		$this->typeRegistry->addData(
+		$this->typeRegistryBuilder->addData(
 			new TypeNameIdentifier('UnknownEnumerationValue'),
 			$this->typeRegistry->record([
 				'enumeration' => $this->typeRegistry->type($this->typeRegistry->any),
@@ -211,7 +211,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 				)
 			]),
 		);
-		$this->typeRegistry->addData(
+		$this->typeRegistryBuilder->addData(
 			new TypeNameIdentifier('HydrationError'),
 			$this->typeRegistry->record([
 				'value' => $this->typeRegistry->any,
@@ -224,7 +224,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 			new TypeNameIdentifier('JsonValue')
 		);
 
-		$this->typeRegistry->addAlias(
+		$this->typeRegistryBuilder->addAlias(
 			new TypeNameIdentifier('JsonValue'),
 			new UnionType(
 				new UnionTypeNormalizer($this->typeRegistry),
@@ -239,13 +239,13 @@ abstract class BaseProgramTestHelper extends TestCase {
 			)
 		);
 
-		$this->typeRegistry->addData(
+		$this->typeRegistryBuilder->addData(
 			new TypeNameIdentifier('DatabaseConnection'),
 			$this->typeRegistry->record([
 				'dsn' => $this->typeRegistry->string()
 			]),
 		);
-		$this->typeRegistry->addAlias(
+		$this->typeRegistryBuilder->addAlias(
 			new TypeNameIdentifier('DatabaseValue'),
 			$this->typeRegistry->union([
 				$this->typeRegistry->string(),
@@ -255,14 +255,14 @@ abstract class BaseProgramTestHelper extends TestCase {
 			])
 		);
 
-		$this->typeRegistry->addOpen(
+		$this->typeRegistryBuilder->addOpen(
 			new TypeNameIdentifier('Uuid'),
 			$this->typeRegistry->record([
 				'value' => $this->typeRegistry->string()
 			]),
 		);
 
-		$this->typeRegistry->addAlias(
+		$this->typeRegistryBuilder->addAlias(
 			new TypeNameIdentifier('DatabaseQueryBoundParameters'),
 			$this->typeRegistry->union([
 				$this->typeRegistry->array(
@@ -277,7 +277,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 				)
 			])
 		);
-		$this->typeRegistry->addAlias(
+		$this->typeRegistryBuilder->addAlias(
 			new TypeNameIdentifier('DatabaseQueryCommand'),
 			$this->typeRegistry->record([
 				'query' => $this->typeRegistry->string(1),
@@ -286,7 +286,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 				)
 			])
 		);
-		$this->typeRegistry->addAlias(
+		$this->typeRegistryBuilder->addAlias(
 			new TypeNameIdentifier('DatabaseQueryDataRow'),
 			$this->typeRegistry->map(
 				$this->typeRegistry->withName(
@@ -294,7 +294,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 				)
 			)
 		);
-		$this->typeRegistry->addAlias(
+		$this->typeRegistryBuilder->addAlias(
 			new TypeNameIdentifier('DatabaseQueryResult'),
 			$this->typeRegistry->array(
 				$this->typeRegistry->withName(
@@ -302,7 +302,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 				)
 			)
 		);
-		$this->typeRegistry->addData(
+		$this->typeRegistryBuilder->addData(
 			new TypeNameIdentifier('DatabaseQueryFailure'),
 			$this->typeRegistry->record([
 				'query' => $this->typeRegistry->string(1),
@@ -312,7 +312,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 				'error' => $this->typeRegistry->string(),
 			]),
 		);
-		$this->typeRegistry->addSealed(
+		$this->typeRegistryBuilder->addSealed(
 			new TypeNameIdentifier('DatabaseConnector'),
 			$this->typeRegistry->record([
 				'connection' => $this->typeRegistry->data(
@@ -324,7 +324,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 		);
 
 		//$[errorType: String, originalError: Any, errorMessage: String]
-		$this->typeRegistry->addSealed(
+		$this->typeRegistryBuilder->addSealed(
 			new TypeNameIdentifier('ExternalError'),
 			$this->typeRegistry->record([
 				'errorType' => $this->typeRegistry->string(),

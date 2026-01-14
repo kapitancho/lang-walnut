@@ -185,10 +185,7 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 		VariableNameIdentifier $variableName,
 		Expression $assignedExpression
 	): VariableAssignmentExpression {
-		return new VariableAssignmentExpression(
-			$variableName,
-			$assignedExpression
-		);
+		return new VariableAssignmentExpression($variableName, $assignedExpression);
 	}
 
 	/** @param array<VariableNameIdentifier> $variableNames */
@@ -196,10 +193,7 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 		array $variableNames,
 		Expression $assignedExpression
 	): MultiVariableAssignmentExpression {
-		return new MultiVariableAssignmentExpression(
-			$variableNames,
-			$assignedExpression
-		);
+		return new MultiVariableAssignmentExpression($variableNames, $assignedExpression);
 	}
 
 	/** @param list<MatchExpressionPairInterface|MatchExpressionDefaultInterface> $pairs */
@@ -208,11 +202,7 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 		MatchExpressionOperation $operation,
 		array $pairs
 	): MatchExpression {
-		return new MatchExpression(
-			$target,
-			$operation,
-			$pairs
-		);
+		return new MatchExpression($target, $operation, $pairs);
 	}
 
 	public function matchPair(Expression $matchExpression, Expression $valueExpression): MatchExpressionPair {
@@ -228,11 +218,7 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 		MethodNameIdentifier $methodName,
 		Expression $parameter
 	): MethodCallExpression {
-		return new MethodCallExpression(
-			$target,
-			$methodName,
-			$parameter
-		);
+		return new MethodCallExpression($target, $methodName, $parameter);
 	}
 
 	public function functionBody(Expression $expression): FunctionBody {
@@ -240,10 +226,7 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 	}
 
 	public function mutable(Type $type, Expression $value): MutableExpression {
-		return new MutableExpression(
-			$type,
-			$value
-		);
+		return new MutableExpression($type, $value);
 	}
 
 	public function booleanOr(Expression $first, Expression $second): BooleanOrExpression {

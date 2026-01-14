@@ -21,7 +21,7 @@ final class AsIntegerTest extends BaseProgramTestHelper {
 	}
 
 	public function testAsInteger(): void {
-		$this->typeRegistry->addAtom(new TypeNameIdentifier('NotANumber'));
+		$this->typeRegistryBuilder->addAtom(new TypeNameIdentifier('NotANumber'));
 		$nan = $this->valueRegistry->error(
 			$this->valueRegistry->atom(new TypeNameIdentifier('NotANumber'))
 		);

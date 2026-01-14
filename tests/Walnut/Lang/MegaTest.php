@@ -3,43 +3,10 @@
 namespace Walnut\Lang\Test;
 
 use BcMath\Number;
-use PHPUnit\Framework\TestCase;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry as TypeRegistryInterface;
-use Walnut\Lang\Blueprint\Program\Registry\ValueRegistry as ValueRegistryInterface;
-use Walnut\Lang\Implementation\AST\Parser\BytesEscapeCharHandler;
-use Walnut\Lang\Implementation\AST\Parser\StringEscapeCharHandler;
-use Walnut\Lang\Implementation\Code\NativeCode\NativeCodeTypeMapper;
-use Walnut\Lang\Implementation\Program\Builder\CustomMethodRegistryBuilder;
-use Walnut\Lang\Implementation\Program\Builder\TypeRegistryBuilder;
-use Walnut\Lang\Implementation\Program\Registry\MainMethodRegistry;
-use Walnut\Lang\Implementation\Program\Registry\NestedMethodRegistry;
-use Walnut\Lang\Implementation\Program\Registry\ValueRegistry;
 
-final class MegaTest extends TestCase {
-
-	private TypeRegistryInterface $typeRegistry;
-	private ValueRegistryInterface $valueRegistry;
-
-	protected function setUp(): void {
-		parent::setUp();
-
-		$this->typeRegistry = new TypeRegistryBuilder(
-			new CustomMethodRegistryBuilder(),
-			new MainMethodRegistry(
-				new NativeCodeTypeMapper(),
-				new NestedMethodRegistry(),
-				[]
-			),
-			$ech = new StringEscapeCharHandler()
-		);
-		$this->valueRegistry = new ValueRegistry(
-			$this->typeRegistry,
-			$ech,
-			new BytesEscapeCharHandler()
-		);
-	}
+final class MegaTest extends BaseProgramTestHelper {
 
 	public function testNullType(): void {
 		self::assertEquals(

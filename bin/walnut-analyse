@@ -3,13 +3,11 @@
 require __DIR__ . '/inc/autoload.php';
 require __DIR__ . '/inc/error-display.php';
 
-use Walnut\Lang\Blueprint\AST\Node\SourceLocation;
 use Walnut\Lang\Blueprint\Compilation\CompilationException;
 use Walnut\Lang\Implementation\Compilation\AST\NodeAstCodeMapper;
 use Walnut\Lang\Implementation\Compilation\CompilationErrorBuilder;
 use Walnut\Lang\Implementation\Compilation\CompilerFactory;
 use Walnut\Lang\Implementation\Compilation\Module\PackageConfiguration\JsonFilePackageConfigurationProvider;
-use Walnut\Lib\Walex\SourcePosition;
 
 // Parse arguments
 $showErrorsOnly = false;
