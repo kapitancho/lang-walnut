@@ -69,13 +69,13 @@ final class ToStringTest extends BaseProgramTestHelper {
 		$tr = $this->typeRegistry;
 
 		foreach([
-			'MyAlias' => $tr->alias($i('MyAlias')),
-			'MyAtom' => $tr->atom($i('MyAtom')),
-			'MyEnum' => $tr->enumeration($i('MyEnum')),
-			'MyEnum[A, B]' => $tr->enumerationSubsetType($i('MyEnum'), [$ev('A'), $ev('B')]),
-			'MySealed' => $tr->sealed($i('MySealed')),
-			'MyOpen' => $tr->open($i('MyOpen')),
-			'MyData' => $tr->data($i('MyData')),
+			'MyAlias' => $tr->complex->alias($i('MyAlias')),
+			'MyAtom' => $tr->complex->atom($i('MyAtom')),
+			'MyEnum' => $tr->complex->enumeration($i('MyEnum')),
+			'MyEnum[A, B]' => $tr->complex->enumerationSubsetType($i('MyEnum'), [$ev('A'), $ev('B')]),
+			'MySealed' => $tr->complex->sealed($i('MySealed')),
+			'MyOpen' => $tr->complex->open($i('MyOpen')),
+			'MyData' => $tr->complex->data($i('MyData')),
 			'Boolean' => $tr->boolean,
 			'True' => $tr->true,
 			'False' => $tr->false,
@@ -152,10 +152,10 @@ final class ToStringTest extends BaseProgramTestHelper {
 			'Any' => $tr->any,
 			'Nothing' => $tr->nothing,
 			'(MyAtom|MyEnum)' => $tr->union([
-				$tr->atom($i('MyAtom')), $tr->enumeration($i('MyEnum'))
+				$tr->complex->atom($i('MyAtom')), $tr->complex->enumeration($i('MyEnum'))
 			]),
 			'(MyAtom&MyEnum)' => $tr->intersection([
-				$tr->atom($i('MyAtom')), $tr->enumeration($i('MyEnum'))
+				$tr->complex->atom($i('MyAtom')), $tr->complex->enumeration($i('MyEnum'))
 			]),
 			'OptionalKey<Integer>' => $tr->optionalKey($tr->integer()),
 

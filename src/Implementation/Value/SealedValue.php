@@ -6,7 +6,7 @@ use JsonSerializable;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\ComplexTypeRegistry;
 use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Value\SealedValue as SealedValueInterface;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -14,13 +14,13 @@ use Walnut\Lang\Blueprint\Value\Value;
 final class SealedValue implements SealedValueInterface, JsonSerializable {
 
     public function __construct(
-		private readonly TypeRegistry $typeRegistry,
-		private readonly TypeNameIdentifier $typeName,
-	    public readonly Value $value
+		private readonly ComplexTypeRegistry $complexTypeRegistry,
+		private readonly TypeNameIdentifier  $typeName,
+	    public readonly Value                $value
     ) {}
 
 	public SealedType $type {
-        get => $this->typeRegistry->sealed($this->typeName);
+        get => $this->complexTypeRegistry->sealed($this->typeName);
     }
 
 	public function equals(Value $other): bool {
@@ -32,7 +32,7 @@ final class SealedValue implements SealedValueInterface, JsonSerializable {
 
 	/** @throws AnalyserException */
 	public function selfAnalyse(AnalyserContext $analyserContext): void {
-		$type = $this->typeRegistry->sealed($this->typeName);
+		$type = $this->complexTypeRegistry->sealed($this->typeName);
 		// @codeCoverageIgnoreStart
 		if (!$this->value->type->isSubtypeOf($type->valueType)) {
 			throw new AnalyserException(

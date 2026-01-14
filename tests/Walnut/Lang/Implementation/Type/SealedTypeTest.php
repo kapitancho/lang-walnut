@@ -16,7 +16,7 @@ final class SealedTypeTest extends BaseProgramTestHelper {
 			),
 			null
 		);
-		$type = $this->typeRegistry->sealed(new TypeNameIdentifier('M'));
+		$type = $this->typeRegistry->complex->sealed(new TypeNameIdentifier('M'));
 		$this->assertEquals($valueType, $type->valueType);
 	}
 

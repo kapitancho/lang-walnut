@@ -6,7 +6,7 @@ use JsonSerializable;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\ComplexTypeRegistry;
 use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
 use Walnut\Lang\Blueprint\Type\EnumerationType;
 use Walnut\Lang\Blueprint\Value\EnumerationValue as EnumerationValueInterface;
@@ -15,7 +15,7 @@ use Walnut\Lang\Blueprint\Value\Value;
 final class EnumerationValue implements EnumerationValueInterface, JsonSerializable {
 
     public function __construct(
-        private readonly TypeRegistry $typeRegistry,
+	    private readonly ComplexTypeRegistry $complexTypeRegistry,
         private readonly TypeNameIdentifier $typeName,
         public readonly EnumValueIdentifier $name
     ) {}
@@ -25,7 +25,7 @@ final class EnumerationValue implements EnumerationValueInterface, JsonSerializa
     }
 
 	public EnumerationType $enumeration {
-        get => $this->typeRegistry->enumeration($this->typeName);
+        get => $this->complexTypeRegistry->enumeration($this->typeName);
     }
 
 	public function equals(Value $other): bool {

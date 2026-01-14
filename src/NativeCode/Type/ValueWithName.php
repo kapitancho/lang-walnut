@@ -41,7 +41,7 @@ final readonly class ValueWithName implements NativeMethod {
 			if ($refType instanceof EnumerationSubsetType) {
 				if ($parameterType instanceof StringType) {
 					return $typeRegistry->result(
-						$typeRegistry->enumeration($refType->enumeration->name),
+						$typeRegistry->complex->enumeration($refType->enumeration->name),
 						$typeRegistry->core->unknownEnumerationValue
 					);
 				}

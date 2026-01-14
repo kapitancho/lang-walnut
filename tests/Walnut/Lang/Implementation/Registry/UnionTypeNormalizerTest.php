@@ -107,7 +107,7 @@ final class UnionTypeNormalizerTest extends BaseProgramTestHelper {
     public function testAliasTypes(): void {
 	    $this->typeRegistryBuilder->addAlias(new TypeNameIdentifier('M'), $this->typeRegistry->boolean);
         self::assertEquals("(M|Real)", (string)$this->union(
-	        $this->typeRegistry->alias(new TypeNameIdentifier('M')),
+	        $this->typeRegistry->complex->alias(new TypeNameIdentifier('M')),
             $this->typeRegistry->integer(),
             $this->typeRegistry->false,
             $this->typeRegistry->real()
@@ -118,8 +118,8 @@ final class UnionTypeNormalizerTest extends BaseProgramTestHelper {
 	    $this->typeRegistryBuilder->addAlias(new TypeNameIdentifier('M'), $this->typeRegistry->boolean);
 	    $this->typeRegistryBuilder->addAlias(new TypeNameIdentifier('N'), $this->typeRegistry->integer());
         self::assertEquals("(M|N)", (string)$this->union(
-	        $this->typeRegistry->alias(new TypeNameIdentifier('M')),
-	        $this->typeRegistry->alias(new TypeNameIdentifier('N')),
+	        $this->typeRegistry->complex->alias(new TypeNameIdentifier('M')),
+	        $this->typeRegistry->complex->alias(new TypeNameIdentifier('N')),
         ));
     }
 

@@ -42,7 +42,7 @@ final readonly class MatchAgainst implements NativeMethod {
 					0,
 					PlusInfinity::value,
 					$typeRegistry->string()
-				), $typeRegistry->atom(new TypeNameIdentifier('RoutePatternDoesNotMatch'))]);
+				), $typeRegistry->complex->atom(new TypeNameIdentifier('RoutePatternDoesNotMatch'))]);
 			}
 			throw new AnalyserException(sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType));
 		}

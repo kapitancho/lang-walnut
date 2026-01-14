@@ -227,7 +227,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 	public function testAlias(): void {
 		$this->assertEquals(
 			['DatabaseValue', /*'Alias', 'Union',*/ 'JsonValue', 'Any'],
-			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->alias(
+			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->complex->alias(
 				new TypeNameIdentifier('DatabaseValue')
 			))
 		);
@@ -236,7 +236,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 	public function testData(): void {
 		$this->assertEquals(
 			['DatabaseConnection', 'Data', 'Any'],
-			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->data(
+			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->complex->data(
 				new TypeNameIdentifier('DatabaseConnection')
 			))
 		);
@@ -245,7 +245,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 	public function testOpen(): void {
 		$this->assertEquals(
 			['Uuid', 'Open', 'Any'],
-			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->open(
+			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->complex->open(
 				new TypeNameIdentifier('Uuid')
 			))
 		);
@@ -254,7 +254,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 	/*public function testSealed(): void {
 		$this->assertEquals(
 			['HydrationError', 'Open', 'Any'],
-			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->data(
+			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->complex->data(
 				new TypeNameIdentifier('HydrationError')
 			))
 		);
@@ -263,7 +263,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 	public function testAtom(): void {
 		$this->assertEquals(
 			['NotANumber', 'Atom', 'Any'],
-			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->atom(
+			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->complex->atom(
 				new TypeNameIdentifier('NotANumber')
 			))
 		);
@@ -272,7 +272,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 	public function testEnumeration(): void {
 		$this->assertEquals(
 			['DependencyContainerErrorType', 'Enumeration', 'Any'],
-			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->enumeration(
+			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->complex->enumeration(
 				new TypeNameIdentifier('DependencyContainerErrorType')
 			))
 		);
@@ -281,7 +281,7 @@ class NativeCodeTypeMapperTest extends BaseProgramTestHelper {
 	public function testEnumerationSubset(): void {
 		$this->assertEquals(
 			['Enumeration', 'Any'],
-			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->enumerationSubsetType(
+			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->complex->enumerationSubsetType(
 				new TypeNameIdentifier('DependencyContainerErrorType'), [
 				new EnumValueIdentifier('NotFound')
 			]))

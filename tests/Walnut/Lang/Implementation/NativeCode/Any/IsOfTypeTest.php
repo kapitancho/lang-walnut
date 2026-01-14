@@ -248,8 +248,8 @@ final class IsOfTypeTest extends BaseProgramTestHelper {
 			$this->valueRegistry->record(['x' => $this->valueRegistry->integer(5)])
 		);
 		$v4 = $this->valueRegistry->integer(5);
-		$t1 = $this->typeRegistry->sealed($tPer);
-		$t2 = $this->typeRegistry->sealed($tDig);
+		$t1 = $this->typeRegistry->complex->sealed($tPer);
+		$t2 = $this->typeRegistry->complex->sealed($tDig);
 		$t3 = $this->typeRegistry->integer(-10, 30);
 		$t4 = $this->typeRegistry->integer(-200, 200);
 		$z = $this->typeRegistry->integer();
@@ -286,10 +286,10 @@ final class IsOfTypeTest extends BaseProgramTestHelper {
 
 		$v1 = $this->valueRegistry->enumerationValue($se = new TypeNameIdentifier('SE'), new EnumValueIdentifier('A'));
 		$v2 = $this->valueRegistry->enumerationValue(new TypeNameIdentifier('SG'), new EnumValueIdentifier('A'));
-		$t1 = $this->typeRegistry->enumerationSubsetType($se, [new EnumValueIdentifier('A'), new EnumValueIdentifier('B')]);
-		$t2 = $this->typeRegistry->enumerationSubsetType($se, [new EnumValueIdentifier('B'), new EnumValueIdentifier('C')]);
-		$t3 = $this->typeRegistry->enumerationSubsetType($se, [new EnumValueIdentifier('A')]);
-		$t4 = $this->typeRegistry->enumeration($se);
+		$t1 = $this->typeRegistry->complex->enumerationSubsetType($se, [new EnumValueIdentifier('A'), new EnumValueIdentifier('B')]);
+		$t2 = $this->typeRegistry->complex->enumerationSubsetType($se, [new EnumValueIdentifier('B'), new EnumValueIdentifier('C')]);
+		$t3 = $this->typeRegistry->complex->enumerationSubsetType($se, [new EnumValueIdentifier('A')]);
+		$t4 = $this->typeRegistry->complex->enumeration($se);
 		$z = $this->typeRegistry->integer();
 
 		$this->callIsOfType($v1, $t1, true);
@@ -308,7 +308,7 @@ final class IsOfTypeTest extends BaseProgramTestHelper {
 
 		$v1 = $this->valueRegistry->atom($sh = new TypeNameIdentifier('SH'));
 		$v2 = $this->valueRegistry->atom(new TypeNameIdentifier('SJ'));
-		$t1 = $this->typeRegistry->atom($sh);
+		$t1 = $this->typeRegistry->complex->atom($sh);
 		$z = $this->typeRegistry->integer();
 
 		$this->callIsOfType($v1, $t1, true);

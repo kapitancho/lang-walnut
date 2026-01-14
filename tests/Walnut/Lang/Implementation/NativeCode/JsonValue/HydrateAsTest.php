@@ -141,7 +141,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				$this->typeRegistry->nothing,
 				null
 			),
-			$this->typeRegistry->enumeration(new TypeNameIdentifier('MyCustomEnum')),
+			$this->typeRegistry->complex->enumeration(new TypeNameIdentifier('MyCustomEnum')),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->matchValue(
 					$this->expressionRegistry->variableName(
@@ -192,7 +192,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 				$this->typeRegistry->nothing,
 				null
 			),
-			$this->typeRegistry->sealed(new TypeNameIdentifier('MyCustomState')),
+			$this->typeRegistry->complex->sealed(new TypeNameIdentifier('MyCustomState')),
 			$this->expressionRegistry->functionBody(
 				$this->expressionRegistry->matchValue(
 					$this->expressionRegistry->variableName(
@@ -697,14 +697,14 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		//Atom
 		$this->callHydrateAs(
 			$this->valueRegistry->integer(42),
-			$this->typeRegistry->atom(new TypeNameIdentifier('MyAtom')),
+			$this->typeRegistry->complex->atom(new TypeNameIdentifier('MyAtom')),
 			$this->valueRegistry->atom(new TypeNameIdentifier('MyAtom')),
 		);
 		$this->callHydrateAs(
 			$this->valueRegistry->integer(42),
 			$this->typeRegistry->union([
 				$this->typeRegistry->string(),
-				$this->typeRegistry->atom(new TypeNameIdentifier('MyAtom'))
+				$this->typeRegistry->complex->atom(new TypeNameIdentifier('MyAtom'))
 			]),
 			$this->valueRegistry->atom(new TypeNameIdentifier('MyAtom')),
 		);
@@ -712,17 +712,17 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		//Enumeration
 		$this->callHydrateAs(
 			$this->valueRegistry->string('C'),
-			$this->typeRegistry->enumeration(new TypeNameIdentifier('MyEnum')),
+			$this->typeRegistry->complex->enumeration(new TypeNameIdentifier('MyEnum')),
 			$this->valueRegistry->enumerationValue(new TypeNameIdentifier('MyEnum'), new EnumValueIdentifier('C')),
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->true,
-			$this->typeRegistry->enumeration(new TypeNameIdentifier('MyEnum')),
+			$this->typeRegistry->complex->enumeration(new TypeNameIdentifier('MyEnum')),
 			"@HydrationError![\n	value: true,\n	hydrationPath: 'value',\n	errorMessage: 'The value should be a string with a value among MyEnum.A, MyEnum.B, MyEnum.C, MyEnum.D'\n]"
 		);
 		$this->callHydrateAs(
 			$this->valueRegistry->string('C'),
-			$this->typeRegistry->enumerationSubsetType(new TypeNameIdentifier('MyEnum'), [
+			$this->typeRegistry->complex->enumerationSubsetType(new TypeNameIdentifier('MyEnum'), [
 				new EnumValueIdentifier('A'),
 				new EnumValueIdentifier('B'),
 				new EnumValueIdentifier('C'),
@@ -731,7 +731,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->string('C'),
-			$this->typeRegistry->enumerationSubsetType(new TypeNameIdentifier('MyEnum'), [
+			$this->typeRegistry->complex->enumerationSubsetType(new TypeNameIdentifier('MyEnum'), [
 				new EnumValueIdentifier('A'),
 				new EnumValueIdentifier('B'),
 			]),
@@ -739,7 +739,7 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 		);
 		$this->callHydrateAsError(
 			$this->valueRegistry->true,
-			$this->typeRegistry->enumerationSubsetType(new TypeNameIdentifier('MyEnum'), [
+			$this->typeRegistry->complex->enumerationSubsetType(new TypeNameIdentifier('MyEnum'), [
 				new EnumValueIdentifier('A'),
 				new EnumValueIdentifier('B'),
 			]),
@@ -748,12 +748,12 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 
 		$this->callHydrateAs(
 			$this->valueRegistry->string('A'),
-			$this->typeRegistry->enumeration(new TypeNameIdentifier('MyCustomEnum')),
+			$this->typeRegistry->complex->enumeration(new TypeNameIdentifier('MyCustomEnum')),
 			$this->valueRegistry->enumerationValue(new TypeNameIdentifier('MyCustomEnum'), new EnumValueIdentifier('A')),
 		);
 		$this->callHydrateAs(
 			$this->valueRegistry->true,
-			$this->typeRegistry->enumeration(new TypeNameIdentifier('MyCustomEnum')),
+			$this->typeRegistry->complex->enumeration(new TypeNameIdentifier('MyCustomEnum')),
 			$this->valueRegistry->enumerationValue(new TypeNameIdentifier('MyCustomEnum'), new EnumValueIdentifier('B')),
 		);
 
@@ -789,13 +789,13 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 
 		$this->callHydrateAs(
 			$this->valueRegistry->string('A'),
-			$this->typeRegistry->sealed(new TypeNameIdentifier('MyCustomState')),
+			$this->typeRegistry->complex->sealed(new TypeNameIdentifier('MyCustomState')),
 			$this->valueRegistry->sealedValue(new TypeNameIdentifier('MyCustomState'),
 				$this->valueRegistry->record(['x' => $this->valueRegistry->string('A')])),
 		);
 		$this->callHydrateAs(
 			$this->valueRegistry->true,
-			$this->typeRegistry->sealed(new TypeNameIdentifier('MyCustomState')),
+			$this->typeRegistry->complex->sealed(new TypeNameIdentifier('MyCustomState')),
 			$this->valueRegistry->sealedValue(new TypeNameIdentifier('MyCustomState'),
 				$this->valueRegistry->record(['x' => $this->valueRegistry->string('B')])),
 		);
@@ -819,8 +819,8 @@ final class HydrateAsTest extends BaseProgramTestHelper {
 						new TypeNameIdentifier('MySealed')
 					)),
 					'd' => $this->typeRegistry->record([
-						'x' => $this->typeRegistry->enumeration(new TypeNameIdentifier('MyCustomEnum')),
-						'y' => $this->typeRegistry->atom(new TypeNameIdentifier('MyAtom')),
+						'x' => $this->typeRegistry->complex->enumeration(new TypeNameIdentifier('MyCustomEnum')),
+						'y' => $this->typeRegistry->complex->atom(new TypeNameIdentifier('MyAtom')),
 					]),
 				])
 			))

@@ -16,7 +16,7 @@ final class EnumerationTypeTest extends BaseProgramTestHelper {
 			new EnumValueIdentifier('Diamonds'),
 			new EnumValueIdentifier('Clubs')
 		]);
-		$type = $this->typeRegistry->enumeration(new TypeNameIdentifier('Suit'));
+		$type = $this->typeRegistry->complex->enumeration(new TypeNameIdentifier('Suit'));
 		$this->assertTrue(
 			$type->name->equals(new TypeNameIdentifier('Suit'))
 		);
@@ -32,7 +32,7 @@ final class EnumerationTypeTest extends BaseProgramTestHelper {
 			new EnumValueIdentifier('Diamonds'),
 			new EnumValueIdentifier('Clubs')
 		]);
-		$type = $this->typeRegistry->enumeration(new TypeNameIdentifier('Suit'));
+		$type = $this->typeRegistry->complex->enumeration(new TypeNameIdentifier('Suit'));
 		$type->subsetType([]);
 	}
 
@@ -44,7 +44,7 @@ final class EnumerationTypeTest extends BaseProgramTestHelper {
 			new EnumValueIdentifier('Diamonds'),
 			new EnumValueIdentifier('Clubs')
 		]);
-		$type = $this->typeRegistry->enumeration(new TypeNameIdentifier('Suit'));
+		$type = $this->typeRegistry->complex->enumeration(new TypeNameIdentifier('Suit'));
 		$type->subsetType([new EnumValueIdentifier('Wrong')]);
 	}
 }

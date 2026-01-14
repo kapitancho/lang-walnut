@@ -5,7 +5,7 @@ namespace Walnut\Lang\Implementation\Value;
 use JsonSerializable;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\ComplexTypeRegistry;
 use Walnut\Lang\Blueprint\Type\AtomType;
 use Walnut\Lang\Blueprint\Value\AtomValue as AtomValueInterface;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -13,12 +13,12 @@ use Walnut\Lang\Blueprint\Value\Value;
 final class AtomValue implements AtomValueInterface, JsonSerializable {
 
     public function __construct(
-        private readonly TypeRegistry $typeRegistry,
+	    private readonly ComplexTypeRegistry $complexTypeRegistry,
         private readonly TypeNameIdentifier $typeName
     ) {}
 
 	public AtomType $type {
-        get => $this->typeRegistry->atom($this->typeName);
+        get => $this->complexTypeRegistry->atom($this->typeName);
     }
 
 	public function equals(Value $other): bool {

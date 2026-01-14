@@ -60,7 +60,7 @@ final readonly class TypeRegistryBuilder implements TypeRegistryBuilderInterface
 		return $this->complexTypeStorage->addAtom(
 			$name,
 			$this->complexTypeBuilder->atom($name,
-				new AtomValue($this->typeRegistry, $name)
+				new AtomValue($this->typeRegistry->complex, $name)
 			)
 		);
 	}
@@ -69,7 +69,7 @@ final readonly class TypeRegistryBuilder implements TypeRegistryBuilderInterface
 		return $this->complexTypeStorage->addEnumerationType(
 			$this->complexTypeBuilder->enumeration($name,
 				array_map(fn(EnumValueIdentifier $enumValue): EnumerationValue =>
-					new EnumerationValue($this->typeRegistry, $name, $enumValue),
+					new EnumerationValue($this->typeRegistry->complex, $name, $enumValue),
 					$values
 				)
 			)

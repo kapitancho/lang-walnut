@@ -146,7 +146,7 @@ final class ValueRegistry implements ValueRegistryInterface {
 
     /** @throws UnknownType */
     public function atom(TypeNameIdentifier $typeName): AtomValueInterface {
-		return $this->typeRegistry->atom($typeName)->value;
+		return $this->typeRegistry->complex->atom($typeName)->value;
 	}
 
     /** @throws UnknownType */
@@ -155,7 +155,7 @@ final class ValueRegistry implements ValueRegistryInterface {
         TypeNameIdentifier $typeName,
         EnumValueIdentifier $valueIdentifier
     ): EnumerationValueInterface {
-		return $this->typeRegistry->enumeration($typeName)
+		return $this->typeRegistry->complex->enumeration($typeName)
 			->value($valueIdentifier);
 	}
 
@@ -165,7 +165,7 @@ final class ValueRegistry implements ValueRegistryInterface {
 		Value $value
 	): DataValue {
 		return new DataValue(
-			$this->typeRegistry,
+			$this->typeRegistry->complex,
 			$typeName,
 			$value
 		);
@@ -177,7 +177,7 @@ final class ValueRegistry implements ValueRegistryInterface {
 		Value $value
 	): OpenValue {
 		return new OpenValue(
-			$this->typeRegistry,
+			$this->typeRegistry->complex,
 			$typeName,
 			$value
 		);
@@ -189,7 +189,7 @@ final class ValueRegistry implements ValueRegistryInterface {
         Value $value
     ): SealedValue {
 		return new SealedValue(
-			$this->typeRegistry,
+			$this->typeRegistry->complex,
 			$typeName,
 			$value
 		);

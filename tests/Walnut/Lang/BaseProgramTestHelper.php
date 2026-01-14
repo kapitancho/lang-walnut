@@ -94,14 +94,14 @@ abstract class BaseProgramTestHelper extends TestCase {
 			new TypeNameIdentifier('IntegerNumberInterval'),
 			$this->typeRegistry->record([
 				'start' => $this->typeRegistry->union([
-					$this->typeRegistry->atom(new TypeNameIdentifier('MinusInfinity')),
-					$this->typeRegistry->data(
+					$this->typeRegistry->complex->atom(new TypeNameIdentifier('MinusInfinity')),
+					$this->typeRegistry->complex->data(
 						new TypeNameIdentifier('IntegerNumberIntervalEndpoint')
 					)
 				]),
 				'end' => $this->typeRegistry->union([
-					$this->typeRegistry->atom(new TypeNameIdentifier('PlusInfinity')),
-					$this->typeRegistry->data(
+					$this->typeRegistry->complex->atom(new TypeNameIdentifier('PlusInfinity')),
+					$this->typeRegistry->complex->data(
 						new TypeNameIdentifier('IntegerNumberIntervalEndpoint')
 					)
 				]),
@@ -111,7 +111,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 			new TypeNameIdentifier('IntegerNumberRange'),
 			$this->typeRegistry->record(
 				['intervals' => $this->typeRegistry->array(
-					$this->typeRegistry->open(new TypeNameIdentifier('IntegerNumberInterval')),
+					$this->typeRegistry->complex->open(new TypeNameIdentifier('IntegerNumberInterval')),
 					1
 				)]
 			)
@@ -127,14 +127,14 @@ abstract class BaseProgramTestHelper extends TestCase {
 			new TypeNameIdentifier('RealNumberInterval'),
 			$this->typeRegistry->record([
 				'start' => $this->typeRegistry->union([
-					$this->typeRegistry->atom(new TypeNameIdentifier('MinusInfinity')),
-					$this->typeRegistry->data(
+					$this->typeRegistry->complex->atom(new TypeNameIdentifier('MinusInfinity')),
+					$this->typeRegistry->complex->data(
 						new TypeNameIdentifier('RealNumberIntervalEndpoint')
 					)
 				]),
 				'end' => $this->typeRegistry->union([
-					$this->typeRegistry->atom(new TypeNameIdentifier('PlusInfinity')),
-					$this->typeRegistry->data(
+					$this->typeRegistry->complex->atom(new TypeNameIdentifier('PlusInfinity')),
+					$this->typeRegistry->complex->data(
 						new TypeNameIdentifier('RealNumberIntervalEndpoint')
 					)
 				]),
@@ -144,7 +144,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 			new TypeNameIdentifier('RealNumberRange'),
 			$this->typeRegistry->record(
 				['intervals' => $this->typeRegistry->array(
-					$this->typeRegistry->open(new TypeNameIdentifier('RealNumberInterval')),
+					$this->typeRegistry->complex->open(new TypeNameIdentifier('RealNumberInterval')),
 					1
 				)]
 			)
@@ -206,7 +206,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 				'targetType' => $this->typeRegistry->type($this->typeRegistry->any),
 				'errorOnType' => $this->typeRegistry->type($this->typeRegistry->any),
 				'errorMessage' => $this->typeRegistry->string(),
-				'errorType' => $this->typeRegistry->enumeration(
+				'errorType' => $this->typeRegistry->complex->enumeration(
 					new TypeNameIdentifier('DependencyContainerErrorType')
 				)
 			]),
@@ -281,7 +281,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 			new TypeNameIdentifier('DatabaseQueryCommand'),
 			$this->typeRegistry->record([
 				'query' => $this->typeRegistry->string(1),
-				'boundParameters' => $this->typeRegistry->alias(
+				'boundParameters' => $this->typeRegistry->complex->alias(
 					new TypeNameIdentifier('DatabaseQueryBoundParameters')
 				)
 			])
@@ -306,7 +306,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 			new TypeNameIdentifier('DatabaseQueryFailure'),
 			$this->typeRegistry->record([
 				'query' => $this->typeRegistry->string(1),
-				'boundParameters' => $this->typeRegistry->alias(
+				'boundParameters' => $this->typeRegistry->complex->alias(
 					new TypeNameIdentifier('DatabaseQueryBoundParameters')
 				),
 				'error' => $this->typeRegistry->string(),
@@ -315,7 +315,7 @@ abstract class BaseProgramTestHelper extends TestCase {
 		$this->typeRegistryBuilder->addSealed(
 			new TypeNameIdentifier('DatabaseConnector'),
 			$this->typeRegistry->record([
-				'connection' => $this->typeRegistry->data(
+				'connection' => $this->typeRegistry->complex->data(
 					new TypeNameIdentifier('DatabaseConnection')
 				)
 			]),

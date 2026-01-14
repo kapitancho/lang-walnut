@@ -9,7 +9,7 @@ final class AliasTypeTest extends BaseProgramTestHelper {
 
 	public function testProperties(): void {
 		$this->typeRegistryBuilder->addAlias(new TypeNameIdentifier('M'), $boolean = $this->typeRegistry->boolean);
-		$type = $this->typeRegistry->alias(new TypeNameIdentifier('M'));
+		$type = $this->typeRegistry->complex->alias(new TypeNameIdentifier('M'));
 		$this->assertEquals($boolean, $type->aliasedType);
 	}
 

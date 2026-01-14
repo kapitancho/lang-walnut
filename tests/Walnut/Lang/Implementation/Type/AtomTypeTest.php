@@ -15,28 +15,28 @@ final class AtomTypeTest extends BaseProgramTestHelper {
 	}
 
 	public function testAtomType(): void {
-		$atomType = $this->typeRegistry->atom(new TypeNameIdentifier('MyAtom'));
+		$atomType = $this->typeRegistry->complex->atom(new TypeNameIdentifier('MyAtom'));
 		self::assertEquals('MyAtom', $atomType->name->identifier);
 	}
 
 	public function testAtomValue(): void {
-		$atomType = $this->typeRegistry->atom(new TypeNameIdentifier('MyAtom'));
+		$atomType = $this->typeRegistry->complex->atom(new TypeNameIdentifier('MyAtom'));
 		self::assertEquals($atomType, $atomType->value->type);
 	}
 
 	public function testIsSubtypeOf(): void {
 		self::assertTrue(
-			$this->typeRegistry->atom(new TypeNameIdentifier('MyAtom'))
-				->isSubtypeOf($this->typeRegistry->atom(new TypeNameIdentifier('MyAtom')))
+			$this->typeRegistry->complex->atom(new TypeNameIdentifier('MyAtom'))
+				->isSubtypeOf($this->typeRegistry->complex->atom(new TypeNameIdentifier('MyAtom')))
 		);
 		self::assertFalse(
-			$this->typeRegistry->atom(new TypeNameIdentifier('MyAtom'))
-				->isSubtypeOf($this->typeRegistry->atom(new TypeNameIdentifier('AnotherAtom')))
+			$this->typeRegistry->complex->atom(new TypeNameIdentifier('MyAtom'))
+				->isSubtypeOf($this->typeRegistry->complex->atom(new TypeNameIdentifier('AnotherAtom')))
 		);
 	}
 
 	public function testAtomTypeInvalid(): void {
 		$this->expectException(UnknownType::class);
-		$this->typeRegistry->atom(new TypeNameIdentifier('YourAtom'));
+		$this->typeRegistry->complex->atom(new TypeNameIdentifier('YourAtom'));
 	}
 }

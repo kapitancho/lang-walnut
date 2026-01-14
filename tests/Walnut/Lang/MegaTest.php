@@ -10,7 +10,7 @@ final class MegaTest extends BaseProgramTestHelper {
 
 	public function testNullType(): void {
 		self::assertEquals(
-			$this->typeRegistry->atom(new TypeNameIdentifier('Null')),
+			$this->typeRegistry->complex->atom(new TypeNameIdentifier('Null')),
 			$this->typeRegistry->null
 		);
 		self::assertEquals(
@@ -21,12 +21,12 @@ final class MegaTest extends BaseProgramTestHelper {
 
 	public function testBooleanType(): void {
 		self::assertEquals(
-			$this->typeRegistry->enumeration(new TypeNameIdentifier('Boolean')),
+			$this->typeRegistry->complex->enumeration(new TypeNameIdentifier('Boolean')),
 			$this->typeRegistry->boolean
 		);
 		self::assertEquals(
 			$this->typeRegistry
-				->enumerationSubsetType(new TypeNameIdentifier('Boolean'), [
+				->complex->enumerationSubsetType(new TypeNameIdentifier('Boolean'), [
 					new EnumValueIdentifier('True'),
 					new EnumValueIdentifier('False')
 				]),
@@ -34,14 +34,14 @@ final class MegaTest extends BaseProgramTestHelper {
 		);
 		self::assertEquals(
 			$this->typeRegistry
-				->enumerationSubsetType(new TypeNameIdentifier('Boolean'), [
+				->complex->enumerationSubsetType(new TypeNameIdentifier('Boolean'), [
 					new EnumValueIdentifier('True'),
 				]),
 			$this->typeRegistry->true
 		);
 		self::assertEquals(
 			$this->typeRegistry
-				->enumerationSubsetType(new TypeNameIdentifier('Boolean'), [
+				->complex->enumerationSubsetType(new TypeNameIdentifier('Boolean'), [
 					new EnumValueIdentifier('False'),
 				]),
 			$this->typeRegistry->false

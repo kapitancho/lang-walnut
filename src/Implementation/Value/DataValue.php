@@ -6,7 +6,7 @@ use JsonSerializable;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserContext;
 use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
+use Walnut\Lang\Blueprint\Program\Registry\ComplexTypeRegistry;
 use Walnut\Lang\Blueprint\Type\DataType;
 use Walnut\Lang\Blueprint\Value\DataValue as DataValueInterface;
 use Walnut\Lang\Blueprint\Value\Value;
@@ -14,18 +14,18 @@ use Walnut\Lang\Blueprint\Value\Value;
 final class DataValue implements DataValueInterface, JsonSerializable {
 
     public function __construct(
-		private readonly TypeRegistry $typeRegistry,
+	    private readonly ComplexTypeRegistry $complexTypeRegistry,
 		private readonly TypeNameIdentifier $typeName,
 	    public readonly Value $value
     ) {}
 
 	public DataType $type {
-        get => $this->typeRegistry->data($this->typeName);
+        get => $this->complexTypeRegistry->data($this->typeName);
     }
 
 	/** @throws AnalyserException */
 	public function selfAnalyse(AnalyserContext $analyserContext): void {
-		$type = $this->typeRegistry->data($this->typeName);
+		$type = $this->complexTypeRegistry->data($this->typeName);
 		if (!$this->value->type->isSubtypeOf($type->valueType)) {
 			throw new AnalyserException(
 				sprintf(

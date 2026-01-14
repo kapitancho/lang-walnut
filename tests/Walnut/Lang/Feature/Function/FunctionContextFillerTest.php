@@ -342,7 +342,7 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 		$executionContext = $this->programContext->programRegistry->executionContext;
 		$filledExecutionContext = $this->functionContextFiller->fillExecutionContext(
 			$executionContext,
-			$this->programContext->typeRegistry->sealed(
+			$this->programContext->typeRegistry->complex->sealed(
 				new TypeNameIdentifier('MySealed')
 			),
 			($this->programContext->valueRegistry->sealedValue(
@@ -359,7 +359,7 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 				$this->programContext->valueRegistry->string('str')
 			]),
 			$this->programContext->typeRegistry->nameAndType(
-				$this->programContext->typeRegistry->open(
+				$this->programContext->typeRegistry->complex->open(
 					new TypeNameIdentifier('MyOpenTuple')
 				),
 				null
@@ -399,7 +399,7 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 		$executionContext = $this->programContext->programRegistry->executionContext;
 		$filledExecutionContext = $this->functionContextFiller->fillExecutionContext(
 			$executionContext,
-			$this->programContext->typeRegistry->open(
+			$this->programContext->typeRegistry->complex->open(
 				new TypeNameIdentifier('MyOpen')
 			),
 			($this->programContext->valueRegistry->openValue(
@@ -423,7 +423,7 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 				'b' => $this->programContext->valueRegistry->integer(99),
 			]),
 			$this->programContext->typeRegistry->nameAndType(
-				$this->programContext->typeRegistry->open(
+				$this->programContext->typeRegistry->complex->open(
 					new TypeNameIdentifier('MyOpenRecord')
 				),
 				null,
@@ -480,7 +480,7 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 		$executionContext = $this->programContext->programRegistry->executionContext;
 		$filledExecutionContext = $this->functionContextFiller->fillExecutionContext(
 			$executionContext,
-			($this->programContext->typeRegistry->sealed(
+			($this->programContext->typeRegistry->complex->sealed(
 				new TypeNameIdentifier('MySealedRecord')
 			)),
 			($this->programContext->valueRegistry->sealedValue(
@@ -492,7 +492,7 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 				]),
 			)),
 			$this->programContext->typeRegistry->nameAndType(
-				$this->programContext->typeRegistry->sealed(
+				$this->programContext->typeRegistry->complex->sealed(
 					new TypeNameIdentifier('MySealedRecord')
 				),
 				null
@@ -549,7 +549,7 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 		$executionContext = $this->programContext->programRegistry->executionContext;
 		$filledExecutionContext = $this->functionContextFiller->fillExecutionContext(
 			$executionContext,
-			$this->programContext->typeRegistry->open(
+			$this->programContext->typeRegistry->complex->open(
 				new TypeNameIdentifier('MyOpenRecord')
 			),
 			($this->programContext->valueRegistry->openValue(
@@ -560,7 +560,7 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 				]),
 			)),
 			$this->programContext->typeRegistry->nameAndType(
-				$this->programContext->typeRegistry->open(
+				$this->programContext->typeRegistry->complex->open(
 					new TypeNameIdentifier('MyOpenRecord')
 				),
 				null
@@ -625,7 +625,7 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 		$executionContext = $this->programContext->programRegistry->executionContext;
 		$filledExecutionContext = $this->functionContextFiller->fillExecutionContext(
 			$executionContext,
-			$this->programContext->typeRegistry->open(
+			$this->programContext->typeRegistry->complex->open(
 				new TypeNameIdentifier('MyDataRecord')
 			),
 			($this->programContext->valueRegistry->openValue(
@@ -636,7 +636,7 @@ final class FunctionContextFillerTest extends ProgramContextTestHelper {
 				]),
 			)),
 			$this->programContext->typeRegistry->nameAndType(
-				$this->programContext->typeRegistry->open(
+				$this->programContext->typeRegistry->complex->open(
 					new TypeNameIdentifier('MyDataRecord')
 				),
 				null

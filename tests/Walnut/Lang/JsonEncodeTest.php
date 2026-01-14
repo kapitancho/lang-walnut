@@ -83,16 +83,16 @@ final class JsonEncodeTest extends BaseProgramTestHelper {
 
 		foreach([
 			'{"type":"Alias","name":"MyAlias","aliasedType":{"type":"Null"}}'
-				=> $tr->alias($i('MyAlias')),
-			'{"type":"Atom","name":"MyAtom"}' => $tr->atom($i('MyAtom')),
+				=> $tr->complex->alias($i('MyAlias')),
+			'{"type":"Atom","name":"MyAtom"}' => $tr->complex->atom($i('MyAtom')),
 			'{"type":"Enumeration","name":"MyEnum","values":{"A":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"A"},"B":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"B"},"C":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"C"}}}'
-				=> $tr->enumeration($i('MyEnum')),
+				=> $tr->complex->enumeration($i('MyEnum')),
 			'{"type":"EnumerationSubsetType","enumerationName":"MyEnum","subsetValues":{"A":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"A"},"B":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"B"}}}'
-			=> $tr->enumerationSubsetType($i('MyEnum'), [$ev('A'), $ev('B')]),
+			=> $tr->complex->enumerationSubsetType($i('MyEnum'), [$ev('A'), $ev('B')]),
 			'{"type":"Sealed","name":"MySealed","valueType":{"type":"Null"}}'
-				=> $tr->sealed($i('MySealed')),
-			'{"type":"Open","name":"MyOpen","valueType":{"type":"Null"}}' => $tr->open($i('MyOpen')),
-			'{"type":"Data","name":"MyData","valueType":{"type":"Null"}}' => $tr->data($i('MyData')),
+				=> $tr->complex->sealed($i('MySealed')),
+			'{"type":"Open","name":"MyOpen","valueType":{"type":"Null"}}' => $tr->complex->open($i('MyOpen')),
+			'{"type":"Data","name":"MyData","valueType":{"type":"Null"}}' => $tr->complex->data($i('MyData')),
 			'{"type":"Boolean"}' => $tr->boolean,
 			'{"type":"True"}' => $tr->true,
 			'{"type":"False"}' => $tr->false,
@@ -171,10 +171,10 @@ final class JsonEncodeTest extends BaseProgramTestHelper {
 			'{"type":"Any"}' => $tr->any,
 			'{"type":"Nothing"}' => $tr->nothing,
 			'{"type":"Union","types":[{"type":"Atom","name":"MyAtom"},{"type":"Enumeration","name":"MyEnum","values":{"A":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"A"},"B":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"B"},"C":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"C"}}}]}' => $tr->union([
-				$tr->atom($i('MyAtom')), $tr->enumeration($i('MyEnum'))
+				$tr->complex->atom($i('MyAtom')), $tr->complex->enumeration($i('MyEnum'))
 			]),
 			'{"type":"Intersection","types":[{"type":"Atom","name":"MyAtom"},{"type":"Enumeration","name":"MyEnum","values":{"A":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"A"},"B":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"B"},"C":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"C"}}}]}' => $tr->intersection([
-				$tr->atom($i('MyAtom')), $tr->enumeration($i('MyEnum'))
+				$tr->complex->atom($i('MyAtom')), $tr->complex->enumeration($i('MyEnum'))
 			]),
 			'{"type":"OptionalKey","valueType":{"type":"Integer","range":{"intervals":[{"start":"MinusInfinity","end":"PlusInfinity"}]}}}' => $tr->optionalKey($tr->integer()),
 

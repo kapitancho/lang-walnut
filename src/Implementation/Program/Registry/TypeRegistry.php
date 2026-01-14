@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Implementation\Program\Registry;
 
 use BcMath\Number;
-use InvalidArgumentException;
 use Walnut\Lang\Blueprint\AST\Parser\EscapeCharHandler;
 use Walnut\Lang\Blueprint\Common\Identifier\EnumValueIdentifier;
 use Walnut\Lang\Blueprint\Common\Identifier\TypeNameIdentifier;
@@ -15,27 +14,19 @@ use Walnut\Lang\Blueprint\Program\Registry\ComplexTypeRegistry;
 use Walnut\Lang\Blueprint\Program\Registry\MethodFinder;
 use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry as TypeRegistryInterface;
 use Walnut\Lang\Blueprint\Program\UnknownType;
-use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AliasType as AliasTypeInterface;
 use Walnut\Lang\Blueprint\Type\AnyType as AnyTypeInterface;
 use Walnut\Lang\Blueprint\Type\AtomType as AtomTypeInterface;
 use Walnut\Lang\Blueprint\Type\BooleanType as BooleanTypeInterface;
 use Walnut\Lang\Blueprint\Type\CoreType;
-use Walnut\Lang\Blueprint\Type\DataType;
-use Walnut\Lang\Blueprint\Type\DuplicateSubsetValue;
-use Walnut\Lang\Blueprint\Type\EnumerationSubsetType;
-use Walnut\Lang\Blueprint\Type\EnumerationType;
 use Walnut\Lang\Blueprint\Type\FalseType as FalseTypeInterface;
 use Walnut\Lang\Blueprint\Type\InvalidMapKeyType;
 use Walnut\Lang\Blueprint\Type\NamedType;
 use Walnut\Lang\Blueprint\Type\NothingType as NothingTypeInterface;
 use Walnut\Lang\Blueprint\Type\NullType as NullTypeInterface;
-use Walnut\Lang\Blueprint\Type\OpenType;
 use Walnut\Lang\Blueprint\Type\ResultType as ResultTypeInterface;
-use Walnut\Lang\Blueprint\Type\SealedType;
 use Walnut\Lang\Blueprint\Type\TrueType as TrueTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Type\UnknownEnumerationValue;
 use Walnut\Lang\Implementation\Common\Range\LengthRange;
 use Walnut\Lang\Implementation\Program\Builder\SimpleTypeRegistry;
 use Walnut\Lang\Implementation\Program\Builder\TypeRegistryCore;
@@ -89,9 +80,9 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 	public TypeRegistryCore $core;
 
 	public function __construct(
-		private MethodFinder $methodFinder,
-		private EscapeCharHandler $escapeCharHandler,
-		private ComplexTypeRegistry $complexTypeRegistry,
+		private MethodFinder        $methodFinder,
+		private EscapeCharHandler   $escapeCharHandler,
+		public ComplexTypeRegistry $complex,
 	) {
 		$this->unionTypeNormalizer = new UnionTypeNormalizer($this);
 		$this->intersectionTypeNormalizer = new IntersectionTypeNormalizer($this);
@@ -103,7 +94,7 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 		);
 		$this->constructor = new AtomType(
 			$c = CoreType::Constructor->typeName(),
-			new AtomValue($this, $c)
+			new AtomValue($this->complex, $c)
 		);
 		$this->boolean = new BooleanType(
 			new TypeNameIdentifier(self::booleanTypeName),
@@ -115,7 +106,7 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 		$this->true = new TrueType($this->boolean, $trueValue);
 		$this->false = new FalseType($this->boolean, $falseValue);
 
-		$this->core = new TypeRegistryCore($this);
+		$this->core = new TypeRegistryCore($this->complex);
 	}
 
 	public function shape(Type $refType): ShapeType {
@@ -238,9 +229,9 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 				return $this->unionTypeNormalizer->normalize(... $types);
 				// @codeCoverageIgnoreStart
 			} catch (UnknownType) {}
-			// @codeCoverageIgnoreEnd
 		}
 		return new UnionType($this->unionTypeNormalizer, ...$types);
+		// @codeCoverageIgnoreEnd
 	}
 
 	/** @param list<Type> $types */
@@ -293,39 +284,9 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 		return new NameAndType($type, $name);
 	}
 
-
 	// Proxy the complex type registry methods
 	public function withName(TypeNameIdentifier $typeName): NamedType {
-		return $this->complexTypeRegistry->withName($typeName);
-	}
-	/** @throws UnknownType */
-	public function alias(TypeNameIdentifier $typeName): AliasType {
-		return $this->complexTypeRegistry->alias($typeName);
-	}
-	/** @throws UnknownType */
-	public function data(TypeNameIdentifier $typeName): DataType {
-		return $this->complexTypeRegistry->data($typeName);
-	}
-	/** @throws UnknownType */
-	public function open(TypeNameIdentifier $typeName): OpenType {
-		return $this->complexTypeRegistry->open($typeName);
-	}
-	public function sealed(TypeNameIdentifier $typeName): SealedType {
-		return $this->complexTypeRegistry->sealed($typeName);
-	}
-	public function atom(TypeNameIdentifier $typeName): AtomTypeInterface {
-		return $this->complexTypeRegistry->atom($typeName);
-	}
-	/** @throws UnknownType */
-	public function enumeration(TypeNameIdentifier $typeName): EnumerationType {
-		return $this->complexTypeRegistry->enumeration($typeName);
-	}
-	/**
-	 * @param non-empty-list<EnumValueIdentifier> $values
-	 * @throws UnknownEnumerationValue|DuplicateSubsetValue|InvalidArgumentException
-	 **/
-	public function enumerationSubsetType(TypeNameIdentifier $typeName, array $values): EnumerationSubsetType {
-		return $this->complexTypeRegistry->enumerationSubsetType($typeName, $values);
+		return $this->complex->withName($typeName);
 	}
 
 }

@@ -26,6 +26,7 @@ use Walnut\Lang\Blueprint\Type\MapType;
 use Walnut\Lang\Blueprint\Type\MetaType;
 use Walnut\Lang\Blueprint\Type\MutableType;
 use Walnut\Lang\Blueprint\Type\NameAndType;
+use Walnut\Lang\Blueprint\Type\NamedType;
 use Walnut\Lang\Blueprint\Type\NothingType;
 use Walnut\Lang\Blueprint\Type\NullType;
 use Walnut\Lang\Blueprint\Type\OptionalKeyType;
@@ -43,8 +44,9 @@ use Walnut\Lang\Blueprint\Type\TupleType;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Blueprint\Type\TypeType;
 
-interface TypeRegistry extends ComplexTypeRegistry {
+interface TypeRegistry {
 	public TypeRegistryCore $core { get; }
+	public ComplexTypeRegistry $complex { get; }
 
 	public AnyType $any { get; }
 	public NothingType $nothing { get; }
@@ -148,4 +150,6 @@ interface TypeRegistry extends ComplexTypeRegistry {
 	public function metaType(MetaTypeValue $value): MetaType;
 	/** @throws UnknownType */
 	public function typeByName(TypeNameIdentifier $typeName): Type;
-	}
+
+	public function withName(TypeNameIdentifier $typeName): NamedType;
+}

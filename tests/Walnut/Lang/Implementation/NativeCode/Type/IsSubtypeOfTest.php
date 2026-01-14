@@ -400,8 +400,8 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 		$this->typeRegistryBuilder->addAlias(new TypeNameIdentifier('Integer1050'), $this->typeRegistry->integer(10, 50));
 		$this->typeRegistryBuilder->addAlias(new TypeNameIdentifier('Integer2040'), $this->typeRegistry->integer(20, 40));
 
-		$t1 = $this->typeRegistry->alias(new TypeNameIdentifier('Integer1050'));
-		$t2 = $this->typeRegistry->alias(new TypeNameIdentifier('Integer2040'));
+		$t1 = $this->typeRegistry->complex->alias(new TypeNameIdentifier('Integer1050'));
+		$t2 = $this->typeRegistry->complex->alias(new TypeNameIdentifier('Integer2040'));
 		$t3 = $this->typeRegistry->integer(10, 50);
 		$t4 = $this->typeRegistry->integer(20, 40);
 
@@ -505,8 +505,8 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 		$this->typeRegistryBuilder->addAtom(new TypeNameIdentifier('Atom1'));
 		$this->typeRegistryBuilder->addAtom(new TypeNameIdentifier('Atom2'));
 
-		$t1 = $this->typeRegistry->atom(new TypeNameIdentifier('Atom1'));
-		$t2 = $this->typeRegistry->atom(new TypeNameIdentifier('Atom2'));
+		$t1 = $this->typeRegistry->complex->atom(new TypeNameIdentifier('Atom1'));
+		$t2 = $this->typeRegistry->complex->atom(new TypeNameIdentifier('Atom2'));
 
 		$matrix = [
 			1 => [1 =>  true, false],
@@ -536,8 +536,8 @@ final class IsSubtypeOfTest extends BaseProgramTestHelper {
 			new EnumValueIdentifier('C')
 		]);
 
-		$t1 = $this->typeRegistry->enumeration(new TypeNameIdentifier('Enumeration1'));
-		$t2 = $this->typeRegistry->enumeration(new TypeNameIdentifier('Enumeration2'));
+		$t1 = $this->typeRegistry->complex->enumeration(new TypeNameIdentifier('Enumeration1'));
+		$t2 = $this->typeRegistry->complex->enumeration(new TypeNameIdentifier('Enumeration2'));
 		$t3 = $t1->subsetType([
 			new EnumValueIdentifier('A'),
 		]);

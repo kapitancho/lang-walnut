@@ -59,7 +59,7 @@ final class LnTest extends BaseProgramTestHelper {
             $this->typeRegistry->real(-3.14, 99.9),
             $this->typeRegistry->result(
                 $this->typeRegistry->real(max: 99.9),
-                $this->typeRegistry->atom(
+                $this->typeRegistry->complex->atom(
                     new TypeNameIdentifier('NotANumber')
                 )
             )
