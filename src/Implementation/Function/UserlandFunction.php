@@ -69,7 +69,6 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 		return $this->functionBody->analyseDependencyType($dependencyContainer);
 	}
 
-
 	/** @throws AnalyserException */
 	public function analyse(
 		Type $targetType,

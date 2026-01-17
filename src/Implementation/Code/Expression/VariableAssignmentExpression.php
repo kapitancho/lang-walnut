@@ -26,10 +26,7 @@ final readonly class VariableAssignmentExpression implements VariableAssignmentE
 		) {
 			$analyserContext = $analyserContext->withAddedVariableType(
 				$this->variableName,
-				$analyserContext->typeRegistry->function(
-					$v->type->parameterType,
-					$v->type->returnType,
-				)
+				$v->type,
 			);
 		}
 		$ret = $this->assignedExpression->analyse($analyserContext);

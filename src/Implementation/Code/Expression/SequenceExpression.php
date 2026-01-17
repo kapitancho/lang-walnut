@@ -45,7 +45,7 @@ final readonly class SequenceExpression implements SequenceExpressionInterface, 
 	}
 
 	public function execute(ExecutionContext $executionContext): ExecutionResult {
-		$result = ($executionContext->valueRegistry->null);
+		$result = $executionContext->valueRegistry->null;
 		foreach($this->expressions as $expression) {
 			$executionContext = $expression->execute($executionContext);
 			$result = $executionContext->value;

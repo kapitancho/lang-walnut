@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Implementation\Program\Builder;
+namespace Walnut\Lang\Implementation\Program\Registry;
 
 use BcMath\Number;
 use Walnut\Lang\Blueprint\AST\Parser\EscapeCharHandler;

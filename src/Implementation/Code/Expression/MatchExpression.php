@@ -130,21 +130,6 @@ final readonly class MatchExpression implements MatchExpressionInterface, JsonSe
 			}
 			$innerContext = $pair->matchExpression->execute($executionContext);
 			if ($this->operation->match($executionContext->value, $innerContext->value)) {
-				if ($this->target instanceof VariableNameExpression) {
-					if ($this->operation instanceof MatchExpressionIsSubtypeOf && $innerContext->value instanceof TypeValue) {
-						$typedValue = $innerContext->variableValueScope->typedValueOf($this->target->variableName);
-						$innerContext = $innerContext->withAddedVariableValue(
-							$this->target->variableName,
-							$typedValue
-						);
-					}
-					if ($this->operation instanceof MatchExpressionEquals) {
-						$innerContext = $innerContext->withAddedVariableValue(
-							$this->target->variableName,
-							$innerContext->value
-						);
-					}
-				}
 				$result = $pair->valueExpression->execute($innerContext);
 				return $executionContext->withValue($result->value);
 			}

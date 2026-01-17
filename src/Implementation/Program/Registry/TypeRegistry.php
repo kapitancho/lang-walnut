@@ -28,8 +28,6 @@ use Walnut\Lang\Blueprint\Type\ResultType as ResultTypeInterface;
 use Walnut\Lang\Blueprint\Type\TrueType as TrueTypeInterface;
 use Walnut\Lang\Blueprint\Type\Type;
 use Walnut\Lang\Implementation\Common\Range\LengthRange;
-use Walnut\Lang\Implementation\Program\Builder\SimpleTypeRegistry;
-use Walnut\Lang\Implementation\Program\Builder\TypeRegistryCore;
 use Walnut\Lang\Implementation\Program\Type\IntersectionTypeNormalizer;
 use Walnut\Lang\Implementation\Program\Type\UnionTypeNormalizer;
 use Walnut\Lang\Implementation\Type\AnyType;
