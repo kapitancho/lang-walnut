@@ -36,7 +36,7 @@ final readonly class Hydrator implements HydratorInterface {
 				$this->typeTypeHydrator->hydrate($value, $targetType, $hydrationPath),
 			$targetType instanceof ComplexType =>
 				$this->complexTypeHydrator->hydrate($this, $value, $targetType, $hydrationPath),
-			$targetType instanceof MetaType =>throw new HydrationException(
+			$targetType instanceof MetaType => throw new HydrationException(
 				$value,
 				$hydrationPath,
 				sprintf(

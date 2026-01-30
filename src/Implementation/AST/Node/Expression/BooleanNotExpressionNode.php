@@ -15,7 +15,7 @@ final readonly class BooleanNotExpressionNode implements BooleanNotExpressionNod
 	public function jsonSerialize(): array {
 		return [
 			'sourceLocation' => $this->sourceLocation,
-			'nodeCategNoty' => 'Expression',
+			'nodeCategory' => 'Expression',
 			'nodeName' => 'BooleanNotExpression',
 			'expression' => $this->expression
 		];

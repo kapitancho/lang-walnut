@@ -166,10 +166,10 @@ final readonly class CompositeTypeHydrator implements CompositeTypeHydratorInter
 			$set = $this->valueRegistry->set($result);
 			$l = count($set->values);
 			if ($targetType->range->minLength <= $l && (
-					$targetType->range->maxLength === PlusInfinity::value ||
-					$targetType->range->maxLength >= $l
-				)) {
-				return $this->valueRegistry->set($result);
+				$targetType->range->maxLength === PlusInfinity::value ||
+				$targetType->range->maxLength >= $l
+			)) {
+				return $set;
 			}
 			throw new HydrationException(
 				$value,

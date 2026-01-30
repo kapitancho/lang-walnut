@@ -10,7 +10,6 @@ final class AstCompilationException extends CompilationException {
 	public function __construct(public SourceNode $node, string $message, Throwable|null $previous = null) {
 		parent::__construct(
 			message: $message,
-			//message: sprintf("[%s] at %s", $message, $this->node->sourceLocation->startPosition),
 			previous: $previous
 		);
 	}
