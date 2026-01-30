@@ -43,6 +43,9 @@ final readonly class ValueRegistry implements ValueRegistryInterface {
 	public Value $true;
 	public Value $false;
 
+	public ValueRegistryCore $core;
+
+
 	public function __construct(
 		private TypeRegistryInterface   $typeRegistry,
 		private EscapeCharHandler       $stringEscapeCharHandler,
@@ -51,6 +54,8 @@ final readonly class ValueRegistry implements ValueRegistryInterface {
 		$this->null = $this->typeRegistry->null->value;
 		$this->true = $this->typeRegistry->true->value;
 		$this->false = $this->typeRegistry->false->value;
+
+		$this->core = new ValueRegistryCore($this);
 	}
 
 	public function type(Type $refType): TypeValue {

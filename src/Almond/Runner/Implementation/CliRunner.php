@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Almond\Runner\Implementation;
 
+use Walnut\Lang\Almond\Engine\Blueprint\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Blueprint\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\InvalidEntryPointDependency;
 use Walnut\Lang\Almond\Engine\Blueprint\Value\StringValue;
@@ -41,6 +42,19 @@ final readonly class CliRunner {
 					$compilationResult->programContext,
 					$compilationResult->moduleLookupContext,
 					$compilationResult->rootNode,
+				);
+			} catch (ExecutionException $ex) {
+				return new CompilationFailure(
+					$compilationResult->programContext,
+					$compilationResult->moduleLookupContext,
+					$compilationResult->rootNode,
+					[
+						new CustomCompilationError(
+							CompilationErrorType::executionError,
+							$ex->getMessage(),
+							[]
+						)
+					]
 				);
 			} catch (InvalidEntryPointDependency $ex) {
 				return new CompilationFailure(

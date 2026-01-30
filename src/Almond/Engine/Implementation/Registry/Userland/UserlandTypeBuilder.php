@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Almond\Engine\Implementation\Registry\Userland;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Function\FunctionBody;
+use Walnut\Lang\Almond\Engine\Blueprint\Function\UserlandFunction;
 use Walnut\Lang\Almond\Engine\Blueprint\Identifier\EnumerationValueName;
 use Walnut\Lang\Almond\Engine\Blueprint\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Blueprint\Registry\Userland\UserlandTypeBuilder as UserlandTypeBuilderInterface;
@@ -54,24 +55,22 @@ final readonly class UserlandTypeBuilder implements UserlandTypeBuilderInterface
 	public function addOpen(
 		TypeName $name,
 		Type $valueType,
-		FunctionBody|null $constructorBody = null,
-		Type|null $errorType = null
+		UserlandFunction|null $validator
 	): OpenType {
 		return $this->userlandTypeStorage->addOpen(
 			$name,
-			$this->userlandTypeFactory->open($name, $valueType)
+			$this->userlandTypeFactory->open($name, $valueType, $validator)
 		);
 	}
 
 	public function addSealed(
 		TypeName $name,
 		Type $valueType,
-		FunctionBody|null $constructorBody = null,
-		Type|null $errorType = null
+		UserlandFunction|null $validator
 	): SealedType {
 		return $this->userlandTypeStorage->addSealed(
 			$name,
-			$this->userlandTypeFactory->sealed($name, $valueType)
+			$this->userlandTypeFactory->sealed($name, $valueType, $validator)
 		);
 	}
 

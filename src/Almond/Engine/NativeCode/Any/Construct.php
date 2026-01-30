@@ -23,6 +23,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationSuccess;
 use Walnut\Lang\Almond\Engine\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Value\TypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Value\Value;
+use Walnut\Lang\Almond\Engine\Blueprint\VariableScope\VariableScopeFactory;
 
 final readonly class Construct implements NativeMethod {
 
@@ -31,6 +32,7 @@ final readonly class Construct implements NativeMethod {
 		private TypeRegistry $typeRegistry,
 		private ValueRegistry $valueRegistry,
 		private MethodContext $methodContext,
+		private VariableScopeFactory $variableScopeFactory
 	) {}
 
 
@@ -83,9 +85,28 @@ final readonly class Construct implements NativeMethod {
 						$this
 					);
 				}
+
+				$validationMethod = $refType->validator;
+				$vError = null;
+				if ($validationMethod !== null) {
+					$validationResult = $validationMethod->validate(
+						$this->typeRegistry->nothing,
+						$refType->valueType
+					);
+					if ($validationResult instanceof ValidationFailure) {
+						return $validationResult;
+					}
+					if ($validationResult->type instanceof ResultType) {
+						$vError = $validationResult->type->errorType;
+					}
+				}
+				$errorType = $cError && $vError ?
+					$this->typeRegistry->union([$cError, $vError]) :
+					$cError ?? $vError;
+
 				return $this->validationFactory->validationSuccess(
-					$cError ? $this->typeRegistry->result(
-						$refType, $cError
+					$errorType ? $this->typeRegistry->result(
+						$refType, $errorType
 					) : $refType
 				);
 			}
@@ -123,6 +144,18 @@ final readonly class Construct implements NativeMethod {
 						return $t;
 					}
 				}
+				$validationMethod = $parameterType->validator;
+				if ($validationMethod !== null) {
+					$t = $validationMethod->execute(
+						$this->variableScopeFactory->emptyVariableValueScope,
+						null,
+						$t,
+					);
+					if ($t instanceof ErrorValue) {
+						return $t;
+					}
+				}
+
 				if ($parameterType instanceof OpenType) {
 					return $this->valueRegistry->open($parameterType->name, $t);
 				} else {

@@ -26,7 +26,10 @@ final readonly class NameBuilder implements NameBuilderInterface {
 		$this->codeMapper->mapNode($typeName, $name);
 		return $name;
 	}
-	public function variableName(VariableNameNode $variableName): VariableName {
+	public function variableName(string|VariableNameNode $variableName): VariableName {
+		if (is_string($variableName)) {
+			return new VariableName($variableName);
+		}
 		$name = new VariableName($variableName->name);
 		$this->codeMapper->mapNode($variableName, $name);
 		return $name;

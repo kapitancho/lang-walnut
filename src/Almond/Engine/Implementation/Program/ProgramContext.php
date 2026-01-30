@@ -153,7 +153,9 @@ final readonly class ProgramContext implements ProgramContextInterface, TypeFind
 			$this->variableScopeFactory,
 		);
 
-		$this->userlandTypeFactory = new UserlandTypeFactory();
+		$this->userlandTypeFactory = new UserlandTypeFactory(
+			$this->variableScopeFactory
+		);
 		$this->userlandMethodFactory = new UserlandMethodFactory(
 			$this->typeRegistry,
 			$this->userlandFunctionFactory,
@@ -190,6 +192,7 @@ final readonly class ProgramContext implements ProgramContextInterface, TypeFind
 				),
 				$this->userlandMethodStorage,
 				$this->validationFactory,
+				$this->variableScopeFactory
 			)
 		);
 	}

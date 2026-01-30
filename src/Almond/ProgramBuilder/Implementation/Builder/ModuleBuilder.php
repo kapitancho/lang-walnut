@@ -16,7 +16,9 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Module\ModuleNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Name\EnumerationValueNameNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\TypeNode;
 use Walnut\Lang\Almond\Engine\Blueprint\Function\FunctionBody;
+use Walnut\Lang\Almond\Engine\Blueprint\Function\UserlandFunction;
 use Walnut\Lang\Almond\Engine\Blueprint\Identifier\EnumerationValueName;
+use Walnut\Lang\Almond\Engine\Blueprint\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Blueprint\Method\UserlandMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\ProgramContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Registry\Userland\UserlandMethodBuilder;
@@ -112,6 +114,35 @@ final readonly class ModuleBuilder implements ModuleCompilerInterface {
 		);
 	}
 
+	private function validator(
+		TypeName $typeName,
+		Type $valueType,
+		TypeNode $errorTypeNode,
+		FunctionBodyNode $constructorBodyNode
+	): UserlandFunction {
+		$errorType = $this->type($errorTypeNode);
+		$constructorBody = $this->functionBody($constructorBodyNode);
+		return $this->programContext->userlandMethodStorage->addValidator(
+			$typeName,
+			$this->programContext->userlandFunctionFactory->create(
+				new NameAndType($this->programContext->typeRegistry->nothing, null),
+				new NameAndType($valueType, $typeName->asVariableName()),
+				new NameAndType($this->programContext->typeRegistry->nothing, null),
+				$this->programContext->typeRegistry->result(
+					$valueType,
+					$errorType
+				),
+				$this->programContext->expressionRegistry->functionBody(
+					$this->programContext->expressionRegistry->sequence([
+						$constructorBody->expression,
+						$this->programContext->expressionRegistry->variableName(
+							$this->nameBuilder->variableName('#')
+						)
+					])
+				)
+			)
+		);
+	}
 
 	/** @throws CompilationException */
 	private function compileModuleDefinition(ModuleDefinitionNode $moduleDefinition): void {
@@ -159,25 +190,29 @@ final readonly class ModuleBuilder implements ModuleCompilerInterface {
 					),
 				$moduleDefinition instanceof AddOpenTypeNode =>
 					$this->programContext->userlandTypeBuilder->addOpen(
-						$this->nameBuilder->typeName($moduleDefinition->name),
-						$this->type($moduleDefinition->valueType),
-						$moduleDefinition->constructorBody ?
-							$this->validatorBody(
+						$typeName = $this->nameBuilder->typeName($moduleDefinition->name),
+						$valueType = $this->type($moduleDefinition->valueType),
+						$moduleDefinition->errorType && $moduleDefinition->constructorBody ?
+							$this->validator(
+								$typeName,
+								$valueType,
+								$moduleDefinition->errorType,
 								$moduleDefinition->constructorBody
-							) : null,
-						$moduleDefinition->errorType ?
-							$this->type($moduleDefinition->errorType) : null
+							) :
+							null,
 					),
 				$moduleDefinition instanceof AddSealedTypeNode =>
 					$this->programContext->userlandTypeBuilder->addSealed(
-						$this->nameBuilder->typeName($moduleDefinition->name),
-						$this->type($moduleDefinition->valueType),
-						$moduleDefinition->constructorBody ?
-							$this->validatorBody(
+						$typeName = $this->nameBuilder->typeName($moduleDefinition->name),
+						$valueType = $this->type($moduleDefinition->valueType),
+						$moduleDefinition->errorType && $moduleDefinition->constructorBody ?
+							$this->validator(
+								$typeName,
+								$valueType,
+								$moduleDefinition->errorType,
 								$moduleDefinition->constructorBody
-							) : null,
-						$moduleDefinition->errorType ?
-							$this->type($moduleDefinition->errorType) : null
+							) :
+							null,
 					),
 				// @codeCoverageIgnoreStart
 				true => throw new CompilationException(
@@ -208,11 +243,6 @@ final readonly class ModuleBuilder implements ModuleCompilerInterface {
 	/** @throws CompilationException */
 	private function functionBody(FunctionBodyNode $functionBodyNode): FunctionBody {
 		return $this->functionBodyCompiler->functionBody($functionBodyNode);
-	}
-
-	/** @throws CompilationException */
-	private function validatorBody(FunctionBodyNode $functionBodyNode): FunctionBody {
-		return $this->functionBodyCompiler->validatorBody($functionBodyNode);
 	}
 
 }

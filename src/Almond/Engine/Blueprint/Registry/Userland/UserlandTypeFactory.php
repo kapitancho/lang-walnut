@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Almond\Engine\Blueprint\Registry\Userland;
 
+use Walnut\Lang\Almond\Engine\Blueprint\Function\UserlandFunction;
 use Walnut\Lang\Almond\Engine\Blueprint\Identifier\EnumerationValueName;
 use Walnut\Lang\Almond\Engine\Blueprint\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Blueprint\Type\AliasType;
@@ -19,6 +20,6 @@ interface UserlandTypeFactory {
 	public function enumeration(TypeName $name, array $values): EnumerationType;
 	public function alias(TypeName $name, Type $aliasedType): AliasType;
 	public function data(TypeName $name, Type $valueType): DataType;
-	public function open(TypeName $name, Type $valueType): OpenType;
-	public function sealed(TypeName $name, Type $valueType): SealedType;
+	public function open(TypeName $name, Type $valueType, UserlandFunction|null $validator): OpenType;
+	public function sealed(TypeName $name, Type $valueType, UserlandFunction|null $validator): SealedType;
 }

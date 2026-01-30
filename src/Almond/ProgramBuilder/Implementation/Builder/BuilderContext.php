@@ -42,7 +42,6 @@ final readonly class BuilderContext implements FunctionBodyCompilerInterface {
 			$codeMapper
 		);
 		$this->functionBodyBuilder = new FunctionBodyBuilder(
-			$nameBuilder,
 			$expressionBuilder,
 			$programContext->expressionRegistry,
 			$codeMapper
@@ -63,12 +62,5 @@ final readonly class BuilderContext implements FunctionBodyCompilerInterface {
 	public function functionBody(FunctionBodyNode $functionBodyNode): FunctionBody {
 		return $this->functionBodyBuilder->functionBody($functionBodyNode);
 	}
-
-	// Not really in use, but required by the interface
-	// @codeCoverageIgnoreStart
-	public function validatorBody(FunctionBodyNode $functionBodyNode): FunctionBody {
-		return $this->functionBodyBuilder->validatorBody($functionBodyNode);
-	}
-	// @codeCoverageIgnoreEnd
 
 }

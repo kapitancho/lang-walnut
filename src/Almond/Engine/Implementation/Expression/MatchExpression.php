@@ -85,6 +85,10 @@ final readonly class MatchExpression implements Expression, JsonSerializable {
 				}
 			}
 			$valueContext = $pair->valueExpression->validateInContext($innerContext);
+			if ($valueContext instanceof ValidationFailure) {
+				$failure = $failure ? $failure->mergeFailure($valueContext) : $valueContext;
+				continue;
+			}
 
 			$expressionTypes[] = $valueContext->expressionType;
 			$returnTypes[] = $valueContext->returnType;

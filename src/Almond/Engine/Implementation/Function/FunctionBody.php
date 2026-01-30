@@ -20,7 +20,7 @@ final readonly class FunctionBody implements FunctionBodyInterface {
 		private TypeRegistry $typeRegistry,
 		private ValidationFactory $validationFactory,
 
-		private Expression $expression
+		public Expression $expression
 	) {}
 
 	public function validateInContext(ValidationContext $validationContext): ValidationSuccess|ValidationFailure {

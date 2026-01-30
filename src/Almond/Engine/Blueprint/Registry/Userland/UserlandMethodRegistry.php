@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Almond\Engine\Blueprint\Registry\Userland;
 
+use Walnut\Lang\Almond\Engine\Blueprint\Function\UserlandFunction;
 use Walnut\Lang\Almond\Engine\Blueprint\Identifier\MethodName;
 use Walnut\Lang\Almond\Engine\Blueprint\Method\UserlandMethod;
 
@@ -11,4 +12,7 @@ interface UserlandMethodRegistry {
 
 	/** @return array<string, list<UserlandMethod>> */
 	public function allMethods(): array;
+
+	/** @return array<string, UserlandFunction> */
+	public function allValidators(): array;
 }

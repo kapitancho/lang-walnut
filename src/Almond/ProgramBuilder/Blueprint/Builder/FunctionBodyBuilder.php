@@ -10,9 +10,4 @@ interface FunctionBodyBuilder {
 	public function functionBody(
 		FunctionBodyNode $functionBodyNode
 	): FunctionBody;
-
-	/** @throws CompilationException */
-	public function validatorBody(
-		FunctionBodyNode $functionBodyNode
-	): FunctionBody;
 }

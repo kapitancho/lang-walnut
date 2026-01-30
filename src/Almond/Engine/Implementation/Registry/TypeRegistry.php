@@ -14,6 +14,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Range\MinusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Range\NumberInterval as NumberIntervalInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Registry\TypeRegistry as TypeRegistryInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Registry\TypeRegistryCore as TypeRegistryCoreInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Registry\Userland\UserlandTypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Type\AliasType as AliasTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Type\AnyType as AnyTypeInterface;
@@ -65,13 +66,16 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 	public FalseTypeInterface $false;
 	public TrueTypeInterface $true;
 
+	public TypeRegistryCoreInterface $core;
+
+
 	private IntersectionTypeNormalizer $intersectionTypeNormalizer;
 	private UnionTypeNormalizer $unionTypeNormalizer;
 
 	public function __construct(
 		private MethodContext $methodContext,
 		public UserlandTypeRegistry $userland,
-		private EscapeCharHandler    $escapeCharHandler,
+		private EscapeCharHandler $escapeCharHandler,
 	) {
 		$this->null = $this->userland->null;
 		$this->nothing = new NothingType();
@@ -82,6 +86,8 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 
 		$this->intersectionTypeNormalizer = new IntersectionTypeNormalizer($this);
 		$this->unionTypeNormalizer = new UnionTypeNormalizer($this);
+
+		$this->core = new TypeRegistryCore($this->userland);
 	}
 
 	public function function(Type $parameterType, Type $returnType): FunctionType {

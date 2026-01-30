@@ -9,6 +9,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Registry\Userland\UserlandMethodRegistry
 use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationResult;
+use Walnut\Lang\Almond\Engine\Blueprint\VariableScope\VariableScopeFactory;
 
 final readonly class UserlandMethodValidator implements UserlandMethodValidatorInterface {
 
@@ -16,6 +17,7 @@ final readonly class UserlandMethodValidator implements UserlandMethodValidatorI
 		private DependencyContextFactory $dependencyContextFactory,
 		private UserlandMethodRegistry $userlandMethodRegistry,
 		private ValidationFactory $validationFactory,
+		private VariableScopeFactory $variableScopeFactory,
 	) {}
 
 	public function validateAll(): ValidationResult {
@@ -28,6 +30,15 @@ final readonly class UserlandMethodValidator implements UserlandMethodValidatorI
 				if ($step instanceof ValidationFailure) {
 					$validationResult = $validationResult->mergeFailure($step);
 				}
+			}
+		}
+		$allValidators = $this->userlandMethodRegistry->allValidators();
+		foreach ($allValidators as $typeName => $validator) {
+			$step = $validator->validateInVariableScope(
+				$this->variableScopeFactory->emptyVariableScope
+			);
+			if ($step instanceof ValidationFailure) {
+				$validationResult = $validationResult->mergeFailure($step);
 			}
 		}
 		return $validationResult;

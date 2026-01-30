@@ -15,7 +15,6 @@ use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Builder\FunctionBodyBuilder as F
 final readonly class FunctionBodyBuilder implements FunctionBodyCompilerInterface {
 
 	public function __construct(
-		private NameBuilder        $nameBuilder,
 		private ExpressionBuilder  $astExpressionCompiler,
 		private ExpressionRegistry $expressionRegistry,
 		private CodeMapper         $codeMapper,
@@ -28,20 +27,6 @@ final readonly class FunctionBodyBuilder implements FunctionBodyCompilerInterfac
 		);
 		$this->codeMapper->mapNode($functionBodyNode, $result);
 		return $result;
-	}
-
-	/** @throws CompilationException */
-	public function validatorBody(
-		FunctionBodyNode $functionBodyNode
-	): FunctionBody {
-		return $this->expressionRegistry->functionBody(
-			$this->expressionRegistry->sequence([
-				$this->astExpressionCompiler->expression($functionBodyNode->expression),
-				$this->expressionRegistry->variableName(
-					new VariableName('#')
-				)
-			])
-		);
 	}
 
 }

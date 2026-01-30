@@ -13,7 +13,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Identifier\VariableName;
 
 interface NameBuilder {
 	public function typeName(string|TypeNameNode $typeName): TypeName;
-	public function variableName(VariableNameNode $variableName): VariableName;
+	public function variableName(string|VariableNameNode $variableName): VariableName;
 	public function methodName(string|MethodNameNode $methodName): MethodName;
 	public function enumerationValueName(EnumerationValueNameNode $enumerationValueName): EnumerationValueName;
 }

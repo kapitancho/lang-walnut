@@ -142,4 +142,6 @@ interface TypeRegistry extends TypeFinder {
 
 	public UserlandTypeRegistry $userland { get; }
 
+	public TypeRegistryCore $core { get; }
+
 }

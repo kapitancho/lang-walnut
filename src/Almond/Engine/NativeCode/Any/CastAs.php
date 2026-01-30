@@ -20,35 +20,43 @@ use Walnut\Lang\Almond\Engine\Implementation\ValueConverter;
 
 final readonly class CastAs implements NativeMethod {
 
+	private ValueConverter $valueConverter;
+
 	public function __construct(
 		private ValidationFactory $validationFactory,
 		private TypeRegistry $typeRegistry,
 		private ValueRegistry $valueRegistry,
 		private MethodContext $methodContext,
-	) {}
+	) {
+		$this->valueConverter = new ValueConverter(
+			$this->validationFactory,
+			$this->typeRegistry,
+			$this->valueRegistry,
+			$this->methodContext,
+		);
+	}
 
 
 	public function validate(
 		TypeInterface $targetType, TypeInterface $parameterType, Expression|null $origin
 	): ValidationSuccess|ValidationFailure {
 		if ($parameterType instanceof TypeType) {
-			new ValueConverter(
-
-			)->analyseConvertValueToType(
-
+			return $this->valueConverter->analyseConvertValueToType(
+				$targetType,
+				$parameterType->refType,
+				$origin
 			);
 		}
 		return $this->validationFactory->error(
 			ValidationErrorType::invalidParameterType,
 			sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-			$this
+			$origin
 		);
 	}
 
 	public function execute(Value $target, Value $parameter): Value {
 		if ($parameter instanceof TypeValue) {
-			return new ValueConverter()->convertValueToType(
-				$programRegistry,
+			return $this->valueConverter->convertValueToType(
 				$target,
 				$parameter->typeValue
 			);

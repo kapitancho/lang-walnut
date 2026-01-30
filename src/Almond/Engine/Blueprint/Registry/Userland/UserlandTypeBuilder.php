@@ -2,7 +2,7 @@
 
 namespace Walnut\Lang\Almond\Engine\Blueprint\Registry\Userland;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Function\FunctionBody;
+use Walnut\Lang\Almond\Engine\Blueprint\Function\UserlandFunction;
 use Walnut\Lang\Almond\Engine\Blueprint\Identifier\EnumerationValueName;
 use Walnut\Lang\Almond\Engine\Blueprint\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Blueprint\Type\AliasType;
@@ -29,14 +29,12 @@ interface UserlandTypeBuilder {
 	public function addOpen(
 		TypeName $name,
 		Type $valueType,
-		FunctionBody|null $constructorBody = null,
-		Type|null $errorType = null
+		UserlandFunction|null $validator
 	): OpenType;
 
 	public function addSealed(
 		TypeName $name,
 		Type $valueType,
-		FunctionBody|null $constructorBody = null,
-		Type|null $errorType = null
+		UserlandFunction|null $validator
 	): SealedType;
 }

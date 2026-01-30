@@ -3,17 +3,30 @@
 namespace Walnut\Lang\Almond\Engine\Implementation;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Execution\ExecutionException;
+use Walnut\Lang\Almond\Engine\Blueprint\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Identifier\MethodName;
 use Walnut\Lang\Almond\Engine\Blueprint\Method\MethodContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Registry\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Registry\ValueRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Type\CoreType;
+use Walnut\Lang\Almond\Engine\Blueprint\Type\NamedType;
 use Walnut\Lang\Almond\Engine\Blueprint\Type\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Type\UnionType;
+use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationErrorType;
+use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationFactory;
+use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationFailure;
+use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationSuccess;
+use Walnut\Lang\Almond\Engine\Blueprint\Value\DataValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Value\ErrorValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Value\Value;
+use Walnut\Lang\Almond\Engine\Implementation\Type\Helper\BaseType;
 
 final readonly class ValueConverter {
+	use BaseType;
 
 	public function __construct(
+		private ValidationFactory $validationFactory,
 		private TypeRegistry $typeRegistry,
 		private ValueRegistry $valueRegistry,
 		private MethodContext $methodContext,
@@ -23,7 +36,7 @@ final readonly class ValueConverter {
 		Type $sourceType,
 		Type $targetType,
 	): Type {
-		$shapeTargetType = $typeRegistry->shape($targetType);
+		$shapeTargetType = $this->typeRegistry->shape($targetType);
 
 		if ($sourceType->isSubtypeOf($shapeTargetType)) {
 			return $targetType;
@@ -36,7 +49,7 @@ final readonly class ValueConverter {
 			$returnType = $methodAnalyser->safeAnalyseMethod(
 				$sourceType,
 				$methodName,
-				$typeRegistry->null
+				$this->typeRegistry->null
 			);
 			if ($returnType !== UnknownMethod::value) {
 				if ($returnType instanceof ResultType) {
@@ -78,6 +91,7 @@ final readonly class ValueConverter {
 			$result->errorValue->type->name->equals(CoreType::CastNotAvailable->typeName());
 	}
 
+	/** @throws ExecutionException */
 	public function convertValueToShape(
 		Value $sourceValue,
 		Type $targetType
@@ -96,7 +110,7 @@ final readonly class ValueConverter {
 
 		$convertTypes = $baseType instanceof UnionType ? $baseType->types : [];
 		foreach([$targetType, ... $convertTypes] as $convertType) {
-			$converted = $this->convertValueToType($programRegistry, $sourceValue, $convertType);
+			$converted = $this->convertValueToType($sourceValue, $convertType);
 			if (!$this->isError($converted)) {
 				return $converted;
 			}
@@ -110,42 +124,48 @@ final readonly class ValueConverter {
 	public function analyseConvertValueToType(
 		Type $sourceType,
 		Type $targetType,
-	): Type {
+		Expression|null $origin
+	): ValidationSuccess|ValidationFailure {
 		if ($sourceType->isSubtypeOf($targetType)) {
-			return $sourceType;
+			return $this->validationFactory->validationSuccess($sourceType);
 		}
-		$methodNameString = sprintf('as%s', $targetType);
-		if (MethodName::isValidIdentifier($methodNameString)) {
-			$methodName = new MethodName($methodNameString);
-
-			$returnType = $this->methodContext->validateMethod(
+		if ($targetType instanceof NamedType) {
+			$result = $this->methodContext->validateCast(
 				$sourceType,
-				$methodName,
-				$this->typeRegistry->null,
-				$origin
+				$targetType->name,
+				null
 			);
-
-			if ($returnType !== UnknownMethod::value) {
-				$errorType = $returnType instanceof ResultType ? $returnType->errorType : null;
-				$returnType = $returnType instanceof ResultType ? $returnType->returnType : $returnType;
-				if (!$returnType->isSubtypeOf($targetType)) {
-					// @codeCoverageIgnoreStart
-					throw new AnalyserException(sprintf(
-						"Cast method '%s' returns '%s' which is not a subtype of '%s'",
-						$methodName,
+			if ($result instanceof ValidationFailure) {
+				return $this->validationFactory->validationSuccess(
+					$this->typeRegistry->result($targetType, $this->typeRegistry->any)
+				);
+			}
+			$resultType = $result->type;
+			$errorType = $resultType instanceof ResultType ? $resultType->errorType : null;
+			$returnType = $resultType instanceof ResultType ? $resultType->returnType : $resultType;
+			if (!$resultType->isSubtypeOf($targetType)) {
+				return $this->validationFactory->error(
+					ValidationErrorType::invalidReturnType,
+					sprintf(
+						"Cast method returns '%s' which is not a subtype of '%s'",
 						$returnType,
 						$targetType
-					));
-					// @codeCoverageIgnoreEnd
-				}
-				return $errorType ? $typeRegistry->result($targetType, $errorType) : $targetType;
+					),
+					$origin
+				);
 			}
+			return $this->validationFactory->validationSuccess(
+				$errorType ?
+					$this->typeRegistry->result($targetType, $errorType) :
+					$targetType
+			);
 		}
 
-		return $typeRegistry->result(
-			$targetType,
-			$typeRegistry->any
-			//$typeRegistry->withName(new TypeNameIdentifier('CastNotAvailable'))
+		return $this->validationFactory->validationSuccess(
+			$this->typeRegistry->result(
+				$targetType,
+				$this->typeRegistry->core->castNotAvailable
+			)
 		);
 	}
 
@@ -157,22 +177,33 @@ final readonly class ValueConverter {
 		if ($sourceValue->type->isSubtypeOf($targetType)) {
 			return $sourceValue;
 		}
-		$methodNameString = sprintf('as%s', $targetType);
-		if (MethodName::isValidIdentifier($methodNameString)) {
-			$methodName = new MethodName($methodNameString);
-
-			return $this->methodContext->executeMethod(
+		if ($targetType instanceof NamedType) {
+			$result = $this->methodContext->validateCast(
+				$sourceValue->type,
+				$targetType->name,
+				null
+			);
+			if ($result instanceof ValidationFailure) {
+				return $this->valueRegistry->error(
+					$this->valueRegistry->core->castNotAvailable(
+						$this->valueRegistry->record([
+							'from' => $this->valueRegistry->type($sourceValue->type),
+							'to' => $this->valueRegistry->type($targetType)
+						])
+					)
+				);
+			}
+			return $this->methodContext->executeCast(
 				$sourceValue,
-				$methodName,
-				$this->valueRegistry->null
+				$targetType->name
 			);
 		}
 
 		return $this->valueRegistry->error(
 			$this->valueRegistry->core->castNotAvailable(
 				$this->valueRegistry->record([
-					'from' => $programRegistry->valueRegistry->type($sourceValue->type),
-					'to' => $programRegistry->valueRegistry->type($targetType)
+					'from' => $this->valueRegistry->type($sourceValue->type),
+					'to' => $this->valueRegistry->type($targetType)
 				])
 			)
 		);

@@ -69,4 +69,6 @@ interface ValueRegistry {
 	public function real(Number|float $value): RealValue;
 	public function string(string $value): StringValue;
 	public function bytes(string $value): BytesValue;
+
+	public ValueRegistryCore $core { get; }
 }
