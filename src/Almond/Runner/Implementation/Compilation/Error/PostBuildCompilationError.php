@@ -1,0 +1,48 @@
+<?php
+
+namespace Walnut\Lang\Almond\Runner\Implementation\Compilation\Error;
+
+use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation;
+use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationError;
+use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationErrorType;
+use Walnut\Lang\Almond\ProgramBuilder\Blueprint\SourceLocator;
+use Walnut\Lang\Almond\Runner\Blueprint\Compilation\Error\CompilationError;
+use Walnut\Lang\Almond\Runner\Blueprint\Compilation\Error\CompilationErrorType;
+
+final class PostBuildCompilationError implements CompilationError {
+
+	public function __construct(
+		private readonly ValidationError $validationError,
+		private readonly SourceLocator $sourceLocator
+	) {}
+
+	public CompilationErrorType $errorType {
+		get => match($this->validationError->type) {
+			ValidationErrorType::typeTypeMismatch => CompilationErrorType::typeTypeMismatch,
+			ValidationErrorType::valueTypeMismatch => CompilationErrorType::valueTypeMismatch,
+			ValidationErrorType::mutableTypeMismatch => CompilationErrorType::mutableTypeMismatch,
+			ValidationErrorType::undefinedVariable => CompilationErrorType::undefinedVariable,
+			ValidationErrorType::mapKeyTypeMismatch => CompilationErrorType::mapKeyTypeMismatch,
+			ValidationErrorType::undefinedMethod => CompilationErrorType::undefinedMethod,
+			ValidationErrorType::invalidTargetType => CompilationErrorType::invalidTargetType,
+			ValidationErrorType::invalidParameterType => CompilationErrorType::invalidParameterType,
+			ValidationErrorType::invalidReturnType => CompilationErrorType::invalidReturnType,
+			ValidationErrorType::dependencyNotFound => CompilationErrorType::dependencyNotFound,
+			ValidationErrorType::variableScopeMismatch => CompilationErrorType::variableScopeMismatch,
+			default => CompilationErrorType::other
+		};
+	}
+
+	public string $errorMessage {
+		get => $this->validationError->message;
+	}
+
+	/** @var list<SourceLocation> */
+	public array $sourceLocations {
+		get {
+			$sourceNode = $this->validationError->origin ?
+				$this->sourceLocator->getSourceNode($this->validationError->origin) : null;
+			return $sourceNode ? [$sourceNode->sourceLocation] : [];
+		}
+	}
+}

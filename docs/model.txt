@@ -1,0 +1,93 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[type, *]
+    [type, atom  , name]
+    [type, enum  , name, (value)+]
+    [type, alias , name, base]
+    [type, data  , name, base]
+    [type, open  , name, base, error, dep, body]
+    [type, sealed, name, base, error, dep, body]
+    [type, type, ref]
+    [type, mutable, ref]
+    [type, shape , ref]
+    [type, optional key, ref]
+    [type, impure, ref]
+    [type, error , ref]
+    [type, result , okType, errType]
+    [type, any]
+    [type, nothing]
+    [type, union , (type)+]
+    [type, intersection , (type)+]
+    [type, real, ([min, max])*]
+    [type, integer, ([min, max])*]
+    [type, string,                     minLength, maxLength]
+    [type, bytes ,                     minLength, maxLength]
+    [type, array ,          valueType, minLength, maxLength]
+    [type, map   , keyType, valueType, minLength, maxLength]
+    [type, set   ,          valueType, minLength, maxLength]
+    [type, tuple , (type)+, restType]
+    [type, record, (key:type)+, restType]
+    [type, func  , paramType, returnType]
+    [type, subset, string, (value)+]
+    [type, subset, integer, (value)+]
+    [type, subset, real, (value)+]
+    [type, subset, enum, name, (value)+]
+    // subset * 4
+[value, *]
+    [value, atom  , name]
+    [value, enum  , name, value]
+    [value, error, baseValue]
+    [value, type, type]
+    [value, tuple, (value)+]
+    [value, record, (key:value)+]
+    [value, set  , (value)+]
+    [value, integer, number]
+    [value, real, number]
+    [value, string, string]
+    [value, bytes, bytes]
+    [value, data, name, baseValue]
+    [value, open, name, baseValue]
+    [value, sealed, name, baseValue]
+    [value, mutable, value]
+    [value, function, paramType, returnType, dependency, body]
+[expression, *]
+    [expression, constant, value]
+    [expression, booleanAnd, expression, expression]
+    [expression, booleanOr, expression, expression]
+    [expression, booleanXor, expression, expression]
+    [expression, booleanNot, expression]
+    [expression, data, name, expression]
+    [expression, mutable, type, expression]
+    [expression, scoped, expression]
+    [expression, group, expression]
+    [expression, sequence, (expression)*]
+    [expression, tuple, (expression)+]
+    [expression, record, (key:expression)+]
+    [expression, set, (expression)+]
+    [expression, variable, name]
+    [expression, assign, name, expression]
+    [expression, multiAssign, names, expression]
+    [expression, noError, expression]
+    [expression, noExternalError, expression]
+    [expression, return, expression]
+    [expression, methodCall, method, expression]
+    [expression, propertyAccess, property]
+    [expression, functionCall, expression]
+    [expression, match, target, operation, (pattern:expression)+]
+

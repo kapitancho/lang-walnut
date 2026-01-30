@@ -1,0 +1,23 @@
+<?php
+
+namespace Walnut\Lang\Almond\Engine\Blueprint\Type;
+
+enum MetaTypeValue: string {
+    case Function = 'Function';
+	case Tuple = 'Tuple';
+	case Record = 'Record';
+	case Union = 'Union';
+	case Intersection = 'Intersection';
+	case Atom = 'Atom';
+	case Enumeration = 'Enumeration';
+	case EnumerationSubset = 'EnumerationSubset';
+	case IntegerSubset = 'IntegerSubset';
+	case MutableValue = 'MutableValue';
+	case RealSubset = 'RealSubset';
+	case StringSubset = 'StringSubset';
+	case Alias = 'Alias';
+	case Data = 'Data';
+	case Open = 'Open';
+	case Sealed = 'Sealed';
+	case Named = 'Named';
+}
