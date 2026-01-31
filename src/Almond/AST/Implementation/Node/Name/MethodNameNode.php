@@ -12,6 +12,9 @@ final readonly class MethodNameNode implements MethodNameNodeInterface {
 		public string $name
 	) {}
 
+	public function equals(MethodNameNodeInterface $other): bool {
+		return $this->name === $other->name;
+	}
 
 	/** @return iterable<Node> */
 	public function children(): iterable {

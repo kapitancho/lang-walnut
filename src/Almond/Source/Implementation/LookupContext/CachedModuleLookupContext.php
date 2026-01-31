@@ -14,6 +14,6 @@ final class CachedModuleLookupContext implements ModuleLookupContext {
 
 	public function sourceOf(string $moduleName): string|null {
 		return array_key_exists($moduleName, $this->cache) ? $this->cache[$moduleName] :
-			$this->moduleLookupContext->sourceOf($moduleName);
+			$this->cache[$moduleName] = $this->moduleLookupContext->sourceOf($moduleName);
 	}
 }

@@ -6,12 +6,12 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Name\EnumerationValueNameNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Name\MethodNameNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Name\TypeNameNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Name\VariableNameNode;
-use Walnut\Lang\Almond\Engine\Blueprint\Identifier\EnumerationValueName;
-use Walnut\Lang\Almond\Engine\Blueprint\Identifier\MethodName;
-use Walnut\Lang\Almond\Engine\Blueprint\Identifier\TypeName;
-use Walnut\Lang\Almond\Engine\Blueprint\Identifier\VariableName;
-use Walnut\Lang\Almond\ProgramBuilder\Blueprint\CodeMapper;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\EnumerationValueName;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\MethodName;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\VariableName;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Builder\NameBuilder as NameBuilderInterface;
+use Walnut\Lang\Almond\ProgramBuilder\Blueprint\CodeMapper;
 
 final readonly class NameBuilder implements NameBuilderInterface {
 	public function __construct(

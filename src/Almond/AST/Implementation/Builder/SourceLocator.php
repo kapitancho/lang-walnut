@@ -3,7 +3,7 @@
 namespace Walnut\Lang\Almond\AST\Implementation\Builder;
 
 use Walnut\Lang\Almond\AST\Blueprint\Builder\SourceLocator as SourceLocatorInterface;
-use Walnut\Lang\Almond\AST\Implementation\Node\SourceLocation;
+use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation;
 use Walnut\Lang\Almond\AST\Implementation\Parser\ParserState;
 use Walnut\Lib\Walex\SourcePosition;
 use Walnut\Lib\Walex\Token;

@@ -35,7 +35,7 @@ final readonly class NodeIteratorFactory implements NodeIteratorFactoryInterface
 	 * Create a recursive iterator over an entire node tree.
 	 *
 	 * @param Node $rootNode
-	 * @return NodeIterator
+	 * @return NodeIteratorInterface
 	 */
 	public function recursive(Node $rootNode): NodeIteratorInterface {
 		return new RecursiveNodeIterator($rootNode);

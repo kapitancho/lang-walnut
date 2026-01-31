@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Almond\ProgramBuilder\Implementation\Builder;
 
 use BcMath\Number;
-use Exception;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Name\EnumerationValueNameNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\AnyTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\ArrayTypeNode;
@@ -45,18 +44,23 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Value\RealValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\StringValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Number\MinusInfinity as NodeMinusInfinity;
 use Walnut\Lang\Almond\AST\Blueprint\Number\PlusInfinity as NodePlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Identifier\EnumerationValueName;
-use Walnut\Lang\Almond\Engine\Blueprint\Range\MinusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\TypeRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\MetaTypeValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\UnknownType;
-use Walnut\Lang\Almond\Engine\Implementation\Range\NumberInterval;
-use Walnut\Lang\Almond\Engine\Implementation\Range\NumberIntervalEndpoint;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\DuplicateSubsetValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\UnknownEnumerationValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\UnknownType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\MetaTypeValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\EnumerationValueName;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\InvalidLengthRange;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\InvalidNumberInterval;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\MinusInfinity;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberInterval;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberIntervalEndpoint;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Builder\NameBuilder;
-use Walnut\Lang\Almond\ProgramBuilder\Blueprint\CodeMapper;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Builder\TypeBuilder as TypeCompilerInterface;
+use Walnut\Lang\Almond\ProgramBuilder\Blueprint\BuildException;
+use Walnut\Lang\Almond\ProgramBuilder\Blueprint\CodeMapper;
 
 final readonly class TypeBuilder implements TypeCompilerInterface {
 	public function __construct(
@@ -65,7 +69,7 @@ final readonly class TypeBuilder implements TypeCompilerInterface {
 		private CodeMapper $codeMapper,
 	) {}
 
-	/** @throws CompilationException */
+	/** @throws BuildException */
 	public function type(TypeNode $typeNode): Type {
 		try {
 			$result = match(true) {
@@ -212,20 +216,16 @@ final readonly class TypeBuilder implements TypeCompilerInterface {
 					),
 
 				// @codeCoverageIgnoreStart
-				true => throw new CompilationException(
+				true => throw new BuildException(
 					$typeNode,
 					"Unknown type node type: " . get_class($typeNode)
 				)
 				// @codeCoverageIgnoreEnd
 			};
-			if ($result === UnknownType::value) {
-				//TODO: better exception
-				throw new Exception("The type could not be resolved: ". json_encode($typeNode));
-			}
 			$this->codeMapper->mapNode($typeNode, $result);
 			return $result;
-		} catch (UnknownType|DuplicateSubsetValue|InvalidLengthRange|InvalidNumberInterval|InvalidMapKeyType|UnknownEnumerationValue $e) {
-			throw new CompilationException($typeNode, $e->getMessage(), $e);
+		} catch (UnknownType|DuplicateSubsetValue|InvalidLengthRange|InvalidNumberInterval|UnknownEnumerationValue $e) {
+			throw new BuildException($typeNode, $e->getMessage(), $e);
 		}
 	}
 

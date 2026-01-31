@@ -21,22 +21,23 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Value\TrueValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\TupleValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\TypeValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\ValueNode;
-use Walnut\Lang\Almond\Engine\Blueprint\Abc\Function\FunctionValueFactory;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\TypeRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Value\Value;
-use Walnut\Lang\Almond\Engine\Implementation\Type\P\NameAndType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\FunctionValueFactory;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\NameAndType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\UnknownEnumerationValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\UnknownType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Builder\FunctionBodyBuilder;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Builder\NameBuilder;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Builder\TypeBuilder;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Builder\ValueBuilder as ValueCompilerInterface;
+use Walnut\Lang\Almond\ProgramBuilder\Blueprint\BuildException;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\CodeMapper;
 
 final readonly class ValueBuilder implements ValueCompilerInterface {
 	public function __construct(
 		private NameBuilder        $nameBuilder,
-		private TypeRegistry        $typeRegistry,
 		private ValueRegistry       $valueRegistry,
 		private FunctionValueFactory $functionValueFactory,
 		private FunctionBodyBuilder $functionBodyCompiler,
@@ -44,12 +45,12 @@ final readonly class ValueBuilder implements ValueCompilerInterface {
 		private CodeMapper          $codeMapper,
 	) {}
 
-	/** @throws CompilationException */
+	/** @throws BuildException */
 	public function type(TypeNode $typeNode): Type {
 		return $this->typeBuilder->type($typeNode);
 	}
 
-	/** @throws CompilationException */
+	/** @throws BuildException */
 	public function value(ValueNode $valueNode): Value {
 		try {
 			$result = match(true) {
@@ -106,7 +107,7 @@ final readonly class ValueBuilder implements ValueCompilerInterface {
 						$this->functionBodyCompiler->functionBody($valueNode->functionBody),
 					),
 				// @codeCoverageIgnoreStart
-				true => throw new CompilationException(
+				true => throw new BuildException(
 					$valueNode,
 					"Unknown value node type: " . get_class($valueNode)
 				)
@@ -115,7 +116,7 @@ final readonly class ValueBuilder implements ValueCompilerInterface {
 			$this->codeMapper->mapNode($valueNode, $result);
 			return $result;
 		} catch (UnknownType|UnknownEnumerationValue $e) {
-			throw new CompilationException($valueNode, $e->getMessage(), $e);
+			throw new BuildException($valueNode, $e->getMessage(), $e);
 		}
 	}
 

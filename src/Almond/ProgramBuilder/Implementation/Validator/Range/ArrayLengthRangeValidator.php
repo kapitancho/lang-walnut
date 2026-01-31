@@ -24,7 +24,8 @@ final readonly class ArrayLengthRangeValidator implements PreBuildValidator {
 			) {
 				$result = $result->withAddedError(
 					PreBuildValidationErrorType::invalidRange,
-					"Array length range ({$arrayTypeNode->minLength}..{$arrayTypeNode->maxLength}) is not valid",
+					sprintf("Array length range (%s..%s) is not valid",
+						$arrayTypeNode->minLength, $arrayTypeNode->maxLength),
 					[$arrayTypeNode]
 				);
 			}

@@ -12,6 +12,9 @@ final readonly class VariableNameNode implements VariableNameNodeInterface {
 		public string $name
 	) {}
 
+	public function equals(VariableNameNodeInterface $other): bool {
+		return $this->name === $other->name;
+	}
 
 	/** @return iterable<Node> */
 	public function children(): iterable {

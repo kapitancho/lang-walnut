@@ -5,6 +5,7 @@ namespace Walnut\Lang\Almond\Runner\Blueprint\Compilation\Error;
 enum CompilationErrorType {
 	case other;
 	case parseError;
+	case buildError;
 	case moduleDependencyMissing;
 	case moduleDependencyLoop;
 

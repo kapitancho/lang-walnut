@@ -2,57 +2,56 @@
 
 namespace Walnut\Lang\Almond\Engine\Implementation\Program;
 
-use Walnut\Lang\Almond\AST\Implementation\Parser\BytesEscapeCharHandler;
-use Walnut\Lang\Almond\AST\Implementation\Parser\StringEscapeCharHandler;
-use Walnut\Lang\Almond\Engine\Blueprint\Abc\Function\FunctionValueFactory as FunctionValueFactoryInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Abc\Function\UserlandFunctionFactory as UserlandFunctionFactoryInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Abc\Function\UserlandMethodFactory as UserlandMethodFactoryInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Dependency\DependencyContainer as DependencyContainerInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Identifier\TypeName;
-use Walnut\Lang\Almond\Engine\Blueprint\Method\MethodContext as MethodContextInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\ExpressionRegistry as ExpressionRegistryInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\FunctionValueFactory as FunctionValueFactoryInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\UserlandFunctionFactory as UserlandFunctionFactoryInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\UserlandMethodFactory as UserlandMethodFactoryInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodContext as MethodContextInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethodBuilder as UserlandMethodBuilderInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethodRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethodStorage as UserlandMethodStorageInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeFinder;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry as TypeRegistryInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Userland\UserlandTypeBuilder as UserlandTypeBuilderInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Userland\UserlandTypeFactory as UserlandTypeFactoryInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Userland\UserlandTypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Userland\UserlandTypeStorage as UserlandTypeStorageInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry as ValueRegistryInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
+use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyContainer as DependencyContainerInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\ProgramContext as ProgramContextInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\ExpressionRegistry as ExpressionRegistryInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\TypeFinder;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\TypeRegistry as TypeRegistryInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\Userland\UserlandMethodBuilder as UserlandMethodBuilderInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\Userland\UserlandMethodRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\Userland\UserlandMethodStorage as UserlandMethodStorageInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\Userland\UserlandTypeBuilder as UserlandTypeBuilderInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\Userland\UserlandTypeFactory as UserlandTypeFactoryInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\Userland\UserlandTypeRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\Userland\UserlandTypeStorage as UserlandTypeStorageInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\ValueRegistry as ValueRegistryInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\UnknownType;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationFactory as ValidationFactoryInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationResult;
-use Walnut\Lang\Almond\Engine\Blueprint\VariableScope\VariableScopeFactory as VariableScopeFactoryInterface;
-use Walnut\Lang\Almond\Engine\Implementation\Abc\FunctionValueFactory;
-use Walnut\Lang\Almond\Engine\Implementation\Dependency\DependencyContainer;
-use Walnut\Lang\Almond\Engine\Implementation\Dependency\DependencyContextFactory;
-use Walnut\Lang\Almond\Engine\Implementation\Execution\ExecutionContextFactory;
-use Walnut\Lang\Almond\Engine\Implementation\Function\FunctionContextFiller;
-use Walnut\Lang\Almond\Engine\Implementation\Function\UserlandFunctionFactory;
-use Walnut\Lang\Almond\Engine\Implementation\Method\MethodContext;
-use Walnut\Lang\Almond\Engine\Implementation\Method\MethodFinder;
-use Walnut\Lang\Almond\Engine\Implementation\Method\UserlandMethodValidator;
-use Walnut\Lang\Almond\Engine\Implementation\Registry\ExpressionRegistry;
-use Walnut\Lang\Almond\Engine\Implementation\Registry\MethodRegistry;
-use Walnut\Lang\Almond\Engine\Implementation\Registry\Native\NamespaceConfigMap;
-use Walnut\Lang\Almond\Engine\Implementation\Registry\Native\NativeCodeTypeMapper;
-use Walnut\Lang\Almond\Engine\Implementation\Registry\Native\NativeMethodLoader;
-use Walnut\Lang\Almond\Engine\Implementation\Registry\Native\NativeMethodRegistry;
-use Walnut\Lang\Almond\Engine\Implementation\Registry\TypeRegistry;
-use Walnut\Lang\Almond\Engine\Implementation\Registry\Userland\UserlandMethodBuilder;
-use Walnut\Lang\Almond\Engine\Implementation\Registry\Userland\UserlandMethodFactory;
-use Walnut\Lang\Almond\Engine\Implementation\Registry\Userland\UserlandMethodStorage;
-use Walnut\Lang\Almond\Engine\Implementation\Registry\Userland\UserlandTypeBuilder;
-use Walnut\Lang\Almond\Engine\Implementation\Registry\Userland\UserlandTypeFactory;
-use Walnut\Lang\Almond\Engine\Implementation\Registry\Userland\UserlandTypeStorage;
-use Walnut\Lang\Almond\Engine\Implementation\Registry\Userland\UserlandTypeValidator;
-use Walnut\Lang\Almond\Engine\Implementation\Registry\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Implementation\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Implementation\VariableScope\VariableScopeFactory;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory as ValidationFactoryInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResult;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\VariableScope\VariableScopeFactory as VariableScopeFactoryInterface;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Expression\ExpressionRegistry;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Function\FunctionContextFiller;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Function\FunctionValueFactory;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Function\UserlandFunctionFactory;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Method\MethodContext;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Method\MethodFinder;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Method\MethodRegistry;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Method\Native\NamespaceConfigMap;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Method\Native\NativeMethodLoader;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Method\Native\NativeMethodRegistry;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Method\Userland\UserlandMethodBuilder;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Method\Userland\UserlandMethodFactory;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Method\Userland\UserlandMethodStorage;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Method\UserlandMethodValidator;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Type\NativeCodeTypeMapper;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Userland\UserlandTypeBuilder;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Userland\UserlandTypeFactory;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Userland\UserlandTypeStorage;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Userland\UserlandTypeValidator;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Value\ValueRegistry;
+use Walnut\Lang\Almond\Engine\Implementation\Common\BytesEscapeCharHandler;
+use Walnut\Lang\Almond\Engine\Implementation\Common\StringEscapeCharHandler;
+use Walnut\Lang\Almond\Engine\Implementation\Feature\DependencyContainer\DependencyContainer;
+use Walnut\Lang\Almond\Engine\Implementation\Feature\DependencyContainer\DependencyContextFactory;
+use Walnut\Lang\Almond\Engine\Implementation\Program\Execution\ExecutionContextFactory;
+use Walnut\Lang\Almond\Engine\Implementation\Program\Validation\ValidationFactory;
+use Walnut\Lang\Almond\Engine\Implementation\Program\VariableScope\VariableScopeFactory;
 
 
 final readonly class ProgramContext implements ProgramContextInterface, TypeFinder {
@@ -208,7 +207,7 @@ final readonly class ProgramContext implements ProgramContextInterface, TypeFind
 		);
 	}
 
-	public function typeByName(TypeName $typeName): Type|UnknownType {
+	public function typeByName(TypeName $typeName): Type {
 		return $this->typeRegistry->typeByName($typeName);
 	}
 }

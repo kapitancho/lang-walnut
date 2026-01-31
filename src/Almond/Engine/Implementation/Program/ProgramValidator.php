@@ -2,11 +2,11 @@
 
 namespace Walnut\Lang\Almond\Engine\Implementation\Program;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Method\UserlandMethodValidator;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethodValidator;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Userland\UserlandTypeValidator;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\ProgramValidator as ProgramValidatorInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\Userland\UserlandTypeValidator;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationResult;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResult;
 
 final readonly class ProgramValidator implements ProgramValidatorInterface {
 

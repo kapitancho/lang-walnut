@@ -7,11 +7,11 @@ namespace Walnut\Lang\Almond\AST\Implementation\Parser;
 use BcMath\Number;
 use ReflectionClass;
 use Walnut\Lang\Almond\AST\Blueprint\Builder\NodeBuilder;
+use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation;
 use Walnut\Lang\Almond\AST\Blueprint\Number\MinusInfinity;
 use Walnut\Lang\Almond\AST\Blueprint\Number\PlusInfinity;
 use Walnut\Lang\Almond\AST\Blueprint\Parser\EscapeCharHandler;
 use Walnut\Lang\Almond\AST\Blueprint\Parser\ParserState;
-use Walnut\Lang\Almond\AST\Implementation\Node\SourceLocation;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\NumberIntervalEndpointNode;
 use Walnut\Lib\Walex\PatternMatch;
 use Walnut\Lib\Walex\Token as LT;
@@ -2768,8 +2768,9 @@ final readonly class ParserStateMachine {
 					$this->s->move(620);
 				},
 				T::string_value->name => function(LT $token) {
-					$this->s->result['next_variable_key'] = $this->stringEscapeCharHandler->unescape(
-						$token->patternMatch->text);
+					$this->s->result['next_variable_key'] = $this->nodeBuilder->name->variableName(
+						$this->stringEscapeCharHandler->unescape($token->patternMatch->text)
+					);
 					$this->s->move(623);
 				},
 			]],

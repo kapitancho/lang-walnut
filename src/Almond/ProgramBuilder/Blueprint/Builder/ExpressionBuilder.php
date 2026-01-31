@@ -3,9 +3,10 @@
 namespace Walnut\Lang\Almond\ProgramBuilder\Blueprint\Builder;
 
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ExpressionNode;
-use Walnut\Lang\Almond\Engine\Blueprint\Expression\Expression;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
+use Walnut\Lang\Almond\ProgramBuilder\Blueprint\BuildException;
 
 interface ExpressionBuilder {
-	/** @throws CompilationException */
+	/** @throws BuildException */
 	public function expression(ExpressionNode $expressionNode): Expression;
 }

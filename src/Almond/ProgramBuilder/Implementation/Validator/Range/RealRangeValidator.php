@@ -3,8 +3,8 @@
 namespace Walnut\Lang\Almond\ProgramBuilder\Implementation\Validator\Range;
 
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\RealTypeNode;
+use Walnut\Lang\Almond\AST\Blueprint\Number\MinusInfinity;
 use Walnut\Lang\Almond\AST\Blueprint\Number\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Range\MinusInfinity;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Validator\PreBuildValidationErrorType;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Validator\PreBuildValidationFailure;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Validator\PreBuildValidationRequest;
@@ -26,7 +26,8 @@ final readonly class RealRangeValidator implements PreBuildValidator {
 			) {
 				$result = $result->withAddedError(
 					PreBuildValidationErrorType::invalidRange,
-					"Real range ({$realTypeNode->minValue}..{$realTypeNode->maxValue}) is not valid",
+					sprintf("Real range (%s..%s) is not valid",
+						$realTypeNode->minValue, $realTypeNode->maxValue),
 					[$realTypeNode]
 				);
 			}

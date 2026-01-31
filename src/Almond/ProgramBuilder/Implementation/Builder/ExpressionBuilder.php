@@ -9,10 +9,9 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\BooleanXorExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ConstantExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ConstructorCallExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\DataExpressionNode;
-use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\GroupExpressionNode;
-use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ScopedExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\FunctionCallExpressionNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\GroupExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MatchErrorExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MatchExpressionDefaultNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MatchExpressionPairNode;
@@ -28,6 +27,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\NoExternalErrorExpressionNo
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\PropertyAccessExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\RecordExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ReturnExpressionNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ScopedExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\SequenceExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\SetExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\TupleExpressionNode;
@@ -36,19 +36,21 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\VariableNameExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Name\VariableNameNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\TypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\ValueNode;
-use Walnut\Lang\Almond\Engine\Blueprint\Expression\Expression;
-use Walnut\Lang\Almond\Engine\Blueprint\Expression\MatchExpressionDefault;
-use Walnut\Lang\Almond\Engine\Blueprint\Expression\MatchExpressionPair;
-use Walnut\Lang\Almond\Engine\Blueprint\Identifier\VariableName;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\ExpressionRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Value\Value;
-use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Builder\NameBuilder;
-use Walnut\Lang\Almond\ProgramBuilder\Blueprint\CodeMapper;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\ExpressionRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\MatchExpressionDefault;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\MatchExpressionPair;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\UnknownType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\VariableName;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Builder\ExpressionBuilder as ExpressionCompilerInterface;
+use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Builder\NameBuilder;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Builder\TypeBuilder;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Builder\ValueBuilder;
+use Walnut\Lang\Almond\ProgramBuilder\Blueprint\BuildException;
+use Walnut\Lang\Almond\ProgramBuilder\Blueprint\CodeMapper;
 
 
 final readonly class ExpressionBuilder implements ExpressionCompilerInterface {
@@ -61,7 +63,7 @@ final readonly class ExpressionBuilder implements ExpressionCompilerInterface {
 		private CodeMapper         $astCodeMapper,
 	) {}
 
-	/** @throws CompilationException */
+	/** @throws BuildException */
 	private function matchExpressionPair(MatchExpressionPairNode $matchExpressionPairNode): MatchExpressionPair {
 		return $this->expressionRegistry->matchPair(
 			$this->expression($matchExpressionPairNode->matchExpression),
@@ -69,34 +71,24 @@ final readonly class ExpressionBuilder implements ExpressionCompilerInterface {
 		);
 	}
 
-	/** @throws CompilationException */
+	/** @throws BuildException */
 	private function matchExpressionDefault(MatchExpressionDefaultNode $matchExpressionDefaultNode): MatchExpressionDefault {
 		return $this->expressionRegistry->matchDefault(
 			$this->expression($matchExpressionDefaultNode->valueExpression)
 		);
 	}
 
-	/** @throws CompilationException */
-	private function matchExpression(MatchExpressionPairNode|MatchExpressionDefaultNode $matchExpressionNode): MatchExpressionPair|MatchExpressionDefault {
-		return match(true) {
-			$matchExpressionNode instanceof MatchExpressionPairNode =>
-				$this->matchExpressionPair($matchExpressionNode),
-			$matchExpressionNode instanceof MatchExpressionDefaultNode =>
-				$this->matchExpressionDefault($matchExpressionNode),
-		};
-	}
-
-	/** @throws CompilationException */
+	/** @throws BuildException */
 	public function type(TypeNode $typeNode): Type {
 		return $this->typeBuilder->type($typeNode);
 	}
 
-	/** @throws CompilationException */
+	/** @throws BuildException */
 	public function value(ValueNode $valueNode): Value {
 		return $this->valueBuilder->value($valueNode);
 	}
 
-	/** @throws CompilationException */
+	/** @throws BuildException */
 	private function constructorCall(ConstructorCallExpressionNode $expressionNode): Expression {
 		try {
 			return $this->expressionRegistry->constructorCall(
@@ -104,7 +96,7 @@ final readonly class ExpressionBuilder implements ExpressionCompilerInterface {
 				$this->expression($expressionNode->parameter)
 			);
 		} catch (UnknownType $e) {
-			throw new CompilationException(
+			throw new BuildException(
 				$expressionNode,
 				$e->getMessage(),
 				$e
@@ -147,7 +139,7 @@ final readonly class ExpressionBuilder implements ExpressionCompilerInterface {
 	}
 
 
-	/** @throws CompilationException */
+	/** @throws BuildException */
 	public function expression(ExpressionNode $expressionNode): Expression {
 		$result = match(true) {
 			$expressionNode instanceof ConstantExpressionNode =>
@@ -166,15 +158,6 @@ final readonly class ExpressionBuilder implements ExpressionCompilerInterface {
 					$this->expression($expressionNode->target),
 					$this->expression($expressionNode->parameter)
 				),
-			/*$expressionNode instanceof MatchExpressionDefaultNode =>
-				$this->codeBuilder->matchDefault(
-					$this->expression($expressionNode->valueExpression)
-				),
-			$expressionNode instanceof MatchExpressionPairNode =>
-				$this->codeBuilder->matchPair(
-					$this->expression($expressionNode->matchExpression),
-					$this->expression($expressionNode->valueExpression)
-				),*/
 			$expressionNode instanceof MatchIfExpressionNode =>
 				$this->expressionRegistry->matchIf(
 					$this->expression($expressionNode->condition),
@@ -298,7 +281,7 @@ final readonly class ExpressionBuilder implements ExpressionCompilerInterface {
 					$this->nameBuilder->variableName($expressionNode->variableName)
 				),
 			// @codeCoverageIgnoreStart
-			true => throw new CompilationException(
+			true => throw new BuildException(
 				$expressionNode,
 				sprintf("Unknown expression node type: %s", get_class($expressionNode))
 			)

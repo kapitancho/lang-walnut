@@ -2,17 +2,17 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Function;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Expression\Expression;
-use Walnut\Lang\Almond\Engine\Blueprint\Method\NativeMethod;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\FunctionType;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\Type as TypeInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Value\FunctionValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Value\Value;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type as TypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
 
 final readonly class Invoke implements NativeMethod {
 

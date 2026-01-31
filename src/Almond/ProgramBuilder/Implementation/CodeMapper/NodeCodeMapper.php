@@ -4,21 +4,21 @@ namespace Walnut\Lang\Almond\ProgramBuilder\Implementation\CodeMapper;
 
 use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation;
 use Walnut\Lang\Almond\AST\Blueprint\Node\SourceNode;
-use Walnut\Lang\Almond\Engine\Blueprint\Expression\Expression;
-use Walnut\Lang\Almond\Engine\Blueprint\Function\FunctionBody;
-use Walnut\Lang\Almond\Engine\Blueprint\Function\UserlandFunction;
-use Walnut\Lang\Almond\Engine\Blueprint\Identifier\EnumerationValueName;
-use Walnut\Lang\Almond\Engine\Blueprint\Identifier\MethodName;
-use Walnut\Lang\Almond\Engine\Blueprint\Identifier\TypeName;
-use Walnut\Lang\Almond\Engine\Blueprint\Identifier\VariableName;
-use Walnut\Lang\Almond\Engine\Blueprint\Method\UserlandMethod;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Value\Value;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\FunctionBody;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\UserlandFunction;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\EnumerationValueName;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\MethodName;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\VariableName;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\CodeMapper;
-use Walnut\Lang\Almond\ProgramBuilder\Blueprint\SourceLocator;
+use Walnut\Lang\Almond\ProgramBuilder\Blueprint\SourceNodeLocator;
 use WeakMap;
 
-final class NodeCodeMapper implements CodeMapper, SourceLocator {
+final class NodeCodeMapper implements CodeMapper, SourceNodeLocator {
 
 	/** @var WeakMap<Expression|Value|Type|FunctionBody|UserlandMethod, SourceNode> */
 	private WeakMap $nodeMap;

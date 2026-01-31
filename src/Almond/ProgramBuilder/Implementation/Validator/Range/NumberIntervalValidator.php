@@ -3,8 +3,8 @@
 namespace Walnut\Lang\Almond\ProgramBuilder\Implementation\Validator\Range;
 
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NumberIntervalNode;
+use Walnut\Lang\Almond\AST\Blueprint\Number\MinusInfinity;
 use Walnut\Lang\Almond\AST\Blueprint\Number\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Range\MinusInfinity;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Validator\PreBuildValidationErrorType;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Validator\PreBuildValidationFailure;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Validator\PreBuildValidationRequest;

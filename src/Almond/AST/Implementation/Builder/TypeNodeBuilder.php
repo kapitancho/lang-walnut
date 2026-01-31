@@ -8,7 +8,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Builder\TypeNodeBuilder as TypeNodeBuilderI
 use Walnut\Lang\Almond\AST\Blueprint\Node\Name\EnumerationValueNameNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Name\TypeNameNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Name\VariableNameNode;
-use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation as SourceLocationInterface;
+use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NumberIntervalEndpointNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NumberIntervalNode as NumberIntervalNodeInterface;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\TypeNode;
@@ -16,7 +16,6 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Value\StringValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Number\MinusInfinity;
 use Walnut\Lang\Almond\AST\Blueprint\Number\PlusInfinity;
 use Walnut\Lang\Almond\AST\Implementation\Node\NameAndTypeNode;
-use Walnut\Lang\Almond\AST\Implementation\Node\SourceLocation;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\AnyTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\ArrayTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\BooleanTypeNode;
@@ -56,7 +55,7 @@ final class TypeNodeBuilder implements TypeNodeBuilderInterface {
 
 	public function __construct(private readonly SourceLocator $sourceLocator) {}
 
-	private function getSourceLocation(): SourceLocationInterface {
+	private function getSourceLocation(): SourceLocation {
 		return $this->sourceLocator->getSourceLocation();
 	}
 

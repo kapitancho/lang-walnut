@@ -6,8 +6,26 @@ use JsonSerializable;
 use Stringable;
 use Walnut\Lib\Walex\SourcePosition;
 
-interface SourceLocation extends JsonSerializable, Stringable {
-	public string $moduleName { get; }
-	public SourcePosition $startPosition { get; }
-	public SourcePosition $endPosition { get; }
+final readonly class SourceLocation implements JsonSerializable, Stringable {
+	public function __construct(
+		public string $moduleName,
+		public SourcePosition $startPosition,
+		public SourcePosition $endPosition,
+	) {}
+
+	public function __toString(): string {
+		return sprintf("module %s, starting on line %d, column %d, offset %d, ending on line %d, column %d, offset %d",
+			$this->moduleName,
+			$this->startPosition->line, $this->startPosition->column, $this->startPosition->offset,
+			$this->endPosition->line, $this->endPosition->column, $this->endPosition->offset
+		);
+	}
+
+	public function jsonSerialize(): string {
+		return sprintf("%s(%d:%d:%d-%d:%d:%d)",
+			$this->moduleName,
+			$this->startPosition->line, $this->startPosition->column, $this->startPosition->offset,
+			$this->endPosition->line, $this->endPosition->column, $this->endPosition->offset
+		);
+	}
 }

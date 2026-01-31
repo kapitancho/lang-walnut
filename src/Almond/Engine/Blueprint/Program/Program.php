@@ -2,7 +2,7 @@
 
 namespace Walnut\Lang\Almond\Engine\Blueprint\Program;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Identifier\TypeName;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 
 interface Program {
 

@@ -6,8 +6,9 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\RootNode;
 use Walnut\Lang\Almond\AST\Blueprint\Parser\ModuleDependencyException;
 use Walnut\Lang\Almond\AST\Blueprint\Parser\ParserException;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\ProgramContext;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationError;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationResult;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationError;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResult;
+use Walnut\Lang\Almond\ProgramBuilder\Blueprint\BuildException;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Validator\PreBuildValidationError;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Validator\PreBuildValidationFailure;
 use Walnut\Lang\Almond\Runner\Blueprint\Compilation\Error\CompilationError;
@@ -39,6 +40,15 @@ final readonly class CompilationFailureTransformer implements CompilationFailure
 			$this->moduleLookupContext,
 			null,
 			[$this->errorTransformer->fromModuleDependencyException($exception)],
+		);
+	}
+
+	public function fromBuildException(BuildException $exception): CompilationFailureInterface {
+		return new CompilationFailure(
+			$this->programContext,
+			$this->moduleLookupContext,
+			null,
+			[$this->errorTransformer->fromBuildException($exception)],
 		);
 	}
 

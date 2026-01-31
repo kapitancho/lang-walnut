@@ -24,7 +24,8 @@ final readonly class MapLengthRangeValidator implements PreBuildValidator {
 			) {
 				$result = $result->withAddedError(
 					PreBuildValidationErrorType::invalidRange,
-					"Map length range ({$mapTypeNode->minLength}..{$mapTypeNode->maxLength}) is not valid",
+					sprintf("Map length range (%s..%s) is not valid",
+						$mapTypeNode->minLength, $mapTypeNode->maxLength),
 					[$mapTypeNode]
 				);
 			}

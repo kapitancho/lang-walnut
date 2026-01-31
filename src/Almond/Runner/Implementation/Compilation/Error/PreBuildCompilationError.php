@@ -19,9 +19,6 @@ final class PreBuildCompilationError implements CompilationError {
 			PreBuildValidationErrorType::nonUniqueValueDefinition => CompilationErrorType::nonUniqueValueDefinition,
 			PreBuildValidationErrorType::missingType => CompilationErrorType::missingType,
 			PreBuildValidationErrorType::missingValue => CompilationErrorType::missingValue,
-			PreBuildValidationErrorType::other => CompilationErrorType::other,
-			PreBuildValidationErrorType::other => CompilationErrorType::other,
-			PreBuildValidationErrorType::other => CompilationErrorType::other,
 			default => CompilationErrorType::other
 		};
 	}

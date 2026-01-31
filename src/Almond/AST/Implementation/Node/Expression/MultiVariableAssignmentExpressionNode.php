@@ -25,7 +25,7 @@ final readonly class MultiVariableAssignmentExpressionNode implements MultiVaria
 		return [
 			'sourceLocation' => $this->sourceLocation,
 			'nodeCategory' => 'Expression',
-			'nodeName' => 'VariableAssignmentExpression',
+			'nodeName' => 'MultiVariableAssignmentExpression',
 			'variableNames' => $this->variableNames,
 			'assignedExpression' => $this->assignedExpression
 		];

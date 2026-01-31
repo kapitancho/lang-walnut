@@ -11,7 +11,7 @@ final readonly class PreBuildValidationRequestFactory implements PreBuildValidat
 		private NodeIteratorFactory $nodeIteratorFactory
 	) {}
 
-	public function newRequest(RootNode $rootNode,): PreBuildValidationRequest {
+	public function newRequest(RootNode $rootNode): PreBuildValidationRequest {
 		return new PreBuildValidationRequest(
 			$rootNode,
 			$this->nodeIteratorFactory,

@@ -2,11 +2,11 @@
 
 namespace Walnut\Lang\Test\Almond\Engine;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Identifier\MethodName;
-use Walnut\Lang\Almond\Engine\Blueprint\Identifier\TypeName;
-use Walnut\Lang\Almond\Engine\Blueprint\Identifier\VariableName;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Implementation\Type\P\NameAndType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\NameAndType;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\MethodName;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\VariableName;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
 use Walnut\Lang\Test\Almond\AlmondBaseTestHelper;
 
 final class AlmondSmokeTest extends AlmondBaseTestHelper {
@@ -51,6 +51,7 @@ final class AlmondSmokeTest extends AlmondBaseTestHelper {
 		$validation = $customMethod->validate(
 			$this->programContext->typeRegistry->null,
 			$this->programContext->typeRegistry->null,
+			null
 		);
 		$this->assertInstanceOf(ValidationSuccess::class, $validation);
 

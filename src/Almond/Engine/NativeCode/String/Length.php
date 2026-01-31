@@ -2,19 +2,19 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\String;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Expression\Expression;
-use Walnut\Lang\Almond\Engine\Blueprint\Method\NativeMethod;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\TypeRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\StringType;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Blueprint\Value\StringValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Value\Value;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
 
 final readonly class Length implements NativeMethod {
 

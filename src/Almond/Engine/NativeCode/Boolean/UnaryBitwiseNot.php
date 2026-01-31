@@ -2,22 +2,22 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Boolean;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Expression\Expression;
-use Walnut\Lang\Almond\Engine\Blueprint\Method\NativeMethod;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\TypeRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\BooleanType;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\FalseType;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\TrueType;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Blueprint\Value\BooleanValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Value\Value;
-use Walnut\Lang\Almond\Engine\Implementation\Type\Helper\BaseType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BooleanType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FalseType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TrueType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BooleanValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
 
 final readonly class UnaryBitwiseNot implements NativeMethod {
 	use BaseType;

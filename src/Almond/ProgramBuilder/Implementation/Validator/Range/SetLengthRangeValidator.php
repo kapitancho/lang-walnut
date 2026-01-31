@@ -24,7 +24,8 @@ final readonly class SetLengthRangeValidator implements PreBuildValidator {
 			) {
 				$result = $result->withAddedError(
 					PreBuildValidationErrorType::invalidRange,
-					"Set length range ({$setTypeNode->minLength}..{$setTypeNode->maxLength}) is not valid",
+					sprintf("Set length range (%s..%s) is not valid",
+						$setTypeNode->minLength, $setTypeNode->maxLength),
 					[$setTypeNode]
 				);
 			}

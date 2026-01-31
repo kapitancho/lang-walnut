@@ -3,14 +3,12 @@
 namespace Walnut\Lang\Almond\ProgramBuilder\Implementation\Builder;
 
 use Walnut\Lang\Almond\AST\Blueprint\Node\FunctionBodyNode;
-use Walnut\Lang\Almond\AST\Implementation\Node\Name\VariableNameNode;
-use Walnut\Lang\Almond\Engine\Blueprint\Function\FunctionBody;
-use Walnut\Lang\Almond\Engine\Blueprint\Identifier\VariableName;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\ExpressionRegistry;
-use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Builder\NameBuilder;
-use Walnut\Lang\Almond\ProgramBuilder\Blueprint\CodeMapper;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\ExpressionRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\FunctionBody;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Builder\ExpressionBuilder;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Builder\FunctionBodyBuilder as FunctionBodyCompilerInterface;
+use Walnut\Lang\Almond\ProgramBuilder\Blueprint\BuildException;
+use Walnut\Lang\Almond\ProgramBuilder\Blueprint\CodeMapper;
 
 final readonly class FunctionBodyBuilder implements FunctionBodyCompilerInterface {
 
@@ -20,7 +18,7 @@ final readonly class FunctionBodyBuilder implements FunctionBodyCompilerInterfac
 		private CodeMapper         $codeMapper,
 	) {}
 
-	/** @throws CompilationException */
+	/** @throws BuildException */
 	public function functionBody(FunctionBodyNode $functionBodyNode): FunctionBody {
 		$result = $this->expressionRegistry->functionBody(
 			$this->astExpressionCompiler->expression($functionBodyNode->expression)

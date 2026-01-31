@@ -26,6 +26,14 @@ interface NodeIteratorFactory {
 	public function all(Node $rootNode): Iterator;
 
 	/**
+	 * Create a recursive iterator over an entire node tree.
+	 *
+	 * @param Node $rootNode
+	 * @return NodeIterator
+	 */
+	public function recursive(Node $rootNode): NodeIterator;
+
+	/**
 	 * Filter nodes by instance type.
 	 *
 	 * @template T of Node

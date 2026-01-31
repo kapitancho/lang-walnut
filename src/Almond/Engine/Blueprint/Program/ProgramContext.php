@@ -2,25 +2,24 @@
 
 namespace Walnut\Lang\Almond\Engine\Blueprint\Program;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Abc\Function\FunctionValueFactory as FunctionValueFactoryInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Abc\Function\UserlandFunctionFactory as UserlandFunctionFactoryInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Abc\Function\UserlandMethodFactory as UserlandMethodFactoryInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Dependency\DependencyContainer as DependencyContainerInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Method\MethodContext as MethodContextInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\ExpressionRegistry as ExpressionRegistryInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\TypeRegistry as TypeRegistryInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\Userland\UserlandMethodBuilder as UserlandMethodBuilderInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\Userland\UserlandMethodRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\Userland\UserlandMethodStorage as UserlandMethodStorageInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\Userland\UserlandTypeBuilder as UserlandTypeBuilderInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\Userland\UserlandTypeFactory as UserlandTypeFactoryInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\Userland\UserlandTypeRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\Userland\UserlandTypeStorage as UserlandTypeStorageInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\ValueRegistry as ValueRegistryInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationFactory as ValidationFactoryInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationResult;
-use Walnut\Lang\Almond\Engine\Blueprint\VariableScope\VariableScopeFactory as VariableScopeFactoryInterface;
-use Walnut\Lang\Almond\Engine\Implementation\Program\ProgramValidator;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\ExpressionRegistry as ExpressionRegistryInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\FunctionValueFactory as FunctionValueFactoryInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\UserlandFunctionFactory as UserlandFunctionFactoryInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\UserlandMethodFactory as UserlandMethodFactoryInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodContext as MethodContextInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethodBuilder as UserlandMethodBuilderInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethodRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethodStorage as UserlandMethodStorageInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry as TypeRegistryInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Userland\UserlandTypeBuilder as UserlandTypeBuilderInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Userland\UserlandTypeFactory as UserlandTypeFactoryInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Userland\UserlandTypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Userland\UserlandTypeStorage as UserlandTypeStorageInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry as ValueRegistryInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyContainer as DependencyContainerInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory as ValidationFactoryInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResult;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\VariableScope\VariableScopeFactory as VariableScopeFactoryInterface;
 
 interface ProgramContext {
 	public UserlandTypeRegistry $userlandTypeRegistry { get; }

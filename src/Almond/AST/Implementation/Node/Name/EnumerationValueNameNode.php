@@ -12,6 +12,9 @@ final readonly class EnumerationValueNameNode implements EnumerationValueNameNod
 		public string $name
 	) {}
 
+	public function equals(EnumerationValueNameNodeInterface $other): bool {
+		return $this->name === $other->name;
+	}
 
 	/** @return iterable<Node> */
 	public function children(): iterable {

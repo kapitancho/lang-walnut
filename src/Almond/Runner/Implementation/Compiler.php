@@ -7,10 +7,11 @@ use Walnut\Lang\Almond\AST\Blueprint\Parser\ParserException;
 use Walnut\Lang\Almond\AST\Implementation\Builder\NodeBuilderFactory;
 use Walnut\Lang\Almond\AST\Implementation\Parser\NodeImporter;
 use Walnut\Lang\Almond\AST\Implementation\Parser\TransitionLogger;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationResult;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResult;
 use Walnut\Lang\Almond\Engine\Implementation\Program\ProgramContextFactory;
+use Walnut\Lang\Almond\ProgramBuilder\Blueprint\BuildException;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\CodeMapper;
-use Walnut\Lang\Almond\ProgramBuilder\Blueprint\SourceLocator;
+use Walnut\Lang\Almond\ProgramBuilder\Blueprint\SourceNodeLocator;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Validator\PreBuildValidationFailure;
 use Walnut\Lang\Almond\ProgramBuilder\Implementation\Builder\ProgramBuilderFactory;
 use Walnut\Lang\Almond\ProgramBuilder\Implementation\CodeMapper\NoopCodeMapper;
@@ -36,9 +37,9 @@ use Walnut\Lang\Almond\Source\Implementation\SourceFinder\PackageBasedSourceFind
 final readonly class Compiler {
 
 	private function __construct(
-		private string                        $startModule,
-		private CodeMapper&SourceLocator      $codeMapper,
-		private CompositeSourceFinder         $sourceFinder,
+		private string                       $startModule,
+		private CodeMapper&SourceNodeLocator $codeMapper,
+		private CompositeSourceFinder        $sourceFinder,
 	) {}
 
 	public static function builder(): self {
@@ -53,7 +54,7 @@ final readonly class Compiler {
 		return clone($this, ['startModule' => $startModule]);
 	}
 
-	public function withCodeMapper(CodeMapper&SourceLocator $codeMapper): self {
+	public function withCodeMapper(CodeMapper&SourceNodeLocator $codeMapper): self {
 		return clone($this, ['codeMapper' => $codeMapper]);
 	}
 
@@ -141,12 +142,15 @@ final readonly class Compiler {
 
 		//Program Builder:
 		$gateway = new ProgramBuilderGateway(new ProgramBuilderFactory());
-		$gateway->build(
-			$rootNode,
-			$programContext,
-			$this->codeMapper
-		);
-
+		try {
+			$gateway->build(
+				$rootNode,
+				$programContext,
+				$this->codeMapper
+			);
+		} catch (BuildException $exception) {
+			return $compilationFailureTransformer->fromBuildException($exception);
+		}
 		$program = $programContext->validateAndBuildProgram();
 		if ($program instanceof ValidationResult) {
 			return $compilationFailureTransformer

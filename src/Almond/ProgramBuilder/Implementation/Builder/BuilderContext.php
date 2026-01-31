@@ -3,11 +3,11 @@
 namespace Walnut\Lang\Almond\ProgramBuilder\Implementation\Builder;
 
 use Walnut\Lang\Almond\AST\Blueprint\Node\FunctionBodyNode;
-use Walnut\Lang\Almond\Engine\Blueprint\Function\FunctionBody;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\FunctionBody;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\ProgramContext;
-use Walnut\Lang\Almond\ProgramBuilder\Blueprint\CodeMapper;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Builder\FunctionBodyBuilder as FunctionBodyCompilerInterface;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Builder\ProgramBuilder as ProgramCompilerInterface;
+use Walnut\Lang\Almond\ProgramBuilder\Blueprint\CodeMapper;
 
 final readonly class BuilderContext implements FunctionBodyCompilerInterface {
 
@@ -26,7 +26,6 @@ final readonly class BuilderContext implements FunctionBodyCompilerInterface {
 		);
 		$valueBuilder = new ValueBuilder(
 			$nameBuilder,
-			$programContext->typeRegistry,
 			$programContext->valueRegistry,
 			$programContext->functionValueFactory,
 			$this,

@@ -2,7 +2,7 @@
 
 namespace Walnut\Lang\Almond\Source\Implementation\Precompiler;
 
-use Walnut\Lang\Almond\Source\Blueprint\Precomipiler\CodePrecompiler;
+use Walnut\Lang\Almond\Source\Blueprint\Precompiler\CodePrecompiler;
 
 final readonly class TestPrecompiler implements CodePrecompiler {
 

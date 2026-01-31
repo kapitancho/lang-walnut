@@ -3,9 +3,9 @@
 namespace Walnut\Lang\Almond\Runner\Implementation\Compilation\Error;
 
 use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationError;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\ProgramBuilder\Blueprint\SourceLocator;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationError;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
+use Walnut\Lang\Almond\ProgramBuilder\Blueprint\SourceNodeLocator;
 use Walnut\Lang\Almond\Runner\Blueprint\Compilation\Error\CompilationError;
 use Walnut\Lang\Almond\Runner\Blueprint\Compilation\Error\CompilationErrorType;
 
@@ -13,7 +13,7 @@ final class PostBuildCompilationError implements CompilationError {
 
 	public function __construct(
 		private readonly ValidationError $validationError,
-		private readonly SourceLocator $sourceLocator
+		private readonly SourceNodeLocator $sourceLocator
 	) {}
 
 	public CompilationErrorType $errorType {

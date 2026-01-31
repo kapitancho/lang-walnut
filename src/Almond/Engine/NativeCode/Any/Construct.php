@@ -2,28 +2,28 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Any;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Expression\Expression;
-use Walnut\Lang\Almond\Engine\Blueprint\Identifier\TypeName;
-use Walnut\Lang\Almond\Engine\Blueprint\Method\MethodContext;
-use Walnut\Lang\Almond\Engine\Blueprint\Method\NativeMethod;
-use Walnut\Lang\Almond\Engine\Blueprint\Method\UnknownMethod;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\TypeRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\NothingType;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\OpenType;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\ResultType;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\SealedType;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\Type as TypeInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\TypeType;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Blueprint\Value\ErrorValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Value\TypeValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\VariableScope\VariableScopeFactory;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodContext;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\UnknownMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OpenType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SealedType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type as TypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\VariableScope\VariableScopeFactory;
 
 final readonly class Construct implements NativeMethod {
 

@@ -15,23 +15,26 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Module\ModuleDefinitionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Module\ModuleNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Name\EnumerationValueNameNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\TypeNode;
-use Walnut\Lang\Almond\Engine\Blueprint\Function\FunctionBody;
-use Walnut\Lang\Almond\Engine\Blueprint\Function\UserlandFunction;
-use Walnut\Lang\Almond\Engine\Blueprint\Identifier\EnumerationValueName;
-use Walnut\Lang\Almond\Engine\Blueprint\Identifier\TypeName;
-use Walnut\Lang\Almond\Engine\Blueprint\Method\UserlandMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\FunctionBody;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\NameAndType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\UserlandFunction;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethodBuilder;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EnumerationType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OpenType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SealedType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\DuplicateSubsetValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\UnknownType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\EnumerationValueName;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\ProgramContext;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\Userland\UserlandMethodBuilder;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\EnumerationType;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\NothingType;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\OpenType;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\SealedType;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\Type;
-use Walnut\Lang\Almond\Engine\Implementation\Type\P\NameAndType;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Builder\FunctionBodyBuilder as FunctionBodyCompilerInterface;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Builder\ModuleBuilder as ModuleCompilerInterface;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Builder\NameBuilder;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Builder\TypeBuilder as TypeCompilerInterface;
+use Walnut\Lang\Almond\ProgramBuilder\Blueprint\BuildException;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\CodeMapper;
 
 final readonly class ModuleBuilder implements ModuleCompilerInterface {
@@ -44,23 +47,14 @@ final readonly class ModuleBuilder implements ModuleCompilerInterface {
 		private UserlandMethodBuilder         $userlandMethodBuilder,
 	) {}
 
-	/** @throws ModuleCompilationException */
+	/** @throws BuildException */
 	public function compileModule(ModuleNode $module): void {
-		$exceptions = array();
-		array_map(function(ModuleDefinitionNode $moduleDefinition) use (&$exceptions) {
-			try {
-				$this->compileModuleDefinition($moduleDefinition);
-			} catch (CompilationException $e) {
-				$exceptions[] = $e;
-			}
+		array_map(function(ModuleDefinitionNode $moduleDefinition) {
+			$this->compileModuleDefinition($moduleDefinition);
 		}, $module->definitions);
-
-		if (count($exceptions) > 0) {
-			throw new ModuleCompilationException($module->moduleName, $exceptions);
-		}
 	}
 
-	/** @throws CompilationException */
+	/** @throws BuildException */
 	public function addConstructorMethod(
 		AddConstructorMethodNode $moduleDefinition
 	): UserlandMethod {
@@ -77,7 +71,7 @@ final readonly class ModuleBuilder implements ModuleCompilerInterface {
 				$this->nameBuilder->typeName($typeName)
 			);
 		} catch (UnknownType $e) {
-			throw new CompilationException(
+			throw new BuildException(
 				$moduleDefinition,
 				$e->getMessage(),
 				$e
@@ -90,7 +84,7 @@ final readonly class ModuleBuilder implements ModuleCompilerInterface {
 				$this->programContext->typeRegistry->string()
 			]),
 			// @codeCoverageIgnoreStart
-			default => throw new CompilationException(
+			default => throw new BuildException(
 				$moduleDefinition,
 				"Constructors are only allowed for open and sealed types and for enumerations.",
 			)
@@ -144,7 +138,7 @@ final readonly class ModuleBuilder implements ModuleCompilerInterface {
 		);
 	}
 
-	/** @throws CompilationException */
+	/** @throws BuildException */
 	private function compileModuleDefinition(ModuleDefinitionNode $moduleDefinition): void {
 		try {
 			$result = match(true) {
@@ -215,7 +209,7 @@ final readonly class ModuleBuilder implements ModuleCompilerInterface {
 							null,
 					),
 				// @codeCoverageIgnoreStart
-				true => throw new CompilationException(
+				true => throw new BuildException(
 					$moduleDefinition,
 					"Unknown module definition node type: " . get_class($moduleDefinition)
 				)
@@ -228,19 +222,19 @@ final readonly class ModuleBuilder implements ModuleCompilerInterface {
 				);
 			}
 		} catch (DuplicateSubsetValue $e) {
-			throw new CompilationException(
+			throw new BuildException(
 				$moduleDefinition,
 				$e->getMessage()
 			);
 		}
 	}
 
-	/** @throws CompilationException */
+	/** @throws BuildException */
 	private function type(TypeNode $typeNode): Type {
 		return $this->typeCompiler->type($typeNode);
 	}
 
-	/** @throws CompilationException */
+	/** @throws BuildException */
 	private function functionBody(FunctionBodyNode $functionBodyNode): FunctionBody {
 		return $this->functionBodyCompiler->functionBody($functionBodyNode);
 	}

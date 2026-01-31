@@ -3,7 +3,7 @@
 namespace Walnut\Lang\Almond\Source\Implementation\LookupContext;
 
 use Walnut\Lang\Almond\Source\Blueprint\LookupContext\ModuleLookupContext;
-use Walnut\Lang\Almond\Source\Blueprint\Precomipiler\CodePrecompiler;
+use Walnut\Lang\Almond\Source\Blueprint\Precompiler\CodePrecompiler;
 use Walnut\Lang\Almond\Source\Blueprint\SourceFinder\SourceFinder;
 
 final readonly class PrecompilerModuleLookupContext implements ModuleLookupContext {

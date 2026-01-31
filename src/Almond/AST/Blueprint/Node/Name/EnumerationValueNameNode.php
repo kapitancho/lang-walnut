@@ -2,4 +2,6 @@
 
 namespace Walnut\Lang\Almond\AST\Blueprint\Node\Name;
 
-interface EnumerationValueNameNode extends NameNode {}
+interface EnumerationValueNameNode extends NameNode {
+	public function equals(EnumerationValueNameNode $other): bool;
+}

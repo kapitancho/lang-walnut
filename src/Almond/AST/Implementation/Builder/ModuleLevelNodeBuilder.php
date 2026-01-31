@@ -10,7 +10,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Name\EnumerationValueNameNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Name\MethodNameNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Name\TypeNameNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\NameAndTypeNode as NameAndTypeNodeInterface;
-use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation as SourceLocationInterface;
+use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\TypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Module\AddAliasTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Module\AddAtomTypeNode;
@@ -58,7 +58,7 @@ final class ModuleLevelNodeBuilder implements ModuleLevelNodeBuilderInterface {
 		);
 	}
 
-	private function getSourceLocation(): SourceLocationInterface {
+	private function getSourceLocation(): SourceLocation {
 		return $this->sourceLocator->getSourceLocation();
 	}
 

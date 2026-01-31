@@ -25,7 +25,7 @@ final readonly class DataExpressionNode implements DataExpressionNodeInterface {
 			'nodeCategory' => 'Expression',
 			'nodeName' => 'DataExpression',
 			'typeName' => $this->typeName,
-			'parameter' => $this->value
+			'value' => $this->value
 		];
 	}
 }

@@ -2,14 +2,14 @@
 
 namespace Walnut\Lang\Almond\Engine\Implementation\Program;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Dependency\DependencyContainer;
-use Walnut\Lang\Almond\Engine\Blueprint\Dependency\DependencyError;
-use Walnut\Lang\Almond\Engine\Blueprint\Identifier\TypeName;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\UnknownType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
+use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyContainer;
+use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyError;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\InvalidEntryPointDependency;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Program as ProgramInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\TypeRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\UnknownType;
-use Walnut\Lang\Almond\Engine\Blueprint\Value\FunctionValue;
 
 final readonly class Program implements ProgramInterface {
 
@@ -20,8 +20,9 @@ final readonly class Program implements ProgramInterface {
 
 	/** @throws InvalidEntryPointDependency */
 	public function getEntryPoint(TypeName $typeName): ProgramEntryPoint {
-		$type = $this->typeRegistry->typeByName($typeName);
-		if ($type === UnknownType::value) {
+		try {
+			$type = $this->typeRegistry->typeByName($typeName);
+		} catch (UnknownType) {
 			InvalidEntryPointDependency::becauseTypeIsNotDefined($typeName);
 		}
 		$value = $this->dependencyContainer->valueForType($type);

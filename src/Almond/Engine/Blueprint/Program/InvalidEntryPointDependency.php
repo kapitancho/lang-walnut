@@ -3,8 +3,8 @@
 namespace Walnut\Lang\Almond\Engine\Blueprint\Program;
 
 use InvalidArgumentException;
-use Walnut\Lang\Almond\Engine\Blueprint\Dependency\DependencyError;
-use Walnut\Lang\Almond\Engine\Blueprint\Identifier\TypeName;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
+use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyError;
 
 final class InvalidEntryPointDependency extends InvalidArgumentException {
 	private const string TypeIsNotDefined = "type is not defined";

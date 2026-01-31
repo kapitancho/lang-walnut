@@ -2,10 +2,10 @@
 
 namespace Walnut\Lang\Almond\Runner\Implementation;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Identifier\TypeName;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\InvalidEntryPointDependency;
-use Walnut\Lang\Almond\Engine\Blueprint\Value\StringValue;
 use Walnut\Lang\Almond\Runner\Blueprint\Cli\CliExecutionResult as CliExecutionResultInterface;
 use Walnut\Lang\Almond\Runner\Blueprint\Compilation\Error\CompilationErrorType;
 use Walnut\Lang\Almond\Runner\Blueprint\Compilation\Error\CompilationFailure as CompilationFailureInterface;

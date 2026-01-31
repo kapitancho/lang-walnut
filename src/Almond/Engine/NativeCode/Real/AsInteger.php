@@ -4,28 +4,27 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Real;
 
 use BcMath\Number;
 use RoundingMode;
-use Walnut\Lang\Almond\Engine\Blueprint\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Expression\Expression;
-use Walnut\Lang\Almond\Engine\Blueprint\Method\NativeMethod;
-use Walnut\Lang\Almond\Engine\Blueprint\Range\MinusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Range\NumberInterval as NumberIntervalInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\TypeRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Registry\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\IntegerSubsetType;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\IntegerType;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\RealSubsetType;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\RealType;
-use Walnut\Lang\Almond\Engine\Blueprint\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Blueprint\Value\IntegerValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Value\RealValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Value\Value;
-use Walnut\Lang\Almond\Engine\Implementation\Range\NumberInterval;
-use Walnut\Lang\Almond\Engine\Implementation\Range\NumberIntervalEndpoint;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerSubsetType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealSubsetType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\MinusInfinity;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberInterval;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberIntervalEndpoint;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
 
 final readonly class AsInteger implements NativeMethod {
 
@@ -48,7 +47,7 @@ final readonly class AsInteger implements NativeMethod {
 		if ($targetType instanceof IntegerType || $targetType instanceof RealType) {
 			return $this->validationFactory->validationSuccess(
 				$this->typeRegistry->integerFull(... array_map(
-					fn(NumberIntervalInterface $interval) => new NumberInterval(
+					fn(NumberInterval $interval) => new NumberInterval(
 						$interval->start === MinusInfinity::value ? MinusInfinity::value :
 							new NumberIntervalEndpoint(
 								$interval->start->value->round(0, RoundingMode::TowardsZero),

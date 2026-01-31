@@ -9,7 +9,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\FunctionBodyNode as FunctionBodyNodeIn
 use Walnut\Lang\Almond\AST\Blueprint\Node\Name\EnumerationValueNameNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Name\TypeNameNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\NameAndTypeNode as NameAndTypeNodeInterface;
-use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation as SourceLocationInterface;
+use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\TypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\AtomValueNode as AtomValueNodeInterface;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\ValueNode;
@@ -35,7 +35,7 @@ final class ValueNodeBuilder implements ValueNodeBuilderInterface {
 
 	public function __construct(private readonly SourceLocator $sourceLocator) {}
 
-	private function getSourceLocation(): SourceLocationInterface {
+	private function getSourceLocation(): SourceLocation {
 		return $this->sourceLocator->getSourceLocation();
 	}
 

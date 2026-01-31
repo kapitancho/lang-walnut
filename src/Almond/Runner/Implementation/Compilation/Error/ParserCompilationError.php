@@ -2,9 +2,8 @@
 
 namespace Walnut\Lang\Almond\Runner\Implementation\Compilation\Error;
 
-use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation as SourceLocationInterface;
+use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation;
 use Walnut\Lang\Almond\AST\Blueprint\Parser\ParserException;
-use Walnut\Lang\Almond\AST\Implementation\Node\SourceLocation;
 use Walnut\Lang\Almond\Runner\Blueprint\Compilation\Error\CompilationError;
 use Walnut\Lang\Almond\Runner\Blueprint\Compilation\Error\CompilationErrorType;
 use Walnut\Lib\Walex\SourcePosition;
@@ -23,7 +22,7 @@ final class ParserCompilationError implements CompilationError {
 		get => $this->parserException->getMessage();
 	}
 
-	/** @var list<SourceLocationInterface> */
+	/** @var list<SourceLocation> */
 	public array $sourceLocations {
 		get => [
 			new SourceLocation(

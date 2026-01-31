@@ -12,7 +12,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MultiVariableAssignmentExpr
 use Walnut\Lang\Almond\AST\Blueprint\Node\Name\MethodNameNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Name\TypeNameNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Name\VariableNameNode;
-use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation as SourceLocationInterface;
+use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\TypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\ValueNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\BooleanAndExpressionNode;
@@ -49,7 +49,7 @@ use Walnut\Lang\Almond\AST\Implementation\Node\Expression\VariableNameExpression
 final readonly class ExpressionNodeBuilder implements ExpressionNodeBuilderInterface {
 	public function __construct(private SourceLocator $sourceLocator) {}
 
-	private function getSourceLocation(): SourceLocationInterface {
+	private function getSourceLocation(): SourceLocation {
 		return $this->sourceLocator->getSourceLocation();
 	}
 

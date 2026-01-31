@@ -12,6 +12,9 @@ final readonly class TypeNameNode implements TypeNameNodeInterface {
 		public string $name
 	) {}
 
+	public function equals(TypeNameNodeInterface $other): bool {
+		return $this->name === $other->name;
+	}
 
 	/** @return iterable<Node> */
 	public function children(): iterable {
