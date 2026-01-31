@@ -152,7 +152,6 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 			return $this->unionTypeNormalizer->normalize(... $types);
 		}
 		return new UnionType($this->unionTypeNormalizer, $types);
-		// @codeCoverageIgnoreEnd
 	}
 
 	/** @param list<Type> $types */

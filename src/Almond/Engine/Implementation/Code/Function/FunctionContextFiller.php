@@ -157,8 +157,8 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 				if ($t instanceof TupleType && $v instanceof TupleValue) {
 					foreach($t->types as $index => $typeItem) {
 						try {
-							$v = $v->valueOf($index);
-							if ($v instanceof Value) {
+							$val = $v->valueOf($index);
+							if ($val instanceof Value) {
 								$executionContext = $executionContext->withAddedVariableValue(
 									new VariableName($variableName . $index),
 									$v->valueOf($index)

@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn;
 
+use JsonSerializable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AliasType as AliasTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\SupertypeChecker;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -13,7 +14,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Feature\Hydrator\HydrationSuccess;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationRequest;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResult;
 
-final class ProxyNamedType implements SupertypeChecker, AliasTypeInterface {
+final class ProxyNamedType implements SupertypeChecker, JsonSerializable, AliasTypeInterface {
 
 	public function __construct(
 		private readonly TypeRegistry $typeRegistry,

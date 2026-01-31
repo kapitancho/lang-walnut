@@ -11,8 +11,10 @@ use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyCo
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
 
 final readonly class MatchErrorExpression implements Expression, JsonSerializable {
+	use BaseType;
 
 	public function __construct(
 		private TypeRegistry $typeRegistry,
@@ -29,7 +31,7 @@ final readonly class MatchErrorExpression implements Expression, JsonSerializabl
 		if ($result instanceof ValidationFailure) {
 			return $result;
 		}
-		$expressionType = $result->expressionType; //TODO : to base type
+		$expressionType = $this->toBaseType($result->expressionType);
 
 		$returnTypes = [$result->returnType];
 		$onErrorExpressionType = $this->typeRegistry->nothing;

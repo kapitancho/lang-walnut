@@ -14,8 +14,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionEarlyReturn;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\ExternalTypeHelper;
-use Walnut\Lang\Almond\Engine\Implementation\Expression\CoreType;
-use Walnut\Lang\Almond\Engine\Implementation\Expression\SealedValue;
 
 final readonly class NoExternalErrorExpression implements Expression, JsonSerializable {
 	use ExternalTypeHelper;
