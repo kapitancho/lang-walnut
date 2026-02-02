@@ -105,7 +105,7 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 				'Enumeration' => EnumerationType::class,
 				'Data' => DataType::class,
 				'Open' => OpenType::class,
-			][$type->value->value] ?? null;
+			][$type->value->value] ?? '';
 			return array_merge($baseIds,
 				$this->getTypeMapping()[$class] ?? []
 			);

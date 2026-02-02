@@ -172,7 +172,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 	}
 
 	public function valueByType(Type $type): Value|DependencyError {
-		if ($this->visited->contains($type)) {
+		if ($this->visited->offsetExists($type)) {
 			return new DependencyError(UnresolvableDependency::circularDependency, $type);
 		}
 		$typeStr = (string)$type;
@@ -180,7 +180,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 		if ($cached) {
 			return $cached;
 		}
-		$this->visited->attach($type);
+		$this->visited->offsetSet($type);
 		$result = $this->findValueByType($type);
 		if (!($result instanceof DependencyError) && !$result->type->isSubtypeOf($type)) {
 			$result = new DependencyError(
@@ -190,7 +190,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 			);
 		}
 		$this->cache[$typeStr] = $result;
-		$this->visited->detach($type);
+		$this->visited->offsetUnset($type);
 		return $result;
 	}
 }

@@ -1362,6 +1362,7 @@ class ParserTest extends TestCase {
 		yield ['Integer<5..>', IntegerTypeNode::class, fn($t) => $t->minValue == new Number('5') && $t->maxValue === PlusInfinity::value];
 		yield ['Integer<..-8>', IntegerTypeNode::class, fn($t) => $t->minValue === MinusInfinity::value && $t->maxValue == new Number('-8')];
 		yield ['Integer<-5..8>', IntegerTypeNode::class, fn($t) => $t->minValue == new Number('-5') && $t->maxValue == new Number('8')];
+		yield ['5', IntegerSubsetTypeNode::class, fn($t) => count($t->values) === 1 && $t->values[0] == new Number('5')];
 		yield ['Integer[5]', IntegerSubsetTypeNode::class, fn($t) => count($t->values) === 1 && $t->values[0] == new Number('5')];
 		yield ['Integer[5, -8]', IntegerSubsetTypeNode::class, fn($t) => count($t->values) === 2 && $t->values[0] == new Number('5') && $t->values[1] == new Number('-8')];
 		yield ['Integer<[5..8], (..6)>', IntegerFullTypeNode::class, fn($t) => count($t->intervals) === 2 && $t->intervals[0]->start == new NumberIntervalEndpoint(new Number(5), true) && $t->intervals[0]->end == new NumberIntervalEndpoint(new Number(8), true) && $t->intervals[1]->start === MinusInfinity::value && $t->intervals[1]->end == new NumberIntervalEndpoint(new Number(6), false)];
@@ -1373,6 +1374,7 @@ class ParserTest extends TestCase {
 		yield ['Real<5.14..>', RealTypeNode::class, fn($t) => $t->minValue == new Number('5.14') && $t->maxValue === PlusInfinity::value];
 		yield ['Real<..-8.14>', RealTypeNode::class, fn($t) => $t->minValue === MinusInfinity::value && $t->maxValue == new Number('-8.14')];
 		yield ['Real<-5.14..8.14>', RealTypeNode::class, fn($t) => $t->minValue == new Number('-5.14') && $t->maxValue == new Number('8.14')];
+		yield ['3.14', RealSubsetTypeNode::class, fn($t) => count($t->values) === 1 && $t->values[0] == new Number('3.14')];
 		yield ['Real[3.14]', RealSubsetTypeNode::class, fn($t) => count($t->values) === 1 && $t->values[0] == new Number('3.14')];
 		yield ['Real[3.14, -8]', RealSubsetTypeNode::class, fn($t) => count($t->values) === 2 && $t->values[0] == new Number('3.14') && $t->values[1] == new Number('-8')];
 		yield ['Real<[5.15..8], (..6)>', RealFullTypeNode::class, fn($t) => count($t->intervals) === 2 && $t->intervals[0]->start == new NumberIntervalEndpoint(new Number('5.15'), true) && $t->intervals[0]->end == new NumberIntervalEndpoint(new Number(8), true) && $t->intervals[1]->start === MinusInfinity::value && $t->intervals[1]->end == new NumberIntervalEndpoint(new Number(6), false)];
@@ -1382,6 +1384,7 @@ class ParserTest extends TestCase {
 		yield ['String<..8>', StringTypeNode::class, fn($t) => $t->minLength == new Number('0') && $t->maxLength == new Number('8')];
 		yield ['String<5>', StringTypeNode::class, fn($t) => $t->minLength == new Number('5') && $t->maxLength == new Number('5')];
 		yield ['String<5..8>', StringTypeNode::class, fn($t) => $t->minLength == new Number('5') && $t->maxLength == new Number('8')];
+		yield ["'hello'", StringSubsetTypeNode::class, fn($t) => count($t->values) === 1 && $t->values[0] == 'hello'];
 		yield ["String['hello']", StringSubsetTypeNode::class, fn($t) => count($t->values) === 1 && $t->values[0] == 'hello'];
 		yield ["String['hello', 'world']", StringSubsetTypeNode::class, fn($t) => count($t->values) === 2 && $t->values[0] == 'hello' && $t->values[1] == 'world'];
 		yield ['Bytes', BytesTypeNode::class, fn($t) => $t->minLength == new Number('0') && $t->maxLength === PlusInfinity::value];
