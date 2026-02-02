@@ -14,6 +14,7 @@ enum CompilationErrorType {
 	case mutableTypeMismatch;
 	case undefinedVariable;
 	case mapKeyTypeMismatch;
+	case shapeMismatch;
 	case undefinedMethod;
 	case invalidTargetType;
 	case invalidParameterType;

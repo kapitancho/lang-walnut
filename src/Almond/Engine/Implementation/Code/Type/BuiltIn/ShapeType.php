@@ -5,9 +5,11 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn;
 use JsonSerializable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ShapeType as ShapeTypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\NamedType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\SupertypeChecker;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\Hydrator\HydrationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\Hydrator\HydrationRequest;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\Hydrator\HydrationSuccess;
@@ -38,6 +40,17 @@ final readonly class ShapeType implements ShapeTypeInterface, SupertypeChecker, 
 		};
 	}
 
+	private function getTypeName(Type $type): TypeName|null {
+		if ($type instanceof NamedType) {
+			return $type->name;
+		}
+		$typeNameString = (string)$type;
+		if (TypeName::isValidIdentifier($typeNameString)) {
+			return new TypeName($typeNameString);
+		}
+		return null;
+	}
+
 	private function isShapeOf(Type $ofType): bool {
 		$baseType = $this->toBaseType($this->refType);
 		if ($baseType instanceof IntersectionType) {
@@ -46,9 +59,13 @@ final readonly class ShapeType implements ShapeTypeInterface, SupertypeChecker, 
 		}
 		$refTypes = $baseType instanceof UnionType ? $baseType->types : [];
 		foreach([$this->refType, ...$refTypes] as $checkType) {
+			$checkTypeName = $this->getTypeName($checkType);
+			if ($checkTypeName === null) {
+				continue;
+			}
 			$canCast = $this->methodContext->validateCast(
 				$ofType,
-				$checkType,
+				$checkTypeName,
 				null
 			);
 			if ($canCast instanceof ValidationSuccess && $canCast->type->isSubtypeOf($this->refType)) {

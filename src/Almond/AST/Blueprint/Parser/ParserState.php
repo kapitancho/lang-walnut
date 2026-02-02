@@ -10,7 +10,6 @@ interface ParserState {
 
 	public function push(int $callReturnPoint): void;
 	public function pop(): array;
-	public function moveAndPop(): void;
 	public function move(int $state): void;
 	public function stay(int $state): void;
 	public function depth(): int;

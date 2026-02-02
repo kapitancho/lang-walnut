@@ -27,6 +27,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SealedType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\DuplicateSubsetValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\UnknownType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\EnumerationValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\EnumerationValueName;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\ProgramContext;
@@ -81,7 +82,11 @@ final readonly class ModuleBuilder implements ModuleCompilerInterface {
 			$type instanceof OpenType, $type instanceof SealedType => $type->valueType,
 			$type instanceof EnumerationType => $this->programContext->typeRegistry->union([
 				$type,
-				$this->programContext->typeRegistry->string()
+				$this->programContext->typeRegistry->stringSubset(
+					array_map(fn(EnumerationValue $enumValue): string
+						=> $enumValue->name, $type->values
+					)
+				)
 			]),
 			// @codeCoverageIgnoreStart
 			default => throw new BuildException(

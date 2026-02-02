@@ -12,11 +12,25 @@ use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Validator\PreBuildValidationSucc
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Validator\PreBuildValidator;
 
 final readonly class TypeNameExistsValidator implements PreBuildValidator {
+	private const array buildInTypes = [
+		'Any', 'Nothing', 'Boolean', 'True', 'False', 'Integer', 'Real', 'String', 'Type', 'Array', 'Map', 'Set',
+		'Shape', 'Impure', 'Error', 'Mutable', 'Type', 'Atom', 'Data', 'Open', 'Sealed', 'Named', 'Enumeration'
+	];
+
 	public function validate(PreBuildValidationRequest $request): PreBuildValidationSuccess|PreBuildValidationFailure {
 		$result = $request->result;
 
 		// First pass: collect all type definitions (for ProxyTypeNode checks)
 		$allDefinedTypes = [];
+		$definedSoFar = [];
+		$forwardReferences = [];
+		// Second pass: iterate in order to check forward references
+		$undefinedLazyTypes = [];
+
+		foreach(self::buildInTypes as $typeName) {
+			$allDefinedTypes[$typeName] = true;
+			$definedSoFar[$typeName] = true;
+		}
 		foreach ($request->nodeIteratorFactory->filterByType(
 			$request->nodeIteratorFactory->recursive($request->rootNode),
 			AddTypeNode::class
@@ -24,10 +38,6 @@ final readonly class TypeNameExistsValidator implements PreBuildValidator {
 			$allDefinedTypes[$addTypeNode->name->name] = true;
 		}
 
-		// Second pass: iterate in order to check forward references
-		$definedSoFar = [];
-		$forwardReferences = [];
-		$undefinedLazyTypes = [];
 
 		foreach ($request->nodeIteratorFactory->filterByTypes(
 			$request->nodeIteratorFactory->recursive($request->rootNode),
@@ -83,4 +93,5 @@ final readonly class TypeNameExistsValidator implements PreBuildValidator {
 
 		return $result;
 	}
+
 }

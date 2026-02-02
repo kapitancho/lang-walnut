@@ -35,52 +35,60 @@ final readonly class ValueConverter {
 	public function analyseConvertValueToShape(
 		Type $sourceType,
 		Type $targetType,
-	): Type {
+		Expression|null $origin
+	): ValidationSuccess|ValidationFailure {
 		$shapeTargetType = $this->typeRegistry->shape($targetType);
 
 		if ($sourceType->isSubtypeOf($shapeTargetType)) {
-			return $targetType;
+			return $this->validationFactory->validationSuccess($targetType);
 		}
-
-		$methodNameString = sprintf('as%s', $targetType);
-		if (MethodNameIdentifier::isValidIdentifier($methodNameString)) {
-			$methodName = new MethodNameIdentifier($methodNameString);
-
-			$returnType = $methodAnalyser->safeAnalyseMethod(
+		$targetTypeName = $this->getTypeName($targetType);
+		if ($targetTypeName) {
+			$result = $this->methodContext->validateCast(
 				$sourceType,
-				$methodName,
-				$this->typeRegistry->null
+				$targetTypeName,
+				origin: $origin
 			);
-			if ($returnType !== UnknownMethod::value) {
+			if ($result instanceof ValidationSuccess) {
+				$returnType = $result->type;
 				if ($returnType instanceof ResultType) {
-					throw new AnalyserException(
+					return $this->validationFactory->error(
+						ValidationErrorType::shapeMismatch,
 						sprintf(
 							"Cannot convert value of type '%s' to shape '%s' because the cast may return an error of type %s",
 							$sourceType,
 							$targetType,
 							$returnType->errorType
-						)
+						),
+						$origin
 					);
 				}
 				// @codeCoverageIgnoreStart
 				if (!$returnType->isSubtypeOf($targetType)) {
-					throw new AnalyserException(sprintf(
-						"Cast method '%s' returns '%s' which is not a subtype of '%s'",
-						$methodName,
-						$returnType,
-						$targetType
-					));
+					return $this->validationFactory->error(
+						ValidationErrorType::shapeMismatch,
+						sprintf(
+							"Cast from '%s' to '%s' returns '%s' which is not a subtype of '%s'",
+							$sourceType,
+							$targetType,
+							$returnType,
+							$targetType
+						),
+						$origin
+					);
 				}
-				return $returnType;
+				return $this->validationFactory->validationSuccess($returnType);
 				// @codeCoverageIgnoreEnd
 			}
 		}
-		throw new AnalyserException(
+		return $this->validationFactory->error(
+			ValidationErrorType::shapeMismatch,
 			sprintf(
-				"Cannot convert value of type '%s' to shape '%s'",
+				"Cast method cannot convert value of type '%s' to shape '%s'",
 				$sourceType,
 				$targetType
-			)
+			),
+			$origin
 		);
 	}
 

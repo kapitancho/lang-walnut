@@ -606,10 +606,9 @@ final readonly class ParserStateMachine {
 			]],
 			202 => ['name' => 'expression sequence', 'transitions' => [
 				T::sequence_end->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->expression->sequence([
-
-					]);
-					$this->s->moveAndPop();
+					$this->s->i++;
+					$this->s->generated = $this->nodeBuilder->expression->sequence([]);
+					$this->s->pop();
 				},
 				'' => function(LT $token) {
 					$this->s->result['sequence_expressions'] = [];
@@ -640,8 +639,9 @@ final readonly class ParserStateMachine {
 			]],
 			205 => ['name' => 'expression sequence separator', 'transitions' => [
 				T::sequence_end->name => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->expression->sequence($this->s->result['sequence_expressions']);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				}
 			]],
 			206 => ['name' => 'expression group', 'transitions' => [
@@ -652,8 +652,9 @@ final readonly class ParserStateMachine {
 			]],
 			207 => ['name' => 'expression sequence separator', 'transitions' => [
 				T::call_end->name => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->expression->group($this->s->generated);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				}
 			]],
 			212 => ['name' => 'var expression', 'transitions' => [
@@ -727,11 +728,12 @@ final readonly class ParserStateMachine {
 			]],
 			218 => ['name' => 'constructor call value', 'transitions' => [
 				T::call_end->name => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->expression->constructorCall(
 						$this->s->result['type_name'],
 						$this->s->generated
 					);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				}
 			]],
 			219 => ['name' => 'constructor call value tuple or record', 'transitions' => [
@@ -751,8 +753,9 @@ final readonly class ParserStateMachine {
 			]],
 			222 => ['name' => 'list or dict expression', 'transitions' => [
 				T::tuple_end->name => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->expression->tuple([]);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 				T::expression_separator->name => 242,
 				T::colon->name => 243,
@@ -896,14 +899,16 @@ final readonly class ParserStateMachine {
 			]],
 			242 => ['name' => 'empty set value', 'transitions' => [
 				T::tuple_end->name => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->expression->set([]);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 			]],
 			243 => ['name' => 'empty record value', 'transitions' => [
 				T::tuple_end->name => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->expression->record([]);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 			]],
 			4000 => ['name' => 'type function expression start', 'transitions' => [
@@ -1027,11 +1032,12 @@ final readonly class ParserStateMachine {
 			]],
 			4041 => ['name' => 'type shape expression op expr', 'transitions' => [
 				T::sequence_end->name => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated =
 						$this->nodeBuilder->type->shapeType(
 							$this->s->generated,
 						);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				}
 			]],
 			4050 => ['name' => 'type expression start', 'transitions' => [
@@ -1093,29 +1099,32 @@ final readonly class ParserStateMachine {
 					$this->s->move(839);
 				},
 				T::positive_integer_number->name => $i = function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->type->integerSubsetType([
 						$this->nodeBuilder->value->integerValue(
 							new Number($token->patternMatch->text)
 						)
 					]);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 				T::integer_number->name => $i,
 				T::real_number->name => $i = function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->type->realSubsetType([
 						$this->nodeBuilder->value->realValue(
 							new Number($token->patternMatch->text)
 						)
 					]);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 				T::string_value->name => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->type->stringSubsetType([
 						$this->nodeBuilder->value->stringValue(
 							$this->stringEscapeCharHandler->unescape($token->patternMatch->text)
 						)
 					]);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 			]],
 			4051 => ['name' => 'type expression braces', 'transitions' => [
@@ -1138,7 +1147,8 @@ final readonly class ParserStateMachine {
 						}
 						$this->s->generated = $new;
 					}
-					$this->s->moveAndPop();
+					$this->s->i++;
+					$this->s->pop();
 				},
 			]],
 
@@ -1722,10 +1732,11 @@ final readonly class ParserStateMachine {
 					}
 				},
 				T::special_var->name => $tx = function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->expression->variableName(
 						$this->nodeBuilder->name->variableName($token->patternMatch->text)
 					);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 				T::special_var_param->name => $tx,
 				T::special_var_modulo->name => $tx,
@@ -1791,20 +1802,22 @@ final readonly class ParserStateMachine {
 
 			3303 => ['name' => 'property name', 'transitions' => [
 				T::string_value->name => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->expression->propertyAccess(
 						$this->s->generated,
 						$this->stringEscapeCharHandler->unescape( $token->patternMatch->text)
 					);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 				T::var_keyword->name => $c = function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->expression->propertyAccess(
 						$this->s->generated,
 						is_numeric($token->patternMatch->text) ?
 							(int)$token->patternMatch->text :
 							$token->patternMatch->text
 					);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 				T::method_marker->name => $c,
 				T::error_as_external->name => $c,
@@ -1839,8 +1852,9 @@ final readonly class ParserStateMachine {
 			]],
 			3308 => ['name' => 'method call value', 'transitions' => [
 				T::call_end->name => function(LT $token) {
+					$this->s->i++;
 					$this->noErrorMethodCall(true);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				}
 			]],
 			3309 => ['name' => 'method call start tuple or record', 'transitions' => [
@@ -1857,11 +1871,12 @@ final readonly class ParserStateMachine {
 			]],
 			3311 => ['name' => 'function call start', 'transitions' => [
 				T::call_end->name => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->expression->functionCall(
 						$this->s->result['expression_left'],
 						$this->nodeBuilder->expression->constant($this->nodeBuilder->value->nullValue)
 					);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 				'' => function(LT $token) {
 					$this->s->push(3312);
@@ -2129,10 +2144,11 @@ final readonly class ParserStateMachine {
 			]],
 			360 => ['name' => 'constant value end', 'transitions' => [
 				T::sequence_end->name => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->expression->constant(
 						$this->s->generated
 					);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 			]],
 			361 => ['name' => 'constant value tuple end', 'transitions' => [
@@ -2189,48 +2205,55 @@ final readonly class ParserStateMachine {
 			]],
 			403 => ['name' => 'empty dict value', 'transitions' => [
 				T::tuple_end->name => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->value->recordValue([]);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 			]],
 			404 => ['name' => 'empty set value', 'transitions' => [
 				T::tuple_end->name => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->value->setValue([]);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 			]],
 			405 => ['name' => 'null value', 'transitions' => [
 				'' => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->value->nullValue;
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 			]],
 			406 => ['name' => 'true value', 'transitions' => [
 				'' => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->value->trueValue;
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 			]],
 			407 => ['name' => 'false value', 'transitions' => [
 				'' => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->value->falseValue;
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 			]],
 			408 => ['name' => 'string value', 'transitions' => [
 				'' => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->value->stringValue(
 						$this->stringEscapeCharHandler->unescape( $token->patternMatch->text)
 					);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 			]],
 			4081 => ['name' => 'byte array value', 'transitions' => [
 				'' => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->value->bytesValue(
 						$this->bytesEscapeCharHandler->unescape( $token->patternMatch->text)
 					);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 			]],
 			409 => ['name' => 'error constant value value start', 'transitions' => [
@@ -2280,14 +2303,16 @@ final readonly class ParserStateMachine {
 			]],
 			416 => ['name' => 'integer value', 'transitions' => [
 				'' => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->value->integerValue(new Number($token->patternMatch->text));
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 			]],
 			417 => ['name' => 'real value', 'transitions' => [
 				'' => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->value->realValue(new Number($token->patternMatch->text));
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 			]],
 			418 => ['name' => 'function value', 'transitions' => [
@@ -2303,8 +2328,9 @@ final readonly class ParserStateMachine {
 			]],
 			420 => ['name' => 'list or dict value', 'transitions' => [
 				T::tuple_end->name => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->value->tupleValue([]);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 				T::colon->name => 403,
 				T::expression_separator->name => 404,
@@ -3036,10 +3062,11 @@ final readonly class ParserStateMachine {
 			]],
 			717 => ['name' => 'type integer full return', 'transitions' => [
 				T::type_end->name => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->type->integerFullType(
 						$this->s->generated
 					);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 			]],
 			718 => ['name' => 'type real', 'transitions' => [
@@ -3134,10 +3161,11 @@ final readonly class ParserStateMachine {
 			]],
 			726 => ['name' => 'type real full return', 'transitions' => [
 				T::type_end->name => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->type->realFullType(
 						$this->s->generated
 					);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 			]],
 
@@ -3811,8 +3839,9 @@ final readonly class ParserStateMachine {
 			]],
 			839 => ['name' => 'module level tuple or record', 'transitions' => [
 				T::tuple_end->name => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->type->tupleType([]);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 				T::string_value->name => function(LT $token) {
 					$this->s->result['first_token'] = new LT(
@@ -3991,8 +4020,9 @@ final readonly class ParserStateMachine {
 			860 => ['name' => 'module level tuple value rest', 'transitions' => [
 				T::rest_type->name => 847,
 				T::tuple_end->name => function(LT $token) {
+					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->type->recordType([]);
-					$this->s->moveAndPop();
+					$this->s->pop();
 				},
 			]],
 			870 => ['name' => 'integer interval init', 'transitions' => [

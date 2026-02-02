@@ -27,11 +27,6 @@ final class ParserState implements ParserStateInterface {
 		return $return;
 	}
 
-	public function moveAndPop(): void {
-		$this->i++;
-		$this->pop();
-	}
-
 	public function move(int $state): void {
 		$this->state = $state;
 		$this->i++;
