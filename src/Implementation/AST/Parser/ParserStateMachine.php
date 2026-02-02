@@ -1101,6 +1101,25 @@ final readonly class ParserStateMachine {
 					$this->s->result['startPosition'] = $token->sourcePosition;
 					$this->s->move(839);
 				},
+				T::positive_integer_number->name => $i = function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->type->integerSubsetType([
+						new Number($token->patternMatch->text)
+					]);
+					$this->s->moveAndPop();
+				},
+				T::integer_number->name => $i,
+				T::real_number->name => $i = function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->type->realSubsetType([
+						new Number($token->patternMatch->text)
+					]);
+					$this->s->moveAndPop();
+				},
+				T::string_value->name => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->type->stringSubsetType([
+						$this->stringEscapeCharHandler->unescape($token->patternMatch->text)
+					]);
+					$this->s->moveAndPop();
+				},
 			]],
 			4051 => ['name' => 'type expression braces', 'transitions' => [
 				T::call_end->name => function(LT $token) {
