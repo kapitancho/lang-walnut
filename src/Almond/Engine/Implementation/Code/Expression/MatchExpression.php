@@ -98,6 +98,8 @@ final readonly class MatchExpression implements Expression, JsonSerializable {
 			if ($defaultContext instanceof ValidationFailure) {
 				$failure = $failure ? $failure->mergeFailure($defaultContext) : $defaultContext;
 			}
+			$expressionTypes[] = $defaultContext->expressionType;
+			$returnTypes[] = $defaultContext->returnType;
 		} elseif ($hasDynamicTypes || !$validationContext->expressionType->isSubtypeOf(
 			$this->typeRegistry->union($refTypes)
 		)) {

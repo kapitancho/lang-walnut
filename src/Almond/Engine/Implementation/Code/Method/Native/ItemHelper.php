@@ -82,7 +82,7 @@ final readonly class ItemHelper {
 					if ($parameterType instanceof IntegerSubsetType) {
 						$returnType = $this->typeRegistry->union(
 							array_map(
-								static fn(Number $value) =>
+								fn(Number $value) =>
 									$targetType->types[(string)$value] ?? $targetType->restType,
 								$parameterType->subsetValues
 							)
@@ -147,12 +147,12 @@ final readonly class ItemHelper {
 		if ($parameterType instanceof StringType) {
 			$returnType = $mapType->itemType;
 			if ($targetType instanceof RecordType && $parameterType instanceof StringSubsetType) {
-				$tConv = static fn(Type $fType): Type => $fType instanceof OptionalKeyType ?
+				$tConv = fn(Type $fType): Type => $fType instanceof OptionalKeyType ?
 					$this->typeRegistry->result($fType->valueType, $mapItemNotFound) :
 					$fType;
 				$returnType = $this->typeRegistry->union(
 					array_map(
-						static fn(string $value) => $tConv(
+						fn(string $value) => $tConv(
 							$targetType->types[$value] ??
 							$targetType->restType
 						),
@@ -160,7 +160,7 @@ final readonly class ItemHelper {
 					)
 				);
 				$allKeys = array_filter($parameterType->subsetValues,
-					static fn(string $value) => array_key_exists($value, $targetType->types)
+					fn(string $value) => array_key_exists($value, $targetType->types)
 				);
 				if (count($allKeys) === count($parameterType->subsetValues)) {
 					return $this->validationFactory->validationSuccess($returnType);

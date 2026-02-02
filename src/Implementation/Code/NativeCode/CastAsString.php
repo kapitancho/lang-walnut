@@ -70,13 +70,14 @@ final readonly class CastAsString {
 			$targetType instanceof BytesType => [$targetType->range->minLength, $targetType->range->maxLength],
 			$targetType instanceof IntegerType => [
 				1,
-				($max = $targetType->numberRange->max) instanceof NumberIntervalEndpoint &&
+				1000,
+				/*($max = $targetType->numberRange->max) instanceof NumberIntervalEndpoint &&
 				($min = $targetType->numberRange->min) instanceof NumberIntervalEndpoint ?
 					max(1,
 						(int)ceil(log10(abs((int)(string)$max->value))),
 						(int)ceil(log10(abs((int)(string)$min->value))) +
 						($min->value < 0 ? 1 : 0)
-					) : 1000
+					) : 1000*/
 			],
 			$targetType instanceof RealType => [1, 1000],
 			$targetType instanceof TypeType => [1, PlusInfinity::value],

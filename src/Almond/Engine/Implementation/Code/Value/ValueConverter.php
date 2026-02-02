@@ -14,15 +14,13 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\DataValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Implementation\AnalyserException;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
-use Walnut\Lang\Almond\Engine\Implementation\MethodNameIdentifier;
-use Walnut\Lang\Almond\Engine\Implementation\UnknownMethod;
 
 final readonly class ValueConverter {
 	use BaseType;
@@ -123,6 +121,17 @@ final readonly class ValueConverter {
 		// @codeCoverageIgnoreEnd
 	}
 
+	private function getTypeName(Type $type): TypeName|null {
+		if ($type instanceof NamedType) {
+			return $type->name;
+		}
+		$typeNameString = (string)$type;
+		if (TypeName::isValidIdentifier($typeNameString)) {
+			return new TypeName($typeNameString);
+		}
+		return null;
+	}
+
 	public function analyseConvertValueToType(
 		Type $sourceType,
 		Type $targetType,
@@ -131,10 +140,11 @@ final readonly class ValueConverter {
 		if ($sourceType->isSubtypeOf($targetType)) {
 			return $this->validationFactory->validationSuccess($sourceType);
 		}
-		if ($targetType instanceof NamedType) {
+		$targetTypeName = $this->getTypeName($targetType);
+		if ($targetTypeName) {
 			$result = $this->methodContext->validateCast(
 				$sourceType,
-				$targetType->name,
+				$targetTypeName,
 				null
 			);
 			if ($result instanceof ValidationFailure) {
@@ -158,8 +168,8 @@ final readonly class ValueConverter {
 			}
 			return $this->validationFactory->validationSuccess(
 				$errorType ?
-					$this->typeRegistry->result($targetType, $errorType) :
-					$targetType
+					$this->typeRegistry->result($resultType, $errorType) :
+					$resultType
 			);
 		}
 
@@ -179,10 +189,11 @@ final readonly class ValueConverter {
 		if ($sourceValue->type->isSubtypeOf($targetType)) {
 			return $sourceValue;
 		}
-		if ($targetType instanceof NamedType) {
+		$targetTypeName = $this->getTypeName($targetType);
+		if ($targetTypeName) {
 			$result = $this->methodContext->validateCast(
 				$sourceValue->type,
-				$targetType->name,
+				$targetTypeName,
 				null
 			);
 			if ($result instanceof ValidationFailure) {
@@ -197,7 +208,7 @@ final readonly class ValueConverter {
 			}
 			return $this->methodContext->executeCast(
 				$sourceValue,
-				$targetType->name
+				$targetTypeName
 			);
 		}
 

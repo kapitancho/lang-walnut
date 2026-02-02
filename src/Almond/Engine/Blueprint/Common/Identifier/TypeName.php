@@ -9,8 +9,12 @@ final readonly class TypeName implements JsonSerializable {
 	public function __construct(
 		public string $identifier
 	) {
-		preg_match('/^[A-Z][a-zA-Z0-9_]*$/', $identifier) ||
-		IdentifierException::invalidTypeNameIdentifier($identifier);
+		self::isValidIdentifier($this->identifier) ||
+			IdentifierException::invalidTypeNameIdentifier($identifier);
+	}
+
+	public static function isValidIdentifier(string $identifier): bool {
+		return preg_match('/^[A-Z][a-zA-Z0-9_]*$/', $identifier) === 1;
 	}
 
 	public function equals(TypeName $other): bool {

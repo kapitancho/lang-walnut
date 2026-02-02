@@ -13,8 +13,10 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
 
 final readonly class Invoke implements NativeMethod {
+	use BaseType;
 
 	public function __construct(
 		private ValidationFactory $validationFactory,
@@ -40,6 +42,7 @@ final readonly class Invoke implements NativeMethod {
 			$parameterType,
 		);
 		*/
+		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof FunctionType) {
 			if ($parameterType->isSubtypeOf($targetType->parameterType)) {
 				return $this->validationFactory->validationSuccess($targetType->returnType);
