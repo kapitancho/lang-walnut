@@ -126,12 +126,15 @@ final readonly class ItemHelper {
 			//TODO: this is not a long-term fix.
 			/** @var RecordType[] $intersectionTypes */
 			$intersectionTypes = $targetType->types;
-			$types = array_map(
-				fn(MapType|RecordType|MetaType|AliasType $type) =>
-					$this->validateMapItem($type, $parameterType, $origin),
-				$intersectionTypes
-			);
-			// TODO: handle validation failures
+
+			$types = [];
+			foreach ($intersectionTypes as $intersectionType) {
+				$iResult = $this->validateMapItem($intersectionType, $parameterType, $origin);
+				if ($iResult instanceof ValidationFailure) {
+					return $iResult;
+				}
+				$types[] = $iResult->type;
+			}
 			return $this->validationFactory->validationSuccess(
 				$this->typeRegistry->intersection($types)
 			);

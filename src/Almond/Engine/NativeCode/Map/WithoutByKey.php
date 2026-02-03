@@ -5,6 +5,7 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalKeyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
@@ -20,10 +21,12 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\SubsetTypeHelper;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
 
 final readonly class WithoutByKey implements NativeMethod {
 	use BaseType;
+	use SubsetTypeHelper;
 
 	public function __construct(
 		private ValidationFactory $validationFactory,
@@ -32,34 +35,77 @@ final readonly class WithoutByKey implements NativeMethod {
 	) {}
 
 	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
+		$r = $this->typeRegistry;
 		$targetType = $this->toBaseType($targetType);
 		$parameterType = $this->toBaseType($parameterType);
 		if ($targetType instanceof RecordType) {
-			if ($parameterType instanceof StringSubsetType &&
-				count($parameterType->subsetValues) === 1 &&
-				array_key_exists($parameterType->subsetValues[0], $targetType->types)
-			) {
-				$keyValue = $parameterType->subsetValues[0];
+			if ($parameterType instanceof StringSubsetType) {
 				$recordTypes = $targetType->types;
-				$elementType = $recordTypes[$keyValue];
-				unset($recordTypes[$keyValue]);
-				return $this->validationFactory->validationSuccess(
-					$this->typeRegistry->record([
-						'element' => $elementType,
-						'map' => $this->typeRegistry->record(
-							$recordTypes,
+				if (
+					count($parameterType->subsetValues) === 1 &&
+					array_key_exists($parameterType->subsetValues[0], $recordTypes)
+				) {
+					$elementType = $recordTypes[$parameterType->subsetValues[0]];
+					unset($recordTypes[$parameterType->subsetValues[0]]);
+					return $this->validationFactory->validationSuccess(
+						$r->record([
+							'element' => $elementType,
+							'map' => $r->record(
+								$recordTypes,
+								$targetType->restType
+							)
+						], null)
+					);
+				} else {
+					$canBeMissing = false;
+					$elementTypes = [];
+					foreach ($parameterType->subsetValues as $subsetValue) {
+						if (array_key_exists($subsetValue, $recordTypes)) {
+							if ($recordTypes[$subsetValue] instanceof OptionalKeyType) {
+								$elementTypes[] = $recordTypes[$subsetValue]->valueType;
+								$canBeMissing = true;
+							} else {
+								$elementTypes[] = $recordTypes[$subsetValue];
+								$recordTypes[$subsetValue] = $r->optionalKey(
+									$recordTypes[$subsetValue]
+								);
+							}
+						} else {
+							$canBeMissing = true;
+							$elementTypes[] = $targetType->restType;
+						}
+					}
+					$returnType = $r->record([
+						'element' => $r->union($elementTypes),
+						'map' => $r->record(
+							array_map(
+								fn(Type $type): OptionalKeyType => $type instanceof OptionalKeyType ?
+									$type :
+									$r->optionalKey($type),
+								$targetType->types
+							),
 							$targetType->restType
 						)
-					], null)
-				);
+					], null);
+					return $this->validationFactory->validationSuccess(
+						$canBeMissing ? $r->result(
+							$returnType,
+							$r->core->mapItemNotFound
+						) : $returnType
+					);
+				}
 			}
 			$targetType = $targetType->asMapType();
 		}
 		if ($targetType instanceof MapType) {
 			if ($parameterType instanceof StringType) {
-				$returnType = $this->typeRegistry->record([
+				$keyType = $targetType->keyType;
+				if ($keyType instanceof StringSubsetType && $parameterType instanceof StringSubsetType) {
+					$keyType = $this->stringSubsetDiff($r, $keyType, $parameterType);
+				}
+				$returnType = $r->record([
 					'element' => $targetType->itemType,
-					'map' => $this->typeRegistry->map(
+					'map' => $r->map(
 						$targetType->itemType,
 						$targetType->range->maxLength === PlusInfinity::value ?
 							$targetType->range->minLength : max(0,
@@ -69,13 +115,13 @@ final readonly class WithoutByKey implements NativeMethod {
 							)),
 						$targetType->range->maxLength === PlusInfinity::value ?
 							PlusInfinity::value : max($targetType->range->maxLength - 1, 0),
-						$targetType->keyType
+						$keyType
 					)
 				], null);
 				return $this->validationFactory->validationSuccess(
-					$this->typeRegistry->result(
+					$r->result(
 						$returnType,
-						$this->typeRegistry->core->mapItemNotFound
+						$r->core->mapItemNotFound
 					)
 				);
 			}

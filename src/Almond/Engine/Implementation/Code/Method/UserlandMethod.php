@@ -16,6 +16,8 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\VariableScope\VariableScopeFacto
 
 final readonly class UserlandMethod implements CustomMethodInterface {
 
+	public Type $parameterType;
+
 	public function __construct(
 		private UserlandFunction $function,
 
@@ -23,7 +25,9 @@ final readonly class UserlandMethod implements CustomMethodInterface {
 
 		public TypeName $targetType,
 		public MethodName $methodName,
-	) {}
+	) {
+		$this->parameterType = $this->function->parameter->type;
+	}
 
 	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
 		return $this->function->validate($targetType, $parameterType);

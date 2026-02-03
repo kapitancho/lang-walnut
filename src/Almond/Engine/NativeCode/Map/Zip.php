@@ -33,6 +33,38 @@ final readonly class Zip implements NativeMethod {
 	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
 		$type = $this->toBaseType($targetType);
 		$pType = $this->toBaseType($parameterType);
+		if ($type instanceof RecordType && $pType instanceof RecordType) {
+			$resultType = [];
+			$keys = array_values(array_unique(array_merge(
+				array_keys($type->types), array_keys($pType->types)
+			)));
+			foreach ($keys as $key) {
+				$tg = $type->types[$key] ?? $type->restType;
+				$pr = $pType->types[$key] ?? $pType->restType;
+				$isOptional = false;
+				if ($tg instanceof OptionalKeyType) {
+					$tg = $tg->valueType;
+					$isOptional = true;
+				}
+				if ($pr instanceof OptionalKeyType) {
+					$pr = $pr->valueType;
+					$isOptional = true;
+				}
+				if (!$tg instanceof NothingType && !$pr instanceof NothingType) {
+					$tuple = $this->typeRegistry->tuple([$tg, $pr], null);
+					$resultType[$key] = $isOptional ? $this->typeRegistry->optionalKey($tuple) : $tuple;
+				}
+			}
+			return $this->validationFactory->validationSuccess(
+				$this->typeRegistry->record($resultType,
+					$type->restType instanceof NothingType || $pType->restType instanceof NothingType ?
+						$this->typeRegistry->nothing : $this->typeRegistry->tuple([
+						$type->restType,
+						$pType->restType,
+					], null)
+				)
+			);
+		}
 		$type = $type instanceof RecordType ? $type->asMapType() : $type;
 		$pType = $pType instanceof RecordType ? $pType->asMapType() : $pType;
 		if ($type instanceof MapType) {

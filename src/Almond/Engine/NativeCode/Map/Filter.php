@@ -6,6 +6,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalKeyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -33,7 +34,18 @@ final readonly class Filter implements NativeMethod {
 
 	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
 		$targetType = $this->toBaseType($targetType);
+		$recordReturnType = null;
 		if ($targetType instanceof RecordType) {
+			$recordReturnType = $this->typeRegistry->record(
+				array_map(
+					fn(Type $type): OptionalKeyType =>
+					$type instanceof OptionalKeyType ?
+						$type :
+						$this->typeRegistry->optionalKey($type),
+					$targetType->types
+				),
+				$targetType->restType
+			);
 			$targetType = $targetType->asMapType();
 		}
 		if ($targetType instanceof MapType) {
@@ -43,7 +55,7 @@ final readonly class Filter implements NativeMethod {
 			)) {
 				$pType = $this->toBaseType($parameterType->returnType);
 				if ($targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
-					$returnType = $this->typeRegistry->map(
+					$returnType = $recordReturnType ?? $this->typeRegistry->map(
 						$targetType->itemType,
 						0,
 						$targetType->range->maxLength,

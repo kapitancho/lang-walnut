@@ -40,12 +40,11 @@ final readonly class Construct implements NativeMethod {
 		private VariableScopeFactory $variableScopeFactory
 	) {}
 
-
 	public function validate(
 		TypeInterface $targetType, TypeInterface $parameterType, Expression|null $origin
 	): ValidationSuccess|ValidationFailure {
 		if ($parameterType instanceof TypeType) {
-			$cType = $this->typeRegistry->typeByName(new TypeName('Constructor'));
+			$cType = $this->valueRegistry->core->constructor->type;
 			$refType = $parameterType->refType;
 			if ($refType instanceof ResultType && $refType->returnType instanceof NothingType) {
 				return $this->validationFactory->validationSuccess(
@@ -144,7 +143,8 @@ final readonly class Construct implements NativeMethod {
 
 	public function execute(Value $target, Value $parameter): Value {
 		if ($parameter instanceof TypeValue) {
-			$cValue = $this->typeRegistry->typeByName(new TypeName('Constructor'))->value;
+			$cValue = $this->valueRegistry->core->constructor;
+
 			$parameterType = $parameter->typeValue;
 			if ($parameterType instanceof ResultType && $parameterType->returnType instanceof NothingType) {
 				return $this->valueRegistry->error($target);

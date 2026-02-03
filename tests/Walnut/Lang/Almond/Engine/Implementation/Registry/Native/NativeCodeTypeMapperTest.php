@@ -49,14 +49,14 @@ class NativeCodeTypeMapperTest extends AlmondBaseTestHelper {
 
 	public function testTrue(): void {
 		$this->assertEquals(
-			['Boolean', 'Enumeration', 'JsonValue', 'Any'],
+			['True', 'Boolean', 'Enumeration', 'JsonValue', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->true)
 		);
 	}
 
 	public function testFalse(): void {
 		$this->assertEquals(
-			['Boolean', 'Enumeration', 'JsonValue', 'Any'],
+			['False', 'Boolean', 'Enumeration', 'JsonValue', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->false)
 		);
 	}
@@ -182,7 +182,9 @@ class NativeCodeTypeMapperTest extends AlmondBaseTestHelper {
 		$this->assertEquals(
 			['Mutable', 'Any'],
 			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->mutable(
-				$this->typeRegistry->typeByName(new TypeName('NotANumber')),
+				$this->typeRegistry->userland->atom(
+					new TypeName('NotANumber')
+				)
 			))
 		);
 	}

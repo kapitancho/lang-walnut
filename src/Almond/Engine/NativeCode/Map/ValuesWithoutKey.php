@@ -6,6 +6,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
@@ -19,10 +20,12 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\SubsetTypeHelper;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
 
 final readonly class ValuesWithoutKey implements NativeMethod {
 	use BaseType;
+	use SubsetTypeHelper;
 
 	public function __construct(
 		private ValidationFactory $validationFactory,
@@ -37,6 +40,10 @@ final readonly class ValuesWithoutKey implements NativeMethod {
 		}
 		if ($targetType instanceof MapType) {
 			if ($parameterType instanceof StringType) {
+				$keyType = $targetType->keyType;
+				if ($keyType instanceof StringSubsetType && $parameterType instanceof StringSubsetType) {
+					$keyType = $this->stringSubsetDiff($this->typeRegistry, $keyType, $parameterType);
+				}
 				return $this->validationFactory->validationSuccess(
 					$this->typeRegistry->result(
 						$this->typeRegistry->map(
@@ -49,7 +56,7 @@ final readonly class ValuesWithoutKey implements NativeMethod {
 								)),
 							$targetType->range->maxLength === PlusInfinity::value ?
 								PlusInfinity::value : max($targetType->range->maxLength - 1, 0),
-							$targetType->keyType
+							$keyType
 						),
 						$this->typeRegistry->core->mapItemNotFound
 					)

@@ -5,10 +5,14 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Feature\DependencyContainer;
 use SplObjectStorage;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\UserlandFunction;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodContext;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\UnknownMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AliasType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AtomType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\DataType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OpenType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SealedType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\NamedType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -17,14 +21,13 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\DataValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\MethodName;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyContainer as DependencyContainerInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyError as DependencyErrorInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationError as ValidationErrorInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Implementation\DependencyContainer\OpenType;
-use Walnut\Lang\Almond\Engine\Implementation\DependencyContainer\SealedType;
 use Walnut\Lang\Almond\Engine\Implementation\Program\Validation\ValidationError;
 
 final class DependencyContainer implements DependencyContainerInterface {
@@ -106,6 +109,75 @@ final class DependencyContainer implements DependencyContainerInterface {
 		return $found;
 	}
 
+	private function findTupleValue(TupleType $tupleType): Value|DependencyError {
+		$found = [];
+		foreach($tupleType->types as $index => $type) {
+			$foundValue = $this->valueForType($type);
+			if ($foundValue instanceof DependencyErrorInterface) {
+				return new DependencyError(
+					//UnresolvableDependency::errorWhileCreatingValue,
+					$type,
+					sprintf("Error while creating value for field %d", $index)
+				);
+			}
+			$found[$index] = $foundValue;
+		}
+		return $this->valueRegistry->tuple($found);
+	}
+
+	private function findRecordValue(RecordType $recordType): Value|DependencyError {
+		$found = [];
+		foreach($recordType->types as $key => $field) {
+			$foundValue = $this->valueForType($field);
+
+			if ($foundValue instanceof DependencyError) {
+				return new DependencyError(
+					//UnresolvableDependency::errorWhileCreatingValue,
+					$field,
+					sprintf("Error while creating value for field %s", $key)
+				);
+			}
+			$found[$key] = $foundValue;
+		}
+		return $this->valueRegistry->record($found);
+	}
+
+	private function findSealedOrOpenType(SealedType|OpenType $type): Value|DependencyError {
+		$found = $this->findValueByNamedType($type);
+		if ($found instanceof DependencyError) {
+			$constructor = $this->valueRegistry->core->constructor;
+			$method = $this->methodContext->methodForValue(
+				$constructor,
+				new MethodName($type->name->identifier)
+			);
+			$baseValueType = $method instanceof UserlandMethod ?
+				$method->parameterType :
+				$type->valueType;
+			$baseValue = $this->findValueByType($baseValueType);
+			if ($baseValue instanceof Value) {
+				$result = $this->methodContext->executeMethod(
+					$baseValue,
+					new MethodName('Construct'),
+					$this->valueRegistry->type($type)
+				);
+				if ($result instanceof ErrorValue) {
+					return new DependencyError(
+						//UnresolvableDependency::errorWhileCreatingValue,
+						$type,
+						sprintf("Error while creating value for %s type %s",
+							match(true) {
+								$type instanceof SealedType => 'sealed',
+								$type instanceof OpenType => 'open',
+							},
+							$type)
+					);
+				}
+				return $result;
+			}
+			return $baseValue;
+		}
+		return $found;
+	}
 	private function attemptToFindAlias(AliasType $aliasType): Value|DependencyError {
 		$baseType = $aliasType->aliasedType;
 		return $this->findValueByType($baseType);

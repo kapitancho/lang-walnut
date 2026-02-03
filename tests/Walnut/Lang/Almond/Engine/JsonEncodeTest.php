@@ -9,6 +9,8 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\MethodName;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\VariableName;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\MinusInfinity;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberInterval;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Test\Almond\AlmondBaseTestHelper;
 

@@ -10,6 +10,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BooleanType as Boolean
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FalseType as FalseTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType as NothingTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType as NullTypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType as ResultTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TrueType as TrueTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\DuplicateSubsetValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\InvalidArgument;
@@ -117,6 +118,10 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 	}
 
 	public function result(Type $returnType, Type $errorType): ResultType {
+		if ($returnType instanceof ResultTypeInterface) {
+			$errorType = $this->union([$errorType, $returnType->errorType]);
+			$returnType = $returnType->returnType;
+		}
 		return new ResultType(
 			$returnType,
 			$errorType

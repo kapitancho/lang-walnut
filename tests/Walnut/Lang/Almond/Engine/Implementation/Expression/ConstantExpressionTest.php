@@ -18,7 +18,7 @@ final class ConstantExpressionTest extends CodeExecutionTestHelper {
 
 	public function testWithDependencyError(): void {
 		$this->executeErrorCodeSnippet(
-			"the dependency T cannot be resolved",
+			'No implementation found for the requested type "T".',
 			"fn = ^Null => Integer %% T :: 1;",
 			"T :=  String;"
 		);
