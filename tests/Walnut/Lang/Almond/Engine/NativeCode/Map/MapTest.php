@@ -1,0 +1,42 @@
+<?php
+
+namespace Walnut\Lang\Test\Almond\Engine\NativeCode\Map;
+
+use Walnut\Lang\Test\Almond\Engine\CodeExecutionTestHelper;
+
+final class MapTest extends CodeExecutionTestHelper {
+
+	public function testMapEmpty(): void {
+		$result = $this->executeCodeSnippet("[:]->map(^i: Integer => Integer :: i + 3);");
+		$this->assertEquals("[:]", $result);
+	}
+
+	public function testMapNonEmpty(): void {
+		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 5, d: 10, e: 5]->map(^i: Integer => Integer :: i + 3);");
+		$this->assertEquals("[a: 4, b: 5, c: 8, d: 13, e: 8]", $result);
+	}
+
+	public function testMapNonEmptyError(): void {
+		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 5, d: 10, e: 5]->map(^Integer => Result<Integer, String> :: @'error');");
+		$this->assertEquals("@'error'", $result);
+	}
+
+	public function testMapKeyType(): void {
+		$result = $this->executeCodeSnippet(
+			"fn[a: 1, b: 2];",
+			valueDeclarations: "fn = ^m: Map<String<1>:Integer> => Map<String<1>:Boolean> :: 
+				m->map(^v: Integer => Boolean :: v > 1);"
+		);
+		$this->assertEquals("[a: false, b: true]", $result);
+	}
+
+	public function testMapInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet('Invalid parameter type', "[a: 1, b: 'a']->map(5);");
+	}
+
+	public function testMapInvalidParameterParameterType(): void {
+		$this->executeErrorCodeSnippet("The parameter type Boolean of the callback function is not a supertype of (Integer[1]|String['a'])",
+			"[a: 1, b: 'a']->map(^Boolean => Boolean :: true);");
+	}
+
+}

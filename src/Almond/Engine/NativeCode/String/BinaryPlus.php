@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\String;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -17,15 +18,26 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Value\ValueConverter;
 
 final readonly class BinaryPlus implements NativeMethod {
 	use BaseType;
+
+	private ValueConverter $valueConverter;
 
 	public function __construct(
 		private ValidationFactory $validationFactory,
 		private TypeRegistry $typeRegistry,
 		private ValueRegistry $valueRegistry,
-	) {}
+		private MethodContext $methodContext,
+	) {
+		$this->valueConverter = new ValueConverter(
+			$this->validationFactory,
+			$this->typeRegistry,
+			$this->valueRegistry,
+			$this->methodContext,
+		);
+	}
 
 	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
 		$targetType = $this->toBaseType($targetType);
@@ -62,11 +74,9 @@ final readonly class BinaryPlus implements NativeMethod {
 	public function execute(Value $target, Value $parameter): Value {
 		if ($target instanceof StringValue) {
 			$value = $parameter instanceof StringValue ?
-				$parameter :
-				new ValueConverter()->convertValueToShape(
-					$programRegistry,
+				$parameter : $this->valueConverter->convertValueToShape(
 					$parameter,
-					$programRegistry->typeRegistry->string()
+					$this->typeRegistry->string()
 				);
 			if ($value instanceof StringValue) {
 				$result = $target->literalValue . $value->literalValue;

@@ -1,0 +1,59 @@
+<?php
+
+namespace Walnut\Lang\Test\Almond\Engine\NativeCode\Map;
+
+use Walnut\Lang\Test\Almond\Engine\CodeExecutionTestHelper;
+
+final class WithKeyValueTest extends CodeExecutionTestHelper {
+
+	public function testWithKeyValueEmpty(): void {
+		$result = $this->executeCodeSnippet("[:]->withKeyValue[value: 1, key: 'a'];");
+		$this->assertEquals("[a: 1]", $result);
+	}
+
+	public function testWithKeyValueNonEmptyAdd(): void {
+		$result = $this->executeCodeSnippet("[a: 'a', b: 1, c: 2]->withKeyValue[value: 5, key: 'f'];");
+		$this->assertEquals("[a: 'a', b: 1, c: 2, f: 5]", $result);
+	}
+
+	public function testWithKeyValueNonEmptyReplace(): void {
+		$result = $this->executeCodeSnippet("[a: 'a', b: 1, c: 2]->withKeyValue[value: 5, key: 'b'];");
+		$this->assertEquals("[a: 'a', b: 5, c: 2]", $result);
+	}
+
+	public function testWithKeyValueKeyType(): void {
+		$result = $this->executeCodeSnippet(
+			"fn[a: 1, b: 2];",
+			valueDeclarations: "fn = ^m: Map<String<1>:Integer> => Map<String<1..2>:Integer> :: 
+				m->withKeyValue[key: 'cd', value: 3];"
+		);
+		$this->assertEquals("[a: 1, b: 2, cd: 3]", $result);
+	}
+
+	public function testWithKeyValueKeyTypeStringSubset(): void {
+		$result = $this->executeCodeSnippet(
+			"fn[a: 1, b: 2];",
+			valueDeclarations: "fn = ^m: Map<String['a', 'b']:Integer> => Map<String['a', 'b', 'cd']:Integer> :: 
+				m->withKeyValue[key: 'cd', value: 3];"
+		);
+		$this->assertEquals("[a: 1, b: 2, cd: 3]", $result);
+	}
+
+	public function testWithKeyValueAnyKey(): void {
+		$result = $this->executeCodeSnippet(
+			"f('f');",
+			valueDeclarations: "f = ^key: String => Map<String|Integer, 3..4> :: [a: 'a', b: 1, c: 2]->withKeyValue[value: 5, key: key];"
+		);
+		$this->assertEquals("[a: 'a', b: 1, c: 2, f: 5]", $result);
+	}
+
+	public function testWithKeyValueInvalidParameterValue(): void {
+		$this->executeErrorCodeSnippet("Invalid parameter type",
+			"[a: 'a', b: 1, c: 2]->withKeyValue[value: 'b']");
+	}
+
+	public function testWithKeyValueInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet("Invalid parameter type",
+			"[a: 'a', b: 1, c: 2]->withKeyValue('b')");
+	}
+}

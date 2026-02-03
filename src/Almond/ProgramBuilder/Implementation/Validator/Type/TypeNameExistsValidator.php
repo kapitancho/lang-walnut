@@ -14,7 +14,7 @@ use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Validator\PreBuildValidator;
 final readonly class TypeNameExistsValidator implements PreBuildValidator {
 	private const array buildInTypes = [
 		'Any', 'Nothing', 'Boolean', 'True', 'False', 'Integer', 'Real', 'String', 'Type', 'Array', 'Map', 'Set',
-		'Shape', 'Impure', 'Error', 'Mutable', 'Type', 'Atom', 'Data', 'Open', 'Sealed', 'Named', 'Enumeration'
+		'Shape', 'Impure', 'Error', 'Mutable', 'Type', 'Atom', 'Data', 'Open', 'Sealed', 'Named', 'Enumeration', 'Bytes'
 	];
 
 	public function validate(PreBuildValidationRequest $request): PreBuildValidationSuccess|PreBuildValidationFailure {
