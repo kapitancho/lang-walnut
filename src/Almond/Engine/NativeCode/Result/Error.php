@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Result;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
@@ -27,7 +26,7 @@ final readonly class Error implements NativeMethod {
 		private ValueRegistry $valueRegistry,
 	) {}
 
-	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
+	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
 		$target = $this->toBaseType($targetType);
 		if ($target instanceof ResultType && $target->returnType instanceof NothingType) {
 			return $this->validationFactory->validationSuccess(

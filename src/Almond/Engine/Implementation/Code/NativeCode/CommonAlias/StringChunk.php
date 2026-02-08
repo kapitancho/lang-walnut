@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonAlias;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
@@ -28,7 +27,7 @@ readonly class StringChunk extends NativeMethod {
 	}
 
 	protected function getValidator(): callable {
-		return fn(StringType $targetType, IntegerType $parameterType, Expression|null $origin): ArrayType =>
+		return fn(StringType $targetType, IntegerType $parameterType, mixed $origin): ArrayType =>
 			$this->typeRegistry->array(
 				$this->typeRegistry->string(
 					min(1, $targetType->range->minLength),

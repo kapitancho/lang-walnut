@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\Value;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\UnionType;
@@ -35,7 +34,7 @@ final readonly class ValueConverter {
 	public function analyseConvertValueToShape(
 		Type $sourceType,
 		Type $targetType,
-		Expression|null $origin
+		mixed $origin
 	): ValidationSuccess|ValidationFailure {
 		$shapeTargetType = $this->typeRegistry->shape($targetType);
 
@@ -143,7 +142,7 @@ final readonly class ValueConverter {
 	public function analyseConvertValueToType(
 		Type $sourceType,
 		Type $targetType,
-		Expression|null $origin
+		mixed $origin
 	): ValidationSuccess|ValidationFailure {
 		if ($sourceType->isSubtypeOf($targetType)) {
 			return $this->validationFactory->validationSuccess($sourceType);

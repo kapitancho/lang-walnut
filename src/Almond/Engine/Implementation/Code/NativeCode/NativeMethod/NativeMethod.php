@@ -43,7 +43,7 @@ abstract readonly class NativeMethod implements NativeMethodInterface {
 	public function validate(
 		Type $targetType,
 		Type $parameterType,
-		Expression|null $origin
+		mixed $origin
 	): ValidationSuccess|ValidationFailure {
 		$validator = $this->getValidator();
 
@@ -69,7 +69,7 @@ abstract readonly class NativeMethod implements NativeMethodInterface {
 			$this->validationFactory->validationSuccess($result) : $result;
 	}
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, Expression|null $origin): bool {
+	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool {
 		return $this->matchesCallableParameter($validator, $targetType, 0);
 	}
 

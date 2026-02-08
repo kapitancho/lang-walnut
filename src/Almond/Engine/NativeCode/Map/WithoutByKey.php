@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalKeyType;
@@ -34,7 +33,7 @@ final readonly class WithoutByKey implements NativeMethod {
 		private ValueRegistry $valueRegistry,
 	) {}
 
-	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
+	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
 		$r = $this->typeRegistry;
 		$targetType = $this->toBaseType($targetType);
 		$parameterType = $this->toBaseType($parameterType);

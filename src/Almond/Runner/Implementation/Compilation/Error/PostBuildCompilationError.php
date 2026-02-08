@@ -30,6 +30,7 @@ final class PostBuildCompilationError implements CompilationError {
 			ValidationErrorType::invalidReturnType => CompilationErrorType::invalidReturnType,
 			ValidationErrorType::dependencyNotFound => CompilationErrorType::dependencyNotFound,
 			ValidationErrorType::variableScopeMismatch => CompilationErrorType::variableScopeMismatch,
+			ValidationErrorType::userlandMethodMismatch => CompilationErrorType::userlandMethodMismatch,
 			default => CompilationErrorType::other
 		};
 	}

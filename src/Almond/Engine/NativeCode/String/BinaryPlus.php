@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\String;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
@@ -39,7 +38,7 @@ final readonly class BinaryPlus implements NativeMethod {
 		);
 	}
 
-	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
+	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof StringType) {
 			$parameterType = $this->toBaseType($parameterType);

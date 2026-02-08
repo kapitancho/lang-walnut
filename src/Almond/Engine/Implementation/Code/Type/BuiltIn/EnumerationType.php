@@ -117,7 +117,8 @@ final class EnumerationType implements EnumerationTypeInterface, JsonSerializabl
 						$this->value($valueName) :
 						InvalidArgument::of(
 							'EnumerationValueName',
-							$valueName
+							$valueName,
+							'Expected an instance of EnumerationValueName'
 						),
 				$values
 			)

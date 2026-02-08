@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Array;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
@@ -29,7 +28,7 @@ final readonly class ChainInvoke implements NativeMethod {
 		private ValueRegistry $valueRegistry,
 	) {}
 
-	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
+	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
 		$targetType = $this->toBaseType($targetType);
 		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		if ($type instanceof ArrayType) {

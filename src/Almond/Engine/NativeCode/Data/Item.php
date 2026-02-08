@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Data;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\DataType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -34,7 +33,7 @@ final readonly class Item implements NativeMethod {
 		);
 	}
 
-	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
+	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
 		$type = $this->toBaseType($targetType);
 		if ($type instanceof DataType) {
 			return $this->itemHelper->validateDataOpenType(

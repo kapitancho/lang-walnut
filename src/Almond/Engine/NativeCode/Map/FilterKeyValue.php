@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
@@ -28,7 +27,7 @@ final readonly class FilterKeyValue extends MapNativeMethod {
 	}
 
 	protected function getValidator(): callable {
-		return function(MapType $targetType, FunctionType $parameterType, Expression|null $origin): MapType|ValidationFailure {
+		return function(MapType $targetType, FunctionType $parameterType, mixed $origin): MapType|ValidationFailure {
 			$kv = $this->typeRegistry->record([
 				'key' => $targetType->keyType,
 				'value' => $targetType->itemType
@@ -74,7 +73,7 @@ final readonly class FilterKeyValue extends MapNativeMethod {
 		};
 	}
 
-	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
+	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof RecordType) {
 			$targetType = $targetType->asMapType();

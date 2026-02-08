@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Mutable;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MutableType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -26,7 +25,7 @@ final readonly class SET implements NativeMethod {
 		private ValueRegistry $valueRegistry,
 	) {}
 
-	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
+	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
 		$t = $this->toBaseType($targetType);
 		if ($t instanceof MutableType) {
 			if ($parameterType->isSubtypeOf($t->valueType)) {

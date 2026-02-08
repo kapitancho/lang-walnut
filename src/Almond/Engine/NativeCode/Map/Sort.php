@@ -2,18 +2,12 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BooleanValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
@@ -41,7 +35,7 @@ final readonly class Sort implements NativeMethod {
 		);
 	}
 
-	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
+	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof RecordType) {
 			$targetType = $targetType->asMapType();

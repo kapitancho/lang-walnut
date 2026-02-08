@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\DependencyContainer;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AtomType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
@@ -16,7 +15,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NamedN
 
 final readonly class ValueOf extends NamedNativeMethod {
 
-	protected function isNamedTypeValid(NamedType $namedType, Expression|null $origin): bool {
+	protected function isNamedTypeValid(NamedType $namedType, mixed $origin): bool {
 		return $namedType->name->equals(new TypeName('DependencyContainer'));
 	}
 

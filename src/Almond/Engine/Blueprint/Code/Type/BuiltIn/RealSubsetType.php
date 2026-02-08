@@ -2,9 +2,9 @@
 
 namespace Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue;
+use BcMath\Number;
 
 interface RealSubsetType extends RealType {
-	/** @var list<RealValue> */
+	/** @var list<Number> */
 	public array $subsetValues { get; }
 }

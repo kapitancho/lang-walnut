@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Set;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -35,7 +34,7 @@ final readonly class Sort implements NativeMethod {
 		);
 	}
 
-	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
+	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
 		$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof SetType) {
 			return $this->sortHelper->validate(

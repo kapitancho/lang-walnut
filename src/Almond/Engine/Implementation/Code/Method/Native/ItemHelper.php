@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\Method\Native;
 
 use BcMath\Number;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AliasType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\DataType;
@@ -51,7 +50,7 @@ final readonly class ItemHelper {
 	public function validateDataOpenType(
 		DataType|OpenType $targetType,
 		Type $parameterType,
-		Expression|null $origin
+		mixed $origin
 	): ValidationSuccess|ValidationFailure {
 		$valueType = $this->toBaseType($targetType->valueType);
 		if ($valueType instanceof TupleType || $valueType instanceof ArrayType) {
@@ -70,7 +69,7 @@ final readonly class ItemHelper {
 	public function validateArrayItem(
 		ArrayType|TupleType $targetType,
 		Type $parameterType,
-		Expression|null $origin
+		mixed $origin
 	): ValidationSuccess|ValidationFailure {
 		if ($parameterType instanceof IntegerType) {
 			$arrayType = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
@@ -118,7 +117,7 @@ final readonly class ItemHelper {
 	public function validateMapItem(
 		IntersectionType|MapType|RecordType|MetaType|AliasType $targetType,
 		Type $parameterType,
-		Expression|null $origin
+		mixed $origin
 	): ValidationSuccess|ValidationFailure {
 		$targetType = $this->toBaseType($targetType);
 

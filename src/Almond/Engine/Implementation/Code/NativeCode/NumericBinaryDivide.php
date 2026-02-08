@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -22,7 +21,7 @@ trait NumericBinaryDivide {
 	private function validateHelper(
 		IntegerType|RealType $targetType,
 		Type $parameterType,
-		Expression|null $origin,
+		mixed $origin,
 	): ValidationSuccess|ValidationFailure {
 		$parameterType = $this->toBaseType($parameterType);
 

@@ -2,27 +2,18 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntersectionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonAlias\MapValues;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
 
 final readonly class Values extends MapValues {
 
-	public function validateX(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
+	public function validateX(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
 		$targetType = $this->toBaseType($targetType);
 		$checkTypes = $targetType instanceof IntersectionType
 			? $targetType->types

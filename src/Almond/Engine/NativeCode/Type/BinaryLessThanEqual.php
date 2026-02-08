@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Type;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -24,7 +23,7 @@ final readonly class BinaryLessThanEqual implements NativeMethod {
 		private ValueRegistry $valueRegistry,
 	) {}
 
-	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
+	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
 		if ($targetType instanceof TypeType && $parameterType instanceof TypeType) {
 			return $this->validationFactory->validationSuccess(
 				$this->typeRegistry->boolean

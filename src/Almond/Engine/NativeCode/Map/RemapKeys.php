@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
@@ -22,7 +21,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNat
 final readonly class RemapKeys extends MapNativeMethod {
 
 	protected function getValidator(): callable {
-		return function(MapType $targetType, FunctionType $parameterType, Expression|null $origin): Type|ValidationFailure {
+		return function(MapType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
 			if ($targetType->keyType->isSubtypeOf($parameterType->parameterType)) {
 				$r = $parameterType->returnType;
 				$errorType = $r instanceof ResultType ? $r->errorType : null;

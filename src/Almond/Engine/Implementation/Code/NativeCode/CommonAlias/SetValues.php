@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonAlias;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
@@ -16,7 +15,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNat
 readonly class SetValues extends SetNativeMethod {
 
 	protected function getValidator(): callable {
-		return fn(SetType $targetType, NullType $parameterType, Expression|null $origin): ArrayType =>
+		return fn(SetType $targetType, NullType $parameterType, mixed $origin): ArrayType =>
 			$this->typeRegistry->array(
 				$targetType->itemType,
 				$targetType->range->minLength,

@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\Method;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\UserlandFunction;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethod as CustomMethodInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -17,6 +16,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\VariableScope\VariableScopeFacto
 final readonly class UserlandMethod implements CustomMethodInterface {
 
 	public Type $parameterType;
+	public Type $returnType;
 
 	public function __construct(
 		private UserlandFunction $function,
@@ -27,10 +27,11 @@ final readonly class UserlandMethod implements CustomMethodInterface {
 		public MethodName $methodName,
 	) {
 		$this->parameterType = $this->function->parameter->type;
+		$this->returnType = $this->function->returnType;
 	}
 
-	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
-		return $this->function->validate($targetType, $parameterType);
+	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
+		return $this->function->validate($targetType, $parameterType, $origin);
 	}
 
 	public function validateFunction(): ValidationSuccess|ValidationFailure {

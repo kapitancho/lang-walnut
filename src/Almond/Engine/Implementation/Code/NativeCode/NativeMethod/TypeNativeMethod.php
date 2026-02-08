@@ -2,16 +2,10 @@
 
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
 
 /**
  * @template TRefType of Type
@@ -21,7 +15,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
  */
 abstract readonly class TypeNativeMethod extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, Expression|null $origin): bool {
+	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool {
 		if (!parent::isTargetTypeValid($targetType, $validator, $origin)) {
 			return false;
 		}
@@ -29,7 +23,7 @@ abstract readonly class TypeNativeMethod extends NativeMethod {
 		return $this->isTargetRefTypeValid($targetType->refType, $origin);
 	}
 
-	protected function isTargetRefTypeValid(Type $targetRefType, Expression|null $origin): bool {
+	protected function isTargetRefTypeValid(Type $targetRefType, mixed $origin): bool {
 		return true;
 	}
 
@@ -38,7 +32,7 @@ abstract readonly class TypeNativeMethod extends NativeMethod {
 			return false;
 		}
 		/** @var TypeValue $target */
-		return $this->isTargetRefTypeValid($target->typeValue);
+		return $this->isTargetRefTypeValid($target->typeValue, null);
 	}
 
 }

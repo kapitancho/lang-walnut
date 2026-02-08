@@ -28,4 +28,5 @@ enum CompilationErrorType {
 	case missingValue;
 	case variableScopeMismatch;
 	case executionError;
+	case userlandMethodMismatch;
 }

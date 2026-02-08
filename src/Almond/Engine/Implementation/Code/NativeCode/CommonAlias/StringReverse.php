@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonAlias;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
@@ -14,7 +13,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 readonly class StringReverse extends NativeMethod {
 
 	protected function getValidator(): callable {
-		return function(StringType $targetType, NullType $parameterType, Expression|null $origin): StringType {
+		return function(StringType $targetType, NullType $parameterType, mixed $origin): StringType {
 			if ($targetType instanceof StringSubsetType) {
 				return $this->typeRegistry->stringSubset(
 					array_map(

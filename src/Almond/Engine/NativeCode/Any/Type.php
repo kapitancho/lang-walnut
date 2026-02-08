@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Any;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type as TypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
@@ -21,7 +20,7 @@ final readonly class Type implements NativeMethod {
 	) {}
 
 	public function validate(
-		TypeInterface $targetType, TypeInterface $parameterType, Expression|null $origin
+		TypeInterface $targetType, TypeInterface $parameterType, mixed $origin
 	): ValidationSuccess|ValidationFailure {
 		return $this->validationFactory->validationSuccess(
 			$this->typeRegistry->type($targetType)

@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Set;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -17,7 +16,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNat
 final readonly class Partition extends SetNativeMethod {
 
 	protected function getValidator(): callable {
-		return function(SetType $targetType, FunctionType $parameterType, Expression|null $origin): Type|ValidationFailure {
+		return function(SetType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
 			if (!$parameterType->returnType->isSubtypeOf($this->typeRegistry->boolean)) {
 				return $this->validationFactory->error(
 					ValidationErrorType::invalidParameterType,

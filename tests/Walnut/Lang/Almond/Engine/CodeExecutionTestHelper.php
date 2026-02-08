@@ -82,7 +82,7 @@ class CodeExecutionTestHelper extends TestCase {
 	}
 
 	protected function executeErrorCodeSnippet(
-		string $analyserMessage,
+		string $validatorMessage,
 		string $code,
 		string $typeDeclarations = '',
 		string $valueDeclarations = '',
@@ -92,7 +92,7 @@ class CodeExecutionTestHelper extends TestCase {
 			$code, $typeDeclarations, $valueDeclarations, $parameters
 		);
 		if (is_array($result)) {
-			self::assertStringContainsString($analyserMessage, $result[0]->errorMessage);
+			self::assertStringContainsString($validatorMessage, $result[0]->errorMessage);
 		} else {
 			$this->fail(
 				'No compilation error. The result was: ' . $result

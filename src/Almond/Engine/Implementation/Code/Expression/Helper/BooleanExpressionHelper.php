@@ -28,7 +28,7 @@ final readonly class BooleanExpressionHelper {
 	) {}
 
 	public function getBooleanType(
-		Type $expressionType, Expression|null $origin
+		Type $expressionType, mixed $origin
 	): ValidationSuccess|ValidationFailure {
 		return $this->methodContext->validateCast(
 			$expressionType,

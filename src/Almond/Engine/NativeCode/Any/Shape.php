@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Any;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
@@ -40,7 +39,7 @@ final readonly class Shape implements NativeMethod {
 
 
 	public function validate(
-		TypeInterface $targetType, TypeInterface $parameterType, Expression|null $origin
+		TypeInterface $targetType, TypeInterface $parameterType, mixed $origin
 	): ValidationSuccess|ValidationFailure {
 		$targetType = $this->toBaseType($targetType);
 		$parameterType = $this->toBaseType($parameterType);

@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Array;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BooleanType;
@@ -18,7 +17,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayN
 /** @extends ArrayNativeMethod<AnyType, FunctionType, FunctionValue> */
 final readonly class Any extends ArrayNativeMethod {
 
-	protected function isTargetItemTypeValid(Type $targetItemType, Expression|null $origin): bool {
+	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
 		return true;
 	}
 
@@ -31,7 +30,7 @@ final readonly class Any extends ArrayNativeMethod {
 	}
 
 	protected function getValidator(): callable {
-		return function(ArrayType $targetType, FunctionType $parameterType, Expression|null $origin): BooleanType|ValidationFailure {
+		return function(ArrayType $targetType, FunctionType $parameterType, mixed $origin): BooleanType|ValidationFailure {
 			if ($targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
 				return $this->typeRegistry->boolean;
 			}

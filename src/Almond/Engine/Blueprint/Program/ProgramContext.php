@@ -7,6 +7,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\FunctionValueFactory as Fu
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\UserlandFunctionFactory as UserlandFunctionFactoryInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\UserlandMethodFactory as UserlandMethodFactoryInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodContext as MethodContextInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Native\NativeMethodRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethodBuilder as UserlandMethodBuilderInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethodRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethodStorage as UserlandMethodStorageInterface;
@@ -29,6 +30,7 @@ interface ProgramContext {
 
 	public UserlandFunctionFactoryInterface $userlandFunctionFactory { get; }
 
+	public NativeMethodRegistry $nativeMethodRegistry { get; }
 	public UserlandMethodRegistry $userlandMethodRegistry { get; }
 	public UserlandMethodStorageInterface $userlandMethodStorage { get; }
 	public UserlandMethodFactoryInterface $userlandMethodFactory { get; }

@@ -9,6 +9,7 @@ enum ValidationErrorType {
 	case mutableTypeMismatch;
 	case undefinedVariable; // +
 	case mapKeyTypeMismatch;
+	case userlandMethodMismatch;
 	case shapeMismatch;
 	case undefinedMethod; // +
 	case invalidTargetType;

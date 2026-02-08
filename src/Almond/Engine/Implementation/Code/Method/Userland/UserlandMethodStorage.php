@@ -11,7 +11,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 
 final class UserlandMethodStorage implements UserlandMethodRegistryInterface, UserlandMethodStorageInterface {
 
-	/** @var UserlandMethod */
+	/** @var array<string, UserlandMethod[]> */
 	private array $userlandMethods = [];
 	/** @var array<string, UserlandFunction> */
 	private array $typeValidators = [];

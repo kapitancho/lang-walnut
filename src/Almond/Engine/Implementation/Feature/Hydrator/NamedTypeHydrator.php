@@ -11,7 +11,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Feature\Hydrator\HydrationRequest as Hyd
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\Hydrator\HydrationSuccess as HydrationSuccessInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\Hydrator\NamedTypeHydrator as NamedTypeHydratorInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\NativeCode\Type\TypeName;
 
 final readonly class NamedTypeHydrator implements NamedTypeHydratorInterface {
 	public function __construct(

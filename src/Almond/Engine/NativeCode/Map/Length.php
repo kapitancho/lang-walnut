@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
@@ -14,7 +13,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNat
 final readonly class Length extends MapNativeMethod {
 
 	protected function getValidator(): callable {
-		return fn(MapType $targetType, NullType $parameterType, Expression|null $origin) =>
+		return fn(MapType $targetType, NullType $parameterType, mixed $origin) =>
 			$this->typeRegistry->integer(
 				$targetType->range->minLength,
 				$targetType->range->maxLength

@@ -14,6 +14,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\DataValue as DataValu
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\EnumerationValue as EnumerationValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue as ErrorValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\MutableValue as MutableValueInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\OpenValue as OpenValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SealedValue as SealedValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue as TupleValueInterface;
@@ -39,9 +40,9 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\Value\BuiltIn\TypeValue;
 
 final readonly class ValueRegistry implements ValueRegistryInterface {
 
-	public Value $null;
-	public Value $true;
-	public Value $false;
+	public NullValue $null;
+	public BooleanValue $true;
+	public BooleanValue $false;
 
 	public ValueRegistryCore $core;
 

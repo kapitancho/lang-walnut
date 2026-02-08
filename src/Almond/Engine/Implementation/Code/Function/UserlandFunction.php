@@ -75,28 +75,28 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 		return $validationResult;
 	}
 
-	public function validate(Type $targetType, Type $parameterType): ValidationSuccess|ValidationFailure {
+	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
 		$validationResult = $this->validationFactory->validationSuccess($this->returnType);
 		if (!$targetType->isSubtypeOf($this->target->type)) {
 			$validationResult = $validationResult->withError(
 				ValidationErrorType::invalidTargetType,
 				sprintf(
-					"Function target type '%s' is not compatible with declared target type '%s'.",
+					"The target type '%s' is not compatible with declared target type '%s'.",
 					$targetType,
 					$this->target->type
 				),
-				$this
+				$origin ?? $this
 			);
 		}
 		if (!$parameterType->isSubtypeOf($this->parameter->type)) {
 			$validationResult = $validationResult->withError(
 				ValidationErrorType::invalidParameterType,
 				sprintf(
-					"Function parameter type '%s' is not compatible with declared parameter type '%s'.",
+					"The parameter type '%s' is not compatible with declared parameter type '%s'.",
 					$parameterType,
 					$this->parameter->type
 				),
-				$this
+				$origin ?? $this
 			);
 		}
 		return $validationResult;

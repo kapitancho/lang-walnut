@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Real;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType;
@@ -18,7 +17,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 final readonly class Ceil extends NativeMethod {
 
 	protected function getValidator(): callable {
-		return fn(RealType $targetType, NullType $parameterType, Expression|null $origin): IntegerType =>
+		return fn(RealType $targetType, NullType $parameterType, mixed $origin): IntegerType =>
 			$this->typeRegistry->integerFull(... array_map(
 				fn(NumberInterval $interval) => new NumberInterval(
 					$interval->start === MinusInfinity::value ? MinusInfinity::value :

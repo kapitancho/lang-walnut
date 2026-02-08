@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
@@ -27,7 +26,7 @@ final readonly class FindFirstKeyValue extends MapNativeMethod {
 	}
 
 	protected function getValidator(): callable {
-		return function(MapType $targetType, FunctionType $parameterType, Expression|null $origin): ResultType|ValidationFailure {
+		return function(MapType $targetType, FunctionType $parameterType, mixed $origin): ResultType|ValidationFailure {
 			$kv = $this->typeRegistry->record([
 				'key' => $targetType->keyType,
 				'value' => $targetType->itemType

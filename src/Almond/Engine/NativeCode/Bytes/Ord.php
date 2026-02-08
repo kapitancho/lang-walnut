@@ -8,7 +8,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BytesValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
@@ -17,7 +16,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 final readonly class Ord extends NativeMethod {
 
 	protected function getValidator(): callable {
-		return function(BytesType $targetType, NullType $parameterType, Expression|null $origin): IntegerType|ValidationFailure {
+		return function(BytesType $targetType, NullType $parameterType, mixed $origin): IntegerType|ValidationFailure {
 			if ((string)$targetType->range->minLength === '1' &&
 				(string)$targetType->range->maxLength === '1'
 			) {

@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue;
@@ -12,7 +11,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNat
 abstract readonly class SetSubset extends SetNativeMethod {
 
 	protected function getValidator(): callable {
-		return fn(SetType $targetType, SetType $parameterType, Expression|null $origin) =>
+		return fn(SetType $targetType, SetType $parameterType, mixed $origin) =>
 			$this->typeRegistry->boolean;
 	}
 

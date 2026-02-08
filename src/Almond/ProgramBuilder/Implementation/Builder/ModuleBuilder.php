@@ -116,10 +116,10 @@ final readonly class ModuleBuilder implements ModuleCompilerInterface {
 	private function validator(
 		TypeName $typeName,
 		Type $valueType,
-		TypeNode $errorTypeNode,
+		TypeNode|null $errorTypeNode,
 		FunctionBodyNode $constructorBodyNode
 	): UserlandFunction {
-		$errorType = $this->type($errorTypeNode);
+		$errorType = $errorTypeNode ? $this->type($errorTypeNode) : $this->programContext->typeRegistry->any;
 		$constructorBody = $this->functionBody($constructorBodyNode);
 		return $this->programContext->userlandMethodStorage->addValidator(
 			$typeName,
@@ -191,7 +191,7 @@ final readonly class ModuleBuilder implements ModuleCompilerInterface {
 					$this->programContext->userlandTypeBuilder->addOpen(
 						$typeName = $this->nameBuilder->typeName($moduleDefinition->name),
 						$valueType = $this->type($moduleDefinition->valueType),
-						$moduleDefinition->errorType && $moduleDefinition->constructorBody ?
+						$moduleDefinition->constructorBody ?
 							$this->validator(
 								$typeName,
 								$valueType,
@@ -204,7 +204,7 @@ final readonly class ModuleBuilder implements ModuleCompilerInterface {
 					$this->programContext->userlandTypeBuilder->addSealed(
 						$typeName = $this->nameBuilder->typeName($moduleDefinition->name),
 						$valueType = $this->type($moduleDefinition->valueType),
-						$moduleDefinition->errorType && $moduleDefinition->constructorBody ?
+						$moduleDefinition->constructorBody ?
 							$this->validator(
 								$typeName,
 								$valueType,

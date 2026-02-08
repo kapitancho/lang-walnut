@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Any;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\UnknownMethod;
@@ -22,7 +21,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\EnumerationValueName;
-use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
@@ -41,7 +39,7 @@ final readonly class Construct implements NativeMethod {
 	) {}
 
 	public function validate(
-		TypeInterface $targetType, TypeInterface $parameterType, Expression|null $origin
+		TypeInterface $targetType, TypeInterface $parameterType, mixed $origin
 	): ValidationSuccess|ValidationFailure {
 		if ($parameterType instanceof TypeType) {
 			$cType = $this->valueRegistry->core->constructor->type;
@@ -104,7 +102,8 @@ final readonly class Construct implements NativeMethod {
 					if ($validationMethod !== null) {
 						$validationResult = $validationMethod->validate(
 							$this->typeRegistry->nothing,
-							$refType->valueType
+							$refType->valueType,
+							$origin
 						);
 						if ($validationResult instanceof ValidationFailure) {
 							return $validationResult;

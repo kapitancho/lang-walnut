@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Type;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType;
@@ -46,7 +45,7 @@ final readonly class MaxValue extends TypeNativeMethod {
 		};
 	}
 
-	protected function isTargetRefTypeValid(Type $targetRefType, Expression|null $origin): bool {
+	protected function isTargetRefTypeValid(Type $targetRefType, mixed $origin): bool {
 		return $targetRefType instanceof IntegerType || $targetRefType instanceof RealType;
 	}
 

@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\Method;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Method;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
@@ -26,7 +25,7 @@ final readonly class UnionMethodCall implements Method {
 	public function validate(
 		Type $targetType,
 		Type $parameterType,
-		Expression|null $origin
+		mixed $origin
 	): ValidationSuccess|ValidationFailure {
 		$types = [];
 		$failure = null;
@@ -35,7 +34,7 @@ final readonly class UnionMethodCall implements Method {
 			if ($tResult instanceof ValidationFailure) {
 				$failure = $failure ? $failure->mergeWith($tResult) : $tResult;
 			} else {
-				$types[] = $tResult;
+				$types[] = $tResult->type;
 			}
 		}
 		return $failure ?? $this->validationFactory->validationSuccess(

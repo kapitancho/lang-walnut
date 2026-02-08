@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Set;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
@@ -18,7 +17,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNat
 /** @extends SetNativeMethod<ArrayType|TupleType, TupleValue> */
 final readonly class ZipMap extends SetNativeMethod {
 
-	protected function isTargetItemTypeValid(Type $targetItemType, Expression|null $origin): bool {
+	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
 		return $targetItemType->isSubtypeOf($this->typeRegistry->string());
 	}
 

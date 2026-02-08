@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Type;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AliasType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
@@ -46,7 +45,7 @@ final readonly class OpenApiSchema implements NativeMethod {
 		private ValueRegistry $valueRegistry,
 	) {}
 
-	public function validate(TypeInterface $targetType, TypeInterface $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
+	public function validate(TypeInterface $targetType, TypeInterface $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
 		if ($targetType instanceof TypeType) {
 			$refType = $targetType->refType;
 			if ($refType->isSubtypeOf($this->typeRegistry->core->jsonValue)) {

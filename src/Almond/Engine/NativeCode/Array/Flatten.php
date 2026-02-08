@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Array;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -15,7 +14,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayN
 /** @extends ArrayNativeMethod<Type, NullType, NullValue> */
 final readonly class Flatten extends ArrayNativeMethod {
 
-	protected function isTargetItemTypeValid(Type $targetItemType, Expression|null $origin): bool {
+	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
 		return $targetItemType->isSubtypeOf($this->typeRegistry->array());
 	}
 

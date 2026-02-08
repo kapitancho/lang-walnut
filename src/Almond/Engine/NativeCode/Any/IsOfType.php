@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Any;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type as TypeInterface;
@@ -15,7 +14,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Value\ValueConverter;
 
 final readonly class IsOfType implements NativeMethod {
 
@@ -27,7 +25,7 @@ final readonly class IsOfType implements NativeMethod {
 
 
 	public function validate(
-		TypeInterface $targetType, TypeInterface $parameterType, Expression|null $origin
+		TypeInterface $targetType, TypeInterface $parameterType, mixed $origin
 	): ValidationSuccess|ValidationFailure {
 		if ($parameterType instanceof TypeType) {
 			return $this->validationFactory->validationSuccess($this->typeRegistry->boolean);

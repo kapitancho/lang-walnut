@@ -14,6 +14,7 @@ interface UserlandMethod extends Method {
 	public TypeName $targetType { get; }
 	public MethodName $methodName { get; }
 	public Type $parameterType { get; }
+	public Type $returnType { get; }
 
 	public function validateFunction(): ValidationSuccess|ValidationFailure;
 

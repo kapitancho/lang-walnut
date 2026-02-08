@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\Composite;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MutableType;
@@ -39,7 +38,7 @@ final readonly class SortHelper {
 		ArrayType|MapType|SetType|MutableType $returnType,
 		ArrayType|MapType|SetType $targetType,
 		Type $parameterType,
-		Expression|null $origin
+		mixed $origin
 	): ValidationSuccess|ValidationFailure {
 		$r = $this->typeRegistry;
 		$itemType = $targetType->itemType;

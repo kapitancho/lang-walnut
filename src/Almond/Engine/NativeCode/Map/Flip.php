@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -15,7 +14,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNat
 /** @extends MapNativeMethod<Type, NullType, NullValue> */
 final readonly class Flip extends MapNativeMethod {
 
-	protected function isTargetItemTypeValid(Type $targetItemType, Expression|null $origin): bool {
+	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
 		return $targetItemType->isSubtypeOf($this->typeRegistry->string());
 	}
 

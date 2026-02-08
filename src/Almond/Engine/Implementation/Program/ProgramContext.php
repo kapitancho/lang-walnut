@@ -7,6 +7,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\FunctionValueFactory as Fu
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\UserlandFunctionFactory as UserlandFunctionFactoryInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\UserlandMethodFactory as UserlandMethodFactoryInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodContext as MethodContextInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Native\NativeMethodRegistry as NativeMethodRegistryInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethodBuilder as UserlandMethodBuilderInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethodRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethodStorage as UserlandMethodStorageInterface;
@@ -62,6 +63,7 @@ final readonly class ProgramContext implements ProgramContextInterface, TypeFind
 
 	public UserlandFunctionFactoryInterface $userlandFunctionFactory;
 
+	public NativeMethodRegistryInterface $nativeMethodRegistry;
 	public UserlandMethodRegistry $userlandMethodRegistry;
 	public UserlandMethodStorageInterface $userlandMethodStorage;
 	public UserlandMethodFactoryInterface $userlandMethodFactory;
@@ -96,23 +98,24 @@ final readonly class ProgramContext implements ProgramContextInterface, TypeFind
 
 		$this->validationFactory = new ValidationFactory($this);
 
+		$this->nativeMethodRegistry = new NativeMethodRegistry(
+			new NativeCodeTypeMapper(),
+			new NativeMethodLoader(
+				$this,
+				new NamespaceConfigMap(
+					$nativeExtensionNamespaces,
+					'Walnut\Lang\Almond\Engine\NativeCode'
+				)
+			)
+		);
+
 		$this->methodContext = new MethodContext(
 			$this,
 			$this->validationFactory,
 			new MethodFinder(
 				new MethodRegistry(
 					$this,
-					new NativeMethodRegistry(
-						new NativeCodeTypeMapper(),
-						new NativeMethodLoader(
-							$this,
-							new NamespaceConfigMap(
-								$nativeExtensionNamespaces,
-								'Walnut\Lang\Almond\Engine\NativeCode'
-							)
-						)
-					),
-					$this->userlandMethodStorage
+					$this->nativeMethodRegistry,
 				)
 			),
 		);
@@ -191,7 +194,9 @@ final readonly class ProgramContext implements ProgramContextInterface, TypeFind
 				),
 				$this->userlandMethodStorage,
 				$this->validationFactory,
-				$this->variableScopeFactory
+				$this->variableScopeFactory,
+				$this->typeRegistry,
+				$this->nativeMethodRegistry
 			)
 		);
 	}

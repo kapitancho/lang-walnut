@@ -4,7 +4,6 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Real;
 
 use BcMath\Number;
 use RoundingMode;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
@@ -34,7 +33,7 @@ final readonly class AsInteger implements NativeMethod {
 		private ValueRegistry $valueRegistry,
 	) {}
 
-	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
+	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
 		//$targetType = $this->toBaseType($targetType);
 		if ($targetType instanceof IntegerSubsetType || $targetType instanceof RealSubsetType) {
 			return $this->validationFactory->validationSuccess(

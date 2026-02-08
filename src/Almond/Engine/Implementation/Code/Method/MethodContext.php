@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\Method;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Method;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodContext as MethodContextInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodFinder as MethodFinderInterface;
@@ -38,7 +37,7 @@ final class MethodContext implements MethodContextInterface {
 	}
 
 	public function validateMethod(
-		Type $targetType, MethodName $methodName, Type $parameterType, Expression|null $origin
+		Type $targetType, MethodName $methodName, Type $parameterType, mixed $origin
 	): ValidationSuccess|ValidationFailure {
 		$method = $this->methodFinder->methodForType($targetType, $methodName);
 		if ($method instanceof UnknownMethod) {
@@ -53,7 +52,7 @@ final class MethodContext implements MethodContextInterface {
 	}
 
 	public function validateCast(
-		Type $targetType, TypeName $castTypeName, Expression|null $origin
+		Type $targetType, TypeName $castTypeName, mixed $origin
 	): ValidationSuccess|ValidationFailure {
 		return $this->validateMethod(
 			$targetType,

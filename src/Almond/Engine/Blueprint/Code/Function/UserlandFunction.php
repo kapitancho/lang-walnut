@@ -22,7 +22,7 @@ interface UserlandFunction {
 	public function validateInVariableScope(VariableScope $variableScope): ValidationSuccess|ValidationFailure;
 	public function validateDependencies(DependencyContext $dependencyContext): DependencyContext;
 
-	public function validate(Type $targetType, Type $parameterType): ValidationSuccess|ValidationFailure;
+	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure;
 
 	/** @throws ExecutionException */
 	public function execute(

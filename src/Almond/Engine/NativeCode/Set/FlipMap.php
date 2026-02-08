@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Set;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
@@ -19,12 +18,12 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNat
 /** @extends SetNativeMethod<FunctionType, FunctionValue> */
 final readonly class FlipMap extends SetNativeMethod {
 
-	protected function isTargetItemTypeValid(Type $targetItemType, Expression|null $origin): bool {
+	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
 		return $targetItemType->isSubtypeOf($this->typeRegistry->string());
 	}
 
 	protected function getValidator(): callable {
-		return function(SetType $targetType, FunctionType $parameterType, Expression|null $origin): Type|ValidationFailure {
+		return function(SetType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
 			if (!$targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
 				return $this->validationFactory->error(
 					ValidationErrorType::invalidParameterType,

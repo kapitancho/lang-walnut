@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -17,7 +16,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
  */
 abstract readonly class SetNativeMethod extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, Expression|null $origin): bool {
+	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool {
 		if (!parent::isTargetTypeValid($targetType, $validator, $origin)) {
 			return false;
 		}
@@ -28,7 +27,7 @@ abstract readonly class SetNativeMethod extends NativeMethod {
 		);
 	}
 
-	protected function isTargetItemTypeValid(Type $targetItemType, Expression|null $origin): bool {
+	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
 		return true;
 	}
 

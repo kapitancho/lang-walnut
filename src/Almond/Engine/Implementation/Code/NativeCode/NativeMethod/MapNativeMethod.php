@@ -19,7 +19,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
  */
 abstract readonly class MapNativeMethod extends NativeMethod {
 
-	public function validate(Type $targetType, Type $parameterType, ?Expression $origin): ValidationSuccess|ValidationFailure {
+	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
 		$baseTargetType = $this->toBaseType($targetType);
 		if ($baseTargetType instanceof RecordType) {
 			$targetType = $baseTargetType->asMapType();
@@ -27,7 +27,7 @@ abstract readonly class MapNativeMethod extends NativeMethod {
 		return parent::validate($targetType, $parameterType, $origin);
 	}
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, Expression|null $origin): bool {
+	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool {
 		$targetType = $targetType instanceof RecordType ? $targetType->asMapType() : $targetType;
 		if (!parent::isTargetTypeValid($targetType, $validator, $origin)) {
 			return false;
@@ -39,7 +39,7 @@ abstract readonly class MapNativeMethod extends NativeMethod {
 		);
 	}
 
-	protected function isTargetItemTypeValid(Type $targetItemType, Expression|null $origin): bool {
+	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
 		return true;
 	}
 

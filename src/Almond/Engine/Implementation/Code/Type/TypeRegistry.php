@@ -36,7 +36,6 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\BytesType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\IntegerSubsetType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\IntegerType;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\IntersectionType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\MetaType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\MutableType;
