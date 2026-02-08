@@ -2,31 +2,25 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Bytes;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BooleanType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BytesType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BooleanValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BytesValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-final readonly class AsBoolean implements NativeMethod {
+/** @extends NativeMethod<BytesType, NullType, BytesValue, NullValue> */
+final readonly class AsBoolean extends NativeMethod {
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
-		return $this->validationFactory->validationSuccess(
-			$this->typeRegistry->boolean
-		);
+	protected function getValidator(): callable {
+		return fn(BytesType $targetType, NullType $parameterType): BooleanType =>
+			$this->typeRegistry->boolean;
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		return $this->valueRegistry->boolean($target->literalValue !== '');
+	protected function getExecutor(): callable {
+		return fn(BytesValue $target, NullValue $parameter): BooleanValue =>
+			$this->valueRegistry->boolean($target->literalValue !== '');
 	}
+
 }

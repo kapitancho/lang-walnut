@@ -3,31 +3,25 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\False;
 
 use BcMath\Number;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FalseType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BooleanValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-final readonly class AsInteger implements NativeMethod {
+/** @extends NativeMethod<FalseType, NullType, BooleanValue, NullValue> */
+final readonly class AsInteger extends NativeMethod {
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
-		return $this->validationFactory->validationSuccess(
-			$this->typeRegistry->integerSubset([new Number(0)])
-		);
+	protected function getValidator(): callable {
+		return fn(FalseType $targetType, NullType $parameterType): Type =>
+			$this->typeRegistry->integerSubset([new Number(0)]);
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		return $this->valueRegistry->integer(0);
+	protected function getExecutor(): callable {
+		return fn(BooleanValue $target, NullValue $parameter): IntegerValue =>
+			$this->valueRegistry->integer(0);
 	}
+
 }

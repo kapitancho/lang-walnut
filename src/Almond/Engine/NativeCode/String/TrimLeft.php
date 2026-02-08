@@ -2,27 +2,27 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\String;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\StringTrimTrimLeftTrimRight;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-final readonly class TrimLeft implements NativeMethod {
-	use StringTrimTrimLeftTrimRight;
+/** @extends NativeMethod<StringType, StringType|NullType, StringValue, StringValue|NullValue */
+final readonly class TrimLeft extends NativeMethod {
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
+	protected function getValidator(): callable {
+		return fn(StringType $targetType, StringType|NullType $parameterType): StringType =>
+		$this->typeRegistry->string(0, $targetType->range->maxLength);
+	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		return $this->executeHelper(
-			$target,
-			$parameter,
-			ltrim(...)
+	protected function getExecutor(): callable {
+		return fn(StringValue $target, StringValue|NullValue $parameter): StringValue =>
+		$this->valueRegistry->string(
+			$parameter instanceof StringValue ?
+				ltrim($target->literalValue, $parameter->literalValue) :
+				ltrim($target->literalValue)
 		);
 	}
+
 }

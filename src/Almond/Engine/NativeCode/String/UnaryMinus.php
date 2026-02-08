@@ -2,20 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\String;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\StringReverse;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonAlias\StringReverse;
 
-final readonly class UnaryMinus implements NativeMethod {
-	use StringReverse;
-	use BaseType;
-
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-}
+final readonly class UnaryMinus extends StringReverse {}

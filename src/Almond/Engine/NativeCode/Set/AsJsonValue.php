@@ -35,7 +35,7 @@ final readonly class AsJsonValue implements NativeMethod {
 
 	public function execute(Value $target, Value $parameter): Value {
 		$values = [];
-		foreacH($target->values as $value) {
+		foreach($target->values as $value) {
 			$result = $this->methodContext->executeMethod(
 				$value,
 				new MethodName('asJsonValue'),

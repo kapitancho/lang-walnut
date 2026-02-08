@@ -31,6 +31,7 @@ final readonly class NativeMethodLoader implements NativeMethodLoaderInterface {
 				$this->programContext->valueRegistry,
 				$this->programContext->methodContext,
 				$this->programContext->variableScopeFactory,
+				$this->programContext->dependencyContainer
 			);
 		}
 		return UnknownMethod::value;

@@ -16,4 +16,11 @@ final class ValuesTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[1, 2, 5.3]", $result);
 	}
 
+	public function testValuesReturnType(): void {
+		$result = $this->executeCodeSnippet("values[1; 2; 'hello'; 2];",
+			valueDeclarations: "values = ^s: Set<Integer|String<5>> => Array<Integer|String<5>> :: s->values;"
+		);
+		$this->assertEquals("[1, 2, 'hello']", $result);
+	}
+
 }

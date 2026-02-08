@@ -5,7 +5,6 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Feature\DependencyContainer;
 use SplObjectStorage;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\UserlandFunction;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodContext;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\UnknownMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AliasType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AtomType;
@@ -24,6 +23,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\MethodName;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyContainer as DependencyContainerInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyContainerErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyError as DependencyErrorInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationError as ValidationErrorInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
@@ -60,7 +60,10 @@ final class DependencyContainer implements DependencyContainerInterface {
 
 	public function valueForType(Type $type): Value|DependencyErrorInterface {
 		if ($this->visited->offsetExists($type)) {
-			return new DependencyError('circularDependency', $type);
+			return new DependencyError(
+				DependencyContainerErrorType::circularDependency,
+				$type
+			);
 		}
 		$typeStr = (string)$type;
 		$cached = $this->cache[$typeStr] ?? null;
@@ -71,7 +74,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 		$result = $this->findValueByType($type);
 		if (!($result instanceof DependencyError) && !$result->type->isSubtypeOf($type)) {
 			$result = new DependencyError(
-				'errorWhileCreatingValue',
+				DependencyContainerErrorType::errorWhileCreatingValue,
 				$type,
 				sprintf("The value %s is not a subtype of %s", $result->type, $type)
 			);
@@ -82,7 +85,6 @@ final class DependencyContainer implements DependencyContainerInterface {
 
 	}
 
-
 	private function findValueByType(Type $type): Value|DependencyError {
 		return match(true) {
 			$type instanceof AtomType => $type->value,
@@ -91,7 +93,10 @@ final class DependencyContainer implements DependencyContainerInterface {
 			$type instanceof NamedType => $this->findValueByNamedType($type),
 			$type instanceof TupleType => $this->findTupleValue($type),
 			$type instanceof RecordType => $this->findRecordValue($type),
-			default => new DependencyError('unsupportedType', $type)
+			default => new DependencyError(
+				DependencyContainerErrorType::unsupportedType,
+				$type
+			)
 		};
 	}
 
@@ -115,7 +120,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 			$foundValue = $this->valueForType($type);
 			if ($foundValue instanceof DependencyErrorInterface) {
 				return new DependencyError(
-					//UnresolvableDependency::errorWhileCreatingValue,
+					DependencyContainerErrorType::errorWhileCreatingValue,
 					$type,
 					sprintf("Error while creating value for field %d", $index)
 				);
@@ -132,7 +137,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 
 			if ($foundValue instanceof DependencyError) {
 				return new DependencyError(
-					//UnresolvableDependency::errorWhileCreatingValue,
+					DependencyContainerErrorType::errorWhileCreatingValue,
 					$field,
 					sprintf("Error while creating value for field %s", $key)
 				);
@@ -162,7 +167,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 				);
 				if ($result instanceof ErrorValue) {
 					return new DependencyError(
-						//UnresolvableDependency::errorWhileCreatingValue,
+						DependencyContainerErrorType::errorWhileCreatingValue,
 						$type,
 						sprintf("Error while creating value for %s type %s",
 							match(true) {
@@ -185,8 +190,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 
 	private function findValueByNamedType(NamedType $type): Value|DependencyErrorInterface {
 		$sType = $this->valueRegistry->type($type);
-		$dependencyContainerType = $this->typeRegistry
-			->typeByName(new TypeName('DependencyContainer'));
+		$dependencyContainerType = $this->typeRegistry->core->dependencyContainer;
 
 		$validationResult = $this->methodContext->validateCast(
 			$dependencyContainerType,
@@ -194,7 +198,14 @@ final class DependencyContainer implements DependencyContainerInterface {
 			null
 		);
 		if ($validationResult instanceof ValidationFailure) {
-			return new DependencyError('not found', $type);
+			return new DependencyError(
+				DependencyContainerErrorType::notFound,
+				$type,
+				implode("\n", array_map(
+					fn(ValidationErrorInterface $error) => $error->message,
+					$validationResult->errors
+				))
+			);
 		}
 		$result = $this->methodContext->executeCast($dependencyContainerType->value, $type->name);
 		if (
@@ -205,7 +216,10 @@ final class DependencyContainer implements DependencyContainerInterface {
 			if ($type instanceof AliasType) {
 				return $this->attemptToFindAlias($type);
 			}
-			return new DependencyError('not found', $type);
+			return new DependencyError(
+				DependencyContainerErrorType::notFound,
+				$type
+			);
 		}
 		return $result;
 	}

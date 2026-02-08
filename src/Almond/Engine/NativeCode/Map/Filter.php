@@ -23,6 +23,9 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
 
+// This methods will stay as it is, and it will not extend MapNativeMethod because it can return a RecordType
+// instead of a MapType if the target type is a RecordType. In that case, the return type will be a RecordType
+// with the same keys as the target type and the item type as the value type.
 final readonly class Filter implements NativeMethod {
 	use BaseType;
 

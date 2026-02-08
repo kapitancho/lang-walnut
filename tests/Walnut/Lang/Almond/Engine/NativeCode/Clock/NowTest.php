@@ -25,9 +25,7 @@ final class NowTest extends CodeExecutionTestHelper {
 	public function testNowWithWrongTargetType(): void {
 		$this->executeErrorCodeSnippet(
 			"Method 'Now' is not defined for type 'String['not a clock']'.",
-			"'not a clock'->Now;",
-			typeDeclarations: "",
-			valueDeclarations: ""
+			"'not a clock'->Now;"
 		);
 	}
 

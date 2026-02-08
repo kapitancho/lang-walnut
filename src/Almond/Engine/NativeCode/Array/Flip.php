@@ -3,58 +3,36 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\Array;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
-final readonly class Flip implements NativeMethod {
-	use BaseType;
+/** @extends ArrayNativeMethod<Type, NullType, NullValue> */
+final readonly class Flip extends ArrayNativeMethod {
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
-		$targetType = $this->toBaseType($targetType);
-		$targetType = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
-		if ($targetType instanceof ArrayType) {
-			$itemType = $targetType->itemType;
-			if ($itemType->isSubtypeOf($this->typeRegistry->string())) {
-				return $this->validationFactory->validationSuccess(
-					$this->typeRegistry->map(
-						$this->typeRegistry->integer(0, $targetType->range->maxLength),
-						min(1, $targetType->range->minLength),
-						$targetType->range->maxLength,
-						$itemType
-					)
-				);
-			}
-		}
-		// @codeCoverageIgnoreStart
-		return $this->validationFactory->error(
-			ValidationErrorType::invalidTargetType,
-			sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-			origin: $origin
-		);
-		// @codeCoverageIgnoreEnd
+	protected function isTargetItemTypeValid(Type $targetItemType, Expression|null $origin): bool {
+		return $targetItemType->isSubtypeOf($this->typeRegistry->string());
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		if ($target instanceof TupleValue) {
+	protected function getValidator(): callable {
+		return fn(ArrayType $targetType, NullType $parameterType): MapType =>
+			$this->typeRegistry->map(
+				$this->typeRegistry->integer(0, $targetType->range->maxLength),
+				min(1, $targetType->range->minLength),
+				$targetType->range->maxLength,
+				$targetType->itemType
+			);
+	}
+
+	protected function getExecutor(): callable {
+		return function(TupleValue $target, NullValue $parameter): RecordValue {
 			$rawValues = [];
 			foreach ($target->values as $value) {
 				if ($value instanceof StringValue) {
@@ -70,9 +48,7 @@ final readonly class Flip implements NativeMethod {
 				fn($value) => $this->valueRegistry->integer($value),
 				$rawValues
 			));
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid target value");
-		// @codeCoverageIgnoreEnd
+		};
 	}
+
 }

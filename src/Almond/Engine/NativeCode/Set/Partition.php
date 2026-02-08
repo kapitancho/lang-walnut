@@ -3,78 +3,54 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\Set;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNativeMethod;
 
-final readonly class Partition implements NativeMethod {
-	use BaseType;
+/** @extends SetNativeMethod<FunctionType, FunctionValue> */
+final readonly class Partition extends SetNativeMethod {
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
-		$type = $this->toBaseType($targetType);
-		if ($type instanceof SetType) {
-			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf($this->typeRegistry->boolean)) {
-				if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
-					$partitionType = $this->typeRegistry->set($type->itemType, 0, $type->range->maxLength);
-					return $this->validationFactory->validationSuccess(
-						$this->typeRegistry->record([
-							'matching' => $partitionType,
-							'notMatching' => $partitionType
-						], null)
-					);
-				}
+	protected function getValidator(): callable {
+		return function(SetType $targetType, FunctionType $parameterType, Expression|null $origin): Type|ValidationFailure {
+			if (!$parameterType->returnType->isSubtypeOf($this->typeRegistry->boolean)) {
+				return $this->validationFactory->error(
+					ValidationErrorType::invalidParameterType,
+					sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+					$origin
+				);
+			}
+			if (!$targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
 				return $this->validationFactory->error(
 					ValidationErrorType::invalidParameterType,
 					sprintf(
 						"The parameter type %s of the callback function is not a subtype of %s",
-						$type->itemType,
+						$targetType->itemType,
 						$parameterType->parameterType
 					),
-					origin: $origin
+					$origin
 				);
 			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				origin: $origin
-			);
-		}
-		// @codeCoverageIgnoreStart
-		return $this->validationFactory->error(
-			ValidationErrorType::invalidTargetType,
-			sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-			origin: $origin
-		);
-		// @codeCoverageIgnoreEnd
+			$partitionType = $this->typeRegistry->set($targetType->itemType, 0, $targetType->range->maxLength);
+			return $this->typeRegistry->record([
+				'matching' => $partitionType,
+				'notMatching' => $partitionType
+			], null);
+		};
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		if ($target instanceof SetValue && $parameter instanceof FunctionValue) {
-			$values = $target->values;
+	protected function getExecutor(): callable {
+		return function(SetValue $target, FunctionValue $parameter): Value {
 			$matching = [];
 			$notMatching = [];
 			$true = $this->valueRegistry->true;
 
-			foreach($values as $value) {
+			foreach ($target->values as $value) {
 				$r = $parameter->execute($value);
 				if ($true->equals($r)) {
 					$matching[] = $value;
@@ -87,9 +63,7 @@ final readonly class Partition implements NativeMethod {
 				'matching' => $this->valueRegistry->set($matching),
 				'notMatching' => $this->valueRegistry->set($notMatching)
 			]);
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid parameter value");
-		// @codeCoverageIgnoreEnd
+		};
 	}
+
 }

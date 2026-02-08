@@ -17,6 +17,6 @@ final class AppendWithTest extends CodeExecutionTestHelper {
 	}
 
 	public function testAppendWithInvalidType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "[1, 2]->appendWith(3);");
+		$this->executeErrorCodeSnippet('Invalid parameter type', "[1, 2]->appendWith(3);");
 	}
 }

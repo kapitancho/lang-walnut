@@ -2,40 +2,25 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Bytes;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BooleanType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BytesType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BooleanValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BytesValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\TargetBytesParameterBytesReturnBoolean;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-final readonly class Contains implements NativeMethod {
-	use TargetBytesParameterBytesReturnBoolean;
+/** @extends NativeMethod<BytesType, BytesType, BytesValue, BytesValue> */
+final readonly class Contains extends NativeMethod {
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function execute(Value $target, Value $parameter): Value {
-		if ($target instanceof BytesValue) {
-			if ($parameter instanceof BytesValue) {
-				return $this->valueRegistry->boolean(
-					str_contains(
-						$target->literalValue,
-						$parameter->literalValue
-					)
-				);
-			}
-			// @codeCoverageIgnoreStart
-			throw new ExecutionException("Invalid parameter value");
-			// @codeCoverageIgnoreEnd
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid target value");
-		// @codeCoverageIgnoreEnd
+	protected function getValidator(): callable {
+		return fn(BytesType $targetType, BytesType $parameterType): BooleanType =>
+			$this->typeRegistry->boolean;
 	}
+
+	protected function getExecutor(): callable {
+		return fn(BytesValue $target, BytesValue $parameter): BooleanValue =>
+			$this->valueRegistry->boolean(
+				str_contains($target->literalValue, $parameter->literalValue)
+			);
+	}
+
 }

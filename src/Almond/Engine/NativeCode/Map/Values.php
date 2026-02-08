@@ -17,18 +17,12 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonAlias\MapValues;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
 
-final readonly class Values implements NativeMethod {
-	use BaseType;
+final readonly class Values extends MapValues {
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
+	public function validateX(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
 		$targetType = $this->toBaseType($targetType);
 		$checkTypes = $targetType instanceof IntersectionType
 			? $targetType->types
@@ -55,12 +49,4 @@ final readonly class Values implements NativeMethod {
 		// @codeCoverageIgnoreEnd
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		if ($target instanceof RecordValue) {
-			return $this->valueRegistry->tuple(array_values($target->values));
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid target value");
-		// @codeCoverageIgnoreEnd
-	}
 }

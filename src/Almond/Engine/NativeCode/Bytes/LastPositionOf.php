@@ -2,28 +2,36 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Bytes;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\BytesPositionOfLastPositionOf;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BytesType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BytesValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-final readonly class LastPositionOf implements NativeMethod {
-	use BytesPositionOfLastPositionOf;
+/** @extends NativeMethod<BytesType, BytesType, BytesValue, BytesValue> */
+final readonly class LastPositionOf extends NativeMethod {
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
+	protected function getValidator(): callable {
+		return fn(BytesType $targetType, BytesType $parameterType): ResultType =>
+			$this->typeRegistry->result(
+				$this->typeRegistry->integer(0,
+					$targetType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
+					$targetType->range->maxLength - $parameterType->range->minLength
+				),
+				$this->typeRegistry->core->sliceNotInBytes
+			);
+	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		return $this->executeHelper(
-			$target,
-			$parameter,
-			strrpos(...)
-		);
+	protected function getExecutor(): callable {
+		return function(BytesValue $target, BytesValue $parameter): IntegerValue|ErrorValue {
+			$result = strrpos($target->literalValue, $parameter->literalValue);
+			return $result === false ?
+				$this->valueRegistry->error(
+					$this->valueRegistry->core->sliceNotInBytes
+				) : $this->valueRegistry->integer($result);
+		};
 	}
 
 }

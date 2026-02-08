@@ -16,6 +16,14 @@ final class PadRightTest extends CodeExecutionTestHelper {
 		$this->assertEquals("'hello'", $result);
 	}
 
+	public function testPadRightReturnType(): void {
+		$result = $this->executeCodeSnippet("pad[str: 'hello', len: 10];",
+			valueDeclarations: "pad = ^[str: String<4..8>, len: Integer<2..12>] => String<4..12> :: 
+				#str->padRight[length: #len, padString: '-+'];"
+		);
+		$this->assertEquals("'hello-+-+-'", $result);
+	}
+
 	public function testPadRightInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet('Invalid parameter type', "'hello'->padRight(5);");
 	}

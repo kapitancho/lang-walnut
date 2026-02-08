@@ -2,28 +2,12 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\String;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\StringPadLeftPadRight;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\StringPad;
 
-final readonly class PadRight implements NativeMethod {
-	use StringPadLeftPadRight;
+final readonly class PadRight extends StringPad {
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function execute(Value $target, Value $parameter): Value {
-		return $this->executeHelper(
-			$target,
-			$parameter,
-			STR_PAD_RIGHT
-		);
+	protected function getPadType(): int {
+		return STR_PAD_RIGHT;
 	}
 
 }

@@ -26,6 +26,15 @@ final class AsRealTest extends CodeExecutionTestHelper {
 		$this->assertEquals("-3.77", $result);
 	}
 
+	public function testAsRealOtherType(): void {
+		$result = $this->executeCodeSnippet(
+			"r(mutable{MyType, MyType(-3.77)});",
+			"MyType := #Real; MyType ==> Real :: $$;",
+			"r = ^v: Mutable<MyType> => Real :: v->asReal;"
+		);
+		$this->assertEquals("-3.77", $result);
+	}
+
 	public function testAsRealInvalidTargetType(): void {
 		$this->executeErrorCodeSnippet('Invalid target type', "mutable{Set, [;]}->asReal;");
 	}

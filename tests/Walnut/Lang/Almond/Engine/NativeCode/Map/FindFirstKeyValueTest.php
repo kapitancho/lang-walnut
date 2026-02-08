@@ -20,10 +20,10 @@ final class FindFirstKeyValueTest extends CodeExecutionTestHelper {
 	public function testFindFirstKeyValueKeyType(): void {
 		$result = $this->executeCodeSnippet(
 			"fn[a: 1, b: 2];",
-			valueDeclarations: "fn = ^m: Map<String<1>:Integer> => Map<String<1>:Integer> :: 
-				m->filterKeyValue(^[key: String<1>, value: Integer] => Boolean :: #value > #key->length);"
+			valueDeclarations: "fn = ^m: Map<String<1>:Integer> => Result<[key: String<1>, value: Integer], ItemNotFound> :: 
+				m->findFirstKeyValue(^[key: String<1>, value: Integer] => Boolean :: #value > #key->length);"
 		);
-		$this->assertEquals("[b: 2]", $result);
+		$this->assertEquals("[key: 'b', value: 2]", $result);
 	}
 
 	public function testFindFirstKeyValueInvalidParameterType(): void {
@@ -31,7 +31,7 @@ final class FindFirstKeyValueTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFindFirstKeyValueInvalidParameterParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("The parameter type Boolean of the callback function is not a subtype",
 			"[a: 1, b: 'a']->findFirstKeyValue(^Boolean => Boolean :: true);");
 	}
 

@@ -3,31 +3,25 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\Boolean;
 
 use BcMath\Number;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BooleanType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BooleanValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-final readonly class AsReal implements NativeMethod {
+/** @extends NativeMethod<BooleanType, NullType, BooleanValue, NullValue> */
+final readonly class AsReal extends NativeMethod {
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
-		return $this->validationFactory->validationSuccess(
-			$this->typeRegistry->realSubset([new Number(0), new Number(1)])
-		);
+	protected function getValidator(): callable {
+		return fn(BooleanType $targetType, NullType $parameterType): Type =>
+			$this->typeRegistry->realSubset([new Number(0), new Number(1)]);
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		return $this->valueRegistry->real($target->literalValue ? 1 : 0);
+	protected function getExecutor(): callable {
+		return fn(BooleanValue $target, NullValue $parameter): RealValue =>
+			$this->valueRegistry->real($target->literalValue ? 1 : 0);
 	}
+
 }

@@ -3,73 +3,51 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\ResultType;
 
-final readonly class FindFirst implements NativeMethod {
-	use BaseType;
+/** @extends MapNativeMethod<AnyType, FunctionType, FunctionValue> */
+final readonly class FindFirst extends MapNativeMethod {
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
+	protected function isParameterTypeValid(Type $parameterType, callable $validator): bool {
+		if (!parent::isParameterTypeValid($parameterType, $validator)) {
+			return false;
+		}
+		/** @var FunctionType $parameterType */
+		return $parameterType->returnType->isSubtypeOf($this->typeRegistry->boolean);
+	}
 
-	public function validate(Type $targetType, Type $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
-		$targetType = $this->toBaseType($targetType);
-		$type = $targetType instanceof RecordType ? $targetType->asMapType() : $targetType;
-		if ($type instanceof MapType) {
-			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf($this->typeRegistry->boolean)) {
-				if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
-					return $this->validationFactory->validationSuccess(
-						$this->typeRegistry->result(
-							$type->itemType,
-							$this->typeRegistry->core->itemNotFound
-						)
-					);
-				}
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf(
-						"The parameter type %s of the callback function is not a subtype of %s",
-						$type->itemType,
-						$parameterType->parameterType
-					),
-					origin: $origin
+	protected function getValidator(): callable {
+		return function(MapType $targetType, FunctionType $parameterType, Expression|null $origin): ResultType|ValidationFailure {
+			if ($targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
+				return $this->typeRegistry->result(
+					$targetType->itemType,
+					$this->typeRegistry->core->itemNotFound
 				);
 			}
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+				sprintf(
+					"The parameter type %s of the callback function is not a subtype of %s",
+					$targetType->itemType,
+					$parameterType->parameterType
+				),
 				origin: $origin
 			);
-		}
-		// @codeCoverageIgnoreStart
-		return $this->validationFactory->error(
-			ValidationErrorType::invalidTargetType,
-			sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-			origin: $origin
-		);
-		// @codeCoverageIgnoreEnd
+		};
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		if ($target instanceof RecordValue && $parameter instanceof FunctionValue) {
+	protected function getExecutor(): callable {
+		return function(RecordValue $target, FunctionValue $parameter): Value {
 			$true = $this->valueRegistry->true;
 			foreach($target->values as $value) {
 				$r = $parameter->execute($value);
@@ -80,9 +58,7 @@ final readonly class FindFirst implements NativeMethod {
 			return $this->valueRegistry->error(
 				$this->valueRegistry->core->itemNotFound
 			);
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid target value");
-		// @codeCoverageIgnoreEnd
+		};
 	}
+
 }

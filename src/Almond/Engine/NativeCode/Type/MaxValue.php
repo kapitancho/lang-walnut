@@ -3,78 +3,51 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\Type;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type as TypeInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNativeMethod;
 
-final readonly class MaxValue implements NativeMethod {
+/** @extends TypeNativeMethod<RealType|IntegerType, NullType, NullValue> */
+final readonly class MaxValue extends TypeNativeMethod {
 
-	use BaseType;
-
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function validate(TypeInterface $targetType, TypeInterface $parameterType, Expression|null $origin): ValidationSuccess|ValidationFailure {
-		if ($targetType instanceof TypeType) {
+	protected function getValidator(): callable {
+		return function(TypeType $targetType, NullType $parameterType): Type {
+			/** @var RealType|IntegerType $refType */
 			$refType = $this->toBaseType($targetType->refType);
-			if ($refType instanceof IntegerType) {
-				return $this->validationFactory->validationSuccess(
-					$this->typeRegistry->union([
-						$this->typeRegistry->integer(),
-						$this->typeRegistry->core->plusInfinity
-					])
-				);
-			}
-			if ($refType instanceof RealType) {
-				return $this->validationFactory->validationSuccess(
-					$this->typeRegistry->union([
-						$this->typeRegistry->real(),
-						$this->typeRegistry->core->plusInfinity
-					])
-				);
-			}
-		}
-		// @codeCoverageIgnoreStart
-		return $this->validationFactory->error(
-			ValidationErrorType::invalidTargetType,
-			sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-			origin: $origin
-		);
-		// @codeCoverageIgnoreEnd
+			return $this->typeRegistry->union([
+				$refType instanceof IntegerType ?
+					$this->typeRegistry->integer() :
+					$this->typeRegistry->real(),
+				$this->typeRegistry->core->plusInfinity
+			]);
+		};
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		if ($target instanceof TypeValue) {
+	protected function getExecutor(): callable {
+		return function(TypeValue $target, NullValue $parameter): Value {
+			/** @var RealType|IntegerType $typeValue */
 			$typeValue = $this->toBaseType($target->typeValue);
 			if ($typeValue instanceof IntegerType) {
 				return $typeValue->numberRange->max === PlusInfinity::value ?
 					$this->valueRegistry->core->plusInfinity :
 					$this->valueRegistry->integer($typeValue->numberRange->max->value);
-			}
-			if ($typeValue instanceof RealType) {
+			} else {
 				return $typeValue->numberRange->max === PlusInfinity::value ?
 					$this->valueRegistry->core->plusInfinity :
 					$this->valueRegistry->real($typeValue->numberRange->max->value);
 			}
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid parameter value");
-		// @codeCoverageIgnoreEnd
+		};
 	}
+
+	protected function isTargetRefTypeValid(Type $targetRefType, Expression|null $origin): bool {
+		return $targetRefType instanceof IntegerType || $targetRefType instanceof RealType;
+	}
+
 }

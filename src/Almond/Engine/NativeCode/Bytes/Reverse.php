@@ -2,18 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Bytes;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\BytesReverse;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonAlias\BytesReverse;
 
-final readonly class Reverse implements NativeMethod {
-	use BytesReverse;
-
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-}
+final readonly class Reverse extends BytesReverse {}
