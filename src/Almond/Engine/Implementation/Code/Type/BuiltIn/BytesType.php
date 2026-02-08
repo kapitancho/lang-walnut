@@ -6,6 +6,7 @@ use JsonSerializable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BytesType as BytesTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\SupertypeChecker;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\LengthRange;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\Hydrator\HydrationFailure;
@@ -19,8 +20,29 @@ final readonly class BytesType implements BytesTypeInterface, JsonSerializable {
 	public function __construct(public LengthRange $range) {}
 
 	public function hydrate(HydrationRequest $request): HydrationSuccess|HydrationFailure {
-		return $request->namedTypeHydrator->tryHydrateByName($this, $request) ??
-			$request->withError('Cannot hydrate Bytes type directly', $this);
+		if ($request->value instanceof StringValue) {
+			$l = strlen($request->value->literalValue);
+			if ($this->range->minLength <= $l && (
+				$this->range->maxLength === PlusInfinity::value ||
+				$this->range->maxLength >= $l
+			)) {
+				return $request->ok($request->valueRegistry->bytes($request->value->literalValue));
+			}
+			return $request->withError(
+				sprintf("The string value should be with a raw length between %s and %s",
+					$this->range->minLength,
+					$this->range->maxLength === PlusInfinity::value ? "+Infinity" : $this->range->maxLength,
+				),
+				$this
+			);
+		}
+		return $request->withError(
+			sprintf("The value should be a string with a raw length between %s and %s",
+				$this->range->minLength,
+				$this->range->maxLength === PlusInfinity::value ? "+Infinity" : $this->range->maxLength,
+			),
+			$this
+		);
 	}
 
 	public function isSubtypeOf(Type $ofType): bool {

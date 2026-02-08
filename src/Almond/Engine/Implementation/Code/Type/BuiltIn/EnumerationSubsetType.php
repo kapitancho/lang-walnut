@@ -52,7 +52,21 @@ final readonly class EnumerationSubsetType implements EnumerationSubsetTypeInter
     }
 
 	public function hydrate(HydrationRequest $request): HydrationSuccess|HydrationFailure {
-		return $request->ok($request->value);
+		$result = $this->enumeration->hydrate($request);
+		if ($result instanceof HydrationFailure) {
+			return $result;
+		}
+		if (!in_array($result->hydratedValue, $this->subsetValues)) {
+			return $request->withError(
+				sprintf(
+					"Value %s is not part of the subset %s.",
+					$result->hydratedValue,
+					$this
+				),
+				$this,
+			);
+		}
+		return $result;
 	}
 
 	public function isSubtypeOf(Type $ofType): bool {

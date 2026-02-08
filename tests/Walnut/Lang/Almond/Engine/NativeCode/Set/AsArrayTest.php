@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Almond\Engine\NativeCode\Set;
+namespace Walnut\Lang\Test\Almond\Engine\NativeCode\Set;
 
 use Walnut\Lang\Test\Almond\Engine\CodeExecutionTestHelper;
 

@@ -7,6 +7,7 @@ use JsonSerializable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType as RealTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\SupertypeChecker;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberRange;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\Hydrator\HydrationFailure;
@@ -22,7 +23,7 @@ final readonly class RealType implements RealTypeInterface, JsonSerializable {
 
 	public function hydrate(HydrationRequest $request): HydrationSuccess|HydrationFailure {
 		$value = $request->value;
-		if ($value instanceof RealValue) {
+		if ($value instanceof RealValue || $value instanceof IntegerValue) {
 			if ($this->contains($value->literalValue)) {
 				return $request->ok($value);
 			}

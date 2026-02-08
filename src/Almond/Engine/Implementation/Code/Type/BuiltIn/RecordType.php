@@ -36,6 +36,7 @@ final readonly class RecordType implements RecordTypeInterface, JsonSerializable
 		if ($value instanceof RecordValue) {
 			$usedKeys = [];
 			foreach($this->types as $key => $refType) {
+				$usedKeys[$key] = true;
 				$itemRequest = $request->withAddedPathSegment(".$key");
 
 				$isOptional = $refType instanceof OptionalKeyType;
@@ -71,12 +72,13 @@ final readonly class RecordType implements RecordTypeInterface, JsonSerializable
 					$itemResult = $this->restType->hydrate(
 						$itemRequest->forValue($val)
 					);
-					$result[$key] = $itemResult;
 					if ($itemResult instanceof HydrationFailure) {
 						$failure = ($failure ?? $request->withError(
 							"One or more items in the record failed to hydrate",
 							$this,
 						))->mergeFailure($itemResult);
+					} else {
+						$result[$key] = $itemResult->hydratedValue;
 					}
 				}
 			}

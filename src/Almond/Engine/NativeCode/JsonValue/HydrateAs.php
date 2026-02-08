@@ -8,6 +8,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type as TypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
@@ -38,8 +39,7 @@ final readonly class HydrateAs implements NativeMethod {
 			return $this->validationFactory->validationSuccess(
 				$this->typeRegistry->result(
 					$parameterType->refType,
-					//TODO: hydration error instead
-					$this->typeRegistry->string()
+					$this->typeRegistry->core->hydrationError
 				)
 			);
 		}
@@ -53,6 +53,7 @@ final readonly class HydrateAs implements NativeMethod {
 	public function execute(Value $target, Value $parameter): Value {
 		if ($parameter instanceof TypeValue) {
 			$hydrationRequest = new HydrationFactory(
+				$this->typeRegistry,
 				$this->valueRegistry,
 				new NamedTypeHydrator(
 					$this->methodContext
@@ -65,17 +66,22 @@ final readonly class HydrateAs implements NativeMethod {
 			if ($result instanceof HydrationSuccess) {
 				return $result->hydratedValue;
 			}
-			//TODO : hydration error
-			return $this->valueRegistry->string(
-				implode(' / ', array_map(
-					fn (HydrationError $error) => sprintf(
-						"%s (%s): %s",
-						$error->path,
-						$error->targetType,
-						$error->message,
-					),
-					$result->errors
-				))
+			return $this->valueRegistry->error(
+				$this->valueRegistry->core->hydrationError(
+					$this->valueRegistry->record([
+						'value' => $target,
+						'errors' => $this->valueRegistry->tuple(
+							array_map(
+								fn(HydrationError $error): RecordValue => $this->valueRegistry->record([
+									'hydrationPath' => $this->valueRegistry->string($error->path),
+									'errorMessage' => $this->valueRegistry->string($error->message),
+									'targetType' => $this->valueRegistry->type($error->targetType),
+								]),
+								$result->errors
+							)
+						)
+					])
+				)
 			);
 		}
 		// @codeCoverageIgnoreStart

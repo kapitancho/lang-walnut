@@ -13,7 +13,7 @@ final class UnknownEnumerationValue extends EngineException {
 	) {
 		parent::__construct(
 			sprintf(
-				'The enumeration type "%s" does not contain a value with the name "%s", ' .
+				'The enumeration type "%s" does not contain a value with the name "%s", ',
 				$enumerationType->name,
 				$valueName
 			)

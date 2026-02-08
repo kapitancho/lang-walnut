@@ -36,7 +36,7 @@ final readonly class MetaType implements MetaTypeInterface, SupertypeChecker, Js
 
 	public function hydrate(HydrationRequest $request): HydrationSuccess|HydrationFailure {
 		return $request->withError(
-			sprintf("Values of cannot be hydrated to type %s.", $this->value->value),
+			sprintf("Values cannot be hydrated to type %s.", $this->value->value),
 			$this
 		);
 	}

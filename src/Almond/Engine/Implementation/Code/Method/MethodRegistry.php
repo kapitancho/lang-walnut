@@ -28,6 +28,19 @@ final readonly class MethodRegistry implements MethodRegistryInterface {
 		if ($methodName->identifier === 'as') {
 			$methodName = new MethodName('castAs');
 		}
+
+		$userlandMethods = $this->userlandMethodRegistry->methodsByName($methodName);
+		foreach(array_reverse($userlandMethods) as $userlandMethod) {
+			$typeByName = $this->typeFinder->typeByName($userlandMethod->targetType);
+			if ($type->isSubtypeOf($typeByName)) {
+				return $userlandMethod;
+			}
+		}
+		$nativeMethods = $this->nativeMethodRegistry->nativeMethods($type, $methodName);
+		if (count($nativeMethods) > 0) {
+			return array_first($nativeMethods);
+		}
+
 		$baseType = $this->toBaseType($type);
 		if ($baseType instanceof IntersectionType) {
 			$methods = [];
@@ -73,22 +86,15 @@ final readonly class MethodRegistry implements MethodRegistryInterface {
 				}
 			}
 			if (count($methods) > 0) {
+				echo "Found union method call for method '$methodName' on type '$type':\n";
+				foreach($methods as $method) {
+					echo "- " . $method[0] . " => " . ($method[1] instanceof NativeMethod ? $method[1]::class : (string)$method[0]) . "\n";
+				}
 				//TODO
 				return new UnionMethodCall(null, null, $methods);
 			}
 		}
 
-		$userlandMethods = $this->userlandMethodRegistry->methodsByName($methodName);
-		foreach(array_reverse($userlandMethods) as $userlandMethod) {
-			$typeByName = $this->typeFinder->typeByName($userlandMethod->targetType);
-			if ($type->isSubtypeOf($typeByName)) {
-				return $userlandMethod;
-			}
-		}
-		$nativeMethods = $this->nativeMethodRegistry->nativeMethods($type, $methodName);
-		if (count($nativeMethods) > 0) {
-			return array_first($nativeMethods);
-		}
 		return UnknownMethod::value;
 	}
 }

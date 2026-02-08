@@ -90,7 +90,7 @@ InvocationError := [functionType: Type, parameterType: Type];
 UnknownEnumerationValue := [enumeration: Type, value: String];
 
 /* hydration */
-HydrationError := [value: Any, hydrationPath: String, errorMessage: String];
+HydrationError := [value: Any, errors: Array<[hydrationPath: String, errorMessage: String, targetType: Type]>];
 /*HydrationError->errorMessage(=> String) :: [$hydrationPath, $errorMessage]->format('Error in {0}: {1}');*/
 
 /* IO etc. */
