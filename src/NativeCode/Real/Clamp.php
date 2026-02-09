@@ -2,50 +2,35 @@
 
 namespace Walnut\Lang\NativeCode\Real;
 
-use Walnut\Lang\Blueprint\Code\Analyser\AnalyserException;
-use Walnut\Lang\Blueprint\Code\Execution\ExecutionException;
-use Walnut\Lang\Blueprint\Function\NativeMethod;
-use Walnut\Lang\Blueprint\Program\Registry\MethodAnalyser;
-use Walnut\Lang\Blueprint\Program\Registry\ProgramRegistry;
-use Walnut\Lang\Blueprint\Program\Registry\TypeRegistry;
-use Walnut\Lang\Blueprint\Type\IntegerType;
-use Walnut\Lang\Blueprint\Type\RealType;
-use Walnut\Lang\Blueprint\Type\Type;
-use Walnut\Lang\Blueprint\Value\IntegerValue;
-use Walnut\Lang\Blueprint\Value\RealValue;
-use Walnut\Lang\Blueprint\Value\RecordValue;
-use Walnut\Lang\Blueprint\Value\Value;
-use Walnut\Lang\Implementation\Code\NativeCode\Analyser\Numeric\Clamp as ClampTrait;
 
-final readonly class Clamp implements NativeMethod {
-	use ClampTrait;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\NumericClamp;
 
-	public function analyse(
-		TypeRegistry $typeRegistry,
-		MethodAnalyser $methodAnalyser,
-		Type $targetType,
-		Type $parameterType,
-	): Type {
-		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof IntegerType || $targetType instanceof RealType) {
-			return $this->analyseHelper($typeRegistry, $targetType, $parameterType);
-		}
-		// @codeCoverageIgnoreStart
-		throw new AnalyserException(sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType));
-		// @codeCoverageIgnoreEnd
+/** @extends NumericClamp<IntegerType|RealType, IntegerValue> */
+final readonly class Clamp extends NumericClamp {
+
+	protected function getValidator(): callable {
+		return fn(
+			IntegerType|RealType $targetType,
+			RecordType $parameterType,
+			mixed $origin
+		): IntegerType|RealType|ResultType =>
+		$this->doValidate($targetType, $parameterType);
 	}
 
-	public function execute(
-		ProgramRegistry $programRegistry,
-		Value $target,
-		Value $parameter
-	): Value {
-		if (($target instanceof IntegerValue || $target instanceof RealValue) && $parameter instanceof RecordValue) {
-			return $this->executeHelper($programRegistry, $target, $parameter);
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid target or parameter value");
-		// @codeCoverageIgnoreEnd
+	protected function getExecutor(): callable {
+		return fn(
+			IntegerValue|RealValue $target,
+			RecordValue $parameter
+		): IntegerValue|RealValue|ErrorValue =>
+		$this->doDivide($target, $parameter);
 	}
 
 }

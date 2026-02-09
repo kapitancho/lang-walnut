@@ -21,6 +21,27 @@ final class AsBooleanTest extends CodeExecutionTestHelper {
 		$this->assertEquals("true", $result);
 	}
 
+	public function testAsBooleanType(): void {
+		$result = $this->executeCodeSnippet("bool[1, 'hello'];",
+			valueDeclarations: 'bool = ^a: Array => Boolean :: a->as(`Boolean);'
+		);
+		$this->assertEquals("true", $result);
+	}
+
+	public function testAsBooleanTypeEmpty(): void {
+		$result = $this->executeCodeSnippet("bool[];",
+			valueDeclarations: 'bool = ^a: Array<0> => False :: a->as(`Boolean);'
+		);
+		$this->assertEquals("false", $result);
+	}
+
+	public function testAsBooleanTypeNotEmpty(): void {
+		$result = $this->executeCodeSnippet("bool[1, 'hello'];",
+			valueDeclarations: 'bool = ^a: Array<1..> => True :: a->as(`Boolean);'
+		);
+		$this->assertEquals("true", $result);
+	}
+
 	public function testAsBooleanInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet('Invalid parameter type', "[1, 2]->asBoolean(5);");
 	}

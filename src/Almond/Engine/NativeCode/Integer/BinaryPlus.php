@@ -2,86 +2,45 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Integer;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NumericRangeHelper;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
 
-final readonly class BinaryPlus implements NativeMethod {
-	use BaseType, NumericRangeHelper;
+/** @extends NativeMethod<IntegerType, IntegerType|RealType, IntegerValue, IntegerValue|RealValue> */
+final readonly class BinaryPlus extends NativeMethod {
+	use NumericRangeHelper;
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
-		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof IntegerType) {
-			$parameterType = $this->toBaseType($parameterType);
-
-			if ($parameterType instanceof IntegerType || $parameterType instanceof RealType) {
-				$fixType = $this->getPlusFixType($targetType, $parameterType);
-				if ($fixType !== null) {
-					return $this->validationFactory->validationSuccess($fixType);
-				}
-				$subsetType = $this->getPlusSubsetType(
-					$targetType, $parameterType
-				);
-				if ($subsetType !== null) {
-					return $this->validationFactory->validationSuccess($subsetType);
-				}
-				$interval = $this->getPlusRange($targetType, $parameterType);
-				return $this->validationFactory->validationSuccess(
-					$parameterType instanceof IntegerType ?
-						$this->typeRegistry->integerFull($interval) :
-						$this->typeRegistry->realFull($interval)
-				);
+	protected function getValidator(): callable {
+		return function(IntegerType $targetType, IntegerType|RealType $parameterType, mixed $origin): IntegerType|RealType {
+			$fixType = $this->getPlusFixType($targetType, $parameterType);
+			if ($fixType !== null) {
+				return $fixType;
 			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				origin: $origin
+			$subsetType = $this->getPlusSubsetType(
+				$targetType, $parameterType
 			);
-		}
-		return $this->validationFactory->error(
-			ValidationErrorType::invalidTargetType,
-			sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-			origin: $origin
-		);
+			if ($subsetType !== null) {
+				return $subsetType;
+			}
+			$interval = $this->getPlusRange($targetType, $parameterType);
+			return $parameterType instanceof IntegerType ?
+					$this->typeRegistry->integerFull($interval) :
+					$this->typeRegistry->realFull($interval);
+		};
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		if ($target instanceof IntegerValue) {
-			if ($parameter instanceof IntegerValue) {
-				return $this->valueRegistry->integer(
+	protected function getExecutor(): callable {
+		return fn(IntegerValue $target, IntegerValue|RealValue $parameter): IntegerValue|RealValue =>
+			$parameter instanceof IntegerValue ?
+				$this->valueRegistry->integer(
+					$target->literalValue + $parameter->literalValue
+				) :
+				$this->valueRegistry->real(
 					$target->literalValue + $parameter->literalValue
 				);
-			}
-			if ($parameter instanceof RealValue) {
-				return $this->valueRegistry->real(
-					$target->literalValue + $parameter->literalValue
-				);
-			}
-			// @codeCoverageIgnoreStart
-			throw new ExecutionException("Invalid parameter value");
-			// @codeCoverageIgnoreEnd
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid target value");
-		// @codeCoverageIgnoreEnd
 	}
+
 }

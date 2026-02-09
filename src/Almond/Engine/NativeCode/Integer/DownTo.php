@@ -2,71 +2,31 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Integer;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NumericRangeHelper;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
 
-final readonly class DownTo implements NativeMethod {
-	use BaseType, NumericRangeHelper;
+/** @extends NativeMethod<IntegerType, IntegerType, IntegerValue, IntegerValue> */
+final readonly class DownTo extends NativeMethod {
+	use NumericRangeHelper;
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
-		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof IntegerType) {
-			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof IntegerType) {
-				return $this->validationFactory->validationSuccess(
-					$this->getFromToAsArray($targetType->numberRange, $parameterType->numberRange)
-				);
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				origin: $origin
-			);
-		}
-		// @codeCoverageIgnoreStart
-		return $this->validationFactory->error(
-			ValidationErrorType::invalidTargetType,
-			sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-			origin: $origin
-		);
-		// @codeCoverageIgnoreEnd
+	protected function getValidator(): callable {
+		return fn(IntegerType $targetType, IntegerType $parameterType): ArrayType =>
+			$this->getFromToAsArray($targetType->numberRange, $parameterType->numberRange);
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		if ($target instanceof IntegerValue) {
-			if ($parameter instanceof IntegerValue) {
-				return $this->valueRegistry->tuple(
-					$target->literalValue > $parameter->literalValue ?
-						array_map(fn(int $i): IntegerValue =>
-							$this->valueRegistry->integer($i),
-							range($target->literalValue, $parameter->literalValue, -1)
-						) : []
-				);
-			}
-			// @codeCoverageIgnoreStart
-			throw new ExecutionException("Invalid parameter value");
-			// @codeCoverageIgnoreEnd
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid target value");
-		// @codeCoverageIgnoreEnd
+	protected function getExecutor(): callable {
+		return fn(IntegerValue $target, IntegerValue $parameter): TupleValue =>
+			$this->valueRegistry->tuple(
+				$target->literalValue > $parameter->literalValue ?
+					array_map(fn(int $i): IntegerValue =>
+						$this->valueRegistry->integer($i),
+						range($target->literalValue, $parameter->literalValue, -1)
+					) : []
+			);
 	}
 }

@@ -2,65 +2,26 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Real;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BooleanType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BooleanValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-final readonly class BinaryGreaterThanEqual implements NativeMethod {
-	use BaseType;
+/** @extends NativeMethod<IntegerType|RealType, IntegerType|RealType, RealValue, IntegerValue|RealValue> */
+final readonly class BinaryGreaterThanEqual extends NativeMethod {
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
-		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof RealType || $targetType instanceof IntegerType) {
-			$parameterType = $this->toBaseType($parameterType);
-
-			if ($parameterType instanceof IntegerType || $parameterType instanceof RealType) {
-				return $this->validationFactory->validationSuccess($this->typeRegistry->boolean);
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				origin: $origin
-			);
-		}
-		return $this->validationFactory->error(
-			ValidationErrorType::invalidTargetType,
-			sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-			origin: $origin
-		);
+	protected function getValidator(): callable {
+		return fn(IntegerType|RealType $targetType, IntegerType|RealType $parameterType): BooleanType =>
+			$this->typeRegistry->boolean;
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		if ($target instanceof RealValue) {
-			if ($parameter instanceof IntegerValue || $parameter instanceof RealValue) {
-				return $this->valueRegistry->boolean(
-					$target->literalValue >= $parameter->literalValue
-				);
-			}
-			// @codeCoverageIgnoreStart
-			throw new ExecutionException("Invalid parameter value");
-			// @codeCoverageIgnoreEnd
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid target value");
-		// @codeCoverageIgnoreEnd
+	protected function getExecutor(): callable {
+		return fn(RealValue $target, IntegerValue|RealValue $parameter): BooleanValue =>
+			$this->valueRegistry->boolean(
+				$target->literalValue >= $parameter->literalValue
+			);
 	}
 }

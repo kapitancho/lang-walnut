@@ -2,78 +2,47 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Integer;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberIntervalEndpoint;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-final readonly class BinaryBitwiseXor implements NativeMethod {
-	use BaseType;
+/** @extends NativeMethod<IntegerType, IntegerType, IntegerValue, IntegerValue> */
+final readonly class BinaryBitwiseXor extends NativeMethod {
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
-		$targetType = $this->toBaseType($targetType);
-		if (($targetType instanceof IntegerType) &&
+	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool {
+		return $targetType instanceof IntegerType &&
 			$targetType->numberRange->min instanceof NumberIntervalEndpoint &&
 			$targetType->numberRange->min->value >= 0 &&
-			$targetType->numberRange->min->value <= PHP_INT_MAX
-		) {
-			$parameterType = $this->toBaseType($parameterType);
+			$targetType->numberRange->min->value <= PHP_INT_MAX;
+	}
 
-			if (($parameterType instanceof IntegerType) &&
+	protected function getValidator(): callable {
+		return function(IntegerType $targetType, IntegerType $parameterType, mixed $origin): IntegerType|ValidationFailure {
+			if (
 				$parameterType->numberRange->min instanceof NumberIntervalEndpoint &&
 				$parameterType->numberRange->min->value >= 0 &&
 				$parameterType->numberRange->min->value <= PHP_INT_MAX
 			) {
 				$min = 0;
 				$max = 2 * max($targetType->numberRange->max->value, $parameterType->numberRange->max->value);
-				return $this->validationFactory->validationSuccess(
-					$this->typeRegistry->integer($min, $max)
-				);
+				return $this->typeRegistry->integer($min, $max);
 			}
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidParameterType,
 				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
 				origin: $origin
 			);
-		}
-		// @codeCoverageIgnoreStart
-		return $this->validationFactory->error(
-			ValidationErrorType::invalidTargetType,
-			sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-			origin: $origin
-		);
-		// @codeCoverageIgnoreEnd
+		};
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		if ($target instanceof IntegerValue) {
-			if ($parameter instanceof IntegerValue) {
-				return $this->valueRegistry->integer(
-					(int)(string)$target->literalValue ^ (int)(string)$parameter->literalValue
-				);
-			}
-			// @codeCoverageIgnoreStart
-			throw new ExecutionException("Invalid parameter value");
-			// @codeCoverageIgnoreEnd
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid target value");
-		// @codeCoverageIgnoreEnd
+	protected function getExecutor(): callable {
+		return fn(IntegerValue $target, IntegerValue $parameter): IntegerValue =>
+			$this->valueRegistry->integer(
+				(int)(string)$target->literalValue ^ (int)(string)$parameter->literalValue
+			);
 	}
 }
