@@ -2,58 +2,35 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Type;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type as TypeInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNativeMethod;
 
-final readonly class KeyType implements NativeMethod {
+/** @extends TypeNativeMethod<MapType, NullType, NullValue> */
+final readonly class KeyType extends TypeNativeMethod {
 
-	use BaseType;
+	protected function isTargetRefTypeValid(Type $targetRefType, mixed $origin): bool {
+		return $this->toBaseType($targetRefType) instanceof MapType;
+	}
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function validate(TypeInterface $targetType, TypeInterface $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
-		if ($targetType instanceof TypeType) {
+	protected function getValidator(): callable {
+		return function(TypeType $targetType, NullType $parameterType): TypeType {
+			/** @var MapType $refType */
 			$refType = $this->toBaseType($targetType->refType);
-			if ($refType instanceof MapType) {
-				return $this->validationFactory->validationSuccess(
-					$this->typeRegistry->type($refType->keyType)
-				);
-			}
-		}
-		// @codeCoverageIgnoreStart
-		return $this->validationFactory->error(
-			ValidationErrorType::invalidTargetType,
-			sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-			origin: $origin
-		);
-		// @codeCoverageIgnoreEnd
+			return $this->typeRegistry->type($refType->keyType);
+		};
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		if ($target instanceof TypeValue) {
+	protected function getExecutor(): callable {
+		return function(TypeValue $target, NullValue $parameter): TypeValue {
+			/** @var MapType $typeValue */
 			$typeValue = $this->toBaseType($target->typeValue);
-			if ($typeValue instanceof MapType) {
-				return $this->valueRegistry->type($typeValue->keyType);
-			}
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid parameter value");
-		// @codeCoverageIgnoreEnd
+			return $this->valueRegistry->type($typeValue->keyType);
+		};
 	}
+
 }

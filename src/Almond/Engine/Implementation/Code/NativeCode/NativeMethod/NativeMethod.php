@@ -7,6 +7,8 @@ use ReflectionFunction;
 use ReflectionNamedType;
 use ReflectionUnionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\ExpressionRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\FunctionValueFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod as NativeMethodInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -38,6 +40,8 @@ abstract readonly class NativeMethod implements NativeMethodInterface {
 		protected MethodContext $methodContext,
 		protected VariableScopeFactory $variableScopeFactory,
 		protected DependencyContainer $dependencyContainer,
+		protected ExpressionRegistry $expressionRegistry,
+		protected FunctionValueFactory $functionValueFactory,
 	) {}
 
 	public function validate(

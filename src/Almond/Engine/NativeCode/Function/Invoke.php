@@ -2,62 +2,29 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Function;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type as TypeInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\TupleAsRecord;
 
-final readonly class Invoke implements NativeMethod {
-	use BaseType;
+/** @extends NativeMethod<FunctionType, TypeInterface, FunctionValue, Value> */
+final readonly class Invoke extends NativeMethod {
 	use TupleAsRecord;
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function validate(TypeInterface $targetType, TypeInterface $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
-		/*
-		$baseTargetType = $this->toTargetBaseType(
-			$targetType,
-			$typeRegistry->metaType(MetaTypeValue::Function)
-		);
-		if (!$baseTargetType) {
-			// @codeCoverageIgnoreStart
-			throw new AnalyserException(
-				sprintf("Invalid target type: %s, expected a function", $targetType));
-			// @codeCoverageIgnoreEnd
-		}
-
-		$p = $baseTargetType->parameterType;
-		$parameterType = $this->adjustParameterType(
-			$typeRegistry,
-			$p,
-			$parameterType,
-		);
-		*/
-		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof FunctionType) {
+	protected function getValidator(): callable {
+		return function(FunctionType $targetType, TypeInterface $parameterType, mixed $origin): TypeInterface|ValidationFailure {
 			$p = $targetType->parameterType;
 			$parameterType = $this->adjustParameterType(
 				$this->typeRegistry,
 				$p,
 				$parameterType,
 			);
-
 			if ($parameterType->isSubtypeOf($targetType->parameterType)) {
-				return $this->validationFactory->validationSuccess($targetType->returnType);
+				return $targetType->returnType;
 			}
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidParameterType,
@@ -66,30 +33,17 @@ final readonly class Invoke implements NativeMethod {
 				),
 				$origin
 			);
-		}
-		// @codeCoverageIgnoreStart
-		return $this->validationFactory->error(
-			ValidationErrorType::invalidTargetType,
-			sprintf("Invalid target type: %s, expected a function", $targetType),
-			$origin
-		);
-		// @codeCoverageIgnoreEnd
+		};
 	}
 
-	/** @throws ExecutionException */
-	public function execute(Value $target, Value $parameter): Value {
-		if ($target instanceof FunctionValue) {
+	protected function getExecutor(): callable {
+		return function(FunctionValue $target, Value $parameter): Value {
 			$parameter = $this->adjustParameterValue(
 				$this->valueRegistry,
 				$target->type->parameterType,
 				$parameter,
 			);
 			return $target->execute($parameter);
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException(
-			sprintf("Invalid target value: %s, expected a function", $target->type)
-		);
-		// @codeCoverageIgnoreEnd
+		};
 	}
 }

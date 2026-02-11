@@ -29,4 +29,5 @@ enum CompilationErrorType {
 	case variableScopeMismatch;
 	case executionError;
 	case userlandMethodMismatch;
+	case compositionMismatch;
 }

@@ -3,8 +3,8 @@
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\Value\BuiltIn;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\UserlandFunction;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue as FunctionValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
@@ -18,7 +18,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResult;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\VariableScope\VariableValueScope;
 
 final readonly class FunctionValue implements FunctionValueInterface {
-	public Type $type;
+	public FunctionType $type;
 
 	public function __construct(
 		private TypeRegistry $typeRegistry,

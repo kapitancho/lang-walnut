@@ -2,91 +2,51 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Type;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MetaType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\MetaTypeValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type as TypeInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNativeMethod;
 
-final readonly class WithRestType implements NativeMethod {
+/** @extends TypeNativeMethod<TupleType|RecordType|MetaType, TypeType, TypeValue> */
+final readonly class WithRestType extends TypeNativeMethod {
 
-	use BaseType;
-
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function validate(TypeInterface $targetType, TypeInterface $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
-		if ($targetType instanceof TypeType) {
-			$refType = $this->toBaseType($targetType->refType);
-			if ($parameterType->isSubtypeOf(
-				$this->typeRegistry->type(
-					$this->typeRegistry->any
-				)
-			)) {
-				if ($refType instanceof TupleType || (
-					$refType instanceof MetaType && $refType->value === MetaTypeValue::Tuple
-				)) {
-					return $this->validationFactory->validationSuccess(
-						$this->typeRegistry->type(
-							$this->typeRegistry->metaType(
-								MetaTypeValue::Tuple
-							)
-						)
-					);
-				}
-				if ($refType instanceof RecordType || (
-					$refType instanceof MetaType && $refType->value === MetaTypeValue::Record
-				)) {
-					return $this->validationFactory->validationSuccess(
-						$this->typeRegistry->type(
-							$this->typeRegistry->metaType(
-								MetaTypeValue::Record
-							)
-						)
-					);
-				}
-				// @codeCoverageIgnoreStart
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidTargetType,
-					sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-					origin: $origin
-				);
-				// @codeCoverageIgnoreEnd
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				origin: $origin
-			);
-		}
-		// @codeCoverageIgnoreStart
-		return $this->validationFactory->error(
-			ValidationErrorType::invalidTargetType,
-			sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-			origin: $origin
-		);
-		// @codeCoverageIgnoreEnd
+	protected function isTargetRefTypeValid(Type $targetRefType, mixed $origin): bool {
+		$refType = $this->toBaseType($targetRefType);
+		return $refType instanceof TupleType || $refType instanceof RecordType ||
+			($refType instanceof MetaType && (
+				$refType->value === MetaTypeValue::Tuple || $refType->value === MetaTypeValue::Record
+			));
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		if ($target instanceof TypeValue) {
+	protected function getValidator(): callable {
+		return function(TypeType $targetType, TypeType $parameterType): TypeType {
+			/** @var TupleType|RecordType|MetaType $refType */
+			$refType = $this->toBaseType($targetType->refType);
+			if ($refType instanceof TupleType || (
+				$refType instanceof MetaType && $refType->value === MetaTypeValue::Tuple
+			)) {
+				return $this->typeRegistry->type(
+					$this->typeRegistry->metaType(
+						MetaTypeValue::Tuple
+					)
+				);
+			}
+			return $this->typeRegistry->type(
+				$this->typeRegistry->metaType(
+					MetaTypeValue::Record
+				)
+			);
+		};
+	}
+
+	protected function getExecutor(): callable {
+		return function(TypeValue $target, TypeValue $parameter): TypeValue {
+			/** @var TupleType|RecordType|MetaType $typeValue */
 			$typeValue = $this->toBaseType($target->typeValue);
-			/** @var TypeValue $parameter */
 			if ($typeValue instanceof TupleType || (
 				$typeValue instanceof MetaType && $typeValue->value === MetaTypeValue::Tuple
 			)) {
@@ -96,18 +56,12 @@ final readonly class WithRestType implements NativeMethod {
 				);
 				return $this->valueRegistry->type($result);
 			}
-			if ($typeValue instanceof RecordType || (
-				$typeValue instanceof MetaType && $typeValue->value === MetaTypeValue::Record
-			)) {
-				$result = $this->typeRegistry->record(
-					$typeValue instanceof RecordType ? $typeValue->types : [],
-					$parameter->typeValue,
-				);
-				return $this->valueRegistry->type($result);
-			}
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid parameter value");
-		// @codeCoverageIgnoreEnd
+			$result = $this->typeRegistry->record(
+				$typeValue instanceof RecordType ? $typeValue->types : [],
+				$parameter->typeValue,
+			);
+			return $this->valueRegistry->type($result);
+		};
 	}
+
 }

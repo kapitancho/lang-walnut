@@ -31,6 +31,7 @@ final class PostBuildCompilationError implements CompilationError {
 			ValidationErrorType::dependencyNotFound => CompilationErrorType::dependencyNotFound,
 			ValidationErrorType::variableScopeMismatch => CompilationErrorType::variableScopeMismatch,
 			ValidationErrorType::userlandMethodMismatch => CompilationErrorType::userlandMethodMismatch,
+			ValidationErrorType::compositionMismatch => CompilationErrorType::compositionMismatch,
 			default => CompilationErrorType::other
 		};
 	}

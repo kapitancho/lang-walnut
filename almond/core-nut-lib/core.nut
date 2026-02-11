@@ -115,4 +115,4 @@ PasswordString := #[value: String];
 /* CLI */
 CliEntryPoint = ^Array<String> => String;
 
-JsonValue = Null|Boolean|String|Array<\JsonValue>|Map<String:\JsonValue>|Set<\JsonValue>|Mutable<\JsonValue>;
+JsonValue = Null|Boolean|String|Real|Array<\JsonValue>|Map<String:\JsonValue>|Set<\JsonValue>|Mutable<\JsonValue>;

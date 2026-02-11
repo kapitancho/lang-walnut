@@ -2,6 +2,8 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Integer;
 
+use BcMath\Number;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
@@ -17,6 +19,14 @@ final readonly class AsString extends NativeMethod {
 
 	protected function getValidator(): callable {
 		return function(IntegerType $targetType, NullType $parameterType): StringType {
+			if ($targetType instanceof IntegerSubsetType) {
+				return $this->typeRegistry->stringSubset(
+					array_map(
+						fn(Number $value) => (string)$value,
+						$targetType->subsetValues,
+					),
+				);
+			}
 			$min = $targetType->numberRange->min;
 			$max = $targetType->numberRange->max;
 			$minLength = match(true) {

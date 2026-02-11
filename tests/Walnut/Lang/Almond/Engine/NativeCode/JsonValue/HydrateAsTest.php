@@ -27,8 +27,8 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 	}
 
 	public function testHydrateAsIntersection(): void {
-		$result = $this->executeCodeSnippet("42->hydrateAs(type{[a: String, ... Real]&[b: Real, ... String]});");
-		$this->assertEquals("@HydrationError![\n\tvalue: 42,\n\terrors: [\n\t\t[\n\t\t\thydrationPath: 'value',\n\t\t\terrorMessage: 'Intersection type values cannot be hydrated',\n\t\t\ttargetType: type{([a: String, ... Real]&[b: Real, ... String])}\n\t\t]\n\t]\n]", $result);
+		$result = $this->executeCodeSnippet("42->hydrateAs(type{[a: String, ... Real]&{Real}});");
+		$this->assertEquals("@HydrationError![\n\tvalue: 42,\n\terrors: [\n\t\t[\n\t\t\thydrationPath: 'value',\n\t\t\terrorMessage: 'Intersection type values cannot be hydrated',\n\t\t\ttargetType: type{([a: String, ... Real]&Shape<Real>)}\n\t\t]\n\t]\n]", $result);
 	}
 
 	public function testHydrateAsProxy(): void {

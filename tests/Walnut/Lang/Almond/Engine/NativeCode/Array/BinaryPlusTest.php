@@ -17,6 +17,6 @@ final class BinaryPlusTest extends CodeExecutionTestHelper {
 	}
 
 	public function testBinaryPlusInvalidType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "[1, 2] + 3;");
+		$this->executeErrorCodeSnippet('Invalid parameter type', "[1, 2] + 3;");
 	}
 }

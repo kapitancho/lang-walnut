@@ -119,7 +119,7 @@ final readonly class ModuleBuilder implements ModuleCompilerInterface {
 		TypeNode|null $errorTypeNode,
 		FunctionBodyNode $constructorBodyNode
 	): UserlandFunction {
-		$errorType = $errorTypeNode ? $this->type($errorTypeNode) : $this->programContext->typeRegistry->any;
+		$errorType = $errorTypeNode ? $this->type($errorTypeNode) : $this->programContext->typeRegistry->nothing;
 		$constructorBody = $this->functionBody($constructorBodyNode);
 		return $this->programContext->userlandMethodStorage->addValidator(
 			$typeName,
@@ -127,10 +127,11 @@ final readonly class ModuleBuilder implements ModuleCompilerInterface {
 				new NameAndType($this->programContext->typeRegistry->nothing, null),
 				new NameAndType($valueType, $typeName->asVariableName()),
 				new NameAndType($this->programContext->typeRegistry->nothing, null),
-				$this->programContext->typeRegistry->result(
-					$valueType,
-					$errorType
-				),
+				$errorType instanceof NothingType ? $valueType :
+					$this->programContext->typeRegistry->result(
+						$valueType,
+						$errorType
+					),
 				$this->programContext->expressionRegistry->functionBody(
 					$this->programContext->expressionRegistry->sequence([
 						$constructorBody->expression,

@@ -17,4 +17,5 @@ enum ValidationErrorType {
 	case invalidReturnType; // +
 	case variableScopeMismatch;
 	case dependencyNotFound;
+	case compositionMismatch;
 }

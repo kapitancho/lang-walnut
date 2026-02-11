@@ -2,40 +2,25 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Array;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-final readonly class WithoutLast implements NativeMethod {
-	use BaseType;
+/** @extends NativeMethod<ArrayType|TupleType, NullType, TupleValue, NullValue> */
+final readonly class WithoutLast extends NativeMethod {
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
-		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof TupleType && $this->toBaseType($parameterType) instanceof NullType) {
-			if (count($targetType->types) === 0) {
-				return $this->validationFactory->validationSuccess(
-					$this->typeRegistry->result(
+	protected function getValidator(): callable {
+		return function(ArrayType|TupleType $targetType, NullType $parameterType): Type {
+			if ($targetType instanceof TupleType) {
+				if (count($targetType->types) === 0) {
+					return $this->typeRegistry->result(
 						$targetType->restType instanceof NothingType ?
 							$this->typeRegistry->nothing :
 							$this->typeRegistry->record([
@@ -43,62 +28,40 @@ final readonly class WithoutLast implements NativeMethod {
 								'array' => $this->typeRegistry->tuple([], $targetType->restType)
 							], null),
 						$this->typeRegistry->core->itemNotFound
-					)
-				);
-			}
-			$tupleTypes = $targetType->types;
-			$lastType = array_pop($tupleTypes);
-			$u = $this->typeRegistry->union([
-				$lastType,
-				$targetType->restType
-			]);
-			if (!$targetType->restType instanceof NothingType) {
-				$tupleTypes[] = $u;
-			}
-			return $this->validationFactory->validationSuccess(
-				$this->typeRegistry->record([
+					);
+				}
+				$tupleTypes = $targetType->types;
+				$lastType = array_pop($tupleTypes);
+				$u = $this->typeRegistry->union([
+					$lastType,
+					$targetType->restType
+				]);
+				if (!$targetType->restType instanceof NothingType) {
+					$tupleTypes[] = $u;
+				}
+				return $this->typeRegistry->record([
 					'element' => $u,
 					'array' => $this->typeRegistry->tuple($tupleTypes, $targetType->restType)
-				], null)
-			);
-		}
-		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
-		if ($type instanceof ArrayType) {
-			$pType = $this->toBaseType($parameterType);
-			if ($pType instanceof NullType) {
-				$returnType = $this->typeRegistry->record([
-					'element' => $type->itemType,
-					'array' => $this->typeRegistry->array(
-						$type->itemType,
-						max(0, $type->range->minLength - 1),
-						$type->range->maxLength === PlusInfinity::value ?
-							PlusInfinity::value : max($type->range->maxLength - 1, 0)
-					)
 				], null);
-				return $this->validationFactory->validationSuccess(
-					$type->range->minLength > 0 ? $returnType :
-						$this->typeRegistry->result($returnType,
-							$this->typeRegistry->core->itemNotFound
-						)
-				);
 			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				origin: $origin
-			);
-		}
-		// @codeCoverageIgnoreStart
-		return $this->validationFactory->error(
-			ValidationErrorType::invalidTargetType,
-			sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-			origin: $origin
-		);
-		// @codeCoverageIgnoreEnd
+			$returnType = $this->typeRegistry->record([
+				'element' => $targetType->itemType,
+				'array' => $this->typeRegistry->array(
+					$targetType->itemType,
+					max(0, $targetType->range->minLength - 1),
+					$targetType->range->maxLength === PlusInfinity::value ?
+						PlusInfinity::value : max($targetType->range->maxLength - 1, 0)
+				)
+			], null);
+			return $targetType->range->minLength > 0 ? $returnType :
+				$this->typeRegistry->result($returnType,
+					$this->typeRegistry->core->itemNotFound
+				);
+		};
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		if ($target instanceof TupleValue && $parameter instanceof NullValue) {
+	protected function getExecutor(): callable {
+		return function(TupleValue $target, NullValue $parameter): Value {
 			$values = $target->values;
 			if (count($values) === 0) {
 				return $this->valueRegistry->error(
@@ -110,9 +73,7 @@ final readonly class WithoutLast implements NativeMethod {
 				'element' => $element,
 				'array' => $this->valueRegistry->tuple($values)
 			]);
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid target value");
-		// @codeCoverageIgnoreEnd
+		};
 	}
+
 }

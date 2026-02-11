@@ -5,6 +5,7 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Any;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\UnknownMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EnumerationType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OpenType;
@@ -27,8 +28,10 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\VariableScope\VariableScopeFactory;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\TupleAsRecord;
 
 final readonly class Construct implements NativeMethod {
+	use TupleAsRecord;
 
 	public function __construct(
 		private ValidationFactory $validationFactory,
@@ -69,9 +72,16 @@ final readonly class Construct implements NativeMethod {
 
 				$cError = null;
 				if ($constructorMethod !== UnknownMethod::value) {
+					$tType = $constructorMethod instanceof UserlandMethod ?
+						$this->adjustParameterType(
+							$this->typeRegistry,
+							$constructorMethod->parameterType,
+							$targetType
+						) : $targetType;
+
 					$constructorResult = $constructorMethod->validate(
 						$cType,
-						$targetType,
+						$tType,
 						$origin
 					);
 					if ($constructorResult instanceof ValidationFailure) {
@@ -82,7 +92,12 @@ final readonly class Construct implements NativeMethod {
 						$cError = $cResult->errorType;
 					}
 				} else {
-					if (!$targetType->isSubtypeOf($expectedType)) {
+					$tType = $this->adjustParameterType(
+						$this->typeRegistry,
+						$expectedType,
+						$targetType
+					);
+					if (!$tType->isSubtypeOf($expectedType)) {
 						return $this->validationFactory->error(
 							ValidationErrorType::invalidParameterType,
 							sprintf(
@@ -155,7 +170,14 @@ final readonly class Construct implements NativeMethod {
 				);
 				$t = $target;
 				if ($constructorMethod !== UnknownMethod::value) {
-					$t = $constructorMethod->execute($cValue, $target);
+					$tParam = $constructorMethod instanceof UserlandMethod ?
+						$this->adjustParameterValue(
+							$this->valueRegistry,
+							$constructorMethod->parameterType,
+							$target
+						) : $target;
+
+					$t = $constructorMethod->execute($cValue, $tParam);
 					if ($t instanceof ErrorValue) {
 						return $t;
 					}
@@ -163,10 +185,15 @@ final readonly class Construct implements NativeMethod {
 				if ($parameterType instanceof OpenType || $parameterType instanceof SealedType) {
 					$validationMethod = $parameterType->validator;
 					if ($validationMethod !== null) {
+						$tParameterValue = $this->adjustParameterValue(
+							$this->valueRegistry,
+							$validationMethod->parameter->type,
+							$t
+						);
 						$t = $validationMethod->execute(
 							$this->variableScopeFactory->emptyVariableValueScope,
 							null,
-							$t,
+							$tParameterValue,
 						);
 						if ($t instanceof ErrorValue) {
 							return $t;

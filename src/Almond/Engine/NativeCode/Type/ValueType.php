@@ -2,71 +2,51 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Type;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\DataType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MetaType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MutableType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OpenType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalKeyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SealedType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\MetaTypeValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type as TypeInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNativeMethod;
 
-final readonly class ValueType implements NativeMethod {
+/** @extends TypeNativeMethod<OpenType|SealedType|DataType|MutableType|OptionalKeyType|MetaType, NullType, NullValue> */
+final readonly class ValueType extends TypeNativeMethod {
 
-	use BaseType;
-
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function validate(TypeInterface $targetType, TypeInterface $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
-		if ($targetType instanceof TypeType) {
+	protected function getValidator(): callable {
+		return function(TypeType $targetType, NullType $parameterType, mixed $origin): TypeType|ValidationFailure {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof OpenType || $refType instanceof SealedType ||
 				$refType instanceof DataType || $refType instanceof MutableType ||
 				$refType instanceof OptionalKeyType
 			) {
-				return $this->validationFactory->validationSuccess(
-					$this->typeRegistry->type($refType->valueType)
-				);
+				return $this->typeRegistry->type($refType->valueType);
 			}
-			if ($refType instanceof MetaType) {
-				if ($refType->value === MetaTypeValue::Data ||
-					$refType->value === MetaTypeValue::Open ||
-					$refType->value === MetaTypeValue::Sealed ||
-					$refType->value === MetaTypeValue::MutableValue
-				) {
-					return $this->validationFactory->validationSuccess(
-						$this->typeRegistry->type($this->typeRegistry->any)
-					);
-				}
+			if ($refType instanceof MetaType && (
+				$refType->value === MetaTypeValue::Data ||
+				$refType->value === MetaTypeValue::Open ||
+				$refType->value === MetaTypeValue::Sealed ||
+				$refType->value === MetaTypeValue::MutableValue
+			)) {
+				return $this->typeRegistry->type($this->typeRegistry->any);
 			}
-		}
-		// @codeCoverageIgnoreStart
-		return $this->validationFactory->error(
-			ValidationErrorType::invalidTargetType,
-			sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-			origin: $origin
-		);
-		// @codeCoverageIgnoreEnd
+			return $this->validationFactory->error(
+				ValidationErrorType::invalidTargetType,
+				sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
+				origin: $origin
+			);
+		};
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		if ($target instanceof TypeValue) {
+	protected function getExecutor(): callable {
+		return function(TypeValue $target, NullValue $parameter): TypeValue {
 			$typeValue = $this->toBaseType($target->typeValue);
 			if ($typeValue instanceof DataType ||
 				$typeValue instanceof OpenType ||
@@ -77,9 +57,7 @@ final readonly class ValueType implements NativeMethod {
 				return $this->valueRegistry->type($typeValue->valueType);
 			}
 			return $this->valueRegistry->type($typeValue);
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid target value");
-		// @codeCoverageIgnoreEnd
+		};
 	}
+
 }
