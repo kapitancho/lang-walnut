@@ -2,32 +2,24 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Any;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type as TypeInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-final readonly class Type implements NativeMethod {
+/** @extends NativeMethod<Type, NullType, Value, NullValue> */
+final readonly class Type extends NativeMethod {
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function validate(
-		TypeInterface $targetType, TypeInterface $parameterType, mixed $origin
-	): ValidationSuccess|ValidationFailure {
-		return $this->validationFactory->validationSuccess(
-			$this->typeRegistry->type($targetType)
-		);
+	protected function getValidator(): callable {
+		return fn(TypeInterface $targetType, NullType $parameterType): TypeType =>
+			$this->typeRegistry->type($targetType);
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		return $this->valueRegistry->type($target->type);
+	protected function getExecutor(): callable {
+		return fn(Value $target, NullValue $parameter): Value =>
+			$this->valueRegistry->type($target->type);
 	}
+
 }

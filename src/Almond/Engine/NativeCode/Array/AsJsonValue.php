@@ -1,24 +1,24 @@
 <?php
 
-namespace Walnut\Lang\Almond\Engine\NativeCode\Set;
+namespace Walnut\Lang\Almond\Engine\NativeCode\Array;
 
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\MethodName;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
-/** @extends SetNativeMethod<Type, NullType, NullValue> */
-final readonly class AsJsonValue extends SetNativeMethod {
+/** @extends ArrayNativeMethod<Type, NullType, NullValue> */
+final readonly class AsJsonValue extends ArrayNativeMethod {
 
 	protected function getValidator(): callable {
-		return fn(SetType $targetType, NullType $parameterType, mixed $origin): ValidationSuccess|ValidationFailure =>
+		return fn(ArrayType $targetType, NullType $parameterType, mixed $origin): ValidationSuccess|ValidationFailure =>
 			$this->methodContext->validateMethod(
 				$targetType->itemType,
 				new MethodName('asJsonValue'),
@@ -28,7 +28,7 @@ final readonly class AsJsonValue extends SetNativeMethod {
 	}
 
 	protected function getExecutor(): callable {
-		return function(SetValue $target, NullValue $parameter): Value {
+		return function(TupleValue $target, NullValue $parameter): Value {
 			$result = [];
 			foreach($target->values as $value) {
 				$returnValue = $this->methodContext->executeMethod(

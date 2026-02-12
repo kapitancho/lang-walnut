@@ -83,7 +83,7 @@ final readonly class ValueConverter {
 		return $this->validationFactory->error(
 			ValidationErrorType::shapeMismatch,
 			sprintf(
-				"Cast method cannot convert value of type '%s' to shape '%s'",
+				"Cannot convert value of type '%s' to shape '%s'",
 				$sourceType,
 				$targetType
 			),
@@ -162,7 +162,7 @@ final readonly class ValueConverter {
 			$resultType = $result->type;
 			$errorType = $resultType instanceof ResultType ? $resultType->errorType : null;
 			$returnType = $resultType instanceof ResultType ? $resultType->returnType : $resultType;
-			if (!$resultType->isSubtypeOf($targetType)) {
+			if (!$returnType->isSubtypeOf($targetType)) {
 				return $this->validationFactory->error(
 					ValidationErrorType::invalidReturnType,
 					sprintf(

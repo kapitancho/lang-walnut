@@ -15,7 +15,7 @@ final readonly class AsJsonValue extends NativeMethod {
 
 	protected function getValidator(): callable {
 		return fn(IntegerType $targetType, NullType $parameterType): Type =>
-			$this->typeRegistry->typeByName(new TypeName('JsonValue'));
+			$this->typeRegistry->core->jsonValue;
 	}
 
 	protected function getExecutor(): callable {

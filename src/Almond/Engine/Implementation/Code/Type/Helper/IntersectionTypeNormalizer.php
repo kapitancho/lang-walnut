@@ -99,14 +99,14 @@ final readonly class IntersectionTypeNormalizer {
 								$this->normalize($qBase->restType, $txBase->restType)
 							);
                     } else if ($qBase instanceof MapType && $txBase instanceof MapType) {
-	                    $newRange = $q->range->tryRangeIntersectionWith($tx->range);
+	                    $newRange = $qBase->range->tryRangeIntersectionWith($txBase->range);
 	                    if ($newRange) {
 		                    array_splice($queue, $ql, 1);
 		                    $tx = $this->typeRegistry->map(
-			                    $this->normalize($q->itemType, $tx->itemType),
+			                    $this->normalize($qBase->itemType, $txBase->itemType),
 			                    $newRange->minLength,
 			                    $newRange->maxLength,
-			                    $this->normalize($q->keyType, $tx->keyType)
+			                    $this->normalize($qBase->keyType, $txBase->keyType)
 		                    );
 	                    }
                     } else if ($qBase instanceof ArrayType && $txBase instanceof ArrayType) {

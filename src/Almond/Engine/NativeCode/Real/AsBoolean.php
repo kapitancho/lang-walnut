@@ -22,15 +22,17 @@ final readonly class AsBoolean extends NativeMethod {
 	protected function getValidator(): callable {
 		return fn(IntegerType|RealType $targetType, NullType $parameterType): BooleanType|TrueType|FalseType =>
 			match(true) {
-				(string)$targetType->numberRange === '0' => $this->typeRegistry->false,
+				(float)(string)$targetType->numberRange === 0.0 => $this->typeRegistry->false,
 				$targetType->numberRange->min !== MinusInfinity::value && (
-					$targetType->numberRange->min->value > '0' || (
-						$targetType->numberRange->min->value == '0' && !$targetType->numberRange->min->inclusive
+					$targetType->numberRange->min->value > 0 || (
+						(float)(string)$targetType->numberRange->min->value === 0.0 &&
+						!$targetType->numberRange->min->inclusive
 					)
 				),
 				$targetType->numberRange->max !== PlusInfinity::value && (
-					$targetType->numberRange->max->value < '0' || (
-						$targetType->numberRange->max->value == '0' && !$targetType->numberRange->max->inclusive
+					$targetType->numberRange->max->value < 0 || (
+						(float)(string)$targetType->numberRange->max->value === 0.0 &&
+						!$targetType->numberRange->max->inclusive
 					)
 				) => $this->typeRegistry->true,
 				default => $this->typeRegistry->boolean,
@@ -39,6 +41,6 @@ final readonly class AsBoolean extends NativeMethod {
 
 	protected function getExecutor(): callable {
 		return fn(IntegerValue|RealValue $target, NullValue $parameter): BooleanValue =>
-			$this->valueRegistry->boolean((string)$target->literalValue !== '0');
+			$this->valueRegistry->boolean((float)(string)$target->literalValue !== 0.0);
 	}
 }

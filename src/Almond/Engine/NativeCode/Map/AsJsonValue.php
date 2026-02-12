@@ -1,24 +1,24 @@
 <?php
 
-namespace Walnut\Lang\Almond\Engine\NativeCode\Set;
+namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\MethodName;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
 
-/** @extends SetNativeMethod<Type, NullType, NullValue> */
-final readonly class AsJsonValue extends SetNativeMethod {
+/** @extends MapNativeMethod<Type, NullType, NullValue> */
+final readonly class AsJsonValue extends MapNativeMethod {
 
 	protected function getValidator(): callable {
-		return fn(SetType $targetType, NullType $parameterType, mixed $origin): ValidationSuccess|ValidationFailure =>
+		return fn(MapType $targetType, NullType $parameterType, mixed $origin): ValidationSuccess|ValidationFailure =>
 			$this->methodContext->validateMethod(
 				$targetType->itemType,
 				new MethodName('asJsonValue'),
@@ -28,9 +28,9 @@ final readonly class AsJsonValue extends SetNativeMethod {
 	}
 
 	protected function getExecutor(): callable {
-		return function(SetValue $target, NullValue $parameter): Value {
+		return function(RecordValue $target, NullValue $parameter): Value {
 			$result = [];
-			foreach($target->values as $value) {
+			foreach($target->values as $key => $value) {
 				$returnValue = $this->methodContext->executeMethod(
 					$value,
 					new MethodName('asJsonValue'),
@@ -39,9 +39,9 @@ final readonly class AsJsonValue extends SetNativeMethod {
 				if ($returnValue instanceof ErrorValue) {
 					return $returnValue;
 				}
-				$result[] = $returnValue;
+				$result[$key] = $returnValue;
 			}
-			return $this->valueRegistry->tuple($result);
+			return $this->valueRegistry->record($result);
 		};
 	}
 

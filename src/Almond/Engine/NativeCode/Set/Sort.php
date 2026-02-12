@@ -2,6 +2,8 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Set;
 
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\ExpressionRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\FunctionValueFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -29,8 +31,19 @@ final readonly class Sort extends NativeMethod {
 		MethodContext $methodContext,
 		VariableScopeFactory $variableScopeFactory,
 		DependencyContainer $dependencyContainer,
+		ExpressionRegistry $expressionRegistry,
+		FunctionValueFactory $functionValueFactory,
 	) {
-		parent::__construct($validationFactory, $typeRegistry, $valueRegistry, $methodContext, $variableScopeFactory, $dependencyContainer);
+		parent::__construct(
+			$validationFactory,
+			$typeRegistry,
+			$valueRegistry,
+			$methodContext,
+			$variableScopeFactory,
+			$dependencyContainer,
+			$expressionRegistry,
+			$functionValueFactory
+		);
 		$this->sortHelper = new SortHelper($validationFactory, $typeRegistry, $valueRegistry);
 	}
 

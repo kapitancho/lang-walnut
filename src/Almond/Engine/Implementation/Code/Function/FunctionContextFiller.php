@@ -26,8 +26,10 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\IdentifierException;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\VariableName;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationContext;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
 
 final readonly class FunctionContextFiller implements FunctionContextFillerInterface {
+	use BaseType;
 
 	public function __construct(
 		private TypeRegistry $typeRegistry,
@@ -68,7 +70,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 					new VariableName($variableName),
 					$type
 				);
-				//$type = $this->toBaseType($type);
+				$type = $this->toBaseType($type);
 				$t = $type instanceof OpenType || $type instanceof DataType ? $type->valueType : $type;
 				if ($t instanceof TupleType) {
 					foreach($t->types as $index => $typeItem) {
@@ -113,7 +115,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 		NameAndType $dependency, Value|null $dependencyValue,
 	): ExecutionContext {
 
-		$t = /*$this->toBaseType(*/$target->type/*)*/;
+		$t = $this->toBaseType($target->type);
 		if (
 			($t instanceof OpenType && $targetValue instanceof OpenValue) ||
 			($t instanceof SealedType && $targetValue instanceof SealedValue) ||
@@ -145,7 +147,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 			if ($value) {
 				$executionContext = $executionContext->withAddedVariableValue(
 					new VariableName($variableName), $value);
-				$type = /*$this->toBaseType(*/$xType/*)*/;
+				$type = $this->toBaseType($xType);
 				[$t, $v] =
 					($type instanceof OpenType && $value instanceof OpenValue) ||
 					($type instanceof DataType && $value instanceof DataValue) ?
