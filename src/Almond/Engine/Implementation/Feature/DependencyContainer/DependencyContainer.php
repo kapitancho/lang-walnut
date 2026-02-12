@@ -26,6 +26,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyContainer as DependencyContainerInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyContainerErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyError as DependencyErrorInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationError as ValidationErrorInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
@@ -211,7 +212,11 @@ final class DependencyContainer implements DependencyContainerInterface {
 				))
 			);
 		}
-		$result = $this->methodContext->executeCast($dependencyContainerType->value, $type->name);
+		try {
+			$result = $this->methodContext->executeCast($dependencyContainerType->value, $type->name);
+		} catch (ExecutionException) {
+			return new DependencyError(DependencyContainerErrorType::errorWhileCreatingValue, $type);
+		}
 		if (
 			$result instanceof ErrorValue &&
 			$result->errorValue instanceof DataValue &&

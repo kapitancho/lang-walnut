@@ -8,7 +8,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 
 	public function testCycle(): void {
 		$this->executeErrorCodeSnippet(
-			'No implementation found for the requested type "A".',
+			'No implementation found for the requested type "B".',
 			"f();",
 		<<<NUT
 		 A := #Integer;

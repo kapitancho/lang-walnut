@@ -164,9 +164,9 @@ final readonly class UserlandMethodValidator implements UserlandMethodValidatorI
 		$allMethods = $this->userlandMethodRegistry->allMethods();
 		foreach($allMethods as $methodName => $methods) {
 			foreach($methods as $method) {
-				try {
+				//try {
 					$dependencyContext = $method->validateDependencies($dependencyContext);
-				} catch (ExecutionException) {}
+				//} catch (ExecutionException) {}
 			}
 		}
 		return $dependencyContext;

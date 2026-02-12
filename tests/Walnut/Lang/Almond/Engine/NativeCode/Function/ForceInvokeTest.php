@@ -41,7 +41,7 @@ final class ForceInvokeTest extends CodeExecutionTestHelper {
 
 	public function testIntersectionNoMatch(): void {
 		$this->executeErrorCodeSnippet(
-			"Cannot call method 'forceInvoke'",
+			"Method 'forceInvoke' is not defined for type '(R&T)'.",
 			"null;",
 		<<<NUT
 		R := #[b: String];

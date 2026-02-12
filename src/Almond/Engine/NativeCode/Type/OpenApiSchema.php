@@ -48,6 +48,9 @@ final readonly class OpenApiSchema implements NativeMethod {
 	public function validate(TypeInterface $targetType, TypeInterface $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
 		if ($targetType instanceof TypeType) {
 			$refType = $targetType->refType;
+			while($refType instanceof MutableType) {
+				$refType = $refType->valueType;
+			}
 			if ($refType->isSubtypeOf($this->typeRegistry->core->jsonValue)) {
 				return $this->validationFactory->validationSuccess(
 					$this->typeRegistry->core->jsonValue

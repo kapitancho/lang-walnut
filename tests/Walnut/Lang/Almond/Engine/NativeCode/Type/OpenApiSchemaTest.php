@@ -129,7 +129,7 @@ final class OpenApiSchemaTest extends CodeExecutionTestHelper {
 	}
 
 	public function testOpenApiSchemaIntersection(): void {
-		$result = $this->executeCodeSnippet("type{[a: Integer] & [b: String]}->openApiSchema;");
+		$result = $this->executeCodeSnippet("type{[a: Integer] & [String]}->openApiSchema;");
 		$this->assertStringContainsString("allOf", $result);
 	}
 

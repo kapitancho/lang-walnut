@@ -22,7 +22,7 @@ final readonly class AsBoolean extends NativeMethod {
 	protected function getValidator(): callable {
 		return fn(IntegerType|RealType $targetType, NullType $parameterType): BooleanType|TrueType|FalseType =>
 			match(true) {
-				(float)(string)$targetType->numberRange === 0.0 => $this->typeRegistry->false,
+				(string)$targetType->numberRange === '0' => $this->typeRegistry->false,
 				$targetType->numberRange->min !== MinusInfinity::value && (
 					$targetType->numberRange->min->value > 0 || (
 						(float)(string)$targetType->numberRange->min->value === 0.0 &&

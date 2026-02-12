@@ -6,6 +6,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Method;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodRegistry as MethodRegistryInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Native\NativeMethodRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\UnknownMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntersectionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\UnionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\MethodName;
@@ -25,7 +26,6 @@ final readonly class MethodRegistry implements MethodRegistryInterface {
 			$methodName = new MethodName('castAs');
 		}
 
-
 		$userlandMethods = $this->programContext->userlandMethodRegistry->methodsByName($methodName);
 		foreach(array_reverse($userlandMethods) as $userlandMethod) {
 			$typeByName = $this->programContext->typeRegistry->typeByName($userlandMethod->targetType);
@@ -39,6 +39,14 @@ final readonly class MethodRegistry implements MethodRegistryInterface {
 		}
 
 		$baseType = $this->toBaseType($type);
+		if ($baseType instanceof IntersectionType) {
+			foreach($baseType->types as $baseType) {
+				$method = $this->methodFor($baseType, $methodName);
+				if (!$method instanceof UnknownMethod) {
+					return $method;
+				}
+			}
+		}
 		if ($baseType instanceof UnionType) {
 			$methods = [];
 			foreach($baseType->types as $baseType) {
@@ -54,7 +62,8 @@ final readonly class MethodRegistry implements MethodRegistryInterface {
 				return new UnionMethodCall(
 					$this->programContext->validationFactory,
 					$this->programContext->typeRegistry,
-					$methods);
+					$methods
+				);
 			}
 		}
 

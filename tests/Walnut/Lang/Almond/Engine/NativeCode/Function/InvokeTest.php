@@ -27,7 +27,7 @@ final class InvokeTest extends CodeExecutionTestHelper {
 
 	public function testIntersectionNoMatch(): void {
 		$this->executeErrorCodeSnippet(
-			"Cannot call method 'invoke'",
+			"Method 'invoke' is not defined for type '(R&T)'.",
 			"null;",
 		<<<NUT
 		R := #[b: String];

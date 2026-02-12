@@ -45,14 +45,14 @@ final readonly class ForceInvoke extends NativeMethod {
 			return $this->valueRegistry->error(
 				$this->valueRegistry->core->invocationError(
 					$this->valueRegistry->record([
-						'functionType' => $this->valueRegistry->type($v->type),
+						'functionType' => $this->valueRegistry->type($target->type),
 						'providedParameterType' => $this->valueRegistry->type($parameter->type),
 						'errorMessage' => $this->valueRegistry->string(
 							sprintf(
 								"Invalid parameter type: %s, %s expected (function is %s)",
 								$parameter->type,
-								$v->type->parameterType,
-								$v->type
+								$target->type->parameterType,
+								$target->type
 							)
 						),
 					])

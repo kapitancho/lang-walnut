@@ -11,6 +11,8 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\ExpressionRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\FunctionValueFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod as NativeMethodInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AliasType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntersectionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
@@ -54,30 +56,36 @@ abstract readonly class NativeMethod implements NativeMethodInterface {
 		$baseTargetType = $this->toBaseType($targetType);
 		$baseParameterType = $this->toBaseType($parameterType);
 
-		if (!$this->isTargetTypeValid($baseTargetType, $validator, $origin)) {
+		$validatedTargetType = $this->isTargetTypeValid($baseTargetType, $validator, $origin);
+		if (!$validatedTargetType) {
 			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
+				ValidationErrorType::invalidTargetType,
 				sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
 				$origin
 			);
 		}
-		if (!$this->isParameterTypeValid($baseParameterType, $validator)) {
+		$validatedParameterType = $this->isParameterTypeValid($baseParameterType, $validator);
+		if (!$validatedParameterType) {
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidParameterType,
 				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
 				$origin
 			);
 		}
-		$result = $validator($baseTargetType, $baseParameterType, $origin);
+		$result = $validator(
+			is_bool($validatedTargetType) ? $baseTargetType : $validatedTargetType,
+			is_bool($validatedParameterType) ? $baseParameterType : $validatedParameterType,
+			$origin
+		);
 		return $result instanceof Type ?
 			$this->validationFactory->validationSuccess($result) : $result;
 	}
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool {
+	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
 		return $this->matchesCallableParameter($validator, $targetType, 0);
 	}
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator): bool {
+	protected function isParameterTypeValid(Type $parameterType, callable $validator): bool|Type {
 		return $this->matchesCallableParameter($validator, $parameterType, 1);
 	}
 
@@ -110,18 +118,36 @@ abstract readonly class NativeMethod implements NativeMethodInterface {
 	/** @return callable(TTargetValue, TParameterValue): Value */
 	abstract protected function getExecutor(): callable;
 
-	private function matchesCallableParameter(callable $callable, object $value, int $parameterIndex): bool {
+	private function matchesCallableParameter(callable $callable, object $value, int $parameterIndex): bool|Type {
 		$reflection = new ReflectionFunction(Closure::fromCallable($callable));
 		$type = $reflection->getParameters()[$parameterIndex]->getType();
+
+		$q = function(object $value, string $typeName): bool|Type {
+			if ($value instanceof $typeName) {
+				return true;
+			}
+			if ($value instanceof IntersectionType) {
+				foreach($value->types as $it) {
+					if ($it instanceof $typeName) {
+						return $it;
+					}
+					if ($it instanceof AliasType && $it->aliasedType instanceof $typeName) {
+						return $it->aliasedType;
+					}
+				}
+			}
+			return false;
+		};
+
 		if ($type instanceof ReflectionNamedType) {
 			$typeName = $type->getName();
-			return $value instanceof $typeName;
+			return $q($value, $typeName);
 		}
 		if ($type instanceof ReflectionUnionType) {
 			foreach ($type->getTypes() as $t) {
 				if ($t instanceof ReflectionNamedType) {
 					$typeName = $t->getName();
-					if ($value instanceof $typeName) {
+					if ($q($value, $typeName)) {
 						return true;
 					}
 				}
