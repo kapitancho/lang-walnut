@@ -82,11 +82,12 @@ final readonly class ModuleBuilder implements ModuleCompilerInterface {
 			$type instanceof OpenType, $type instanceof SealedType => $type->valueType,
 			$type instanceof EnumerationType => $this->programContext->typeRegistry->union([
 				$type,
-				$this->programContext->typeRegistry->stringSubset(
+				$this->programContext->typeRegistry->string(),
+				/*$this->programContext->typeRegistry->stringSubset(
 					array_map(fn(EnumerationValue $enumValue): string
 						=> $enumValue->name, $type->values
 					)
-				)
+				)*/
 			]),
 			// @codeCoverageIgnoreStart
 			default => throw new BuildException(

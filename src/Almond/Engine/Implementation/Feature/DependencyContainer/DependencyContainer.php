@@ -13,6 +13,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OpenType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SealedType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\CoreType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\NamedType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
@@ -198,6 +199,9 @@ final class DependencyContainer implements DependencyContainerInterface {
 			null
 		);
 		if ($validationResult instanceof ValidationFailure) {
+			if ($type instanceof AliasType) {
+				return $this->attemptToFindAlias($type);
+			}
 			return new DependencyError(
 				DependencyContainerErrorType::notFound,
 				$type,
@@ -211,7 +215,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 		if (
 			$result instanceof ErrorValue &&
 			$result->errorValue instanceof DataValue &&
-			$result->errorValue->type->name->equals(new TypeName('CastNotAvailable'))
+			$result->errorValue->type->name->equals(CoreType::CastNotAvailable->typeName())
 		) {
 			if ($type instanceof AliasType) {
 				return $this->attemptToFindAlias($type);

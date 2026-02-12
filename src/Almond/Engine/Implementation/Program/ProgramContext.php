@@ -140,6 +140,8 @@ final readonly class ProgramContext implements ProgramContextInterface, TypeFind
 		// Factories continued:
 		$this->userlandFunctionFactory = new UserlandFunctionFactory(
 			$this->validationFactory,
+			$this->typeRegistry,
+			$this->valueRegistry,
 			new ExecutionContextFactory(
 				$this->typeRegistry->null->value
 			),

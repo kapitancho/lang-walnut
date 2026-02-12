@@ -62,13 +62,14 @@ final readonly class Construct implements NativeMethod {
 				);
 
 				$expectedType = $refType instanceof EnumerationType ?
+					$this->typeRegistry->string(): $refType->valueType;
+				$safeType = $refType instanceof EnumerationType ?
 					$this->typeRegistry->stringSubset(
 						array_map(
 							fn(EnumerationValue $ev): string => $ev->name->identifier,
 							$refType->subsetValues
 						)
-					):
-					$refType->valueType;
+					) : null;
 
 				$cError = null;
 				if ($constructorMethod !== UnknownMethod::value) {
@@ -108,6 +109,9 @@ final readonly class Construct implements NativeMethod {
 							),
 							$origin
 						);
+					}
+					if ($safeType && !$tType->isSubtypeOf($safeType)) {
+						$cError = $this->typeRegistry->core->unknownEnumerationValue;
 					}
 				}
 
@@ -184,16 +188,16 @@ final readonly class Construct implements NativeMethod {
 				}
 				if ($parameterType instanceof OpenType || $parameterType instanceof SealedType) {
 					$validationMethod = $parameterType->validator;
+					$t = $this->adjustParameterValue(
+						$this->valueRegistry,
+						$parameterType->valueType,
+						$t
+					);
 					if ($validationMethod !== null) {
-						$tParameterValue = $this->adjustParameterValue(
-							$this->valueRegistry,
-							$validationMethod->parameter->type,
-							$t
-						);
 						$t = $validationMethod->execute(
 							$this->variableScopeFactory->emptyVariableValueScope,
 							null,
-							$tParameterValue,
+							$t,
 						);
 						if ($t instanceof ErrorValue) {
 							return $t;
@@ -211,7 +215,16 @@ final readonly class Construct implements NativeMethod {
 				if ($t instanceof StringValue) {
 					try {
 						return $parameterType->value(new EnumerationValueName($t->literalValue));
-					} catch (UnknownEnumerationValue) {}
+					} catch (UnknownEnumerationValue) {
+						return $this->valueRegistry->error(
+							$this->valueRegistry->core->unknownEnumerationValue(
+								$this->valueRegistry->record([
+									'enumeration' => $this->valueRegistry->type($parameterType),
+									'value' => $t
+								])
+							)
+						);
+					}
 				}
 			}
 			// @codeCoverageIgnoreStart

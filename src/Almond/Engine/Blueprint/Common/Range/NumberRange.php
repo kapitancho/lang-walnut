@@ -63,12 +63,12 @@ final readonly class NumberRange implements Stringable, JsonSerializable {
 
 	public function containsInterval(NumberInterval $interval): bool {
 		return array_any($this->adjustedIntervals, fn(NumberInterval $existingInterval) =>
-		$existingInterval->containsInterval($interval));
+			$existingInterval->containsInterval($interval));
 	}
 
 	public function containsRange(NumberRange $range): bool {
 		return array_all($range->intervals, fn(NumberInterval $interval) =>
-		$this->containsInterval($interval));
+			$this->containsInterval($interval));
 	}
 
 	public function intersectionWith(NumberRange $other): NumberRange|null {

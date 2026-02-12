@@ -10,12 +10,10 @@ final readonly class NumberInterval implements Stringable {
 		public MinusInfinity|NumberIntervalEndpoint $start,
 		public PlusInfinity|NumberIntervalEndpoint $end
 	) {
-		if ($start instanceof NumberIntervalEndpoint &&
-			$end instanceof NumberIntervalEndpoint
-		) {
+		if ($start instanceof NumberIntervalEndpoint && $end instanceof NumberIntervalEndpoint) {
 			if ($start->value > $end->value || (
-					$start->value == $end->value && (!$start->inclusive || !$end->inclusive)
-				)) {
+				$start->value == $end->value && (!$start->inclusive || !$end->inclusive)
+			)) {
 				throw new InvalidNumberInterval($start, $end);
 			}
 		}

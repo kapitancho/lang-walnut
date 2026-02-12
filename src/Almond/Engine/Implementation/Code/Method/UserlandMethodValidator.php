@@ -11,6 +11,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\MethodName;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyContextFactory;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
@@ -163,7 +164,9 @@ final readonly class UserlandMethodValidator implements UserlandMethodValidatorI
 		$allMethods = $this->userlandMethodRegistry->allMethods();
 		foreach($allMethods as $methodName => $methods) {
 			foreach($methods as $method) {
-				$dependencyContext = $method->validateDependencies($dependencyContext);
+				try {
+					$dependencyContext = $method->validateDependencies($dependencyContext);
+				} catch (ExecutionException) {}
 			}
 		}
 		return $dependencyContext;

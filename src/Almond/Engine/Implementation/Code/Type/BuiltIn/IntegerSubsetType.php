@@ -56,7 +56,7 @@ final class IntegerSubsetType implements IntegerSubsetTypeInterface, JsonSeriali
 			$selected[$vs] = true;
 		}
 
-		$numberRange = new NumberRange(false,
+		$numberRange = new NumberRange(true,
 			...array_map(
 				fn(Number $number): NumberInterval =>
 					NumberInterval::singleNumber($number),

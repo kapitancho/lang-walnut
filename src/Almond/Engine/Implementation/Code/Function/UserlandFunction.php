@@ -8,9 +8,12 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\NameAndType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\UserlandFunction as UserlandFunctionInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyContainer;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyContext;
+use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyError;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionContextFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
@@ -19,10 +22,15 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\VariableScope\VariableScope;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\VariableScope\VariableValueScope;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\TupleAsRecord;
 
 final readonly class UserlandFunction implements UserlandFunctionInterface {
+	use TupleAsRecord;
+
 	public function __construct(
 		private ValidationFactory        $validationFactory,
+		private TypeRegistry             $typeRegistry,
+		private ValueRegistry            $valueRegistry,
 		private ExecutionContextFactory  $executionContextFactory,
 
 		private FunctionContextFiller    $functionContextFiller,
@@ -88,7 +96,12 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 				$origin ?? $this
 			);
 		}
-		if (!$parameterType->isSubtypeOf($this->parameter->type)) {
+		$pType = $this->adjustParameterType(
+			$this->typeRegistry,
+			$this->parameter->type,
+			$parameterType,
+		);
+		if (!$pType->isSubtypeOf($this->parameter->type)) {
 			$validationResult = $validationResult->withError(
 				ValidationErrorType::invalidParameterType,
 				sprintf(
@@ -109,6 +122,22 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 	}
 
 	public function execute(VariableValueScope $variableValueScope, Value|null $targetValue, Value $parameterValue): Value {
+		$pValue = $this->adjustParameterValue(
+			$this->valueRegistry,
+			$this->parameter->type,
+			$parameterValue
+		);
+		$dependencyValue = $this->dependency->type instanceof NothingType ? null :
+			$this->dependencyContainer->valueForType($this->dependency->type);
+		if ($dependencyValue instanceof DependencyError) {
+			throw new ExecutionException(
+				sprintf(
+					"Failed to resolve dependency of type '%s' for function execution: %s",
+					$this->dependency->type,
+					$dependencyValue->message
+				)
+			);
+		}
 		$returnValue = $this->functionBody->execute(
 			$this->functionContextFiller->fillExecutionContext(
 				$this->executionContextFactory->fromVariableValueScope(
@@ -117,10 +146,9 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 				$this->target,
 				$targetValue,
 				$this->parameter,
-				$parameterValue,
+				$pValue,
 				$this->dependency,
-				$this->dependency->type instanceof NothingType ? null :
-					$this->dependencyContainer->valueForType($this->dependency->type)
+				$dependencyValue
 			)
 		);
 		if (!$returnValue->type->isSubtypeOf($this->returnType)) {

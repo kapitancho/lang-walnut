@@ -2525,6 +2525,10 @@ final readonly class ParserStateMachine {
 				T::arithmetic_op_multiply->name => $c,
 				T::tuple_start->name => $c,
 				T::lambda_param->name => $c,
+				T::string_value->name => $c,
+				T::real_number->name => $c,
+				T::integer_number->name => $c,
+				T::positive_integer_number->name => $c,
 			]],
 			440 => ['name' => 'type value', 'transitions' => [
 				T::tuple_start->name => function(LT $token) {

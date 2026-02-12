@@ -250,7 +250,7 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 	public function realFull(
 		NumberInterval ... $intervals
 	): RealType {
-		$numberRange = new NumberRange(true, ...
+		$numberRange = new NumberRange(false, ...
 			count($intervals) === 0 ?
 				[new NumberInterval(MinusInfinity::value, PlusInfinity::value)] :
 				$intervals

@@ -122,15 +122,15 @@ final class ConstructTest extends CodeExecutionTestHelper {
 	}
 
 	public function testUnknownTypeConstructorError(): void {
-		$this->expectException(AstProgramCompilationException::class);
-		$this->executeCodeSnippet(
+		$this->executeErrorCodeSnippet(
+			'The type "A" does not exist.',
 			"A[a: 1, b: 'hi'];"
 		);
 	}
 
 	public function testDataConstructorError(): void {
 		$this->executeErrorCodeSnippet(
-			"Cannot construct a value of type: A",
+			"Construct expects a sealed, an open, or an enumeration type, A given",
 			"A[a: 1, b: 'hi'];",
 	<<<NUT
 		A := [a: Integer, b: String];
@@ -139,7 +139,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testAliasConstructorError(): void {
 		$this->executeErrorCodeSnippet(
-			"Cannot construct a value of type: A",
+			"Construct expects a sealed, an open, or an enumeration type, A given",
 			"A[a: 1, b: 'hi'];",
 	<<<NUT
 		A = [a: Integer, b: String];
@@ -157,7 +157,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testOpenWithoutConstructorCallError(): void {
 		$this->executeErrorCodeSnippet(
-			"Invalid constructor value",
+			"The constructor for type 'A' expects a parameter of type '[a: Integer, b: String]', but type '[a: Integer[1], other: String['hi']]' was provided.",
 			"A[a: 1, other: 'hi'];",
 		<<<NUT
 			A := #[a: Integer, b: String];
@@ -175,7 +175,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testOpenWithInvariantConstructorCallWrongReturnType(): void {
 		$this->executeErrorCodeSnippet(
-			"Expected a return value of type A, got Result<A, Any>",
+			"Function body return type 'Result<A, Any>' is not compatible with declared return type 'A'.",
 			"[A[a: 1, b: 'hi'], getA[a: 1, b: 'hi']];",
 		<<<NUT
 			A := #[a: Integer, b: String] @ Any :: null;
@@ -194,7 +194,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testOpenWithInvariantConstructorCallError(): void {
 		$this->executeErrorCodeSnippet(
-			"Invalid constructor value",
+			"The constructor for type 'A' expects a parameter of type '[a: Integer, b: String]', but type '[a: Integer[1], other: String['hi']]' was provided.",
 			"A[a: 1, other: 'hi'];",
 			<<<NUT
 			A := #[a: Integer, b: String] @ Any :: null;
@@ -223,7 +223,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testOpenWithConstructorCallOkErrorValueWrongConstructionType(): void {
 		$this->executeErrorCodeSnippet(
-			"Expected a return value of type [a: Integer, b: String], got Integer[15]",
+			"Function body return type 'Integer[15]' is not compatible with declared return type '[a: Integer, b: String]'.",
 			"[A[f: 'hi', e: 1], getA[f: 'hi', e: 1]];",
 		<<<NUT
 			A := #[a: Integer, b: String];
@@ -233,7 +233,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testOpenWithConstructorCallOkErrorValueWrongReturnType(): void {
 		$this->executeErrorCodeSnippet(
-			"Expected a return value of type A, got Result<A, Any>",
+			"Function body return type 'Result<A, Any>' is not compatible with declared return type 'A'.",
 			"[A[f: 'hi', e: 1], getA[f: 'hi', e: 1]];",
 		<<<NUT
 			A := #[a: Integer, b: String];
@@ -246,7 +246,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testOpenWithConstructorCallError(): void {
 		$this->executeErrorCodeSnippet(
-			"Expected a parameter value of type",
+			"The parameter type '[f: String['hi'], other: Integer[3]]' is not compatible with declared parameter type '[f: String, e: Real]'.",
 			"A[f: 'hi', other: 3];",
 		<<<NUT
 			A := #[a: Integer, b: String];
@@ -290,7 +290,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testOpenWithTwoConstructorsCallErrorValueBothWrongReturnType(): void {
 		$this->executeErrorCodeSnippet(
-			"Expected a return value of type A, got Result<A, String['error 2', 'error 1']>",
+			"Function body return type 'Result<A, String['error 2', 'error 1']>' is not compatible with declared return type 'A'.",
 			"[A[f: 'hi', e: 1], getA[f: 'hi', e: 1]];",
 		<<<NUT
 			A := #[a: Integer, b: String] @ String['error 1'] :: @'error 1';
@@ -303,7 +303,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testOpenWithTwoConstructorsCallError(): void {
 		$this->executeErrorCodeSnippet(
-			"Expected a parameter value of type",
+			"The parameter type '[f: String['hi'], other: Integer[3]]' is not compatible with declared parameter type '[f: String, e: Real]'.",
 			"A[f: 'hi', other: 3];",
 		<<<NUT
 			A := #[a: Integer, b: String] @ Any :: null;
@@ -325,7 +325,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testSealedWithoutConstructorCallError(): void {
 		$this->executeErrorCodeSnippet(
-			"Invalid constructor value",
+			"The constructor for type 'A' expects a parameter of type '[a: Integer, b: String]', but type '[a: Integer[1], other: String['hi']]' was provided.",
 			"A[a: 1, other: 'hi'];",
 			<<<NUT
 			A := $[a: Integer, b: String];
@@ -348,7 +348,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testSealedWithInvariantConstructorCallError(): void {
 		$this->executeErrorCodeSnippet(
-			"Invalid constructor value",
+			"The constructor for type 'A' expects a parameter of type '[a: Integer, b: String]', but type '[a: Integer[1], other: String['hi']]' was provided.",
 			"A[a: 1, other: 'hi'];",
 			<<<NUT
 			A := $[a: Integer, b: String] @ Any :: null;
@@ -373,7 +373,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testSealedWithConstructorCallError(): void {
 		$this->executeErrorCodeSnippet(
-			"Expected a parameter value of type",
+			"The parameter type '[f: String['hi'], other: Integer[3]]' is not compatible with declared parameter type '[f: String, e: Real]'.",
 			"A[f: 'hi', other: 3];",
 			<<<NUT
 			A := $[a: Integer, b: String];
@@ -415,7 +415,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testSealedWithTwoConstructorsCallError(): void {
 		$this->executeErrorCodeSnippet(
-			"Expected a parameter value of type",
+			"The parameter type '[f: String['hi'], other: Integer[3]]' is not compatible with declared parameter type '[f: String, e: Real]'.",
 			"A[f: 'hi', other: 3];",
 			<<<NUT
 			A := $[a: Integer, b: String] @ Any :: null;

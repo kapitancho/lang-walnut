@@ -11,7 +11,7 @@ final class UnknownType extends EngineException {
 	) {
 		parent::__construct(
 			sprintf(
-				'The type "%s" does not exist ',
+				'The type "%s" does not exist.',
 				$this->typeName
 			)
 		);

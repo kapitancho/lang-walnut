@@ -105,6 +105,29 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 			}
 		}
 
+		if (
+			$targetType instanceof SealedType &&
+			($targetType->valueType instanceof RecordType || $targetType->valueType instanceof TupleType)
+		) {
+			foreach($targetType->valueType->types as $fieldName => $fieldType) {
+				$validationContext = $validationContext->withAddedVariableType(
+					new VariableName('$' . $fieldName),
+					$tConv($fieldType)
+				);
+			}
+			if (!$targetType->valueType->restType instanceof NothingType) {
+				$validationContext = $validationContext->withAddedVariableType(
+					new VariableName('$_'),
+					$targetType->valueType instanceof RecordType ?
+						$this->typeRegistry->map(
+							$targetType->valueType->restType
+						) : $this->typeRegistry->array(
+							$targetType->valueType->restType
+						)
+				);
+			}
+		}
+
 		return $validationContext;
 	}
 
@@ -205,6 +228,37 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 						);
 					}
 				}
+			}
+		}
+		if (
+			$target->type instanceof SealedType && $targetValue instanceof SealedValue &&
+			(($tv = $targetValue->value) instanceof TupleValue || $tv instanceof RecordValue)
+		) {
+			$restValues = $tv->values;
+			$values = $tv->values;
+			foreach($target->type->valueType->types as $fieldName => $fieldType) {
+				unset($restValues[$fieldName]);
+				$value = $values[$fieldName] ??
+					$this->valueRegistry->error(
+						$this->valueRegistry->core->mapItemNotFound(
+							$this->valueRegistry->record([
+								'key' => $this->valueRegistry->string($fieldName)
+							])
+						)
+					)
+				;
+				$executionContext = $executionContext->withAddedVariableValue(
+					new VariableName('$' . $fieldName),
+					$value
+				);
+			}
+			if (!$target->type->valueType->restType instanceof NothingType) {
+				$executionContext = $executionContext->withAddedVariableValue(
+					new VariableName('$_'),
+					$tv instanceof RecordValue ?
+						$this->valueRegistry->record($restValues) :
+						$this->valueRegistry->tuple(array_values($restValues))
+				);
 			}
 		}
 		return $executionContext;

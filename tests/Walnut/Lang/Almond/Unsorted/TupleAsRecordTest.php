@@ -24,7 +24,7 @@ final class TupleAsRecordTest  extends CodeExecutionTestHelper {
 	public function testMethodCall(): void {
 		$result = $this->executeCodeSnippet("A->fn[1, 3.14, 'hi'];", <<<NUT
 		A := ();
-		A->fn(^[a: Integer, b: Real, c: String] => Real) :: #a + #b + {#c->length};
+		A->fn(^[a: Integer, b: Real, c: String] => Real) :: #a + #b + #c->length;
 	NUT);
 		$this->assertEquals("6.14", $result);
 	}
