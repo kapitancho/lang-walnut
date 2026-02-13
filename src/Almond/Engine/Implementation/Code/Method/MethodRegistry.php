@@ -5,7 +5,9 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Code\Method;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Method;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodRegistry as MethodRegistryInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Native\NativeMethodRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\UnknownMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AliasType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntersectionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\UnionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -26,6 +28,14 @@ final readonly class MethodRegistry implements MethodRegistryInterface {
 			$methodName = new MethodName('castAs');
 		}
 		$baseType = $this->toBaseType($type);
+
+		// Infinite loop prevention for alias types with intersection or union base types
+		if ($type instanceof AliasType && ($baseType instanceof IntersectionType || $baseType instanceof UnionType)) {
+			$nativeMethod = $this->nativeMethodRegistry->nativeMethodForTypeName($type->name, $methodName);
+			if ($nativeMethod instanceof NativeMethod) {
+				return $nativeMethod;
+			}
+		}
 		if ($baseType instanceof IntersectionType) {
 			foreach($baseType->types as $baseType) {
 				$method = $this->methodFor($baseType, $methodName);

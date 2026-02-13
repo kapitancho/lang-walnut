@@ -14,9 +14,13 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResult;
 
 final readonly class NullValue implements NullValueInterface, AtomValueInterface, JsonSerializable {
 
+	public null $literalValue;
+
 	public function __construct(
 		public NullType&AtomType $type,
-	) {}
+	) {
+		$this->literalValue = null;
+	}
 
 	public function equals(Value $other): bool {
 		return $other instanceof NullValueInterface;

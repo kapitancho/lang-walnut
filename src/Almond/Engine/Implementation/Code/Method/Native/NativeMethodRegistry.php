@@ -5,9 +5,11 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Code\Method\Native;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Native\NativeMethodLoader as NativeMethodLoaderInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Native\NativeMethodRegistry as NativeMethodRegistryInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\UnknownMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\NativeCodeTypeMapper as NativeCodeTypeMapperInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\MethodName;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 
 final readonly class NativeMethodRegistry implements NativeMethodRegistryInterface {
 
@@ -20,6 +22,10 @@ final readonly class NativeMethodRegistry implements NativeMethodRegistryInterfa
 	public function nativeMethods(Type $type, MethodName $methodName): array {
 		$typeNames = $this->codeTypeMapper->getTypesFor($type);
 		return $this->nativeMethodLoader->loadNativeMethods($typeNames, $methodName);
+	}
+
+	public function nativeMethodForTypeName(TypeName $typeName, MethodName $methodName): NativeMethod|UnknownMethod {
+		return $this->nativeMethodLoader->loadNativeMethod($typeName, $methodName);
 	}
 
 }
