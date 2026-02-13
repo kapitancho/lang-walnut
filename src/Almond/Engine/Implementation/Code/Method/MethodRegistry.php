@@ -25,19 +25,6 @@ final readonly class MethodRegistry implements MethodRegistryInterface {
 		if ($methodName->identifier === 'as') {
 			$methodName = new MethodName('castAs');
 		}
-
-		$userlandMethods = $this->programContext->userlandMethodRegistry->methodsByName($methodName);
-		foreach(array_reverse($userlandMethods) as $userlandMethod) {
-			$typeByName = $this->programContext->typeRegistry->typeByName($userlandMethod->targetType);
-			if ($type->isSubtypeOf($typeByName)) {
-				return $userlandMethod;
-			}
-		}
-		$nativeMethods = $this->nativeMethodRegistry->nativeMethods($type, $methodName);
-		if (count($nativeMethods) > 0) {
-			return array_first($nativeMethods);
-		}
-
 		$baseType = $this->toBaseType($type);
 		if ($baseType instanceof IntersectionType) {
 			foreach($baseType->types as $baseType) {
@@ -66,6 +53,19 @@ final readonly class MethodRegistry implements MethodRegistryInterface {
 				);
 			}
 		}
+
+		$userlandMethods = $this->programContext->userlandMethodRegistry->methodsByName($methodName);
+		foreach(array_reverse($userlandMethods) as $userlandMethod) {
+			$typeByName = $this->programContext->typeRegistry->typeByName($userlandMethod->targetType);
+			if ($type->isSubtypeOf($typeByName)) {
+				return $userlandMethod;
+			}
+		}
+		$nativeMethods = $this->nativeMethodRegistry->nativeMethods($type, $methodName);
+		if (count($nativeMethods) > 0) {
+			return array_first($nativeMethods);
+		}
+
 
 		return UnknownMethod::value;
 	}

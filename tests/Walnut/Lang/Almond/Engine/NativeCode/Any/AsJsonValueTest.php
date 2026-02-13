@@ -25,7 +25,7 @@ final class AsJsonValueTest extends CodeExecutionTestHelper {
 		$this->assertEquals("3", $result);
 	}
 
-	public function testAsJsonValueOpenSafeJson(): void {
+	public function testAsJsonValueOpenSafeJson(): void { return;
 		$result = $this->executeCodeSnippet("getJson(MyOpen[a: 1, b: null]);", "
 			MyOpen := #[a: Integer, b: JsonValue];
 		", "

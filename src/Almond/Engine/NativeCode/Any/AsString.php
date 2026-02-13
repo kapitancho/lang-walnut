@@ -23,7 +23,7 @@ final readonly class AsString implements NativeMethod {
 		return $this->validationFactory->validationSuccess(
 			$this->typeRegistry->result(
 				$this->typeRegistry->string(),
-				$this->typeRegistry->null
+				$this->typeRegistry->core->castNotAvailable
 			)
 		);
 	}

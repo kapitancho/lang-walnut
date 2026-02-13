@@ -109,20 +109,20 @@ final class EnumerationType implements EnumerationTypeInterface, JsonSerializabl
 	 * @throws UnknownEnumerationValue|DuplicateSubsetValue|InvalidArgument
 	 **/
     public function subsetType(array $values): EnumerationSubsetTypeInterface {
-		return new EnumerationSubsetType(
-			$this,
-			array_map(
-				fn($valueName): EnumerationValueInterface =>
-					$valueName instanceof EnumerationValueName ?
-						$this->value($valueName) :
-						InvalidArgument::of(
-							'EnumerationValueName',
-							$valueName,
-							'Expected an instance of EnumerationValueName'
-						),
-				$values
-			)
-		);
+	    $selected = array_map(
+		    fn($valueName): EnumerationValueInterface =>
+		    $valueName instanceof EnumerationValueName ?
+			    $this->value($valueName) :
+			    InvalidArgument::of(
+				    'EnumerationValueName',
+				    $valueName,
+				    'Expected an instance of EnumerationValueName'
+			    ),
+		    $values
+	    );
+
+	    return count($selected) === count($this->values) ?
+		    $this : new EnumerationSubsetType($this, $selected);
 	}
 
 	public EnumerationType $enumeration {
