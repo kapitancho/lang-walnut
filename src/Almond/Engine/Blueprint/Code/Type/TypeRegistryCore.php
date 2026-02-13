@@ -31,6 +31,7 @@ interface TypeRegistryCore {
 	public DataType        $invalidRegExp                 { get; }
 	public DataType        $invalidUuid                   { get; }
 	public DataType        $invocationError               { get; }
+	public AtomType        $invalidString                 { get; }
 	public AtomType        $itemNotFound                  { get; }
 	public AliasType       $jsonValue                     { get; }
 	public OpenType        $lengthRange                   { get; }

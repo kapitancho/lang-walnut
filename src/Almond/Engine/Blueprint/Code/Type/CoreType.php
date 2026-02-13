@@ -27,6 +27,7 @@ enum CoreType {
 	case InvalidRegExp;
 	case InvalidUuid;
 	case InvocationError;
+	case InvalidString;
 	case ItemNotFound;
 	case JsonValue;
 	case LengthRange;

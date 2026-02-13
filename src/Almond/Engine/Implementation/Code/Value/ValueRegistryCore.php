@@ -27,6 +27,11 @@ final class ValueRegistryCore implements ValueRegistryCoreInterface {
 			return $this->valueRegistry->atom(CoreType::DependencyContainer->typeName());
 		}
 	}
+	public AtomValue $invalidString {
+		get {
+			return $this->valueRegistry->atom(CoreType::InvalidString->typeName());
+		}
+	}
 	public AtomValue $itemNotFound {
 		get {
 			return $this->valueRegistry->atom(CoreType::ItemNotFound->typeName());

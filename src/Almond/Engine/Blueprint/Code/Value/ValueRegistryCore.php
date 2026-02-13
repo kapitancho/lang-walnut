@@ -34,7 +34,8 @@ interface ValueRegistryCore {
 	public function invalidRegExp(StringValue $value): DataValue;
 	public function invalidUuid(StringValue $value): DataValue;
 	public function invocationError(RecordValue $value): DataValue;
-	public AtomValue        $itemNotFound                  { get; }
+	public AtomValue        $invalidString                   { get; }
+	public AtomValue        $itemNotFound                    { get; }
 	//public OpenValue        $lengthRange                   { get; }
 	public function mapItemNotFound(RecordValue $value): DataValue;
 	public AtomValue        $minusInfinity                 { get; }

@@ -8,6 +8,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BytesValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
 /** @extends NativeMethod<StringType, NullType, StringValue, NullValue> */
@@ -17,7 +18,9 @@ final readonly class AsBytes extends NativeMethod {
 		return fn(StringType $targetType, NullType $parameterType): BytesType =>
 			$this->typeRegistry->bytes(
 				$targetType->range->minLength,
-				$targetType->range->maxLength
+				$targetType->range->maxLength === PlusInfinity::value ?
+					PlusInfinity::value :
+					$targetType->range->maxLength * 4
 			);
 	}
 

@@ -3,46 +3,23 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\String;
 
 use JsonException;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-final readonly class JsonDecode implements NativeMethod {
-	use BaseType;
+/** @extends NativeMethod<StringType, NullType, StringValue, NullValue> */
+final readonly class JsonDecode extends NativeMethod {
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
-		$targetType = $this->toBaseType($targetType);
-		if ($targetType instanceof StringType) {
-			return $this->validationFactory->validationSuccess(
-				$this->typeRegistry->result(
-					$this->typeRegistry->core->jsonValue,
-					$this->typeRegistry->core->invalidJsonString
-				)
+	protected function getValidator(): callable {
+		return fn(StringType $targetType, NullType $parameterType): ResultType =>
+			$this->typeRegistry->result(
+				$this->typeRegistry->core->jsonValue,
+				$this->typeRegistry->core->invalidJsonString
 			);
-		}
-		// @codeCoverageIgnoreStart
-		return $this->validationFactory->error(
-			ValidationErrorType::invalidTargetType,
-			sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-			$origin
-		);
-		// @codeCoverageIgnoreEnd
 	}
 
 	private function phpToValue(string|int|float|bool|null|array|object $value): Value {
@@ -63,12 +40,11 @@ final readonly class JsonDecode implements NativeMethod {
 		};
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		if ($target instanceof StringValue) {
+	protected function getExecutor(): callable {
+		return function(StringValue $target, NullValue $parameter): Value {
 			try {
 				/** @var array|bool|float|int|object|string|null $value */
 				$value = json_decode($target->literalValue, false, 512, JSON_THROW_ON_ERROR);
-
 				return $this->phpToValue($value);
 			} catch (JsonException) {
 				return $this->valueRegistry->error(
@@ -77,10 +53,7 @@ final readonly class JsonDecode implements NativeMethod {
 					)
 				);
 			}
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid target value");
-		// @codeCoverageIgnoreEnd
+		};
 	}
 
 }

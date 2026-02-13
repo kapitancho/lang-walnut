@@ -82,6 +82,9 @@ final class TypeRegistryCore implements TypeRegistryCoreInterface {
 	public DataType $invocationError {
 		get { return $this->registry->data(CoreType::InvocationError->typeName()); }
 	}
+	public AtomType $invalidString {
+		get { return $this->registry->atom(CoreType::InvalidString->typeName()); }
+	}
 	public AtomType $itemNotFound {
 		get { return $this->registry->atom(CoreType::ItemNotFound->typeName()); }
 	}
