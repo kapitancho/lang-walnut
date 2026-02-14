@@ -21,14 +21,21 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<ArrayType|TupleType, StringType, TupleValue, StringValue> */
 final readonly class Format extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
+	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type|ValidationFailure {
 		if (!($targetType instanceof ArrayType || $targetType instanceof TupleType)) {
 			return false;
 		}
 		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 		$itemType = $type->itemType;
 		$stringShape = $this->typeRegistry->shape($this->typeRegistry->string());
-		return $itemType->isSubtypeOf($stringShape);
+		if (!$itemType->isSubtypeOf($stringShape)) {
+			return $this->validationFactory->error(
+				ValidationErrorType::invalidTargetType,
+				sprintf("[%s] Invalid target type: array item type %s is not a subtype of Shape<String>", __CLASS__, $itemType),
+				$origin
+			);
+		}
+		return true;
 	}
 
 	protected function getValidator(): callable {

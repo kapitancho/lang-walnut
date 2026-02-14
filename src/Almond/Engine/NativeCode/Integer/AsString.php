@@ -40,8 +40,8 @@ final readonly class AsString extends NativeMethod {
 				$max === PlusInfinity::value, $min === MinusInfinity::value => PlusInfinity::value,
 				default => max(
 					1,
-					(int)ceil(log10(1 + abs((int)(string)$max->value))),
-					1 + (int)ceil( log10(1 + abs((int)(string)$min->value))),
+					$max->value < 0 ? 0 : (int)ceil(log10(1 + abs((int)(string)$max->value))),
+					$min->value > 0 ? 0 : 1 + (int)ceil(log10(1 + abs((int)(string)$min->value))),
 				)
 			};
 			return $this->typeRegistry->string($minLength, $maxLength);

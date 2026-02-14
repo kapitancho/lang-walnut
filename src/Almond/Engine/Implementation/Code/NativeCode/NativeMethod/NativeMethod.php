@@ -57,6 +57,9 @@ abstract readonly class NativeMethod implements NativeMethodInterface {
 		$baseParameterType = $this->toBaseType($parameterType);
 
 		$validatedTargetType = $this->isTargetTypeValid($baseTargetType, $validator, $origin);
+		if ($validatedTargetType instanceof ValidationFailure) {
+			return $validatedTargetType;
+		}
 		if (!$validatedTargetType) {
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidTargetType,
@@ -81,7 +84,7 @@ abstract readonly class NativeMethod implements NativeMethodInterface {
 			$this->validationFactory->validationSuccess($result) : $result;
 	}
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
+	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type|ValidationFailure {
 		return $this->matchesCallableParameter($validator, $targetType, 0);
 	}
 

@@ -3,7 +3,7 @@
 namespace Walnut\Lang\Implementation\Code\NativeCode;
 
 use BcMath\Number;
-use Walnut\Lang\Blueprint\Common\Range\NumberIntervalEndpoint;
+use Walnut\Lang\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Blueprint\Type\AliasType;
 use Walnut\Lang\Blueprint\Type\AtomType;
@@ -68,21 +68,32 @@ final readonly class CastAsString {
 			$targetType instanceof AliasType => $this->detectRangedType($targetType->aliasedType),
 			$targetType instanceof MutableType => $this->detectRangedType($targetType->valueType),
 			$targetType instanceof BytesType => [$targetType->range->minLength, $targetType->range->maxLength],
-			$targetType instanceof IntegerType => [
-				1,
-				1000,
-				/*($max = $targetType->numberRange->max) instanceof NumberIntervalEndpoint &&
-				($min = $targetType->numberRange->min) instanceof NumberIntervalEndpoint ?
-					max(1,
-						(int)ceil(log10(abs((int)(string)$max->value))),
-						(int)ceil(log10(abs((int)(string)$min->value))) +
-						($min->value < 0 ? 1 : 0)
-					) : 1000*/
-			],
+			$targetType instanceof IntegerType => $this->getIntegerRange($targetType),
 			$targetType instanceof RealType => [1, 1000],
 			$targetType instanceof TypeType => [1, PlusInfinity::value],
 			default => null
 		};
+	}
+
+	private function getIntegerRange(IntegerType $targetType): array {
+		$min = $targetType->numberRange->min;
+		$max = $targetType->numberRange->max;
+		$minLength = match(true) {
+			$max !== PlusInfinity::value && $max->value <= 0 =>
+			strlen((string)$max->value->sub($max->inclusive ? 0 : 1)),
+			$min !== MinusInfinity::value && $min->value >= 0 =>
+			strlen((string)$min->value->add($min->inclusive ? 0 : 1)),
+			default => 1,
+		};
+		$maxLength = match(true) {
+			$max === PlusInfinity::value, $min === MinusInfinity::value => PlusInfinity::value,
+			default => max(
+				1,
+				$max->value < 0 ? 0 : (int)ceil(log10(1 + abs((int)(string)$max->value))),
+				$min->value > 0 ? 0 : 1 + (int)ceil(log10(1 + abs((int)(string)$min->value))),
+			)
+		};
+		return [$minLength, $maxLength];
 	}
 
 	public function evaluate(Value $value): string|null {
