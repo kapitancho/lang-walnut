@@ -2,8 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Any;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodContext;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\UnknownMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EnumerationType;
@@ -13,46 +11,31 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SealedType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\UnknownEnumerationValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type as TypeInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\EnumerationValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\EnumerationValueName;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\VariableScope\VariableScopeFactory;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\TupleAsRecord;
 
-final readonly class Construct implements NativeMethod {
+/** @extends NativeMethod<Type, TypeType, Value, TypeValue> */
+final readonly class Construct extends NativeMethod {
 	use TupleAsRecord;
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-		private MethodContext $methodContext,
-		private VariableScopeFactory $variableScopeFactory
-	) {}
-
-	public function validate(
-		TypeInterface $targetType, TypeInterface $parameterType, mixed $origin
-	): ValidationSuccess|ValidationFailure {
-		if ($parameterType instanceof TypeType) {
+	protected function getValidator(): callable {
+		return function(Type $targetType, TypeType $parameterType, mixed $origin): Type|ValidationFailure {
 			$cType = $this->valueRegistry->core->constructor->type;
 			$refType = $parameterType->refType;
 			if ($refType instanceof ResultType && $refType->returnType instanceof NothingType) {
-				return $this->validationFactory->validationSuccess(
-					$this->typeRegistry->result(
-						$this->typeRegistry->nothing,
-						$targetType
-					)
+				return $this->typeRegistry->result(
+					$this->typeRegistry->nothing,
+					$targetType
 				);
 			}
 			if ($refType instanceof OpenType || $refType instanceof SealedType || $refType instanceof EnumerationType) {
@@ -138,11 +121,9 @@ final readonly class Construct implements NativeMethod {
 					$this->typeRegistry->union([$cError, $vError]) :
 					$cError ?? $vError;
 
-				return $this->validationFactory->validationSuccess(
-					$errorType ? $this->typeRegistry->result(
-						$refType, $errorType
-					) : $refType
-				);
+				return $errorType ? $this->typeRegistry->result(
+					$refType, $errorType
+				) : $refType;
 			}
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidParameterType,
@@ -151,16 +132,11 @@ final readonly class Construct implements NativeMethod {
 				),
 				$origin
 			);
-		}
-		return $this->validationFactory->error(
-			ValidationErrorType::invalidParameterType,
-			sprintf("[%s] Construct expects a type, %s given", __CLASS__, $parameterType),
-			$origin
-		);
+		};
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		if ($parameter instanceof TypeValue) {
+	protected function getExecutor(): callable {
+		return function(Value $target, TypeValue $parameter): Value {
 			$cValue = $this->valueRegistry->core->constructor;
 
 			$parameterType = $parameter->typeValue;
@@ -230,10 +206,7 @@ final readonly class Construct implements NativeMethod {
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value type");
 			// @codeCoverageIgnoreEnd
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid parameter value");
-		// @codeCoverageIgnoreEnd
+		};
 	}
 
 }

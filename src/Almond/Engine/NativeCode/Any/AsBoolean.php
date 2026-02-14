@@ -2,30 +2,23 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Any;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BooleanType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BooleanValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-final readonly class AsBoolean implements NativeMethod {
+/** @extends NativeMethod<Type, Type, Value, Value> */
+final readonly class AsBoolean extends NativeMethod {
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
-		return $this->validationFactory->validationSuccess(
-			$this->typeRegistry->boolean
-		);
+	protected function getValidator(): callable {
+		return fn(Type $targetType, Type $parameterType): BooleanType =>
+			$this->typeRegistry->boolean;
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		return $this->valueRegistry->true;
+	protected function getExecutor(): callable {
+		return fn(Value $target, Value $parameter): BooleanValue =>
+			$this->valueRegistry->true;
 	}
+
 }

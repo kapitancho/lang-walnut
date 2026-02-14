@@ -2,59 +2,28 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Mutable;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MutableType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\MutableValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MutableNativeMethod;
 
-final readonly class REVERSE implements NativeMethod {
-	use BaseType;
+/** @extends MutableNativeMethod<StringType|ArrayType, NullType, NullValue> */
+final readonly class REVERSE extends MutableNativeMethod {
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
+	protected function isTargetValueTypeValid(Type $targetValueType, mixed $origin): bool {
+		return $targetValueType instanceof StringType || $targetValueType instanceof ArrayType;
+	}
 
-	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
-		$t = $this->toBaseType($targetType);
-		if ($t instanceof MutableType) {
-			$valueType = $this->toBaseType($t->valueType);
-			if ($valueType instanceof StringType || $valueType instanceof ArrayType) {
-				if ($this->toBaseType($parameterType) instanceof NullType) {
-					return $this->validationFactory->validationSuccess($targetType);
-				}
-				// @codeCoverageIgnoreStart
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-					origin: $origin
-				);
-				// @codeCoverageIgnoreEnd
-			}
-		}
-		// @codeCoverageIgnoreStart
-		return $this->validationFactory->error(
-			ValidationErrorType::invalidTargetType,
-			sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-			origin: $origin
-		);
-		// @codeCoverageIgnoreEnd
+	protected function getValidator(): callable {
+		return fn(MutableType $targetType, NullType $parameterType): MutableType =>
+			$targetType;
 	}
 
 	private function reverse(string $str): string {
@@ -62,27 +31,21 @@ final readonly class REVERSE implements NativeMethod {
 		return implode('', array_reverse($matches[0]));
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		if ($target instanceof MutableValue) {
-			if (!$parameter instanceof NullValue) {
-				// @codeCoverageIgnoreStart
-				throw new ExecutionException("Invalid parameter value");
-				// @codeCoverageIgnoreEnd
-			}
+	protected function getExecutor(): callable {
+		return function(MutableValue $target, NullValue $parameter): MutableValue {
 			$t = $target->value;
 			if ($t instanceof TupleValue) {
-				$values = $t->values;
-				$values = array_reverse($values);
-				$target->value = $this->valueRegistry->tuple($values);
+				$target->value = $this->valueRegistry->tuple(array_reverse($t->values));
 				return $target;
 			}
 			if ($t instanceof StringValue) {
-				$target->value = $this->valueRegistry->string($this->reverse($target->value->literalValue));
+				$target->value = $this->valueRegistry->string($this->reverse($t->literalValue));
 				return $target;
 			}
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid target value");
-		// @codeCoverageIgnoreEnd
+			// @codeCoverageIgnoreStart
+			throw new ExecutionException("Invalid target value");
+			// @codeCoverageIgnoreEnd
+		};
 	}
+
 }

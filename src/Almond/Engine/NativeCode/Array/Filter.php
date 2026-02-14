@@ -2,38 +2,29 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Array;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-final readonly class Filter implements NativeMethod {
-	use BaseType;
+/** @extends NativeMethod<ArrayType|TupleType, FunctionType, TupleValue, FunctionValue> */
+final readonly class Filter extends NativeMethod {
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
+	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
+		return $targetType instanceof ArrayType || $targetType instanceof TupleType;
+	}
 
-	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
-		$targetType = $this->toBaseType($targetType);
-		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
-		if ($type instanceof ArrayType) {
+	protected function getValidator(): callable {
+		return function(ArrayType|TupleType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
+			$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf(
 				$this->typeRegistry->result($this->typeRegistry->boolean, $this->typeRegistry->any)
@@ -45,12 +36,10 @@ final readonly class Filter implements NativeMethod {
 						0,
 						$type->range->maxLength
 					);
-					return $this->validationFactory->validationSuccess(
-						$pType instanceof ResultType ? $this->typeRegistry->result(
-							$returnType,
-							$pType->errorType
-						) : $returnType
-					);
+					return $pType instanceof ResultType ? $this->typeRegistry->result(
+						$returnType,
+						$pType->errorType
+					) : $returnType;
 				}
 				return $this->validationFactory->error(
 					ValidationErrorType::invalidParameterType,
@@ -59,26 +48,19 @@ final readonly class Filter implements NativeMethod {
 						$type->itemType,
 						$parameterType->parameterType
 					),
-					origin: $origin
+					$origin
 				);
 			}
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidParameterType,
 				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				origin: $origin
+				$origin
 			);
-		}
-		// @codeCoverageIgnoreStart
-		return $this->validationFactory->error(
-			ValidationErrorType::invalidTargetType,
-			sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-			origin: $origin
-		);
-		// @codeCoverageIgnoreEnd
+		};
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		if ($target instanceof TupleValue && $parameter instanceof FunctionValue) {
+	protected function getExecutor(): callable {
+		return function(TupleValue $target, FunctionValue $parameter): Value {
 			$result = [];
 			$true = $this->valueRegistry->true;
 			foreach ($target->values as $value) {
@@ -91,9 +73,7 @@ final readonly class Filter implements NativeMethod {
 				}
 			}
 			return $this->valueRegistry->tuple($result);
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid target value");
-		// @codeCoverageIgnoreEnd
+		};
 	}
+
 }

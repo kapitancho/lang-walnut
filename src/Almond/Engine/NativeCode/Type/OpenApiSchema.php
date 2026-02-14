@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Type;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AliasType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BooleanType;
@@ -23,47 +22,29 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\UnionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\CoreType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\NamedType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type as TypeInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNativeMethod;
 
-final readonly class OpenApiSchema implements NativeMethod {
+/** @extends TypeNativeMethod<Type, NullType, NullValue> */
+final readonly class OpenApiSchema extends TypeNativeMethod {
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function validate(TypeInterface $targetType, TypeInterface $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
-		if ($targetType instanceof TypeType) {
-			$refType = $targetType->refType;
-			while($refType instanceof MutableType) {
-				$refType = $refType->valueType;
-			}
-			if ($refType->isSubtypeOf($this->typeRegistry->core->jsonValue)) {
-				return $this->validationFactory->validationSuccess(
-					$this->typeRegistry->core->jsonValue
-				);
-			}
+	protected function isTargetRefTypeValid(Type $targetRefType, mixed $origin): bool {
+		$refType = $targetRefType;
+		while ($refType instanceof MutableType) {
+			$refType = $refType->valueType;
 		}
-		// @codeCoverageIgnoreStart
-		return $this->validationFactory->error(
-			ValidationErrorType::invalidTargetType,
-			sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-			origin: $origin
-		);
-		// @codeCoverageIgnoreEnd
+		return $refType->isSubtypeOf($this->typeRegistry->core->jsonValue);
+	}
+
+	protected function getValidator(): callable {
+		return fn(TypeType $targetType, NullType $parameterType): Type =>
+			$this->typeRegistry->core->jsonValue;
 	}
 
 	private function integerToOpenApiSchema(IntegerType $type): Value {
@@ -112,7 +93,7 @@ final readonly class OpenApiSchema implements NativeMethod {
 			]) : $result[0];
 	}
 
-	private function typeToOpenApiSchema(TypeInterface $type): Value {
+	private function typeToOpenApiSchema(Type $type): Value {
 		/** @noinspection PhpParamsInspection */
 		return match(true) {
 			$type instanceof AliasType && $type->name->equals(CoreType::JsonValue->typeName()) =>
@@ -149,7 +130,7 @@ final readonly class OpenApiSchema implements NativeMethod {
 			$type instanceof UnionType => $this->valueRegistry->record([
 				'oneOf' => $this->valueRegistry->tuple(
 					array_map(
-						fn(TypeInterface $type) => $this->typeToOpenApiSchema($type),
+						fn(Type $type) => $this->typeToOpenApiSchema($type),
 						$type->types
 					)
 				)
@@ -157,7 +138,7 @@ final readonly class OpenApiSchema implements NativeMethod {
 			$type instanceof IntersectionType => $this->valueRegistry->record([
 				'allOf' => $this->valueRegistry->tuple(
 					array_map(
-						fn(TypeInterface $type) => $this->typeToOpenApiSchema($type),
+						fn(Type $type) => $this->typeToOpenApiSchema($type),
 						$type->types
 					)
 				)
@@ -193,13 +174,13 @@ final readonly class OpenApiSchema implements NativeMethod {
 					'type' => $this->valueRegistry->string('object'),
 					'properties' => $this->valueRegistry->record(
 						array_map(
-							fn(TypeInterface $type) => $this->typeToOpenApiSchema($type instanceof OptionalKeyType ? $type->valueType : $type),
+							fn(Type $type) => $this->typeToOpenApiSchema($type instanceof OptionalKeyType ? $type->valueType : $type),
 							$type->types
 						)
 					)
 				],
 				... (count($requiredFields = array_keys(
-					array_filter($type->types, static fn(TypeInterface $type): bool => !($type instanceof OptionalKeyType))
+					array_filter($type->types, static fn(Type $type): bool => !($type instanceof OptionalKeyType))
 				)) > 0 ? ['required' => $this->valueRegistry->tuple(
 					array_map(
 						fn(string $requiredField): StringValue => $this->valueRegistry->string($requiredField),
@@ -213,12 +194,9 @@ final readonly class OpenApiSchema implements NativeMethod {
 		};
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		if ($target instanceof TypeValue) {
-			return $this->typeToOpenApiSchema($target->typeValue);
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid parameter value");
-		// @codeCoverageIgnoreEnd
+	protected function getExecutor(): callable {
+		return fn(TypeValue $target, NullValue $parameter): Value =>
+			$this->typeToOpenApiSchema($target->typeValue);
 	}
+
 }

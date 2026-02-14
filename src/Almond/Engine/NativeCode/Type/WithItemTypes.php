@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Type;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntersectionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MetaType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
@@ -10,31 +9,19 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\UnionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\MetaTypeValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type as TypeInterface;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNativeMethod;
 
-final readonly class WithItemTypes implements NativeMethod {
+/** @extends TypeNativeMethod<Type, Type, Value> */
+final readonly class WithItemTypes extends TypeNativeMethod {
 
-	use BaseType;
-
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function validate(TypeInterface $targetType, TypeInterface $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
-		if ($targetType instanceof TypeType) {
+	protected function getValidator(): callable {
+		return function(TypeType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($parameterType->isSubtypeOf(
 				$this->typeRegistry->array(
@@ -46,41 +33,29 @@ final readonly class WithItemTypes implements NativeMethod {
 				if ($refType instanceof TupleType || (
 					$refType instanceof MetaType && $refType->value === MetaTypeValue::Tuple
 				)) {
-					return $this->validationFactory->validationSuccess(
-						$this->typeRegistry->type(
-							$this->typeRegistry->metaType(
-								MetaTypeValue::Tuple
-							)
-						)
+					return $this->typeRegistry->type(
+						$this->typeRegistry->metaType(MetaTypeValue::Tuple)
 					);
 				}
 				if ($refType instanceof IntersectionType || (
 					$refType instanceof MetaType && $refType->value === MetaTypeValue::Intersection
 				)) {
-					return $this->validationFactory->validationSuccess(
-						$this->typeRegistry->type(
-							$this->typeRegistry->metaType(
-								MetaTypeValue::Intersection
-							)
-						)
+					return $this->typeRegistry->type(
+						$this->typeRegistry->metaType(MetaTypeValue::Intersection)
 					);
 				}
 				if ($refType instanceof UnionType || (
 					$refType instanceof MetaType && $refType->value === MetaTypeValue::Union
 				)) {
-					return $this->validationFactory->validationSuccess(
-						$this->typeRegistry->type(
-							$this->typeRegistry->metaType(
-								MetaTypeValue::Union
-							)
-						)
+					return $this->typeRegistry->type(
+						$this->typeRegistry->metaType(MetaTypeValue::Union)
 					);
 				}
 				// @codeCoverageIgnoreStart
 				return $this->validationFactory->error(
 					ValidationErrorType::invalidTargetType,
 					sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-					origin: $origin
+					$origin
 				);
 				// @codeCoverageIgnoreEnd
 			}
@@ -97,39 +72,28 @@ final readonly class WithItemTypes implements NativeMethod {
 				if ($refType instanceof RecordType || (
 					$refType instanceof MetaType && $refType->value === MetaTypeValue::Record
 				)) {
-					return $this->validationFactory->validationSuccess(
-						$this->typeRegistry->type(
-							$this->typeRegistry->metaType(
-								MetaTypeValue::Record
-							)
-						)
+					return $this->typeRegistry->type(
+						$this->typeRegistry->metaType(MetaTypeValue::Record)
 					);
 				}
 				// @codeCoverageIgnoreStart
 				return $this->validationFactory->error(
 					ValidationErrorType::invalidTargetType,
 					sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-					origin: $origin
+					$origin
 				);
 				// @codeCoverageIgnoreEnd
 			}
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidParameterType,
 				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				origin: $origin
+				$origin
 			);
-		}
-		// @codeCoverageIgnoreStart
-		return $this->validationFactory->error(
-			ValidationErrorType::invalidTargetType,
-			sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-			origin: $origin
-		);
-		// @codeCoverageIgnoreEnd
+		};
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		if ($target instanceof TypeValue) {
+	protected function getExecutor(): callable {
+		return function(TypeValue $target, Value $parameter): Value {
 			$typeValue = $this->toBaseType($target->typeValue);
 			if ($parameter->type->isSubtypeOf(
 				$this->typeRegistry->array(
@@ -142,7 +106,7 @@ final readonly class WithItemTypes implements NativeMethod {
 					$typeValue instanceof MetaType && $typeValue->value === MetaTypeValue::Tuple
 				)) {
 					$result = $this->typeRegistry->tuple(
-						array_map(fn(TypeValue $tv): TypeInterface => $tv->typeValue, $parameter->values),
+						array_map(fn(TypeValue $tv): Type => $tv->typeValue, $parameter->values),
 						$typeValue instanceof TupleType ? $typeValue->restType : $this->typeRegistry->nothing,
 					);
 					return $this->valueRegistry->type($result);
@@ -151,7 +115,7 @@ final readonly class WithItemTypes implements NativeMethod {
 					$typeValue instanceof MetaType && $typeValue->value === MetaTypeValue::Intersection
 				)) {
 					$result = $this->typeRegistry->intersection(
-						array_map(fn(TypeValue $tv): TypeInterface => $tv->typeValue, $parameter->values),
+						array_map(fn(TypeValue $tv): Type => $tv->typeValue, $parameter->values),
 					);
 					return $this->valueRegistry->type($result);
 				}
@@ -159,7 +123,7 @@ final readonly class WithItemTypes implements NativeMethod {
 					$typeValue instanceof MetaType && $typeValue->value === MetaTypeValue::Union
 				)) {
 					$result = $this->typeRegistry->union(
-						array_map(fn(TypeValue $tv): TypeInterface => $tv->typeValue, $parameter->values),
+						array_map(fn(TypeValue $tv): Type => $tv->typeValue, $parameter->values),
 					);
 					return $this->valueRegistry->type($result);
 				}
@@ -178,15 +142,16 @@ final readonly class WithItemTypes implements NativeMethod {
 					$typeValue instanceof MetaType && $typeValue->value === MetaTypeValue::Record
 				)) {
 					$result = $this->typeRegistry->record(
-						array_map(fn(TypeValue $tv): TypeInterface => $tv->typeValue, $parameter->values),
+						array_map(fn(TypeValue $tv): Type => $tv->typeValue, $parameter->values),
 						$typeValue instanceof RecordType ? $typeValue->restType : $this->typeRegistry->nothing,
 					);
 					return $this->valueRegistry->type($result);
 				}
 			}
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid target value");
-		// @codeCoverageIgnoreEnd
+			// @codeCoverageIgnoreStart
+			throw new \Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException("Invalid target value");
+			// @codeCoverageIgnoreEnd
+		};
 	}
+
 }

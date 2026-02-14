@@ -2,38 +2,29 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Array;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-final readonly class Reduce implements NativeMethod {
-	use BaseType;
+/** @extends NativeMethod<ArrayType|TupleType, Type, TupleValue, RecordValue> */
+final readonly class Reduce extends NativeMethod {
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
+	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
+		return $targetType instanceof ArrayType || $targetType instanceof TupleType;
+	}
 
-	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
-		$targetType = $this->toBaseType($targetType);
-		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
-		if ($type instanceof ArrayType) {
+	protected function getValidator(): callable {
+		return function(ArrayType|TupleType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
+			$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 			if ($parameterType->isSubtypeOf(
 				$this->typeRegistry->record([
 					'reducer' => $this->typeRegistry->function(
@@ -68,7 +59,7 @@ final readonly class Reduce implements NativeMethod {
 							$reducerReturnReturnType,
 							$resultType
 						),
-						origin: $origin
+						$origin
 					);
 				}
 				if (!$initialType->isSubtypeOf($resultType)) {
@@ -80,55 +71,36 @@ final readonly class Reduce implements NativeMethod {
 							$initialType,
 							$resultType
 						),
-						origin: $origin
+						$origin
 					);
 				}
-				return $this->validationFactory->validationSuccess(
-					$reducerReturnErrorType ?
-						$this->typeRegistry->result($resultType, $reducerReturnErrorType) :
-						$resultType
-				);
+				return $reducerReturnErrorType ?
+					$this->typeRegistry->result($resultType, $reducerReturnErrorType) :
+					$resultType;
 			}
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidParameterType,
 				sprintf("[%s] Parameter must be a record with 'reducer' and 'initial' fields", __CLASS__),
-				origin: $origin
+				$origin
 			);
-		}
-		// @codeCoverageIgnoreStart
-		return $this->validationFactory->error(
-			ValidationErrorType::invalidTargetType,
-			sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-			origin: $origin
-		);
-		// @codeCoverageIgnoreEnd
+		};
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		if ($target instanceof TupleValue) {
-			if ($parameter instanceof RecordValue) {
-				if (isset($parameter->values['reducer']) && isset($parameter->values['initial'])) {
-					$reducer = $parameter->values['reducer'];
-					$accumulator = $parameter->values['initial'];
+	protected function getExecutor(): callable {
+		return function(TupleValue $target, RecordValue $parameter): Value {
+			/** @var FunctionValue $reducer */
+			$reducer = $parameter->values['reducer'];
+			$accumulator = $parameter->values['initial'];
 
-					if ($reducer instanceof FunctionValue) {
-						foreach ($target->values as $item) {
-							$reducerParam = $this->valueRegistry->record(['result' => $accumulator, 'item' => $item]);
-							$accumulator = $reducer->execute($reducerParam);
-							if ($accumulator instanceof ErrorValue) {
-								break;
-							}
-						}
-						return $accumulator;
-					}
+			foreach ($target->values as $item) {
+				$reducerParam = $this->valueRegistry->record(['result' => $accumulator, 'item' => $item]);
+				$accumulator = $reducer->execute($reducerParam);
+				if ($accumulator instanceof ErrorValue) {
+					break;
 				}
 			}
-			// @codeCoverageIgnoreStart
-			throw new ExecutionException("Invalid parameter value");
-			// @codeCoverageIgnoreEnd
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid target value");
-		// @codeCoverageIgnoreEnd
+			return $accumulator;
+		};
 	}
+
 }
