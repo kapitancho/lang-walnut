@@ -52,6 +52,7 @@ final readonly class MetaType implements MetaTypeInterface, SupertypeChecker, Js
 					MetaTypeValue::Open, MetaTypeValue::Sealed
 				], true),
 				MetaTypeValue::Enumeration => $ofType->value === MetaTypeValue::EnumerationSubset,
+				MetaTypeValue::RealSubset => $ofType->value === MetaTypeValue::IntegerSubset,
 				default => false
 			};
 			if ($isSupertype) {

@@ -2,38 +2,25 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Mutable;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MutableType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\MutableValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-final readonly class FILTER implements NativeMethod {
-	use BaseType;
+/** @extends NativeMethod<MutableType, FunctionType, MutableValue, FunctionValue> */
+final readonly class FILTER extends NativeMethod {
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
+	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
 		if ($targetType instanceof MutableType) {
 			$type = $this->toBaseType($targetType->valueType);
 			if (($type instanceof ArrayType || $type instanceof MapType || $type instanceof SetType) && $type->isSubtypeOf(
@@ -47,39 +34,40 @@ final readonly class FILTER implements NativeMethod {
 				!$type->isSubtypeOf($this->typeRegistry->map($this->typeRegistry->any, 1)) &&
 				!$type->isSubtypeOf($this->typeRegistry->set($this->typeRegistry->any, 1))
 			) {
-				$parameterType = $this->toBaseType($parameterType);
-				if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf($this->typeRegistry->boolean)) {
-					if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
-						return $this->validationFactory->validationSuccess($targetType);
-					}
-					return $this->validationFactory->error(
-						ValidationErrorType::invalidParameterType,
-						sprintf(
-							"The parameter type %s of the callback function is not a subtype of %s",
-							$type->itemType,
-							$parameterType->parameterType
-						),
-						origin: $origin
-					);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected function getValidator(): callable {
+		return function(MutableType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
+			$type = $this->toBaseType($targetType->valueType);
+			$parameterType = $this->toBaseType($parameterType);
+			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf($this->typeRegistry->boolean)) {
+				if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
+					return $targetType;
 				}
 				return $this->validationFactory->error(
 					ValidationErrorType::invalidParameterType,
-					sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-					origin: $origin
+					sprintf(
+						"The parameter type %s of the callback function is not a subtype of %s",
+						$type->itemType,
+						$parameterType->parameterType
+					),
+					$origin
 				);
 			}
-		}
-		// @codeCoverageIgnoreStart
-		return $this->validationFactory->error(
-			ValidationErrorType::invalidTargetType,
-			sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-			origin: $origin
-		);
-		// @codeCoverageIgnoreEnd
+			return $this->validationFactory->error(
+				ValidationErrorType::invalidParameterType,
+				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+				$origin
+			);
+		};
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		if ($target instanceof MutableValue && $parameter instanceof FunctionValue) {
+	protected function getExecutor(): callable {
+		return function(MutableValue $target, FunctionValue $parameter): MutableValue {
 			$v = $target->value;
 			if ($v instanceof TupleValue || $v instanceof RecordValue || $v instanceof SetValue) {
 				$values = $v->values;
@@ -94,17 +82,15 @@ final readonly class FILTER implements NativeMethod {
 				if (!$v instanceof RecordValue) {
 					$result = array_values($result);
 				}
-				$output = match(true) {
+				$target->value = match(true) {
 					$v instanceof TupleValue => $this->valueRegistry->tuple($result),
 					$v instanceof RecordValue => $this->valueRegistry->record($result),
 					$v instanceof SetValue => $this->valueRegistry->set($result),
 				};
-				$target->value = $output;
 				return $target;
 			}
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid target value");
-		// @codeCoverageIgnoreEnd
+			return $target;
+		};
 	}
+
 }

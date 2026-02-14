@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Mutable;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MutableType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
@@ -12,48 +11,49 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\MutableValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-final readonly class ADD implements NativeMethod {
-	use BaseType;
+/** @extends NativeMethod<MutableType, Type, MutableValue, Value> */
+final readonly class ADD extends NativeMethod {
 
-	public function __construct(
-		private ValidationFactory $validationFactory,
-		private TypeRegistry $typeRegistry,
-		private ValueRegistry $valueRegistry,
-	) {}
-
-	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
-		$t = $this->toBaseType($targetType);
-		if ($t instanceof MutableType) {
-			$valueType = $this->toBaseType($t->valueType);
+	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
+		if ($targetType instanceof MutableType) {
+			$valueType = $this->toBaseType($targetType->valueType);
 			if ($valueType instanceof SetType && $valueType->range->maxLength === PlusInfinity::value) {
-				$p = $this->toBaseType($parameterType);
+				return true;
+			}
+			if ($valueType instanceof RecordType) {
+				return true;
+			}
+			if ($valueType instanceof MapType && $valueType->range->maxLength === PlusInfinity::value) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected function getValidator(): callable {
+		return function(MutableType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
+			$valueType = $this->toBaseType($targetType->valueType);
+			$p = $this->toBaseType($parameterType);
+			if ($valueType instanceof SetType) {
 				if ($p->isSubtypeOf($valueType->itemType)) {
-					return $this->validationFactory->validationSuccess($t);
+					return $targetType;
 				}
-				// @codeCoverageIgnoreStart
 				return $this->validationFactory->error(
 					ValidationErrorType::invalidParameterType,
 					sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-					origin: $origin
+					$origin
 				);
-				// @codeCoverageIgnoreEnd
 			}
 			if ($valueType instanceof RecordType) {
-				$p = $this->toBaseType($parameterType);
 				if ($p->isSubtypeOf($this->typeRegistry->record([
 					'key' => $this->typeRegistry->string(),
 					'value' => $this->typeRegistry->any
@@ -71,7 +71,7 @@ final readonly class ADD implements NativeMethod {
 											sprintf("[%s] Invalid parameter type: %s - an item with key %s cannot be added",
 												__CLASS__, $mType, $subsetValue
 											),
-											origin: $origin
+											$origin
 										);
 									} else {
 										return $this->validationFactory->error(
@@ -79,12 +79,12 @@ final readonly class ADD implements NativeMethod {
 											sprintf("[%s] Invalid parameter type: %s - the item with key %s cannot be of type %s, %s expected",
 												__CLASS__, $mType, $subsetValue, $vv, $mType instanceof OptionalKeyType ? $mType->valueType : $mType
 											),
-											origin: $origin
+											$origin
 										);
 									}
 								}
 							}
-							return $this->validationFactory->validationSuccess($t);
+							return $targetType;
 						}
 						if ($kk instanceof StringType) {
 							if (!$vv->isSubtypeOf($valueType->restType)) {
@@ -94,7 +94,7 @@ final readonly class ADD implements NativeMethod {
 										"[%s] Invalid parameter type - the value type %s should be a subtype of %s",
 										__CLASS__, $vv, $valueType->restType
 									),
-									origin: $origin
+									$origin
 								);
 							}
 							foreach($valueType->types as $vKey => $vType) {
@@ -105,62 +105,50 @@ final readonly class ADD implements NativeMethod {
 											"[%s] Invalid parameter type - the value type %s of item %s should be a subtype of %s",
 											__CLASS__, $vv, $vKey, $valueType->restType
 										),
-										origin: $origin
+										$origin
 									);
 								}
 							}
-							return $this->validationFactory->validationSuccess($t);
+							return $targetType;
 						}
 					}
 				}
-				// @codeCoverageIgnoreStart
 				return $this->validationFactory->error(
 					ValidationErrorType::invalidParameterType,
 					sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-					origin: $origin
+					$origin
 				);
-				// @codeCoverageIgnoreEnd
 			}
-			if ($valueType instanceof MapType && $valueType->range->maxLength === PlusInfinity::value) {
-				$p = $this->toBaseType($parameterType);
+			if ($valueType instanceof MapType) {
 				if ($p->isSubtypeOf($this->typeRegistry->record([
 					'key' => $valueType->keyType,
 					'value' => $valueType->itemType
 				], null))) {
-					return $this->validationFactory->validationSuccess($t);
+					return $targetType;
 				}
-				// @codeCoverageIgnoreStart
 				return $this->validationFactory->error(
 					ValidationErrorType::invalidParameterType,
 					sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-					origin: $origin
+					$origin
 				);
-				// @codeCoverageIgnoreEnd
 			}
-		}
-		// @codeCoverageIgnoreStart
-		return $this->validationFactory->error(
-			ValidationErrorType::invalidTargetType,
-			sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-			origin: $origin
-		);
-		// @codeCoverageIgnoreEnd
+			return $this->validationFactory->error(
+				ValidationErrorType::invalidParameterType,
+				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+				$origin
+			);
+		};
 	}
 
-	public function execute(Value $target, Value $parameter): Value {
-		if ($target instanceof MutableValue) {
+	protected function getExecutor(): callable {
+		return function(MutableValue $target, Value $parameter): MutableValue {
 			$targetType = $this->toBaseType($target->targetType);
 			$mv = $target->value;
 			if ($targetType instanceof SetType && $mv instanceof SetValue) {
-				if ($parameter->type->isSubtypeOf($targetType->itemType)) {
-					$arr = $mv->values;
-					$arr[] = $parameter;
-					$target->value = $this->valueRegistry->set($arr);
-					return $target;
-				}
-				// @codeCoverageIgnoreStart
-				throw new ExecutionException("Invalid parameter value");
-				// @codeCoverageIgnoreEnd
+				$arr = $mv->values;
+				$arr[] = $parameter;
+				$target->value = $this->valueRegistry->set($arr);
+				return $target;
 			}
 			if ($targetType instanceof RecordType && $mv instanceof RecordValue && $parameter instanceof RecordValue) {
 				$kk = $parameter->values['key']->literalValue ?? null;
@@ -173,9 +161,7 @@ final readonly class ADD implements NativeMethod {
 						return $target;
 					}
 				}
-				// @codeCoverageIgnoreStart
-				throw new ExecutionException("Invalid parameter value");
-				// @codeCoverageIgnoreEnd
+				return $target;
 			}
 			if ($targetType instanceof MapType && $mv instanceof RecordValue) {
 				$recordType = $this->typeRegistry->record([
@@ -188,13 +174,10 @@ final readonly class ADD implements NativeMethod {
 					$target->value = $this->valueRegistry->record($mv);
 					return $target;
 				}
-				// @codeCoverageIgnoreStart
-				throw new ExecutionException("Invalid parameter value");
-				// @codeCoverageIgnoreEnd
+				return $target;
 			}
-		}
-		// @codeCoverageIgnoreStart
-		throw new ExecutionException("Invalid target value");
-		// @codeCoverageIgnoreEnd
+			return $target;
+		};
 	}
+
 }
