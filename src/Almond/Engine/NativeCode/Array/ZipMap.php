@@ -11,33 +11,28 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
-/** @extends NativeMethod<ArrayType|TupleType, ArrayType|TupleType, TupleValue, TupleValue> */
-final readonly class ZipMap extends NativeMethod {
+/** @extends ArrayNativeMethod<Type, Type, TupleValue> */
+final readonly class ZipMap extends ArrayNativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
-		if (!($targetType instanceof ArrayType || $targetType instanceof TupleType)) {
-			return false;
-		}
-		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
-		return $type->itemType->isSubtypeOf($this->typeRegistry->string());
+	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
+		return $targetItemType->isSubtypeOf($this->typeRegistry->string());
 	}
 
 	protected function getValidator(): callable {
-		return function(ArrayType|TupleType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
-			$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
-			$itemType = $type->itemType;
+		return function(ArrayType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
+			$itemType = $targetType->itemType;
 			$parameterType = $this->toBaseType($parameterType);
 			$pType = $parameterType instanceof TupleType ? $parameterType->asArrayType() : $parameterType;
 			if ($pType instanceof ArrayType) {
 				return $this->typeRegistry->map(
 					$pType->itemType,
-					min(1, $type->range->minLength, $pType->range->minLength),
+					min(1, $targetType->range->minLength, $pType->range->minLength),
 					match(true) {
-						$type->range->maxLength === PlusInfinity::value => $pType->range->maxLength,
-						$pType->range->maxLength === PlusInfinity::value => $type->range->maxLength,
-						default => min($type->range->maxLength, $pType->range->maxLength)
+						$targetType->range->maxLength === PlusInfinity::value => $pType->range->maxLength,
+						$pType->range->maxLength === PlusInfinity::value => $targetType->range->maxLength,
+						default => min($targetType->range->maxLength, $pType->range->maxLength)
 					},
 					$itemType
 				);

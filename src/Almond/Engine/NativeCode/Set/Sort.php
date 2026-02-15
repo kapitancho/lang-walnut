@@ -17,10 +17,10 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\VariableScope\VariableScopeFactory;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\Composite\SortHelper;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNativeMethod;
 
-/** @extends NativeMethod<SetType, Type, SetValue, Value> */
-final readonly class Sort extends NativeMethod {
+/** @extends SetNativeMethod<Type, Type, Value> */
+final readonly class Sort extends SetNativeMethod {
 
 	private SortHelper $sortHelper;
 

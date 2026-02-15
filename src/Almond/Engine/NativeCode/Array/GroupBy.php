@@ -4,7 +4,6 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Array;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
@@ -12,33 +11,28 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
-/** @extends NativeMethod<ArrayType|TupleType, FunctionType, TupleValue, FunctionValue> */
-final readonly class GroupBy extends NativeMethod {
-
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
-		return $targetType instanceof ArrayType || $targetType instanceof TupleType;
-	}
+/** @extends ArrayNativeMethod<Type, FunctionType, FunctionValue> */
+final readonly class GroupBy extends ArrayNativeMethod {
 
 	protected function getValidator(): callable {
-		return function(ArrayType|TupleType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
-			$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
+		return function(ArrayType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof FunctionType) {
 				$returnType = $this->toBaseType($parameterType->returnType);
 				if ($returnType->isSubtypeOf($this->typeRegistry->string())) {
-					if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
-						$minGroupSize = (int)(string)$type->range->minLength > 0 ? 1 : 0;
+					if ($targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
+						$minGroupSize = (int)(string)$targetType->range->minLength > 0 ? 1 : 0;
 						$groupArrayType = $this->typeRegistry->array(
-							$type->itemType,
+							$targetType->itemType,
 							$minGroupSize,
-							$type->range->maxLength
+							$targetType->range->maxLength
 						);
 						return $this->typeRegistry->map(
 							$groupArrayType,
 							$minGroupSize,
-							$type->range->maxLength,
+							$targetType->range->maxLength,
 							$returnType
 						);
 					}
@@ -46,7 +40,7 @@ final readonly class GroupBy extends NativeMethod {
 						ValidationErrorType::invalidParameterType,
 						sprintf(
 							"The parameter type %s of the callback function is not a subtype of %s",
-							$type->itemType,
+							$targetType->itemType,
 							$parameterType->parameterType
 						),
 						$origin

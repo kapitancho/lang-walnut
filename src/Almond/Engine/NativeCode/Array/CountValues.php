@@ -4,7 +4,6 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Array;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
@@ -13,25 +12,18 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
-/** @extends NativeMethod<ArrayType|TupleType, NullType, TupleValue, NullValue> */
-final readonly class CountValues extends NativeMethod {
+/** @extends ArrayNativeMethod<Type, NullType, NullValue> */
+final readonly class CountValues extends ArrayNativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
-		if (!parent::isTargetTypeValid($targetType, $validator, $origin)) {
-			return false;
-		}
-		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
-		/** @var ArrayType $type */
-		$itemType = $type->itemType;
-		return $itemType->isSubtypeOf($this->typeRegistry->string()) ||
-			$itemType->isSubtypeOf($this->typeRegistry->integer());
+	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
+		return $targetItemType->isSubtypeOf($this->typeRegistry->string()) ||
+			$targetItemType->isSubtypeOf($this->typeRegistry->integer());
 	}
 
 	protected function getValidator(): callable {
-		return function(ArrayType|TupleType $targetType, NullType $parameterType): Type {
-			$targetType = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
+		return function(ArrayType $targetType, NullType $parameterType): Type {
 			$itemType = $targetType->itemType;
 			if ($itemType->isSubtypeOf($this->typeRegistry->string())) {
 				$keyType = $itemType;

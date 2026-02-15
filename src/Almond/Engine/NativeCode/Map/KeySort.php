@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BooleanValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
@@ -11,18 +10,13 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
 
-/** @extends NativeMethod<MapType|RecordType, Type, RecordValue, Value> */
-final readonly class KeySort extends NativeMethod {
-
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
-		return $targetType instanceof MapType || $targetType instanceof RecordType;
-	}
+/** @extends MapNativeMethod<Type, Type, Value> */
+final readonly class KeySort extends MapNativeMethod {
 
 	protected function getValidator(): callable {
-		return function(MapType|RecordType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
-			$type = $targetType instanceof RecordType ? $targetType->asMapType() : $targetType;
+		return function(MapType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
 			$pType = $this->typeRegistry->union([
 				$this->typeRegistry->null,
 				$this->typeRegistry->record([
@@ -30,7 +24,7 @@ final readonly class KeySort extends NativeMethod {
 				], null)
 			]);
 			if ($parameterType->isSubtypeOf($pType)) {
-				return $type;
+				return $targetType;
 			}
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidParameterType,

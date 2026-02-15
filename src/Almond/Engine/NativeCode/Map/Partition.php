@@ -4,29 +4,23 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
 
-/** @extends NativeMethod<MapType|RecordType, FunctionType, RecordValue, FunctionValue> */
-final readonly class Partition extends NativeMethod {
-
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
-		return $targetType instanceof MapType || $targetType instanceof RecordType;
-	}
+/** @extends MapNativeMethod<Type, FunctionType, FunctionValue> */
+final readonly class Partition extends MapNativeMethod {
 
 	protected function getValidator(): callable {
-		return function(MapType|RecordType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
-			$type = $targetType instanceof RecordType ? $targetType->asMapType() : $targetType;
+		return function(MapType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf($this->typeRegistry->boolean)) {
-				if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
-					$partitionType = $this->typeRegistry->map($type->itemType, 0, $type->range->maxLength);
+				if ($targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
+					$partitionType = $this->typeRegistry->map($targetType->itemType, 0, $targetType->range->maxLength);
 					return $this->typeRegistry->record([
 						'matching' => $partitionType,
 						'notMatching' => $partitionType
@@ -36,7 +30,7 @@ final readonly class Partition extends NativeMethod {
 					ValidationErrorType::invalidParameterType,
 					sprintf(
 						"The parameter type %s of the callback function is not a subtype of %s",
-						$type->itemType,
+						$targetType->itemType,
 						$parameterType->parameterType
 					),
 					$origin

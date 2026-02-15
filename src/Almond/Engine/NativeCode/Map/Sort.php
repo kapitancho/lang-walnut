@@ -3,33 +3,27 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\Composite\SortHelper;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
 
-/** @extends NativeMethod<MapType|RecordType, Type, RecordValue, Value> */
-final readonly class Sort extends NativeMethod {
-
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
-		return $targetType instanceof MapType || $targetType instanceof RecordType;
-	}
+/** @extends MapNativeMethod<Type, Type, Value> */
+final readonly class Sort extends MapNativeMethod {
 
 	protected function getValidator(): callable {
-		return function(MapType|RecordType $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
-			$type = $targetType instanceof RecordType ? $targetType->asMapType() : $targetType;
+		return function(MapType $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
 			$sortHelper = new SortHelper(
 				$this->validationFactory,
 				$this->typeRegistry,
 				$this->valueRegistry
 			);
 			return $sortHelper->validate(
-				$type,
-				$type,
+				$targetType,
+				$targetType,
 				$parameterType,
 				$origin
 			);

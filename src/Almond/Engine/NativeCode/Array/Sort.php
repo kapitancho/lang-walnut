@@ -3,33 +3,27 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\Array;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\Composite\SortHelper;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
-/** @extends NativeMethod<ArrayType|TupleType, Type, TupleValue, Value> */
-final readonly class Sort extends NativeMethod {
-
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
-		return $targetType instanceof ArrayType || $targetType instanceof TupleType;
-	}
+/** @extends ArrayNativeMethod<Type, Type, Value> */
+final readonly class Sort extends ArrayNativeMethod {
 
 	protected function getValidator(): callable {
-		return function(ArrayType|TupleType $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
-			$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
+		return function(ArrayType $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
 			$sortHelper = new SortHelper(
 				$this->validationFactory,
 				$this->typeRegistry,
 				$this->valueRegistry
 			);
 			return $sortHelper->validate(
-				$type,
-				$type,
+				$targetType,
+				$targetType,
 				$parameterType,
 				$origin
 			);

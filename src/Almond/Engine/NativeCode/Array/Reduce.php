@@ -4,7 +4,6 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Array;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
@@ -13,24 +12,19 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
-/** @extends NativeMethod<ArrayType|TupleType, Type, TupleValue, RecordValue> */
-final readonly class Reduce extends NativeMethod {
-
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
-		return $targetType instanceof ArrayType || $targetType instanceof TupleType;
-	}
+/** @extends ArrayNativeMethod<Type, Type, RecordValue> */
+final readonly class Reduce extends ArrayNativeMethod {
 
 	protected function getValidator(): callable {
-		return function(ArrayType|TupleType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
-			$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
+		return function(ArrayType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
 			if ($parameterType->isSubtypeOf(
 				$this->typeRegistry->record([
 					'reducer' => $this->typeRegistry->function(
 						$this->typeRegistry->record([
 							'result' => $this->typeRegistry->nothing,
-							'item' => $type->itemType,
+							'item' => $targetType->itemType,
 						], null),
 						$this->typeRegistry->any
 					),

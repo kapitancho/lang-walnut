@@ -5,7 +5,6 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Array;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
@@ -14,18 +13,13 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
-/** @extends NativeMethod<ArrayType|TupleType, RecordType, TupleValue, RecordValue> */
-final readonly class PadRight extends NativeMethod {
-
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
-		return $targetType instanceof ArrayType || $targetType instanceof TupleType;
-	}
+/** @extends ArrayNativeMethod<Type, RecordType, RecordValue> */
+final readonly class PadRight extends ArrayNativeMethod {
 
 	protected function getValidator(): callable {
-		return function(ArrayType|TupleType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
-			$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
+		return function(ArrayType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
 			$parameterType = $this->toBaseType($parameterType);
 			if ($parameterType instanceof RecordType) {
 				$types = $parameterType->types;
@@ -37,18 +31,18 @@ final readonly class PadRight extends NativeMethod {
 				if ($lengthType instanceof IntegerType) {
 					return $this->typeRegistry->array(
 						$this->typeRegistry->union([
-							$type->itemType,
+							$targetType->itemType,
 							$valueType
 						]),
 						max(
-							(int)(string)$type->range->minLength,
+							(int)(string)$targetType->range->minLength,
 							$lengthType->numberRange->min === MinusInfinity::value ?
 								0 : $lengthType->numberRange->min->value
 						),
-						$type->range->maxLength === PlusInfinity::value ||
+						$targetType->range->maxLength === PlusInfinity::value ||
 							$lengthType->numberRange->max === PlusInfinity::value ? PlusInfinity::value :
 							max(
-								(int)(string)$type->range->maxLength,
+								(int)(string)$targetType->range->maxLength,
 								$lengthType->numberRange->max->value -
 								($lengthType->numberRange->max->inclusive ? 0 : 1)
 							),

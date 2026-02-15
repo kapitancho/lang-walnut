@@ -9,18 +9,13 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
 
-/** @extends NativeMethod<MapType|RecordType, MapType|RecordType, RecordValue, RecordValue> */
-final readonly class BinaryPlus extends NativeMethod {
-
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
-		return $targetType instanceof MapType || $targetType instanceof RecordType;
-	}
+/** @extends MapNativeMethod<Type, MapType|RecordType, RecordValue> */
+final readonly class BinaryPlus extends MapNativeMethod {
 
 	protected function getValidator(): callable {
-		return function(MapType|RecordType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
-			$targetType = $targetType instanceof RecordType ? $targetType->asMapType() : $targetType;
+		return function(MapType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
 			$parameterType = $this->toBaseType($parameterType);
 			$parameterType = $parameterType instanceof RecordType ? $parameterType->asMapType() : $parameterType;
 			if ($parameterType instanceof MapType) {

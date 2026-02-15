@@ -7,7 +7,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
@@ -16,19 +15,13 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberInterval;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
-/** @extends NativeMethod<ArrayType|TupleType, NullType, TupleValue, NullValue> */
-final readonly class Product extends NativeMethod {
+/** @extends ArrayNativeMethod<Type, NullType, NullValue> */
+final readonly class Product extends ArrayNativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
-		if (!parent::isTargetTypeValid($targetType, $validator, $origin)) {
-			return false;
-		}
-		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
-		/** @var ArrayType $type */
-		$itemType = $this->toBaseType($type->itemType);
-		return $itemType->isSubtypeOf(
+	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
+		return $targetItemType->isSubtypeOf(
 			$this->typeRegistry->union([
 				$this->typeRegistry->integer(),
 				$this->typeRegistry->real()
@@ -37,8 +30,7 @@ final readonly class Product extends NativeMethod {
 	}
 
 	protected function getValidator(): callable {
-		return function(ArrayType|TupleType $targetType, NullType $parameterType): Type {
-			$targetType = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
+		return function(ArrayType $targetType, NullType $parameterType): Type {
 			$itemType = $this->toBaseType($targetType->itemType);
 			if ($itemType instanceof RealType || $itemType instanceof IntegerType) {
 				$start = match(true) {

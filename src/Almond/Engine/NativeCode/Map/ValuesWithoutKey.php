@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -11,22 +10,15 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\SubsetTypeHelper;
 
-/** @extends NativeMethod<MapType|RecordType, StringType, RecordValue, StringValue> */
-final readonly class ValuesWithoutKey extends NativeMethod {
+/** @extends MapNativeMethod<Type, StringType, StringValue> */
+final readonly class ValuesWithoutKey extends MapNativeMethod {
 	use SubsetTypeHelper;
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
-		return $targetType instanceof RecordType || $targetType instanceof MapType;
-	}
-
 	protected function getValidator(): callable {
-		return function(MapType|RecordType $targetType, StringType $parameterType): Type {
-			$targetType = $targetType instanceof RecordType ? $targetType->asMapType() : $targetType;
+		return function(MapType $targetType, StringType $parameterType): Type {
 			$keyType = $targetType->keyType;
 			if ($keyType instanceof StringSubsetType && $parameterType instanceof StringSubsetType) {
 				$keyType = $this->stringSubsetDiff($this->typeRegistry, $keyType, $parameterType);

@@ -4,22 +4,15 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Array;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
-/** @extends NativeMethod<ArrayType|TupleType, IntegerType, TupleValue, IntegerValue> */
-final readonly class Chunk extends NativeMethod {
-
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
-		return $targetType instanceof ArrayType || $targetType instanceof TupleType;
-	}
+/** @extends ArrayNativeMethod<Type, IntegerType, IntegerValue> */
+final readonly class Chunk extends ArrayNativeMethod {
 
 	protected function isParameterTypeValid(Type $parameterType, callable $validator): bool|Type {
 		if (!parent::isParameterTypeValid($parameterType, $validator)) {
@@ -31,11 +24,9 @@ final readonly class Chunk extends NativeMethod {
 	}
 
 	protected function getValidator(): callable {
-		return function(ArrayType|TupleType $targetType, IntegerType $parameterType): Type {
-			$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
-
-			$minL = $type->range->minLength;
-			$maxL = $type->range->maxLength;
+		return function(ArrayType $targetType, IntegerType $parameterType): Type {
+			$minL = $targetType->range->minLength;
+			$maxL = $targetType->range->maxLength;
 			$minS = $parameterType->numberRange->min->value;
 			$maxS = $parameterType->numberRange->max === PlusInfinity::value ?
 				PlusInfinity::value : $parameterType->numberRange->max->value;
@@ -58,7 +49,7 @@ final readonly class Chunk extends NativeMethod {
 
 			return $this->typeRegistry->array(
 				$this->typeRegistry->array(
-					$type->itemType,
+					$targetType->itemType,
 					$minI,
 					$maxI
 				),
