@@ -36,12 +36,12 @@ final class FilterKeyValueTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFilterKeyValueInvalidParameterParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("The callback function parameter type (Integer[1]|String['a']) should be a supertype of",
 			"[a: 1, b: 'a']->filterKeyValue(^[key: String, value: Boolean] => Boolean :: true);");
 	}
 
 	public function testFilterKeyValueInvalidParameterReturnType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("The return type of the callback function must be a subtype of Result<Boolean, ItemNotFound>, but got Real",
 			"[a: 1, b: 'a']->filterKeyValue(^Any => Real :: 3.14);");
 	}
 

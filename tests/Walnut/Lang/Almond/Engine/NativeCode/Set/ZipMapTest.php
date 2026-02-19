@@ -67,7 +67,8 @@ final class ZipMapTest extends CodeExecutionTestHelper {
 	}
 
 	public function testZipMapInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "[1; 'a']->zipMap[1, 2];");
+		$this->executeErrorCodeSnippet("The item type of the target set must be a subtype of String, got (Integer[1]|String['a'])",
+			"[1; 'a']->zipMap[1, 2];");
 	}
 
 	public function testZipMapInvalidParameterType(): void {

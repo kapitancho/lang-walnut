@@ -80,7 +80,7 @@ final class ItemTest extends CodeExecutionTestHelper {
 
 	public function testItemInvalidKeyType(): void {
 		$this->executeErrorCodeSnippet(
-			"Map<String<2>:Real> expected",
+			"The parameter type [xy: Real[3.14], wrong: Real[-1.25]] is not a subtype of the function parameter type Map<String<2>:Real>",
 			"f[xy: 3.14, wrong: -1.25];",
 			valueDeclarations: "f = ^m: Map<String<2>:Real> => Real :: m->values->sum;");
 	}

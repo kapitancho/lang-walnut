@@ -35,7 +35,7 @@ final class MapTest extends CodeExecutionTestHelper {
 	}
 
 	public function testMapInvalidParameterParameterType(): void {
-		$this->executeErrorCodeSnippet("The parameter type Boolean of the callback function is not a supertype of (Integer[1]|String['a'])",
+		$this->executeErrorCodeSnippet("The item type (Integer[1]|String['a']) is not a subtype of the of the callback function parameter type Boolean",
 			"[a: 1, b: 'a']->map(^Boolean => Boolean :: true);");
 	}
 

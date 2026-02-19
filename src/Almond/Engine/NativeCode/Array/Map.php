@@ -10,13 +10,12 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\ArrayCallbackBase;
 
 final readonly class Map extends ArrayCallbackBase {
 
 	protected function getValidator(): callable {
-		return function(ArrayType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
+		return function(ArrayType $targetType, FunctionType $parameterType, mixed $origin): Type {
 			$r = $parameterType->returnType;
 			$errorType = $r instanceof ResultType ? $r->errorType : null;
 			$returnType = $r instanceof ResultType ? $r->returnType : $r;

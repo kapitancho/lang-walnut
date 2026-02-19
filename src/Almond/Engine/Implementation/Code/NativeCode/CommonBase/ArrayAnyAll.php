@@ -14,7 +14,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayN
 /** @extends ArrayNativeMethod<AnyType, FunctionType, FunctionValue> */
 abstract readonly class ArrayAnyAll extends ArrayNativeMethod {
 
-	protected function validateParameterType(Type $parameterType, Type $targetType, mixed $origin): null|string|ValidationFailure {
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		/** @var ArrayType $targetType */
 		/** @var FunctionType $parameterType */
 		if (!$parameterType->returnType->isSubtypeOf($this->typeRegistry->boolean)) {

@@ -16,13 +16,8 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayN
 /** @extends ArrayNativeMethod<Type, NullType, NullValue> */
 final readonly class Flip extends ArrayNativeMethod {
 
-	protected function validateTargetArrayItemType(Type $itemType, mixed $origin): null|string {
-		return $itemType->isSubtypeOf($this->typeRegistry->string()) ?
-			null :
-			sprintf(
-				"The item type %s should be a subtype of String",
-				$itemType
-			);
+	protected function getExpectedArrayItemType(): Type {
+		return $this->typeRegistry->string();
 	}
 
 	protected function getValidator(): callable {

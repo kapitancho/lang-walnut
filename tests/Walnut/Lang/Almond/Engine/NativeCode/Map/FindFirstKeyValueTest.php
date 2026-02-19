@@ -31,12 +31,12 @@ final class FindFirstKeyValueTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFindFirstKeyValueInvalidParameterParameterType(): void {
-		$this->executeErrorCodeSnippet("The parameter type Boolean of the callback function is not a subtype",
+		$this->executeErrorCodeSnippet("The callback function parameter type (Integer[1]|String['a']) should be a supertype of",
 			"[a: 1, b: 'a']->findFirstKeyValue(^Boolean => Boolean :: true);");
 	}
 
 	public function testFindFirstKeyValueInvalidParameterReturnType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("The return type of the callback function must be a subtype of Result<Boolean",
 			"[a: 1, b: 'a']->findFirstKeyValue(^Any => Real :: 3.14);");
 	}
 

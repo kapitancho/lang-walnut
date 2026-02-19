@@ -26,12 +26,12 @@ final class FilterTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFilterInvalidParameterParameterType(): void {
-		$this->executeErrorCodeSnippet("The parameter type (Integer[1]|String['a']) of the callback function is not a subtype of Boolean",
+		$this->executeErrorCodeSnippet("The item type (Integer[1]|String['a']) is not a subtype of the of the callback function parameter type Boolean",
 			"[1; 'a']->filter(^Boolean => Boolean :: true);");
 	}
 
 	public function testFilterInvalidParameterReturnType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("The return type of the callback function must be a subtype of Result<Boolean, Any>, but got Real",
 			"[1; 'a']->filter(^Any => Real :: 3.14);");
 	}
 

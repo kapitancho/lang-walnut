@@ -11,13 +11,13 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
 /** @extends ArrayNativeMethod<Type, RecordType, RecordValue> */
 final readonly class InsertAt extends ArrayNativeMethod {
 
-	protected function validateParameterType(Type $parameterType, Type $targetType, mixed $origin): null|string|ValidationFailure {
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		return $parameterType->isSubtypeOf(
 			$this->typeRegistry->record([
 				"value" => $this->typeRegistry->any,
@@ -68,7 +68,7 @@ final readonly class InsertAt extends ArrayNativeMethod {
 				);
 			}
 			// @codeCoverageIgnoreStart
-			throw new \Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException("Invalid parameter value");
+			throw new ExecutionException("Invalid parameter value");
 			// @codeCoverageIgnoreEnd
 		};
 	}

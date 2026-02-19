@@ -14,8 +14,8 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNat
 /** @extends MapNativeMethod<Type, NullType, NullValue> */
 final readonly class Flip extends MapNativeMethod {
 
-	protected function isTargetItemTypeValid(Type $targetItemType): bool {
-		return $targetItemType->isSubtypeOf($this->typeRegistry->string());
+	protected function getExpectedMapItemType(): Type {
+		return $this->typeRegistry->string();
 	}
 
 	protected function getValidator(): callable {

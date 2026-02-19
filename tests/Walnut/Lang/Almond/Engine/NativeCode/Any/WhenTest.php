@@ -65,19 +65,19 @@ final class WhenTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWhenInvalidParameterTypeSuccessKey(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type: [",
+		$this->executeErrorCodeSnippet("is not a subtype of the expected record type",
 			"^a: Result<Integer, String> :: a->when[success: 42, error: ^e: String :: e->length];"
 		);
 	}
 
 	public function testWhenInvalidParameterTypeErrorKey(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type: [",
+		$this->executeErrorCodeSnippet("is not a subtype of the expected record type",
 			"^a: Result<Integer, String> :: a->when[success: ^i: Integer => Integer :: i + 1, error: 53];"
 		);
 	}
 
 	public function testWhenInvalidParameterTypeMissingKey(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type: [",
+		$this->executeErrorCodeSnippet("The parameter type [success: ^Integer => Integer] is not a subtype of the expected record type [",
 			"^a: Result<Integer, String> :: a->when[success: ^i: Integer => Integer :: i + 1];"
 		);
 	}

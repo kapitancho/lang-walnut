@@ -9,13 +9,25 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
 /** @extends ArrayNativeMethod<Type, Type, Value> */
 final readonly class ChainInvoke extends ArrayNativeMethod {
 
-	protected function validateTargetArrayItemType(Type $itemType, mixed $origin): null|string {
+	/** @return list<Type> */
+	protected function getExpectedArrayItemType(): array {
+		return [
+			$this->typeRegistry->nothing,
+			$this->typeRegistry->function(
+				$this->typeRegistry->nothing,
+				$this->typeRegistry->any
+			)
+		];
+	}
+
+	protected function validateTargetType(Type $targetType, mixed $origin): null|string {
+		 /** @var ArrayType $targetType */
+		$itemType = $this->toBaseType($targetType->itemType);
 		if ($itemType instanceof NothingType) {
 			return null;
 		}
@@ -32,7 +44,7 @@ final readonly class ChainInvoke extends ArrayNativeMethod {
 		);
 	}
 
-	protected function validateParameterType(Type $parameterType, Type $targetType, mixed $origin): null|string|ValidationFailure {
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		/** @var ArrayType $targetType */
 		$itemType = $this->toBaseType($targetType->itemType);
 		if ($itemType instanceof NothingType) {

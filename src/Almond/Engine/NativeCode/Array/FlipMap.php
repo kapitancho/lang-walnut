@@ -16,12 +16,11 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayN
 /** @extends ArrayNativeMethod<Type, FunctionType, FunctionValue> */
 final readonly class FlipMap extends ArrayNativeMethod {
 
-	protected function validateTargetArrayItemType(Type $itemType, mixed $origin): null|string {
-		return $itemType->isSubtypeOf($this->typeRegistry->string()) ? null :
-			sprintf("The item type of the target array must be a subtype of String, got %s", $itemType);
+	protected function getExpectedArrayItemType(): Type {
+		return $this->typeRegistry->string();
 	}
 
-	protected function validateParameterType(Type $parameterType, Type $targetType, mixed $origin): null|string {
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		/** @var ArrayType $targetType */
 		/** @var FunctionType $parameterType */
 		return $targetType->itemType->isSubtypeOf($parameterType->parameterType) ?

@@ -73,7 +73,7 @@ final class GroupByTest extends CodeExecutionTestHelper {
 	}
 
 	public function testGroupByInvalidParameterParameterType(): void {
-		$this->executeErrorCodeSnippet("The parameter type Integer",
+		$this->executeErrorCodeSnippet("The item type Integer[1, 2, 3] is not a subtype of the of the callback function parameter type Boolean",
 			"[1, 2, 3]->groupBy(^Boolean => String :: 'key');");
 	}
 

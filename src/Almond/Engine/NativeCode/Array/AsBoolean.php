@@ -7,12 +7,15 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BooleanType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FalseType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TrueType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BooleanValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
 
+/** @extends MapNativeMethod<Type, NullType, NullValue> */
 final readonly class AsBoolean extends ArrayNativeMethod {
 
 	protected function getValidator(): callable {
@@ -20,7 +23,7 @@ final readonly class AsBoolean extends ArrayNativeMethod {
 			match(true) {
 				$targetType->range->minLength > 0 => $this->typeRegistry->true,
 				$targetType->range->maxLength !== PlusInfinity::value &&
-					(string)$targetType->range->maxLength == '0' => $this->typeRegistry->false,
+					(string)$targetType->range->maxLength === '0' => $this->typeRegistry->false,
 				default => $this->typeRegistry->boolean,
 			};
 	}

@@ -13,7 +13,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayN
 /** @extends ArrayNativeMethod<Type, NullType, NullValue> */
 abstract readonly class ArrayMinMax extends ArrayNativeMethod {
 
-	protected function validateTargetType(Type $targetType, mixed $origin): null|string|ValidationFailure {
+	protected function validateTargetType(Type $targetType, mixed $origin): null|string {
 		if ($result = parent::validateTargetType($targetType, $origin)) {
 			return $result;
 		}
@@ -26,9 +26,8 @@ abstract readonly class ArrayMinMax extends ArrayNativeMethod {
 		return null;
 	}
 
-	protected function validateTargetArrayItemType(Type $itemType, mixed $origin): null|string {
-		return $itemType->isSubtypeOf($this->typeRegistry->real()) ?
-			null : "The item type of the array must be a subtype of Real.";
+	protected function getExpectedArrayItemType(): Type {
+		return $this->typeRegistry->real();
 	}
 
 }

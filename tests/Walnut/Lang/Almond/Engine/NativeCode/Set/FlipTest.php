@@ -33,6 +33,7 @@ final class FlipTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFlipInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "[1; 'a']->flip;");
+		$this->executeErrorCodeSnippet("The item type of the target set must be a subtype of String, got (Integer[1]|String['a'])",
+			"[1; 'a']->flip;");
 	}
 }

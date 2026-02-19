@@ -20,9 +20,8 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayN
 
 final readonly class Sum extends ArrayNativeMethod {
 
-	protected function validateTargetArrayItemType(Type $itemType, mixed $origin): null|string {
-		return $itemType->isSubtypeOf($this->typeRegistry->real()) ?
-			null : "The item type of the array must be a subtype of Real.";
+	protected function getExpectedArrayItemType(): Type {
+		return $this->typeRegistry->real();
 	}
 
 	protected function getValidator(): callable {

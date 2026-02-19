@@ -30,7 +30,7 @@ final class MinTest extends CodeExecutionTestHelper {
 	}
 
 	public function testMinInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('The item type of the array must be a subtype of Real.',
+		$this->executeErrorCodeSnippet("The item type of the target array must be a subtype of Real, got String['hello', 'world', 'hi']",
 			"['hello','world', 'hi', 'hello']->min;");
 	}
 }

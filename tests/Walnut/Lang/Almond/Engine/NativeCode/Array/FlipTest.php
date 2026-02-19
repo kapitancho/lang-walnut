@@ -33,7 +33,7 @@ final class FlipTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFlipInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet("The item type (Integer[1]|String['a']) should be a subtype of String",
+		$this->executeErrorCodeSnippet("The item type of the target array must be a subtype of String, got (Integer[1]|String['a'])",
 			"[1, 'a']->flip;");
 	}
 }

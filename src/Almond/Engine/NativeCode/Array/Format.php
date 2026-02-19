@@ -19,13 +19,8 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayN
 /** @extends ArrayNativeMethod<ShapeType, StringType, StringValue> */
 final readonly class Format extends ArrayNativeMethod {
 
-	protected function validateTargetArrayItemType(Type $itemType, mixed $origin): null|string {
-		$stringShape = $this->typeRegistry->shape($this->typeRegistry->string());
-		return $itemType->isSubtypeOf($stringShape) ?
-			null :
-			sprintf("Invalid target type: array item type %s is not a subtype of Shape<String>",
-				$itemType
-			);
+	protected function getExpectedArrayItemType(): Type {
+		return $this->typeRegistry->shape($this->typeRegistry->string());
 	}
 
 	protected function getValidator(): callable {

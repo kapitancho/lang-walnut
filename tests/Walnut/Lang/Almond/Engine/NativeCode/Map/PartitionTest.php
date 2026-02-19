@@ -64,12 +64,12 @@ final class PartitionTest extends CodeExecutionTestHelper {
 	}
 
 	public function testPartitionInvalidParameterParameterType(): void {
-		$this->executeErrorCodeSnippet("The parameter type Integer",
+		$this->executeErrorCodeSnippet("The item type Integer[1, 2, 3] is not a subtype of the of the callback function parameter type Boolean",
 			"[a: 1, b: 2, c: 3]->partition(^Boolean => Boolean :: true);");
 	}
 
 	public function testPartitionInvalidParameterReturnType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("The return type of the callback function must be a subtype of Result<Boolean, Any>, but got Integer",
 			"[a: 1, b: 2, c: 3]->partition(^i: Integer => Integer :: i);");
 	}
 

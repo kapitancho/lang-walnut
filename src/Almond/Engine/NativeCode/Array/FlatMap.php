@@ -12,13 +12,12 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
 /** @extends ArrayNativeMethod<Type, FunctionType, FunctionValue> */
 final readonly class FlatMap extends ArrayNativeMethod {
 
-	protected function validateParameterType(Type $parameterType, Type $targetType, mixed $origin): null|string|ValidationFailure {
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		/** @var ArrayType $targetType */
 		/** @var FunctionType $parameterType */
 		if (!$targetType->itemType->isSubtypeOf($parameterType->parameterType)) {

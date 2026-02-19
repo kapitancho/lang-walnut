@@ -38,7 +38,7 @@ final class ProductTest extends CodeExecutionTestHelper {
 	}
 
 	public function testProductInvalidType(): void {
-		$this->executeErrorCodeSnippet('The item type of the array must be a subtype of Real.',
+		$this->executeErrorCodeSnippet("The item type of the target array must be a subtype of Real, got String['hello', 'world', 'hi']",
 			"['hello','world', 'hi', 'hello']->product;");
 	}
 }

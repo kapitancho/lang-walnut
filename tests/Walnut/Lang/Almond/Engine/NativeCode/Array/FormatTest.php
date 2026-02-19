@@ -128,7 +128,8 @@ final class FormatTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFormatInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('is not a subtype of Shape<String>', "[[1, 2], [3, 4]]->format('Test {0}');");
+		$this->executeErrorCodeSnippet('The item type of the target array must be a subtype of Shape<String>, got',
+			"[[1, 2], [3, 4]]->format('Test {0}');");
 	}
 
 }

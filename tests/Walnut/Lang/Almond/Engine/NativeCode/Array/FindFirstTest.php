@@ -21,7 +21,7 @@ final class FindFirstTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFindFirstInvalidParameterParameterType(): void {
-		$this->executeErrorCodeSnippet("The parameter type (Integer[1]|String['a']) of the callback function is not a subtype of Boolean",
+		$this->executeErrorCodeSnippet("The item type (Integer[1]|String['a']) is not a subtype of the of the callback function parameter type Boolean",
 			"[1, 'a']->findFirst(^Boolean => Boolean :: true);");
 	}
 

@@ -13,11 +13,8 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<Type, NullType, NullValue> */
+/** @extends ArrayNativeMethod<Type, NullType, NullValue> */
 final readonly class Last extends ArrayNativeMethod {
-
-	protected function getTupleRefinedType(TupleType $targetType, Type $parameterType): Type|null {
-	}
 
 	protected function getValidator(): callable {
 		return function(ArrayType|TupleType $targetType, NullType $parameterType): Type {

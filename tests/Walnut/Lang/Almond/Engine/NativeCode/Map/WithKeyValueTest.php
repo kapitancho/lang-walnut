@@ -48,7 +48,7 @@ final class WithKeyValueTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithKeyValueInvalidParameterValue(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("Parameter type [value: String['b']] is not compatible with expected type [key: String, Value: Any].",
 			"[a: 'a', b: 1, c: 2]->withKeyValue[value: 'b']");
 	}
 

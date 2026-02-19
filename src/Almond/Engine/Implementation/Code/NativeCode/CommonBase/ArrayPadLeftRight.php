@@ -15,7 +15,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayN
 /** @extends ArrayNativeMethod<Type, RecordType, RecordValue> */
 abstract readonly class ArrayPadLeftRight extends ArrayNativeMethod {
 
-	protected function validateParameterType(Type $parameterType, Type $targetType, mixed $origin): null|string|ValidationFailure {
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		return $parameterType->isSubtypeOf(
 			$this->typeRegistry->record([
 				"length" => $this->typeRegistry->integer(0),

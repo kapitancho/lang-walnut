@@ -4,6 +4,7 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ShapeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -16,26 +17,14 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionEarlyReturn;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<MapType|RecordType, StringType, RecordValue, StringValue> */
-final readonly class Format extends NativeMethod {
+/** @extends MapNativeMethod<ShapeType, StringType, StringValue> */
+final readonly class Format extends MapNativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type|ValidationFailure {
-		if (!($targetType instanceof MapType || $targetType instanceof RecordType)) {
-			return false;
-		}
-		$t = $targetType instanceof RecordType ? $targetType->asMapType() : $targetType;
-		$itemType = $t->itemType;
-		$stringShape = $this->typeRegistry->shape($this->typeRegistry->string());
-		if (!$itemType->isSubtypeOf($stringShape)) {
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidTargetType,
-				sprintf("[%s] Invalid target type: map item type %s is not a subtype of Shape<String>", __CLASS__, $itemType),
-				$origin
-			);
-		}
-		return true;
+	protected function getExpectedMapItemType(): Type {
+		return $this->typeRegistry->shape($this->typeRegistry->string());
 	}
 
 	protected function getValidator(): callable {

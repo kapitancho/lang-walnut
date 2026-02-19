@@ -15,7 +15,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayN
 /** @extends ArrayNativeMethod<Type, IntegerType, IntegerValue> */
 abstract readonly class ArrayChunk extends ArrayNativeMethod {
 
-	protected function validateParameterType(Type $parameterType, Type $targetType, mixed $origin): null|string|ValidationFailure {
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		return $parameterType->isSubtypeOf($this->typeRegistry->integer(1)) ?
 			null : "The parameter type should be a subtype of Integer<1..>";
 	}

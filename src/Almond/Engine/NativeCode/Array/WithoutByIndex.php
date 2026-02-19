@@ -14,12 +14,13 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<ArrayType|TupleType, IntegerType, TupleValue, IntegerValue> */
-final readonly class WithoutByIndex extends NativeMethod {
+/** @extends ArrayNativeMethod<Type, IntegerType, IntegerValue> */
+final readonly class WithoutByIndex extends ArrayNativeMethod {
 
-	protected function validateParameterType(Type $parameterType, Type $targetType, mixed $origin): null|string|ValidationFailure {
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		return $parameterType->isSubtypeOf($this->typeRegistry->integer(0)) ? null : sprintf(
 			"Parameter type %s is not a subtype Integer<0..>",
 			$parameterType

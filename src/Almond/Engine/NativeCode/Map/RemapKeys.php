@@ -20,39 +20,40 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNat
 /** @extends MapNativeMethod<AnyType, MapType, FunctionType> */
 final readonly class RemapKeys extends MapNativeMethod {
 
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		/** @var MapType $targetType */
+		/** @var FunctionType $parameterType */
+
+		if (!$targetType->keyType->isSubtypeOf($parameterType->parameterType)) {
+			return sprintf(
+				"The parameter type %s of the callback function is not a supertype of %s",
+				$parameterType->parameterType,
+				$targetType->keyType,
+			);
+		}
+		$r = $parameterType->returnType;
+		$returnType = $r instanceof ResultType ? $r->returnType : $r;
+		return $returnType->isSubtypeOf($this->typeRegistry->string()) ?
+			null :
+			sprintf(
+				"The return type %s of the callback function is not a subtype of String",
+				$returnType
+			);
+	}
+
 	protected function getValidator(): callable {
 		return function(MapType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
-			if ($targetType->keyType->isSubtypeOf($parameterType->parameterType)) {
-				$r = $parameterType->returnType;
-				$errorType = $r instanceof ResultType ? $r->errorType : null;
-				$returnType = $r instanceof ResultType ? $r->returnType : $r;
-				if ($returnType->isSubtypeOf($this->typeRegistry->string())) {
-					$t = $this->typeRegistry->map(
-						$targetType->itemType,
-						$targetType->range->minLength > 0 ? 1 : 0,
-						$targetType->range->maxLength,
-						$returnType,
-					);
-					return $errorType ? $this->typeRegistry->result($t, $errorType) : $t;
-				}
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf(
-						"The return type %s of the callback function is not a subtype of String",
-						$returnType
-					),
-					origin: $origin
-				);
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf(
-					"The parameter type %s of the callback function is not a supertype of %s",
-					$parameterType->parameterType,
-					$targetType->keyType,
-				),
-				origin: $origin
+			$r = $parameterType->returnType;
+			$errorType = $r instanceof ResultType ? $r->errorType : null;
+			$returnType = $r instanceof ResultType ? $r->returnType : $r;
+
+			$t = $this->typeRegistry->map(
+				$targetType->itemType,
+				$targetType->range->minLength > 0 ? 1 : 0,
+				$targetType->range->maxLength,
+				$returnType,
 			);
+			return $errorType ? $this->typeRegistry->result($t, $errorType) : $t;
 		};
 	}
 

@@ -33,6 +33,7 @@ final class FlattenTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFlattenInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('should be a subtype of Array', "[1, [0, 2, 5], [], [[[22]], 9]]->flatten;");
+		$this->executeErrorCodeSnippet('The item type of the target array must be a subtype of Array, got',
+			"[1, [0, 2, 5], [], [[[22]], 9]]->flatten;");
 	}
 }

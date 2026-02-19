@@ -10,13 +10,13 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<ArrayType|TupleType, IntegerType, TupleValue, IntegerValue> */
-final readonly class BinaryMultiply extends NativeMethod {
+/** @extends ArrayNativeMethod<Type, IntegerType, IntegerValue> */
+final readonly class BinaryMultiply extends ArrayNativeMethod {
 
-	protected function validateParameterType(Type $parameterType, Type $targetType, mixed $origin): null|string|ValidationFailure {
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		return $parameterType->isSubtypeOf($this->typeRegistry->integer(0)) ?
 			null : "The parameter type should be a subtype of Integer<0..>";
 	}

@@ -12,44 +12,24 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\SetFilterBase;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNativeMethod;
 
 /** @extends SetNativeMethod<FunctionType, FunctionValue> */
-final readonly class Filter extends SetNativeMethod {
-
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
-		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
-			return false;
-		}
-		/** @var FunctionType $parameterType */
-		return $parameterType->returnType->isSubtypeOf(
-			$this->typeRegistry->result($this->typeRegistry->boolean, $this->typeRegistry->any)
-		);
-	}
+final readonly class Filter extends SetFilterBase {
 
 	protected function getValidator(): callable {
-		return function(SetType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
-			if ($targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
-				$pType = $this->toBaseType($parameterType->returnType);
-				$returnType = $this->typeRegistry->set(
-					$targetType->itemType,
-					0,
-					$targetType->range->maxLength
-				);
-				return $pType instanceof ResultType ? $this->typeRegistry->result(
-					$returnType,
-					$pType->errorType
-				) : $returnType;
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf(
-					"The parameter type %s of the callback function is not a subtype of %s",
-					$targetType->itemType,
-					$parameterType->parameterType
-				),
-				$origin
+		return function(SetType $targetType, FunctionType $parameterType, mixed $origin): Type {
+			$pType = $this->toBaseType($parameterType->returnType);
+			$returnType = $this->typeRegistry->set(
+				$targetType->itemType,
+				0,
+				$targetType->range->maxLength
 			);
+			return $pType instanceof ResultType ? $this->typeRegistry->result(
+				$returnType,
+				$pType->errorType
+			) : $returnType;
 		};
 	}
 

@@ -12,24 +12,14 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\SetCallbackBase;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNativeMethod;
 
 /** @extends SetNativeMethod<FunctionType, FunctionValue> */
-final readonly class Map extends SetNativeMethod {
+final readonly class Map extends SetCallbackBase {
 
 	protected function getValidator(): callable {
-		return function(SetType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
-			if (!$targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf(
-						"The parameter type %s of the callback function is not a subtype of %s",
-						$targetType->itemType,
-						$parameterType->parameterType
-					),
-					$origin
-				);
-			}
+		return function(SetType $targetType, FunctionType $parameterType, mixed $origin): Type {
 			$r = $parameterType->returnType;
 			$errorType = $r instanceof ResultType ? $r->errorType : null;
 			$returnType = $r instanceof ResultType ? $r->returnType : $r;

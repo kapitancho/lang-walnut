@@ -11,36 +11,17 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\MapFilterBase;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\ResultType;
 
-/** @extends MapNativeMethod<AnyType, FunctionType, FunctionValue> */
-final readonly class FindFirst extends MapNativeMethod {
-
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
-		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
-			return false;
-		}
-		/** @var FunctionType $parameterType */
-		return $parameterType->returnType->isSubtypeOf($this->typeRegistry->boolean);
-	}
+final readonly class FindFirst extends MapFilterBase {
 
 	protected function getValidator(): callable {
-		return function(MapType $targetType, FunctionType $parameterType, mixed $origin): ResultType|ValidationFailure {
-			if ($targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
-				return $this->typeRegistry->result(
-					$targetType->itemType,
-					$this->typeRegistry->core->itemNotFound
-				);
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf(
-					"The parameter type %s of the callback function is not a subtype of %s",
-					$targetType->itemType,
-					$parameterType->parameterType
-				),
-				origin: $origin
+		return function(MapType $targetType, FunctionType $parameterType, mixed $origin): ResultType {
+			return $this->typeRegistry->result(
+				$targetType->itemType,
+				$this->typeRegistry->core->itemNotFound
 			);
 		};
 	}

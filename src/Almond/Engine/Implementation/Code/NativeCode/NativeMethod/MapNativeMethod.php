@@ -18,27 +18,56 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
  */
 abstract readonly class MapNativeMethod extends NativeMethod {
 
-	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
-		$baseTargetType = $this->toBaseType($targetType);
-		if ($baseTargetType instanceof RecordType) {
-			$targetType = $baseTargetType->asMapType();
+	protected function validateTargetType(Type $targetType, mixed $origin): null|string {
+		if ($targetType instanceof RecordType) {
+			$targetType = $targetType->asMapType();
 		}
-		return parent::validate($targetType, $parameterType, $origin);
+		if ($targetType instanceof MapType) {
+			$itemType = $this->toBaseType($targetType->itemType);
+			$expectedType = $this->getExpectedMapItemType();
+			if (is_array($expectedType)) {
+				foreach ($expectedType as $item) {
+					if ($itemType->isSubtypeOf($item)) {
+						return null;
+					}
+				}
+				return sprintf("The item type of the target map must be a subtype of one of %s, got %s",
+					implode(", ", $expectedType),
+					$targetType->itemType
+				);
+			} else {
+				if (!$itemType->isSubtypeOf($expectedType)) {
+					return sprintf("The item type of the target map must be a subtype of %s, got %s",
+						$expectedType,
+						$targetType->itemType
+					);
+
+				}
+			}
+		}
+		return null;
+	}
+
+	/** @return Type|list<Type> */
+	protected function getExpectedMapItemType(): Type|array {
+		return $this->typeRegistry->any;
+	}
+
+	protected function checkValidatorTargetType(Type $targetType, callable $validator): bool|Type {
+		$base = parent::checkValidatorTargetType($targetType, $validator);
+		if (!$base && $targetType instanceof RecordType) {
+			$arrayType = $targetType->asMapType();
+			$aBase = parent::checkValidatorTargetType($arrayType, $validator);
+			if ($aBase) {
+				return $aBase === true ? $arrayType : $aBase;
+			}
+		}
+		return $base;
 	}
 
 	protected function isTargetTypeValid(Type $targetType, callable $validator): bool {
 		$targetType = $targetType instanceof RecordType ? $targetType->asMapType() : $targetType;
-		if (!parent::isTargetTypeValid($targetType, $validator)) {
-			return false;
-		}
-		/** @var MapType $targetType */
-		return $this->isTargetItemTypeValid(
-			$this->toBaseType($targetType->itemType),
-		);
-	}
-
-	protected function isTargetItemTypeValid(Type $targetItemType): bool {
-		return true;
+		return parent::isTargetTypeValid($targetType, $validator);
 	}
 
 }

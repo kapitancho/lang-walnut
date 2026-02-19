@@ -12,7 +12,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayN
 /** @extends ArrayNativeMethod<Type, FunctionType, FunctionValue> */
 abstract readonly class ArrayGroupByIndexByBase extends ArrayCallbackBase {
 
-	protected function validateParameterType(Type $parameterType, Type $targetType, mixed $origin): null|string|ValidationFailure {
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		if ($error = parent::validateParameterType($parameterType, $targetType, $origin)) {
 			return $error;
 		}

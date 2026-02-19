@@ -5,25 +5,17 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\MapFilterKeyValueBase;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\ResultType;
 
-/** @extends MapNativeMethod<AnyType, FunctionType, FunctionValue> */
-final readonly class FindFirstKeyValue extends MapNativeMethod {
-
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
-		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
-			return false;
-		}
-		/** @var FunctionType $parameterType */
-		return $parameterType->returnType->isSubtypeOf($this->typeRegistry->boolean);
-	}
+final readonly class FindFirstKeyValue extends MapFilterKeyValueBase {
 
 	protected function getValidator(): callable {
 		return function(MapType $targetType, FunctionType $parameterType, mixed $origin): ResultType|ValidationFailure {
@@ -32,20 +24,9 @@ final readonly class FindFirstKeyValue extends MapNativeMethod {
 				'value' => $targetType->itemType
 			], null);
 
-			if ($kv->isSubtypeOf($parameterType->parameterType)) {
-				return $this->typeRegistry->result(
-					$kv,
-					$this->typeRegistry->core->itemNotFound
-				);
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf(
-					"The parameter type %s of the callback function is not a subtype of %s",
-					$parameterType->parameterType,
-					$kv,
-				),
-				origin: $origin
+			return $this->typeRegistry->result(
+				$kv,
+				$this->typeRegistry->core->itemNotFound
 			);
 		};
 	}

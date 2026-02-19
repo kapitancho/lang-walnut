@@ -12,12 +12,12 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayN
 /** @extends ArrayNativeMethod<Type, FunctionType, FunctionValue> */
 abstract readonly class ArrayCallbackBase extends ArrayNativeMethod {
 
-	protected function validateParameterType(Type $parameterType, Type $targetType, mixed $origin): null|string|ValidationFailure {
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		/** @var ArrayType $targetType */
 		/** @var FunctionType $parameterType */
 		if (!$targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
 			return sprintf(
-				"The parameter type %s of the callback function is not a subtype of %s",
+				"The item type %s is not a subtype of the of the callback function parameter type %s",
 				$targetType->itemType,
 				$parameterType->parameterType
 			);

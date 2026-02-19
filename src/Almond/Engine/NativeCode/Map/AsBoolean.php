@@ -22,7 +22,7 @@ final readonly class AsBoolean extends MapNativeMethod {
 			match(true) {
 				$targetType->range->minLength > 0 => $this->typeRegistry->true,
 				$targetType->range->maxLength !== PlusInfinity::value &&
-				(string)$targetType->range->maxLength == '0' => $this->typeRegistry->false,
+				(string)$targetType->range->maxLength === '0' => $this->typeRegistry->false,
 				default => $this->typeRegistry->boolean,
 			};
 	}

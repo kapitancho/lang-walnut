@@ -30,7 +30,7 @@ final class MaxTest extends CodeExecutionTestHelper {
 	}
 
 	public function testMaxInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('The item type of the array must be a subtype of Real.',
+		$this->executeErrorCodeSnippet("The item type of the target array must be a subtype of Real, got String['hello', 'world', 'hi']",
 			"['hello','world', 'hi', 'hello']->max;");
 	}
 }

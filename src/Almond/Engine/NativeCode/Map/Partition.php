@@ -7,21 +7,11 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\MapFilterBase;
 
-/** @extends MapNativeMethod<Type, FunctionType, FunctionValue> */
-final readonly class Partition extends MapNativeMethod {
-
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
-		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
-			return false;
-		}
-		/** @var FunctionType $parameterType */
-		return $parameterType->returnType->isSubtypeOf($this->typeRegistry->boolean);
-	}
+final readonly class Partition extends MapFilterBase {
 
 	protected function getValidator(): callable {
 		return function(MapType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {

@@ -13,10 +13,12 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayN
 /** @extends ArrayNativeMethod<Type, NullType, NullValue> */
 final readonly class Unique extends ArrayNativeMethod {
 
-	protected function validateTargetArrayItemType(Type $itemType, mixed $origin): null|string {
-		return $itemType->isSubtypeOf($this->typeRegistry->real()) ||
-			$itemType->isSubtypeOf($this->typeRegistry->string()) ?
-				null : "The item type of the array must be a subtype of Real or a subtype of String.";
+	/** @return list<Type> */
+	protected function getExpectedArrayItemType(): array {
+		return [
+			$this->typeRegistry->string(),
+			$this->typeRegistry->real()
+		];
 	}
 
 	protected function getValidator(): callable {

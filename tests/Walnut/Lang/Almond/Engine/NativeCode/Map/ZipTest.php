@@ -85,7 +85,7 @@ final class ZipTest extends CodeExecutionTestHelper {
 	}
 
 	public function testZipInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', "[a: 'a', b: 'bcd', c: 'ef']->zip(5);");
+		$this->executeErrorCodeSnippet('Parameter type Integer[5] is not a subtype of Map', "[a: 'a', b: 'bcd', c: 'ef']->zip(5);");
 	}
 
 }

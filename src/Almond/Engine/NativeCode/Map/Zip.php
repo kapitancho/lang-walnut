@@ -9,18 +9,17 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
 
-/** @extends NativeMethod<MapType|RecordType, MapType|RecordType, RecordValue, RecordValue> */
-final readonly class Zip extends NativeMethod {
+/** @extends MapNativeMethod<Type, MapType|RecordType, RecordValue> */
+final readonly class Zip extends MapNativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type {
-		return $targetType instanceof MapType || $targetType instanceof RecordType;
-	}
-
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
-		$parameterType = $this->toBaseType($parameterType);
-		return $parameterType instanceof MapType || $parameterType instanceof RecordType;
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		return $parameterType->isSubtypeOf($this->typeRegistry->map()) ?
+			null : sprintf(
+				"Parameter type %s is not a subtype of Map",
+				$parameterType
+			);
 	}
 
 	protected function getValidator(): callable {

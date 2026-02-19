@@ -1,0 +1,40 @@
+<?php
+
+namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
+
+use Walnut\Lang\Test\Almond\Engine\CodeExecutionTestHelper;
+
+final class BinaryMinusTest extends CodeExecutionTestHelper {
+
+	public function testWithoutAllEmpty(): void {
+		$result = $this->executeCodeSnippet("[:] - 3;");
+		$this->assertEquals("[:]", $result);
+	}
+
+	public function testWithoutAllNotFound(): void {
+		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 5, d: 10, e: 5] - 3;");
+		$this->assertEquals("[a: 1, b: 2, c: 5, d: 10, e: 5]", $result);
+	}
+
+	public function testWithoutAllNonEmpty(): void {
+		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 5, d: 10, e: 5] - 5;");
+		$this->assertEquals("[a: 1, b: 2, d: 10]", $result);
+	}
+
+	public function testWithoutAllKeyType(): void {
+		$result = $this->executeCodeSnippet(
+			"fn[a: 1, b: 2];",
+			valueDeclarations: "fn = ^m: Map<String<1>:Integer> => Map<String<1>:Integer> :: m - 1;"
+		);
+		$this->assertEquals("[b: 2]", $result);
+	}
+
+	public function testWithoutAllKeyTypeStringSubset(): void {
+		$result = $this->executeCodeSnippet(
+			"fn[a: 1, b: 2];",
+			valueDeclarations: "fn = ^m: Map<String['a', 'b']:Integer> => Map<String['a', 'b']:Integer> :: m - 1;"
+		);
+		$this->assertEquals("[b: 2]", $result);
+	}
+
+}

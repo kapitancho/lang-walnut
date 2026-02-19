@@ -12,21 +12,15 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\SubsetTypeHelper;
 
-/** @extends NativeMethod<MapType|RecordType, StringType, RecordValue, StringValue> */
-final readonly class WithoutByKey extends NativeMethod {
+/** @extends MapNativeMethod<Type, StringType, StringValue> */
+final readonly class WithoutByKey extends MapNativeMethod {
 	use SubsetTypeHelper;
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type {
-		return $targetType instanceof RecordType || $targetType instanceof MapType;
-	}
-
 	protected function getValidator(): callable {
-		return function(MapType|RecordType $targetType, StringType $parameterType, mixed $origin): Type|ValidationFailure {
+		return function(MapType|RecordType $targetType, StringType $parameterType, mixed $origin): Type {
 			$r = $this->typeRegistry;
 			if ($targetType instanceof RecordType) {
 				if ($parameterType instanceof StringSubsetType) {

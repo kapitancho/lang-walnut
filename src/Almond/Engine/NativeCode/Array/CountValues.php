@@ -18,15 +18,12 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayN
 /** @extends ArrayNativeMethod<Type, NullType, NullValue> */
 final readonly class CountValues extends ArrayNativeMethod {
 
-	protected function validateTargetArrayItemType(Type $itemType, mixed $origin): null|string {
-		return
-			$itemType->isSubtypeOf($this->typeRegistry->string()) ||
-			$itemType->isSubtypeOf($this->typeRegistry->integer()) ?
-				null :
-				sprintf(
-					"The item type %s should be a subtype of String or Integer",
-					$itemType
-				);
+	/** @return list<Type> */
+	protected function getExpectedArrayItemType(): array {
+		return [
+			$this->typeRegistry->string(),
+			$this->typeRegistry->integer()
+		];
 	}
 
 	protected function getValidator(): callable {

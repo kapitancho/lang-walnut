@@ -52,7 +52,8 @@ final class FlipMapTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFlipMapInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "[1; 'a']->flipMap(^s: String => Integer :: s->length);");
+		$this->executeErrorCodeSnippet("The item type of the target set must be a subtype of String, got (Integer[1]|String['a'])",
+			"[1; 'a']->flipMap(^s: String => Integer :: s->length);");
 	}
 
 	public function testFlipMapInvalidParameterType(): void {

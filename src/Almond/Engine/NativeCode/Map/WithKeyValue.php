@@ -10,21 +10,21 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<MapType|RecordType, RecordType, RecordValue, RecordValue> */
-final readonly class WithKeyValue extends NativeMethod {
+/** @extends MapNativeMethod<Type, RecordType, RecordValue> */
+final readonly class WithKeyValue extends MapNativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type {
-		return $targetType instanceof RecordType || $targetType instanceof MapType;
-	}
-
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		return $parameterType->isSubtypeOf(
 			$this->typeRegistry->record([
 				'key' => $this->typeRegistry->string(),
 				'value' => $this->typeRegistry->any,
 			], null)
+		) ? null : sprintf(
+			"Parameter type %s is not compatible with expected type [key: String, Value: Any].",
+			$parameterType
 		);
 	}
 

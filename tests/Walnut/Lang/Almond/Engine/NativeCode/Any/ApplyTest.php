@@ -23,7 +23,7 @@ final class ApplyTest extends CodeExecutionTestHelper {
 
 	public function testInvalidTargetType(): void {
 		$this->executeErrorCodeSnippet(
-			"Invalid target type",
+			"The target type Integer[4] is not a subtype of the function parameter type String",
 			"4->apply(fn);",
 			valueDeclarations: "fn = ^p: String => Integer :: p->length;"
 		);

@@ -127,7 +127,7 @@ abstract readonly class NativeMethod implements NativeMethodInterface {
 				$errors[] = $tResult;
 			}
 
-			$pResult = $this->validateParameterType($usedParameterType, $usedTargetType, $origin);
+			$pResult = $this->validateParameterType($usedParameterType, $usedTargetType);
 			if (is_string($pResult)) {
 				$pResult = $this->invalidParameterType($pResult, $origin);
 			}
@@ -149,11 +149,11 @@ abstract readonly class NativeMethod implements NativeMethodInterface {
 			$this->validationFactory->validationSuccess($validatorResult) : $validatorResult;
 	}
 
-	protected function validateTargetType(Type $targetType, mixed $origin): null|string|ValidationFailure {
+	protected function validateTargetType(Type $targetType, mixed $origin): null|string {
 		return null;
 	}
 
-	protected function validateParameterType(Type $parameterType, Type $targetType, mixed $origin): null|string|ValidationFailure {
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		return null;
 	}
 

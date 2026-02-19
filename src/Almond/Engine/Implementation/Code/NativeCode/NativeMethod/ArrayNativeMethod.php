@@ -18,27 +18,39 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
  */
 abstract readonly class ArrayNativeMethod extends NativeMethod {
 
-	public function validate2(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
-		$baseTargetType = $this->toBaseType($targetType);
-		if ($baseTargetType instanceof TupleType) {
-			$refinedType = $this->getTupleRefinedType($baseTargetType, $parameterType);
-			if ($refinedType) {
-				return $this->validationFactory->validationSuccess($refinedType);
-			}
-			$targetType = $baseTargetType->asArrayType();
+	protected function validateTargetType(Type $targetType, mixed $origin): null|string {
+		if ($targetType instanceof TupleType) {
+			$targetType = $targetType->asArrayType();
 		}
-		return parent::validate($targetType, $parameterType, $origin);
-	}
-
-	protected function validateTargetType(Type $targetType, mixed $origin): null|string|ValidationFailure {
 		if ($targetType instanceof ArrayType) {
-			return $this->validateTargetArrayItemType($targetType->itemType, $origin);
+			$itemType = $this->toBaseType($targetType->itemType);
+			$expectedType = $this->getExpectedArrayItemType();
+			if (is_array($expectedType)) {
+				foreach ($expectedType as $item) {
+					if ($itemType->isSubtypeOf($item)) {
+						return null;
+					}
+				}
+				return sprintf("The item type of the target array must be a subtype of one of %s, got %s",
+					implode(", ", $expectedType),
+					$targetType->itemType
+				);
+			} else {
+				if (!$itemType->isSubtypeOf($expectedType)) {
+					return sprintf("The item type of the target array must be a subtype of %s, got %s",
+						$expectedType,
+						$targetType->itemType
+					);
+
+				}
+			}
 		}
 		return null;
 	}
 
-	protected function validateTargetArrayItemType(Type $itemType, mixed $origin): null|string {
-		return null;
+	/** @return Type|list<Type> */
+	protected function getExpectedArrayItemType(): Type|array {
+		return $this->typeRegistry->any;
 	}
 
 	protected function checkValidatorTargetType(Type $targetType, callable $validator): bool|Type {
@@ -55,17 +67,7 @@ abstract readonly class ArrayNativeMethod extends NativeMethod {
 
 	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|string {
 		$targetType = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
-		if (!parent::isTargetTypeValid($targetType, $validator)) {
-			return false;
-		}
-		/** @var ArrayType $targetType */
-		return $this->isTargetItemTypeValid(
-			$this->toBaseType($targetType->itemType),
-		);
-	}
-
-	protected function isTargetItemTypeValid(Type $targetItemType): bool|string {
-		return true;
+		return parent::isTargetTypeValid($targetType, $validator);
 	}
 
 }

@@ -8,13 +8,13 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<ArrayType|TupleType, ArrayType|TupleType, TupleValue, TupleValue> */
-final readonly class Zip extends NativeMethod {
+/** @extends ArrayNativeMethod<Type, ArrayType|TupleType, TupleValue> */
+final readonly class Zip extends ArrayNativeMethod {
 
-	protected function validateParameterType(Type $parameterType, Type $targetType, mixed $origin): null|string|ValidationFailure {
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		return $parameterType->isSubtypeOf($this->typeRegistry->array()) ?
 			null : sprintf(
 				"Parameter type %s is not a subtype of Array",
