@@ -10,7 +10,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\ArrayFilterBase;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
@@ -18,7 +17,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayN
 final readonly class Filter extends ArrayFilterBase {
 
 	protected function getValidator(): callable {
-		return function(ArrayType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
+		return function(ArrayType $targetType, FunctionType $parameterType, mixed $origin): Type {
 			$pType = $this->toBaseType($parameterType->returnType);
 			$returnType = $this->typeRegistry->array(
 				$targetType->itemType,

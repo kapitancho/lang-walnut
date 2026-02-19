@@ -8,13 +8,12 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\MapFilterBase;
 
 final readonly class Partition extends MapFilterBase {
 
 	protected function getValidator(): callable {
-		return function(MapType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
+		return function(MapType $targetType, FunctionType $parameterType, mixed $origin): Type {
 			if ($targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
 				$partitionType = $this->typeRegistry->map($targetType->itemType, 0, $targetType->range->maxLength);
 				return $this->typeRegistry->record([

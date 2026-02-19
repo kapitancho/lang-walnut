@@ -13,9 +13,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
 /** @extends ArrayNativeMethod<Type, IntegerType, IntegerValue> */
 final readonly class WithoutByIndex extends ArrayNativeMethod {
@@ -28,7 +26,7 @@ final readonly class WithoutByIndex extends ArrayNativeMethod {
 	}
 
 	protected function getValidator(): callable {
-		return function(ArrayType|TupleType $targetType, IntegerType $parameterType, mixed $origin): Type|ValidationFailure {
+		return function(ArrayType|TupleType $targetType, IntegerType $parameterType, mixed $origin): Type {
 			if ($targetType instanceof TupleType && $parameterType instanceof IntegerSubsetType && count($parameterType->subsetValues) === 1) {
 				$param = (int)(string)$parameterType->subsetValues[0];
 				if ($param >= 0) {

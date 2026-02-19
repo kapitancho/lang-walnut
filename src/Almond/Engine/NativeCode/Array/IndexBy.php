@@ -10,13 +10,12 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\ArrayGroupByIndexByBase;
 
 final readonly class IndexBy extends ArrayGroupByIndexByBase {
 
 	protected function getValidator(): callable {
-		return function(ArrayType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
+		return function(ArrayType $targetType, FunctionType $parameterType, mixed $origin): Type {
 			$returnType = $this->toBaseType($parameterType->returnType);
 			$maxLength = $targetType->range->maxLength;
 			$minLength = (string)$targetType->range->minLength === '0' ||

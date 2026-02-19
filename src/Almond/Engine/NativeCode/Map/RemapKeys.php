@@ -13,8 +13,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
 
 /** @extends MapNativeMethod<AnyType, MapType, FunctionType> */
@@ -42,7 +40,7 @@ final readonly class RemapKeys extends MapNativeMethod {
 	}
 
 	protected function getValidator(): callable {
-		return function(MapType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
+		return function(MapType $targetType, FunctionType $parameterType, mixed $origin): Type {
 			$r = $parameterType->returnType;
 			$errorType = $r instanceof ResultType ? $r->errorType : null;
 			$returnType = $r instanceof ResultType ? $r->returnType : $r;

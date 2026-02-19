@@ -34,7 +34,7 @@ final readonly class AsReal extends MutableNativeMethod {
 			$targetValueType,
 			new MethodName('asReal'),
 			$this->typeRegistry->null,
-			$origin
+			null
 		);
 		return !($result instanceof ValidationFailure && ($result->errors[0]?->type === ValidationErrorType::undefinedMethod));
 	}

@@ -8,7 +8,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
 /** @extends NativeMethod<IntegerType|RealType, NullType, IntegerType|RealValue, NullValue> */

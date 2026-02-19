@@ -2,23 +2,18 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\MapFilterKeyValueBase;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\ResultType;
 
 final readonly class FindFirstKeyValue extends MapFilterKeyValueBase {
 
 	protected function getValidator(): callable {
-		return function(MapType $targetType, FunctionType $parameterType, mixed $origin): ResultType|ValidationFailure {
+		return function(MapType $targetType, FunctionType $parameterType, mixed $origin): ResultType {
 			$kv = $this->typeRegistry->record([
 				'key' => $targetType->keyType,
 				'value' => $targetType->itemType

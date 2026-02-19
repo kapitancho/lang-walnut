@@ -18,16 +18,12 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<MutableType, FunctionType, MutableValue, FunctionValue> */
 final readonly class REMAPKEYS extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type|ValidationFailure {
+	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type {
 		if ($targetType instanceof MutableType) {
 			$valueType = $this->toBaseType($targetType->valueType);
 			if ($valueType instanceof MapType) {
 				if ($valueType->range->minLength > 1) {
-					return $this->validationFactory->error(
-						ValidationErrorType::invalidTargetType,
-						"Invalid target type: REMAPKEYS can only be used on maps with a minimum size of 0 or 1",
-						$origin
-					);
+					return "Invalid target type: REMAPKEYS can only be used on maps with a minimum size of 0 or 1";
 				}
 				return true;
 			}

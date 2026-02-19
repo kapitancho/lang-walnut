@@ -8,13 +8,12 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\ArrayFilterBase;
 
 final readonly class FindLast extends ArrayFilterBase {
 
 	protected function getValidator(): callable {
-		return function(ArrayType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
+		return function(ArrayType $targetType, FunctionType $parameterType, mixed $origin): Type {
 			return $this->typeRegistry->result(
 				$targetType->itemType,
 				$this->typeRegistry->core->itemNotFound

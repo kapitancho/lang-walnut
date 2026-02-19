@@ -5,18 +5,16 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BooleanValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
 
 /** @extends MapNativeMethod<Type, Type, Value> */
 final readonly class KeySort extends MapNativeMethod {
 
 	protected function getValidator(): callable {
-		return function(MapType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
+		return function(MapType $targetType, Type $parameterType, mixed $origin): Type {
 			$pType = $this->typeRegistry->union([
 				$this->typeRegistry->null,
 				$this->typeRegistry->record([
