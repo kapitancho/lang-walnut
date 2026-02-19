@@ -49,8 +49,8 @@ abstract readonly class NumericClamp extends NativeMethod {
 		return $this->isBefore($from, $value) && $this->isBefore($value, $to);
 	}
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator): bool {
-		if (!parent::isParameterTypeValid($parameterType, $validator)) {
+	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
+		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
 			return false;
 		}
 		return $parameterType->isSubtypeOf(
