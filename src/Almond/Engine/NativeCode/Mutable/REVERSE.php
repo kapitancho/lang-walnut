@@ -17,13 +17,18 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Mutabl
 /** @extends MutableNativeMethod<StringType|ArrayType, NullType, NullValue> */
 final readonly class REVERSE extends MutableNativeMethod {
 
-	protected function isTargetValueTypeValid(Type $targetValueType): bool {
-		return $targetValueType instanceof StringType || $targetValueType instanceof ArrayType;
+	protected function validateTargetValueType(Type $valueType): null|string {
+		return (
+			$valueType->isSubtypeOf($this->typeRegistry->string()) ||
+			$valueType->isSubtypeOf($this->typeRegistry->array())
+		) ? null :
+			sprintf("The value type of the target set must be a subtype of String or Array, got %s",
+				$valueType
+			);
 	}
 
 	protected function getValidator(): callable {
-		return fn(MutableType $targetType, NullType $parameterType): MutableType =>
-			$targetType;
+		return fn(MutableType $targetType, NullType $parameterType): MutableType => $targetType;
 	}
 
 	private function reverse(string $str): string {

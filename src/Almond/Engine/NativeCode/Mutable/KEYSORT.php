@@ -16,31 +16,30 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Mutabl
 /** @extends MutableNativeMethod<MapType, Type, Value> */
 final readonly class KEYSORT extends MutableNativeMethod {
 
-	protected function isTargetValueTypeValid(Type $targetValueType): bool {
-		return $targetValueType instanceof MapType;
+	protected function validateTargetValueType(Type $valueType): null|string {
+		return $valueType->isSubtypeOf($this->typeRegistry->map()) ?
+			null :
+			sprintf("The value type of the target set must be a subtype of Map, got %s", $valueType);
+	}
+
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		$pType = $this->typeRegistry->union([
+			$this->typeRegistry->null,
+			$this->typeRegistry->record([
+				'reverse' => $this->typeRegistry->boolean
+			], null)
+		]);
+		return $parameterType->isSubtypeOf($pType) ?
+			null :
+			sprintf(
+				"The parameter type %s is not a subtype of %s",
+				$parameterType,
+				$pType
+			);
 	}
 
 	protected function getValidator(): callable {
-		return function(MutableType $targetType, Type $parameterType, mixed $origin): MutableType|ValidationFailure {
-			$pType = $this->typeRegistry->union([
-				$this->typeRegistry->null,
-				$this->typeRegistry->record([
-					'reverse' => $this->typeRegistry->boolean
-				], null)
-			]);
-			if ($parameterType->isSubtypeOf($pType)) {
-				return $targetType;
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf(
-					"The parameter type %s is not a subtype of %s",
-					$parameterType,
-					$pType
-				),
-				$origin
-			);
-		};
+		return fn(MutableType $targetType, Type $parameterType, mixed $origin): MutableType => $targetType;
 	}
 
 	protected function getExecutor(): callable {

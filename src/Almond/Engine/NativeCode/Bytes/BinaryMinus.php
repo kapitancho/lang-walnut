@@ -14,7 +14,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<BytesType, Type, BytesValue, Value> */
 final readonly class BinaryMinus extends NativeMethod {
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		return $parameterType->isSubtypeOf(
 			$this->typeRegistry->union([
 				$this->typeRegistry->bytes(1),
@@ -25,7 +25,7 @@ final readonly class BinaryMinus extends NativeMethod {
 					$this->typeRegistry->bytes(1)
 				)
 			])
-		);
+		) ? null : "Parameter type must be one of Bytes<1>, Array<Bytes<1>> or Set<Bytes<1>>";
 	}
 
 	protected function getValidator(): callable {

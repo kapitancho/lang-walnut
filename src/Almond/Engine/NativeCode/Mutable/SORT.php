@@ -15,23 +15,23 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\Composite\SortHelper;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MutableNativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<MutableType, Type, MutableValue, Value> */
-final readonly class SORT extends NativeMethod {
+/** @extends MutableNativeMethod<ArrayType|SetType|MapType, Type, Value> */
+final readonly class SORT extends MutableNativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type {
-		if ($targetType instanceof MutableType) {
-			$valueType = $this->toBaseType($targetType->valueType);
-			if ($valueType instanceof ArrayType || $valueType instanceof MapType || $valueType instanceof SetType) {
-				return true;
-			}
-		}
-		return false;
+	protected function validateTargetValueType(Type $valueType): null|string {
+		return $valueType instanceof ArrayType || $valueType instanceof MapType || $valueType instanceof SetType ?
+			null : sprintf(
+				"The value type of the target must be an Array, Map or Set type, got %s",
+				$valueType
+			);
 	}
 
 	protected function getValidator(): callable {
 		return function(MutableType $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
+			/** @var ArrayType|MapType|SetType $valueType */
 			$valueType = $this->toBaseType($targetType->valueType);
 			$sortHelper = new SortHelper(
 				$this->validationFactory,

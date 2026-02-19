@@ -27,7 +27,8 @@ final class AsIntegerTest extends CodeExecutionTestHelper {
 	}
 
 	public function testAsIntegerInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "mutable{Set, [;]}->asInteger;");
+		$this->executeErrorCodeSnippet("Method 'asInteger' is not defined for type 'Set'.",
+			"mutable{Set, [;]}->asInteger;");
 	}
 
 }

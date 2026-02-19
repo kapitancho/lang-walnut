@@ -46,7 +46,7 @@ final class FilterTest extends CodeExecutionTestHelper {
 
 	public function testFilterArrayInvalidParameterRange(): void {
 		$this->executeErrorCodeSnippet(
-			"Invalid target type: Mutable<Array<Integer, 3..>>",
+			"The value type of the target set must be a subtype of Array, Map or Set with a minimum number of elements 0, got Array<Integer, 3..>",
 			"testFn(mutable{Array<Integer, 3..>, [1, 2, 5, 10, 5]});",
 			valueDeclarations: "testFn = ^m: Mutable<Array<Integer, 3..>> => Mutable<Array<Integer, 3..>> :: m->FILTER(^i: Integer => Boolean :: i > 4);"
 		);
@@ -145,7 +145,7 @@ final class FilterTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFilterArrayInvalidParameterReturnType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("The return type of the callback function must be a subtype of Boolean, got Real",
 			"testFn(mutable{Array<Integer>, [1]});",
 			valueDeclarations: "testFn = ^m: Mutable<Array<Integer>> => Mutable<Array<Integer>> :: m->FILTER(^Integer => Real :: 3.14);"
 		);
@@ -166,7 +166,7 @@ final class FilterTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFilterMapInvalidParameterReturnType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("The return type of the callback function must be a subtype of Boolean, got Real",
 			"testFn(mutable{Map<Integer>, [a: 1]});",
 			valueDeclarations: "testFn = ^m: Mutable<Map<Integer>> => Mutable<Map<Integer>> :: m->FILTER(^Integer => Real :: 3.14);"
 		);
@@ -187,7 +187,7 @@ final class FilterTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFilterSetInvalidParameterReturnType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("The return type of the callback function must be a subtype of Boolean, got Real",
 			"testFn(mutable{Set<Integer>, [1;]});",
 			valueDeclarations: "testFn = ^m: Mutable<Set<Integer>> => Mutable<Set<Integer>> :: m->FILTER(^Integer => Real :: 3.14);"
 		);

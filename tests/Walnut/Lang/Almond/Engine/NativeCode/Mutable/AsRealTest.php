@@ -36,7 +36,8 @@ final class AsRealTest extends CodeExecutionTestHelper {
 	}
 
 	public function testAsRealInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "mutable{Set, [;]}->asReal;");
+		$this->executeErrorCodeSnippet("Method 'asReal' is not defined for type 'Set'.",
+			"mutable{Set, [;]}->asReal;");
 	}
 
 }

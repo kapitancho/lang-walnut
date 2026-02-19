@@ -18,34 +18,88 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MutableNativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<MutableType, Type, MutableValue, Value> */
-final readonly class REMOVE extends NativeMethod {
+/** @extends MutableNativeMethod<MapType|RecordType|SetType, Type, Value> */
+final readonly class REMOVE extends MutableNativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type {
-		if ($targetType instanceof MutableType) {
-			$valueType = $this->toBaseType($targetType->valueType);
-			if ($valueType instanceof SetType && (int)(string)$valueType->range->minLength === 0) {
-				return true;
-			}
-			if ($valueType instanceof RecordType) {
-				if (
-					!$valueType->restType instanceof NothingType ||
-					array_any($valueType->types, fn(Type $type) => $type instanceof OptionalKeyType)
-				) {
-					return true;
-				}
-			}
-			if ($valueType instanceof MapType && (int)(string)$valueType->range->minLength === 0) {
-				return true;
+	protected function validateTargetValueType(Type $valueType): null|string {
+		if ($valueType instanceof SetType && (int)(string)$valueType->range->minLength === 0) {
+			return null;
+		}
+		if ($valueType instanceof RecordType) {
+			if (
+				!$valueType->restType instanceof NothingType ||
+				array_any($valueType->types, fn(Type $type) => $type instanceof OptionalKeyType)
+			) {
+				return null;
 			}
 		}
-		return false;
+		if ($valueType instanceof MapType && (int)(string)$valueType->range->minLength === 0) {
+			return null;
+		}
+		return sprintf(
+			"The value type of the target must be a Set type with minimum number of elements 0, a Record type with at least one optional key or an open Record type, or a Map type with minimum number of elements 0, got %s",
+			$valueType
+		);
+	}
+
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		$valueType = $this->toBaseType($targetType->valueType);
+		if ($valueType instanceof SetType) {
+			return null;
+		}
+		if ($valueType instanceof RecordType) {
+			if ($parameterType instanceof StringSubsetType) {
+				$useRestType = false;
+				foreach($parameterType->subsetValues as $subsetValue) {
+					$rt = $valueType->types[$subsetValue] ?? null;
+					if ($rt) {
+						if (!$rt instanceof OptionalKeyType) {
+							return sprintf(
+								"Cannot remove required record key '%s' of type %s",
+								$subsetValue, $rt
+							);
+						}
+					} else {
+						$useRestType = true;
+					}
+					if ($useRestType) {
+						if ($valueType->restType instanceof NothingType) {
+							return sprintf(
+								"Cannot remove unknown record key '%s' from a closed record type",
+								$subsetValue
+							);
+						}
+					}
+					return null;
+				}
+			}
+			return $parameterType instanceof StringType ?
+				null : sprintf(
+					"The parameter type %s is not a valid key type for the record type, expected String",
+					$parameterType
+				);
+		}
+		if ($valueType instanceof MapType) {
+			$pType = $this->toBaseType($parameterType);
+			return $pType->isSubtypeOf($valueType->keyType) ?
+				null : sprintf(
+				"The parameter type %s is not a subtype of the map key type %s",
+				$parameterType,
+				$valueType->keyType
+			);
+		}
+		return sprintf(
+			"The mutable value type %s does not support the REMOVE operation",
+			$valueType
+		);
 	}
 
 	protected function getValidator(): callable {
 		return function(MutableType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
+			/** @var SetType|RecordType|MapType $valueType */
 			$valueType = $this->toBaseType($targetType->valueType);
 			if ($valueType instanceof SetType) {
 				return $this->typeRegistry->result(
@@ -62,30 +116,11 @@ final readonly class REMOVE extends NativeMethod {
 						if ($rt) {
 							if ($rt instanceof OptionalKeyType) {
 								$returnTypes[] = $rt->valueType;
-							} else {
-								return $this->validationFactory->error(
-									ValidationErrorType::invalidParameterType,
-									sprintf(
-										"Cannot remove required record key '%s' of type %s",
-										$subsetValue, $rt
-									),
-									$origin
-								);
 							}
 						} else {
 							$useRestType = true;
 						}
 						if ($useRestType) {
-							if ($valueType->restType instanceof NothingType) {
-								return $this->validationFactory->error(
-									ValidationErrorType::invalidParameterType,
-									sprintf(
-										"Cannot remove unknown record key '%s' from a closed record type",
-										$subsetValue
-									),
-									$origin
-								);
-							}
 							$returnTypes[] = $valueType->restType;
 						}
 						return $this->typeRegistry->result(
@@ -94,49 +129,15 @@ final readonly class REMOVE extends NativeMethod {
 						);
 					}
 				}
-				if ($parameterType instanceof StringType) {
-					return $this->typeRegistry->result(
-						$valueType->asMapType()->itemType,
-						$this->typeRegistry->core->mapItemNotFound
-					);
-				}
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf(
-						"The parameter type %s is not a valid key type for the record type, expected String",
-						$parameterType
-					),
-					$origin
+				return $this->typeRegistry->result(
+					$valueType->asMapType()->itemType,
+					$this->typeRegistry->core->mapItemNotFound
 				);
 			}
-			if ($valueType instanceof MapType) {
-				$pType = $this->toBaseType($parameterType);
-				if ($pType->isSubtypeOf($valueType->keyType)) {
-					return $this->typeRegistry->result(
-						$valueType->itemType,
-						$this->typeRegistry->core->mapItemNotFound
-					);
-				}
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf(
-						"The parameter type %s is not a subtype of the map key type %s",
-						$parameterType,
-						$valueType->keyType
-					),
-					$origin
-				);
-			}
-			// @codeCoverageIgnoreStart
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf(
-					"The mutable value type %s does not support the REMOVE operation",
-					$valueType
-				),
-				$origin
+			return $this->typeRegistry->result(
+				$valueType->itemType,
+				$this->typeRegistry->core->mapItemNotFound
 			);
-			// @codeCoverageIgnoreEnd
 		};
 	}
 

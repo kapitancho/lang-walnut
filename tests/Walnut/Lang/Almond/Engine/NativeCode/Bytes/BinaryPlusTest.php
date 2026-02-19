@@ -25,7 +25,7 @@ final class BinaryPlusTest extends CodeExecutionTestHelper {
 	}
 
 	public function testBinaryPlusInvalidParameter(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', '"hello" + A;',
+		$this->executeErrorCodeSnippet('Parameter type A is not a subtype of Bytes or Integer<0..255>', '"hello" + A;',
 			"A := (); B := (); A ==> Bytes @ B :: @B;");
 	}
 

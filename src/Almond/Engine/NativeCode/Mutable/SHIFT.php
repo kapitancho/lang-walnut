@@ -15,8 +15,12 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Mutabl
 /** @extends MutableNativeMethod<ArrayType, NullType, NullValue> */
 final readonly class SHIFT extends MutableNativeMethod {
 
-	protected function isTargetValueTypeValid(Type $targetValueType): bool {
-		return $targetValueType instanceof ArrayType && (int)(string)$targetValueType->range->minLength === 0;
+	protected function validateTargetValueType(Type $valueType): null|string {
+		return
+			($valueType instanceof ArrayType && (int)(string)$valueType->range->minLength === 0) ?
+				null : sprintf("The value type of the target set must be a subtype of Array with a minimum length of 0, got %s",
+				$valueType
+			);
 	}
 
 	protected function getValidator(): callable {

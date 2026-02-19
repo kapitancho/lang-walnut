@@ -50,19 +50,19 @@ final class BinaryMinusTest extends CodeExecutionTestHelper {
 	}
 
 	public function testBinaryMinusInvalidParameterStringType(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', '"hello " - "";');
+		$this->executeErrorCodeSnippet('Parameter type must be one of Bytes<1>, Array<Bytes<1>> or Set<Bytes<1>>', '"hello " - "";');
 	}
 
 	public function testBinaryMinusInvalidParameterArrayType(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', '"hello " - ["x", 12, "w"];');
+		$this->executeErrorCodeSnippet('Parameter type must be one of Bytes<1>, Array<Bytes<1>> or Set<Bytes<1>>', '"hello " - ["x", 12, "w"];');
 	}
 
 	public function testBinaryMinusInvalidParameterSetType(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', '"hello " - ["x"; 12; "w"];');
+		$this->executeErrorCodeSnippet('Parameter type must be one of Bytes<1>, Array<Bytes<1>> or Set<Bytes<1>>', '"hello " - ["x"; 12; "w"];');
 	}
 
 	public function testBinaryMinusInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', '"hello " - false;');
+		$this->executeErrorCodeSnippet('Parameter type must be one of Bytes<1>, Array<Bytes<1>> or Set<Bytes<1>>', '"hello " - false;');
 	}
 
 }

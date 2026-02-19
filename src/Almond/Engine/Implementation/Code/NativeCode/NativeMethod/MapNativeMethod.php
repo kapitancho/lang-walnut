@@ -63,9 +63,4 @@ abstract readonly class MapNativeMethod extends NativeMethod {
 		return $base;
 	}
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool {
-		$targetType = $targetType instanceof RecordType ? $targetType->asMapType() : $targetType;
-		return parent::isTargetTypeValid($targetType, $validator);
-	}
-
 }

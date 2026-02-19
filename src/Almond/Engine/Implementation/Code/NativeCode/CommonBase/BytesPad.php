@@ -38,14 +38,12 @@ abstract readonly class BytesPad extends NativeMethod {
 		};
 	}
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator): bool {
-		if (!parent::isParameterTypeValid($parameterType, $validator)) {
-			return false;
-		}
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		/** @var RecordType $parameterType */
 		$lengthType = $parameterType->typeOf('length');
 		$padBytesType = $parameterType->typeOf('padBytes');
-		return $lengthType instanceof IntegerType && $padBytesType instanceof BytesType;
+		return $lengthType instanceof IntegerType && $padBytesType instanceof BytesType ?
+			null : sprintf("Parameter type %s is not a subtype of [length: Integer, padBytes: Bytes]", $parameterType);
 	}
 
 	protected function getExecutor(): callable {

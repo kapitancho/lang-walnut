@@ -42,11 +42,11 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 
 final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterface {
 	private const array typeMap = [
+		TupleType::class => ['Tuple', 'Array'],
+		RecordType::class => ['Record', 'Map'],
 		ArrayType::class => ['Array'],
 		MapType::class => ['Map'],
 		SetType::class => ['Set'],
-		TupleType::class => ['Tuple', 'Array'],
-		RecordType::class => ['Record', 'Map'],
 		IntegerType::class => ['Integer', 'Real'],
 		IntegerSubsetType::class => ['Integer', 'Real'],
 		RealType::class => ['Real'],
@@ -122,11 +122,11 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 				$type instanceof StringType,
 				$type instanceof BooleanType, $type instanceof TrueType,
 				$type instanceof FalseType, $type instanceof NullType => true,
+			$type instanceof TupleType => $this->isJsonType($type->asArrayType()),
+			$type instanceof RecordType => $this->isJsonType($type->asMapType()),
 			$type instanceof ArrayType => $this->isJsonType($type->itemType),
 			$type instanceof MapType => $this->isJsonType($type->itemType),
 			$type instanceof SetType => $this->isJsonType($type->itemType),
-			$type instanceof TupleType => $this->isJsonType($type->asArrayType()),
-			$type instanceof RecordType => $this->isJsonType($type->asMapType()),
 			$type instanceof MutableType => $this->isJsonType($type->valueType),
 			$type instanceof AliasType && $type->name->identifier === 'JsonValue' => true,
 			$type instanceof AliasType => $this->isJsonType($type->aliasedType),

@@ -16,6 +16,15 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Mutabl
 
 final readonly class POP extends MutableNativeMethod {
 
+	protected function validateTargetValueType(Type $valueType): null|string {
+		return
+			($valueType instanceof ArrayType && (int)(string)$valueType->range->minLength === 0) ||
+			($valueType instanceof TupleType && count($valueType->types) === 0) ?
+				null : sprintf("The value type of the target set must be a subtype of Array or Tuple with a minimum length of 0, got %s",
+				$valueType
+			);
+	}
+
 	protected function getValidator(): callable {
 		return function(MutableType $targetType, NullType $parameterType, mixed $origin): ResultType {
 			$vt = $this->toBaseType($targetType->valueType);
@@ -28,13 +37,6 @@ final readonly class POP extends MutableNativeMethod {
 				$this->typeRegistry->core->itemNotFound
 			);
 		};
-	}
-
-	protected function isTargetValueTypeValid(Type $targetValueType): bool {
-		return
-			($targetValueType instanceof ArrayType && (int)(string)$targetValueType->range->minLength === 0) ||
-			($targetValueType instanceof TupleType && count($targetValueType->types) === 0);
-
 	}
 
 	protected function getExecutor(): callable {

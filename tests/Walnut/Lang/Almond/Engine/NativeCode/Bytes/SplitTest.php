@@ -18,7 +18,7 @@ final class SplitTest extends CodeExecutionTestHelper {
 
 	public function testSplitEmptyString(): void {
 		$this->executeErrorCodeSnippet(
-			"Invalid parameter type: Bytes<0>",
+			"Parameter type Bytes<0> is not a subtype of Bytes<1..>",
 			'"hello"->split("");');
 	}
 

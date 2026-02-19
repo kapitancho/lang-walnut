@@ -13,54 +13,49 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MutableNativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<MutableType, FunctionType, MutableValue, FunctionValue> */
-final readonly class REMAPKEYS extends NativeMethod {
+/** @extends MutableNativeMethod<MapType, FunctionType, FunctionValue> */
+final readonly class REMAPKEYS extends MutableNativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type {
-		if ($targetType instanceof MutableType) {
-			$valueType = $this->toBaseType($targetType->valueType);
-			if ($valueType instanceof MapType) {
-				if ($valueType->range->minLength > 1) {
-					return "Invalid target type: REMAPKEYS can only be used on maps with a minimum size of 0 or 1";
-				}
-				return true;
-			}
+	protected function validateTargetValueType(Type $valueType): null|string {
+		if ($valueType instanceof MapType) {
+			return $valueType->range->minLength > 1 ?
+				sprintf("REMAPKEYS can only be used on maps with a minimum size of 0 or 1, got %s",
+					$valueType
+				) : null;
 		}
-		return false;
+		return sprintf("The value type of the target set must be a Map type, got %s",
+			$valueType
+		);
+	}
+
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		/** @var MutableType $targetType */
+		/** @var MapType $valueType */
+		$valueType = $this->toBaseType($targetType->valueType);
+		if ($valueType->keyType->isSubtypeOf($parameterType->parameterType)) {
+			$r = $parameterType->returnType;
+			$returnType = $r instanceof ResultType ? $r->returnType : $r;
+			if ($returnType->isSubtypeOf($valueType->keyType)) {
+				return null;
+			}
+			return sprintf(
+				"The return type %s of the callback function is not a subtype of %s",
+				$returnType,
+				$valueType->keyType
+			);
+		}
+		return sprintf(
+			"The parameter type %s of the callback function is not a supertype of %s",
+			$parameterType->parameterType,
+			$valueType->keyType,
+		);
 	}
 
 	protected function getValidator(): callable {
-		return function(MutableType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
-			$valueType = $this->toBaseType($targetType->valueType);
-			/** @var MapType $valueType */
-			if ($valueType->keyType->isSubtypeOf($parameterType->parameterType)) {
-				$r = $parameterType->returnType;
-				$returnType = $r instanceof ResultType ? $r->returnType : $r;
-				if ($returnType->isSubtypeOf($valueType->keyType)) {
-					return $targetType;
-				}
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidReturnType,
-					sprintf(
-						"The return type %s of the callback function is not a subtype of %s",
-						$returnType,
-						$valueType->keyType
-					),
-					$origin
-				);
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf(
-					"The parameter type %s of the callback function is not a supertype of %s",
-					$parameterType->parameterType,
-					$valueType->keyType,
-				),
-				$origin
-			);
-		};
+		return fn(MutableType $targetType, FunctionType $parameterType, mixed $origin): MutableType => $targetType;
 	}
 
 	protected function getExecutor(): callable {

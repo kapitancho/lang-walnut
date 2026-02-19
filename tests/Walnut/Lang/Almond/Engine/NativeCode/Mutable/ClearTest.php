@@ -12,11 +12,11 @@ final class ClearTest extends CodeExecutionTestHelper {
 	}
 
 	public function testSetClearInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "mutable{Set<2..>, [1; 2; 3]}->CLEAR;");
+		$this->executeErrorCodeSnippet('The value type of the target must be a Set or Map type with a minimum length of 0, got Set<2..>', "mutable{Set<2..>, [1; 2; 3]}->CLEAR;");
 	}
 
 	public function testClearInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "mutable{Real, 3.14}->CLEAR;");
+		$this->executeErrorCodeSnippet('The value type of the target must be a Set or Map type with a minimum length of 0, got Real', "mutable{Real, 3.14}->CLEAR;");
 	}
 
 	public function testMapClear(): void {
@@ -25,7 +25,7 @@ final class ClearTest extends CodeExecutionTestHelper {
 	}
 
 	public function testMapClearInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "mutable{Map<2..>, [a: 1, b: 2, c: 3]}->CLEAR;");
+		$this->executeErrorCodeSnippet('The value type of the target must be a Set or Map type with a minimum length of 0, got Map<2..>', "mutable{Map<2..>, [a: 1, b: 2, c: 3]}->CLEAR;");
 	}
 
 	public function testRecordClear(): void {
@@ -34,7 +34,7 @@ final class ClearTest extends CodeExecutionTestHelper {
 	}
 
 	public function testRecordClearInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "mutable{[a: Integer, b: ?Integer, ...Integer], [a: 1, b: 2, c: 3]}->CLEAR");
+		$this->executeErrorCodeSnippet('The value type of the target must be a Set or Map type with a minimum length of 0, got Map<Integer, 1..>', "mutable{[a: Integer, b: ?Integer, ...Integer], [a: 1, b: 2, c: 3]}->CLEAR");
 	}
 
 }

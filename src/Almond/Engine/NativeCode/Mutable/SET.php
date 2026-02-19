@@ -6,28 +6,24 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MutableType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\MutableValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MutableNativeMethod;
 
 /** @extends MutableNativeMethod<Type, Type, Value> */
 final readonly class SET extends MutableNativeMethod {
 
-	protected function getValidator(): callable {
-		return function(MutableType $targetType, Type $parameterType, mixed $origin): MutableType|ValidationFailure {
-			if ($parameterType->isSubtypeOf($targetType->valueType)) {
-				return $targetType;
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf(
-					"The parameter type %s is not a subtype of the value type %s",
-					$parameterType,
-					$targetType->valueType
-				),
-				$origin
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		/** @var MutableType $targetType */
+		return $parameterType->isSubtypeOf($targetType->valueType) ?
+			null :
+			sprintf(
+				"The parameter type %s is not a subtype of the value type %s",
+				$parameterType,
+				$targetType->valueType
 			);
-		};
+	}
+
+	protected function getValidator(): callable {
+		return fn(MutableType $targetType, Type $parameterType, mixed $origin): MutableType => $targetType;
 	}
 
 	protected function getExecutor(): callable {

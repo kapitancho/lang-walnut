@@ -16,27 +16,17 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
  */
 abstract readonly class MutableNativeMethod extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool {
-		$targetType = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
-		if (!parent::isTargetTypeValid($targetType, $validator)) {
-			return false;
+	protected function validateTargetType(Type $targetType, mixed $origin): null|string {
+		if ($targetType instanceof MutableType) {
+			/** @var MutableType $targetType */
+			$valueType = $this->toBaseType($targetType->valueType);
+			return $this->validateTargetValueType($valueType);
 		}
-		/** @var MutableType $targetType */
-		return $this->isTargetValueTypeValid(
-			$this->toBaseType($targetType->valueType),
-		);
+		return null;
 	}
 
-	protected function isTargetValueTypeValid(Type $targetValueType, mixed $origin): bool {
-		return true;
-	}
-
-	public function isTargetValueValid(Value $target, callable $executor): bool {
-		if (!parent::isTargetValueValid($target, $executor)) {
-			return false;
-		}
-		/** @var MutableValue $target */
-		return $this->isTargetValueTypeValid($target->targetType, null);
+	protected function validateTargetValueType(Type $valueType): null|string {
+		return null;
 	}
 
 }

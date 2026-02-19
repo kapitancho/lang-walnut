@@ -15,54 +15,54 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MutableNativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<MutableType, FunctionType, MutableValue, FunctionValue> */
-final readonly class MAP extends NativeMethod {
+/** @extends MutableNativeMethod<MutableType, FunctionType, MutableValue, FunctionValue> */
+final readonly class MAP extends MutableNativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type {
-		if ($targetType instanceof MutableType) {
-			$type = $this->toBaseType($targetType->valueType);
-			if (($type instanceof ArrayType || $type instanceof MapType || $type instanceof SetType) && $type->isSubtypeOf(
-				$this->typeRegistry->union([
-					$this->typeRegistry->array($type->itemType),
-					$this->typeRegistry->map($type->itemType),
-					$this->typeRegistry->set($type->itemType),
-				])
-			) && !$type->isSubtypeOf($this->typeRegistry->set($this->typeRegistry->any, 2))) {
-				return true;
-			}
+	protected function validateTargetType(Type $targetType, mixed $origin): null|string {
+		/** @var MutableType $targetType */
+		$type = $this->toBaseType($targetType->valueType);
+		if (($type instanceof ArrayType || $type instanceof MapType || $type instanceof SetType) && $type->isSubtypeOf(
+			$this->typeRegistry->union([
+				$this->typeRegistry->array($type->itemType),
+				$this->typeRegistry->map($type->itemType),
+				$this->typeRegistry->set($type->itemType),
+			])
+		)) {
+			return $type->isSubtypeOf($this->typeRegistry->set($this->typeRegistry->any, 2)) ?
+				 sprintf("Only Set type with a minimum number of elements 0 or 1 are allowed, got %s",
+					 $targetType->valueType
+				 ) : null;
 		}
-		return false;
+		return sprintf("The value type of the target set must be a subtype of Array, Map or Set, got %s",
+			$targetType->valueType
+		);
+	}
+
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		/** @var MutableType $targetType */
+		/** @var FunctionType $parameterType */
+		/** @var ArrayType|MapType|SetType $type */
+		$type = $this->toBaseType($targetType->valueType);
+		if (!$type->itemType->isSubtypeOf($parameterType->parameterType)) {
+			return sprintf(
+				"The parameter type %s of the callback function is not a subtype of %s",
+				$type->itemType,
+				$parameterType->parameterType
+			);
+		}
+		return $parameterType->returnType->isSubtypeOf($type->itemType) ? null : sprintf(
+			"The value type %s is not a subtype of the return type %s of the callback function",
+			$parameterType->returnType,
+			$type->itemType,
+		);
 	}
 
 	protected function getValidator(): callable {
-		return function(MutableType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
-			$type = $this->toBaseType($targetType->valueType);
-			if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
-				if ($parameterType->returnType->isSubtypeOf($type->itemType)) {
-					return $targetType;
-				}
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidReturnType,
-					sprintf(
-						"The value type %s is not a subtype of the return type %s of the callback function",
-						$parameterType->returnType,
-						$type->itemType,
-					),
-					$origin
-				);
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf(
-					"The parameter type %s of the callback function is not a subtype of %s",
-					$type->itemType,
-					$parameterType->parameterType
-				),
-				$origin
-			);
-		};
+		return fn(MutableType $targetType, FunctionType $parameterType, mixed $origin): MutableType => $targetType;
 	}
 
 	protected function getExecutor(): callable {

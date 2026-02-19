@@ -63,9 +63,4 @@ abstract readonly class ArrayNativeMethod extends NativeMethod {
 		return $base;
 	}
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|string {
-		$targetType = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
-		return parent::isTargetTypeValid($targetType, $validator);
-	}
-
 }

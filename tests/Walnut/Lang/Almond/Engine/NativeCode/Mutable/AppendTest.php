@@ -16,7 +16,7 @@ final class AppendTest extends CodeExecutionTestHelper {
 	}
 
 	public function testSetInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "mutable{Real, 3.14}->APPEND('hello');");
+		$this->executeErrorCodeSnippet('The value type of the target set must be an unbounded String type, got Real', "mutable{Real, 3.14}->APPEND('hello');");
 	}
 
 }

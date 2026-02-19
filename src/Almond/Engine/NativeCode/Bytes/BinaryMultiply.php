@@ -13,8 +13,10 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<BytesType, IntegerType, BytesValue, IntegerValue> */
 final readonly class BinaryMultiply extends NativeMethod {
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
-		return $parameterType->isSubtypeOf($this->typeRegistry->integer(0));
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		return $parameterType->isSubtypeOf($this->typeRegistry->integer(0)) ?
+			null :
+			sprintf("Parameter type %s is not a subtype of Integer<0..>", $parameterType);
 	}
 
 	protected function getValidator(): callable {

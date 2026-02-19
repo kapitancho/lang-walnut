@@ -15,55 +15,52 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MutableNativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<MutableType, FunctionType, MutableValue, FunctionValue> */
-final readonly class FILTER extends NativeMethod {
+/** @extends MutableNativeMethod<ArrayType|SetType|MapType, FunctionType, FunctionValue> */
+final readonly class FILTER extends MutableNativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type {
-		if ($targetType instanceof MutableType) {
-			$type = $this->toBaseType($targetType->valueType);
-			if (($type instanceof ArrayType || $type instanceof MapType || $type instanceof SetType) && $type->isSubtypeOf(
-				$this->typeRegistry->union([
-					$this->typeRegistry->array($type->itemType),
-					$this->typeRegistry->map($type->itemType),
-					$this->typeRegistry->set($type->itemType),
-				])
-			) &&
-				!$type->isSubtypeOf($this->typeRegistry->array($this->typeRegistry->any, 1)) &&
-				!$type->isSubtypeOf($this->typeRegistry->map($this->typeRegistry->any, 1)) &&
-				!$type->isSubtypeOf($this->typeRegistry->set($this->typeRegistry->any, 1))
-			) {
-				return true;
-			}
+	protected function validateTargetValueType(Type $valueType): null|string {
+		if (($valueType instanceof ArrayType || $valueType instanceof MapType || $valueType instanceof SetType) && $valueType->isSubtypeOf(
+			$this->typeRegistry->union([
+				$this->typeRegistry->array($valueType->itemType),
+				$this->typeRegistry->map($valueType->itemType),
+				$this->typeRegistry->set($valueType->itemType),
+			])
+		) &&
+			!$valueType->isSubtypeOf($this->typeRegistry->array($this->typeRegistry->any, 1)) &&
+			!$valueType->isSubtypeOf($this->typeRegistry->map($this->typeRegistry->any, 1)) &&
+			!$valueType->isSubtypeOf($this->typeRegistry->set($this->typeRegistry->any, 1))
+		) {
+			return null;
 		}
-		return false;
+		return sprintf("The value type of the target set must be a subtype of Array, Map or Set with a minimum number of elements 0, got %s",
+			$valueType
+		);
 	}
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
-		$parameterType = $this->toBaseType($parameterType);
-		if ($parameterType instanceof FunctionType) {
-			return $parameterType->returnType->isSubtypeOf($this->typeRegistry->boolean);
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		/** @var MutableType $targetType */
+		if (!$parameterType instanceof FunctionType) {
+			return sprintf("The parameter type must be a function type, got %s", $parameterType);
 		}
-		return false;
+		if (!$parameterType->returnType->isSubtypeOf($this->typeRegistry->boolean)) {
+			return sprintf("The return type of the callback function must be a subtype of Boolean, got %s", $parameterType->returnType);
+		}
+		/** @var ArrayType|SetType|MapType $type */
+		$type = $this->toBaseType($targetType->valueType);
+		return $type->itemType->isSubtypeOf($parameterType->parameterType) ?
+			null :
+			sprintf(
+				"The parameter type %s of the callback function is not a subtype of %s",
+				$type->itemType,
+				$parameterType->parameterType
+			);
 	}
 
 	protected function getValidator(): callable {
-		return function(MutableType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
-			$type = $this->toBaseType($targetType->valueType);
-			if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
-				return $targetType;
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf(
-					"The parameter type %s of the callback function is not a subtype of %s",
-					$type->itemType,
-					$parameterType->parameterType
-				),
-				$origin
-			);
-		};
+		return fn(MutableType $targetType, FunctionType $parameterType, mixed $origin): MutableType => $targetType;
 	}
 
 	protected function getExecutor(): callable {

@@ -8,6 +8,8 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntersectionType as In
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ShapeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -98,6 +100,12 @@ final readonly class IntersectionTypeNormalizer {
 							$this->typeRegistry->record($fieldTypes,
 								$this->normalize($qBase->restType, $txBase->restType)
 							);
+                    } else if ($qBase instanceof RecordType && $txBase instanceof MapType) {
+	                    array_splice($queue, $ql, 1);
+	                    $tx = $this->intersectRecordWithMap($qBase, $txBase);
+                    } else if ($qBase instanceof MapType && $txBase instanceof RecordType) {
+	                    array_splice($queue, $ql, 1);
+	                    $tx = $this->intersectRecordWithMap($txBase, $qBase);
                     } else if ($qBase instanceof MapType && $txBase instanceof MapType) {
 	                    $newRange = $qBase->range->tryRangeIntersectionWith($txBase->range);
 	                    if ($newRange) {
@@ -109,6 +117,15 @@ final readonly class IntersectionTypeNormalizer {
 			                    $this->normalize($qBase->keyType, $txBase->keyType)
 		                    );
 	                    }
+                    } else if ($qBase instanceof TupleType && $txBase instanceof TupleType) {
+	                    array_splice($queue, $ql, 1);
+	                    $tx = $this->intersectTupleWithTuple($qBase, $txBase);
+                    } else if ($qBase instanceof TupleType && $txBase instanceof ArrayType) {
+	                    array_splice($queue, $ql, 1);
+	                    $tx = $this->intersectTupleWithArray($qBase, $txBase);
+                    } else if ($qBase instanceof ArrayType && $txBase instanceof TupleType) {
+	                    array_splice($queue, $ql, 1);
+	                    $tx = $this->intersectTupleWithArray($txBase, $qBase);
                     } else if ($qBase instanceof ArrayType && $txBase instanceof ArrayType) {
 	                    $newRange = $q->range->tryRangeIntersectionWith($tx->range);
 	                    if ($newRange) {
@@ -192,4 +209,63 @@ final readonly class IntersectionTypeNormalizer {
         }
         return $queue;
     }
+
+	private function intersectTupleWithTuple(TupleType $a, TupleType $b): Type {
+		$aTypes = $a->types;
+		$bTypes = $b->types;
+		$maxLen = max(count($aTypes), count($bTypes));
+		$resultTypes = [];
+		for ($i = 0; $i < $maxLen; $i++) {
+			$aItem = $aTypes[$i] ?? $a->restType;
+			$bItem = $bTypes[$i] ?? $b->restType;
+			$intersected = $this->normalize($aItem, $bItem);
+			if ($intersected instanceof NothingType) {
+				return $this->typeRegistry->nothing;
+			}
+			$resultTypes[] = $intersected;
+		}
+		$restType = $this->normalize($a->restType, $b->restType);
+		return $this->typeRegistry->tuple($resultTypes, $restType);
+	}
+
+	private function intersectTupleWithArray(TupleType $tuple, ArrayType $array): Type {
+		$resultTypes = [];
+		foreach ($tuple->types as $tupleItemType) {
+			$intersected = $this->normalize($tupleItemType, $array->itemType);
+			if ($intersected instanceof NothingType) {
+				return $this->typeRegistry->nothing;
+			}
+			$resultTypes[] = $intersected;
+		}
+		$restType = $this->normalize($tuple->restType, $array->itemType);
+		$tupleLen = count($tuple->types);
+		if ($tupleLen < $array->range->minLength) {
+			if ($restType instanceof NothingType) {
+				return $this->typeRegistry->nothing;
+			}
+			for ($i = $tupleLen; $i < $array->range->minLength; $i++) {
+				$resultTypes[] = $restType;
+			}
+		}
+		if ($array->range->maxLength !== PlusInfinity::value &&
+			$tuple->restType instanceof NothingType &&
+			$tupleLen > $array->range->maxLength
+		) {
+			return $this->typeRegistry->nothing;
+		}
+		return $this->typeRegistry->tuple($resultTypes, $restType);
+	}
+
+	private function intersectRecordWithMap(RecordType $record, MapType $map): Type {
+		$fieldTypes = [];
+		foreach ($record->types as $fieldName => $fieldType) {
+			$intersected = $this->normalize($fieldType, $map->itemType);
+			if ($intersected instanceof NothingType) {
+				return $this->typeRegistry->nothing;
+			}
+			$fieldTypes[$fieldName] = $intersected;
+		}
+		$restType = $this->normalize($record->restType, $map->itemType);
+		return $this->typeRegistry->record($fieldTypes, $restType);
+	}
 }

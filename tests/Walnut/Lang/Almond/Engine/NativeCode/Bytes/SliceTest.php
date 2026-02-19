@@ -12,11 +12,11 @@ final class SliceTest extends CodeExecutionTestHelper {
 	}
 
 	public function testSubstringInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', '"hello"->slice(5);');
+		$this->executeErrorCodeSnippet('Parameter type Integer[5] is not a subtype of [start: Integer<0..>, length: Integer<0..>]', '"hello"->slice(5);');
 	}
 
 	public function testSubstringInvalidParameterKeys(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', '"hello"->slice[length: 10];');
+		$this->executeErrorCodeSnippet('Parameter type [length: Integer[10]] is not a subtype of [start: Integer<0..>, length: Integer<0..>]', '"hello"->slice[length: 10];');
 	}
 
 }

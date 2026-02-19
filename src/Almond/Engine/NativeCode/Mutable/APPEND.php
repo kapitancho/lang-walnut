@@ -13,8 +13,11 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Mutabl
 /** @extends MutableNativeMethod<StringType, StringType, StringValue> */
 final readonly class APPEND extends MutableNativeMethod {
 
-	protected function isTargetValueTypeValid(Type $targetValueType): bool {
-		return $targetValueType instanceof StringType && $targetValueType->range->maxLength === PlusInfinity::value;
+	protected function validateTargetValueType(Type $valueType): null|string {
+		return $valueType instanceof StringType && $valueType->range->maxLength === PlusInfinity::value ?
+			null : sprintf("The value type of the target set must be an unbounded String type, got %s",
+				$valueType
+			);
 	}
 
 	protected function getValidator(): callable {

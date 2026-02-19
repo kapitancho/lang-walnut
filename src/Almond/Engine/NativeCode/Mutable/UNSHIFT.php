@@ -16,27 +16,28 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Mutabl
 /** @extends MutableNativeMethod<ArrayType, Type, Value> */
 final readonly class UNSHIFT extends MutableNativeMethod {
 
-	protected function isTargetValueTypeValid(Type $targetValueType): bool {
-		return $targetValueType instanceof ArrayType && $targetValueType->range->maxLength === PlusInfinity::value;
+	protected function validateTargetValueType(Type $valueType): null|string {
+		return $valueType instanceof ArrayType && $valueType->range->maxLength === PlusInfinity::value ?
+			null : sprintf(
+				"The value type of the target must be an unbounded Array type, got %s",
+				$valueType
+			);
+	}
+
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		/** @var MutableType $targetType */
+		$valueType = $this->toBaseType($targetType->valueType);
+		/** @var ArrayType $valueType */
+		return $parameterType->isSubtypeOf($valueType->itemType) ?
+			null : sprintf(
+				"The parameter type %s is not a subtype of the item type %s",
+				$parameterType,
+				$valueType->itemType
+			);
 	}
 
 	protected function getValidator(): callable {
-		return function(MutableType $targetType, Type $parameterType, mixed $origin): MutableType|ValidationFailure {
-			$valueType = $this->toBaseType($targetType->valueType);
-			/** @var ArrayType $valueType */
-			if ($parameterType->isSubtypeOf($valueType->itemType)) {
-				return $targetType;
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf(
-					"The parameter type %s is not a subtype of the item type %s",
-					$parameterType,
-					$valueType->itemType
-				),
-				$origin
-			);
-		};
+		return fn(MutableType $targetType, Type $parameterType, mixed $origin): MutableType => $targetType;
 	}
 
 	protected function getExecutor(): callable {

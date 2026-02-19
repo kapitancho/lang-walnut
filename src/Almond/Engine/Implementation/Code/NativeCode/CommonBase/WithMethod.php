@@ -35,58 +35,7 @@ abstract readonly class WithMethod extends NativeMethod {
 		$valueType = $this->toBaseType($targetType->valueType);
 		$pType = $this->toBaseType($parameterType);
 
-		if ($valueType instanceof ArrayType) {
-			$pType = $pType instanceof TupleType ? $pType->asArrayType() : $pType;
-			if ($pType instanceof ArrayType) {
-				if (!$pType->itemType->isSubtypeOf($valueType->itemType)) {
-					return $this->validationFactory->error(
-						ValidationErrorType::invalidParameterType,
-						sprintf("Cannot call 'with' on Array type %s with a parameter of Array type %s due to incompatible item type",
-							$targetType, $parameterType),
-						$origin
-					);
-				}
-				if (
-					$valueType->range->maxLength === PlusInfinity::value || (
-						$pType->range->maxLength !== PlusInfinity::value &&
-						$pType->range->maxLength <= $valueType->range->maxLength
-					)
-				) {
-					return $typeAdjustFn();
-				}
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf("Cannot call 'with' on Array type %s with a parameter of Array type %s due to incompatible length",
-						$targetType, $parameterType),
-					$origin
-				);
-			}
-		}
 		if ($valueType instanceof TupleType) {
-			if ($pType instanceof ArrayType) {
-				if (
-					$pType->range->maxLength === PlusInfinity::value ||
-					$pType->range->maxLength > count($valueType->types)
-				) {
-					return $this->validationFactory->error(
-						ValidationErrorType::invalidParameterType,
-						sprintf("Cannot call 'with' on Tuple type %s with a parameter of Array type %s due to incompatible length",
-							$targetType, $parameterType),
-						$origin
-					);
-				}
-				foreach ($valueType->types as $vIndex => $vType) {
-					if (!$pType->itemType->isSubtypeOf($vType)) {
-						return $this->validationFactory->error(
-							ValidationErrorType::invalidParameterType,
-							sprintf("Cannot call 'with' on Tuple type %s with a parameter of Array type %s due to incompatible type at index %d",
-								$targetType, $parameterType, $vIndex),
-							$origin
-						);
-					}
-				}
-				return $typeAdjustFn();
-			}
 			if ($pType instanceof TupleType) {
 				if (count($pType->types) > count($valueType->types)) {
 					return $this->validationFactory->error(
@@ -117,6 +66,81 @@ abstract readonly class WithMethod extends NativeMethod {
 				}
 				return $typeAdjustFn();
 			}
+			if ($pType instanceof ArrayType) {
+				if (
+					$pType->range->maxLength === PlusInfinity::value ||
+					$pType->range->maxLength > count($valueType->types)
+				) {
+					return $this->validationFactory->error(
+						ValidationErrorType::invalidParameterType,
+						sprintf("Cannot call 'with' on Tuple type %s with a parameter of Array type %s due to incompatible length",
+							$targetType, $parameterType),
+						$origin
+					);
+				}
+				foreach ($valueType->types as $vIndex => $vType) {
+					if (!$pType->itemType->isSubtypeOf($vType)) {
+						return $this->validationFactory->error(
+							ValidationErrorType::invalidParameterType,
+							sprintf("Cannot call 'with' on Tuple type %s with a parameter of Array type %s due to incompatible type at index %d",
+								$targetType, $parameterType, $vIndex),
+							$origin
+						);
+					}
+				}
+				return $typeAdjustFn();
+			}
+		}
+		if ($valueType instanceof ArrayType) {
+			$pType = $pType instanceof TupleType ? $pType->asArrayType() : $pType;
+			if ($pType instanceof ArrayType) {
+				if (!$pType->itemType->isSubtypeOf($valueType->itemType)) {
+					return $this->validationFactory->error(
+						ValidationErrorType::invalidParameterType,
+						sprintf("Cannot call 'with' on Array type %s with a parameter of Array type %s due to incompatible item type",
+							$targetType, $parameterType),
+						$origin
+					);
+				}
+				if (
+					$valueType->range->maxLength === PlusInfinity::value || (
+						$pType->range->maxLength !== PlusInfinity::value &&
+						$pType->range->maxLength <= $valueType->range->maxLength
+					)
+				) {
+					return $typeAdjustFn();
+				}
+				return $this->validationFactory->error(
+					ValidationErrorType::invalidParameterType,
+					sprintf("Cannot call 'with' on Array type %s with a parameter of Array type %s due to incompatible length",
+						$targetType, $parameterType),
+					$origin
+				);
+			}
+		}
+		if ($valueType instanceof RecordType) {
+			if ($pType instanceof RecordType) {
+				foreach ($pType->types as $vKey => $vType) {
+					$pPropertyType = $valueType->types[$vKey] ?? $valueType->restType;
+					if (!$vType->isSubtypeOf($pPropertyType)) {
+						return $this->validationFactory->error(
+							ValidationErrorType::invalidParameterType,
+							sprintf("Cannot call 'with' on Record type %s with a parameter of Record type %s due to incompatible type at key %s",
+								$targetType, $parameterType, $vKey),
+							$origin
+						);
+					}
+				}
+				return $typeAdjustFn();
+			}
+			if ($pType instanceof MapType) {
+				return $this->validationFactory->error(
+					ValidationErrorType::invalidParameterType,
+					sprintf("Cannot call 'with' on Record type %s with a parameter of Map type %s",
+						$targetType, $parameterType),
+					$origin
+				);
+			}
 		}
 		if ($valueType instanceof MapType) {
 			$pType = $pType instanceof RecordType ? $pType->asMapType() : $pType;
@@ -146,30 +170,6 @@ abstract readonly class WithMethod extends NativeMethod {
 				sprintf("Cannot call 'with' on Map type %s with a limited length", $targetType),
 				$origin
 			);
-		}
-		if ($valueType instanceof RecordType) {
-			if ($pType instanceof MapType) {
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf("Cannot call 'with' on Record type %s with a parameter of Map type %s",
-						$targetType, $parameterType),
-					$origin
-				);
-			}
-			if ($pType instanceof RecordType) {
-				foreach ($pType->types as $vKey => $vType) {
-					$pPropertyType = $valueType->types[$vKey] ?? $valueType->restType;
-					if (!$vType->isSubtypeOf($pPropertyType)) {
-						return $this->validationFactory->error(
-							ValidationErrorType::invalidParameterType,
-							sprintf("Cannot call 'with' on Record type %s with a parameter of Record type %s due to incompatible type at key %s",
-								$targetType, $parameterType, $vKey),
-							$origin
-						);
-					}
-				}
-				return $typeAdjustFn();
-			}
 		}
 		// @codeCoverageIgnoreStart
 		return $this->validationFactory->error(

@@ -12,7 +12,8 @@ final class SetTest extends CodeExecutionTestHelper {
 	}
 
 	public function testSetInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', "mutable{Real, 3.14}->SET('a');");
+		$this->executeErrorCodeSnippet("The parameter type String['a'] is not a subtype of the value type Real",
+			"mutable{Real, 3.14}->SET('a');");
 	}
 
 }

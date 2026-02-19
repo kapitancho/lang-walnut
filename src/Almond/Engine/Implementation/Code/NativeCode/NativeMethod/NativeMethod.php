@@ -46,46 +46,6 @@ abstract readonly class NativeMethod implements NativeMethodInterface {
 		protected FunctionValueFactory $functionValueFactory,
 	) {}
 
-	public function validate2(
-		Type $targetType,
-		Type $parameterType,
-		mixed $origin
-	): ValidationSuccess|ValidationFailure {
-		$validator = $this->getValidator();
-
-		$baseTargetType = $this->toBaseType($targetType);
-		$baseParameterType = $this->toBaseType($parameterType);
-
-		$validatedTargetType = $this->isTargetTypeValid(
-			$baseTargetType,
-			$validator
-		);
-		if ($validatedTargetType === false || is_string($validatedTargetType)) {
-			return $this->invalidTargetType(
-				is_string($validatedTargetType) ? $validatedTargetType : $targetType,
-				$origin
-			);
-		}
-		$validatedParameterType = $this->isParameterTypeValid(
-			$baseParameterType,
-			$validator,
-			$targetType
-		);
-		if ($validatedParameterType === false || is_string($validatedParameterType)) {
-			return $this->invalidParameterType(
-				is_string($validatedParameterType) ? $validatedParameterType : $parameterType,
-				$origin
-			);
-		}
-		$result = $validator(
-			is_bool($validatedTargetType) ? $baseTargetType : $validatedTargetType,
-			is_bool($validatedParameterType) ? $baseParameterType : $validatedParameterType,
-			$origin
-		);
-		return $result instanceof Type ?
-			$this->validationFactory->validationSuccess($result) : $result;
-	}
-
 	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|string|Type {
 		return $this->matchesCallableParameter($validator, $targetType, 0);
 	}
@@ -126,7 +86,8 @@ abstract readonly class NativeMethod implements NativeMethodInterface {
 			if ($tResult instanceof ValidationFailure) {
 				$errors[] = $tResult;
 			}
-
+		}
+		if (count($errors) === 0) {
 			$pResult = $this->validateParameterType($usedParameterType, $usedTargetType);
 			if (is_string($pResult)) {
 				$pResult = $this->invalidParameterType($pResult, $origin);

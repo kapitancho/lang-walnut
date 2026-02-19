@@ -18,145 +18,112 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MutableNativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<MutableType, Type, MutableValue, Value> */
-final readonly class ADD extends NativeMethod {
+/** @extends MutableNativeMethod<SetType|RecordType|MapType, Type, Value> */
+final readonly class ADD extends MutableNativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type {
-		if ($targetType instanceof MutableType) {
-			$valueType = $this->toBaseType($targetType->valueType);
-			if ($valueType instanceof SetType && $valueType->range->maxLength === PlusInfinity::value) {
-				return true;
-			}
-			if ($valueType instanceof RecordType) {
-				return true;
-			}
-			if ($valueType instanceof MapType && $valueType->range->maxLength === PlusInfinity::value) {
-				return true;
-			}
+	protected function validateTargetValueType(Type $valueType): null|string {
+		if ($valueType instanceof SetType && $valueType->range->maxLength === PlusInfinity::value) {
+			return null;
 		}
-		return false;
+		if ($valueType instanceof RecordType) {
+			return null;
+		}
+		if ($valueType instanceof MapType && $valueType->range->maxLength === PlusInfinity::value) {
+			return null;
+		}
+		return sprintf(
+			"The value type of the target must be a Set, Record or Map type with an unbounded number of items, got %s",
+			$valueType
+		);
 	}
 
-	protected function getValidator(): callable {
-		return function(MutableType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
-			$valueType = $this->toBaseType($targetType->valueType);
-			$p = $this->toBaseType($parameterType);
-			if ($valueType instanceof SetType) {
-				if ($p->isSubtypeOf($valueType->itemType)) {
-					return $targetType;
-				}
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf(
-						"The parameter type %s is not a subtype of the set item type %s",
-						$parameterType,
-						$valueType->itemType
-					),
-					$origin
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		/** @var MutableType $targetType */
+		$valueType = $this->toBaseType($targetType->valueType);
+		$p = $this->toBaseType($parameterType);
+		if ($valueType instanceof SetType) {
+			return $p->isSubtypeOf($valueType->itemType) ?
+				null : sprintf(
+					"The parameter type %s is not a subtype of the set item type %s",
+					$parameterType,
+					$valueType->itemType
 				);
-			}
-			if ($valueType instanceof RecordType) {
-				if ($p->isSubtypeOf($this->typeRegistry->record([
-					'key' => $this->typeRegistry->string(),
-					'value' => $this->typeRegistry->any
-				], null))) {
-					$kk = $p->types['key'] ?? null;
-					$vv = $p->types['value'] ?? null;
-					if ($kk && $vv) {
-						if ($kk instanceof StringSubsetType) {
-							foreach ($kk->subsetValues as $subsetValue) {
-								$mType = $valueType->types[$subsetValue] ?? $valueType->restType;
-								if (!$vv->isSubtypeOf($mType)) {
-									if ($mType instanceof NothingType) {
-										return $this->validationFactory->error(
-											ValidationErrorType::invalidParameterType,
-											sprintf(
-												"An item with key '%s' cannot be added to this record type",
-												$subsetValue
-											),
-											$origin
-										);
-									} else {
-										return $this->validationFactory->error(
-											ValidationErrorType::invalidParameterType,
-											sprintf(
-												"The value type %s for key '%s' is not a subtype of %s",
-												$vv, $subsetValue,
-												$mType instanceof OptionalKeyType ? $mType->valueType : $mType
-											),
-											$origin
-										);
-									}
-								}
-							}
-							return $targetType;
-						}
-						if ($kk instanceof StringType) {
-							if (!$vv->isSubtypeOf($valueType->restType)) {
-								return $this->validationFactory->error(
-									ValidationErrorType::invalidParameterType,
-									sprintf(
-										"The value type %s should be a subtype of the rest type %s",
-										$vv, $valueType->restType
-									),
-									$origin
-								);
-							}
-							foreach($valueType->types as $vKey => $vType) {
-								if (!$valueType->restType->isSubtypeOf($vType)) {
-									return $this->validationFactory->error(
-										ValidationErrorType::invalidParameterType,
-										sprintf(
-											"The rest type %s is not a subtype of the type %s for key '%s'",
-											$valueType->restType, $vType, $vKey
-										),
-										$origin
+		}
+		if ($valueType instanceof RecordType) {
+			if ($p->isSubtypeOf($this->typeRegistry->record([
+				'key' => $this->typeRegistry->string(),
+				'value' => $this->typeRegistry->any
+			], null))) {
+				$kk = $p->types['key'] ?? null;
+				$vv = $p->types['value'] ?? null;
+				if ($kk && $vv) {
+					if ($kk instanceof StringSubsetType) {
+						foreach ($kk->subsetValues as $subsetValue) {
+							$mType = $valueType->types[$subsetValue] ?? $valueType->restType;
+							if (!$vv->isSubtypeOf($mType)) {
+								if ($mType instanceof NothingType) {
+									return sprintf(
+										"An item with key '%s' cannot be added to this record type",
+										$subsetValue
+									);
+								} else {
+									return sprintf(
+										"The value type %s for key '%s' is not a subtype of %s",
+										$vv, $subsetValue,
+										$mType instanceof OptionalKeyType ? $mType->valueType : $mType
 									);
 								}
 							}
-							return $targetType;
 						}
+						return null;
+					}
+					if ($kk instanceof StringType) {
+						if (!$vv->isSubtypeOf($valueType->restType)) {
+							return sprintf(
+								"The value type %s should be a subtype of the rest type %s",
+								$vv, $valueType->restType
+							);
+						}
+						foreach($valueType->types as $vKey => $vType) {
+							if (!$valueType->restType->isSubtypeOf($vType)) {
+								return sprintf(
+									"The rest type %s is not a subtype of the type %s for key '%s'",
+									$valueType->restType, $vType, $vKey
+								);
+							}
+						}
+						return null;
 					}
 				}
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf(
-						"The parameter type %s is not a valid key-value record for the record type",
-						$parameterType
-					),
-					$origin
-				);
 			}
-			if ($valueType instanceof MapType) {
-				if ($p->isSubtypeOf($this->typeRegistry->record([
-					'key' => $valueType->keyType,
-					'value' => $valueType->itemType
-				], null))) {
-					return $targetType;
-				}
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf(
-						"The parameter type %s is not a valid key-value record for the map type %s",
-						$parameterType,
-						$valueType
-					),
-					$origin
-				);
-			}
-			// @codeCoverageIgnoreStart
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf(
-					"The mutable value type %s does not support the ADD operation",
-					$valueType
-				),
-				$origin
+			return sprintf(
+				"The parameter type %s is not a valid key-value record for the record type",
+				$parameterType
 			);
-			// @codeCoverageIgnoreEnd
-		};
+		}
+		if ($valueType instanceof MapType) {
+			return $p->isSubtypeOf($this->typeRegistry->record([
+				'key' => $valueType->keyType,
+				'value' => $valueType->itemType
+			], null)) ?
+				null :
+				 sprintf(
+					 "The parameter type %s is not a valid key-value record for the map type %s",
+					 $parameterType,
+					 $valueType
+				 );
+		}
+		return sprintf(
+			"The mutable value type %s does not support the ADD operation",
+			$valueType
+		);
+	}
+
+	protected function getValidator(): callable {
+		return fn(MutableType $targetType, Type $parameterType, mixed $origin): MutableType => $targetType;
 	}
 
 	protected function getExecutor(): callable {

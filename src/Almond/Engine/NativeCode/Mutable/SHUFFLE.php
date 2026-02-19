@@ -14,13 +14,15 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Mutabl
 /** @extends MutableNativeMethod<ArrayType, NullType, NullValue> */
 final readonly class SHUFFLE extends MutableNativeMethod {
 
-	protected function isTargetValueTypeValid(Type $targetValueType): bool {
-		return $targetValueType instanceof ArrayType;
+	protected function validateTargetValueType(Type $valueType): null|string {
+		return $valueType->isSubtypeOf($this->typeRegistry->array()) ?
+			null : sprintf("The value type of the target set must be a subtype of Array, got %s",
+				$valueType
+			);
 	}
 
 	protected function getValidator(): callable {
-		return fn(MutableType $targetType, NullType $parameterType): MutableType =>
-			$targetType;
+		return fn(MutableType $targetType, NullType $parameterType): MutableType =>	$targetType;
 	}
 
 	protected function getExecutor(): callable {

@@ -13,23 +13,20 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNat
 /** @extends MapNativeMethod<Type, Type, Value> */
 final readonly class KeySort extends MapNativeMethod {
 
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		$pType = $this->typeRegistry->union([
+			$this->typeRegistry->null,
+			$this->typeRegistry->record([
+				'reverse' => $this->typeRegistry->boolean
+			], null)
+		]);
+		return $parameterType->isSubtypeOf($pType) ?
+			null :
+			sprintf("The parameter type %s is not a subtype of %s", $parameterType, $pType);
+	}
+
 	protected function getValidator(): callable {
-		return function(MapType $targetType, Type $parameterType, mixed $origin): Type {
-			$pType = $this->typeRegistry->union([
-				$this->typeRegistry->null,
-				$this->typeRegistry->record([
-					'reverse' => $this->typeRegistry->boolean
-				], null)
-			]);
-			if ($parameterType->isSubtypeOf($pType)) {
-				return $targetType;
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("The parameter type %s is not a subtype of %s", $parameterType, $pType),
-				$origin
-			);
-		};
+		return fn(MapType $targetType, Type $parameterType, mixed $origin): MapType => $targetType;
 	}
 
 	protected function getExecutor(): callable {

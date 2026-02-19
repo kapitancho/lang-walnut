@@ -18,11 +18,16 @@ final class PopTest extends CodeExecutionTestHelper {
 	}
 
 	public function testPopInvalidTargetTypeRange(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "mutable{Array<2..>, [1, 2, 3]}->POP(2);");
+		$this->executeErrorCodeSnippet('The value type of the target set must be a subtype of Array or Tuple with a minimum length of 0, got Array<2..>', "mutable{Array<2..>, [1, 2, 3]}->POP;");
 	}
 
 	public function testPopInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "mutable{Real, 3.14}->POP(2);");
+		$this->executeErrorCodeSnippet('The value type of the target set must be a subtype of Array or Tuple with a minimum length of 0, got Real',
+			"mutable{Real, 3.14}->POP;");
+	}
+
+	public function testPopInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet('Invalid parameter type: Integer[2]', "mutable{Array, [1, 2, 3]}->POP(2);");
 	}
 
 }

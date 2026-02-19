@@ -12,11 +12,12 @@ final class UnshiftTest extends CodeExecutionTestHelper {
 	}
 
 	public function testUnshiftInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "mutable{Real, 3.14}->UNSHIFT(2);");
+		$this->executeErrorCodeSnippet('The value type of the target must be an unbounded Array type, got Real', "mutable{Real, 3.14}->UNSHIFT(2);");
 	}
 
 	public function testUnshiftInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', "mutable{Array<Integer>, [1, 2, 3]}->UNSHIFT('hi');");
+		$this->executeErrorCodeSnippet("The parameter type String['hi'] is not a subtype of the item type Integer",
+			"mutable{Array<Integer>, [1, 2, 3]}->UNSHIFT('hi');");
 	}
 
 }

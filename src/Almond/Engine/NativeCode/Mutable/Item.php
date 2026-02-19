@@ -10,30 +10,20 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\MethodName;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<MutableType, Type, MutableValue, Value> */
-final readonly class Item extends NativeMethod {
+/** @extends MapNativeMethod<Type, Type, Value> */
+final readonly class Item extends MapNativeMethod {
 
 	protected function getValidator(): callable {
 		return function(MutableType $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
-			$result = $this->methodContext->validateMethod(
+			return $this->methodContext->validateMethod(
 				$targetType->valueType,
 				new MethodName('item'),
 				$parameterType,
 				$origin
 			);
-			if ($result instanceof ValidationFailure && ($result->errors[0]?->type === ValidationErrorType::undefinedMethod)) {
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidTargetType,
-					sprintf(
-						"The mutable value type %s does not support the 'item' method",
-						$targetType->valueType
-					),
-					origin: $origin
-				);
-			}
-			return $result;
 		};
 	}
 

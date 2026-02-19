@@ -19,24 +19,13 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Mutabl
 final readonly class AsReal extends MutableNativeMethod {
 
 	protected function getValidator(): callable {
-		return function(MutableType $targetType, NullType $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
-			return $this->methodContext->validateMethod(
+		return fn(MutableType $targetType, NullType $parameterType, mixed $origin): ValidationSuccess|ValidationFailure =>
+			$this->methodContext->validateMethod(
 				$targetType->valueType,
 				new MethodName('asReal'),
 				$parameterType,
 				$origin
 			);
-		};
-	}
-
-	protected function isTargetValueTypeValid(Type $targetValueType): bool {
-		$result = $this->methodContext->validateMethod(
-			$targetValueType,
-			new MethodName('asReal'),
-			$this->typeRegistry->null,
-			null
-		);
-		return !($result instanceof ValidationFailure && ($result->errors[0]?->type === ValidationErrorType::undefinedMethod));
 	}
 
 	protected function getExecutor(): callable {

@@ -28,7 +28,7 @@ final class ReverseTest extends CodeExecutionTestHelper {
 
 	public function testReverseInvalidTargetType(): void {
 		$this->executeErrorCodeSnippet(
-			"Invalid target type",
+			"The value type of the target set must be a subtype of String or Array, got Map",
 			"mutable{Map, [a: 1, b: 2]}->REVERSE;"
 		);
 	}

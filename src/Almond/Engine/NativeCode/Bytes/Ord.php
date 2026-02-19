@@ -14,12 +14,11 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<BytesType, NullType, BytesValue, NullValue> */
 final readonly class Ord extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool {
-		if (!($targetType instanceof BytesType)) {
-			return false;
-		}
+	protected function validateTargetType(Type $targetType, mixed $origin): null|string {
+		/** @var BytesType $targetType */
 		return (string)$targetType->range->minLength === '1' &&
-			(string)$targetType->range->maxLength === '1';
+			(string)$targetType->range->maxLength === '1' ?
+			null : sprintf("Target type %s is not a subtype of Bytes<1>", $targetType);
 	}
 
 	protected function getValidator(): callable {

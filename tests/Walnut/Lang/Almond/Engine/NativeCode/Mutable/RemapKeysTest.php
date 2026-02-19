@@ -35,7 +35,7 @@ final class RemapKeysTest extends CodeExecutionTestHelper {
 	}
 
 	public function testRemapKeysInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type: REMAPKEYS can only be used on maps with a minimum size of 0 or 1',
+		$this->executeErrorCodeSnippet('REMAPKEYS can only be used on maps with a minimum size of 0 or 1, got Map<3..5>',
 			"mutable{Map<3..5>, [a: 1, b: 'a', c: false]}->REMAPKEYS(^s: String => String :: s);");
 	}
 

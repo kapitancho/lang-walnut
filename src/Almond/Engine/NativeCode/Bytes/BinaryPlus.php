@@ -14,13 +14,13 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<BytesType, Type, BytesValue, Value> */
 final readonly class BinaryPlus extends NativeMethod {
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		return $parameterType->isSubtypeOf(
 			$this->typeRegistry->union([
 				$this->typeRegistry->bytes(),
 				$this->typeRegistry->integer(0, 255)
 			])
-		);
+		) ? null : sprintf("Parameter type %s is not a subtype of Bytes or Integer<0..255>", $parameterType);
 	}
 
 	protected function getValidator(): callable {

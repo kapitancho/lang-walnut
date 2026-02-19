@@ -23,7 +23,7 @@ final class ConcatListTest extends CodeExecutionTestHelper {
 	}
 
 	public function testConcatListInvalidArrayParameter(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', '"hello"->concatList[15, "World"];');
+		$this->executeErrorCodeSnippet('Parameter type [Integer[15], Bytes<5>] is not a subtype of Array<Bytes>', '"hello"->concatList[15, "World"];');
 	}
 
 	public function testConcatListInvalidParameter(): void {

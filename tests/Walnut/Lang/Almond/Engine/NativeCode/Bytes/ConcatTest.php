@@ -20,7 +20,7 @@ final class ConcatTest extends CodeExecutionTestHelper {
 	}
 
 	public function testConcatInvalidParameter(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', '"hello"->concat(23);');
+		$this->executeErrorCodeSnippet('Parameter type Integer[23] is not a subtype of Bytes', '"hello"->concat(23);');
 	}
 
 }

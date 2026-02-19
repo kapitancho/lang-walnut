@@ -17,11 +17,16 @@ final class ShiftTest extends CodeExecutionTestHelper {
 	}
 
 	public function testShiftInvalidTargetTypeRange(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "mutable{Array<2..>, [1, 2, 3]}->SHIFT(2);");
+		$this->executeErrorCodeSnippet('The value type of the target set must be a subtype of Array with a minimum length of 0, got Array<2..>',
+			"mutable{Array<2..>, [1, 2, 3]}->SHIFT;");
 	}
 
 	public function testShiftInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "mutable{Real, 3.14}->SHIFT(2);");
+		$this->executeErrorCodeSnippet('The value type of the target set must be a subtype of Array with a minimum length of 0, got Real', "mutable{Real, 3.14}->SHIFT;");
+	}
+
+	public function testShiftInvalidParameterType(): void {
+		$this->executeErrorCodeSnippet('Invalid parameter type', "mutable{Array, [1, 2, 3]}->SHIFT(2);");
 	}
 
 }

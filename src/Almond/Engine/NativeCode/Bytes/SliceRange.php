@@ -4,6 +4,7 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Bytes;
 
 use BcMath\Number;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BytesType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BytesValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
@@ -15,17 +16,20 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<BytesType, Type, BytesValue, Value> */
 final readonly class SliceRange extends NativeMethod {
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		$pInt = $this->typeRegistry->integer(0);
 		$pType = $this->typeRegistry->record([
 			"start" => $pInt,
 			"end" => $pInt
 		], null);
-		return $parameterType->isSubtypeOf($pType);
+		return $parameterType->isSubtypeOf($pType) ?
+			null :
+			sprintf("Parameter type %s is not a subtype of [start: Integer<0..>, end: Integer<0..>]", $parameterType);
 	}
 
 	protected function getValidator(): callable {
 		return function(BytesType $targetType, Type $parameterType): BytesType {
+			/** @var RecordType $parameterType */
 			$parameterType = $this->toBaseType($parameterType);
 			$endType = $parameterType->types['end'];
 			/** @var int|Number|PlusInfinity $maxLength */

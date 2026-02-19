@@ -15,10 +15,10 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<BytesType, ArrayType|TupleType, BytesValue, TupleValue> */
 final readonly class ConcatList extends NativeMethod {
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		return $parameterType->isSubtypeOf(
 			$this->typeRegistry->array($this->typeRegistry->bytes())
-		);
+		) ? null : sprintf("Parameter type %s is not a subtype of Array<Bytes>", $parameterType);
 	}
 
 	protected function getValidator(): callable {

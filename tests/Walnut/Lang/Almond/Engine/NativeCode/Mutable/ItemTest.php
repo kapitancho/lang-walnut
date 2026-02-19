@@ -53,7 +53,8 @@ final class ItemTest extends CodeExecutionTestHelper {
 	}
 
 	public function testItemInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "mutable{Set, [;]}->item(0);");
+		$this->executeErrorCodeSnippet("Method 'item' is not defined for type 'Set'.",
+			"mutable{Set, [;]}->item(0);");
 	}
 
 	public function testItemInvalidParameterTypeForArray(): void {

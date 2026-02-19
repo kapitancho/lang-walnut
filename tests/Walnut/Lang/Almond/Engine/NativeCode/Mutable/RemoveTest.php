@@ -17,11 +17,11 @@ final class RemoveTest extends CodeExecutionTestHelper {
 	}
 
 	public function testSetRemoveInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "mutable{Set<1..>, [1; 2; 3]}->REMOVE(2);");
+		$this->executeErrorCodeSnippet('The value type of the target must be a Set type with minimum number of elements 0, a Record type with at least one optional key or an open Record type, or a Map type with minimum number of elements 0, got Set<1..>', "mutable{Set<1..>, [1; 2; 3]}->REMOVE(2);");
 	}
 
 	public function testRemoveInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "mutable{Real, 3.14}->REMOVE(2);");
+		$this->executeErrorCodeSnippet('The value type of the target must be a Set type with minimum number of elements 0, a Record type with at least one optional key or an open Record type, or a Map type with minimum number of elements 0, got Real', "mutable{Real, 3.14}->REMOVE(2);");
 	}
 
 	public function testMapRemoveNew(): void {
@@ -35,11 +35,12 @@ final class RemoveTest extends CodeExecutionTestHelper {
 	}
 
 	public function testMapRemoveInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "mutable{Map<1..>, [a: 1, b: 2, c: 3]}->REMOVE('a');");
+		$this->executeErrorCodeSnippet('The value type of the target must be a Set type with minimum number of elements 0, a Record type with at least one optional key or an open Record type, or a Map type with minimum number of elements 0, got Map<1..>', "mutable{Map<1..>, [a: 1, b: 2, c: 3]}->REMOVE('a');");
 	}
 
 	public function testMapRemoveInvalidTargetTypeKey(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', "mutable{Map<String<1>: Any>, [a: 1, b: 2, c: 3]}->REMOVE('abc');");
+		$this->executeErrorCodeSnippet("The parameter type String['abc'] is not a subtype of the map key type String<1>",
+			"mutable{Map<String<1>: Any>, [a: 1, b: 2, c: 3]}->REMOVE('abc');");
 	}
 
 	public function testRecordRemoveRestMissing(): void {
@@ -64,17 +65,17 @@ final class RemoveTest extends CodeExecutionTestHelper {
 
 	// The record type has neither optional fields nor a rest type
 	public function testRecordRemoveInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "mutable{[a: Integer, b: Integer, c: Integer], [a: 1, b: 2, c: 3]}->REMOVE('a');");
+		$this->executeErrorCodeSnippet('The value type of the target must be a Set type with minimum number of elements 0, a Record type with at least one optional key or an open Record type, or a Map type with minimum number of elements 0, got [a: Integer, b: Integer, c: Integer]', "mutable{[a: Integer, b: Integer, c: Integer], [a: 1, b: 2, c: 3]}->REMOVE('a');");
 	}
 
 	// The key 'a' is of type Integer and is not optional or part of the rest
 	public function testRecordRemoveInvalidParameterTypeKey(): void {
-		$this->executeErrorCodeSnippet('Cannot remove map value with key a', "mutable{[a: Integer, b: ?Integer, c: Integer], [a: 1, b: 2, c: 3]}->REMOVE('a');");
+		$this->executeErrorCodeSnippet("Cannot remove required record key 'a' of type Integer", "mutable{[a: Integer, b: ?Integer, c: Integer], [a: 1, b: 2, c: 3]}->REMOVE('a');");
 	}
 
 	// The key 'a' is of type Integer and is not optional or part of the rest
 	public function testRecordRemoveInvalidParameterTypeKeyRest(): void {
-		$this->executeErrorCodeSnippet('Cannot remove map value with key d', "mutable{[a: Integer, b: ?Integer, c: Integer], [a: 1, b: 2, c: 3]}->REMOVE('d');");
+		$this->executeErrorCodeSnippet("Cannot remove unknown record key 'd' from a closed record type", "mutable{[a: Integer, b: ?Integer, c: Integer], [a: 1, b: 2, c: 3]}->REMOVE('d');");
 	}
 
 	public function testRecordRemoveUseMapType(): void {

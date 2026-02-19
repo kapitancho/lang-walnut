@@ -12,27 +12,27 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\MutableValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MutableNativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<MutableType, NullType, MutableValue, NullValue> */
-final readonly class CLEAR extends NativeMethod {
+/** @extends MutableNativeMethod<SetType|MapType, NullType, NullValue> */
+final readonly class CLEAR extends MutableNativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type {
-		if ($targetType instanceof MutableType) {
-			$valueType = $this->toBaseType($targetType->valueType);
-			if ($valueType instanceof RecordType) {
-				$valueType = $valueType->asMapType();
-			}
-			if (($valueType instanceof SetType || $valueType instanceof MapType) && (int)(string)$valueType->range->minLength === 0) {
-				return true;
-			}
+	protected function validateTargetValueType(Type $valueType): null|string {
+		if ($valueType instanceof RecordType) {
+			$valueType = $valueType->asMapType();
 		}
-		return false;
+		if (($valueType instanceof SetType || $valueType instanceof MapType) && (int)(string)$valueType->range->minLength === 0) {
+			return null;
+		}
+		return sprintf(
+			"The value type of the target must be a Set or Map type with a minimum length of 0, got %s",
+			$valueType
+		);
 	}
 
 	protected function getValidator(): callable {
-		return fn(MutableType $targetType, NullType $parameterType): MutableType =>
-			$targetType;
+		return fn(MutableType $targetType, NullType $parameterType): MutableType => $targetType;
 	}
 
 	protected function getExecutor(): callable {

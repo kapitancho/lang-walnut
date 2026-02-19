@@ -96,14 +96,14 @@ final class MapTest extends CodeExecutionTestHelper {
 	}
 
 	public function testMapMapInvalidTargetTypeSet(): void {
-		$this->executeErrorCodeSnippet('Invalid target type',
+		$this->executeErrorCodeSnippet('Only Set type with a minimum number of elements 0 or 1 are allowed, got Set<Integer, 2..>',
 			"testFn(mutable{Set<Integer, 2..>, [1; 2; 3; 4]});",
 			valueDeclarations: "testFn = ^m: Mutable<Set<Integer, 2..>> => Mutable<Set<Integer, 2..>> :: m->MAP(^i: Integer => Integer :: i % 2);"
 		);
 	}
 
 	public function testMapMapInvalidTargetTypeOther(): void {
-		$this->executeErrorCodeSnippet('Invalid target type',
+		$this->executeErrorCodeSnippet('The value type of the target set must be a subtype of Array, Map or Set, got Boolean',
 			"testFn(mutable{Boolean, false});",
 			valueDeclarations: "testFn = ^m: Mutable<Boolean> => Mutable<Boolean> :: m->MAP(^i: Integer => Integer :: i % 2);"
 		);

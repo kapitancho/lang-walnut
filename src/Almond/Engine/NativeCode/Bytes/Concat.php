@@ -13,8 +13,10 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<BytesType, Type, BytesValue, Value> */
 final readonly class Concat extends NativeMethod {
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
-		return $parameterType->isSubtypeOf($this->typeRegistry->bytes());
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		return $parameterType->isSubtypeOf($this->typeRegistry->bytes()) ?
+			null :
+			sprintf("Parameter type %s is not a subtype of Bytes", $parameterType);
 	}
 
 	protected function getValidator(): callable {

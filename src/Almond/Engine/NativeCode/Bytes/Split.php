@@ -12,8 +12,10 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<BytesType, BytesType, BytesValue, BytesValue> */
 final readonly class Split extends NativeMethod {
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
-		return $parameterType->isSubtypeOf($this->typeRegistry->bytes(1));
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		return $parameterType->isSubtypeOf($this->typeRegistry->bytes(1)) ?
+			null :
+			sprintf("Parameter type %s is not a subtype of Bytes<1..>", $parameterType);
 	}
 
 	protected function getValidator(): callable {

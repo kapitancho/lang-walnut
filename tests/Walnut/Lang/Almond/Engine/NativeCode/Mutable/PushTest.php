@@ -12,11 +12,11 @@ final class PushTest extends CodeExecutionTestHelper {
 	}
 
 	public function testPushInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "mutable{Real, 3.14}->PUSH(2);");
+		$this->executeErrorCodeSnippet('The value type of the target must be an unbounded Array type, got Real', "mutable{Real, 3.14}->PUSH(2);");
 	}
 
 	public function testPushInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', "mutable{Array<Integer>, [1, 2, 3]}->PUSH('hi');");
+		$this->executeErrorCodeSnippet("The parameter type String['hi'] is not a subtype of the item type Integer", "mutable{Array<Integer>, [1, 2, 3]}->PUSH('hi');");
 	}
 
 }

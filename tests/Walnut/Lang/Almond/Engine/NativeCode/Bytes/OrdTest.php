@@ -12,11 +12,11 @@ final class OrdTest extends CodeExecutionTestHelper {
 	}
 
 	public function testOrdInvalidTargetEmpty(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', '""->ord;');
+		$this->executeErrorCodeSnippet('Target type Bytes<0> is not a subtype of Bytes<1>', '""->ord;');
 	}
 
 	public function testOrdInvalidTargetLong(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', '"abc"->ord;');
+		$this->executeErrorCodeSnippet('Target type Bytes<3> is not a subtype of Bytes<1>', '"abc"->ord;');
 	}
 
 	public function testOrdInvalidParameter(): void {
