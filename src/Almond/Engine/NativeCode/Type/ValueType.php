@@ -13,6 +13,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\MetaTypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNativeMethod;
@@ -29,18 +30,16 @@ final readonly class ValueType extends TypeNativeMethod {
 			) {
 				return $this->typeRegistry->type($refType->valueType);
 			}
-			if ($refType instanceof MetaType && (
-				$refType->value === MetaTypeValue::Data ||
-				$refType->value === MetaTypeValue::Open ||
-				$refType->value === MetaTypeValue::Sealed ||
-				$refType->value === MetaTypeValue::MutableValue
-			)) {
+			if ($refType instanceof MetaType && in_array($refType->value, [
+				MetaTypeValue::Data, MetaTypeValue::Open,
+				MetaTypeValue::Sealed, MetaTypeValue::MutableValue
+			], true)) {
 				return $this->typeRegistry->type($this->typeRegistry->any);
 			}
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidTargetType,
-				sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-				origin: $origin
+				sprintf("The type %s does not have a value type", $targetType->refType),
+				$origin
 			);
 		};
 	}

@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\Array;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
@@ -17,9 +18,15 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayN
 /** @extends ArrayNativeMethod<Type, NullType, NullValue> */
 final readonly class CountValues extends ArrayNativeMethod {
 
-	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
-		return $targetItemType->isSubtypeOf($this->typeRegistry->string()) ||
-			$targetItemType->isSubtypeOf($this->typeRegistry->integer());
+	protected function validateTargetArrayItemType(Type $itemType, mixed $origin): null|string {
+		return
+			$itemType->isSubtypeOf($this->typeRegistry->string()) ||
+			$itemType->isSubtypeOf($this->typeRegistry->integer()) ?
+				null :
+				sprintf(
+					"The item type %s should be a subtype of String or Integer",
+					$itemType
+				);
 	}
 
 	protected function getValidator(): callable {
@@ -28,6 +35,7 @@ final readonly class CountValues extends ArrayNativeMethod {
 			if ($itemType->isSubtypeOf($this->typeRegistry->string())) {
 				$keyType = $itemType;
 			} else {
+				/** @var IntegerType $baseItemType */
 				$baseItemType = $this->toBaseType($itemType);
 				$keyType = $this->typeRegistry->string(
 					1,

@@ -99,7 +99,7 @@ ExternalError := $[errorType: String, originalError: Any, errorMessage: String];
 
 /* RegExp */
 InvalidRegExp := [expression: String];
-RegExp := $String;
+RegExp := $String @ InvalidRegExp :: #->asRegExp?;
 RegExpMatch := [match: String, groups: Array<String>];
 NoRegExpMatch := ();
 
@@ -108,7 +108,7 @@ Random := ();
 
 /* UUID */
 InvalidUuid := [value: String];
-Uuid := #String<36>;
+Uuid := #String<36> @ InvalidUuid :: #->asUuid?;
 
 /* Password handling */
 PasswordString := #[value: String];

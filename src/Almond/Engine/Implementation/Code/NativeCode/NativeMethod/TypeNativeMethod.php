@@ -15,15 +15,15 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
  */
 abstract readonly class TypeNativeMethod extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool {
-		if (!parent::isTargetTypeValid($targetType, $validator, $origin)) {
+	protected function isTargetTypeValid(Type $targetType, callable $validator): bool {
+		if (!parent::isTargetTypeValid($targetType, $validator)) {
 			return false;
 		}
 		/** @var TypeType $targetType */
-		return $this->isTargetRefTypeValid($targetType->refType, $origin);
+		return $this->isTargetRefTypeValid($targetType->refType);
 	}
 
-	protected function isTargetRefTypeValid(Type $targetRefType, mixed $origin): bool {
+	protected function isTargetRefTypeValid(Type $targetRefType): bool {
 		return true;
 	}
 

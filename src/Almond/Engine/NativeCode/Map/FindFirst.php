@@ -17,8 +17,8 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\ResultType;
 /** @extends MapNativeMethod<AnyType, FunctionType, FunctionValue> */
 final readonly class FindFirst extends MapNativeMethod {
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator): bool {
-		if (!parent::isParameterTypeValid($parameterType, $validator)) {
+	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
+		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
 			return false;
 		}
 		/** @var FunctionType $parameterType */

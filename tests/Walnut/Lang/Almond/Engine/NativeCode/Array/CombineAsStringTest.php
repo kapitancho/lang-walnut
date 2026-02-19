@@ -22,7 +22,7 @@ final class CombineAsStringTest extends CodeExecutionTestHelper {
 	}
 
 	public function testCombineAsStringInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "[1, 2]->combineAsString(' ');");
+		$this->executeErrorCodeSnippet('The item type Integer[1, 2] should be a subtype of String', "[1, 2]->combineAsString(' ');");
 	}
 
 	public function testCombineAsStringInvalidParameterType(): void {

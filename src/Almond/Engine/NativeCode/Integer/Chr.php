@@ -15,7 +15,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<IntegerType, NullType, IntegerValue, NullValue> */
 final readonly class Chr extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool {
+	protected function isTargetTypeValid(Type $targetType, callable $validator): bool {
 		return $targetType instanceof IntegerType &&
 			$targetType->numberRange->min instanceof NumberIntervalEndpoint &&
 			$targetType->numberRange->min->value >= 0 &&

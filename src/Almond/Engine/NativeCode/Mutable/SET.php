@@ -20,7 +20,11 @@ final readonly class SET extends MutableNativeMethod {
 			}
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+				sprintf(
+					"The parameter type %s is not a subtype of the value type %s",
+					$parameterType,
+					$targetType->valueType
+				),
 				$origin
 			);
 		};

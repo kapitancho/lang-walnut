@@ -28,8 +28,8 @@ final readonly class Apply extends NativeMethod {
 			}
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidTargetType,
-				sprintf("Invalid target type: %s, %s expected (parameter is %s)",
-					$targetType, $p, $parameterType
+				sprintf("The target type %s is not a subtype of the function parameter type %s",
+					$targetType, $p
 				),
 				$origin
 			);

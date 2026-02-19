@@ -19,7 +19,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<IntegerType|RealType, NullType, NullValue> */
 final readonly class NumberRange extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType, mixed $origin): bool {
+	protected function isTargetRefTypeValid(Type $targetRefType): bool {
 		$targetRefType = $this->toBaseType($targetRefType);
 		return $targetRefType instanceof IntegerType || $targetRefType instanceof RealType;
 	}

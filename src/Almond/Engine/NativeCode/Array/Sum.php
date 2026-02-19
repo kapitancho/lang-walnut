@@ -7,7 +7,9 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\MinusInfinity;
@@ -16,8 +18,12 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
-/** @extends ArrayNativeMethod<Type, NullType, NullValue> */
 final readonly class Sum extends ArrayNativeMethod {
+
+	protected function validateTargetArrayItemType(Type $itemType, mixed $origin): null|string {
+		return $itemType->isSubtypeOf($this->typeRegistry->real()) ?
+			null : "The item type of the array must be a subtype of Real.";
+	}
 
 	protected function getValidator(): callable {
 		return function(ArrayType $targetType, NullType $parameterType): Type {
@@ -45,19 +51,11 @@ final readonly class Sum extends ArrayNativeMethod {
 		};
 	}
 
-	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
-		return $targetItemType->isSubtypeOf(
-			$this->typeRegistry->union([
-				$this->typeRegistry->integer(),
-				$this->typeRegistry->real()
-			])
-		);
-	}
-
 	protected function getExecutor(): callable {
 		return function(TupleValue $target, NullValue $parameter): Value {
 			$sum = 0;
 			$hasReal = false;
+			/** @var IntegerValue|RealValue $item */
 			foreach ($target->values as $item) {
 				$v = $item->literalValue;
 				if (str_contains((string)$v, '.')) {

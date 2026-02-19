@@ -17,38 +17,39 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNat
 /** @extends SetNativeMethod<FunctionType, FunctionValue> */
 final readonly class Filter extends SetNativeMethod {
 
+	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
+		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
+			return false;
+		}
+		/** @var FunctionType $parameterType */
+		return $parameterType->returnType->isSubtypeOf(
+			$this->typeRegistry->result($this->typeRegistry->boolean, $this->typeRegistry->any)
+		);
+	}
+
 	protected function getValidator(): callable {
 		return function(SetType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
-			if (!$parameterType->returnType->isSubtypeOf(
-				$this->typeRegistry->result($this->typeRegistry->boolean, $this->typeRegistry->any)
-			)) {
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-					$origin
+			if ($targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
+				$pType = $this->toBaseType($parameterType->returnType);
+				$returnType = $this->typeRegistry->set(
+					$targetType->itemType,
+					0,
+					$targetType->range->maxLength
 				);
+				return $pType instanceof ResultType ? $this->typeRegistry->result(
+					$returnType,
+					$pType->errorType
+				) : $returnType;
 			}
-			if (!$targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf(
-						"The parameter type %s of the callback function is not a subtype of %s",
-						$targetType->itemType,
-						$parameterType->parameterType
-					),
-					$origin
-				);
-			}
-			$pType = $this->toBaseType($parameterType->returnType);
-			$returnType = $this->typeRegistry->set(
-				$targetType->itemType,
-				0,
-				$targetType->range->maxLength
+			return $this->validationFactory->error(
+				ValidationErrorType::invalidParameterType,
+				sprintf(
+					"The parameter type %s of the callback function is not a subtype of %s",
+					$targetType->itemType,
+					$parameterType->parameterType
+				),
+				$origin
 			);
-			return $pType instanceof ResultType ? $this->typeRegistry->result(
-				$returnType,
-				$pType->errorType
-			) : $returnType;
 		};
 	}
 

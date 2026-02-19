@@ -46,6 +46,7 @@ final class CountValuesTest extends CodeExecutionTestHelper {
 	}
 
 	public function testCountValuesInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "[1, 'a']->countValues;");
+		$this->executeErrorCodeSnippet("The item type (Integer[1]|String['a']) should be a subtype of String or Integer",
+			"[1, 'a']->countValues;");
 	}
 }

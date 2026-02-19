@@ -9,35 +9,30 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
 /** @extends NativeMethod<BytesType, Type, BytesValue, Value> */
 final readonly class BinaryMinus extends NativeMethod {
 
+	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
+		return $parameterType->isSubtypeOf(
+			$this->typeRegistry->union([
+				$this->typeRegistry->bytes(1),
+				$this->typeRegistry->array(
+					$this->typeRegistry->bytes(1)
+				),
+				$this->typeRegistry->set(
+					$this->typeRegistry->bytes(1)
+				)
+			])
+		);
+	}
+
 	protected function getValidator(): callable {
-		return function(BytesType $targetType, Type $parameterType, mixed $origin): BytesType|ValidationFailure {
-			if ($parameterType->isSubtypeOf(
-				$this->typeRegistry->union([
-					$this->typeRegistry->bytes(1),
-					$this->typeRegistry->array(
-						$this->typeRegistry->bytes(1)
-					),
-					$this->typeRegistry->set(
-						$this->typeRegistry->bytes(1)
-					)
-				])
-			)) {
-				return $this->typeRegistry->bytes(
-					0,
-					$targetType->range->maxLength
-				);
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				$origin
+		return function(BytesType $targetType, Type $parameterType): BytesType {
+			return $this->typeRegistry->bytes(
+				0,
+				$targetType->range->maxLength
 			);
 		};
 	}

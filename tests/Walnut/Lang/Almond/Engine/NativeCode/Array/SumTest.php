@@ -30,6 +30,7 @@ final class SumTest extends CodeExecutionTestHelper {
 	}
 
 	public function testSumInvalidType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "['hello','world', 'hi', 'hello']->sum;");
+		$this->executeErrorCodeSnippet('The item type of the array must be a subtype of Real.',
+			"['hello','world', 'hi', 'hello']->sum;");
 	}
 }

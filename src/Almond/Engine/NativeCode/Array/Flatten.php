@@ -14,8 +14,13 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayN
 /** @extends ArrayNativeMethod<Type, NullType, NullValue> */
 final readonly class Flatten extends ArrayNativeMethod {
 
-	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
-		return $targetItemType->isSubtypeOf($this->typeRegistry->array());
+	protected function validateTargetArrayItemType(Type $itemType, mixed $origin): null|string {
+		return $itemType->isSubtypeOf($this->typeRegistry->array()) ?
+			null :
+			sprintf(
+				"The item type %s should be a subtype of Array",
+				$itemType
+			);
 	}
 
 	protected function getValidator(): callable {

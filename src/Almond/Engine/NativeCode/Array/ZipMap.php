@@ -9,38 +9,44 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
 /** @extends ArrayNativeMethod<Type, Type, TupleValue> */
 final readonly class ZipMap extends ArrayNativeMethod {
 
-	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
-		return $targetItemType->isSubtypeOf($this->typeRegistry->string());
+	protected function validateTargetArrayItemType(Type $itemType, mixed $origin): null|string {
+		return $itemType->isSubtypeOf($this->typeRegistry->string()) ? null :
+			sprintf(
+				"Invalid target array item type: expected a subtype of String, got %s.",
+				$itemType
+			);
+	}
+
+	protected function validateParameterType(Type $parameterType, Type $targetType, mixed $origin): null|string|ValidationFailure {
+		return $parameterType->isSubtypeOf($this->typeRegistry->array()) ?
+			null :
+			sprintf(
+				"Invalid parameter type: expected an array type, got %s.",
+				$parameterType
+			);
 	}
 
 	protected function getValidator(): callable {
-		return function(ArrayType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
+		return function(ArrayType $targetType, Type $parameterType): Type {
 			$itemType = $targetType->itemType;
 			$parameterType = $this->toBaseType($parameterType);
 			$pType = $parameterType instanceof TupleType ? $parameterType->asArrayType() : $parameterType;
-			if ($pType instanceof ArrayType) {
-				return $this->typeRegistry->map(
-					$pType->itemType,
-					min(1, $targetType->range->minLength, $pType->range->minLength),
-					match(true) {
-						$targetType->range->maxLength === PlusInfinity::value => $pType->range->maxLength,
-						$pType->range->maxLength === PlusInfinity::value => $targetType->range->maxLength,
-						default => min($targetType->range->maxLength, $pType->range->maxLength)
-					},
-					$itemType
-				);
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				$origin
+			/** @var ArrayType $pType */
+			return $this->typeRegistry->map(
+				$pType->itemType,
+				min(1, $targetType->range->minLength, $pType->range->minLength),
+				match(true) {
+					$targetType->range->maxLength === PlusInfinity::value => $pType->range->maxLength,
+					$pType->range->maxLength === PlusInfinity::value => $targetType->range->maxLength,
+					default => min($targetType->range->maxLength, $pType->range->maxLength)
+				},
+				$itemType
 			);
 		};
 	}

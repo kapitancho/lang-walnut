@@ -5,39 +5,25 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Array;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\ArrayMinMax;
 
-/** @extends ArrayNativeMethod<Type, NullType, NullValue> */
-final readonly class Max extends ArrayNativeMethod {
-
-	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
-		return $targetItemType->isSubtypeOf(
-			$this->typeRegistry->union([$this->typeRegistry->integer(), $this->typeRegistry->real()])
-		);
-	}
+final readonly class Max extends ArrayMinMax {
 
 	protected function getValidator(): callable {
-		return function(ArrayType $targetType, NullType $parameterType, mixed $origin): Type|ValidationFailure {
-			if ($targetType->range->minLength > 0) {
-				return $targetType->itemType;
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidTargetType,
-				sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-				origin: $origin
-			);
-		};
+		return fn(ArrayType $targetType, NullType $parameterType): Type => $targetType->itemType;
 	}
 
 	protected function getExecutor(): callable {
 		return function(TupleValue $target, NullValue $parameter): Value {
+			/** @var RealValue|IntegerValue $bestV */
 			$bestV = $target->values[0];
 			$best = $bestV->literalValue;
+			/** @var RealValue|IntegerValue $item */
 			foreach ($target->values as $item) {
 				$value = $item->literalValue;
 				if ($value > $best) {

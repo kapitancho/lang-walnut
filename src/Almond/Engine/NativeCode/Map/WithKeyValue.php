@@ -10,59 +10,53 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
 /** @extends NativeMethod<MapType|RecordType, RecordType, RecordValue, RecordValue> */
 final readonly class WithKeyValue extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
+	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type {
 		return $targetType instanceof RecordType || $targetType instanceof MapType;
 	}
 
+	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
+		return $parameterType->isSubtypeOf(
+			$this->typeRegistry->record([
+				'key' => $this->typeRegistry->string(),
+				'value' => $this->typeRegistry->any,
+			], null)
+		);
+	}
+
 	protected function getValidator(): callable {
-		return function(MapType|RecordType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
-			if ($parameterType->isSubtypeOf(
-				$this->typeRegistry->record([
-					'key' => $this->typeRegistry->string(),
-					'value' => $this->typeRegistry->any
-				], null)
-			)) {
-				$pType = $this->toBaseType($parameterType);
-				$keyType = $pType instanceof RecordType ? ($pType->types['key'] ?? null) : null;
-				if ($targetType instanceof RecordType) {
-					if ($keyType instanceof StringSubsetType && count($keyType->subsetValues) === 1) {
-						$keyValue = $keyType->subsetValues[0];
-						$valueType = $pType instanceof RecordType ? ($pType->types['value'] ?? null) : null;
-						return $this->typeRegistry->record(
-							$targetType->types + [
-								$keyValue => $valueType
-							],
-							$targetType->restType
-						);
-					}
-					$targetType = $targetType->asMapType();
+		return function(MapType|RecordType $targetType, RecordType $parameterType): Type {
+			$keyType = $parameterType->types['key'] ?? null;
+			if ($targetType instanceof RecordType) {
+				if ($keyType instanceof StringSubsetType && count($keyType->subsetValues) === 1) {
+					$keyValue = $keyType->subsetValues[0];
+					$valueType = $parameterType->types['value'] ?? null;
+					return $this->typeRegistry->record(
+						$targetType->types + [
+							$keyValue => $valueType
+						],
+						$targetType->restType
+					);
 				}
-				$valueType = $pType instanceof RecordType ? ($pType->types['value'] ?? null) : null;
-				return $this->typeRegistry->map(
-					$this->typeRegistry->union(array_filter([
-						$targetType->itemType,
-						$valueType
-					])),
-					$targetType->range->minLength,
-					$targetType->range->maxLength === PlusInfinity::value ?
-						PlusInfinity::value : $targetType->range->maxLength + 1,
-					$this->typeRegistry->union(array_filter([
-						$targetType->keyType,
-						$keyType
-					]))
-				);
+				$targetType = $targetType->asMapType();
 			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				$origin
+			$valueType = $parameterType->types['value'] ?? null;
+			return $this->typeRegistry->map(
+				$this->typeRegistry->union(array_filter([
+					$targetType->itemType,
+					$valueType
+				])),
+				$targetType->range->minLength,
+				$targetType->range->maxLength === PlusInfinity::value ?
+					PlusInfinity::value : $targetType->range->maxLength + 1,
+				$this->typeRegistry->union(array_filter([
+					$targetType->keyType,
+					$keyType
+				]))
 			);
 		};
 	}

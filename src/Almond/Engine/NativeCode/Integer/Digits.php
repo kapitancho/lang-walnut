@@ -21,7 +21,7 @@ final readonly class Digits extends NativeMethod {
 		return new Number(strlen((string)$bound));
 	}
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool {
+	protected function isTargetTypeValid(Type $targetType, callable $validator): bool {
 		return $targetType instanceof IntegerType &&
 			$targetType->numberRange->min !== MinusInfinity::value &&
 			$targetType->numberRange->min->value >= '0';

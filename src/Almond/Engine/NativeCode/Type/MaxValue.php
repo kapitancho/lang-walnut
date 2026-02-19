@@ -45,7 +45,7 @@ final readonly class MaxValue extends TypeNativeMethod {
 		};
 	}
 
-	protected function isTargetRefTypeValid(Type $targetRefType, mixed $origin): bool {
+	protected function isTargetRefTypeValid(Type $targetRefType): bool {
 		return $targetRefType instanceof IntegerType || $targetRefType instanceof RealType;
 	}
 

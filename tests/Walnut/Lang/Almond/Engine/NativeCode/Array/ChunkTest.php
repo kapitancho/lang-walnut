@@ -151,14 +151,14 @@ final class ChunkTest extends CodeExecutionTestHelper {
 
 	public function testChunkInvalidParameterTypeNegative(): void {
 		$this->executeErrorCodeSnippet(
-			"Invalid parameter type",
+			"The parameter type should be a subtype of Integer<1..>",
 			"[1, 2, 3]->chunk(-3)"
 		);
 	}
 
 	public function testChunkInvalidParameterTypeZero(): void {
 		$this->executeErrorCodeSnippet(
-			"Invalid parameter type",
+			"The parameter type should be a subtype of Integer<1..>",
 			"[1, 2, 3]->chunk(0)"
 		);
 	}

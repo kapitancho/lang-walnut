@@ -7,20 +7,16 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
 /** @extends ArrayNativeMethod<Type, IntegerType, IntegerValue> */
 final readonly class BinaryIntegerDivide extends ArrayNativeMethod {
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator): bool|Type {
-		if (!parent::isParameterTypeValid($parameterType, $validator)) {
-			return false;
-		}
-		/** @var IntegerType $parameterType */
-		return $parameterType->numberRange->min !== MinusInfinity::value &&
-			$parameterType->numberRange->min->value > 0;
+	protected function validateParameterType(Type $parameterType, Type $targetType, mixed $origin): null|string|ValidationFailure {
+		return $parameterType->isSubtypeOf($this->typeRegistry->integer(1)) ?
+			null : "The parameter type should be a subtype of Integer<1..>";
 	}
 
 	protected function getValidator(): callable {

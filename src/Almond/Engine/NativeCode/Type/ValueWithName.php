@@ -12,21 +12,19 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNativeMethod;
 
-/** @extends TypeNativeMethod<MetaType|EnumerationSubsetType, Type, Value> */
+/** @extends TypeNativeMethod<MetaType|EnumerationSubsetType, StringType, Value> */
 final readonly class ValueWithName extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType, mixed $origin): bool {
+	protected function isTargetRefTypeValid(Type $targetRefType): bool {
 		return ($targetRefType instanceof MetaType &&
 			($targetRefType->value === MetaTypeValue::Enumeration || $targetRefType->value === MetaTypeValue::EnumerationSubset)) ||
 			$targetRefType instanceof EnumerationSubsetType;
 	}
 
 	protected function getValidator(): callable {
-		return function(TypeType $targetType, Type $parameterType, mixed $origin): ResultType|ValidationFailure {
+		return function(TypeType $targetType, StringType $parameterType): ResultType {
 			$refType = $targetType->refType;
 			if ($refType instanceof MetaType) {
 				return $this->typeRegistry->result(
@@ -35,16 +33,9 @@ final readonly class ValueWithName extends TypeNativeMethod {
 				);
 			}
 			/** @var EnumerationSubsetType $refType */
-			if ($parameterType instanceof StringType) {
-				return $this->typeRegistry->result(
-					$refType->enumeration,
-					$this->typeRegistry->core->unknownEnumerationValue
-				);
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				origin: $origin
+			return $this->typeRegistry->result(
+				$refType->enumeration,
+				$this->typeRegistry->core->unknownEnumerationValue
 			);
 		};
 	}

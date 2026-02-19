@@ -15,7 +15,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\OptionalKeyType a
 /** @extends TypeNativeMethod<MutableType|MetaType|OptionalKeyType, TypeType, TypeValue> */
 final readonly class WithValueType extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType, mixed $origin): bool {
+	protected function isTargetRefTypeValid(Type $targetRefType): bool {
 		$refType = $this->toBaseType($targetRefType);
 		return $refType instanceof MutableType || $refType instanceof OptionalKeyType ||
 			($refType instanceof MetaType && $refType->value === MetaTypeValue::MutableValue);

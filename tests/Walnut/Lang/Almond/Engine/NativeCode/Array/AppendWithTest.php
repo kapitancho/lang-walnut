@@ -16,6 +16,13 @@ final class AppendWithTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[1, 2, 3, 4]", $result);
 	}
 
+	public function testAppendWithType(): void {
+		$result = $this->executeCodeSnippet("a[1, 2];",
+			valueDeclarations: "a = ^arr: Array<Integer, 2..5> => Array<Integer|String, 4..7> :: arr->appendWith['a', 'b'];"
+		);
+		$this->assertEquals("[1, 2, 'a', 'b']", $result);
+	}
+
 	public function testAppendWithInvalidType(): void {
 		$this->executeErrorCodeSnippet('Invalid parameter type', "[1, 2]->appendWith(3);");
 	}

@@ -16,7 +16,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNat
 /** @extends SetNativeMethod<StringType, NullType, NullValue> */
 final readonly class Flip extends SetNativeMethod {
 
-	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
+	protected function isTargetItemTypeValid(Type $targetItemType): bool {
 		return $targetItemType->isSubtypeOf($this->typeRegistry->string());
 	}
 

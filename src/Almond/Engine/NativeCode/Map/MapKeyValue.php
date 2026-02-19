@@ -18,39 +18,31 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNat
 final readonly class MapKeyValue extends MapNativeMethod {
 
 	protected function getValidator(): callable {
-		return function(MapType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
-			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof FunctionType) {
-				$callbackParameterType = $parameterType->parameterType;
-				$expectedType = $this->typeRegistry->record([
-					'key' => $targetType->keyType,
-					'value' => $targetType->itemType
-				], null);
-				if ($expectedType->isSubtypeOf($callbackParameterType)) {
-					$r = $parameterType->returnType;
-					$errorType = $r instanceof ResultType ? $r->errorType : null;
-					$returnType = $r instanceof ResultType ? $r->returnType : $r;
-					$t = $this->typeRegistry->map(
-						$returnType,
-						$targetType->range->minLength,
-						$targetType->range->maxLength,
-						$targetType->keyType
-					);
-					return $errorType ? $this->typeRegistry->result($t, $errorType) : $t;
-				}
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf(
-						"The parameter type %s of the callback function is not a subtype of %s",
-						$expectedType,
-						$callbackParameterType
-					),
-					$origin
+		return function(MapType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
+			$callbackParameterType = $parameterType->parameterType;
+			$expectedType = $this->typeRegistry->record([
+				'key' => $targetType->keyType,
+				'value' => $targetType->itemType
+			], null);
+			if ($expectedType->isSubtypeOf($callbackParameterType)) {
+				$r = $parameterType->returnType;
+				$errorType = $r instanceof ResultType ? $r->errorType : null;
+				$returnType = $r instanceof ResultType ? $r->returnType : $r;
+				$t = $this->typeRegistry->map(
+					$returnType,
+					$targetType->range->minLength,
+					$targetType->range->maxLength,
+					$targetType->keyType
 				);
+				return $errorType ? $this->typeRegistry->result($t, $errorType) : $t;
 			}
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+				sprintf(
+					"The parameter type %s of the callback function is not a subtype of %s",
+					$expectedType,
+					$callbackParameterType
+				),
 				$origin
 			);
 		};

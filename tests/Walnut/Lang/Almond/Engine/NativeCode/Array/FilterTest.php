@@ -31,7 +31,7 @@ final class FilterTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFilterInvalidParameterReturnType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("The return type of the callback function must be a subtype of Result<Boolean, Any>, but got Real",
 			"[1, 'a']->filter(^Any => Real :: 3.14);");
 	}
 

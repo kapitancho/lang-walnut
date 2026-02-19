@@ -8,19 +8,22 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
 /** @extends NativeMethod<ArrayType|TupleType, ArrayType|TupleType, TupleValue, TupleValue> */
 final readonly class Zip extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
-		return $targetType instanceof ArrayType || $targetType instanceof TupleType;
+	protected function validateParameterType(Type $parameterType, Type $targetType, mixed $origin): null|string|ValidationFailure {
+		return $parameterType->isSubtypeOf($this->typeRegistry->array()) ?
+			null : sprintf(
+				"Parameter type %s is not a subtype of Array",
+				$parameterType
+			);
 	}
 
 	protected function getValidator(): callable {
-		return function(ArrayType|TupleType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
+		return function(ArrayType|TupleType $targetType, Type $parameterType): Type {
 			$pType = $this->toBaseType($parameterType);
 			if ($targetType instanceof TupleType && $pType instanceof TupleType) {
 				$resultType = [];
@@ -44,24 +47,18 @@ final readonly class Zip extends NativeMethod {
 			}
 			$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 			$pType = $pType instanceof TupleType ? $pType->asArrayType() : $pType;
-			if ($pType instanceof ArrayType) {
-				return $this->typeRegistry->array(
-					$this->typeRegistry->tuple([
-						$type->itemType,
-						$pType->itemType,
-					], null),
-					min($type->range->minLength, $pType->range->minLength),
-					match(true) {
-						$type->range->maxLength === PlusInfinity::value => $pType->range->maxLength,
-						$pType->range->maxLength === PlusInfinity::value => $type->range->maxLength,
-						default => min($type->range->maxLength, $pType->range->maxLength)
-					}
-				);
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				$origin
+			/** @var ArrayType $pType */
+			return $this->typeRegistry->array(
+				$this->typeRegistry->tuple([
+					$type->itemType,
+					$pType->itemType,
+				], null),
+				min($type->range->minLength, $pType->range->minLength),
+				match(true) {
+					$type->range->maxLength === PlusInfinity::value => $pType->range->maxLength,
+					$pType->range->maxLength === PlusInfinity::value => $type->range->maxLength,
+					default => min($type->range->maxLength, $pType->range->maxLength)
+				}
 			);
 		};
 	}

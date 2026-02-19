@@ -12,8 +12,13 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayN
 /** @extends ArrayNativeMethod<Type, StringType, StringValue> */
 final readonly class CombineAsString extends ArrayNativeMethod {
 
-	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
-		return $targetItemType->isSubtypeOf($this->typeRegistry->string());
+	protected function validateTargetArrayItemType(Type $itemType, mixed $origin): null|string {
+		return $itemType->isSubtypeOf($this->typeRegistry->string()) ?
+			null :
+			sprintf(
+				"The item type %s should be a subtype of String",
+				$itemType
+			);
 	}
 
 	protected function getValidator(): callable {

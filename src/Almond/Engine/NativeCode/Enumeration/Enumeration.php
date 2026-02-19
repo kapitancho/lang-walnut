@@ -27,8 +27,8 @@ final readonly class Enumeration extends NativeMethod {
 		};
 	}
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool {
-		if (!parent::isTargetTypeValid($targetType, $validator, $origin)) {
+	protected function isTargetTypeValid(Type $targetType, callable $validator): bool {
+		if (!parent::isTargetTypeValid($targetType, $validator)) {
 			return false;
 		}
 		if ($targetType instanceof MetaType && $targetType->value !== MetaTypeValue::Enumeration) {

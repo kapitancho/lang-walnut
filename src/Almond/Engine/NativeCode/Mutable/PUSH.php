@@ -16,7 +16,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Mutabl
 /** @extends MutableNativeMethod<ArrayType, Type, Value> */
 final readonly class PUSH extends MutableNativeMethod {
 
-	protected function isTargetValueTypeValid(Type $targetValueType, mixed $origin): bool {
+	protected function isTargetValueTypeValid(Type $targetValueType): bool {
 		return $targetValueType instanceof ArrayType && $targetValueType->range->maxLength === PlusInfinity::value;
 	}
 
@@ -29,7 +29,11 @@ final readonly class PUSH extends MutableNativeMethod {
 			}
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+				sprintf(
+					"The parameter type %s is not a subtype of the item type %s",
+					$parameterType,
+					$valueType->itemType
+				),
 				$origin
 			);
 		};

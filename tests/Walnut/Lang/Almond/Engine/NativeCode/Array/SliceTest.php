@@ -27,4 +27,10 @@ final class SliceTest extends CodeExecutionTestHelper {
 			"[1, 2, 10, 11, 12, 13]->slice(42)");
 	}
 
+	public function testSliceInvalidParameterTypeRecord(): void {
+		$this->executeErrorCodeSnippet(
+			"Parameter type [start: Integer[-1]] is not a subtype",
+			"[1, 2, 10, 11, 12, 13]->slice[start: -1]");
+	}
+
 }

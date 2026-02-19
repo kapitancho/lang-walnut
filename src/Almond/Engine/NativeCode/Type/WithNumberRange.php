@@ -14,36 +14,33 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberInterval;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNativeMethod;
 
 /** @extends TypeNativeMethod<IntegerType|RealType, Type, Value> */
 final readonly class WithNumberRange extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType, mixed $origin): bool {
+	protected function isTargetRefTypeValid(Type $targetRefType): bool {
 		$refType = $this->toBaseType($targetRefType);
 		return $refType instanceof IntegerType || $refType instanceof RealType;
 	}
 
+	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
+		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
+			return false;
+		}
+		return $parameterType->isSubtypeOf($this->typeRegistry->core->integerNumberRange) ||
+			$parameterType->isSubtypeOf($this->typeRegistry->core->realNumberRange);
+	}
+
 	protected function getValidator(): callable {
-		return function(TypeType $targetType, Type $parameterType, mixed $origin): TypeType|ValidationFailure {
+		return function(TypeType $targetType, Type $parameterType): TypeType {
 			/** @var IntegerType|RealType $refType */
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof IntegerType) {
-				if ($parameterType->isSubtypeOf($this->typeRegistry->core->integerNumberRange)) {
-					return $this->typeRegistry->type($this->typeRegistry->integer());
-				}
-			} elseif ($refType instanceof RealType) {
-				if ($parameterType->isSubtypeOf($this->typeRegistry->core->realNumberRange)) {
-					return $this->typeRegistry->type($this->typeRegistry->real());
-				}
+				return $this->typeRegistry->type($this->typeRegistry->integer());
 			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				$origin
-			);
+			/** @var RealType $refType */
+			return $this->typeRegistry->type($this->typeRegistry->real());
 		};
 	}
 

@@ -11,7 +11,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<ResultType, TypeType, TypeValue> */
 final readonly class WithErrorType extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType, mixed $origin): bool {
+	protected function isTargetRefTypeValid(Type $targetRefType): bool {
 		$refType = $this->toBaseType($targetRefType);
 		return $refType instanceof ResultType;
 	}

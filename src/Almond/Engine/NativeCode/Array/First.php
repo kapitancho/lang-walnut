@@ -9,10 +9,11 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<ArrayType|TupleType, NullType, TupleValue, NullValue> */
-final readonly class First extends NativeMethod {
+/** @extends NativeMethod<Type, NullType, NullValue> */
+final readonly class First extends ArrayNativeMethod {
 
 	protected function getValidator(): callable {
 		return function(ArrayType|TupleType $targetType, NullType $parameterType): Type {

@@ -26,19 +26,18 @@ abstract readonly class MapNativeMethod extends NativeMethod {
 		return parent::validate($targetType, $parameterType, $origin);
 	}
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool {
+	protected function isTargetTypeValid(Type $targetType, callable $validator): bool {
 		$targetType = $targetType instanceof RecordType ? $targetType->asMapType() : $targetType;
-		if (!parent::isTargetTypeValid($targetType, $validator, $origin)) {
+		if (!parent::isTargetTypeValid($targetType, $validator)) {
 			return false;
 		}
 		/** @var MapType $targetType */
 		return $this->isTargetItemTypeValid(
 			$this->toBaseType($targetType->itemType),
-			$origin
 		);
 	}
 
-	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
+	protected function isTargetItemTypeValid(Type $targetItemType): bool {
 		return true;
 	}
 

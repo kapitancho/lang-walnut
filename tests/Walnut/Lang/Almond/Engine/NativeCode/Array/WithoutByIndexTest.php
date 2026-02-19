@@ -117,4 +117,9 @@ final class WithoutByIndexTest extends CodeExecutionTestHelper {
 		$this->executeErrorCodeSnippet("Invalid parameter type",
 			"['a', 1, 2]->withoutByIndex('b')");
 	}
+
+	public function testWithoutByIndexInvalidParameterInteger(): void {
+		$this->executeErrorCodeSnippet("Parameter type Integer[-1] is not a subtype Integer<0..>",
+			"['a', 1, 2]->withoutByIndex(-1)");
+	}
 }

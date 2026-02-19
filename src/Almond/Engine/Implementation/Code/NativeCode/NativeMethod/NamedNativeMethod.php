@@ -15,15 +15,15 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
  */
 abstract readonly class NamedNativeMethod extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool {
-		if (!parent::isTargetTypeValid($targetType, $validator, $origin)) {
+	protected function isTargetTypeValid(Type $targetType, callable $validator): bool {
+		if (!parent::isTargetTypeValid($targetType, $validator)) {
 			return false;
 		}
 		/** @var NamedType $targetType */
-		return $this->isNamedTypeValid($targetType, $origin);
+		return $this->isNamedTypeValid($targetType);
 	}
 
-	protected function isNamedTypeValid(NamedType $namedType, mixed $origin): bool {
+	protected function isNamedTypeValid(NamedType $namedType): bool {
 		return true;
 	}
 
@@ -33,7 +33,7 @@ abstract readonly class NamedNativeMethod extends NativeMethod {
 		}
 		/** @var NamedType $targetType */
 		$targetType = $target->type;
-		return $this->isNamedTypeValid($targetType, null);
+		return $this->isNamedTypeValid($targetType);
 	}
 
 }

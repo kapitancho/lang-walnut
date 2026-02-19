@@ -151,14 +151,14 @@ final class BinaryDivideTest extends CodeExecutionTestHelper {
 
 	public function testBinaryDivideInvalidParameterTypeNegative(): void {
 		$this->executeErrorCodeSnippet(
-			"Invalid parameter type",
+			"The parameter type should be a subtype of Integer<1..>",
 			"[1, 2, 3] / -3;"
 		);
 	}
 
 	public function testBinaryDivideInvalidParameterTypeZero(): void {
 		$this->executeErrorCodeSnippet(
-			"Invalid parameter type",
+			"The parameter type should be a subtype of Integer<1..>",
 			"[1, 2, 3] / 0;"
 		);
 	}

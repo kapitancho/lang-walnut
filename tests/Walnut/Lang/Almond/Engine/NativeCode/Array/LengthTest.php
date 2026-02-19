@@ -16,6 +16,14 @@ final class LengthTest extends CodeExecutionTestHelper {
 		$this->assertEquals("2", $result);
 	}
 
+	public function testLengthOfArray(): void {
+		$result = $this->executeCodeSnippet(
+			"g[1, 2, 'hello'];",
+			valueDeclarations: "g = ^p: Array<2..5> => Integer<2..5> :: p->length;"
+		);
+		$this->assertEquals("3", $result);
+	}
+
 	public function testLengthOfTupleWithRest(): void {
 		$result = $this->executeCodeSnippet(
 			"g[1, 2, 'hello'];",

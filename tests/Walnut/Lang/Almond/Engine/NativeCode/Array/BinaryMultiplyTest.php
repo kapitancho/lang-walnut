@@ -41,7 +41,7 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 	}
 
 	public function testBinaryMultiplyInvalidParameterValue(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', "['hello'] * {-3};");
+		$this->executeErrorCodeSnippet('The parameter type should be a subtype of Integer<0..>', "['hello'] * {-3};");
 	}
 
 	public function testBinaryMultiplyInvalidParameterType(): void {

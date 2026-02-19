@@ -30,7 +30,7 @@ final readonly class POP extends MutableNativeMethod {
 		};
 	}
 
-	protected function isTargetValueTypeValid(Type $targetValueType, mixed $origin): bool {
+	protected function isTargetValueTypeValid(Type $targetValueType): bool {
 		return
 			($targetValueType instanceof ArrayType && (int)(string)$targetValueType->range->minLength === 0) ||
 			($targetValueType instanceof TupleType && count($targetValueType->types) === 0);

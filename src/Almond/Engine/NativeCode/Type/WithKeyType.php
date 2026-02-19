@@ -6,39 +6,36 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNativeMethod;
 
 /** @extends TypeNativeMethod<MapType, TypeType, TypeValue> */
 final readonly class WithKeyType extends TypeNativeMethod {
 
+	protected function isTargetRefTypeValid(Type $targetRefType): bool {
+		return $this->toBaseType($targetRefType) instanceof MapType;
+	}
+
+	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
+		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
+			return false;
+		}
+		/** @var TypeType $parameterType */
+		return $parameterType->isSubtypeOf(
+			$this->typeRegistry->type($this->typeRegistry->string())
+		);
+	}
+
 	protected function getValidator(): callable {
-		return function(TypeType $targetType, TypeType $parameterType, mixed $origin): TypeType|ValidationFailure {
-			if (!$parameterType->isSubtypeOf(
-				$this->typeRegistry->type($this->typeRegistry->string())
-			)) {
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-					$origin
-				);
-			}
+		return function(TypeType $targetType, TypeType $parameterType): TypeType {
+			/** @var MapType $refType */
 			$refType = $this->toBaseType($targetType->refType);
-			if ($refType instanceof MapType) {
-				return $this->typeRegistry->type(
-					$this->typeRegistry->map(
-						$refType->itemType,
-						$refType->range->minLength,
-						$refType->range->maxLength,
-						$parameterType->refType,
-					)
-				);
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidTargetType,
-				sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-				$origin
+			return $this->typeRegistry->type(
+				$this->typeRegistry->map(
+					$refType->itemType,
+					$refType->range->minLength,
+					$refType->range->maxLength,
+					$parameterType->refType,
+				)
 			);
 		};
 	}

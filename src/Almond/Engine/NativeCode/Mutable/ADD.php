@@ -23,7 +23,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<MutableType, Type, MutableValue, Value> */
 final readonly class ADD extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
+	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type {
 		if ($targetType instanceof MutableType) {
 			$valueType = $this->toBaseType($targetType->valueType);
 			if ($valueType instanceof SetType && $valueType->range->maxLength === PlusInfinity::value) {
@@ -49,7 +49,11 @@ final readonly class ADD extends NativeMethod {
 				}
 				return $this->validationFactory->error(
 					ValidationErrorType::invalidParameterType,
-					sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+					sprintf(
+						"The parameter type %s is not a subtype of the set item type %s",
+						$parameterType,
+						$valueType->itemType
+					),
 					$origin
 				);
 			}
@@ -68,16 +72,19 @@ final readonly class ADD extends NativeMethod {
 									if ($mType instanceof NothingType) {
 										return $this->validationFactory->error(
 											ValidationErrorType::invalidParameterType,
-											sprintf("[%s] Invalid parameter type: %s - an item with key %s cannot be added",
-												__CLASS__, $mType, $subsetValue
+											sprintf(
+												"An item with key '%s' cannot be added to this record type",
+												$subsetValue
 											),
 											$origin
 										);
 									} else {
 										return $this->validationFactory->error(
 											ValidationErrorType::invalidParameterType,
-											sprintf("[%s] Invalid parameter type: %s - the item with key %s cannot be of type %s, %s expected",
-												__CLASS__, $mType, $subsetValue, $vv, $mType instanceof OptionalKeyType ? $mType->valueType : $mType
+											sprintf(
+												"The value type %s for key '%s' is not a subtype of %s",
+												$vv, $subsetValue,
+												$mType instanceof OptionalKeyType ? $mType->valueType : $mType
 											),
 											$origin
 										);
@@ -91,8 +98,8 @@ final readonly class ADD extends NativeMethod {
 								return $this->validationFactory->error(
 									ValidationErrorType::invalidParameterType,
 									sprintf(
-										"[%s] Invalid parameter type - the value type %s should be a subtype of %s",
-										__CLASS__, $vv, $valueType->restType
+										"The value type %s should be a subtype of the rest type %s",
+										$vv, $valueType->restType
 									),
 									$origin
 								);
@@ -102,8 +109,8 @@ final readonly class ADD extends NativeMethod {
 									return $this->validationFactory->error(
 										ValidationErrorType::invalidParameterType,
 										sprintf(
-											"[%s] Invalid parameter type - the value type %s of item %s should be a subtype of %s",
-											__CLASS__, $vv, $vKey, $valueType->restType
+											"The rest type %s is not a subtype of the type %s for key '%s'",
+											$valueType->restType, $vType, $vKey
 										),
 										$origin
 									);
@@ -115,7 +122,10 @@ final readonly class ADD extends NativeMethod {
 				}
 				return $this->validationFactory->error(
 					ValidationErrorType::invalidParameterType,
-					sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+					sprintf(
+						"The parameter type %s is not a valid key-value record for the record type",
+						$parameterType
+					),
 					$origin
 				);
 			}
@@ -128,15 +138,24 @@ final readonly class ADD extends NativeMethod {
 				}
 				return $this->validationFactory->error(
 					ValidationErrorType::invalidParameterType,
-					sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+					sprintf(
+						"The parameter type %s is not a valid key-value record for the map type %s",
+						$parameterType,
+						$valueType
+					),
 					$origin
 				);
 			}
+			// @codeCoverageIgnoreStart
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+				sprintf(
+					"The mutable value type %s does not support the ADD operation",
+					$valueType
+				),
 				$origin
 			);
+			// @codeCoverageIgnoreEnd
 		};
 	}
 

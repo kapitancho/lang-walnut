@@ -6,8 +6,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type as TypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\TupleAsRecord;
 
@@ -16,7 +14,7 @@ final readonly class ForceInvoke extends NativeMethod {
 	use TupleAsRecord;
 
 	protected function getValidator(): callable {
-		return function(FunctionType $targetType, TypeInterface $parameterType, mixed $origin): TypeInterface|ValidationFailure {
+		return function(FunctionType $targetType, TypeInterface $parameterType): TypeInterface {
 			$p = $targetType->parameterType;
 			$parameterType = $this->adjustParameterType(
 				$this->typeRegistry,

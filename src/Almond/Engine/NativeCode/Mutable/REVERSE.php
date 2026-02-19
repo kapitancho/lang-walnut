@@ -17,7 +17,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Mutabl
 /** @extends MutableNativeMethod<StringType|ArrayType, NullType, NullValue> */
 final readonly class REVERSE extends MutableNativeMethod {
 
-	protected function isTargetValueTypeValid(Type $targetValueType, mixed $origin): bool {
+	protected function isTargetValueTypeValid(Type $targetValueType): bool {
 		return $targetValueType instanceof StringType || $targetValueType instanceof ArrayType;
 	}
 

@@ -34,7 +34,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<Type, NullType, NullValue> */
 final readonly class OpenApiSchema extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType, mixed $origin): bool {
+	protected function isTargetRefTypeValid(Type $targetRefType): bool {
 		$refType = $targetRefType;
 		while ($refType instanceof MutableType) {
 			$refType = $refType->valueType;

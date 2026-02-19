@@ -26,7 +26,10 @@ final readonly class AsInteger extends NativeMethod {
 			if ($result instanceof ValidationFailure && ($result->errors[0]?->type === ValidationErrorType::undefinedMethod)) {
 				return $this->validationFactory->error(
 					ValidationErrorType::invalidTargetType,
-					sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
+					sprintf(
+						"The mutable value type %s does not support the 'asInteger' method",
+						$targetType->valueType
+					),
 					origin: $origin
 				);
 			}

@@ -9,35 +9,33 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
 /** @extends NativeMethod<StringType, Type, StringValue, Value> */
 final readonly class BinaryMinus extends NativeMethod {
 
+	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool|Type {
+		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
+			return false;
+		}
+		return $parameterType->isSubtypeOf(
+			$this->typeRegistry->union([
+				$this->typeRegistry->string(1),
+				$this->typeRegistry->array(
+					$this->typeRegistry->string(1)
+				),
+				$this->typeRegistry->set(
+					$this->typeRegistry->string(1)
+				)
+			])
+		);
+	}
+
 	protected function getValidator(): callable {
-		return function(StringType $targetType, Type $parameterType, mixed $origin): StringType|ValidationFailure {
-			if ($parameterType->isSubtypeOf(
-				$this->typeRegistry->union([
-					$this->typeRegistry->string(1),
-					$this->typeRegistry->array(
-						$this->typeRegistry->string(1)
-					),
-					$this->typeRegistry->set(
-						$this->typeRegistry->string(1)
-					)
-				])
-			)) {
-				return $this->typeRegistry->string(
-					0,
-					$targetType->range->maxLength
-				);
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				$origin
+		return function(StringType $targetType, Type $parameterType): StringType {
+			return $this->typeRegistry->string(
+				0,
+				$targetType->range->maxLength
 			);
 		};
 	}

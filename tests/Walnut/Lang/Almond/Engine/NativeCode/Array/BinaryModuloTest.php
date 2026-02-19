@@ -175,14 +175,14 @@ final class BinaryModuloTest extends CodeExecutionTestHelper {
 
 	public function testBinaryModuloInvalidParameterTypeNegative(): void {
 		$this->executeErrorCodeSnippet(
-			"Invalid parameter type",
+			"The parameter type should be a subtype of Integer<1..>",
 			"[1, 2, 3] % -3;"
 		);
 	}
 
 	public function testBinaryModuloInvalidParameterTypeZero(): void {
 		$this->executeErrorCodeSnippet(
-			"Invalid parameter type",
+			"The parameter type should be a subtype of Integer<1..>",
 			"[1, 2, 3] % 0;"
 		);
 	}

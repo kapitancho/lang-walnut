@@ -15,7 +15,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNativeMethod;
@@ -32,16 +31,11 @@ final readonly class ItemTypes extends TypeNativeMethod {
 					return $result;
 				}
 			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidTargetType,
-				sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-				origin: $origin
-			);
 		}
 		return parent::validate($targetType, $parameterType, $origin);
 	}
 
-	protected function isTargetRefTypeValid(Type $targetRefType, mixed $origin): bool {
+	protected function isTargetRefTypeValid(Type $targetRefType): bool {
 		$refType = $this->toBaseType($targetRefType);
 		return $refType instanceof TupleType ||
 			$refType instanceof RecordType ||

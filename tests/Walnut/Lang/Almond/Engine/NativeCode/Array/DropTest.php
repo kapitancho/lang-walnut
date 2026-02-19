@@ -119,7 +119,7 @@ final class DropTest extends CodeExecutionTestHelper {
 	}
 
 	public function testDropNegativeNumber(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', "[1, 2, 3]->drop(-1);");
+		$this->executeErrorCodeSnippet('Parameter type Integer[-1] is not a subtype Integer<0..>', "[1, 2, 3]->drop(-1);");
 	}
 
 }

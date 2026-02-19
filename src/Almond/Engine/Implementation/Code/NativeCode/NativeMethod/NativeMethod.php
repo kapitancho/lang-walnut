@@ -46,7 +46,7 @@ abstract readonly class NativeMethod implements NativeMethodInterface {
 		protected FunctionValueFactory $functionValueFactory,
 	) {}
 
-	public function validate(
+	public function validate2(
 		Type $targetType,
 		Type $parameterType,
 		mixed $origin
@@ -56,22 +56,24 @@ abstract readonly class NativeMethod implements NativeMethodInterface {
 		$baseTargetType = $this->toBaseType($targetType);
 		$baseParameterType = $this->toBaseType($parameterType);
 
-		$validatedTargetType = $this->isTargetTypeValid($baseTargetType, $validator, $origin);
-		if ($validatedTargetType instanceof ValidationFailure) {
-			return $validatedTargetType;
-		}
-		if (!$validatedTargetType) {
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidTargetType,
-				sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
+		$validatedTargetType = $this->isTargetTypeValid(
+			$baseTargetType,
+			$validator
+		);
+		if ($validatedTargetType === false || is_string($validatedTargetType)) {
+			return $this->invalidTargetType(
+				is_string($validatedTargetType) ? $validatedTargetType : $targetType,
 				$origin
 			);
 		}
-		$validatedParameterType = $this->isParameterTypeValid($baseParameterType, $validator);
-		if (!$validatedParameterType) {
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+		$validatedParameterType = $this->isParameterTypeValid(
+			$baseParameterType,
+			$validator,
+			$targetType
+		);
+		if ($validatedParameterType === false || is_string($validatedParameterType)) {
+			return $this->invalidParameterType(
+				is_string($validatedParameterType) ? $validatedParameterType : $parameterType,
 				$origin
 			);
 		}
@@ -84,11 +86,82 @@ abstract readonly class NativeMethod implements NativeMethodInterface {
 			$this->validationFactory->validationSuccess($result) : $result;
 	}
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type|ValidationFailure {
+	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|string|Type {
 		return $this->matchesCallableParameter($validator, $targetType, 0);
 	}
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator): bool|Type {
+	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool|string|Type {
+		return $this->matchesCallableParameter($validator, $parameterType, 1);
+	}
+
+	public function validate(
+		Type $targetType,
+		Type $parameterType,
+		mixed $origin
+	): ValidationSuccess|ValidationFailure {
+		$validator = $this->getValidator();
+
+		$baseTargetType = $this->toBaseType($targetType);
+		$baseParameterType = $this->toBaseType($parameterType);
+
+		$errors = [];
+
+		$validatedTargetType = $this->checkValidatorTargetType($baseTargetType, $validator);
+		if (!$validatedTargetType) {
+			$errors[] = $this->invalidTargetType($targetType, $origin);
+		}
+		$usedTargetType = $validatedTargetType instanceof Type ? $validatedTargetType : $baseTargetType;
+
+		$validatedParameterType = $this->checkValidatorParameterType($baseParameterType, $validator);
+		if (!$validatedParameterType) {
+			$errors[] = $this->invalidParameterType($parameterType, $origin);
+		}
+		$usedParameterType = $validatedParameterType instanceof Type ? $validatedParameterType : $baseParameterType;
+
+		if (count($errors) === 0) {
+			$tResult = $this->validateTargetType($usedTargetType, $origin);
+			if (is_string($tResult)) {
+				$tResult = $this->invalidTargetType($tResult, $origin);
+			}
+			if ($tResult instanceof ValidationFailure) {
+				$errors[] = $tResult;
+			}
+
+			$pResult = $this->validateParameterType($usedParameterType, $usedTargetType, $origin);
+			if (is_string($pResult)) {
+				$pResult = $this->invalidParameterType($pResult, $origin);
+			}
+			if ($pResult instanceof ValidationFailure) {
+				$errors[] = $pResult;
+			}
+		}
+
+		$failure = match(count($errors)) {
+			2 => $errors[0]->mergeFailure($errors[1]),
+			1 => $errors[0],
+			default => null
+		};
+		if ($failure) {
+			return $failure;
+		}
+		$validatorResult = $validator($usedTargetType, $usedParameterType, $origin);
+		return $validatorResult instanceof Type ?
+			$this->validationFactory->validationSuccess($validatorResult) : $validatorResult;
+	}
+
+	protected function validateTargetType(Type $targetType, mixed $origin): null|string|ValidationFailure {
+		return null;
+	}
+
+	protected function validateParameterType(Type $parameterType, Type $targetType, mixed $origin): null|string|ValidationFailure {
+		return null;
+	}
+
+	protected function checkValidatorTargetType(Type $targetType, callable $validator): bool|Type {
+		return $this->matchesCallableParameter($validator, $targetType, 0);
+	}
+
+	protected function checkValidatorParameterType(Type $parameterType, callable $validator): bool|Type {
 		return $this->matchesCallableParameter($validator, $parameterType, 1);
 	}
 
@@ -158,6 +231,26 @@ abstract readonly class NativeMethod implements NativeMethodInterface {
 			return false;
 		}
 		return true;
+	}
+
+	protected function invalidTargetType(Type|string $targetTypeInfo, mixed $origin): ValidationFailure {
+		return $this->validationFactory->error(
+			ValidationErrorType::invalidTargetType,
+			$targetTypeInfo instanceof Type ?
+				sprintf("[%s] Invalid target type: %s", __CLASS__, $targetTypeInfo) :
+				$targetTypeInfo,
+			$origin
+		);
+	}
+
+	protected function invalidParameterType(Type|string $parameterTypeInfo, mixed $origin): ValidationFailure {
+		return $this->validationFactory->error(
+			ValidationErrorType::invalidParameterType,
+			$parameterTypeInfo instanceof Type ?
+				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterTypeInfo) :
+				$parameterTypeInfo,
+			$origin
+		);
 	}
 
 }

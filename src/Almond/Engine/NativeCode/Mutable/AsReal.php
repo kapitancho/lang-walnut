@@ -29,7 +29,7 @@ final readonly class AsReal extends MutableNativeMethod {
 		};
 	}
 
-	protected function isTargetValueTypeValid(Type $targetValueType, mixed $origin): bool {
+	protected function isTargetValueTypeValid(Type $targetValueType): bool {
 		$result = $this->methodContext->validateMethod(
 			$targetValueType,
 			new MethodName('asReal'),

@@ -13,7 +13,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<MapType, NullType, NullValue> */
 final readonly class KeyType extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType, mixed $origin): bool {
+	protected function isTargetRefTypeValid(Type $targetRefType): bool {
 		return $this->toBaseType($targetRefType) instanceof MapType;
 	}
 

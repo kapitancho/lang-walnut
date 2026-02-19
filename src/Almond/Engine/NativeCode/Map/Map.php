@@ -18,34 +18,26 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNat
 final readonly class Map extends MapNativeMethod {
 
 	protected function getValidator(): callable {
-		return function(MapType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
-			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof FunctionType) {
-				if ($targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
-					$r = $parameterType->returnType;
-					$errorType = $r instanceof ResultType ? $r->errorType : null;
-					$returnType = $r instanceof ResultType ? $r->returnType : $r;
-					$t = $this->typeRegistry->map(
-						$returnType,
-						$targetType->range->minLength,
-						$targetType->range->maxLength,
-						$targetType->keyType
-					);
-					return $errorType ? $this->typeRegistry->result($t, $errorType) : $t;
-				}
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf(
-						"The parameter type %s of the callback function is not a supertype of %s",
-						$parameterType->parameterType,
-						$targetType->itemType,
-					),
-					$origin
+		return function(MapType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
+			if ($targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
+				$r = $parameterType->returnType;
+				$errorType = $r instanceof ResultType ? $r->errorType : null;
+				$returnType = $r instanceof ResultType ? $r->returnType : $r;
+				$t = $this->typeRegistry->map(
+					$returnType,
+					$targetType->range->minLength,
+					$targetType->range->maxLength,
+					$targetType->keyType
 				);
+				return $errorType ? $this->typeRegistry->result($t, $errorType) : $t;
 			}
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+				sprintf(
+					"The parameter type %s of the callback function is not a supertype of %s",
+					$parameterType->parameterType,
+					$targetType->itemType,
+				),
 				$origin
 			);
 		};

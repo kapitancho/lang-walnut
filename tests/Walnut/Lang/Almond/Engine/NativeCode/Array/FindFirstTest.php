@@ -26,7 +26,7 @@ final class FindFirstTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFindFirstInvalidParameterReturnType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("The return type of the callback function must be a subtype of Result<Boolean, Any>, but got Real",
 			"[1, 'a']->findFirst(^Any => Real :: 3.14);");
 	}
 

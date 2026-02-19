@@ -26,6 +26,7 @@ final class UniqueTest extends CodeExecutionTestHelper {
 	}
 
 	public function testUniqueInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "[12, 'hello','world', 'hi', 'hello']->unique;");
+		$this->executeErrorCodeSnippet('The item type of the array must be a subtype of Real or a subtype of String.',
+			"[12, 'hello','world', 'hi', 'hello']->unique;");
 	}
 }

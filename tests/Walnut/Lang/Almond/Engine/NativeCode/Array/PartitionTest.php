@@ -69,7 +69,7 @@ final class PartitionTest extends CodeExecutionTestHelper {
 	}
 
 	public function testPartitionInvalidParameterReturnType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("The return type of the callback function must be a subtype of Result<Boolean, Any>, but got Integer",
 			"[1, 2, 3]->partition(^i: Integer => Integer :: i);");
 	}
 

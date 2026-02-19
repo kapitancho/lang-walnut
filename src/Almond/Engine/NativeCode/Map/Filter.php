@@ -16,18 +16,29 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
+
 // This method will not extend MapNativeMethod because it can return a RecordType
 // instead of a MapType if the target type is a RecordType. In that case, the return type will be a RecordType
 // with the same keys as the target type and the item type as the value type.
 /** @extends NativeMethod<MapType|RecordType, FunctionType, RecordValue, FunctionValue> */
 final readonly class Filter extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
+	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type {
 		return $targetType instanceof MapType || $targetType instanceof RecordType;
 	}
 
+	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
+		$parameterType = $this->toBaseType($parameterType);
+		if ($parameterType instanceof FunctionType) {
+			return $parameterType->returnType->isSubtypeOf(
+				$this->typeRegistry->result($this->typeRegistry->boolean, $this->typeRegistry->any)
+			);
+		}
+		return false;
+	}
+
 	protected function getValidator(): callable {
-		return function(MapType|RecordType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
+		return function(MapType|RecordType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
 			$recordReturnType = null;
 			if ($targetType instanceof RecordType) {
 				$recordReturnType = $this->typeRegistry->record(
@@ -42,36 +53,26 @@ final readonly class Filter extends NativeMethod {
 				);
 				$targetType = $targetType->asMapType();
 			}
-			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf(
-				$this->typeRegistry->result($this->typeRegistry->boolean, $this->typeRegistry->any)
-			)) {
+			if ($targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
 				$pType = $this->toBaseType($parameterType->returnType);
-				if ($targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
-					$returnType = $recordReturnType ?? $this->typeRegistry->map(
-						$targetType->itemType,
-						0,
-						$targetType->range->maxLength,
-						$targetType->keyType
-					);
-					return $pType instanceof ResultType ? $this->typeRegistry->result(
-						$returnType,
-						$pType->errorType
-					) : $returnType;
-				}
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf(
-						"The parameter type %s of the callback function is not a subtype of %s",
-						$targetType->itemType,
-						$parameterType->parameterType
-					),
-					$origin
+				$returnType = $recordReturnType ?? $this->typeRegistry->map(
+					$targetType->itemType,
+					0,
+					$targetType->range->maxLength,
+					$targetType->keyType
 				);
+				return $pType instanceof ResultType ? $this->typeRegistry->result(
+					$returnType,
+					$pType->errorType
+				) : $returnType;
 			}
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+				sprintf(
+					"The parameter type %s of the callback function is not a subtype of %s",
+					$targetType->itemType,
+					$parameterType->parameterType
+				),
 				$origin
 			);
 		};

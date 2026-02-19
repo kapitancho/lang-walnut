@@ -18,7 +18,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<MutableType, FunctionType, MutableValue, FunctionValue> */
 final readonly class REMAPKEYS extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type|ValidationFailure {
+	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type|ValidationFailure {
 		if ($targetType instanceof MutableType) {
 			$valueType = $this->toBaseType($targetType->valueType);
 			if ($valueType instanceof MapType) {
@@ -36,39 +36,32 @@ final readonly class REMAPKEYS extends NativeMethod {
 	}
 
 	protected function getValidator(): callable {
-		return function(MutableType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
+		return function(MutableType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
 			$valueType = $this->toBaseType($targetType->valueType);
-			$parameterType = $this->toBaseType($parameterType);
-			if ($valueType instanceof MapType && $parameterType instanceof FunctionType) {
-				if ($valueType->keyType->isSubtypeOf($parameterType->parameterType)) {
-					$r = $parameterType->returnType;
-					$returnType = $r instanceof ResultType ? $r->returnType : $r;
-					if ($returnType->isSubtypeOf($valueType->keyType)) {
-						return $targetType;
-					}
-					return $this->validationFactory->error(
-						ValidationErrorType::invalidReturnType,
-						sprintf(
-							"The return type %s of the callback function is not a subtype of %s",
-							$returnType,
-							$valueType->keyType
-						),
-						$origin
-					);
+			/** @var MapType $valueType */
+			if ($valueType->keyType->isSubtypeOf($parameterType->parameterType)) {
+				$r = $parameterType->returnType;
+				$returnType = $r instanceof ResultType ? $r->returnType : $r;
+				if ($returnType->isSubtypeOf($valueType->keyType)) {
+					return $targetType;
 				}
 				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
+					ValidationErrorType::invalidReturnType,
 					sprintf(
-						"The parameter type %s of the callback function is not a supertype of %s",
-						$parameterType->parameterType,
-						$valueType->keyType,
+						"The return type %s of the callback function is not a subtype of %s",
+						$returnType,
+						$valueType->keyType
 					),
 					$origin
 				);
 			}
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+				sprintf(
+					"The parameter type %s of the callback function is not a supertype of %s",
+					$parameterType->parameterType,
+					$valueType->keyType,
+				),
 				$origin
 			);
 		};

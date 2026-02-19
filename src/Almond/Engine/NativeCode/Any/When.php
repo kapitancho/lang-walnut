@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\Any;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -55,8 +54,8 @@ final readonly class When extends NativeMethod {
 				return $this->typeRegistry->union([$successType, $errorType]);
 			}
 			return $this->validationFactory->error(
-				ValidationErrorType::invalidTargetType,
-				sprintf("Invalid parameter type: %s, a subtype of %s expected",
+				ValidationErrorType::invalidParameterType,
+				sprintf("The parameter type %s is not a subtype of the expected record type %s with success and error callbacks",
 					$parameterType, $refType
 				),
 				$origin

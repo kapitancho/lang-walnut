@@ -24,11 +24,11 @@ final readonly class Value extends NativeMethod {
 		};
 	}
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
+	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type {
 		if ($targetType instanceof MetaType && $targetType->value === MetaTypeValue::Data) {
 			return true;
 		}
-		return parent::isTargetTypeValid($targetType, $validator, $origin);
+		return parent::isTargetTypeValid($targetType, $validator);
 	}
 
 	protected function getExecutor(): callable {

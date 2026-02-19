@@ -15,4 +15,18 @@ final class IndexOfTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("[1, 2, 5, 10, 5]->indexOf(5);");
 		$this->assertEquals("2", $result);
 	}
+
+	public function testIndexOfType(): void {
+		$result = $this->executeCodeSnippet("i[1, 2, 5, 10, 5];",
+			valueDeclarations: "i = ^a: Array<Integer> => Result<Integer, ItemNotFound> :: a->indexOf(5);"
+		);
+		$this->assertEquals("2", $result);
+	}
+
+	public function testIndexOfTypeRanged(): void {
+		$result = $this->executeCodeSnippet("i[1, 2, 5, 10, 5];",
+			valueDeclarations: "i = ^a: Array<Integer, 2..6> => Result<Integer<0..5>, ItemNotFound> :: a->indexOf(5);"
+		);
+		$this->assertEquals("2", $result);
+	}
 }

@@ -18,7 +18,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<MapType|RecordType, Type, RecordValue, Value> */
 final readonly class Item extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
+	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type {
 		return $targetType instanceof IntersectionType ||
 			$targetType instanceof RecordType ||
 			$targetType instanceof MapType || (

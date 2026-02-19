@@ -20,7 +20,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<MutableType, FunctionType, MutableValue, FunctionValue> */
 final readonly class MAP extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
+	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type {
 		if ($targetType instanceof MutableType) {
 			$type = $this->toBaseType($targetType->valueType);
 			if (($type instanceof ArrayType || $type instanceof MapType || $type instanceof SetType) && $type->isSubtypeOf(
@@ -37,37 +37,29 @@ final readonly class MAP extends NativeMethod {
 	}
 
 	protected function getValidator(): callable {
-		return function(MutableType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
+		return function(MutableType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
 			$type = $this->toBaseType($targetType->valueType);
-			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof FunctionType) {
-				if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
-					if ($parameterType->returnType->isSubtypeOf($type->itemType)) {
-						return $targetType;
-					}
-					return $this->validationFactory->error(
-						ValidationErrorType::invalidReturnType,
-						sprintf(
-							"The value type %s is not a subtype of the return type %s of the callback function",
-							$parameterType->returnType,
-							$type->itemType,
-						),
-						$origin
-					);
+			if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
+				if ($parameterType->returnType->isSubtypeOf($type->itemType)) {
+					return $targetType;
 				}
 				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
+					ValidationErrorType::invalidReturnType,
 					sprintf(
-						"The parameter type %s of the callback function is not a subtype of %s",
+						"The value type %s is not a subtype of the return type %s of the callback function",
+						$parameterType->returnType,
 						$type->itemType,
-						$parameterType->parameterType
 					),
 					$origin
 				);
 			}
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+				sprintf(
+					"The parameter type %s of the callback function is not a subtype of %s",
+					$type->itemType,
+					$parameterType->parameterType
+				),
 				$origin
 			);
 		};

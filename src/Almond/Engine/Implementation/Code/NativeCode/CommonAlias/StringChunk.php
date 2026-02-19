@@ -17,8 +17,8 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<StringType, IntegerType, StringValue, IntegerValue> */
 readonly class StringChunk extends NativeMethod {
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator): bool {
-		if (!parent::isParameterTypeValid($parameterType, $validator)) {
+	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
+		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
 			return false;
 		}
 		/** @var IntegerType $parameterType */

@@ -203,21 +203,21 @@ final class ReduceTest extends CodeExecutionTestHelper {
 	// Error tests
 	public function testReduceInvalidParameterNotTuple(): void {
 		$this->executeErrorCodeSnippet(
-			"Parameter must be a record with 'reducer' and 'initial' fields",
+			"The parameter type Integer[5] is not a subtype of [reducer: ^[result: T, item:  Integer[1, 2, 3]] => T, initial: T]",
 			"[1, 2, 3]->reduce(5)"
 		);
 	}
 
 	public function testReduceInvalidParameterNotFunction(): void {
 		$this->executeErrorCodeSnippet(
-			"Parameter must be a record with 'reducer' and 'initial' fields",
+			"is not a subtype of [reducer: ^[result: T, item:  Integer[1, 2, 3]] => T, initial: T]",
 			"[1, 2, 3]->reduce[reducer: 5, initial: 0]"
 		);
 	}
 
 	public function testReduceInvalidItemTypeMismatch(): void {
 		$this->executeErrorCodeSnippet(
-			"Parameter must be a record",
+			"is not a subtype of [reducer: ^[result: T, item:  Integer] => T, initial: T]",
 			"reduceWrong[1, 2, 3]",
 			valueDeclarations: "reduceWrong = ^arr: Array<Integer, 3> => Integer :: arr->reduce[reducer: ^[result: Integer, item: String] => Integer :: #result + #item->length, initial: 0];"
 		);

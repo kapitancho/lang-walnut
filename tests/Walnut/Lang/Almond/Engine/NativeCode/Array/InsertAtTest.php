@@ -22,7 +22,7 @@ final class InsertAtTest extends CodeExecutionTestHelper {
 	}
 
 	public function testInsertAtInvalidParameterValue(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("The parameter type should be a subtype of [value: Any, index: Integer<0..>]",
 			"['a', 1, 2]->insertAt[value: 'b']");
 	}
 

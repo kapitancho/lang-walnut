@@ -17,7 +17,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNat
 /** @extends SetNativeMethod<ArrayType|TupleType, TupleValue> */
 final readonly class ZipMap extends SetNativeMethod {
 
-	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
+	protected function isTargetItemTypeValid(Type $targetItemType): bool {
 		return $targetItemType->isSubtypeOf($this->typeRegistry->string());
 	}
 

@@ -3,9 +3,9 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\Array;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ShapeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
@@ -14,34 +14,22 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionEarlyReturn;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
-/** @extends NativeMethod<ArrayType|TupleType, StringType, TupleValue, StringValue> */
-final readonly class Format extends NativeMethod {
+/** @extends ArrayNativeMethod<ShapeType, StringType, StringValue> */
+final readonly class Format extends ArrayNativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type|ValidationFailure {
-		if (!($targetType instanceof ArrayType || $targetType instanceof TupleType)) {
-			return false;
-		}
-		$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
-		$itemType = $type->itemType;
+	protected function validateTargetArrayItemType(Type $itemType, mixed $origin): null|string {
 		$stringShape = $this->typeRegistry->shape($this->typeRegistry->string());
-		if (!$itemType->isSubtypeOf($stringShape)) {
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidTargetType,
-				sprintf("[%s] Invalid target type: array item type %s is not a subtype of Shape<String>", __CLASS__, $itemType),
-				$origin
+		return $itemType->isSubtypeOf($stringShape) ?
+			null :
+			sprintf("Invalid target type: array item type %s is not a subtype of Shape<String>",
+				$itemType
 			);
-		}
-		return true;
 	}
 
 	protected function getValidator(): callable {
-		return function(ArrayType|TupleType $targetType, StringType $parameterType): Type {
-			$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
-
+		return function(ArrayType $targetType, StringType $parameterType): Type {
 			$paramMin = false;
 			$paramMax = false;
 			$isSafe = false;
@@ -61,7 +49,7 @@ final readonly class Format extends NativeMethod {
 						$paramMin = $l;
 					}
 				}
-				$isSafe = $type->range->minLength > $max;
+				$isSafe = $targetType->range->minLength > $max;
 			}
 
 			$returnType = $this->typeRegistry->string(

@@ -20,7 +20,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<MutableType, FunctionType, MutableValue, FunctionValue> */
 final readonly class FILTER extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
+	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type {
 		if ($targetType instanceof MutableType) {
 			$type = $this->toBaseType($targetType->valueType);
 			if (($type instanceof ArrayType || $type instanceof MapType || $type instanceof SetType) && $type->isSubtypeOf(
@@ -40,27 +40,27 @@ final readonly class FILTER extends NativeMethod {
 		return false;
 	}
 
+	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
+		$parameterType = $this->toBaseType($parameterType);
+		if ($parameterType instanceof FunctionType) {
+			return $parameterType->returnType->isSubtypeOf($this->typeRegistry->boolean);
+		}
+		return false;
+	}
+
 	protected function getValidator(): callable {
-		return function(MutableType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
+		return function(MutableType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
 			$type = $this->toBaseType($targetType->valueType);
-			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf($this->typeRegistry->boolean)) {
-				if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
-					return $targetType;
-				}
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf(
-						"The parameter type %s of the callback function is not a subtype of %s",
-						$type->itemType,
-						$parameterType->parameterType
-					),
-					$origin
-				);
+			if ($type->itemType->isSubtypeOf($parameterType->parameterType)) {
+				return $targetType;
 			}
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+				sprintf(
+					"The parameter type %s of the callback function is not a subtype of %s",
+					$type->itemType,
+					$parameterType->parameterType
+				),
 				$origin
 			);
 		};

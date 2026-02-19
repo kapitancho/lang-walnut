@@ -16,7 +16,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<EnumerationSubsetType|MetaType, NullType, NullValue> */
 final readonly class EnumerationType extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType, mixed $origin): bool {
+	protected function isTargetRefTypeValid(Type $targetRefType): bool {
 		return $targetRefType instanceof EnumerationSubsetType ||
 			($targetRefType instanceof MetaType && (
 				$targetRefType->value === MetaTypeValue::EnumerationSubset ||

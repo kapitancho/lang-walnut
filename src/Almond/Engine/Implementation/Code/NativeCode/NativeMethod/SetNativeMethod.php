@@ -16,18 +16,17 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
  */
 abstract readonly class SetNativeMethod extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool {
-		if (!parent::isTargetTypeValid($targetType, $validator, $origin)) {
+	protected function isTargetTypeValid(Type $targetType, callable $validator): bool {
+		if (!parent::isTargetTypeValid($targetType, $validator)) {
 			return false;
 		}
 		/** @var SetType $targetType */
 		return $this->isTargetItemTypeValid(
 			$this->toBaseType($targetType->itemType),
-			$origin
 		);
 	}
 
-	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
+	protected function isTargetItemTypeValid(Type $targetItemType): bool {
 		return true;
 	}
 

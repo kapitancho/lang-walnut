@@ -22,7 +22,7 @@ final class PadLeftTest extends CodeExecutionTestHelper {
 	}
 
 	public function testPadLeftInvalidParameterValue(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("Parameter type [value: String['b']] is not a subtype [length: Integer<0..>, value: Any]",
 			"['a', 1, 2]->padLeft[value: 'b']");
 	}
 

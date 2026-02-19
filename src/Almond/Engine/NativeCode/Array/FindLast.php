@@ -8,37 +8,16 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\ArrayFilterBase;
 
-/** @extends ArrayNativeMethod<Type, FunctionType, FunctionValue> */
-final readonly class FindLast extends ArrayNativeMethod {
+final readonly class FindLast extends ArrayFilterBase {
 
 	protected function getValidator(): callable {
-		return function(ArrayType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
-			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf($this->typeRegistry->boolean)) {
-				if ($targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
-					return $this->typeRegistry->result(
-						$targetType->itemType,
-						$this->typeRegistry->core->itemNotFound
-					);
-				}
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf(
-						"The parameter type %s of the callback function is not a subtype of %s",
-						$targetType->itemType,
-						$parameterType->parameterType
-					),
-					$origin
-				);
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				$origin
+		return function(ArrayType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
+			return $this->typeRegistry->result(
+				$targetType->itemType,
+				$this->typeRegistry->core->itemNotFound
 			);
 		};
 	}

@@ -9,42 +9,59 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
 /** @extends ArrayNativeMethod<Type, Type, Value> */
 final readonly class ChainInvoke extends ArrayNativeMethod {
 
-	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
-		if ($targetItemType instanceof NothingType) {
-			return true;
+	protected function validateTargetArrayItemType(Type $itemType, mixed $origin): null|string {
+		if ($itemType instanceof NothingType) {
+			return null;
 		}
-		if ($targetItemType instanceof FunctionType) {
-			return $targetItemType->returnType->isSubtypeOf($targetItemType->parameterType);
+		if ($itemType instanceof FunctionType) {
+			return $itemType->returnType->isSubtypeOf($itemType->parameterType) ? null :
+				sprintf(
+					"The item type %s is not a valid function type for chainInvoke because its return type is not a subtype of its parameter type",
+					$itemType
+				);
 		}
-		return false;
+		return sprintf(
+			"The item type %s is not a valid function type for chainInvoke because it is not a function type",
+			$itemType
+		);
+	}
+
+	protected function validateParameterType(Type $parameterType, Type $targetType, mixed $origin): null|string|ValidationFailure {
+		/** @var ArrayType $targetType */
+		$itemType = $this->toBaseType($targetType->itemType);
+		if ($itemType instanceof NothingType) {
+			return null;
+		}
+		/** @var FunctionType $itemType */
+		if ($itemType instanceof FunctionType) {
+			return $parameterType->isSubtypeOf($itemType->parameterType) ?
+				null :
+				sprintf(
+					"The parameter type %s is not a subtype of the item type parameter type %s",
+					$parameterType,
+					$itemType->parameterType
+				);
+		}
+		return sprintf(
+			"The item type %s is not a valid function type for chainInvoke because it is not a function type",
+			$itemType
+		);
 	}
 
 	protected function getValidator(): callable {
-		return function(ArrayType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
+		return function(ArrayType $targetType, Type $parameterType, mixed $origin): Type {
+			/** @var NothingType|FunctionType $itemType */
 			$itemType = $this->toBaseType($targetType->itemType);
 			if ($itemType instanceof NothingType) {
 				return $parameterType;
 			}
-			/** @var FunctionType $itemType */
-			if ($parameterType->isSubtypeOf($itemType->parameterType)) {
-				return $itemType->returnType;
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf(
-					"The parameter type %s is not a subtype of %s",
-					$parameterType,
-					$itemType->parameterType
-				),
-				origin: $origin
-			);
+			return $itemType->returnType;
 		};
 	}
 

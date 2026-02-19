@@ -21,7 +21,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\SubsetTypeHelper;
 final readonly class WithoutByKey extends NativeMethod {
 	use SubsetTypeHelper;
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
+	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type {
 		return $targetType instanceof RecordType || $targetType instanceof MapType;
 	}
 

@@ -27,7 +27,7 @@ final class ChainInvokeTest extends CodeExecutionTestHelper {
 	}*/
 
 	public function testChainInvokeInvalidTargetValue(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "[
+		$this->executeErrorCodeSnippet('The item type ^Integer => Real is not a valid function type for chainInvoke because its return type is not a subtype of its parameter type', "[
 			^Integer => Real :: #->roundAsInteger,
 			^Real => Real :: # + 1,
 			^Real => Real :: # * 2
@@ -35,7 +35,7 @@ final class ChainInvokeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testChainInvokeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "[
+		$this->executeErrorCodeSnippet('The item type (Integer[15]|^Real => Real) is not a valid function type for chainInvoke because it is not a function type', "[
 			15,
 			^Real => Real :: # + 1,
 			^Real => Real :: # * 2
@@ -43,7 +43,7 @@ final class ChainInvokeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testChainInvokeInvalidParameterValue(): void {
-		$this->executeErrorCodeSnippet("The parameter type String['hi'] is not a subtype of Real", "[
+		$this->executeErrorCodeSnippet("The parameter type String['hi'] is not a subtype of the item type parameter type Real", "[
 			^Real => Real :: #->roundAsInteger,
 			^Real => Real :: # + 1,
 			^Real => Real :: # * 2

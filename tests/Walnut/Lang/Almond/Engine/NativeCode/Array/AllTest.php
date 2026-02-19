@@ -51,12 +51,12 @@ final class AllTest extends CodeExecutionTestHelper {
 	}
 
 	public function testAllInvalidParameterParameterType(): void {
-		$this->executeErrorCodeSnippet("The parameter type (Integer[1]|String['a']) of the callback function is not a subtype of Boolean",
+		$this->executeErrorCodeSnippet("The parameter type Boolean of the callback function must be a supertype of",
 			"[1, 'a']->all(^Boolean => Boolean :: true);");
 	}
 
 	public function testAllInvalidParameterReturnType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("The parameter return type Real must be a subtype of Boolean",
 			"[1, 2]->all(^Any => Real :: 3.14);");
 	}
 

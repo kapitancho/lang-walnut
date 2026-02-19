@@ -9,26 +9,23 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
 /** @extends NativeMethod<ArrayType|TupleType, IntegerType, TupleValue, IntegerValue> */
 final readonly class BinaryModulo extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
-		return $targetType instanceof ArrayType || $targetType instanceof TupleType;
+	protected function validateParameterType(Type $parameterType, Type $targetType, mixed $origin): null|string|ValidationFailure {
+		return $parameterType->isSubtypeOf($this->typeRegistry->integer(1)) ?
+			null : "The parameter type should be a subtype of Integer<1..>";
 	}
 
 	protected function getValidator(): callable {
-		return function(ArrayType|TupleType $targetType, IntegerType $parameterType, mixed $origin): Type|ValidationFailure {
+		return function(ArrayType|TupleType $targetType, IntegerType $parameterType): Type {
 			if (
 				$targetType instanceof TupleType &&
 				$targetType->restType instanceof NothingType &&
-				$parameterType->numberRange->min !== MinusInfinity::value &&
-				$parameterType->numberRange->min->value > 0 &&
 				$parameterType->numberRange->max !== PlusInfinity::value &&
 				(string)$parameterType->numberRange->max->value === (string)$parameterType->numberRange->min->value
 			) {
@@ -44,47 +41,37 @@ final readonly class BinaryModulo extends NativeMethod {
 			}
 			$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 			if (
-				$parameterType->numberRange->min !== MinusInfinity::value &&
-				$parameterType->numberRange->min->value > 0
+				$type->range->maxLength !== PlusInfinity::value &&
+				$parameterType->numberRange->min->value > $type->range->maxLength
 			) {
-				if (
-					$type->range->maxLength !== PlusInfinity::value &&
-					$parameterType->numberRange->min->value > $type->range->maxLength
-				) {
-					return $targetType;
-				}
-				if (
-					$type->range->maxLength !== PlusInfinity::value &&
-					(string)$type->range->minLength === (string)$type->range->maxLength &&
-					$parameterType->numberRange->max !== PlusInfinity::value &&
-					(string)$parameterType->numberRange->max->value === (string)$parameterType->numberRange->min->value
-				) {
-					$size = $type->range->maxLength->mod($parameterType->numberRange->min->value);
-					return $this->typeRegistry->array($type->itemType, $size, $size);
-				}
-				return $this->typeRegistry->array(
-					$type->itemType,
-					0,
-					match(true) {
-						$parameterType->numberRange->max === PlusInfinity::value => $type->range->maxLength,
-						$type->range->maxLength === PlusInfinity::value => max(
-							0,
-							$parameterType->numberRange->max->value->sub(1),
-						),
-						default => max(
-							0,
-							min(
-								$parameterType->numberRange->max->value->sub(1),
-								$type->range->maxLength
-							)
-						)
-					}
-				);
+				return $targetType;
 			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				$origin
+			if (
+				$type->range->maxLength !== PlusInfinity::value &&
+				(string)$type->range->minLength === (string)$type->range->maxLength &&
+				$parameterType->numberRange->max !== PlusInfinity::value &&
+				(string)$parameterType->numberRange->max->value === (string)$parameterType->numberRange->min->value
+			) {
+				$size = $type->range->maxLength->mod($parameterType->numberRange->min->value);
+				return $this->typeRegistry->array($type->itemType, $size, $size);
+			}
+			return $this->typeRegistry->array(
+				$type->itemType,
+				0,
+				match(true) {
+					$parameterType->numberRange->max === PlusInfinity::value => $type->range->maxLength,
+					$type->range->maxLength === PlusInfinity::value => max(
+						0,
+						$parameterType->numberRange->max->value->sub(1),
+					),
+					default => max(
+						0,
+						min(
+							$parameterType->numberRange->max->value->sub(1),
+							$type->range->maxLength
+						)
+					)
+				}
 			);
 		};
 	}

@@ -26,6 +26,7 @@ final class UniqueSetTest extends CodeExecutionTestHelper {
 	}
 
 	public function testUniqueSetInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "[12, 'hello','world', 'hi', 'hello']->uniqueSet;");
+		$this->executeErrorCodeSnippet('The item type of the array must be a subtype of Real or a subtype of String.',
+			"[12, 'hello','world', 'hi', 'hello']->uniqueSet;");
 	}
 }

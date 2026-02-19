@@ -15,11 +15,10 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayN
 /** @extends ArrayNativeMethod<Type, NullType, NullValue> */
 final readonly class UniqueSet extends ArrayNativeMethod {
 
-	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
-		return $targetItemType->isSubtypeOf($this->typeRegistry->string()) ||
-			$targetItemType->isSubtypeOf(
-				$this->typeRegistry->union([$this->typeRegistry->integer(), $this->typeRegistry->real()])
-			);
+	protected function validateTargetArrayItemType(Type $itemType, mixed $origin): null|string {
+		return $itemType->isSubtypeOf($this->typeRegistry->real()) ||
+		$itemType->isSubtypeOf($this->typeRegistry->string()) ?
+			null : "The item type of the array must be a subtype of Real or a subtype of String.";
 	}
 
 	protected function getValidator(): callable {

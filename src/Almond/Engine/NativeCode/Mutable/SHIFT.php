@@ -15,7 +15,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Mutabl
 /** @extends MutableNativeMethod<ArrayType, NullType, NullValue> */
 final readonly class SHIFT extends MutableNativeMethod {
 
-	protected function isTargetValueTypeValid(Type $targetValueType, mixed $origin): bool {
+	protected function isTargetValueTypeValid(Type $targetValueType): bool {
 		return $targetValueType instanceof ArrayType && (int)(string)$targetValueType->range->minLength === 0;
 	}
 

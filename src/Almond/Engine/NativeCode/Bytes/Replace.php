@@ -32,7 +32,10 @@ final readonly class Replace extends NativeMethod {
 			}
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+				sprintf(
+					"The parameter type %s is not a valid replacement record [match: Bytes|RegExp, replacement: Bytes]",
+					$parameterType
+				),
 				$origin
 			);
 		};

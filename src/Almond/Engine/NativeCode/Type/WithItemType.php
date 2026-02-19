@@ -13,7 +13,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<ArrayType|MapType|SetType, TypeType, TypeValue> */
 final readonly class WithItemType extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType, mixed $origin): bool {
+	protected function isTargetRefTypeValid(Type $targetRefType): bool {
 		$refType = $this->toBaseType($targetRefType);
 		return $refType instanceof ArrayType || $refType instanceof MapType || $refType instanceof SetType;
 	}

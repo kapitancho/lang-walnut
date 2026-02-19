@@ -10,32 +10,33 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
 /** @extends NativeMethod<StringType, ArrayType|TupleType, StringValue, TupleValue> */
 final readonly class ConcatList extends NativeMethod {
 
+	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool|Type {
+		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
+			return false;
+		}
+		$arrayType = $parameterType instanceof TupleType ? $parameterType->asArrayType() : $parameterType;
+		/** @var ArrayType $arrayType */
+		return $this->toBaseType($arrayType->itemType) instanceof StringType;
+	}
+
 	protected function getValidator(): callable {
-		return function(StringType $targetType, ArrayType|TupleType $parameterType, mixed $origin): StringType|ValidationFailure {
+		return function(StringType $targetType, ArrayType|TupleType $parameterType): StringType {
 			if ($parameterType instanceof TupleType) {
 				$parameterType = $parameterType->asArrayType();
 			}
 			$itemType = $this->toBaseType($parameterType->itemType);
-			if ($itemType instanceof StringType) {
-				return $this->typeRegistry->string(
-					$targetType->range->minLength + $parameterType->range->minLength * $itemType->range->minLength,
-					$targetType->range->maxLength === PlusInfinity::value ||
-					$parameterType->range->maxLength === PlusInfinity::value ||
-					$itemType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
-					$targetType->range->maxLength + $parameterType->range->maxLength * $itemType->range->maxLength,
-				);
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				$origin
+			/** @var StringType $itemType */
+			return $this->typeRegistry->string(
+				$targetType->range->minLength + $parameterType->range->minLength * $itemType->range->minLength,
+				$targetType->range->maxLength === PlusInfinity::value ||
+				$parameterType->range->maxLength === PlusInfinity::value ||
+				$itemType->range->maxLength === PlusInfinity::value ? PlusInfinity::value :
+				$targetType->range->maxLength + $parameterType->range->maxLength * $itemType->range->maxLength,
 			);
 		};
 	}

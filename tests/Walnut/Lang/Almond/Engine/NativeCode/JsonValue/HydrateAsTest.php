@@ -801,6 +801,29 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 		$this->assertEquals("type{Default}", $result);
 	}
 
+
+
+	public function testAsRegExpValid(): void {
+		$result = $this->executeCodeSnippet("'/^hello ([a-z]+)/'->hydrateAs(`RegExp);");
+		$this->assertEquals("RegExp{'/^hello ([a-z]+)/'}", $result);
+	}
+
+	public function testAsRegExpInvalid(): void {
+		$result = $this->executeCodeSnippet("'^he'->hydrateAs(`RegExp);");
+		$this->assertEquals("@HydrationError![\n\tvalue: '^he',\n\terrors: [\n\t\t[\n\t\t\thydrationPath: 'value',\n\t\t\terrorMessage: 'Could not hydrate value of sealed type RegExp: error in validation: @InvalidRegExp![expression: \`^he\`]',\n\t\t\ttargetType: type{RegExp}\n\t\t]\n\t]\n]", $result);
+	}
+
+	public function testAsUuidValid(): void {
+		$result = $this->executeCodeSnippet("'00000000-0000-4000-9000-000000000000'->hydrateAs(`Uuid);");
+		$this->assertEquals("Uuid{'00000000-0000-4000-9000-000000000000'}", $result);
+	}
+
+	public function testAsUuidInvalid(): void {
+		$result = $this->executeCodeSnippet("'00000000-0000-4000-0000-000000000000'->hydrateAs(`Uuid);");
+		$this->assertEquals("@HydrationError![\n\tvalue: '00000000-0000-4000-0000-000000000000',\n\terrors: [\n\t\t[\n\t\t\thydrationPath: 'value',\n\t\t\terrorMessage: 'Could not hydrate value of open type Uuid: error in validation: @InvalidUuid![\\n\\tvalue: \`00000000-0000-4000-0000-000000000000\`\\n]',\n\t\t\ttargetType: type{Uuid}\n\t\t]\n\t]\n]", $result);
+	}
+
+
 	public function testHydrateAsTypeInvalidTypeName(): void {
 		$result = $this->executeCodeSnippet("'Invalid'->hydrateAs(type{Type});", "Default = Integer<1..5>;");
 		$this->assertEquals("@HydrationError![\n\tvalue: 'Invalid',\n\terrors: [\n\t\t[\n\t\t\thydrationPath: 'value',\n\t\t\terrorMessage: 'The string value should be a name of a valid type',\n\t\t\ttargetType: type{Type}\n\t\t]\n\t]\n]", $result);
@@ -817,6 +840,5 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 			"null->hydrateAs(42);"
 		);
 	}
-
 
 }

@@ -15,7 +15,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NamedN
 
 final readonly class ValueOf extends NamedNativeMethod {
 
-	protected function isNamedTypeValid(NamedType $namedType, mixed $origin): bool {
+	protected function isNamedTypeValid(NamedType $namedType): bool {
 		return $namedType->name->equals(new TypeName('DependencyContainer'));
 	}
 

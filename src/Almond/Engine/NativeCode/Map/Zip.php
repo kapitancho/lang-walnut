@@ -9,19 +9,22 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
 /** @extends NativeMethod<MapType|RecordType, MapType|RecordType, RecordValue, RecordValue> */
 final readonly class Zip extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
+	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type {
 		return $targetType instanceof MapType || $targetType instanceof RecordType;
 	}
 
+	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
+		$parameterType = $this->toBaseType($parameterType);
+		return $parameterType instanceof MapType || $parameterType instanceof RecordType;
+	}
+
 	protected function getValidator(): callable {
-		return function(MapType|RecordType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
+		return function(MapType|RecordType $targetType, Type $parameterType): Type {
 			$pType = $this->toBaseType($parameterType);
 			if ($targetType instanceof RecordType && $pType instanceof RecordType) {
 				$resultType = [];
@@ -55,28 +58,22 @@ final readonly class Zip extends NativeMethod {
 			}
 			$type = $targetType instanceof RecordType ? $targetType->asMapType() : $targetType;
 			$pType = $pType instanceof RecordType ? $pType->asMapType() : $pType;
-			if ($pType instanceof MapType) {
-				return $this->typeRegistry->map(
-					$this->typeRegistry->tuple([
-						$type->itemType,
-						$pType->itemType,
-					], null),
-					min($type->range->minLength, $pType->range->minLength),
-					match(true) {
-						$type->range->maxLength === PlusInfinity::value => $pType->range->maxLength,
-						$pType->range->maxLength === PlusInfinity::value => $type->range->maxLength,
-						default => min($type->range->maxLength, $pType->range->maxLength)
-					},
-					$this->typeRegistry->intersection([
-						$type->keyType,
-						$pType->keyType
-					])
-				);
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				$origin
+			/** @var MapType $pType */
+			return $this->typeRegistry->map(
+				$this->typeRegistry->tuple([
+					$type->itemType,
+					$pType->itemType,
+				], null),
+				min($type->range->minLength, $pType->range->minLength),
+				match(true) {
+					$type->range->maxLength === PlusInfinity::value => $pType->range->maxLength,
+					$pType->range->maxLength === PlusInfinity::value => $type->range->maxLength,
+					default => min($type->range->maxLength, $pType->range->maxLength)
+				},
+				$this->typeRegistry->intersection([
+					$type->keyType,
+					$pType->keyType
+				])
 			);
 		};
 	}

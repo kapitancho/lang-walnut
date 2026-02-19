@@ -28,8 +28,8 @@ final readonly class Invoke extends NativeMethod {
 			}
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidParameterType,
-				sprintf("Invalid parameter type: %s, %s expected (target is %s)",
-					$parameterType, $targetType->parameterType, $targetType
+				sprintf("The parameter type %s is not a subtype of the function parameter type %s",
+					$parameterType, $targetType->parameterType
 				),
 				$origin
 			);

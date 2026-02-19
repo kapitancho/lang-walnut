@@ -23,7 +23,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<MutableType, Type, MutableValue, Value> */
 final readonly class REMOVE extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type {
+	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type {
 		if ($targetType instanceof MutableType) {
 			$valueType = $this->toBaseType($targetType->valueType);
 			if ($valueType instanceof SetType && (int)(string)$valueType->range->minLength === 0) {
@@ -65,8 +65,9 @@ final readonly class REMOVE extends NativeMethod {
 							} else {
 								return $this->validationFactory->error(
 									ValidationErrorType::invalidParameterType,
-									sprintf("[%s] Invalid parameter type: %s. Cannot remove map value with key %s",
-										__CLASS__, $parameterType, $subsetValue
+									sprintf(
+										"Cannot remove required record key '%s' of type %s",
+										$subsetValue, $rt
 									),
 									$origin
 								);
@@ -78,8 +79,9 @@ final readonly class REMOVE extends NativeMethod {
 							if ($valueType->restType instanceof NothingType) {
 								return $this->validationFactory->error(
 									ValidationErrorType::invalidParameterType,
-									sprintf("[%s] Invalid parameter type: %s. Cannot remove map value with key %s",
-										__CLASS__, $parameterType, $subsetValue
+									sprintf(
+										"Cannot remove unknown record key '%s' from a closed record type",
+										$subsetValue
 									),
 									$origin
 								);
@@ -100,7 +102,10 @@ final readonly class REMOVE extends NativeMethod {
 				}
 				return $this->validationFactory->error(
 					ValidationErrorType::invalidParameterType,
-					sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+					sprintf(
+						"The parameter type %s is not a valid key type for the record type, expected String",
+						$parameterType
+					),
 					$origin
 				);
 			}
@@ -114,15 +119,24 @@ final readonly class REMOVE extends NativeMethod {
 				}
 				return $this->validationFactory->error(
 					ValidationErrorType::invalidParameterType,
-					sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+					sprintf(
+						"The parameter type %s is not a subtype of the map key type %s",
+						$parameterType,
+						$valueType->keyType
+					),
 					$origin
 				);
 			}
+			// @codeCoverageIgnoreStart
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+				sprintf(
+					"The mutable value type %s does not support the REMOVE operation",
+					$valueType
+				),
 				$origin
 			);
+			// @codeCoverageIgnoreEnd
 		};
 	}
 

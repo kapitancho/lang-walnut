@@ -22,4 +22,10 @@ final class SliceRangeTest extends CodeExecutionTestHelper {
 			"[1, 2, 10, 11, 12, 13]->sliceRange(42)");
 	}
 
+	public function testSliceRangeInvalidParameterTypeRecord(): void {
+		$this->executeErrorCodeSnippet(
+			"Parameter type [start: Integer[-1], end: Integer[-2]] is not a subtype",
+			"[1, 2, 10, 11, 12, 13]->sliceRange[start: -1, end: -2]");
+	}
+
 }

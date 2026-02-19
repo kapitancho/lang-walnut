@@ -9,32 +9,28 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
 /** @extends NativeMethod<StringType, Type, StringValue, Value> */
 final readonly class Substring extends NativeMethod {
 
+	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool|Type {
+		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
+			return false;
+		}
+		$pInt = $this->typeRegistry->integer(0);
+		return $parameterType->isSubtypeOf($this->typeRegistry->record([
+			"start" => $pInt,
+			"length" => $pInt
+		], null));
+	}
+
 	protected function getValidator(): callable {
-		return function(StringType $targetType, Type $parameterType, mixed $origin): StringType|ValidationFailure {
-			$pInt = $this->typeRegistry->integer(0);
-			$pType = $this->typeRegistry->record([
-				"start" => $pInt,
-				"length" => $pInt
-			], null);
-			if ($parameterType->isSubtypeOf($pType)) {
-				$parameterType = $this->toBaseType($parameterType);
-				return $this->typeRegistry->string(0, min(
-					$targetType->range->maxLength,
-					$parameterType->types['length']->numberRange->max->value
-				));
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				$origin
-			);
+		return function(StringType $targetType, RecordType $parameterType): StringType {
+			return $this->typeRegistry->string(0, min(
+				$targetType->range->maxLength,
+				$parameterType->types['length']->numberRange->max->value
+			));
 		};
 	}
 

@@ -7,7 +7,7 @@ use Walnut\Lang\Test\Almond\Engine\CodeExecutionTestHelper;
 final class MaxTest extends CodeExecutionTestHelper {
 
 	public function testMaxEmpty(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "[]->max;");
+		$this->executeErrorCodeSnippet('The array must have at least one item.', "[]->max;");
 	}
 
 	public function testMaxNonEmpty(): void {
@@ -30,6 +30,7 @@ final class MaxTest extends CodeExecutionTestHelper {
 	}
 
 	public function testMaxInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "['hello','world', 'hi', 'hello']->max;");
+		$this->executeErrorCodeSnippet('The item type of the array must be a subtype of Real.',
+			"['hello','world', 'hi', 'hello']->max;");
 	}
 }

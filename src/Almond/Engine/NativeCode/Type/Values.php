@@ -23,7 +23,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<MetaType|IntegerSubsetType|RealSubsetType|StringSubsetType|EnumerationSubsetType, NullType, NullValue> */
 final readonly class Values extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType, mixed $origin): bool {
+	protected function isTargetRefTypeValid(Type $targetRefType): bool {
 		$refType = $this->toBaseType($targetRefType);
 		if ($refType instanceof MetaType) {
 			return match($refType->value) {

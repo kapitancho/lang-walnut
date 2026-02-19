@@ -8,16 +8,26 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Value\ValueConverter;
 
 /** @extends NativeMethod<StringType, Type, StringValue, Value> */
 final readonly class BinaryPlus extends NativeMethod {
 
+	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool|Type {
+		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
+			return false;
+		}
+		return $parameterType instanceof StringType ||
+			$parameterType->isSubtypeOf(
+				$this->typeRegistry->shape(
+					$this->typeRegistry->string()
+				)
+			);
+	}
+
 	protected function getValidator(): callable {
-		return function(StringType $targetType, Type $parameterType, mixed $origin): StringType|ValidationFailure {
+		return function(StringType $targetType, Type $parameterType): StringType {
 			if ($parameterType instanceof StringType) {
 				return $this->typeRegistry->string(
 					$targetType->range->minLength + $parameterType->range->minLength,
@@ -26,18 +36,7 @@ final readonly class BinaryPlus extends NativeMethod {
 						$targetType->range->maxLength + $parameterType->range->maxLength
 				);
 			}
-			if ($parameterType->isSubtypeOf(
-				$this->typeRegistry->shape(
-					$this->typeRegistry->string()
-				)
-			)) {
-				return $this->typeRegistry->string();
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				$origin
-			);
+			return $this->typeRegistry->string();
 		};
 	}
 

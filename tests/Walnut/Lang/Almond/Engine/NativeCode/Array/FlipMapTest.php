@@ -52,7 +52,7 @@ final class FlipMapTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFlipMapInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "[1, 'a']->flipMap(^s: String => Integer :: s->length);");
+		$this->executeErrorCodeSnippet("The item type of the target array must be a subtype of String, got (Integer[1]|String['a'])", "[1, 'a']->flipMap(^s: String => Integer :: s->length);");
 	}
 
 	public function testFlipMapInvalidParameterType(): void {
@@ -60,7 +60,7 @@ final class FlipMapTest extends CodeExecutionTestHelper {
 	}
 
 	public function testFlipMapInvalidParameterParameterType(): void {
-		$this->executeErrorCodeSnippet("The parameter type String['a', 'bcd', 'ef'] of the callback function is not a subtype of Boolean",
+		$this->executeErrorCodeSnippet("The parameter type Boolean of the callback function is not a supertype of String['a', 'bcd', 'ef']",
 			"['a', 'bcd', 'ef']->flipMap(^Boolean => Boolean :: true);");
 	}
 

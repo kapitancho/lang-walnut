@@ -9,8 +9,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\UnknownProperty;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\OptionalKeyType as OptionalKeyTypeImpl;
@@ -18,32 +16,29 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\OptionalKeyType a
 /** @extends ArrayNativeMethod<Type, RecordType, RecordValue> */
 final readonly class Slice extends ArrayNativeMethod {
 
+	protected function validateParameterType(Type $parameterType, Type $targetType, mixed $origin): null|string|ValidationFailure {
+		$expectedType = $this->typeRegistry->record([
+			"start" => $this->typeRegistry->integer(0),
+			"length" => new OptionalKeyTypeImpl($this->typeRegistry->integer(0)),
+		], null);
+		return $parameterType->isSubtypeOf($expectedType) ? null : sprintf(
+			"Parameter type %s is not a subtype %s",
+			$parameterType,
+			$expectedType
+		);
+	}
+
 	protected function getValidator(): callable {
-		return function(ArrayType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
-			$pInt = $this->typeRegistry->integer(0);
-			$pType = $this->typeRegistry->record([
-				"start" => $pInt,
-				"length" => new OptionalKeyTypeImpl($pInt)
-			], null);
-			if ($parameterType->isSubtypeOf($pType)) {
-				$parameterType = $this->toBaseType($parameterType);
-				if ($parameterType instanceof RecordType) {
-					return $this->typeRegistry->array(
-						$targetType->itemType,
-						0,
-						min(
-							$targetType->range->maxLength,
-							($l = $parameterType->types['length'] ?? null) ?
-								$this->toBaseType($l)->numberRange->max->value :
-								$targetType->range->maxLength
-						)
-					);
-				}
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				$origin
+		return function(ArrayType $targetType, RecordType $parameterType): Type {
+			return $this->typeRegistry->array(
+				$targetType->itemType,
+				0,
+				min(
+					$targetType->range->maxLength,
+					($l = $parameterType->types['length'] ?? null) ?
+						$this->toBaseType($l)->numberRange->max->value :
+						$targetType->range->maxLength
+				)
 			);
 		};
 	}

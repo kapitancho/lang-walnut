@@ -75,7 +75,7 @@ class CodeExecutionTestHelper extends TestCase {
 		$this->fail(
 			'Unexpected compilation errors: ' .
 			implode("\n", array_map(
-				fn(CompilationError $error): string => $error->errorMessage,
+				fn(CompilationError $error): string => $error->errorType->name . ':' . $error->errorMessage,
 				$result
 			))
 		);

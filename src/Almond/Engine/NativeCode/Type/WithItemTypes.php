@@ -13,21 +13,47 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNativeMethod;
 
 /** @extends TypeNativeMethod<Type, Type, Value> */
 final readonly class WithItemTypes extends TypeNativeMethod {
 
+	protected function isTargetRefTypeValid(Type $targetRefType): bool {
+		$refType = $this->toBaseType($targetRefType);
+		return $refType instanceof TupleType ||
+			$refType instanceof RecordType ||
+			$refType instanceof IntersectionType ||
+			$refType instanceof UnionType ||
+			($refType instanceof MetaType && in_array($refType->value, [
+				MetaTypeValue::Tuple, MetaTypeValue::Record,
+				MetaTypeValue::Intersection, MetaTypeValue::Union
+			], true));
+	}
+
+	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
+		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
+			return false;
+		}
+		return $parameterType->isSubtypeOf(
+			$this->typeRegistry->array(
+				$this->typeRegistry->type($this->typeRegistry->any)
+			)
+		) || $parameterType->isSubtypeOf(
+			$this->typeRegistry->map(
+				$this->typeRegistry->type($this->typeRegistry->any),
+				0,
+				PlusInfinity::value,
+				$this->typeRegistry->string()
+			)
+		);
+	}
+
 	protected function getValidator(): callable {
-		return function(TypeType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
+		return function(TypeType $targetType, Type $parameterType): Type {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($parameterType->isSubtypeOf(
 				$this->typeRegistry->array(
-					$this->typeRegistry->type(
-						$this->typeRegistry->any
-					)
+					$this->typeRegistry->type($this->typeRegistry->any)
 				)
 			)) {
 				if ($refType instanceof TupleType || (
@@ -44,50 +70,14 @@ final readonly class WithItemTypes extends TypeNativeMethod {
 						$this->typeRegistry->metaType(MetaTypeValue::Intersection)
 					);
 				}
-				if ($refType instanceof UnionType || (
-					$refType instanceof MetaType && $refType->value === MetaTypeValue::Union
-				)) {
-					return $this->typeRegistry->type(
-						$this->typeRegistry->metaType(MetaTypeValue::Union)
-					);
-				}
-				// @codeCoverageIgnoreStart
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidTargetType,
-					sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-					$origin
+				/** @var UnionType|MetaType $refType */
+				return $this->typeRegistry->type(
+					$this->typeRegistry->metaType(MetaTypeValue::Union)
 				);
-				// @codeCoverageIgnoreEnd
 			}
-			if ($parameterType->isSubtypeOf(
-				$this->typeRegistry->map(
-					$this->typeRegistry->type(
-						$this->typeRegistry->any
-					),
-					0,
-					PlusInfinity::value,
-					$this->typeRegistry->string()
-				)
-			)) {
-				if ($refType instanceof RecordType || (
-					$refType instanceof MetaType && $refType->value === MetaTypeValue::Record
-				)) {
-					return $this->typeRegistry->type(
-						$this->typeRegistry->metaType(MetaTypeValue::Record)
-					);
-				}
-				// @codeCoverageIgnoreStart
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidTargetType,
-					sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
-					$origin
-				);
-				// @codeCoverageIgnoreEnd
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				$origin
+			/** @var RecordType|MetaType $refType */
+			return $this->typeRegistry->type(
+				$this->typeRegistry->metaType(MetaTypeValue::Record)
 			);
 		};
 	}

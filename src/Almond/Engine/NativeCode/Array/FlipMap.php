@@ -11,49 +11,40 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
 /** @extends ArrayNativeMethod<Type, FunctionType, FunctionValue> */
 final readonly class FlipMap extends ArrayNativeMethod {
 
-	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
-		return $targetItemType->isSubtypeOf($this->typeRegistry->string());
+	protected function validateTargetArrayItemType(Type $itemType, mixed $origin): null|string {
+		return $itemType->isSubtypeOf($this->typeRegistry->string()) ? null :
+			sprintf("The item type of the target array must be a subtype of String, got %s", $itemType);
+	}
+
+	protected function validateParameterType(Type $parameterType, Type $targetType, mixed $origin): null|string {
+		/** @var ArrayType $targetType */
+		/** @var FunctionType $parameterType */
+		return $targetType->itemType->isSubtypeOf($parameterType->parameterType) ?
+			null : sprintf(
+				"The parameter type %s of the callback function is not a supertype of %s",
+				$parameterType->parameterType,
+				$targetType->itemType
+			);
 	}
 
 	protected function getValidator(): callable {
-		return function(ArrayType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
+		return function(ArrayType $targetType, FunctionType $parameterType, mixed $origin): Type {
 			$itemType = $targetType->itemType;
-			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof FunctionType) {
-				if ($itemType->isSubtypeOf($parameterType->parameterType)) {
-					$r = $parameterType->returnType;
-					$errorType = $r instanceof ResultType ? $r->errorType : null;
-					$returnType = $r instanceof ResultType ? $r->returnType : $r;
-					$t = $this->typeRegistry->map(
-						$returnType,
-						min(1, $targetType->range->minLength),
-						$targetType->range->maxLength,
-						$itemType
-					);
-					return $errorType ? $this->typeRegistry->result($t, $errorType) : $t;
-				}
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf(
-						"The parameter type %s of the callback function is not a subtype of %s",
-						$itemType,
-						$parameterType->parameterType
-					),
-					$origin
-				);
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				$origin
+			$r = $parameterType->returnType;
+			$errorType = $r instanceof ResultType ? $r->errorType : null;
+			$returnType = $r instanceof ResultType ? $r->returnType : $r;
+			$t = $this->typeRegistry->map(
+				$returnType,
+				min(1, $targetType->range->minLength),
+				$targetType->range->maxLength,
+				$itemType
 			);
+			return $errorType ? $this->typeRegistry->result($t, $errorType) : $t;
 		};
 	}
 

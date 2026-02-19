@@ -5,19 +5,24 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Bytes;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BytesType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BytesValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
 /** @extends NativeMethod<BytesType, ArrayType|TupleType, BytesValue, TupleValue> */
 final readonly class ConcatList extends NativeMethod {
 
+	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
+		return $parameterType->isSubtypeOf(
+			$this->typeRegistry->array($this->typeRegistry->bytes())
+		);
+	}
+
 	protected function getValidator(): callable {
-		return function(BytesType $targetType, ArrayType|TupleType $parameterType, mixed $origin): BytesType|ValidationFailure {
+		return function(BytesType $targetType, ArrayType|TupleType $parameterType): BytesType {
 			if ($parameterType instanceof TupleType) {
 				$parameterType = $parameterType->asArrayType();
 			}
@@ -31,14 +36,7 @@ final readonly class ConcatList extends NativeMethod {
 					$targetType->range->maxLength + $parameterType->range->maxLength * $itemType->range->maxLength,
 				);
 			}
-			if ($itemType->isSubtypeOf($this->typeRegistry->bytes())) {
-				return $this->typeRegistry->bytes();
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				$origin
-			);
+			return $this->typeRegistry->bytes();
 		};
 	}
 

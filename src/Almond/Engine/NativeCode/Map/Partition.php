@@ -15,30 +15,30 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNat
 /** @extends MapNativeMethod<Type, FunctionType, FunctionValue> */
 final readonly class Partition extends MapNativeMethod {
 
+	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
+		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
+			return false;
+		}
+		/** @var FunctionType $parameterType */
+		return $parameterType->returnType->isSubtypeOf($this->typeRegistry->boolean);
+	}
+
 	protected function getValidator(): callable {
-		return function(MapType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
-			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof FunctionType && $parameterType->returnType->isSubtypeOf($this->typeRegistry->boolean)) {
-				if ($targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
-					$partitionType = $this->typeRegistry->map($targetType->itemType, 0, $targetType->range->maxLength);
-					return $this->typeRegistry->record([
-						'matching' => $partitionType,
-						'notMatching' => $partitionType
-					], null);
-				}
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf(
-						"The parameter type %s of the callback function is not a subtype of %s",
-						$targetType->itemType,
-						$parameterType->parameterType
-					),
-					$origin
-				);
+		return function(MapType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
+			if ($targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
+				$partitionType = $this->typeRegistry->map($targetType->itemType, 0, $targetType->range->maxLength);
+				return $this->typeRegistry->record([
+					'matching' => $partitionType,
+					'notMatching' => $partitionType
+				], null);
 			}
 			return $this->validationFactory->error(
 				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+				sprintf(
+					"The parameter type %s of the callback function is not a subtype of %s",
+					$targetType->itemType,
+					$parameterType->parameterType
+				),
 				$origin
 			);
 		};

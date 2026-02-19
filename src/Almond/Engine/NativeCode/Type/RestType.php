@@ -35,7 +35,7 @@ final readonly class RestType extends TypeNativeMethod {
 		};
 	}
 
-	protected function isTargetRefTypeValid(Type $targetRefType, mixed $origin): bool {
+	protected function isTargetRefTypeValid(Type $targetRefType): bool {
 		return $targetRefType instanceof TupleType || $targetRefType instanceof RecordType ||
 			($targetRefType instanceof MetaType &&
 				(

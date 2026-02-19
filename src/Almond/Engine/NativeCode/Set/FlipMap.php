@@ -18,7 +18,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNat
 /** @extends SetNativeMethod<FunctionType, FunctionValue> */
 final readonly class FlipMap extends SetNativeMethod {
 
-	protected function isTargetItemTypeValid(Type $targetItemType, mixed $origin): bool {
+	protected function isTargetItemTypeValid(Type $targetItemType): bool {
 		return $targetItemType->isSubtypeOf($this->typeRegistry->string());
 	}
 

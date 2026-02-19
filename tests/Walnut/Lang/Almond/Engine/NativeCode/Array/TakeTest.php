@@ -96,7 +96,7 @@ final class TakeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testTakeNegativeNumber(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', "[1, 2, 3]->take(-1);");
+		$this->executeErrorCodeSnippet('Parameter type Integer[-1] is not a subtype Integer<0..>', "[1, 2, 3]->take(-1);");
 	}
 
 }

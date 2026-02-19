@@ -25,6 +25,15 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<Type, Type, Value> */
 final readonly class WithValues extends TypeNativeMethod {
 
+	protected function isTargetRefTypeValid(Type $targetRefType): bool {
+		$refType = $this->toBaseType($targetRefType);
+		return $refType instanceof IntegerType ||
+			$refType instanceof RealType ||
+			$refType instanceof StringType ||
+			$refType instanceof EnumerationType ||
+			($refType instanceof MetaType && $refType->value === MetaTypeValue::Enumeration);
+	}
+
 	protected function getValidator(): callable {
 		return function(TypeType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
 			$refType = $this->toBaseType($targetType->refType);
@@ -36,13 +45,11 @@ final readonly class WithValues extends TypeNativeMethod {
 						$this->typeRegistry->metaType(MetaTypeValue::IntegerSubset)
 					);
 				}
-				// @codeCoverageIgnoreStart
 				return $this->validationFactory->error(
 					ValidationErrorType::invalidParameterType,
-					sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+					sprintf("The parameter type %s is not a valid array of Integer values", $parameterType),
 					$origin
 				);
-				// @codeCoverageIgnoreEnd
 			}
 			if ($refType instanceof RealType) {
 				if ($parameterType->isSubtypeOf(
@@ -52,13 +59,11 @@ final readonly class WithValues extends TypeNativeMethod {
 						$this->typeRegistry->metaType(MetaTypeValue::RealSubset)
 					);
 				}
-				// @codeCoverageIgnoreStart
 				return $this->validationFactory->error(
 					ValidationErrorType::invalidParameterType,
-					sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+					sprintf("The parameter type %s is not a valid array of Real values", $parameterType),
 					$origin
 				);
-				// @codeCoverageIgnoreEnd
 			}
 			if ($refType instanceof StringType) {
 				if ($parameterType->isSubtypeOf(
@@ -68,13 +73,11 @@ final readonly class WithValues extends TypeNativeMethod {
 						$this->typeRegistry->metaType(MetaTypeValue::StringSubset)
 					);
 				}
-				// @codeCoverageIgnoreStart
 				return $this->validationFactory->error(
 					ValidationErrorType::invalidParameterType,
-					sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+					sprintf("The parameter type %s is not a valid array of String values", $parameterType),
 					$origin
 				);
-				// @codeCoverageIgnoreEnd
 			}
 			if ($refType instanceof EnumerationType) {
 				if ($parameterType->isSubtypeOf(
@@ -82,40 +85,28 @@ final readonly class WithValues extends TypeNativeMethod {
 				)) {
 					return $this->typeRegistry->type($refType);
 				}
-				// @codeCoverageIgnoreStart
 				return $this->validationFactory->error(
 					ValidationErrorType::invalidParameterType,
-					sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+					sprintf("The parameter type %s is not a valid array of %s values", $parameterType, $refType),
 					$origin
 				);
-				// @codeCoverageIgnoreEnd
 			}
-			if ($refType instanceof MetaType && $refType->value === MetaTypeValue::Enumeration) {
-				if ($parameterType->isSubtypeOf(
-					$this->typeRegistry->array($this->typeRegistry->any, 1)
-				)) {
-					return $this->typeRegistry->result(
-						$this->typeRegistry->type(
-							$this->typeRegistry->metaType(MetaTypeValue::EnumerationSubset)
-						),
-						$this->typeRegistry->core->unknownEnumerationValue
-					);
-				}
-				// @codeCoverageIgnoreStart
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-					$origin
+			/** @var MetaType $refType */
+			if ($parameterType->isSubtypeOf(
+				$this->typeRegistry->array($this->typeRegistry->any, 1)
+			)) {
+				return $this->typeRegistry->result(
+					$this->typeRegistry->type(
+						$this->typeRegistry->metaType(MetaTypeValue::EnumerationSubset)
+					),
+					$this->typeRegistry->core->unknownEnumerationValue
 				);
-				// @codeCoverageIgnoreEnd
 			}
-			// @codeCoverageIgnoreStart
 			return $this->validationFactory->error(
-				ValidationErrorType::invalidTargetType,
-				sprintf("[%s] Invalid target type: %s", __CLASS__, $targetType),
+				ValidationErrorType::invalidParameterType,
+				sprintf("The parameter type %s is not a valid array of values", $parameterType),
 				$origin
 			);
-			// @codeCoverageIgnoreEnd
 		};
 	}
 

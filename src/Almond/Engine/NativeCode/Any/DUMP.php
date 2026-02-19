@@ -26,7 +26,9 @@ final readonly class DUMP extends NativeMethod {
 				if (!$parameterType->isSubtypeOf($expectedParamType)) {
 					return $this->validationFactory->error(
 						ValidationErrorType::invalidParameterType,
-						sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
+						sprintf("The parameter type %s is not a subtype of the expected record type %s",
+							$parameterType, $expectedParamType
+						),
 						$origin
 					);
 				}

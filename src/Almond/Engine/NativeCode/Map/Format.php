@@ -21,7 +21,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<MapType|RecordType, StringType, RecordValue, StringValue> */
 final readonly class Format extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator, mixed $origin): bool|Type|ValidationFailure {
+	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type|ValidationFailure {
 		if (!($targetType instanceof MapType || $targetType instanceof RecordType)) {
 			return false;
 		}

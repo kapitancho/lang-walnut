@@ -7,7 +7,7 @@ use Walnut\Lang\Test\Almond\Engine\CodeExecutionTestHelper;
 final class MinTest extends CodeExecutionTestHelper {
 
 	public function testMinEmpty(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "[]->min;");
+		$this->executeErrorCodeSnippet('The array must have at least one item.', "[]->min;");
 	}
 
 	public function testMinNonEmpty(): void {
@@ -30,6 +30,7 @@ final class MinTest extends CodeExecutionTestHelper {
 	}
 
 	public function testMinInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "['hello','world', 'hi', 'hello']->min;");
+		$this->executeErrorCodeSnippet('The item type of the array must be a subtype of Real.',
+			"['hello','world', 'hi', 'hello']->min;");
 	}
 }

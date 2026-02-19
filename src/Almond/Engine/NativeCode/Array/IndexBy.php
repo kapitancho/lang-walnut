@@ -10,53 +10,22 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\ArrayGroupByIndexByBase;
 
-/** @extends ArrayNativeMethod<Type, FunctionType, FunctionValue> */
-final readonly class IndexBy extends ArrayNativeMethod {
+final readonly class IndexBy extends ArrayGroupByIndexByBase {
 
 	protected function getValidator(): callable {
-		return function(ArrayType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
-			$parameterType = $this->toBaseType($parameterType);
-			if ($parameterType instanceof FunctionType) {
-				$returnType = $this->toBaseType($parameterType->returnType);
-				if ($returnType->isSubtypeOf($this->typeRegistry->string())) {
-					if ($targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
-						$maxLength = $targetType->range->maxLength;
-						$minLength = (string)$targetType->range->minLength === '0' ||
-							($maxLength !== PlusInfinity::value && (string)$maxLength === '0') ? 0 : $targetType->range->minLength;
-						return $this->typeRegistry->map(
-							$targetType->itemType,
-							$minLength,
-							$maxLength,
-							$returnType
-						);
-					}
-					return $this->validationFactory->error(
-						ValidationErrorType::invalidParameterType,
-						sprintf(
-							"The parameter type %s of the callback function is not a subtype of %s",
-							$targetType->itemType,
-							$parameterType->parameterType
-						),
-						$origin
-					);
-				}
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf(
-						"The return type of the callback function must be a subtype of String, got %s",
-						$returnType
-					),
-					$origin
-				);
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterType),
-				$origin
+		return function(ArrayType $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
+			$returnType = $this->toBaseType($parameterType->returnType);
+			$maxLength = $targetType->range->maxLength;
+			$minLength = (string)$targetType->range->minLength === '0' ||
+				($maxLength !== PlusInfinity::value && (string)$maxLength === '0') ? 0 : $targetType->range->minLength;
+			return $this->typeRegistry->map(
+				$targetType->itemType,
+				$minLength,
+				$maxLength,
+				$returnType
 			);
 		};
 	}
