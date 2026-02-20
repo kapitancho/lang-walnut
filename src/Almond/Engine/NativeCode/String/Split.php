@@ -12,12 +12,13 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<StringType, StringType, StringValue, StringValue> */
 final readonly class Split extends NativeMethod {
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool|Type {
-		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
-			return false;
-		}
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		/** @var StringType $parameterType */
-		return $parameterType->range->minLength > 0;
+		return $parameterType->range->minLength > 0 ?
+			null : sprintf(
+				"Expected a subtype of String<1..>, but got %s",
+				$parameterType
+			);
 	}
 
 	protected function getValidator(): callable {

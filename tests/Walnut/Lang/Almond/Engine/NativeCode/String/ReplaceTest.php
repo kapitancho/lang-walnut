@@ -12,13 +12,13 @@ final class ReplaceTest extends CodeExecutionTestHelper {
 	}
 
 	public function testReplaceRegexp(): void {
-		$result = $this->executeCodeSnippet("'** hello **'->replace[match: RegExp('/\*+/'), replacement: '+'];");
+		$result = $this->executeCodeSnippet("'** hello **'->replace[match: '/\*+/'->asRegExp, replacement: '+'];");
 		$this->assertEquals("'+ hello +'", $result);
 	}
 
 	public function testReplaceInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet(
-			"Invalid parameter type: Integer[42]",
+			"The parameter type Integer[42] is not a valid replacement record [match: String|RegExp, replacement: String]",
 			"'** hello **'->replace(42);");
 	}
 

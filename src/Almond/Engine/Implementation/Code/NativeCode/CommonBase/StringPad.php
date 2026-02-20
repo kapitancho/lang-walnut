@@ -38,14 +38,12 @@ abstract readonly class StringPad extends NativeMethod {
 		};
 	}
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator): bool {
-		if (!parent::isParameterTypeValid($parameterType, $validator)) {
-			return false;
-		}
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		/** @var RecordType $parameterType */
 		$lengthType = $parameterType->typeOf('length');
-		$padStringType = $parameterType->typeOf('padString');
-		return $lengthType instanceof IntegerType && $padStringType instanceof StringType;
+		$padBytesType = $parameterType->typeOf('padString');
+		return $lengthType instanceof IntegerType && $padBytesType instanceof StringType ?
+			null : sprintf("Parameter type %s is not a subtype of [length: Integer, padString: String]", $parameterType);
 	}
 
 	protected function getExecutor(): callable {
@@ -54,7 +52,7 @@ abstract readonly class StringPad extends NativeMethod {
 			$length = $parameter->valueOf('length');
 			/** @var StringValue $padString */
 			$padString = $parameter->valueOf('padString');
-			$result = str_pad(
+			$result = mb_str_pad(
 				$target->literalValue,
 				(int)(string)$length->literalValue,
 				$padString->literalValue,

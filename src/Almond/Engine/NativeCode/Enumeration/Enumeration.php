@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\Enumeration;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EnumerationSubsetType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EnumerationType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MetaType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
@@ -17,6 +18,15 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<EnumerationSubsetType|MetaType, NullType, EnumerationValue, NullValue> */
 final readonly class Enumeration extends NativeMethod {
 
+	protected function validateTargetType(Type $targetType, mixed $origin): null|string {
+		return $targetType instanceof EnumerationSubsetType || $targetType instanceof EnumerationType ||
+		($targetType instanceof MetaType && $targetType->value === MetaTypeValue::Enumeration) ?
+			null : sprintf(
+				"Target type must be an Enumeration type, but got %s",
+				$targetType
+			);
+	}
+
 	protected function getValidator(): callable {
 		return function (EnumerationSubsetType|MetaType $targetType, NullType $parameterType): TypeType|ValidationFailure {
 			return $this->typeRegistry->type(
@@ -25,16 +35,6 @@ final readonly class Enumeration extends NativeMethod {
 					$targetType->enumeration
 			);
 		};
-	}
-
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool {
-		if (!parent::isTargetTypeValid($targetType, $validator)) {
-			return false;
-		}
-		if ($targetType instanceof MetaType && $targetType->value !== MetaTypeValue::Enumeration) {
-			return false;
-		}
-		return true;
 	}
 
 	protected function getExecutor(): callable {

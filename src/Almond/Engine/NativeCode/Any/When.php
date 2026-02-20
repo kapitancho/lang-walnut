@@ -20,46 +20,48 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\TupleAsRecord;
 final readonly class When extends NativeMethod {
 	use TupleAsRecord;
 
-	protected function getValidator(): callable {
-		return function(Type $targetType, RecordType $parameterType, mixed $origin): Type|ValidationFailure {
-			$targetReturnType = match(true) {
-				$targetType instanceof ResultType => $targetType->returnType,
-				default => $this->typeRegistry->any,
-			};
-			$errorType = match(true) {
-				$targetType instanceof ResultType => $targetType->errorType,
-				$targetType instanceof AnyType => $this->typeRegistry->any,
-				default => $this->typeRegistry->nothing,
-			};
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		$targetReturnType = match(true) {
+			$targetType instanceof ResultType => $targetType->returnType,
+			default => $this->typeRegistry->any,
+		};
+		$errorType = match(true) {
+			$targetType instanceof ResultType => $targetType->errorType,
+			$targetType instanceof AnyType => $this->typeRegistry->any,
+			default => $this->typeRegistry->nothing,
+		};
 
-			// Build the expected parameter type: [success: ^T => R1, error: ^E => R2]
-			$refType = $this->typeRegistry->record([
-				'success' => $this->typeRegistry->function(
-					$targetReturnType,
-					$this->typeRegistry->any
-				),
-				'error' => $this->typeRegistry->function(
-					$errorType,
-					$this->typeRegistry->any
-				)
-			], null);
+		// Build the expected parameter type: [success: ^T => R1, error: ^E => R2]
+		$refType = $this->typeRegistry->record([
+			'success' => $this->typeRegistry->function(
+				$targetReturnType,
+				$this->typeRegistry->any
+			),
+			'error' => $this->typeRegistry->function(
+				$errorType,
+				$this->typeRegistry->any
+			)
+		], null);
 
-			// Validate the parameter type and extract return types
-			$pType = $this->toBaseType($parameterType);
-			if ($pType->isSubtypeOf($refType)) {
-				$successType = $pType->types['success']->returnType;
-				$errorType = $pType->types['error']->returnType;
-
-				// Return type is the union of both callback return types
-				return $this->typeRegistry->union([$successType, $errorType]);
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("The parameter type %s is not a subtype of the expected record type %s with success and error callbacks",
-					$parameterType, $refType
-				),
-				$origin
+		// Validate the parameter type and extract return types
+		$pType = $this->toBaseType($parameterType);
+		return $pType->isSubtypeOf($refType) ?
+			null :
+			sprintf(
+				"The parameter type %s is not a subtype of the expected record type %s with success and error callbacks",
+				$parameterType, $refType
 			);
+	}
+
+	protected function getValidator(): callable {
+		return function(Type $targetType, RecordType $parameterType, mixed $origin): Type {
+			/** @var RecordType $pType */
+			$pType = $this->toBaseType($parameterType);
+			$successType = $pType->typeOf('success')->returnType;
+			$errorType = $pType->typeOf('error')->returnType;
+
+			// Return type is the union of both callback return types
+			return $this->typeRegistry->union([$successType, $errorType]);
 		};
 	}
 

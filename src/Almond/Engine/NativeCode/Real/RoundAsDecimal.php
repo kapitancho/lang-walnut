@@ -14,12 +14,14 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<IntegerType|RealType, IntegerType, IntegerValue|RealValue, IntegerValue> */
 final readonly class RoundAsDecimal extends NativeMethod {
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
-		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
-			return false;
-		}
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		/** @var IntegerType $parameterType */
-		return $parameterType->isSubtypeOf($this->typeRegistry->integer(0));
+		return $parameterType->isSubtypeOf($this->typeRegistry->integer(0)) ?
+			null :
+			sprintf(
+				"The parameter type should be a subtype of Integer<0..>, got %s.",
+				$parameterType
+			);
 	}
 
 	protected function getValidator(): callable {

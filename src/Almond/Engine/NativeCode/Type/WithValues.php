@@ -35,78 +35,81 @@ final readonly class WithValues extends TypeNativeMethod {
 				sprintf("Target ref type must be an Integer type, a Real type, a String type or an Enumeration type, got: %s", $targetRefType);
 	}
 
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		/** @var TypeType $targetType */
+		$refType = $this->toBaseType($targetType->refType);
+		if ($refType instanceof IntegerType) {
+			return $parameterType->isSubtypeOf(
+				$this->typeRegistry->array($this->typeRegistry->integer(), 1)
+			) ? null :
+				sprintf(
+					"The parameter type %s is not a valid array of Integer values",
+					$parameterType
+				);
+		}
+		if ($refType instanceof RealType) {
+			return $parameterType->isSubtypeOf(
+				$this->typeRegistry->array($this->typeRegistry->real(), 1)
+			) ? null :
+				sprintf(
+					"The parameter type %s is not a valid array of Real values",
+					$parameterType
+				);
+		}
+		if ($refType instanceof StringType) {
+			return $parameterType->isSubtypeOf(
+				$this->typeRegistry->array($this->typeRegistry->string(), 1)
+			) ? null :
+				sprintf(
+					"The parameter type %s is not a valid array of String values",
+					$parameterType
+				);
+		}
+		if ($refType instanceof EnumerationType) {
+			return $parameterType->isSubtypeOf(
+				$this->typeRegistry->array($refType, 1)
+			) ? null :
+				sprintf(
+					"The parameter type %s is not a valid array of %s values",
+					$parameterType, $refType
+				);
+		}
+		/** @var MetaType $refType */
+		return $parameterType->isSubtypeOf(
+			$this->typeRegistry->array($this->typeRegistry->any, 1)
+		) ? null :
+			sprintf(
+				"The parameter type %s is not a valid array of values",
+				$parameterType
+			);
+	}
+
 	protected function getValidator(): callable {
-		return function(TypeType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
+		return function(TypeType $targetType, Type $parameterType, mixed $origin): Type {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof IntegerType) {
-				if ($parameterType->isSubtypeOf(
-					$this->typeRegistry->array($this->typeRegistry->integer(), 1)
-				)) {
-					return $this->typeRegistry->type(
-						$this->typeRegistry->metaType(MetaTypeValue::IntegerSubset)
-					);
-				}
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf("The parameter type %s is not a valid array of Integer values", $parameterType),
-					$origin
+				return $this->typeRegistry->type(
+					$this->typeRegistry->metaType(MetaTypeValue::IntegerSubset)
 				);
 			}
 			if ($refType instanceof RealType) {
-				if ($parameterType->isSubtypeOf(
-					$this->typeRegistry->array($this->typeRegistry->real(), 1)
-				)) {
-					return $this->typeRegistry->type(
-						$this->typeRegistry->metaType(MetaTypeValue::RealSubset)
-					);
-				}
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf("The parameter type %s is not a valid array of Real values", $parameterType),
-					$origin
+				return $this->typeRegistry->type(
+					$this->typeRegistry->metaType(MetaTypeValue::RealSubset)
 				);
 			}
 			if ($refType instanceof StringType) {
-				if ($parameterType->isSubtypeOf(
-					$this->typeRegistry->array($this->typeRegistry->string(), 1)
-				)) {
-					return $this->typeRegistry->type(
-						$this->typeRegistry->metaType(MetaTypeValue::StringSubset)
-					);
-				}
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf("The parameter type %s is not a valid array of String values", $parameterType),
-					$origin
+				return $this->typeRegistry->type(
+					$this->typeRegistry->metaType(MetaTypeValue::StringSubset)
 				);
 			}
 			if ($refType instanceof EnumerationType) {
-				if ($parameterType->isSubtypeOf(
-					$this->typeRegistry->array($refType, 1)
-				)) {
-					return $this->typeRegistry->type($refType);
-				}
-				return $this->validationFactory->error(
-					ValidationErrorType::invalidParameterType,
-					sprintf("The parameter type %s is not a valid array of %s values", $parameterType, $refType),
-					$origin
-				);
+				return $this->typeRegistry->type($refType);
 			}
-			/** @var MetaType $refType */
-			if ($parameterType->isSubtypeOf(
-				$this->typeRegistry->array($this->typeRegistry->any, 1)
-			)) {
-				return $this->typeRegistry->result(
-					$this->typeRegistry->type(
-						$this->typeRegistry->metaType(MetaTypeValue::EnumerationSubset)
-					),
-					$this->typeRegistry->core->unknownEnumerationValue
-				);
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf("The parameter type %s is not a valid array of values", $parameterType),
-				$origin
+			return $this->typeRegistry->result(
+				$this->typeRegistry->type(
+					$this->typeRegistry->metaType(MetaTypeValue::EnumerationSubset)
+				),
+				$this->typeRegistry->core->unknownEnumerationValue
 			);
 		};
 	}

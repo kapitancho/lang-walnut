@@ -5,6 +5,7 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\String;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\UnionType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
@@ -18,7 +19,7 @@ final readonly class MatchAgainstPattern extends NativeMethod {
 	private const string REPLACE_PATTERN = '(.+?)';
 
 	protected function getValidator(): callable {
-		return function(StringType $targetType, StringType $parameterType): UnionType {
+		return function(StringType $targetType, StringType $parameterType): Type {
 			$maxLength = PlusInfinity::value;
 			$keyType = $this->typeRegistry->string();
 			if ($parameterType instanceof StringSubsetType) {
@@ -58,7 +59,7 @@ final readonly class MatchAgainstPattern extends NativeMethod {
 				$pathArgs = null;
 				$path = '^' . $path . '$';
 			}
-			$path = strtolower($path);
+			$path = mb_strtolower($path);
 			if (!preg_match('#' . $path . '#', $target->literalValue, $matches)) {
 				return $this->valueRegistry->false;
 			}

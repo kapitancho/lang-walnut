@@ -4,6 +4,7 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn;
 
 use JsonSerializable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType as ArrayTypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType as TupleTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\SupertypeChecker;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue;
@@ -68,6 +69,8 @@ final readonly class ArrayType implements ArrayTypeInterface, JsonSerializable {
 
     public function isSubtypeOf(Type $ofType): bool {
         return match(true) {
+			$ofType instanceof TupleTypeInterface =>
+				$this->isSubtypeOfTupleType($ofType),
             $ofType instanceof ArrayTypeInterface =>
                 $this->itemType->isSubtypeOf($ofType->itemType) &&
                 $this->range->isSubRangeOf($ofType->range),
@@ -76,6 +79,25 @@ final readonly class ArrayType implements ArrayTypeInterface, JsonSerializable {
             default => false
         };
     }
+
+	private function isSubtypeOfTupleType(TupleTypeInterface $ofType): bool {
+		$isClosed = $ofType->restType instanceof NothingType;
+		if ($this->range->minLength < count($ofType->types)) {
+			return false;
+		}
+		if ($isClosed && ($this->range->maxLength === PlusInfinity::value || $this->range->maxLength > count($ofType->types))) {
+			return false;
+		}
+		foreach($ofType->types as $type) {
+			if (!$this->itemType->isSubtypeOf($type)) {
+				return false;
+			}
+		}
+		if (!$isClosed && !$this->itemType->isSubtypeOf($ofType->restType)) {
+			return false;
+		}
+		return true;
+	}
 
 	public function __toString(): string {
 		$itemType = $this->itemType;

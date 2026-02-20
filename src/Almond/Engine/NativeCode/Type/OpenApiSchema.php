@@ -144,6 +144,26 @@ final readonly class OpenApiSchema extends TypeNativeMethod {
 					)
 				)
 			]),
+			$type instanceof RecordType => $this->valueRegistry->record([
+				... [
+					'type' => $this->valueRegistry->string('object'),
+					'properties' => $this->valueRegistry->record(
+						array_map(
+							fn(Type $type) => $this->typeToOpenApiSchema($type instanceof OptionalKeyType ? $type->valueType : $type),
+							$type->types
+						)
+					)
+				],
+				... (count($requiredFields = array_keys(
+					array_filter($type->types, static fn(Type $type): bool => !($type instanceof OptionalKeyType))
+				)) > 0 ? ['required' => $this->valueRegistry->tuple(
+					array_map(
+						fn(string $requiredField): StringValue => $this->valueRegistry->string($requiredField),
+						$requiredFields
+					)
+				)] : []),
+				... ($type->restType instanceof NothingType ? [] : ['additionalProperties' => $this->typeToOpenApiSchema($type->restType)])
+			]),
 			$type instanceof ArrayType => $this->valueRegistry->record([
 				... [
 					'type' => $this->valueRegistry->string('array'),
@@ -168,27 +188,6 @@ final readonly class OpenApiSchema extends TypeNativeMethod {
 				],
 				... (($min = $type->range->minLength) > 0 ? ['minProperties' => $this->valueRegistry->integer($min)] : []),
 				... (($max = $type->range->maxLength) !== PlusInfinity::value ? ['maxProperties' => $this->valueRegistry->integer($max)] : []),
-			]),
-			$type instanceof TupleType => $this->typeToOpenApiSchema($type->asArrayType()),
-			$type instanceof RecordType => $this->valueRegistry->record([
-				... [
-					'type' => $this->valueRegistry->string('object'),
-					'properties' => $this->valueRegistry->record(
-						array_map(
-							fn(Type $type) => $this->typeToOpenApiSchema($type instanceof OptionalKeyType ? $type->valueType : $type),
-							$type->types
-						)
-					)
-				],
-				... (count($requiredFields = array_keys(
-					array_filter($type->types, static fn(Type $type): bool => !($type instanceof OptionalKeyType))
-				)) > 0 ? ['required' => $this->valueRegistry->tuple(
-					array_map(
-						fn(string $requiredField): StringValue => $this->valueRegistry->string($requiredField),
-						$requiredFields
-					)
-				)] : []),
-				... ($type->restType instanceof NothingType ? [] : ['additionalProperties' => $this->typeToOpenApiSchema($type->restType)])
 			]),
 			$type instanceof MutableType => $this->typeToOpenApiSchema($type->valueType),
 			default => $this->valueRegistry->null

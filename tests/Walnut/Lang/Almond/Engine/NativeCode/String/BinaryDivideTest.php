@@ -56,7 +56,7 @@ final class BinaryDivideTest extends CodeExecutionTestHelper {
 	}
 
 	public function testBinaryDivideInvalidParameterTypeRange(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', "'hello' / -3;");
+		$this->executeErrorCodeSnippet('Expected a subtype of Integer<1..>, but got Integer[-3]', "'hello' / -3;");
 	}
 
 }

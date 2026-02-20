@@ -14,13 +14,14 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<StringType, IntegerType, StringValue, IntegerValue> */
 final readonly class BinaryMultiply extends NativeMethod {
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool|Type {
-		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
-			return false;
-		}
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		/** @var IntegerType $parameterType */
 		$minValue = $parameterType->numberRange->min;
-		return $minValue !== MinusInfinity::value && $minValue->value >= 0;
+		return $minValue !== MinusInfinity::value && $minValue->value >= 0 ?
+			null : sprintf(
+				"The parameter type %s is not a subtype of Integer<0..>",
+				$parameterType
+			);
 	}
 
 	protected function getValidator(): callable {

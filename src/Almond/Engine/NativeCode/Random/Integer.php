@@ -19,14 +19,15 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<AtomType, RecordType, AtomValue, RecordValue> */
 final readonly class Integer extends NativeMethod {
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
-		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
-			return false;
-		}
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		/** @var RecordType $parameterType */
 		$fromType = $parameterType->types['min'] ?? null;
 		$toType = $parameterType->types['max'] ?? null;
-		return ($fromType instanceof IntegerType) && ($toType instanceof IntegerType);
+		return ($fromType instanceof IntegerType) && ($toType instanceof IntegerType) ?
+			null : sprintf(
+				"Expected a parameter type [min: Integer, max: Integer], but got %s",
+				$parameterType
+			);
 	}
 
 	protected function getValidator(): callable {

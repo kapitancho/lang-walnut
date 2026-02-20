@@ -17,14 +17,13 @@ final readonly class UnaryBitwiseNot extends NativeMethod {
 		return (~$x) & 0x7FFFFFFFFFFFFFFF;
 	}
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool {
-		if (!parent::isTargetTypeValid($targetType, $validator)) {
-			return false;
-		}
-		/** @var IntegerType $targetType */
-		return $targetType->numberRange->min instanceof NumberIntervalEndpoint &&
-			$targetType->numberRange->min->value >= 0 &&
-			$targetType->numberRange->min->value <= PHP_INT_MAX;
+	protected function validateTargetType(Type $targetType, mixed $origin): null|string {
+		return $targetType instanceof IntegerType &&
+		$targetType->numberRange->min instanceof NumberIntervalEndpoint &&
+		$targetType->numberRange->min->value >= 0 &&
+		$targetType->numberRange->min->value <= PHP_INT_MAX ?
+			null :
+			"Target type of binary bitwise and must be an integer with a minimum value between 0 and " . PHP_INT_MAX . ".";
 	}
 
 	protected function getValidator(): callable {

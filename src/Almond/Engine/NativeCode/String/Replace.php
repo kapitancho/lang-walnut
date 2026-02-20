@@ -17,6 +17,21 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<StringType, Type, StringValue, Value> */
 final readonly class Replace extends NativeMethod {
 
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		return $parameterType->isSubtypeOf(
+			$this->typeRegistry->record([
+				'match' => $this->typeRegistry->union([
+					$this->typeRegistry->string(),
+					$this->typeRegistry->core->regExp
+				]),
+				'replacement' => $this->typeRegistry->string()
+			], null)
+		) ? null : sprintf(
+			"The parameter type %s is not a valid replacement record [match: String|RegExp, replacement: String]",
+			$parameterType
+		);
+	}
+
 	protected function getValidator(): callable {
 		return function(StringType $targetType, Type $parameterType, mixed $origin): StringType|ValidationFailure {
 			if ($parameterType->isSubtypeOf(

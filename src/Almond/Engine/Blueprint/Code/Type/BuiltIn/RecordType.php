@@ -5,7 +5,7 @@ namespace Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\UnknownProperty;
 
-interface RecordType extends Type {
+interface RecordType extends MapType {
 	/**
       * @param array<string, Type> $types
       */

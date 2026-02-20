@@ -12,7 +12,7 @@ final class ConcatListTest extends CodeExecutionTestHelper {
 	}
 
 	public function testConcatListInvalidArrayParameter(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', "'hello'->concatList[15, 'World'];");
+		$this->executeErrorCodeSnippet("Expected an Array<String> as parameter type, got [Integer[15], String['World']]", "'hello'->concatList[15, 'World'];");
 	}
 
 	public function testConcatListInvalidParameter(): void {

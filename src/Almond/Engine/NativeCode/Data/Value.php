@@ -15,6 +15,16 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<DataType|MetaType, NullType, DataValue, NullValue> */
 final readonly class Value extends NativeMethod {
 
+	protected function validateTargetType(Type $targetType, mixed $origin): null|string {
+		return $targetType instanceof DataType ||
+			($targetType instanceof MetaType && $targetType->value === MetaTypeValue::Data) ?
+			null :
+			sprintf(
+				"Target type must be a Data type, got %s",
+				$targetType
+			);
+	}
+
 	protected function getValidator(): callable {
 		return function(DataType|MetaType $targetType, NullType $parameterType): Type {
 			if ($targetType instanceof DataType) {
@@ -22,13 +32,6 @@ final readonly class Value extends NativeMethod {
 			}
 			return $this->typeRegistry->any;
 		};
-	}
-
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type {
-		if ($targetType instanceof MetaType && $targetType->value === MetaTypeValue::Data) {
-			return true;
-		}
-		return parent::isTargetTypeValid($targetType, $validator);
 	}
 
 	protected function getExecutor(): callable {

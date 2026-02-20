@@ -4,9 +4,11 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn;
 
 use JsonSerializable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType as MapTypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType as RecordTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\SupertypeChecker;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\LengthRange;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
@@ -91,6 +93,8 @@ final readonly class MapType implements MapTypeInterface, JsonSerializable {
 
 	public function isSubtypeOf(Type $ofType): bool {
         return match(true) {
+			$ofType instanceof RecordTypeInterface =>
+				$this->isSubtypeOfRecordType($ofType),
             $ofType instanceof MapTypeInterface =>
                 $this->itemType->isSubtypeOf($ofType->itemType) &&
                 $this->keyType->isSubtypeOf($ofType->keyType) &&
@@ -100,6 +104,33 @@ final readonly class MapType implements MapTypeInterface, JsonSerializable {
             default => false
         };
     }
+
+	private function isSubtypeOfRecordType(RecordTypeInterface $ofType): bool {
+		$isClosed = $ofType->restType instanceof NothingType;
+
+		$nonOptional = count(array_filter(
+			$ofType->types,
+			static fn(Type $type) => !($type instanceof OptionalKeyType)
+		));
+		if ($this->range->minLength < $nonOptional) {
+			return false;
+		}
+		if ($isClosed && ($this->range->maxLength === PlusInfinity::value || $this->range->maxLength > count($ofType->types))) {
+			return false;
+		}
+		if ($isClosed && !$this->keyType->isSubtypeOf($ofType->keyType)) {
+			return false;
+		}
+		foreach($ofType->types as $type) {
+			if (!$this->itemType->isSubtypeOf($type)) {
+				return false;
+			}
+		}
+		if (!$isClosed && !$this->itemType->isSubtypeOf($ofType->restType)) {
+			return false;
+		}
+		return true;
+	}
 
 	public function __toString(): string {
 		$itemType = $this->itemType;

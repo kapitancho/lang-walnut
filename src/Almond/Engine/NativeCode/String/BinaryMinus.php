@@ -14,10 +14,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<StringType, Type, StringValue, Value> */
 final readonly class BinaryMinus extends NativeMethod {
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool|Type {
-		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
-			return false;
-		}
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		return $parameterType->isSubtypeOf(
 			$this->typeRegistry->union([
 				$this->typeRegistry->string(1),
@@ -28,6 +25,9 @@ final readonly class BinaryMinus extends NativeMethod {
 					$this->typeRegistry->string(1)
 				)
 			])
+		) ? null : sprintf(
+			"The parameter type %s is not a valid type for String subtraction. Expected String<1..>, Array<String<1..>> or Set<String<1..>>.",
+			$parameterType
 		);
 	}
 

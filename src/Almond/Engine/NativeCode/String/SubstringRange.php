@@ -16,15 +16,16 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<StringType, Type, StringValue, Value> */
 final readonly class SubstringRange extends NativeMethod {
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool|Type {
-		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
-			return false;
-		}
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		$pInt = $this->typeRegistry->integer(0);
 		return $parameterType->isSubtypeOf($this->typeRegistry->record([
 			"start" => $pInt,
 			"end" => $pInt
-		], null));
+		], null)) ?
+			null : sprintf(
+				"Expected parameter type to be [start: Integer<0..>, end: Integer<0..>], got %s.",
+				$parameterType
+			);
 	}
 
 	protected function getValidator(): callable {

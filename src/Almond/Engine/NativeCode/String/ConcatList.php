@@ -15,13 +15,14 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<StringType, ArrayType|TupleType, StringValue, TupleValue> */
 final readonly class ConcatList extends NativeMethod {
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool|Type {
-		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
-			return false;
-		}
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		$arrayType = $parameterType instanceof TupleType ? $parameterType->asArrayType() : $parameterType;
 		/** @var ArrayType $arrayType */
-		return $this->toBaseType($arrayType->itemType) instanceof StringType;
+		return $this->toBaseType($arrayType->itemType) instanceof StringType ?
+			null : sprintf(
+				"Expected an Array<String> as parameter type, got %s",
+				$parameterType
+			);
 	}
 
 	protected function getValidator(): callable {

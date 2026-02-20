@@ -11,21 +11,22 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<IntegerType, IntegerType, IntegerValue, IntegerValue> */
 final readonly class BinaryBitwiseAnd extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool {
+	protected function validateTargetType(Type $targetType, mixed $origin): null|string {
 		return $targetType instanceof IntegerType &&
 			$targetType->numberRange->min instanceof NumberIntervalEndpoint &&
 			$targetType->numberRange->min->value >= 0 &&
-			$targetType->numberRange->min->value <= PHP_INT_MAX;
+			$targetType->numberRange->min->value <= PHP_INT_MAX ?
+				null :
+				"Target type of binary bitwise and must be an integer with a minimum value between 0 and " . PHP_INT_MAX . ".";
 	}
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
-		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
-			return false;
-		}
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		/** @var IntegerType $parameterType */
 		return $parameterType->numberRange->min instanceof NumberIntervalEndpoint &&
 			$parameterType->numberRange->min->value >= 0 &&
-			$parameterType->numberRange->min->value <= PHP_INT_MAX;
+			$parameterType->numberRange->min->value <= PHP_INT_MAX ?
+				null :
+				"Parameter type of binary bitwise and must be an integer with a minimum value between 0 and " . PHP_INT_MAX . ".";
 	}
 
 	protected function getValidator(): callable {

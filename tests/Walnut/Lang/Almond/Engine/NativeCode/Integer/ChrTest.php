@@ -12,11 +12,11 @@ final class ChrTest extends CodeExecutionTestHelper {
 	}
 
 	public function testChrInvalidTargetNegative(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', '-10->chr;');
+		$this->executeErrorCodeSnippet("The 'chr' method requires the target to be an integer in the range 0..255, but Integer[-10] was given.", '-10->chr;');
 	}
 
 	public function testChrInvalidTargetLarge(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', '23410->chr;');
+		$this->executeErrorCodeSnippet("The 'chr' method requires the target to be an integer in the range 0..255, but Integer[23410] was given.", '23410->chr;');
 	}
 
 	public function testChrInvalidParameter(): void {

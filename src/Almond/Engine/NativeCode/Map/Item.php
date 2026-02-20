@@ -18,11 +18,15 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<MapType|RecordType, Type, RecordValue, Value> */
 final readonly class Item extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|Type {
+	protected function validateTargetType(Type $targetType, mixed $origin): null|string {
 		return $targetType instanceof IntersectionType ||
 			$targetType instanceof RecordType ||
 			$targetType instanceof MapType || (
 				$targetType instanceof MetaType && $targetType->value === MetaTypeValue::Record
+			) ? null :
+			sprintf(
+				"Target type must be a Map, Record or an Intersection type, but got %s",
+				$targetType
 			);
 	}
 

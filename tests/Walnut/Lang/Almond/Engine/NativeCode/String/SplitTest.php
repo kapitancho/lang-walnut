@@ -18,7 +18,7 @@ final class SplitTest extends CodeExecutionTestHelper {
 
 	public function testSplitEmptyString(): void {
 		$this->executeErrorCodeSnippet(
-			"Invalid parameter type: String['']",
+			"Expected a subtype of String<1..>, but got String['']",
 			"'hello'->split('');");
 	}
 

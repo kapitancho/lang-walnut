@@ -21,10 +21,15 @@ final readonly class Digits extends NativeMethod {
 		return new Number(strlen((string)$bound));
 	}
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool {
+	protected function validateTargetType(Type $targetType, mixed $origin): null|string {
 		return $targetType instanceof IntegerType &&
 			$targetType->numberRange->min !== MinusInfinity::value &&
-			$targetType->numberRange->min->value >= '0';
+			$targetType->numberRange->min->value >= '0' ?
+				null :
+				sprintf(
+				"The 'digits' method requires the target to be an integer with a minimum value of 0, but %s was given.",
+				$targetType
+			);
 	}
 
 	protected function getValidator(): callable {

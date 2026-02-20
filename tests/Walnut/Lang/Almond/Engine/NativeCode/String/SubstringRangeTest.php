@@ -16,7 +16,7 @@ final class SubstringRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testSubstringRangeInvalidParameterKeys(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', "'hello'->substringRange[length: 10];");
+		$this->executeErrorCodeSnippet('Expected parameter type to be [start: Integer<0..>, end: Integer<0..>], got [length: Integer[10]].', "'hello'->substringRange[length: 10];");
 	}
 
 }

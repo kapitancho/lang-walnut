@@ -18,7 +18,7 @@ final class IntegerTest extends CodeExecutionTestHelper {
 	}
 
 	public function testIntegerInvalidParameterValue(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', "Random->integer[min: 7];");
+		$this->executeErrorCodeSnippet('Expected a parameter type [min: Integer, max: Integer], but got [min: Integer[7]]', "Random->integer[min: 7];");
 	}
 
 	public function testIntegerInvalidParameterType(): void {

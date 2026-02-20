@@ -14,15 +14,15 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\Value\ValueConverter;
 /** @extends NativeMethod<StringType, Type, StringValue, Value> */
 final readonly class BinaryPlus extends NativeMethod {
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool|Type {
-		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
-			return false;
-		}
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		return $parameterType instanceof StringType ||
 			$parameterType->isSubtypeOf(
 				$this->typeRegistry->shape(
 					$this->typeRegistry->string()
 				)
+			) ? null : sprintf(
+				"The parameter type %s is not a subtype of String or a Shape<String>",
+				$parameterType
 			);
 	}
 

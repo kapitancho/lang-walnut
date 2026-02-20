@@ -26,6 +26,13 @@ final class RoundAsDecimalTest extends CodeExecutionTestHelper {
 		$this->assertEquals("-3.8", $result);
 	}
 
+	public function testRoundAsDecimalInvalidParameterTypeInteger(): void {
+		$this->executeErrorCodeSnippet(
+			"The parameter type should be a subtype of Integer<0..>, got Integer[-2].",
+			"-3.77->roundAsDecimal(-2);"
+		);
+	}
+
 	public function testRoundAsDecimalInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet(
 			"Invalid parameter type: String['hello']",

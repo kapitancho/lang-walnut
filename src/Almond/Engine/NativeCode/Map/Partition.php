@@ -14,22 +14,11 @@ final readonly class Partition extends MapFilterBase {
 
 	protected function getValidator(): callable {
 		return function(MapType $targetType, FunctionType $parameterType, mixed $origin): Type {
-			if ($targetType->itemType->isSubtypeOf($parameterType->parameterType)) {
-				$partitionType = $this->typeRegistry->map($targetType->itemType, 0, $targetType->range->maxLength);
-				return $this->typeRegistry->record([
-					'matching' => $partitionType,
-					'notMatching' => $partitionType
-				], null);
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf(
-					"The parameter type %s of the callback function is not a subtype of %s",
-					$targetType->itemType,
-					$parameterType->parameterType
-				),
-				$origin
-			);
+			$partitionType = $this->typeRegistry->map($targetType->itemType, 0, $targetType->range->maxLength);
+			return $this->typeRegistry->record([
+				'matching' => $partitionType,
+				'notMatching' => $partitionType
+			], null);
 		};
 	}
 

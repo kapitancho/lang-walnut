@@ -317,6 +317,7 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 	): MapType {
 		if ($maxLength === 0 || ($maxLength instanceof Number && (string)$maxLength === '0')) {
 			$itemType = $this->nothing;
+			$keyType = $this->nothing;
 		}
 		$str = $this->string();
 		return new MapType(

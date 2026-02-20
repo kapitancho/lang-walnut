@@ -15,11 +15,16 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<IntegerType, NullType, IntegerValue, NullValue> */
 final readonly class Chr extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool {
+	protected function validateTargetType(Type $targetType, mixed $origin): null|string {
 		return $targetType instanceof IntegerType &&
 			$targetType->numberRange->min instanceof NumberIntervalEndpoint &&
 			$targetType->numberRange->min->value >= 0 &&
-			$targetType->numberRange->min->value <= 255;
+			$targetType->numberRange->min->value <= 255 ?
+				null :
+				sprintf(
+					"The 'chr' method requires the target to be an integer in the range 0..255, but %s was given.",
+					$targetType
+				);
 	}
 
 	protected function getValidator(): callable {

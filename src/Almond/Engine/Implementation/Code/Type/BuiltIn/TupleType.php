@@ -12,6 +12,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\UnknownProperty as UnknownPropertyInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\LengthRange;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\Hydrator\HydrationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\Hydrator\HydrationRequest;
@@ -20,15 +21,20 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationRequest;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResult;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\UnknownProperty;
 
-final readonly class TupleType implements TupleTypeInterface, JsonSerializable {
+final class TupleType implements TupleTypeInterface, JsonSerializable {
 
 	/**  @param list<Type> $types */
 	public function __construct(
-		private TypeRegistry $typeRegistry,
+		private readonly TypeRegistry $typeRegistry,
 
 		public array         $types,
 		public Type          $restType
 	) {}
+
+	public Type $itemType { get => $this->arrayType->itemType; }
+	public LengthRange $range { get => $this->arrayType->range; }
+
+	public ArrayTypeInterface $arrayType { get => $this->arrayType ??= $this->asArrayType(); }
 
 	public function asArrayType(): ArrayTypeInterface {
 		$l = count($this->types);

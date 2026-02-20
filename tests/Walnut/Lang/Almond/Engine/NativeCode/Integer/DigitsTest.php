@@ -67,7 +67,7 @@ final class DigitsTest extends CodeExecutionTestHelper {
 
 	public function testDigitsInvalidTargetType(): void {
 		$this->executeErrorCodeSnippet(
-			"Invalid target type: Integer<-50..50>",
+			"The 'digits' method requires the target to be an integer with a minimum value of 0, but Integer<-50..50> was given.",
 			"digitsFn(5);",
 			valueDeclarations: "digitsFn = ^v: Integer<-50..50> => Any :: v->digits;"
 		);

@@ -29,7 +29,7 @@ final class PadRightTest extends CodeExecutionTestHelper {
 	}
 
 	public function testPadRightInvalidParameterKeys(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', "'hello'->padRight[length: 10];");
+		$this->executeErrorCodeSnippet('Parameter type [length: Integer[10]] is not a subtype of [length: Integer, padString: String]', "'hello'->padRight[length: 10];");
 	}
 
 }

@@ -13,8 +13,12 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<StringType, Type, StringValue, Value> */
 final readonly class Concat extends NativeMethod {
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool|Type {
-		return $parameterType->isSubtypeOf($this->typeRegistry->string());
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		return $parameterType->isSubtypeOf($this->typeRegistry->string()) ?
+			null : sprintf(
+				"The parameter type %s is not a subtype of String",
+				$parameterType
+			);
 	}
 
 	protected function getValidator(): callable {

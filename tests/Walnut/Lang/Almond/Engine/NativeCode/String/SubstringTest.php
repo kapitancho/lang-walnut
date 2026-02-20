@@ -16,7 +16,7 @@ final class SubstringTest extends CodeExecutionTestHelper {
 	}
 
 	public function testSubstringInvalidParameterKeys(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', "'hello'->substring[length: 10];");
+		$this->executeErrorCodeSnippet('Expected parameter type to be [start: Integer<0..>, length: Integer<0..>], got [length: Integer[10]].', "'hello'->substring[length: 10];");
 	}
 
 }

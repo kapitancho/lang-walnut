@@ -15,25 +15,23 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\TupleAsRecord;
 final readonly class Apply extends NativeMethod {
 	use TupleAsRecord;
 
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		$p = $parameterType->parameterType;
+		$adjustedTargetType = $this->adjustParameterType(
+			$this->typeRegistry,
+			$p,
+			$targetType,
+		);
+		return $adjustedTargetType->isSubtypeOf($p) ?
+			null :
+			sprintf(
+				"The target type %s is not a subtype of the function parameter type %s",
+				$targetType, $p
+			);
+	}
+
 	protected function getValidator(): callable {
-		return function(Type $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
-			$p = $parameterType->parameterType;
-			$adjustedTargetType = $this->adjustParameterType(
-				$this->typeRegistry,
-				$p,
-				$targetType,
-			);
-			if ($adjustedTargetType->isSubtypeOf($p)) {
-				return $parameterType->returnType;
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidTargetType,
-				sprintf("The target type %s is not a subtype of the function parameter type %s",
-					$targetType, $p
-				),
-				$origin
-			);
-		};
+		return fn(Type $targetType, FunctionType $parameterType, mixed $origin): Type => $parameterType->returnType;
 	}
 
 	protected function getExecutor(): callable {

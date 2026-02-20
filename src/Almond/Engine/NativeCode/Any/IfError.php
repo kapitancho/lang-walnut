@@ -18,32 +18,29 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\TupleAsRecord;
 final readonly class IfError extends NativeMethod {
 	use TupleAsRecord;
 
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		/** @var FunctionType $parameterType */
+		$errorType = match(true) {
+			$targetType instanceof ResultType => $targetType->errorType,
+			$targetType instanceof AnyType => $this->typeRegistry->any,
+			default => $this->typeRegistry->nothing,
+		};
+		return $errorType->isSubtypeOf($parameterType->parameterType) ? null :
+			sprintf(
+				"The parameter type %s of the callback function is not a subtype of %s",
+				$errorType,
+				$parameterType->parameterType
+			);
+	}
+
 	protected function getValidator(): callable {
 		return function(Type $targetType, FunctionType $parameterType, mixed $origin): Type|ValidationFailure {
 			$targetReturnType = match(true) {
 				$targetType instanceof ResultType => $targetType->returnType,
 				default => $this->typeRegistry->any,
 			};
-			$errorType = match(true) {
-				$targetType instanceof ResultType => $targetType->errorType,
-				$targetType instanceof AnyType => $this->typeRegistry->any,
-				default => $this->typeRegistry->nothing,
-			};
-			// Callback should accept the error type
-			if ($errorType->isSubtypeOf($parameterType->parameterType)) {
-				// Return type is union of success type and callback return type
-				$returnType = $parameterType->returnType;
-				return $this->typeRegistry->union([$targetReturnType, $returnType]);
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidTargetType,
-				sprintf(
-					"The parameter type %s of the callback function is not a subtype of %s",
-					$errorType,
-					$parameterType->parameterType
-				),
-				$origin
-			);
+			$returnType = $parameterType->returnType;
+			return $this->typeRegistry->union([$targetReturnType, $returnType]);
 		};
 	}
 

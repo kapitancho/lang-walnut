@@ -50,19 +50,19 @@ final class BinaryMinusTest extends CodeExecutionTestHelper {
 	}
 
 	public function testBinaryMinusInvalidParameterStringType(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', "'hello ' - '';");
+		$this->executeErrorCodeSnippet("The parameter type String[''] is not a valid type for String subtraction. Expected String<1..>, Array<String<1..>> or Set<String<1..>>.", "'hello ' - '';");
 	}
 
 	public function testBinaryMinusInvalidParameterArrayType(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', "'hello ' - ['x', 12, 'w'];");
+		$this->executeErrorCodeSnippet("The parameter type [String['x'], Integer[12], String['w']] is not a valid type for String subtraction. Expected String<1..>, Array<String<1..>> or Set<String<1..>>.", "'hello ' - ['x', 12, 'w'];");
 	}
 
 	public function testBinaryMinusInvalidParameterSetType(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', "'hello ' - ['x'; 12; 'w'];");
+		$this->executeErrorCodeSnippet("The parameter type Set<(Integer[12]|String['x', 'w']), 3> is not a valid type for String subtraction. Expected String<1..>, Array<String<1..>> or Set<String<1..>>.", "'hello ' - ['x'; 12; 'w'];");
 	}
 
 	public function testBinaryMinusInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', "'hello ' - false;");
+		$this->executeErrorCodeSnippet('The parameter type False is not a valid type for String subtraction. Expected String<1..>, Array<String<1..>> or Set<String<1..>>.', "'hello ' - false;");
 	}
 
 }

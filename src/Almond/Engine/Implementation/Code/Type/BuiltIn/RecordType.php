@@ -13,6 +13,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\UnknownProperty as UnknownPropertyInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\LengthRange;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\Hydrator\HydrationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\Hydrator\HydrationRequest;
@@ -21,11 +22,11 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationRequest;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResult;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\UnknownProperty;
 
-final readonly class RecordType implements RecordTypeInterface, JsonSerializable {
+final class RecordType implements RecordTypeInterface, JsonSerializable {
 
 	/**  @param array<string, Type> $types */
 	public function __construct(
-		private TypeRegistry $typeRegistry,
+		private readonly TypeRegistry $typeRegistry,
 
 		public array         $types,
 		public Type          $restType
@@ -96,8 +97,13 @@ final readonly class RecordType implements RecordTypeInterface, JsonSerializable
 		return $this->types[$key] ?? new UnknownProperty($key, $this);
 	}
 
+	public Type $keyType { get => $this->mapType->keyType; }
+	public Type $itemType { get => $this->mapType->itemType; }
+	public LengthRange $range { get => $this->mapType->range; }
 
-	public function asMapType(): MapType {
+	public MapTypeInterface $mapType { get => $this->mapType ??= $this->asMapType(); }
+
+	public function asMapType(): MapTypeInterface {
 		$l = count($this->types);
 		$min = count(array_filter($this->types, static fn($type) => !($type instanceof OptionalKeyType)));
 		$types = array_map(
@@ -109,11 +115,11 @@ final readonly class RecordType implements RecordTypeInterface, JsonSerializable
 			$min,
 			$this->restType instanceof NothingType ? $l : PlusInfinity::value,
 			match(true) {
+				!$this->restType instanceof NothingType => $this->typeRegistry->string(),
 				count($this->types) === 0 => $this->typeRegistry->nothing,
-				$this->restType instanceof NothingType => $this->typeRegistry->stringSubset(
+				default => $this->typeRegistry->stringSubset(
 					array_map(strval(...), array_keys($this->types))
 				),
-				default => $this->typeRegistry->string()
 			}
 		);
 	}

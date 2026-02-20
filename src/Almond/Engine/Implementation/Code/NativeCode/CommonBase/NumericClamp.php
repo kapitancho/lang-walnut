@@ -49,16 +49,16 @@ abstract readonly class NumericClamp extends NativeMethod {
 		return $this->isBefore($from, $value) && $this->isBefore($value, $to);
 	}
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
-		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
-			return false;
-		}
-		return $parameterType->isSubtypeOf(
-			$this->typeRegistry->record([
-				'min' => new OptionalKeyTypeImpl($this->typeRegistry->real()),
-				'max' => new OptionalKeyTypeImpl($this->typeRegistry->real()),
-			], null)
-		);
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		$expectedType = $this->typeRegistry->record([
+			'min' => new OptionalKeyTypeImpl($this->typeRegistry->real()),
+			'max' => new OptionalKeyTypeImpl($this->typeRegistry->real()),
+		], null);
+		return $parameterType->isSubtypeOf($expectedType) ?
+			null : sprintf(
+				"The parameter type %s is not a subtype of the expected record type %s",
+				$parameterType, $expectedType
+			);
 	}
 
 	protected function doValidate(

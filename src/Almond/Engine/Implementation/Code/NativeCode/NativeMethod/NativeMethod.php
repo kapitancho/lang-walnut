@@ -46,14 +46,6 @@ abstract readonly class NativeMethod implements NativeMethodInterface {
 		protected FunctionValueFactory $functionValueFactory,
 	) {}
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool|string|Type {
-		return $this->matchesCallableParameter($validator, $targetType, 0);
-	}
-
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool|string|Type {
-		return $this->matchesCallableParameter($validator, $parameterType, 1);
-	}
-
 	public function validate(
 		Type $targetType,
 		Type $parameterType,
@@ -198,7 +190,7 @@ abstract readonly class NativeMethod implements NativeMethodInterface {
 		return $this->validationFactory->error(
 			ValidationErrorType::invalidTargetType,
 			$targetTypeInfo instanceof Type ?
-				sprintf("[%s] Invalid target type: %s", __CLASS__, $targetTypeInfo) :
+				sprintf("Invalid target type: %s", $targetTypeInfo) :
 				$targetTypeInfo,
 			$origin
 		);
@@ -208,7 +200,7 @@ abstract readonly class NativeMethod implements NativeMethodInterface {
 		return $this->validationFactory->error(
 			ValidationErrorType::invalidParameterType,
 			$parameterTypeInfo instanceof Type ?
-				sprintf("[%s] Invalid parameter type: %s", __CLASS__, $parameterTypeInfo) :
+				sprintf("Invalid parameter type: %s", $parameterTypeInfo) :
 				$parameterTypeInfo,
 			$origin
 		);

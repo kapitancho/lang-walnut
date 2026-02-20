@@ -114,7 +114,7 @@ final class BinaryModuloTest extends CodeExecutionTestHelper {
 	}
 
 	public function testBinaryModuloInvalidParameterTypeRange(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', "'hello' % -3;");
+		$this->executeErrorCodeSnippet('Expected a subtype of Integer<1..>, but got Integer[-3]', "'hello' % -3;");
 	}
 
 }

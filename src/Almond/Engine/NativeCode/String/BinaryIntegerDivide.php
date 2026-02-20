@@ -16,13 +16,14 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<StringType, IntegerType, StringValue, IntegerValue> */
 final readonly class BinaryIntegerDivide extends NativeMethod {
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool|Type {
-		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
-			return false;
-		}
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		/** @var IntegerType $parameterType */
 		return $parameterType->numberRange->min !== MinusInfinity::value &&
-			$parameterType->numberRange->min->value >= 1;
+		$parameterType->numberRange->min->value >= 1 ?
+			null : sprintf(
+				"Expected a subtype of Integer<1..>, but got %s",
+				$parameterType
+			);
 	}
 
 	protected function getValidator(): callable {
