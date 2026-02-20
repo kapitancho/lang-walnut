@@ -67,7 +67,7 @@ final class ValuesTest extends CodeExecutionTestHelper {
 	}
 
 	public function testValuesInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type',
+		$this->executeErrorCodeSnippet('Target ref type must be a EnumerationSubset, IntegerSubset, RealSubset or StringSubset type, got: String',
 			"type{String}->values;");
 	}
 
@@ -77,7 +77,7 @@ final class ValuesTest extends CodeExecutionTestHelper {
 	}
 
 	public function testValuesMetaTypeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type',
+		$this->executeErrorCodeSnippet('Target ref type must be a EnumerationSubset, IntegerSubset, RealSubset or StringSubset type, got: Tuple',
 			"getValues(type[Integer]);", valueDeclarations:  "getValues = ^Type<Tuple> => Array<Integer, 1..> :: #->values;");
 	}
 

@@ -16,10 +16,10 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<AtomType|MetaType, NullType, NullValue> */
 final readonly class AtomValue extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType): bool {
-		$refType = $this->toBaseType($targetRefType);
-		return $refType instanceof AtomType ||
-			($refType instanceof MetaType && $refType->value === MetaTypeValue::Atom);
+	protected function validateTargetRefType(Type $targetRefType): null|string {
+		return $targetRefType instanceof AtomType ||
+			($targetRefType instanceof MetaType && $targetRefType->value === MetaTypeValue::Atom) ?
+			null : sprintf("Target ref type must be an Atom type, got: %s", $targetRefType);
 	}
 
 	protected function getValidator(): callable {

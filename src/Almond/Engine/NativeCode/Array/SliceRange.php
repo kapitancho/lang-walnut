@@ -28,15 +28,6 @@ final readonly class SliceRange extends ArrayNativeMethod {
 		);
 	}
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
-		return $parameterType->isSubtypeOf(
-			$this->typeRegistry->record([
-				"start" => $this->typeRegistry->integer(0),
-				"end" => $this->typeRegistry->integer(0),
-			], null)
-		);
-	}
-
 	protected function getValidator(): callable {
 		return function(ArrayType $targetType, RecordType $parameterType): Type {
 			/** @var IntegerType $endType */

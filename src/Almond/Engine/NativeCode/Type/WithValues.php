@@ -25,13 +25,14 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<Type, Type, Value> */
 final readonly class WithValues extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType): bool {
-		$refType = $this->toBaseType($targetRefType);
-		return $refType instanceof IntegerType ||
-			$refType instanceof RealType ||
-			$refType instanceof StringType ||
-			$refType instanceof EnumerationType ||
-			($refType instanceof MetaType && $refType->value === MetaTypeValue::Enumeration);
+	protected function validateTargetRefType(Type $targetRefType): null|string {
+		return $targetRefType instanceof IntegerType ||
+			$targetRefType instanceof RealType ||
+			$targetRefType instanceof StringType ||
+			$targetRefType instanceof EnumerationType ||
+			($targetRefType instanceof MetaType && $targetRefType->value === MetaTypeValue::Enumeration) ?
+				null :
+				sprintf("Target ref type must be an Integer type, a Real type, a String type or an Enumeration type, got: %s", $targetRefType);
 	}
 
 	protected function getValidator(): callable {

@@ -17,19 +17,17 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<StringType|ArrayType|MapType|SetType, Type, Value> */
 final readonly class WithLengthRange extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType): bool {
-		$refType = $this->toBaseType($targetRefType);
-		return $refType instanceof StringType || $refType instanceof ArrayType ||
-			$refType instanceof MapType || $refType instanceof SetType;
+	protected function validateTargetRefType(Type $targetRefType): null|string {
+		return $targetRefType instanceof StringType || $targetRefType instanceof ArrayType ||
+			$targetRefType instanceof MapType || $targetRefType instanceof SetType ?
+			null :
+			sprintf("Target ref type must be a String type, an Array type, a Map type or a Set type, got: %s", $targetRefType);
 	}
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
-		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
-			return false;
-		}
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		return $parameterType->isSubtypeOf(
 			$this->typeRegistry->core->lengthRange
-		);
+		) ? null : sprintf("Parameter type must be a LengthRange type, got: %s", $parameterType);
 	}
 
 	protected function getValidator(): callable {

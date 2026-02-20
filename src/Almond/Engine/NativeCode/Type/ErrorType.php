@@ -13,8 +13,10 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<ResultType, NullType, NullValue> */
 final readonly class ErrorType extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType): bool {
-		return $this->toBaseType($targetRefType) instanceof ResultType;
+	protected function validateTargetRefType(Type $targetRefType): null|string {
+		return $targetRefType instanceof ResultType ?
+			null :
+			sprintf("Target ref type must be a Result type, got: %s", $targetRefType);
 	}
 
 	protected function getValidator(): callable {

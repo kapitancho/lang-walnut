@@ -18,7 +18,7 @@ final class WithParameterTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithParameterTypeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type',
+		$this->executeErrorCodeSnippet('Target ref type must be a Function type, got: String',
 			"type{String}->withParameterType(type{Integer});");
 	}
 

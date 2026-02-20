@@ -24,8 +24,26 @@ final class WithNumberRangeTest extends CodeExecutionTestHelper {
 		$this->assertEquals("type{Real<(..10.7], 13.9, [20.0001..25)>}", $result);
 	}
 
+	public function testWithNumberRangeRealInteger(): void {
+		$result = $this->executeCodeSnippet("`Real->withNumberRange(IntegerNumberRange![intervals: [
+	IntegerNumberInterval[
+		start: MinusInfinity,
+		end: IntegerNumberIntervalEndpoint![value: 10, inclusive: true]
+	]?,
+	IntegerNumberInterval[
+		start: IntegerNumberIntervalEndpoint![value: 13, inclusive: true],
+		end: IntegerNumberIntervalEndpoint![value: 13, inclusive: true]
+	]?,
+	IntegerNumberInterval[
+		start: IntegerNumberIntervalEndpoint![value: 20, inclusive: true],
+		end: IntegerNumberIntervalEndpoint![value: 25, inclusive: false]
+	]?
+]]?);");
+		$this->assertEquals("type{Real<(..10], 13, [20..25)>}", $result);
+	}
+
 	public function testWithNumberRangeRealInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("Parameter type must be a subtype of IntegerNumberRange or RealNumberRange, got: Integer[42]",
 			"type{Real}->withNumberRange(42);");
 	}
 
@@ -43,7 +61,7 @@ final class WithNumberRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithNumberRangeRealMetaTypeInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("Parameter type must be a subtype of IntegerNumberRange or RealNumberRange, got: Integer[42]",
 			"getWithRange(type{Real});", valueDeclarations:  "getWithRange = ^Type<Real> => Type<Real> :: #->withNumberRange(42);");
 	}
 
@@ -68,7 +86,7 @@ final class WithNumberRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithNumberRangeIntegerInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("Parameter type must be a subtype of IntegerNumberRange, got: Integer[42]",
 			"type{Integer}->withNumberRange(42);");
 	}
 
@@ -85,16 +103,16 @@ final class WithNumberRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithNumberRangeIntegerMetaTypeInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("Parameter type must be a subtype of IntegerNumberRange, got: Integer[42]",
 			"getWithRange(type{Integer});", valueDeclarations:  "getWithRange = ^Type<Integer> => Type<Integer> :: #->withNumberRange(42);");
 	}
 
 	public function testWithNumberRangeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "type{Array}->withNumberRange(IntegerRange[-2, 9]?);");
+		$this->executeErrorCodeSnippet('Target ref type must be an Integer type or a Real type, got: Array', "type{Array}->withNumberRange(IntegerRange[-2, 9]?);");
 	}
 
 	public function testWithNumberRangeMetaTypeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type',
+		$this->executeErrorCodeSnippet('Target ref type must be an Integer type or a Real type, got: Tuple',
 			"getWithRange(type[Integer]);", valueDeclarations:  "getWithRange = ^Type<Tuple> => Type :: #->withNumberRange(IntegerRange[-2, 9]?);");
 	}
 

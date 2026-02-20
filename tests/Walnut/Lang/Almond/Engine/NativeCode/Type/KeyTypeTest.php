@@ -22,7 +22,7 @@ final class KeyTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testKeyTypeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type',
+		$this->executeErrorCodeSnippet('Target ref type must be a Map type, got: Array',
 			"type{Array}->keyType;");
 	}
 

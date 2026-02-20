@@ -12,7 +12,7 @@ final class WithRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithRangeRealInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("Parameter type must be a subtype of IntegerRange or RealRange, got: Integer[42]",
 			"type{Real}->withRange(42);");
 	}
 
@@ -23,7 +23,7 @@ final class WithRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithRangeRealMetaTypeInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("Parameter type must be a subtype of IntegerRange or RealRange, got: Integer[42]",
 			"getWithRange(type{Real});", valueDeclarations:  "getWithRange = ^Type<Real> => Type<Real> :: #->withRange(42);");
 	}
 
@@ -33,7 +33,7 @@ final class WithRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithRangeIntegerInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("Parameter type must be a subtype of IntegerRange, got: Integer[42]",
 			"type{Integer}->withRange(42);");
 	}
 
@@ -44,16 +44,17 @@ final class WithRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithRangeIntegerMetaTypeInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("Parameter type must be a subtype of IntegerRange, got: Integer[42]",
 			"getWithRange(type{Integer});", valueDeclarations: "getWithRange = ^Type<Integer> => Type<Integer> :: #->withRange(42);");
 	}
 
 	public function testWithRangeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "type{Array}->withRange(IntegerRange[-2, 9]?);");
+		$this->executeErrorCodeSnippet('Target ref type must be an Integer or Real type, got: Array',
+			"type{Array}->withRange(IntegerRange[-2, 9]?);");
 	}
 
 	public function testWithRangeMetaTypeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type',
+		$this->executeErrorCodeSnippet('Target ref type must be an Integer or Real type, got: Tuple',
 			"getWithRange(type[Integer]);", valueDeclarations:  "getWithRange = ^Type<Tuple> => Type :: #->withRange(IntegerRange[-2, 9]?);");
 	}
 

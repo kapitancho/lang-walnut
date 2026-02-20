@@ -19,9 +19,9 @@ final class ValueTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testValueTypeOptionalKey(): void {
-		$result = $this->executeCodeSnippet("getValueType(type{Named});",
+		$result = $this->executeCodeSnippet("getValueType(type{OptionalKey<Boolean>});",
 			valueDeclarations: "getValueType = ^Type<OptionalKey<Named>> => Type :: #->valueType;");
-		$this->assertEquals("type{Named}", $result);
+		$this->assertEquals("type{Boolean}", $result);
 	}
 
 	public function testValueTypeSealed(): void {
@@ -48,7 +48,7 @@ final class ValueTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testValueTypeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type',
+		$this->executeErrorCodeSnippet('The type String does not have a value type',
 			"type{String}->valueType;");
 	}
 

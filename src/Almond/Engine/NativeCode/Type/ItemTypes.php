@@ -22,6 +22,16 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<TupleType|RecordType|MetaType, NullType, NullValue> */
 final readonly class ItemTypes extends TypeNativeMethod {
 
+	protected function validateTargetRefType(Type $targetRefType): null|string {
+		return $targetRefType instanceof TupleType ||
+			$targetRefType instanceof RecordType ||
+			($targetRefType instanceof MetaType && in_array($targetRefType->value, [
+					MetaTypeValue::Tuple, MetaTypeValue::Record,
+					MetaTypeValue::Union, MetaTypeValue::Intersection
+				], true)) ?
+			null : sprintf("Target ref type must be a Tuple type or a Record type, got: %s", $targetRefType);
+	}
+
 	public function validate(Type $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
 		$baseTargetType = $this->toBaseType($targetType);
 		if ($baseTargetType instanceof IntersectionType) {
@@ -33,16 +43,6 @@ final readonly class ItemTypes extends TypeNativeMethod {
 			}
 		}
 		return parent::validate($targetType, $parameterType, $origin);
-	}
-
-	protected function isTargetRefTypeValid(Type $targetRefType): bool {
-		$refType = $this->toBaseType($targetRefType);
-		return $refType instanceof TupleType ||
-			$refType instanceof RecordType ||
-			($refType instanceof MetaType && in_array($refType->value, [
-				MetaTypeValue::Tuple, MetaTypeValue::Record,
-				MetaTypeValue::Union, MetaTypeValue::Intersection
-			], true));
 	}
 
 	protected function getValidator(): callable {

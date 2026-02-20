@@ -5,6 +5,7 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\NamedType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 
 /**
  * @template TTargetType of NamedType
@@ -15,17 +16,19 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
  */
 abstract readonly class NamedNativeMethod extends NativeMethod {
 
-	protected function isTargetTypeValid(Type $targetType, callable $validator): bool {
-		if (!parent::isTargetTypeValid($targetType, $validator)) {
-			return false;
+	protected function validateTargetType(Type $targetType, mixed $origin): null|string {
+		if ($targetType instanceof NamedType) {
+			$targetTypeName = $targetType->name;
+			$expectedTypeName = $this->getExpectedTypeName();
+			if (!$targetTypeName->equals($expectedTypeName)) {
+				return sprintf("The target type must be %s, got %s",
+					$expectedTypeName, $targetTypeName);
+			}
 		}
-		/** @var NamedType $targetType */
-		return $this->isNamedTypeValid($targetType);
+		return null;
 	}
 
-	protected function isNamedTypeValid(NamedType $namedType): bool {
-		return true;
-	}
+	abstract protected function getExpectedTypeName(): TypeName;
 
 	protected function isTargetValueValid(Value $target, callable $executor): bool {
 		if (!parent::isTargetValueValid($target, $executor)) {
@@ -33,7 +36,7 @@ abstract readonly class NamedNativeMethod extends NativeMethod {
 		}
 		/** @var NamedType $targetType */
 		$targetType = $target->type;
-		return $this->isNamedTypeValid($targetType);
+		return $targetType->name->equals($this->getExpectedTypeName());
 	}
 
 }

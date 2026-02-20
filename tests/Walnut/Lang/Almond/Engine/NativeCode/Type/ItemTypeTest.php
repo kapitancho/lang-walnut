@@ -22,7 +22,7 @@ final class ItemTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testItemTypeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type',
+		$this->executeErrorCodeSnippet('Target ref type must be an Array, Map or Set type, got: String',
 			"type{String}->itemType;");
 	}
 

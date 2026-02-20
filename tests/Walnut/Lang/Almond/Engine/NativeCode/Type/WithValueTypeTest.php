@@ -24,7 +24,7 @@ final class WithValueTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithValueTypeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type',
+		$this->executeErrorCodeSnippet('Target ref type must be a Mutable type or an OptionalKey type, got: String',
 			"type{String}->withValueType(type{Integer});");
 	}
 

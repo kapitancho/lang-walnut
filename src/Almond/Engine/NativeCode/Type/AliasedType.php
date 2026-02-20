@@ -15,9 +15,10 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<AliasType|MetaType, NullType, NullValue> */
 final readonly class AliasedType extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType): bool {
+	protected function validateTargetRefType(Type $targetRefType): null|string {
 		return $targetRefType instanceof AliasType ||
-			($targetRefType instanceof MetaType && $targetRefType->value === MetaTypeValue::Alias);
+			($targetRefType instanceof MetaType && $targetRefType->value === MetaTypeValue::Alias) ?
+			null : sprintf("Target ref type must be an Alias type, got: %s", $targetRefType);
 	}
 
 	protected function getValidator(): callable {

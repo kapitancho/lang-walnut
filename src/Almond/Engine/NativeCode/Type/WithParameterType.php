@@ -13,10 +13,10 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<FunctionType|MetaType, TypeType, TypeValue> */
 final readonly class WithParameterType extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType): bool {
-		$refType = $this->toBaseType($targetRefType);
-		return $refType instanceof FunctionType ||
-			($refType instanceof MetaType && $refType->value === MetaTypeValue::Function);
+	protected function validateTargetRefType(Type $targetRefType): null|string {
+		return $targetRefType instanceof FunctionType ||
+			($targetRefType instanceof MetaType && $targetRefType->value === MetaTypeValue::Function) ?
+			null : sprintf("Target ref type must be a Function type, got: %s", $targetRefType);
 	}
 
 	protected function getValidator(): callable {

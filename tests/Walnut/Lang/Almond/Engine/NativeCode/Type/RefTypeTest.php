@@ -23,7 +23,7 @@ final class RefTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testRefTypeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "type{String}->refType;");
+		$this->executeErrorCodeSnippet('Target ref type must be a Type type or a Shape type, got: String', "type{String}->refType;");
 	}
 
 }

@@ -51,7 +51,7 @@ final class NumberRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testNumberRangeInvalidTarget(): void {
-		$this->executeErrorCodeSnippet('Invalid target type: Type<String>', "`String->numberRange;");
+		$this->executeErrorCodeSnippet('Target ref type must be an Integer or Real type, got: String', "`String->numberRange;");
 	}
 
 }

@@ -12,17 +12,17 @@ final class WithKeyTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithKeyTypeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type',
+		$this->executeErrorCodeSnippet('Target ref type must be a Map type, got: String',
 			"type{String}->withKeyType(`String);");
 	}
 
 	public function testWithKeyTypeInvalidParameterTypeParameter(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type',
+		$this->executeErrorCodeSnippet('Target ref type must be a Map type, got: String',
 			"type{String}->withKeyType(`Integer);");
 	}
 
 	public function testWithKeyTypeInvalidParameterTypeSubtype(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type',
+		$this->executeErrorCodeSnippet('Parameter type must be a subtype of String type, got: Type<Integer>',
 			"type{Map<String>}->withKeyType(`Integer);");
 	}
 

@@ -13,9 +13,9 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<TypeType|ShapeType, NullType, NullValue> */
 final readonly class RefType extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType): bool {
-		$refType = $this->toBaseType($targetRefType);
-		return $refType instanceof TypeType || $refType instanceof ShapeType;
+	protected function validateTargetRefType(Type $targetRefType): null|string {
+		return $targetRefType instanceof TypeType || $targetRefType instanceof ShapeType ?
+			null : sprintf("Target ref type must be a Type type or a Shape type, got: %s", $targetRefType);
 	}
 
 	protected function getValidator(): callable {

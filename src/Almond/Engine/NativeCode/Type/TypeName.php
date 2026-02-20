@@ -16,9 +16,9 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<NamedType|MetaType, NullType, NullValue> */
 final readonly class TypeName extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType): bool {
+	protected function validateTargetRefType(Type $targetRefType): null|string {
 		if ($targetRefType instanceof NamedType) {
-			return true;
+			return null;
 		}
 		return $targetRefType instanceof MetaType && in_array($targetRefType->value, [
 			MetaTypeValue::Named,
@@ -28,7 +28,7 @@ final readonly class TypeName extends TypeNativeMethod {
 			MetaTypeValue::Data,
 			MetaTypeValue::Open,
 			MetaTypeValue::Sealed,
-		], true);
+		], true) ? null : sprintf("Target ref type must be a Named type, got: %s", $targetRefType);
 	}
 
 	protected function getValidator(): callable {

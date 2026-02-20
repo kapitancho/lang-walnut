@@ -29,7 +29,7 @@ final class WithReturnTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithReturnTypeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type',
+		$this->executeErrorCodeSnippet('Target ref type must be a Result type or a Function type, got: String',
 			"type{String}->withReturnType(type{Boolean});");
 	}
 

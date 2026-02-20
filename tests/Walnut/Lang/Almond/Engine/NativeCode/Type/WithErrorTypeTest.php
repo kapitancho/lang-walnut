@@ -18,7 +18,7 @@ final class WithErrorTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithErrorTypeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type',
+		$this->executeErrorCodeSnippet('Target ref type must be a Result type, got: String',
 			"type{String}->withErrorType(type{Integer});");
 	}
 

@@ -11,18 +11,16 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<MapType, TypeType, TypeValue> */
 final readonly class WithKeyType extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType): bool {
-		return $this->toBaseType($targetRefType) instanceof MapType;
+	protected function validateTargetRefType(Type $targetRefType): null|string {
+		return $targetRefType instanceof MapType ?
+			null :
+			sprintf("Target ref type must be a Map type, got: %s", $targetRefType);
 	}
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
-		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
-			return false;
-		}
-		/** @var TypeType $parameterType */
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		return $parameterType->isSubtypeOf(
 			$this->typeRegistry->type($this->typeRegistry->string())
-		);
+		) ? null : sprintf("Parameter type must be a subtype of String type, got: %s", $parameterType);
 	}
 
 	protected function getValidator(): callable {

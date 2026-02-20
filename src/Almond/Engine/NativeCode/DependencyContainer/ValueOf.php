@@ -5,6 +5,7 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\DependencyContainer;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AtomType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\CoreType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\NamedType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\AtomValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
@@ -15,8 +16,8 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NamedN
 
 final readonly class ValueOf extends NamedNativeMethod {
 
-	protected function isNamedTypeValid(NamedType $namedType): bool {
-		return $namedType->name->equals(new TypeName('DependencyContainer'));
+	protected function getExpectedTypeName(): TypeName {
+		return CoreType::DependencyContainer->typeName();
 	}
 
 	protected function getValidator(): callable {

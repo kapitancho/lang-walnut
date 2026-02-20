@@ -29,7 +29,7 @@ final class WithRestTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithRestTypeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "type{String}->withRestType(type{Integer});");
+		$this->executeErrorCodeSnippet('Target ref type must be a Tuple type or a Record type, got: String', "type{String}->withRestType(type{Integer});");
 	}
 
 	public function testWithRestTypeTupleInvalidParameterType(): void {

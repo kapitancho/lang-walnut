@@ -11,6 +11,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalKeyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SealedType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\MetaTypeValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
@@ -20,8 +21,24 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<OpenType|SealedType|DataType|MutableType|OptionalKeyType|MetaType, NullType, NullValue> */
 final readonly class ValueType extends TypeNativeMethod {
 
+	protected function validateTargetRefType(Type $targetRefType): null|string {
+		if ($targetRefType instanceof OpenType || $targetRefType instanceof SealedType ||
+			$targetRefType instanceof DataType || $targetRefType instanceof MutableType ||
+			$targetRefType instanceof OptionalKeyType
+		) {
+			return null;
+		}
+		if ($targetRefType instanceof MetaType && in_array($targetRefType->value, [
+				MetaTypeValue::Data, MetaTypeValue::Open,
+				MetaTypeValue::Sealed, MetaTypeValue::MutableValue
+			], true)) {
+			return null;
+		}
+		return sprintf("The type %s does not have a value type", $targetRefType);
+	}
+
 	protected function getValidator(): callable {
-		return function(TypeType $targetType, NullType $parameterType, mixed $origin): TypeType|ValidationFailure {
+		return function(TypeType $targetType, NullType $parameterType, mixed $origin): TypeType {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof OpenType || $refType instanceof SealedType ||
 				$refType instanceof DataType || $refType instanceof MutableType ||
@@ -29,17 +46,7 @@ final readonly class ValueType extends TypeNativeMethod {
 			) {
 				return $this->typeRegistry->type($refType->valueType);
 			}
-			if ($refType instanceof MetaType && in_array($refType->value, [
-				MetaTypeValue::Data, MetaTypeValue::Open,
-				MetaTypeValue::Sealed, MetaTypeValue::MutableValue
-			], true)) {
-				return $this->typeRegistry->type($this->typeRegistry->any);
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidTargetType,
-				sprintf("The type %s does not have a value type", $targetType->refType),
-				$origin
-			);
+			return $this->typeRegistry->type($this->typeRegistry->any);
 		};
 	}
 

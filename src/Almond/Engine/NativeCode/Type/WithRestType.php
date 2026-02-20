@@ -14,12 +14,12 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<TupleType|RecordType|MetaType, TypeType, TypeValue> */
 final readonly class WithRestType extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType): bool {
-		$refType = $this->toBaseType($targetRefType);
-		return $refType instanceof TupleType || $refType instanceof RecordType ||
-			($refType instanceof MetaType && (
-				$refType->value === MetaTypeValue::Tuple || $refType->value === MetaTypeValue::Record
-			));
+	protected function validateTargetRefType(Type $targetRefType): null|string {
+		return $targetRefType instanceof TupleType || $targetRefType instanceof RecordType ||
+			($targetRefType instanceof MetaType && (
+				$targetRefType->value === MetaTypeValue::Tuple || $targetRefType->value === MetaTypeValue::Record
+			)) ?
+			null : sprintf("Target ref type must be a Tuple type or a Record type, got: %s", $targetRefType);
 	}
 
 	protected function getValidator(): callable {

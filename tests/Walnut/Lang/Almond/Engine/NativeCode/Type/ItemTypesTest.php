@@ -38,7 +38,7 @@ final class ItemTypesTest extends CodeExecutionTestHelper {
 	}
 
 	public function testItemTypesInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type',
+		$this->executeErrorCodeSnippet('Target ref type must be a Tuple type or a Record type, got: String',
 			"type{String}->itemTypes;");
 	}
 

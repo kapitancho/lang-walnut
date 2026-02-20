@@ -21,7 +21,7 @@ final class AtomValueTest extends CodeExecutionTestHelper {
 	}
 
 	public function testValuesInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type',
+		$this->executeErrorCodeSnippet('Target ref type must be an Atom type, got: String',
 			"type{String}->atomValue;");
 	}
 

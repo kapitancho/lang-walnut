@@ -18,7 +18,7 @@ final class ParameterTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testParameterTypeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type',
+		$this->executeErrorCodeSnippet('Target ref type must be a Function type, got: String',
 			"type{String}->parameterType;");
 	}
 

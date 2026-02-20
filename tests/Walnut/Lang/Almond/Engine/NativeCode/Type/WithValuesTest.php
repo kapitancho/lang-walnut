@@ -12,7 +12,7 @@ final class WithValuesTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithValuesEnumerationInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("The parameter type [MyEnumeration[A], OtherEnum] is not a valid array of MyEnumeration values",
 			"type{MyEnumeration}->withValues[MyEnumeration.A, OtherEnum.X];", "OtherEnum := (X); MyEnumeration := (A, B, C);");
 	}
 
@@ -52,7 +52,7 @@ final class WithValuesTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithValuesStringInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("The parameter type [String['A'], String['C'], Integer[42]] is not a valid array of String values",
 			"type{String}->withValues['A', 'C', 42];");
 	}
 
@@ -62,7 +62,7 @@ final class WithValuesTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithValuesStringMetaTypeInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("The parameter type [String['A'], String['C'], Integer[42]] is not a valid array of String values",
 			"getWithValues(type{String});", valueDeclarations: "getWithValues = ^Type<String> => Type<StringSubset> :: #->withValues['A', 'C', 42];");
 	}
 
@@ -72,7 +72,7 @@ final class WithValuesTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithValuesRealInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("The parameter type [Real[3.14], Integer[-2], String['x']] is not a valid array of Real values",
 			"type{Real}->withValues[3.14, -2, 'x'];");
 	}
 
@@ -82,7 +82,7 @@ final class WithValuesTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithValuesRealMetaTypeInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("The parameter type [Real[3.14], Integer[-2], String['x']] is not a valid array of Real values",
 			"getWithValues(type{Real});", valueDeclarations:  "getWithValues = ^Type<Real> => Type<RealSubset> :: #->withValues[3.14, -2, 'x'];");
 	}
 
@@ -92,7 +92,7 @@ final class WithValuesTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithValuesIntegerInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("The parameter type [Integer[42], Integer[-2], String['x']] is not a valid array of Integer values",
 			"type{Integer}->withValues[42, -2, 'x'];");
 	}
 
@@ -102,16 +102,16 @@ final class WithValuesTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithValuesIntegerMetaTypeInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("The parameter type [Integer[42], Integer[-2], String['x']] is not a valid array of Integer values",
 			"getWithValues(type{Integer});", valueDeclarations:  "getWithValues = ^Type<Integer> => Type<IntegerSubset> :: #->withValues[42, -2, 'x'];");
 	}
 
 	public function testWithValuesInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "type{Array}->withValues[1, 2];");
+		$this->executeErrorCodeSnippet('Target ref type must be an Integer type, a Real type, a String type or an Enumeration type, got: Array', "type{Array}->withValues[1, 2];");
 	}
 
 	public function testWithValuesMetaTypeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type',
+		$this->executeErrorCodeSnippet('Target ref type must be an Integer type, a Real type, a String type or an Enumeration type, got: Tuple',
 			"getWithValues(type[Integer]);", valueDeclarations:  "getWithValues = ^Type<Tuple> => Type :: #->withValues[1, 2];");
 	}
 

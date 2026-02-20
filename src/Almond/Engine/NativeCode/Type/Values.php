@@ -23,20 +23,26 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<MetaType|IntegerSubsetType|RealSubsetType|StringSubsetType|EnumerationSubsetType, NullType, NullValue> */
 final readonly class Values extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType): bool {
-		$refType = $this->toBaseType($targetRefType);
-		if ($refType instanceof MetaType) {
-			return match($refType->value) {
+	protected function validateTargetRefType(Type $targetRefType): null|string {
+		if ($targetRefType instanceof MetaType) {
+			return match($targetRefType->value) {
 				MetaTypeValue::Enumeration, MetaTypeValue::EnumerationSubset,
 				MetaTypeValue::IntegerSubset, MetaTypeValue::RealSubset,
-				MetaTypeValue::StringSubset => true,
-				default => false
+				MetaTypeValue::StringSubset => null,
+				default => sprintf(
+					"Target ref type must be a EnumerationSubset, IntegerSubset, RealSubset or StringSubset type, got: %s",
+					$targetRefType
+				)
 			};
 		}
-		return $refType instanceof IntegerSubsetType ||
-			$refType instanceof RealSubsetType ||
-			$refType instanceof StringSubsetType ||
-			$refType instanceof EnumerationSubsetType;
+		return $targetRefType instanceof IntegerSubsetType ||
+			$targetRefType instanceof RealSubsetType ||
+			$targetRefType instanceof StringSubsetType ||
+			$targetRefType instanceof EnumerationSubsetType ?
+				null : sprintf(
+					"Target ref type must be a EnumerationSubset, IntegerSubset, RealSubset or StringSubset type, got: %s",
+					$targetRefType
+					);
 	}
 
 	protected function getValidator(): callable {

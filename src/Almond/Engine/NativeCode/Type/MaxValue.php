@@ -16,6 +16,11 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<RealType|IntegerType, NullType, NullValue> */
 final readonly class MaxValue extends TypeNativeMethod {
 
+	protected function validateTargetRefType(Type $targetRefType): null|string {
+		return $targetRefType instanceof IntegerType || $targetRefType instanceof RealType ?
+			null : sprintf("Target ref type must be an Integer or Real type, got: %s", $targetRefType);
+	}
+
 	protected function getValidator(): callable {
 		return function(TypeType $targetType, NullType $parameterType): Type {
 			/** @var RealType|IntegerType $refType */
@@ -43,10 +48,6 @@ final readonly class MaxValue extends TypeNativeMethod {
 					$this->valueRegistry->real($typeValue->numberRange->max->value);
 			}
 		};
-	}
-
-	protected function isTargetRefTypeValid(Type $targetRefType): bool {
-		return $targetRefType instanceof IntegerType || $targetRefType instanceof RealType;
 	}
 
 }

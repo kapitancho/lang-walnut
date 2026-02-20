@@ -15,10 +15,11 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\OptionalKeyType a
 /** @extends TypeNativeMethod<MutableType|MetaType|OptionalKeyType, TypeType, TypeValue> */
 final readonly class WithValueType extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType): bool {
-		$refType = $this->toBaseType($targetRefType);
-		return $refType instanceof MutableType || $refType instanceof OptionalKeyType ||
-			($refType instanceof MetaType && $refType->value === MetaTypeValue::MutableValue);
+	protected function validateTargetRefType(Type $targetRefType): null|string {
+		return $targetRefType instanceof MutableType || $targetRefType instanceof OptionalKeyType ||
+			($targetRefType instanceof MetaType && $targetRefType->value === MetaTypeValue::MutableValue) ?
+				null :
+				sprintf("Target ref type must be a Mutable type or an OptionalKey type, got: %s", $targetRefType);
 	}
 
 	protected function getValidator(): callable {

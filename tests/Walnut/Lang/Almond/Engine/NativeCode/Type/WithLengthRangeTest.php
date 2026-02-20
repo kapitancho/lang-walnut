@@ -12,7 +12,7 @@ final class WithLengthRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithLengthRangeStringInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("Parameter type must be a LengthRange type, got: Integer[42]",
 			"type{String}->withLengthRange(42);");
 	}
 
@@ -23,7 +23,7 @@ final class WithLengthRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithLengthRangeStringMetaTypeInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("Parameter type must be a LengthRange type, got: Integer[42]",
 			"getWithLengthRange(type{String});", valueDeclarations:  "getWithLengthRange = ^Type<String> => Type<String> :: #->withLengthRange(42);");
 	}
 
@@ -33,7 +33,7 @@ final class WithLengthRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithLengthRangeArrayInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("Parameter type must be a LengthRange type, got: Integer[42]",
 			"type{Array<Boolean>}->withLengthRange(42);");
 	}
 
@@ -44,7 +44,7 @@ final class WithLengthRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithLengthRangeArrayMetaTypeInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("Parameter type must be a LengthRange type, got: Integer[42]",
 			"getWithLengthRange(type{Array<Boolean>});", valueDeclarations:  "getWithLengthRange = ^Type<Array> => Type<Array> :: #->withLengthRange(42);");
 	}
 
@@ -59,7 +59,7 @@ final class WithLengthRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithLengthRangeMapInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("Parameter type must be a LengthRange type, got: Integer[42]",
 			"type{Map<Boolean>}->withLengthRange(42);");
 	}
 
@@ -70,7 +70,7 @@ final class WithLengthRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithLengthRangeMapMetaTypeInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("Parameter type must be a LengthRange type, got: Integer[42]",
 			"getWithLengthRange(type{Map<Boolean>});", valueDeclarations:  "getWithLengthRange = ^Type<Map> => Type<Map> :: #->withLengthRange(42);");
 	}
 
@@ -80,7 +80,7 @@ final class WithLengthRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithLengthRangeSetInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("Parameter type must be a LengthRange type, got: Integer[42]",
 			"type{Set<Boolean>}->withLengthRange(42);");
 	}
 
@@ -91,16 +91,16 @@ final class WithLengthRangeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithLengthRangeSetMetaTypeInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet("Invalid parameter type",
+		$this->executeErrorCodeSnippet("Parameter type must be a LengthRange type, got: Integer[42]",
 			"getWithLengthRange(type{Set<Boolean>});", valueDeclarations:  "getWithLengthRange = ^Type<Set> => Type<Set> :: #->withLengthRange(42);");
 	}
 
 	public function testWithLengthRangeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type', "type{Integer}->withLengthRange(LengthRange[2, 9]?);");
+		$this->executeErrorCodeSnippet('Target ref type must be a String type, an Array type, a Map type or a Set type, got: Integer', "type{Integer}->withLengthRange(LengthRange[2, 9]?);");
 	}
 
 	public function testWithLengthRangeMetaTypeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('Invalid target type',
+		$this->executeErrorCodeSnippet('Target ref type must be a String type, an Array type, a Map type or a Set type, got: Integer',
 			"getWithLengthRange(type{Integer});", valueDeclarations:  "getWithLengthRange = ^Type<Integer> => Type :: #->withLengthRange(LengthRange[2, 9]?);");
 	}
 

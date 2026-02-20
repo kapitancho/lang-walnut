@@ -18,22 +18,20 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<Type, Type, Value> */
 final readonly class WithItemTypes extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType): bool {
-		$refType = $this->toBaseType($targetRefType);
-		return $refType instanceof TupleType ||
-			$refType instanceof RecordType ||
-			$refType instanceof IntersectionType ||
-			$refType instanceof UnionType ||
-			($refType instanceof MetaType && in_array($refType->value, [
+	protected function validateTargetRefType(Type $targetRefType): null|string {
+		return $targetRefType instanceof TupleType ||
+			$targetRefType instanceof RecordType ||
+			$targetRefType instanceof IntersectionType ||
+			$targetRefType instanceof UnionType ||
+			($targetRefType instanceof MetaType && in_array($targetRefType->value, [
 				MetaTypeValue::Tuple, MetaTypeValue::Record,
 				MetaTypeValue::Intersection, MetaTypeValue::Union
-			], true));
+			], true)) ?
+				null :
+			sprintf("Target ref type must be a Tuple type, a Record type, an Intersection type or a Union type, got: %s", $targetRefType);
 	}
 
-	protected function isParameterTypeValid(Type $parameterType, callable $validator, Type $targetType): bool {
-		if (!parent::isParameterTypeValid($parameterType, $validator, $targetType)) {
-			return false;
-		}
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		return $parameterType->isSubtypeOf(
 			$this->typeRegistry->array(
 				$this->typeRegistry->type($this->typeRegistry->any)
@@ -45,6 +43,9 @@ final readonly class WithItemTypes extends TypeNativeMethod {
 				PlusInfinity::value,
 				$this->typeRegistry->string()
 			)
+		) ? null : sprintf(
+			"The parameter type must be an Array type or a Map type, got: %s",
+			$parameterType
 		);
 	}
 

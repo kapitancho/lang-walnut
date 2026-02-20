@@ -17,10 +17,11 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<MetaType|EnumerationSubsetType, StringType, Value> */
 final readonly class ValueWithName extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType): bool {
+	protected function validateTargetRefType(Type $targetRefType): null|string {
 		return ($targetRefType instanceof MetaType &&
 			($targetRefType->value === MetaTypeValue::Enumeration || $targetRefType->value === MetaTypeValue::EnumerationSubset)) ||
-			$targetRefType instanceof EnumerationSubsetType;
+			$targetRefType instanceof EnumerationSubsetType ?
+			null : sprintf("Target ref type must be an EnumerationSubset type, got: %s", $targetRefType);
 	}
 
 	protected function getValidator(): callable {

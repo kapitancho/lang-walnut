@@ -16,9 +16,9 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<IntegerType|RealType, NullType, NullValue> */
 final readonly class MinValue extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType): bool {
-		$refType = $this->toBaseType($targetRefType);
-		return $refType instanceof IntegerType || $refType instanceof RealType;
+	protected function validateTargetRefType(Type $targetRefType): null|string {
+		return $targetRefType instanceof IntegerType || $targetRefType instanceof RealType ?
+			null : sprintf("Target ref type must be an Integer or Real type, got: %s", $targetRefType);
 	}
 
 	protected function getValidator(): callable {

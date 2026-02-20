@@ -13,8 +13,9 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<MapType, NullType, NullValue> */
 final readonly class KeyType extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType): bool {
-		return $this->toBaseType($targetRefType) instanceof MapType;
+	protected function validateTargetRefType(Type $targetRefType): null|string {
+		return $targetRefType instanceof MapType ?
+			null : sprintf("Target ref type must be a Map type, got: %s", $targetRefType);
 	}
 
 	protected function getValidator(): callable {

@@ -18,10 +18,10 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 /** @extends TypeNativeMethod<StringType|ArrayType|MapType|SetType, NullType, NullValue> */
 final readonly class MaxLength extends TypeNativeMethod {
 
-	protected function isTargetRefTypeValid(Type $targetRefType): bool {
-		$refType = $this->toBaseType($targetRefType);
-		return $refType instanceof StringType || $refType instanceof ArrayType ||
-			$refType instanceof MapType || $refType instanceof SetType;
+	protected function validateTargetRefType(Type $targetRefType): null|string {
+		return $targetRefType instanceof StringType || $targetRefType instanceof ArrayType ||
+			$targetRefType instanceof MapType || $targetRefType instanceof SetType ?
+			null : sprintf("Target ref type must be a String, Array, Map or Set type, got: %s", $targetRefType);
 	}
 
 	protected function getValidator(): callable {

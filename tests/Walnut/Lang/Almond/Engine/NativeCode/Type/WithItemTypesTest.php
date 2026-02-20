@@ -39,17 +39,17 @@ final class WithItemTypesTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithItemTypesInvalidTargetTypeRecord(): void {
-		$this->executeErrorCodeSnippet('Invalid target type',
+		$this->executeErrorCodeSnippet('Target ref type must be a Tuple type, a Record type, an Intersection type or a Union type, got: String',
 			"type{String}->withItemTypes[a: type{Integer}, b: type{Boolean}];");
 	}
 
 	public function testWithItemTypesInvalidTargetTypeTuple(): void {
-		$this->executeErrorCodeSnippet('Invalid target type',
+		$this->executeErrorCodeSnippet('Target ref type must be a Tuple type, a Record type, an Intersection type or a Union type, got: String',
 			"type{String}->withItemTypes[type{Integer}, type{Boolean}];");
 	}
 
 	public function testWithItemTypesInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type',
+		$this->executeErrorCodeSnippet('The parameter type must be an Array type or a Map type, got: Integer[1]',
 			"type{[a: String, ... Real]}->withItemTypes(1);");
 	}
 
