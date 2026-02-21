@@ -67,7 +67,6 @@ final readonly class Integer extends NativeMethod {
 			$from = $parameter->valueOf('min');
 			/** @var IntegerValue $to */
 			$to = $parameter->valueOf('max');
-			/** @noinspection PhpUnhandledExceptionInspection */
 			return $this->valueRegistry->integer(random_int(
 				(int)(string)$from->literalValue,
 				(int)(string)$to->literalValue

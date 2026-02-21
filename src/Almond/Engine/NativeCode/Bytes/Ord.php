@@ -29,7 +29,7 @@ final readonly class Ord extends NativeMethod {
 
 	protected function getExecutor(): callable {
 		return fn(BytesValue $target, NullValue $parameter): IntegerValue =>
-			$this->valueRegistry->integer(ord((string)$target->literalValue));
+			$this->valueRegistry->integer(ord($target->literalValue));
 	}
 
 }

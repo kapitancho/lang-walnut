@@ -4,11 +4,12 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Type;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BooleanType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BooleanValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNativeMethod;
 
-/** @extends TypeNativeMethod<\Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type, TypeType, TypeValue> */
+/** @extends TypeNativeMethod<Type, TypeType, TypeValue> */
 final readonly class BinaryGreaterThan extends TypeNativeMethod {
 
 	protected function getValidator(): callable {

@@ -50,11 +50,10 @@ final readonly class VariableAssignmentExpression implements Expression, JsonSer
 		if ($value instanceof FunctionValue && $this->assignedExpression instanceof ConstantExpressionInterface) {
 			$value = $value->withSelfReferenceAs($this->variableName);
 		}
-		$executionContext = $executionContext->withAddedVariableValue(
+		return $executionContext->withAddedVariableValue(
 			$this->variableName,
 			$value
 		);
-		return $executionContext;
 	}
 
 	public function __toString(): string {

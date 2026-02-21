@@ -20,7 +20,6 @@ final readonly class Uuid extends NativeMethod {
 
 	protected function getExecutor(): callable {
 		return function(AtomValue $target, NullValue $parameter): OpenValue {
-			/** @noinspection PhpUnhandledExceptionInspection */
 			$arr = array_values((array)unpack('N1a/n4b/N1c', random_bytes(16)));
 			$source = (int)(microtime(true) * 0x10000);
 			$arr[0] = $source >> 16;

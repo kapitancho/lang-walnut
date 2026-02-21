@@ -291,7 +291,7 @@ trait NumericRangeHelper {
 						$num1->value->div($num2->value),
 						$num1->inclusive && $num2->inclusive
 					);
-				};
+				}
 			}
 		}
 
@@ -349,7 +349,7 @@ trait NumericRangeHelper {
 						$num1->value->mul($num2->value),
 						$num1->inclusive && $num2->inclusive
 					);
-				};
+				}
 			}
 		}
 		usort($values,

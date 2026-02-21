@@ -160,9 +160,7 @@ abstract readonly class NumericClamp extends NativeMethod {
 			);
 		}
 		$clamped = $maxClamp === null || ($maxClamp->literalValue > $target->literalValue) ? $target : $maxClamp;
-		$clamped = $minClamp === null || ($minClamp->literalValue < $clamped->literalValue) ? $clamped : $minClamp;
-
-		return $clamped;
+		return $minClamp === null || ($minClamp->literalValue < $clamped->literalValue) ? $clamped : $minClamp;
 	}
 
 }

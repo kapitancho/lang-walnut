@@ -13,6 +13,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNativeMethod;
 
 /** @extends TypeNativeMethod<Type, Type, Value> */
@@ -140,7 +141,7 @@ final readonly class WithItemTypes extends TypeNativeMethod {
 				}
 			}
 			// @codeCoverageIgnoreStart
-			throw new \Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException("Invalid target value");
+			throw new ExecutionException("Invalid target value");
 			// @codeCoverageIgnoreEnd
 		};
 	}
