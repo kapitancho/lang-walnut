@@ -7,7 +7,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BooleanValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
 
 /** @extends MapNativeMethod<Type, Type, Value> */

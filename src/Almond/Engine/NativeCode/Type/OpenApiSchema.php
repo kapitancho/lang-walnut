@@ -17,7 +17,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\UnionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\CoreType;

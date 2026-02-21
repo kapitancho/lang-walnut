@@ -4,7 +4,6 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\String;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\UnionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;

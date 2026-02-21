@@ -8,7 +8,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType as RecordTy
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\SupertypeChecker;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\LengthRange;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;

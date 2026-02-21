@@ -16,11 +16,6 @@ final readonly class FilterKeyValue extends MapFilterKeyValueBase {
 
 	protected function getValidator(): callable {
 		return function(MapType $targetType, FunctionType $parameterType, mixed $origin): MapType {
-			$kv = $this->typeRegistry->record([
-				'key' => $targetType->keyType,
-				'value' => $targetType->itemType
-			], null);
-
 			return $this->typeRegistry->map(
 				$targetType->itemType,
 				0,

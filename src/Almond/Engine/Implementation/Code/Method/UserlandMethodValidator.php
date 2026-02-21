@@ -32,7 +32,7 @@ final readonly class UserlandMethodValidator implements UserlandMethodValidatorI
 		$validationResult = $this->validationFactory->emptyValidationResult;
 
 		$allMethods = $this->userlandMethodRegistry->allMethods();
-		foreach ($allMethods as $methodName => $methods) {
+		foreach ($allMethods as $methods) {
 			foreach ($methods as $method) {
 				$step = $method->validateFunction();
 				if ($step instanceof ValidationFailure) {
@@ -147,7 +147,7 @@ final readonly class UserlandMethodValidator implements UserlandMethodValidatorI
 		}
 
 		$allValidators = $this->userlandMethodRegistry->allValidators();
-		foreach ($allValidators as $typeName => $validator) {
+		foreach ($allValidators as $validator) {
 			$step = $validator->validateInVariableScope(
 				$this->variableScopeFactory->emptyVariableScope
 			);
@@ -161,7 +161,7 @@ final readonly class UserlandMethodValidator implements UserlandMethodValidatorI
 	public function validateAllDependencies(): DependencyContext {
 		$dependencyContext = $this->dependencyContextFactory->dependencyContext;
 		$allMethods = $this->userlandMethodRegistry->allMethods();
-		foreach($allMethods as $methodName => $methods) {
+		foreach($allMethods as $methods) {
 			foreach($methods as $method) {
 				//try {
 					$dependencyContext = $method->validateDependencies($dependencyContext);

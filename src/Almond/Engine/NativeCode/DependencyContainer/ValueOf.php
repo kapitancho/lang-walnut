@@ -6,7 +6,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AtomType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\CoreType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\NamedType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\AtomValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;

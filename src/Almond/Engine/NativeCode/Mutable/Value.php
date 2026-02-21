@@ -10,7 +10,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\MutableValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value as ValueInterface;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MutableNativeMethod;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
 /** @extends MutableNativeMethod<Type, NullType, NullValue> */
 final readonly class Value extends MutableNativeMethod {

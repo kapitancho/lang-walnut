@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MutableType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\MutableValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;

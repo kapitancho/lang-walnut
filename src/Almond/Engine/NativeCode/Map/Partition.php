@@ -7,7 +7,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\MapFilterBase;
 
 final readonly class Partition extends MapFilterBase {

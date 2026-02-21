@@ -190,7 +190,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 	}
 
 	private function findValueByNamedType(NamedType $type): Value|DependencyErrorInterface {
-		$sType = $this->valueRegistry->type($type);
+		//$sType = $this->valueRegistry->type($type);
 		$dependencyContainerType = $this->typeRegistry->core->dependencyContainer;
 
 		$validationResult = $this->methodContext->validateCast(

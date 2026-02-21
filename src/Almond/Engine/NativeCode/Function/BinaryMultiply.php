@@ -20,10 +20,6 @@ final readonly class BinaryMultiply extends FunctionCompose {
 		return function(FunctionType $targetType, FunctionType $parameterType, mixed $origin): FunctionType|ValidationFailure {
 			$exe = $this->typeRegistry->core->externalError;
 			$r = $targetType->returnType;
-			$fReturn = match(true) {
-				$r instanceof ResultType => $r->returnType,
-				default => $r,
-			};
 			$fError = match(true) {
 				$r instanceof AnyType => $r,
 				$r instanceof ResultType => $r->errorType,

@@ -49,7 +49,6 @@ final readonly class WithNumberRange extends TypeNativeMethod {
 		return function(TypeValue $target, Value $parameter): TypeValue {
 			/** @var IntegerType|RealType $typeValue */
 			$typeValue = $this->toBaseType($target->typeValue);
-			$prefix = $typeValue instanceof IntegerType ? 'Integer' : 'Real';
 			$intervals = [];
 			foreach($parameter->value->values['intervals']->values as $interval) {
 				['start' => $start, 'end' => $end] = $interval->value->values;

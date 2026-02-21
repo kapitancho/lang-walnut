@@ -254,6 +254,7 @@ abstract readonly class WithMethod extends NativeMethod {
 			);
 		}
 		if ($baseValue instanceof RecordValue) {
+			/** @var RecordValue $parameter */
 			return $constructor(
 				$this->executeMapItem($baseValue, $parameter)
 			);

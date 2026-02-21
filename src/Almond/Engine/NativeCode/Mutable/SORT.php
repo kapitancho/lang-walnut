@@ -16,7 +16,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\Composite\SortHelper;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MutableNativeMethod;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
 /** @extends MutableNativeMethod<ArrayType|SetType|MapType, Type, Value> */
 final readonly class SORT extends MutableNativeMethod {

@@ -13,7 +13,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MutableNativeMethod;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
 /** @extends MutableNativeMethod<SetType|MapType, NullType, NullValue> */
 final readonly class CLEAR extends MutableNativeMethod {
