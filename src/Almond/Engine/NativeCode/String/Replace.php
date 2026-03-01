@@ -33,27 +33,8 @@ final readonly class Replace extends NativeMethod {
 	}
 
 	protected function getValidator(): callable {
-		return function(StringType $targetType, Type $parameterType, mixed $origin): StringType|ValidationFailure {
-			if ($parameterType->isSubtypeOf(
-				$this->typeRegistry->record([
-					'match' => $this->typeRegistry->union([
-						$this->typeRegistry->string(),
-						$this->typeRegistry->core->regExp
-					]),
-					'replacement' => $this->typeRegistry->string()
-				], null)
-			)) {
-				return $this->typeRegistry->string();
-			}
-			return $this->validationFactory->error(
-				ValidationErrorType::invalidParameterType,
-				sprintf(
-					"The parameter type %s is not a valid replacement record [match: String|RegExp, replacement: String]",
-					$parameterType
-				),
-				$origin
-			);
-		};
+		return fn(StringType $targetType, Type $parameterType, mixed $origin): StringType =>
+			$this->typeRegistry->string();
 	}
 
 	protected function getExecutor(): callable {

@@ -21,6 +21,28 @@ final class FilterTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@'error'", $result);
 	}
 
+	public function testFilterReturnTypeErrorNo(): void {
+		$result = $this->executeCodeSnippet(
+			"part[1, 'hello', 'world', 2, 3, 'foo', 4]; ",
+			valueDeclarations: "
+				part = ^a: Array<String|Integer, 3..7> => Result<Array<String|Integer, ..7>, Real> :: 
+					a->filter(^v: Integer|String => Result<Boolean, Real> :: ?when(v == 0) { @3.14 } ~ { v->isOfType(`String) });
+			"
+		);
+		$this->assertEquals("['hello', 'world', 'foo']", $result);
+	}
+
+	public function testFilterReturnTypeErrorYes(): void {
+		$result = $this->executeCodeSnippet(
+			"part[1, 'hello', 'world', 0, 3, 'foo', 4]; ",
+			valueDeclarations: "
+				part = ^a: Array<String|Integer, 3..7> => Result<Array<String|Integer, ..7>, Real> :: 
+					a->filter(^v: Integer|String => Result<Boolean, Real> :: ?when(v == 0) { @3.14 } ~ { v->isOfType(`String) });
+			"
+		);
+		$this->assertEquals("@3.14", $result);
+	}
+
 	public function testFilterInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet('Invalid parameter type', "[1, 'a']->filter(5);");
 	}

@@ -11,7 +11,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
 /** @extends NativeMethod<BooleanType, NullType, BooleanValue, NullValue> */
-final readonly class AsString extends NativeMethod {
+readonly class AsString extends NativeMethod {
 
 	protected function getValidator(): callable {
 		return fn(BooleanType $targetType, NullType $parameterType): Type =>

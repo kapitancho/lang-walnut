@@ -8,7 +8,7 @@ final class NumberRangeTest extends CodeExecutionTestHelper {
 
 	public function testNumberRangeInteger(): void {
 		$result = $this->executeCodeSnippet("`Integer<(..10], 13, [20..25), (32..)>->numberRange;");
-		$this->assertEquals("IntegerNumberRange![
+		$this->assertEquals(str_replace("\r", "" , "IntegerNumberRange![
 	intervals: [
 		IntegerNumberInterval[
 			start: MinusInfinity,
@@ -27,12 +27,12 @@ final class NumberRangeTest extends CodeExecutionTestHelper {
 			end: PlusInfinity
 		]
 	]
-]", $result);
+]"), $result);
 	}
 
 	public function testNumberRangeReal(): void {
 		$result = $this->executeCodeSnippet("`Real<(..10.7], 13.9, [20.0001..25)>->numberRange;");
-		$this->assertEquals("RealNumberRange![
+		$this->assertEquals(str_replace("\r", "" , "RealNumberRange![
 	intervals: [
 		RealNumberInterval[
 			start: MinusInfinity,
@@ -47,7 +47,7 @@ final class NumberRangeTest extends CodeExecutionTestHelper {
 			end: RealNumberIntervalEndpoint![value: 25, inclusive: false]
 		]
 	]
-]", $result);
+]"), $result);
 	}
 
 	public function testNumberRangeInvalidTarget(): void {

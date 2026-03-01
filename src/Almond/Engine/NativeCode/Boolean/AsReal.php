@@ -12,7 +12,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
 /** @extends NativeMethod<BooleanType, NullType, BooleanValue, NullValue> */
-final readonly class AsReal extends NativeMethod {
+readonly class AsReal extends NativeMethod {
 
 	protected function getValidator(): callable {
 		return fn(BooleanType $targetType, NullType $parameterType): Type =>

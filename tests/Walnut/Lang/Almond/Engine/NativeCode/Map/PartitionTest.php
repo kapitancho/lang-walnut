@@ -48,6 +48,17 @@ final class PartitionTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[evens: 2, odds: 3]", $result);
 	}
 
+	public function testPartitionReturnTypeRecord(): void {
+		$result = $this->executeCodeSnippet(
+			"part[a: 1, b: 'hello', c: 3.14]; ",
+			valueDeclarations: "
+				part = ^a: [a: Integer, b: ?String, ...Real] => [matching: [a: ?Integer, b: ?String, ...Real], notMatching: [a: ?Integer, b: ?String, ...Real]] :: 
+					a->partition(^v: Real|String => Boolean :: v->isOfType(`String));
+			"
+		);
+		$this->assertEquals("[\n	matching: [b: 'hello'],\n	notMatching: [a: 1, c: 3.14]\n]", $result);
+	}
+
 	public function testPartitionReturnType(): void {
 		$result = $this->executeCodeSnippet(
 			"part[a: 1, b: 'hello', c: 'world', d: 2, e: 3, f: 'foo', g: 4]; ",
@@ -57,6 +68,28 @@ final class PartitionTest extends CodeExecutionTestHelper {
 			"
 		);
 		$this->assertEquals("[\n	matching: [b: 'hello', c: 'world', f: 'foo'],\n	notMatching: [a: 1, d: 2, e: 3, g: 4]\n]", $result);
+	}
+
+	public function testPartitionReturnTypeErrorNo(): void {
+		$result = $this->executeCodeSnippet(
+			"part[a: 1, b: 'hello', c: 'world', d: 2, e: 3, f: 'foo', g: 4]; ",
+			valueDeclarations: "
+				part = ^a: Map<String|Integer, 3..7> => Result<[matching: Map<String|Integer, ..7>, notMatching: Map<String|Integer, ..7>], Real> :: 
+					a->partition(^v: Integer|String => Result<Boolean, Real> :: ?when(v == 0) { @3.14 } ~ { v->isOfType(`String) });
+			"
+		);
+		$this->assertEquals("[\n	matching: [b: 'hello', c: 'world', f: 'foo'],\n	notMatching: [a: 1, d: 2, e: 3, g: 4]\n]", $result);
+	}
+
+	public function testPartitionReturnTypeErrorYes(): void {
+		$result = $this->executeCodeSnippet(
+			"part[a: 1, b: 'hello', c: 'world', d: 0, e: 3, f: 'foo', g: 4]; ",
+			valueDeclarations: "
+				part = ^a: Map<String|Integer, 3..7> => Result<[matching: Map<String|Integer, ..7>, notMatching: Map<String|Integer, ..7>], Real> :: 
+					a->partition(^v: Integer|String => Result<Boolean, Real> :: ?when(v == 0) { @3.14 } ~ { v->isOfType(`String) });
+			"
+		);
+		$this->assertEquals("@3.14", $result);
 	}
 
 	public function testPartitionInvalidParameterType(): void {

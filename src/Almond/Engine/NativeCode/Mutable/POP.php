@@ -18,8 +18,8 @@ final readonly class POP extends MutableNativeMethod {
 
 	protected function validateTargetValueType(Type $valueType): null|string {
 		return
-			($valueType instanceof ArrayType && (int)(string)$valueType->range->minLength === 0) ||
-			($valueType instanceof TupleType && count($valueType->types) === 0) ?
+			($valueType instanceof TupleType && count($valueType->types) === 0) ||
+			($valueType instanceof ArrayType && (int)(string)$valueType->range->minLength === 0) ?
 				null : sprintf("The value type of the target set must be a subtype of Array or Tuple with a minimum length of 0, got %s",
 				$valueType
 			);
@@ -30,8 +30,8 @@ final readonly class POP extends MutableNativeMethod {
 			$vt = $this->toBaseType($targetType->valueType);
 			return $this->typeRegistry->result(
 				match(true) {
-					$vt instanceof ArrayType => $vt->itemType,
 					$vt instanceof TupleType => $vt->restType,
+					$vt instanceof ArrayType => $vt->itemType,
 					default => $this->typeRegistry->any
 				},
 				$this->typeRegistry->core->itemNotFound

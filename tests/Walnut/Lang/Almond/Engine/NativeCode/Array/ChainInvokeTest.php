@@ -35,7 +35,7 @@ final class ChainInvokeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testChainInvokeInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('The item type (Integer[15]|^Real => Real) is not a valid function type for chainInvoke because it is not a function type', "[
+		$this->executeErrorCodeSnippet('The item type of the target array must be a subtype', "[
 			15,
 			^Real => Real :: # + 1,
 			^Real => Real :: # * 2

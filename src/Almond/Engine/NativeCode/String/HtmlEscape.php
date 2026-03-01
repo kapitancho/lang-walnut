@@ -18,7 +18,7 @@ final readonly class HtmlEscape extends NativeMethod {
 				$targetType->range->minLength,
 				$targetType->range->maxLength === PlusInfinity::value ?
 					PlusInfinity::value :
-					$targetType->range->maxLength * 6 // max expansion when escaping HTML entities
+					$targetType->range->maxLength->mul(6) // max expansion when escaping HTML entities
 			);
 	}
 

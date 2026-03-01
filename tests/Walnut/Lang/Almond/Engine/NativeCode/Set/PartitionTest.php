@@ -59,6 +59,28 @@ final class PartitionTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[\n	matching: ['hello'; 'world'; 'foo'],\n	notMatching: [1; 2; 3; 4]\n]", $result);
 	}
 
+	public function testPartitionReturnTypeErrorNo(): void {
+		$result = $this->executeCodeSnippet(
+			"part[1; 'hello'; 'world'; 2; 3; 'foo'; 4]; ",
+			valueDeclarations: "
+				part = ^a: Set<String|Integer, 3..7> => Result<[matching: Set<String|Integer, ..7>, notMatching: Set<String|Integer, ..7>], Real> :: 
+					a->partition(^v: Integer|String => Result<Boolean, Real> :: ?when(v == 0) { @3.14 } ~ { v->isOfType(`String) });
+			"
+		);
+		$this->assertEquals("[\n	matching: ['hello'; 'world'; 'foo'],\n	notMatching: [1; 2; 3; 4]\n]", $result);
+	}
+
+	public function testPartitionReturnTypeErrorYes(): void {
+		$result = $this->executeCodeSnippet(
+			"part[1; 'hello'; 'world'; 0; 3; 'foo'; 4]; ",
+			valueDeclarations: "
+				part = ^a: Set<String|Integer, 3..7> => Result<[matching: Set<String|Integer, ..7>, notMatching: Set<String|Integer, ..7>], Real> :: 
+					a->partition(^v: Integer|String => Result<Boolean, Real> :: ?when(v == 0) { @3.14 } ~ { v->isOfType(`String) });
+			"
+		);
+		$this->assertEquals("@3.14", $result);
+	}
+
 	public function testPartitionInvalidParameterType(): void {
 		$this->executeErrorCodeSnippet('Invalid parameter type', "[1; 2; 3]->partition(5);");
 	}

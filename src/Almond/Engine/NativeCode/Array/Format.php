@@ -70,12 +70,12 @@ final readonly class Format extends ArrayNativeMethod {
 						$value,
 						new TypeName('String')
 					)->literalValue;
+				// If conversion fails, use string representation
+				// @codeCoverageIgnoreStart
 				} catch (ExecutionException) {
-					// If conversion fails, use string representation
-					// @codeCoverageIgnoreStart
 					$stringValues[$index] = (string)$value;
-					// @codeCoverageIgnoreEnd
 				}
+				// @codeCoverageIgnoreEnd
 			}
 
 			try {

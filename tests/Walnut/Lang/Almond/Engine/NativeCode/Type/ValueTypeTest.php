@@ -12,15 +12,21 @@ final class ValueTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testValueTypeOpenMetaType(): void {
-		$result = $this->executeCodeSnippet("getValueType(type{MyOpen});",
+		$result = $this->executeCodeSnippet("getValueType(`MyOpen);",
 			"MyOpen := #[a: String];",
-			"getValueType = ^Type<Open> => Type :: #->valueType;");
+			"getValueType = ^t: Type<Open> => Type :: t->valueType;");
 		$this->assertEquals("type[a: String]", $result);
 	}
 
 	public function testValueTypeOptionalKey(): void {
 		$result = $this->executeCodeSnippet("getValueType(type{OptionalKey<Boolean>});",
-			valueDeclarations: "getValueType = ^Type<OptionalKey<Named>> => Type :: #->valueType;");
+			valueDeclarations: "getValueType = ^t: Type<OptionalKey<Named>> => Type :: t->valueType;");
+		$this->assertEquals("type{Boolean}", $result);
+	}
+
+	public function testValueTypeOptionalKeyDirect(): void {
+		$result = $this->executeCodeSnippet("getValueType(type{Boolean});",
+			valueDeclarations: "getValueType = ^t: Type<OptionalKey<Named>> => Type :: t->valueType;");
 		$this->assertEquals("type{Boolean}", $result);
 	}
 
@@ -30,7 +36,7 @@ final class ValueTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testValueTypeSealedMetaType(): void {
-		$result = $this->executeCodeSnippet("getValueType(type{MySealed});",
+		$result = $this->executeCodeSnippet("getValueType(`MySealed);",
 			"MySealed := $[a: String];",
 			"getValueType = ^Type<Sealed> => Type :: #->valueType;");
 		$this->assertEquals("type[a: String]", $result);
@@ -42,7 +48,7 @@ final class ValueTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testValueTypeMutableMetaType(): void {
-		$result = $this->executeCodeSnippet("getValueType(type{Mutable<String>});",
+		$result = $this->executeCodeSnippet("getValueType(`Mutable<String>);",
 			valueDeclarations: "getValueType = ^Type<MutableValue> => Type :: #->valueType;");
 		$this->assertEquals("type{String}", $result);
 	}

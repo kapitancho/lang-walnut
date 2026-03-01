@@ -9,18 +9,13 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BooleanValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
+use Walnut\Lang\Almond\Engine\NativeCode\Boolean\AsString as AsStringInterface;
 
-/** @extends NativeMethod<FalseType, NullType, BooleanValue, NullValue> */
-final readonly class AsString extends NativeMethod {
+final readonly class AsString extends AsStringInterface {
 
 	protected function getValidator(): callable {
 		return fn(FalseType $targetType, NullType $parameterType): Type =>
 			$this->typeRegistry->stringSubset(['false']);
-	}
-
-	protected function getExecutor(): callable {
-		return fn(BooleanValue $target, NullValue $parameter): StringValue =>
-			$this->valueRegistry->string('false');
 	}
 
 }

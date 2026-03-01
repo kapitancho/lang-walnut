@@ -26,6 +26,11 @@ final readonly class ChainInvoke extends ArrayNativeMethod {
 	}
 
 	protected function validateTargetType(Type $targetType, mixed $origin): null|string {
+		$result = parent::validateTargetType($targetType, $origin);
+		if ($result) {
+			return $result;
+		}
+
 		 /** @var ArrayType $targetType */
 		$itemType = $this->toBaseType($targetType->itemType);
 		if ($itemType instanceof NothingType) {
@@ -51,19 +56,13 @@ final readonly class ChainInvoke extends ArrayNativeMethod {
 			return null;
 		}
 		/** @var FunctionType $itemType */
-		if ($itemType instanceof FunctionType) {
-			return $parameterType->isSubtypeOf($itemType->parameterType) ?
-				null :
-				sprintf(
-					"The parameter type %s is not a subtype of the item type parameter type %s",
-					$parameterType,
-					$itemType->parameterType
-				);
-		}
-		return sprintf(
-			"The item type %s is not a valid function type for chainInvoke because it is not a function type",
-			$itemType
-		);
+		return $parameterType->isSubtypeOf($itemType->parameterType) ?
+			null :
+			sprintf(
+				"The parameter type %s is not a subtype of the item type parameter type %s",
+				$parameterType,
+				$itemType->parameterType
+			);
 	}
 
 	protected function getValidator(): callable {

@@ -12,15 +12,11 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
 /** @extends NativeMethod<BooleanType|TrueType|FalseType, NullType, BooleanValue, NullValue> */
-final readonly class UnaryBitwiseNot extends NativeMethod {
+readonly class UnaryBitwiseNot extends NativeMethod {
 
 	protected function getValidator(): callable {
 		return fn(BooleanType|TrueType|FalseType $targetType, NullType $parameterType): Type =>
-			match(true) {
-				$targetType instanceof FalseType => $this->typeRegistry->true,
-				$targetType instanceof TrueType => $this->typeRegistry->false,
-				default => $this->typeRegistry->boolean
-			};
+			$this->typeRegistry->boolean;
 	}
 
 	protected function getExecutor(): callable {

@@ -33,14 +33,12 @@ abstract readonly class ArrayNativeMethod extends NativeMethod {
 					implode(", ", $expectedType),
 					$targetType->itemType
 				);
-			} else {
-				if (!$itemType->isSubtypeOf($expectedType)) {
-					return sprintf("The item type of the target array must be a subtype of %s, got %s",
-						$expectedType,
-						$targetType->itemType
-					);
-
-				}
+			}
+			if (!$itemType->isSubtypeOf($expectedType)) {
+				return sprintf("The item type of the target array must be a subtype of %s, got %s",
+					$expectedType,
+					$targetType->itemType
+				);
 			}
 		}
 		return null;

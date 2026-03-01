@@ -10,18 +10,13 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BooleanValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
+use Walnut\Lang\Almond\Engine\NativeCode\Boolean\AsReal as AsRealInterface;
 
-/** @extends NativeMethod<FalseType, NullType, BooleanValue, NullValue> */
-final readonly class AsReal extends NativeMethod {
+final readonly class AsReal extends AsRealInterface {
 
 	protected function getValidator(): callable {
 		return fn(FalseType $targetType, NullType $parameterType): Type =>
 			$this->typeRegistry->realSubset([new Number(0)]);
-	}
-
-	protected function getExecutor(): callable {
-		return fn(BooleanValue $target, NullValue $parameter): RealValue =>
-			$this->valueRegistry->real(0);
 	}
 
 }

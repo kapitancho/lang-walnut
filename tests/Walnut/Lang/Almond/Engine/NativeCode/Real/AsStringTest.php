@@ -6,9 +6,14 @@ use Walnut\Lang\Test\Almond\Engine\CodeExecutionTestHelper;
 
 final class AsStringTest extends CodeExecutionTestHelper {
 
-	public function testAsString(): void {
+	public function testAsStringPlus(): void {
 		$result = $this->executeCodeSnippet("3.14->asString;");
 		$this->assertEquals("'3.14'", $result);
+	}
+
+	public function testAsStringMinus(): void {
+		$result = $this->executeCodeSnippet("-3.14->asString;");
+		$this->assertEquals("'-3.14'", $result);
 	}
 
 	public function testAsStringInteger(): void {
@@ -16,9 +21,23 @@ final class AsStringTest extends CodeExecutionTestHelper {
 		$this->assertEquals("'5.0'", $result);
 	}
 
-	public function testAsStringType(): void {
+	public function testAsStringTypePositive(): void {
 		$result = $this->executeCodeSnippet("asStr(3.14);",
 			valueDeclarations: "asStr = ^b: Real<1..99> => String<1..> :: b->as(`String);"
+		);
+		$this->assertEquals("'3.14'", $result);
+	}
+
+	public function testAsStringTypeNegative(): void {
+		$result = $this->executeCodeSnippet("asStr(-3.14);",
+			valueDeclarations: "asStr = ^b: Real<-99..-1> => String<2..> :: b->as(`String);"
+		);
+		$this->assertEquals("'-3.14'", $result);
+	}
+
+	public function testAsStringTypeInfinity(): void {
+		$result = $this->executeCodeSnippet("asStr(3.14);",
+			valueDeclarations: "asStr = ^b: Real => String<1..> :: b->as(`String);"
 		);
 		$this->assertEquals("'3.14'", $result);
 	}

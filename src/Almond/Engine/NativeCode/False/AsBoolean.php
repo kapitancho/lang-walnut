@@ -7,18 +7,13 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BooleanValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
+use Walnut\Lang\Almond\Engine\NativeCode\Boolean\AsBoolean as AsBooleanInterface;
 
-/** @extends NativeMethod<FalseType, NullType, BooleanValue, NullValue> */
-final readonly class AsBoolean extends NativeMethod {
+final readonly class AsBoolean extends AsBooleanInterface {
 
 	protected function getValidator(): callable {
 		return fn(FalseType $targetType, NullType $parameterType): FalseType =>
 			$this->typeRegistry->false;
-	}
-
-	protected function getExecutor(): callable {
-		return fn(BooleanValue $target, NullValue $parameter): BooleanValue =>
-			$this->valueRegistry->false;
 	}
 
 }

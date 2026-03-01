@@ -35,6 +35,14 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 		$this->assertEquals("['hello', 42, 'hello', 42, 'hello', 42]", $result);
 	}
 
+	public function testBinaryMultiplyTupleWithRest(): void {
+		$result = $this->executeCodeSnippet(
+			"mul3['hello', 42];",
+			valueDeclarations: "mul3 = ^arr: [String, Real, ...Integer] => Array<String|Real, 6..> :: arr * 3;"
+		);
+		$this->assertEquals("['hello', 42, 'hello', 42, 'hello', 42]", $result);
+	}
+
 	public function testBinaryMultiplyZero(): void {
 		$result = $this->executeCodeSnippet("['hello'] * 0;");
 		$this->assertEquals("[]", $result);

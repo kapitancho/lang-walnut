@@ -9,7 +9,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
 /** @extends NativeMethod<BooleanType, NullType, BooleanValue, NullValue> */
-final readonly class AsBoolean extends NativeMethod {
+readonly class AsBoolean extends NativeMethod {
 
 	protected function getValidator(): callable {
 		return fn(BooleanType $targetType, NullType $parameterType): BooleanType =>

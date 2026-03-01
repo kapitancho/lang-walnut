@@ -39,7 +39,7 @@ final class WithoutByKeyTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[element: 1, map: [b: 2]]", $result);
 	}
 
-	public function testFilterRecordSingleValue(): void {
+	public function testWithoutByKeyRecordSingleValue(): void {
 		$result = $this->executeCodeSnippet(
 			"fn[map: [a: 1.72, b: 2, c: 3, d: 'hello', e: 'hi!'], key: 'c'];",
 			valueDeclarations: "fn = ^m: [map: [a: Real, b: ?Integer, c: Real|Boolean, ...String], key: String['c']]
@@ -49,7 +49,7 @@ final class WithoutByKeyTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[\n	element: 3,\n	map: [a: 1.72, b: 2, d: 'hello', e: 'hi!']\n]", $result);
 	}
 
-	public function testFilterRecordMultipleValues(): void {
+	public function testWithoutByKeyRecordMultipleValues(): void {
 		$result = $this->executeCodeSnippet(
 			"fn[map: [a: 1.72, b: 2, c: 3, d: 'hello', e: 'hi!'], key: 'c'];",
 			valueDeclarations: "fn = ^m: [map: [a: Real, b: ?Integer, c: Real|Boolean, ...String], key: String['a', 'c']]
@@ -59,7 +59,7 @@ final class WithoutByKeyTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[\n	element: 3,\n	map: [a: 1.72, b: 2, d: 'hello', e: 'hi!']\n]", $result);
 	}
 
-	public function testFilterRecordMultipleValuesOptionalKey(): void {
+	public function testWithoutByKeyRecordMultipleValuesOptionalKey(): void {
 		$result = $this->executeCodeSnippet(
 			"fn[map: [a: 1.72, b: 2, c: 3, d: 'hello', e: 'hi!'], key: 'c'];",
 			valueDeclarations: "fn = ^m: [map: [a: Real, b: ?Integer, c: Real|Boolean, ...String], key: String['a', 'b', 'c']]
@@ -69,11 +69,21 @@ final class WithoutByKeyTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[\n	element: 3,\n	map: [a: 1.72, b: 2, d: 'hello', e: 'hi!']\n]", $result);
 	}
 
-	public function testFilterRecordMultipleValuesNotFound(): void {
+	public function testWithoutByKeyRecordMultipleValuesNotFound(): void {
 		$result = $this->executeCodeSnippet(
 			"fn[map: [a: 1.72, b: 2, c: 3, d: 'hello', e: 'hi!'], key: 'c'];",
 			valueDeclarations: "fn = ^m: [map: [a: Real, b: ?Integer, c: Real|Boolean, ...String], key: String['a', 'c', 'x']]
 				=> Result<[element: Real|Boolean|String, map: [a: ?Real, b: ?Integer, c: ?Real|Boolean, ...String]], MapItemNotFound> :: 
+					m.map->withoutByKey(m.key);"
+		);
+		$this->assertEquals("[\n	element: 3,\n	map: [a: 1.72, b: 2, d: 'hello', e: 'hi!']\n]", $result);
+	}
+
+	public function testWithoutByKeyRecordNoStringSubset(): void {
+		$result = $this->executeCodeSnippet(
+			"fn[map: [a: 1.72, b: 2, c: 3, d: 'hello', e: 'hi!'], key: 'c'];",
+			valueDeclarations: "fn = ^m: [map: [a: Real, b: ?Integer, c: Real|Boolean, ...String], key: String]
+				=> Result<[element: Real|Boolean|String, map: Map<Real|Boolean|String, 2..>], MapItemNotFound> :: 
 					m.map->withoutByKey(m.key);"
 		);
 		$this->assertEquals("[\n	element: 3,\n	map: [a: 1.72, b: 2, d: 'hello', e: 'hi!']\n]", $result);

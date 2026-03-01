@@ -76,12 +76,12 @@ final readonly class Format extends MapNativeMethod {
 						$value,
 						new TypeName('String')
 					)->literalValue;
-				} catch (ExecutionException) {
 					// If conversion fails, use string representation
 					// @codeCoverageIgnoreStart
+				} catch (ExecutionException) {
 					$stringValues[$key] = (string)$value;
-					// @codeCoverageIgnoreEnd
 				}
+				// @codeCoverageIgnoreEnd
 			}
 
 			try {

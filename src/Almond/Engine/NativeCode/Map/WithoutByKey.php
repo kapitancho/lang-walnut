@@ -38,42 +38,41 @@ final readonly class WithoutByKey extends MapNativeMethod {
 								$targetType->restType
 							)
 						], null);
-					} else {
-						$canBeMissing = false;
-						$elementTypes = [];
-						foreach ($parameterType->subsetValues as $subsetValue) {
-							if (array_key_exists($subsetValue, $recordTypes)) {
-								if ($recordTypes[$subsetValue] instanceof OptionalKeyType) {
-									$elementTypes[] = $recordTypes[$subsetValue]->valueType;
-									$canBeMissing = true;
-								} else {
-									$elementTypes[] = $recordTypes[$subsetValue];
-									$recordTypes[$subsetValue] = $r->optionalKey(
-										$recordTypes[$subsetValue]
-									);
-								}
-							} else {
-								$canBeMissing = true;
-								$elementTypes[] = $targetType->restType;
-							}
-						}
-						$returnType = $r->record([
-							'element' => $r->union($elementTypes),
-							'map' => $r->record(
-								array_map(
-									fn(Type $type): OptionalKeyType => $type instanceof OptionalKeyType ?
-										$type :
-										$r->optionalKey($type),
-									$targetType->types
-								),
-								$targetType->restType
-							)
-						], null);
-						return $canBeMissing ? $r->result(
-							$returnType,
-							$r->core->mapItemNotFound
-						) : $returnType;
 					}
+					$canBeMissing = false;
+					$elementTypes = [];
+					foreach ($parameterType->subsetValues as $subsetValue) {
+						if (array_key_exists($subsetValue, $recordTypes)) {
+							if ($recordTypes[$subsetValue] instanceof OptionalKeyType) {
+								$elementTypes[] = $recordTypes[$subsetValue]->valueType;
+								$canBeMissing = true;
+							} else {
+								$elementTypes[] = $recordTypes[$subsetValue];
+								$recordTypes[$subsetValue] = $r->optionalKey(
+									$recordTypes[$subsetValue]
+								);
+							}
+						} else {
+							$canBeMissing = true;
+							$elementTypes[] = $targetType->restType;
+						}
+					}
+					$returnType = $r->record([
+						'element' => $r->union($elementTypes),
+						'map' => $r->record(
+							array_map(
+								fn(Type $type): OptionalKeyType => $type instanceof OptionalKeyType ?
+									$type :
+									$r->optionalKey($type),
+								$targetType->types
+							),
+							$targetType->restType
+						)
+					], null);
+					return $canBeMissing ? $r->result(
+						$returnType,
+						$r->core->mapItemNotFound
+					) : $returnType;
 				}
 				$targetType = $targetType->asMapType();
 			}

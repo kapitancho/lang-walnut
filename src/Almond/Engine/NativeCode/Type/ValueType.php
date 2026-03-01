@@ -14,6 +14,8 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\MetaTypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
+use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNativeMethod;
 
 /** @extends TypeNativeMethod<OpenType|SealedType|DataType|MutableType|OptionalKeyType|MetaType, NullType, NullValue> */
@@ -61,6 +63,11 @@ final readonly class ValueType extends TypeNativeMethod {
 			}
 			return $this->valueRegistry->type($typeValue);
 		};
+	}
+
+	// Skip the parent check so that it works for OptionalKey type as well.
+	protected function isTargetValueValid(Value $target, callable $executor): bool {
+		return NativeMethod::isTargetValueValid($target, $executor);
 	}
 
 }

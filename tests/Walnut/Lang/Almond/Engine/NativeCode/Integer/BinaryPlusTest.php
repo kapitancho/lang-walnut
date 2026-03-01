@@ -24,6 +24,22 @@ final class BinaryPlusTest extends CodeExecutionTestHelper {
 		$this->assertEquals("8", $result);
 	}
 
+	public function testBinaryPlusRangeInteger(): void {
+		$result = $this->executeCodeSnippet(
+			"plus[5, 3];",
+			valueDeclarations: "plus = ^[a: Integer<1..10>, b: Integer<2..4>] => Integer<3..14> :: #a + #b;"
+		);
+		$this->assertEquals("8", $result);
+	}
+
+	public function testBinaryPlusRangeReal(): void {
+		$result = $this->executeCodeSnippet(
+			"plus[5, 3];",
+			valueDeclarations: "plus = ^[a: Integer<1..10>, b: Real<2..4>] => Real<3..14> :: #a + #b;"
+		);
+		$this->assertEquals("8", $result);
+	}
+
 	public function testBinaryPlusZeroParameter(): void {
 		$result = $this->executeCodeSnippet(
 			"plus(0);",

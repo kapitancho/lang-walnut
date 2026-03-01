@@ -56,7 +56,6 @@ final readonly class Values extends TypeNativeMethod {
 					MetaTypeValue::IntegerSubset => $this->typeRegistry->integer(),
 					MetaTypeValue::RealSubset => $this->typeRegistry->real(),
 					MetaTypeValue::StringSubset => $this->typeRegistry->string(),
-					default => null
 				};
 				return $this->typeRegistry->array($t, 1);
 			}
