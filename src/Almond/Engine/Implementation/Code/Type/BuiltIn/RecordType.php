@@ -36,6 +36,7 @@ final class RecordType implements RecordTypeInterface, JsonSerializable {
 		$value = $request->value;
 		if ($value instanceof RecordValue) {
 			$usedKeys = [];
+			$result = [];
 			foreach($this->types as $key => $refType) {
 				$usedKeys[$key] = true;
 				$itemRequest = $request->withAddedPathSegment(".$key");

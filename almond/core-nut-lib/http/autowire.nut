@@ -1,0 +1,82 @@
+module $http/autowire %% $http/message, $http/request-handler:
+
+RoutePattern := #String;
+RoutePatternDoesNotMatch := ();
+
+HttpAutoWireRequestBodyToParameter = ^{HttpRequest} => Result<Map<JsonValue>>;
+HttpAutoWireResponseBodyFromParameter = ^Any => Result<{HttpResponse}>;
+
+HttpAutoWireRouteDoesNotMatch := ();
+HttpAutoWireRoute := $[
+    method: HttpRequestMethod,
+    pattern: RoutePattern,
+    requestBody: {HttpAutoWireRequestBodyToParameter},
+    handler: Type<^Nothing => Any>,
+    response: {HttpAutoWireResponseBodyFromParameter}
+];
+HttpAutoWireRoute->handleRequest(^request: {HttpRequest} => Result<{HttpResponse}, HttpAutoWireRouteDoesNotMatch>) %% ~DependencyContainer :: {
+    err = ^result => Result<{HttpResponse}, HttpAutoWireRouteDoesNotMatch> %% ~HttpResponseBuilder :: {
+        httpResponse = result->as(`HttpResponse);
+        ?whenTypeOf(httpResponse) {
+            `{HttpResponse}: httpResponse,
+            ~: httpResponseBuilder(500)->withBody('Cannot handle error type: ' + #->type->asString)
+        }
+    };
+    request = request->shape(`HttpRequest);
+    runnerResult = :: {
+        ?whenValueOf(request.method) {
+            $method: {
+                matchResult = $pattern->matchAgainst(request.target);
+                ?whenTypeOf(matchResult) {
+                    `Map<String|Integer<0..>>: {
+                        bodyArg = $requestBody->shape(`HttpAutoWireRequestBodyToParameter)(request)?;
+                        callParams = matchResult->mergeWith(bodyArg);
+                        callParams = callParams->as(`JsonValue);
+                        handlerType = $handler;
+                        handlerParameterType = handlerType->parameterType;
+                        handlerReturnType = handlerType->returnType;
+                        handlerParams = callParams->hydrateAs(handlerParameterType)?;
+                        handlerInstance = dependencyContainer->valueOf(handlerType)?;
+                        handlerResult = handlerInstance->forceInvoke(handlerParams)?;
+                        $response->shape(`HttpAutoWireResponseBodyFromParameter)(handlerResult)?
+                    },
+                    ~: @HttpAutoWireRouteDoesNotMatch
+                }
+            },
+            ~: @HttpAutoWireRouteDoesNotMatch
+        }
+    };
+    ?whenTypeOf(runnerResult) {
+        `Error<HttpAutoWireRouteDoesNotMatch>: runnerResult,
+        `Error: err(runnerResult->error),
+        `{HttpResponse}: runnerResult
+    }
+};
+
+HttpAutoWireRequestHandler := $[routes: Array<HttpAutoWireRoute, 1..>];
+HttpAutoWireRequestHandler ==> HttpRequestHandler %% ~HttpResponseBuilder :: {
+    ^request: {HttpRequest} => {HttpResponse} :: {
+        h = ^routes: Array<HttpAutoWireRoute, 1..> => Result<{HttpResponse}, HttpAutoWireRouteDoesNotMatch> :: {
+            split = routes->withoutFirst;
+            route = split.element;
+            rest = split.array;
+
+            result = route->handleRequest(request);
+            ?whenTypeOf(result) {
+                `{HttpResponse}: result,
+                `Error<HttpAutoWireRouteDoesNotMatch>: {
+                    ?whenTypeOf(rest) {
+                        `Array<HttpAutoWireRoute, 1..>: h(rest),
+                        ~: result
+                    }
+                },
+                ~: result
+            }
+        };
+        resp = h($routes);
+        ?whenTypeOf(resp) {
+            `{HttpResponse}: resp,
+            `Error<HttpAutoWireRouteDoesNotMatch>: httpResponseBuilder(404)->withBody('Route not found: ' + request->shape(`HttpRequest).target)
+        }
+    }
+};

@@ -65,9 +65,4 @@ final readonly class ValueType extends TypeNativeMethod {
 		};
 	}
 
-	// Skip the parent check so that it works for OptionalKey type as well.
-	protected function isTargetValueValid(Value $target, callable $executor): bool {
-		return NativeMethod::isTargetValueValid($target, $executor);
-	}
-
 }

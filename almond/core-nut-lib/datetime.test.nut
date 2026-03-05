@@ -5,22 +5,22 @@ test $datetime:
         ^ => TestResult :: TestResult[
             name: 'Valid Date Test',
             expected: '2024-02-29',
-            actual : ^ :: {Date[2024, 2, 29]}->asString
+            actual : ^ :: Date[2024, 2, 29]?->asString
         ],
         ^ => TestResult :: TestResult[
             name: 'Valid Date From String Test',
             expected: '2024-02-29',
-            actual : ^ :: '2024-02-29'->asDate->asString
+            actual : ^ :: '2024-02-29'->asDate?->asString
         ],
         ^ => TestResult :: TestResult[
             name: 'Valid Date From Json Array Test',
             expected: '2024-02-29',
-            actual : ^ :: [2024, 2, 29]->asDate->asString
+            actual : ^ :: [2024, 2, 29]->asDate?->asString
         ],
         ^ => TestResult :: TestResult[
             name: 'Valid Date From Json Object Test',
             expected: '2024-02-29',
-            actual : ^ :: [year: 2024, month: 2, day: 29]->asDate->asString
+            actual : ^ :: [year: 2024, month: 2, day: 29]->asDate?->asString
         ],
         ^ => TestResult :: TestResult[
             name: 'Valid Date As Json Test',
@@ -51,7 +51,7 @@ test $datetime:
         ^ => TestResult :: TestResult[
             name: 'Valid Time Test',
             expected: '14:30:00',
-            actual : ^ :: {Time[14, 30, 0]}->asString
+            actual : ^ :: Time[14, 30, 0]?->asString
         ],
         ^ => TestResult :: TestResult[
             name: 'Valid Time From String Test',
@@ -61,12 +61,12 @@ test $datetime:
         ^ => TestResult :: TestResult[
             name: 'Valid Time From Json Array Test',
             expected: '14:30:00',
-            actual : ^ :: [14, 30, 0]->asTime->asString
+            actual : ^ :: [14, 30, 0]->asTime?->asString
         ],
         ^ => TestResult :: TestResult[
             name: 'Valid Time From Json Object Test',
             expected: '14:30:00',
-            actual : ^ :: [hour: 14, minute: 30, second: 0]->asTime->asString
+            actual : ^ :: [hour: 14, minute: 30, second: 0]->asTime?->asString
         ],
         ^ => TestResult :: TestResult[
             name: 'Invalid Time From String Test',
@@ -87,22 +87,22 @@ test $datetime:
         ^ => TestResult :: TestResult[
             name: 'Valid DateAndTime Test',
             expected: '2024-02-29 14:30:00',
-            actual : ^ :: {DateAndTime[Date[2024, 2, 29]?, Time[14, 30, 0]]}->asString
+            actual : ^ :: DateAndTime[Date[2024, 2, 29]?, Time[14, 30, 0]]?->asString
         ],
         ^ => TestResult :: TestResult[
             name: 'Valid DateAndTime From String Test',
             expected: '2024-02-29 14:30:00',
-            actual : ^ :: '2024-02-29 14:30:00'->asDateAndTime->asString
+            actual : ^ :: '2024-02-29 14:30:00'->asDateAndTime?->asString
         ],
         ^ => TestResult :: TestResult[
             name: 'Valid DateAndTime From Json Array Test',
             expected: '2024-02-29 14:30:00',
-            actual : ^ :: [2024, 2, 29, 14, 30, 0]->asDateAndTime->asString
+            actual : ^ :: [2024, 2, 29, 14, 30, 0]->asDateAndTime?->asString
         ],
         ^ => TestResult :: TestResult[
             name: 'Valid DateAndTime From Json Object Test',
             expected: '2024-02-29 14:30:00',
-            actual : ^ :: [year: 2024, month: 2, day: 29, hour: 14, minute: 30, second: 0]->asDateAndTime->asString
+            actual : ^ :: [year: 2024, month: 2, day: 29, hour: 14, minute: 30, second: 0]->asDateAndTime?->asString
         ],
         ^ => TestResult :: TestResult[
             name: 'Valid DateAndTime As Json Test',

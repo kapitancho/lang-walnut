@@ -57,7 +57,7 @@ trait TupleAsRecord {
 				$valueRegistry,
 				$actualValue,
 				$expectedType
-			);
+			) ?? $actualValue;
 		}
 		return $actualValue;
 	}
@@ -66,20 +66,18 @@ trait TupleAsRecord {
 		ValueRegistry $valueRegistry,
 		TupleValue    $tupleValue,
 		RecordType    $recordType
-	): RecordValue {
+	): RecordValue|null {
 		$result = [];
 		$index = 0;
 		foreach($recordType->types as $key => $rType) {
-			try {
-				$value = $tupleValue->valueOf($index++);
-				$result[$key] = $value;
-                // @codeCoverageIgnoreStart
-			} catch (UnknownProperty $e) {
+			$value = $tupleValue->valueOf($index++);
+			if ($value instanceof UnknownProperty) {
 				if (!($rType instanceof OptionalKeyType)) {
-					throw $e;
+					return null;
 				}
+			} else {
+				$result[$key] = $value;
 			}
-			// @codeCoverageIgnoreEnd
 		}
 		return $valueRegistry->record($result);
 	}

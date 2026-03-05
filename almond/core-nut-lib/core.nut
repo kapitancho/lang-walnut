@@ -92,7 +92,10 @@ UnknownEnumerationValue := [enumeration: Type, value: String];
 
 /* hydration */
 HydrationError := [value: Any, errors: Array<[hydrationPath: String, errorMessage: String, targetType: Type]>];
-/*HydrationError->errorMessage(=> String) :: [$hydrationPath, $errorMessage]->format('Error in {0}: {1}');*/
+HydrationError->errorMessages(=> Array<String>) :: $errors->map(
+    ^e: [hydrationPath: String, errorMessage: String, targetType: Type] => String ::
+        e->format('Error in {hydrationPath}: {errorMessage}')
+);
 
 /* IO etc. */
 ExternalError := $[errorType: String, originalError: Any, errorMessage: String];

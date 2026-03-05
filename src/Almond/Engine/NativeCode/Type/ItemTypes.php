@@ -105,4 +105,5 @@ final readonly class ItemTypes extends TypeNativeMethod {
 			);
 		};
 	}
+
 }

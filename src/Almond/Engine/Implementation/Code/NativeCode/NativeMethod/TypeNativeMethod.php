@@ -26,7 +26,7 @@ abstract readonly class TypeNativeMethod extends NativeMethod {
 		return null;
 	}
 
-	protected function isTargetValueValid(Value $target, callable $executor): bool {
+	protected function DISABLE_isTargetValueValid(Value $target, callable $executor): bool {
 		if (!parent::isTargetValueValid($target, $executor)) {
 			return false;
 		}

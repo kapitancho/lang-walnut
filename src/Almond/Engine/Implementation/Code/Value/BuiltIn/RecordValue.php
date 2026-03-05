@@ -25,13 +25,17 @@ final class RecordValue implements RecordValueInterface, JsonSerializable {
         private readonly TypeRegistry $typeRegistry,
 	    public readonly array $values
     ) {
-		foreach($this->values as $value) {
+		foreach($this->values as $key => $value) {
 			/** @phpstan-ignore-next-line instanceof.alwaysTrue */
 			if (!$value instanceof Value) {
 				InvalidArgument::of(
 					Value::class,
 					$value,
-					'RecordValue must be constructed with a list of Value instances'
+					sprintf(
+						'RecordValue must be constructed with a list of Value instances but the value for key %s is of type %s',
+						$key,
+						get_debug_type($value)
+					)
 				);
 			}
 		}
