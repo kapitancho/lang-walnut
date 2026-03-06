@@ -134,7 +134,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		NUT, <<<NUT
 		f = ^ %% B :: %;
 		NUT);
-		$this->assertEquals("B{A{42}}", $result);
+		$this->assertEquals("B(A(42))", $result);
 	}
 
 	public function testOpenWithError(): void {
@@ -158,7 +158,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		NUT, <<<NUT
 		f = ^ %% B :: %;
 		NUT);
-		$this->assertEquals("B{42}", $result);
+		$this->assertEquals("B(42)", $result);
 	}
 
 	public function testOpenWithConstructorError(): void {
@@ -182,7 +182,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 	NUT, <<<NUT
 		f = ^ %% B :: %;
 	NUT);
-		$this->assertEquals("B{A{42}}", $result);
+		$this->assertEquals("B(A(42))", $result);
 	}
 
 	public function testSealedWithNoDependency(): void {
@@ -219,7 +219,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		NUT, <<<NUT
 		f = ^ %% B :: %;
 		NUT);
-		$this->assertEquals("B{42}", $result);
+		$this->assertEquals("B(42)", $result);
 	}
 
 	public function testSealedWithConstructorError(): void {

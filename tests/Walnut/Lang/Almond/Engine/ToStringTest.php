@@ -21,8 +21,8 @@ final class ToStringTest extends AlmondBaseTestHelper {
 		foreach([
 			'MyAtom' => $vr->atom($i('MyAtom')),
 			'MyEnum.A' => $vr->enumeration($i('MyEnum'), $ev('A')),
-			'MySealed{null}' => $vr->sealed($i('MySealed'), $vr->null),
-			'MyOpen{null}' => $vr->open($i('MyOpen'), $vr->null),
+			'MySealed(null)' => $vr->sealed($i('MySealed'), $vr->null),
+			'MyOpen(null)' => $vr->open($i('MyOpen'), $vr->null),
 			'MyData!null' => $vr->data($i('MyData'), $vr->null),
 			'true' => $vr->boolean(true),
 			'false' => $vr->boolean(false),

@@ -27,7 +27,7 @@ final class RemapKeysTest extends CodeExecutionTestHelper {
 			valueDeclarations: "fn = ^m: Map<String<1>:Integer> => Map<String<3>:Integer> :: 
 				m->remapKeys(^k: String<1> => String<3> :: '[' + k + ']');"
 		);
-		$this->assertEquals("[[a]: 1, [b]: 2]", $result);
+		$this->assertEquals("['[a]': 1, '[b]': 2]", $result);
 	}
 
 	public function testRemapKeysSubsetAndSizeZero(): void {

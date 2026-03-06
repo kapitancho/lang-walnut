@@ -27,7 +27,7 @@ final class IndexByTest extends CodeExecutionTestHelper {
 			"getMap([1, 2, 3, 4])",
 			valueDeclarations: "getMap = ^arr: Array<Integer<0..9>, 2..> => Map<String<1>:Integer<0..9>, 1..> :: arr->indexBy(^i: Integer<0..9> => String<1> :: i->asString);"
 		);
-		$this->assertEquals("[1: 1, 2: 2, 3: 3, 4: 4]", $result);
+		$this->assertEquals("['1': 1, '2': 2, '3': 3, '4': 4]", $result);
 	}
 
 	public function testIndexBySimple(): void {
@@ -42,7 +42,7 @@ final class IndexByTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet(
 			"[0, 1, 2, 3]->indexBy(^i: Integer => String :: {i % 3}->asString);"
 		);
-		$this->assertEquals("[0: 3, 1: 1, 2: 2]", $result);
+		$this->assertEquals("['0': 3, '1': 1, '2': 2]", $result);
 	}
 
 	public function testIndexByWithStrings(): void {

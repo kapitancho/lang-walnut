@@ -805,7 +805,7 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 
 	public function testAsRegExpValid(): void {
 		$result = $this->executeCodeSnippet("'/^hello ([a-z]+)/'->hydrateAs(`RegExp);");
-		$this->assertEquals("RegExp{'/^hello ([a-z]+)/'}", $result);
+		$this->assertEquals("RegExp('/^hello ([a-z]+)/')", $result);
 	}
 
 	public function testAsRegExpInvalid(): void {
@@ -815,7 +815,7 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 
 	public function testAsUuidValid(): void {
 		$result = $this->executeCodeSnippet("'00000000-0000-4000-9000-000000000000'->hydrateAs(`Uuid);");
-		$this->assertEquals("Uuid{'00000000-0000-4000-9000-000000000000'}", $result);
+		$this->assertEquals("Uuid('00000000-0000-4000-9000-000000000000')", $result);
 	}
 
 	public function testAsUuidInvalid(): void {

@@ -25,18 +25,18 @@ final class GroupByTest extends CodeExecutionTestHelper {
 	public function testGroupByWithStrings(): void {
 		$result = $this->executeCodeSnippet(
 			"['apple', 'apricot', 'ant', 'banana', 'cow']->groupBy(^s: String => String :: s->length->asString);");
-		$this->assertStringContainsString("5: ['apple']", $result);
-		$this->assertStringContainsString("7: ['apricot']", $result);
-		$this->assertStringContainsString("3: ['ant', 'cow']", $result);
-		$this->assertStringContainsString("6: ['banana']", $result);
+		$this->assertStringContainsString("'5': ['apple']", $result);
+		$this->assertStringContainsString("'7': ['apricot']", $result);
+		$this->assertStringContainsString("'3': ['ant', 'cow']", $result);
+		$this->assertStringContainsString("'6': ['banana']", $result);
 	}
 
 	public function testGroupByByLength(): void {
 		$result = $this->executeCodeSnippet(
 			"['a', 'bb', 'ccc', 'dd', 'e']->groupBy(^s: String => String :: s->length->asString);");
-		$this->assertStringContainsString("1: ['a', 'e']", $result);
-		$this->assertStringContainsString("2: ['bb', 'dd']", $result);
-		$this->assertStringContainsString("3: ['ccc']", $result);
+		$this->assertStringContainsString("'1': ['a', 'e']", $result);
+		$this->assertStringContainsString("'2': ['bb', 'dd']", $result);
+		$this->assertStringContainsString("'3': ['ccc']", $result);
 	}
 
 	public function testGroupByWithRecords(): void {

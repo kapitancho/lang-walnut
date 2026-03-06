@@ -28,6 +28,9 @@ final readonly class TestPrecompiler implements CodePrecompiler {
 		$sourceCode .= <<<CODE
 		
 			%% ~TestCases => {
+				greenMark = '\033[1;32m';
+				redMark = '\033[1;31m';
+				endMark = '\033[0m';
 				testCases->map(^ ~TestCase => String :: {
 					testResult = testCase->invoke;
 					before = testResult.before;
@@ -35,8 +38,12 @@ final readonly class TestPrecompiler implements CodePrecompiler {
 						`^Null => Any: before()
 					};
 					?whenIsError(beforeResult) {
-						=> '\033[1;31m' + 'ERROR: ' + testResult.name + ' (before hook failed: ' + 
-						beforeResult->printed + ')' + '\033[0m'
+						=> [
+							mark: redMark,
+							name: testResult.name,
+							result: beforeResult->printed,
+							end: endMark
+						]->format('{mark}ERROR: {name} (before hook failed: {result}){end}')
 					};
 					actualResult = testResult.actual();
 					after = testResult.after;
@@ -44,16 +51,28 @@ final readonly class TestPrecompiler implements CodePrecompiler {
 						`^Null => Any: after()
 					};
 					?whenIsError(afterResult) {
-						=> '\033[1;31m' + 'ERROR: ' + testResult.name + ' (after hook failed: ' + 
-						afterResult->printed + ')' + '\033[0m'
+						=> [
+							mark: redMark,
+							name: testResult.name,
+							result: afterResult->printed,
+							end: endMark
+						]->format('{mark}ERROR: {name} (after hook failed: {result}){end}')
 					};
 					resultMatches = actualResult == testResult.expected;
 					?when(resultMatches) {
-					    '\033[1;32m' + 'PASS: ' + testResult.name + '\033[0m'
+						[
+							mark: greenMark,
+							name: testResult.name,
+							end: endMark
+						]->format('{mark}PASS: {name}{end}')
 					} ~ {
-						'\033[1;31m' + 'FAIL: ' + testResult.name + ' (expected: ' + 
-						{testResult.expected}->printed + ', got: ' + 
-						{actualResult}->printed + ')' + '\033[0m'
+						[
+							mark: redMark,
+							name: testResult.name,
+							expected: testResult.expected->printed,
+							actual: actualResult->printed, 
+							end: endMark
+						]->format('{mark}FAIL: {name} (expected: {expected}, got: {actual}){end}')
 					}
 				})->combineAsString('\n');
 			};

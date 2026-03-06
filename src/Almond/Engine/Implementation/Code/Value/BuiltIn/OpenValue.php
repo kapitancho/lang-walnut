@@ -68,7 +68,7 @@ final readonly class OpenValue implements OpenValueInterface, JsonSerializable {
 	public function __toString(): string {
 		$sv = (string)$this->value;
 		return sprintf(
-			str_starts_with($sv, '[') ? "%s%s" : "%s{%s}",
+			str_starts_with($sv, '[') ? "%s%s" : "%s(%s)",
 			$this->type->name,
 			$sv
 		);

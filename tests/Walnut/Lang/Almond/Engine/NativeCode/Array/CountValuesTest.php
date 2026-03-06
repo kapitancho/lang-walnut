@@ -13,7 +13,7 @@ final class CountValuesTest extends CodeExecutionTestHelper {
 
 	public function testCountValuesNonEmptyInteger(): void {
 		$result = $this->executeCodeSnippet("[1, 2, 2, 2]->countValues;");
-		$this->assertEquals("[1: 1, 2: 3]", $result);
+		$this->assertEquals("['1': 1, '2': 3]", $result);
 	}
 
 	public function testCountValuesNonEmptyString(): void {
@@ -26,7 +26,7 @@ final class CountValuesTest extends CodeExecutionTestHelper {
 			"fn[1, 2, 2, 2];",
 			valueDeclarations: "fn = ^m: Array<Integer<0..99>, ..4> => Map<String<1..2>:Integer<1..4>, ..4> :: m->countValues;"
 		);
-		$this->assertEquals("[1: 1, 2: 3]", $result);
+		$this->assertEquals("['1': 1, '2': 3]", $result);
 	}
 
 	public function testCountValuesKeyTypeString(): void {

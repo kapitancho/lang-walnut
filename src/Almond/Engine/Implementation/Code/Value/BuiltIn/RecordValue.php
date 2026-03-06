@@ -90,7 +90,9 @@ final class RecordValue implements RecordValueInterface, JsonSerializable {
 				array_map(
 					static fn(string $key, Value $value): string =>
 						/** @phpstan-ignore-next-line booleanAnd.leftAlwaysTrue */
-					($s = sprintf("%s: %s", $key, $value)) && $multiline ?
+					($s = sprintf("%s: %s",
+						preg_match('/^[A-Za-z][a-zA-Z0-9_]*$/', $key) ? $key : sprintf("'%s'", $key),
+						$value)) && $multiline ?
 						str_replace("\n", "\n" . "\t", $s) : $s,
 					array_keys($this->values), $this->values
 				)

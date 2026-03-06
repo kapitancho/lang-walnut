@@ -105,7 +105,7 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 				'Open' => OpenType::class,
 			][$type->value->value] ?? null;
 			return array_merge($baseIds,
-				self::typeMap[$class] ?? []
+				self::typeMap[$class ?? ''] ?? []
 			);
 		}
 		// @codeCoverageIgnoreStart

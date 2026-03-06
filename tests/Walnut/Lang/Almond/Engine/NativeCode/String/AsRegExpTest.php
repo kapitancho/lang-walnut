@@ -8,7 +8,7 @@ final class AsRegExpTest extends CodeExecutionTestHelper {
 
 	public function testAsRegExpValid(): void {
 		$result = $this->executeCodeSnippet("'/^hello ([a-z]+)/'->as(`RegExp);");
-		$this->assertEquals("RegExp{'/^hello ([a-z]+)/'}", $result);
+		$this->assertEquals("RegExp('/^hello ([a-z]+)/')", $result);
 	}
 
 	public function testAsRegExpInvalid(): void {
@@ -21,7 +21,7 @@ final class AsRegExpTest extends CodeExecutionTestHelper {
 			"getRegExp('/^hello ([a-z]+)/');",
 			valueDeclarations: "getRegExp = ^a: String['/^hello ([a-z]+)/', '/^welcome ([a-z]+)/'] => RegExp :: a->as(`RegExp);"
 		);
-		$this->assertEquals("RegExp{'/^hello ([a-z]+)/'}", $result);
+		$this->assertEquals("RegExp('/^hello ([a-z]+)/')", $result);
 	}
 
 	public function testAsRegExpTypeUnsafeOk(): void {
@@ -29,7 +29,7 @@ final class AsRegExpTest extends CodeExecutionTestHelper {
 			"getRegExp('/^hello ([a-z]+)/');",
 			valueDeclarations: "getRegExp = ^a: String => Result<RegExp, InvalidRegExp> :: a->as(`RegExp);"
 		);
-		$this->assertEquals("RegExp{'/^hello ([a-z]+)/'}", $result);
+		$this->assertEquals("RegExp('/^hello ([a-z]+)/')", $result);
 	}
 
 	public function testAsRegExpTypeUnsafeError(): void {

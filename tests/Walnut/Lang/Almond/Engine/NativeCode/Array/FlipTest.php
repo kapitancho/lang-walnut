@@ -13,7 +13,7 @@ final class FlipTest extends CodeExecutionTestHelper {
 
 	public function testFlipNonEmpty(): void {
 		$result = $this->executeCodeSnippet("['1', 'a']->flip;");
-		$this->assertEquals("[1: 0, a: 1]", $result);
+		$this->assertEquals("['1': 0, a: 1]", $result);
 	}
 
 	public function testFlipKeyType(): void {

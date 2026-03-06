@@ -1,4 +1,4 @@
-module demo-all:
+module $demo-all:
 
 /* The global scope contains the following declarations: */
 

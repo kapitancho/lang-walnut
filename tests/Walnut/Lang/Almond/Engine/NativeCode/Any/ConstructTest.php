@@ -9,13 +9,13 @@ final class ConstructTest extends CodeExecutionTestHelper {
 	public function testConstructOpenBasic(): void {
 		$result = $this->executeCodeSnippet("MyOpen('hello');",
 			"MyOpen := #String;");
-		$this->assertEquals("MyOpen{'hello'}", $result);
+		$this->assertEquals("MyOpen('hello')", $result);
 	}
 
 	public function testConstructOpenValidatorOk(): void {
 		$result = $this->executeCodeSnippet("MyOpen('hello');",
 			"MyOpen := #String @ Integer :: ?when ({#->length} > 10) { => @{#->length} };");
-		$this->assertEquals("MyOpen{'hello'}", $result);
+		$this->assertEquals("MyOpen('hello')", $result);
 	}
 
 	public function testConstructOpenValidatorInvalidParameterType(): void {
@@ -37,7 +37,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 			"MyOpen := #String @ Integer :: ?when ({#->length} > 10) { => @{#->length} };" .
 			"MyOpen(Integer) :: #->asString;"
 		);
-		$this->assertEquals("MyOpen{'112'}", $result);
+		$this->assertEquals("MyOpen('112')", $result);
 	}
 
 	public function testConstructOpenConstructorAndValidatorError(): void {
@@ -53,7 +53,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 			"MyOpen := #String @ Integer :: ?when ({#->length} > 10) { => @{#->length} };" .
 			"MyOpen(Integer) @ Boolean :: ?whenValueOf(#) {0 : @false, ~ : #->asString};"
 		);
-		$this->assertEquals("MyOpen{'112'}", $result);
+		$this->assertEquals("MyOpen('112')", $result);
 	}
 
 	public function testConstructOpenConstructorWithErrorAndValidatorError(): void {
@@ -68,7 +68,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("MyOpen(112);",
 			"MyOpen := #String; MyOpen(Integer) :: #->asString;"
 		);
-		$this->assertEquals("MyOpen{'112'}", $result);
+		$this->assertEquals("MyOpen('112')", $result);
 	}
 
 

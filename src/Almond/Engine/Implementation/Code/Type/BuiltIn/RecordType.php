@@ -185,7 +185,9 @@ final class RecordType implements RecordTypeInterface, JsonSerializable {
 		if (count($this->types)) {
 			foreach($this->types as $key => $type) {
 				$typeStr = (string)$type;
-				$typeStr = lcfirst($typeStr) === $key ? "~$typeStr" : "$key: $typeStr";
+				$keyStr = preg_match('/^[A-Za-z][a-zA-Z0-9_]*$/', $key) ? $key : sprintf("'%s'", $key);
+				$typeStr = lcfirst($typeStr) === $key ? "~$typeStr" : "$keyStr: $typeStr";
+
 				$typeStr = $multiline ? "\t" . str_replace("\n", "\n" . "\t", $typeStr) : $typeStr;
 				$types[] = $typeStr;
 			}
