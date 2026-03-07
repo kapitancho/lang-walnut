@@ -13,6 +13,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyContainerErrorType as DE;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NamedNativeMethod;
 
+/** @extends NamedNativeMethod<AtomType, TypeType, AtomValue, TypeValue> */
 final readonly class ValueOf extends NamedNativeMethod {
 
 	protected function getExpectedTypeName(): TypeName {

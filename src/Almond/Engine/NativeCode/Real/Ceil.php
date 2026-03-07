@@ -14,6 +14,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
+/** @extends NativeMethod<IntegerType|RealType, NullType, IntegerValue|RealValue, NullValue> */
 final readonly class Ceil extends NativeMethod {
 
 	protected function getValidator(): callable {

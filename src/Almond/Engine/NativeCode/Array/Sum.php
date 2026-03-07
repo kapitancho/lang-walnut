@@ -18,6 +18,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
+/** @extends ArrayNativeMethod<RealType, NullType, NullValue> */
 final readonly class Sum extends ArrayNativeMethod {
 
 	protected function getExpectedArrayItemType(): Type {

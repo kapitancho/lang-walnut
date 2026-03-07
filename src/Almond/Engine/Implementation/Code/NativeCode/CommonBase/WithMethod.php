@@ -23,6 +23,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\OptionalKeyType as OptionalKeyTypeImpl;
 
+/** @extends NativeMethod<Type, Type, Value, Value> */
 abstract readonly class WithMethod extends NativeMethod {
 
 	/** @param callable(): (Type|ValidationFailure) $typeAdjustFn */

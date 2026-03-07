@@ -14,6 +14,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MutableNativeMethod;
 
+/** @extends MutableNativeMethod<ArrayType, NullType, NullValue> */
 final readonly class POP extends MutableNativeMethod {
 
 	protected function validateTargetValueType(Type $valueType): null|string {

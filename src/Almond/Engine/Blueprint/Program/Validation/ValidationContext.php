@@ -11,6 +11,7 @@ interface ValidationContext extends ValidationResult {
 	public Type $expressionType { get; }
 	public Type $returnType { get; }
 
+	/**  @param iterable<VariableName, Type> $types */
 	public function withAddedVariableTypes(iterable $types): ValidationContext;
 	public function withAddedVariableType(VariableName $name, Type $type): ValidationContext;
 	public function withExpressionType(Type $type): ValidationContext;

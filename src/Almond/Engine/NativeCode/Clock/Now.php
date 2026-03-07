@@ -4,6 +4,7 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Clock;
 
 use DateTimeImmutable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AtomType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\AtomValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
@@ -11,6 +12,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NamedNativeMethod;
 
+/** @extends NamedNativeMethod<AtomType, NullType, AtomValue, NullValue> */
 final readonly class Now extends NamedNativeMethod {
 
 	protected function getExpectedTypeName(): TypeName {

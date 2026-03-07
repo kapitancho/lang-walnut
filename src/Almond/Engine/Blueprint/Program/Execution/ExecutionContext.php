@@ -11,6 +11,7 @@ interface ExecutionContext {
 	public Value $value { get; }
 
 	public function withAddedVariableValue(VariableName $variableName, Value $value): self;
+	/**  @param iterable<VariableName, Value> $values */
 	public function withAddedVariableValues(iterable $values): self;
 
 	public function withValue(Value $value): self;
