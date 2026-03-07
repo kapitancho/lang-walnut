@@ -17,7 +17,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 /** @extends NativeMethod<IntegerType, NullType, IntegerValue, NullValue> */
 final readonly class Digits extends NativeMethod {
 
-	private function digitCount(Number $bound): Number|PlusInfinity {
+	private function digitCount(Number $bound): Number {
 		return new Number(strlen((string)$bound));
 	}
 

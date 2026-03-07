@@ -20,6 +20,7 @@ final class RecordValue implements RecordValueInterface, JsonSerializable {
 	 * @param TypeRegistry $typeRegistry
 	 * @param array<string, Value> $values
 	 * @throws InvalidArgument
+	 * @phpstan-ignore throws.unusedType
 	 */
     public function __construct(
         private readonly TypeRegistry $typeRegistry,

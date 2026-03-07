@@ -18,7 +18,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNat
 /** @extends SetNativeMethod<StringType, ArrayType|TupleType, TupleValue> */
 final readonly class ZipMap extends SetNativeMethod {
 
-	protected function getExpectedSetItemType(): Type|array {
+	protected function getExpectedSetItemType(): StringType {
 		return $this->typeRegistry->string();
 	}
 

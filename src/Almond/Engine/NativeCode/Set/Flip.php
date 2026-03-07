@@ -16,7 +16,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNat
 /** @extends SetNativeMethod<StringType, NullType, NullValue> */
 final readonly class Flip extends SetNativeMethod {
 
-	protected function getExpectedSetItemType(): Type|array {
+	protected function getExpectedSetItemType(): StringType {
 		return $this->typeRegistry->string();
 	}
 

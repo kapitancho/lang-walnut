@@ -19,7 +19,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNat
 /** @extends SetNativeMethod<StringType, FunctionType, FunctionValue> */
 final readonly class FlipMap extends SetNativeMethod {
 
-	protected function getExpectedSetItemType(): Type|array {
+	protected function getExpectedSetItemType(): StringType {
 		return $this->typeRegistry->string();
 	}
 

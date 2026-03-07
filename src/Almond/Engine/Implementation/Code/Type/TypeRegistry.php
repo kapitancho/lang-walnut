@@ -192,7 +192,7 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 	}
 
 	/**
-	 * @param list<string> $values
+	 * @param non-empty-list<string> $values
 	 * @throws InvalidArgument|DuplicateSubsetValue
 	 */
 	public function stringSubset(array $values): StringSubsetType {
@@ -240,7 +240,7 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 	}
 
 	/**
-	 * @param list<Number> $values
+	 * @param non-empty-list<Number> $values
 	 * @throws InvalidArgument|DuplicateSubsetValue
 	 */
 	public function integerSubset(array $values): IntegerSubsetType {
@@ -284,7 +284,7 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 	}
 
 	/**
-	 * @param list<Number> $values
+	 * @param non-empty-list<Number> $values
 	 * @throws InvalidArgument|DuplicateSubsetValue
 	 */
 	public function realSubset(array $values): RealSubsetType {

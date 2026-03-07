@@ -21,6 +21,7 @@ final class DuplicateSubsetValue extends EngineException {
 		);
 	}
 
+	/** @throws self */
 	public static function of(
 		Type $enumerationType,
 		EnumerationValueName|string|Number $valueName,

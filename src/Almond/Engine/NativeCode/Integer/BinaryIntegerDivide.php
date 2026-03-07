@@ -28,7 +28,6 @@ final readonly class BinaryIntegerDivide extends NativeMethod {
 				$parameterType->numberRange->min instanceof NumberIntervalEndpoint && $parameterType->numberRange->min->value >= 0
 			) {
 				$pMin = match(true) {
-					$parameterType->numberRange->min === MinusInfinity::value => MinusInfinity::value,
 					(string)$parameterType->numberRange->min->value === '0' => new Number(1),
 					default => $parameterType->numberRange->min->value
 				};

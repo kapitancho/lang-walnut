@@ -2162,6 +2162,7 @@ final readonly class ParserStateMachine {
 			401 => ['name' => 'value start', 'transitions' => [
 				T::var_keyword->name => function(LT $token) {
 					$this->s->result['startPosition'] = $token->sourcePosition;
+					/** @phpstan-ignore match.unhandled */
 					match($token->patternMatch->text) {
 						'null' => $this->s->stay(405),
 						'true' => $this->s->stay(406),

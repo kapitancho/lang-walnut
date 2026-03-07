@@ -20,6 +20,7 @@ final class UnknownEnumerationValue extends EngineException {
 		);
 	}
 
+	/** @throws self */
 	public static function of(
 		EnumerationType      $enumerationType,
 		EnumerationValueName $valueName,

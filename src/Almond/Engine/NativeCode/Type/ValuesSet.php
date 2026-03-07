@@ -49,6 +49,7 @@ final readonly class ValuesSet extends TypeNativeMethod {
 		return function(TypeType $targetType, NullType $parameterType): Type {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof MetaType) {
+				/** @phpstan-ignore match.unhandled */
 				$t = match($refType->value) {
 					MetaTypeValue::Enumeration,
 					MetaTypeValue::EnumerationSubset

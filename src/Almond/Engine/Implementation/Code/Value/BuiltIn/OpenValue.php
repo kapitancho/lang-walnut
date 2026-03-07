@@ -29,25 +29,14 @@ final readonly class OpenValue implements OpenValueInterface, JsonSerializable {
 	public function validate(ValidationRequest $request): ValidationResult {
 		$request = $this->value->validate($request);
 		$type = $this->type;
-		if ($type instanceof OpenType) {
-			if (!$this->value->type->isSubtypeOf($type->valueType)) {
-				return $request->withError(
-					ValidationErrorType::valueTypeMismatch,
-					sprintf(
-						'The value of the open type %s should be a subtype of %s but got %s',
-						$type,
-						$type->valueType,
-						$this->value->type,
-					),
-					$this
-				);
-			}
-		} else {
+		if (!$this->value->type->isSubtypeOf($type->valueType)) {
 			return $request->withError(
-				ValidationErrorType::typeTypeMismatch,
+				ValidationErrorType::valueTypeMismatch,
 				sprintf(
-					'The type %s is not an open type',
-					$this->type,
+					'The value of the open type %s should be a subtype of %s but got %s',
+					$type,
+					$type->valueType,
+					$this->value->type,
 				),
 				$this
 			);

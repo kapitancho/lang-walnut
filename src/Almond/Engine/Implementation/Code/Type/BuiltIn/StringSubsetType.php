@@ -6,6 +6,7 @@ use BcMath\Number;
 use JsonSerializable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringSubsetType as StringSubsetTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType as StringTypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\DuplicateSubsetValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\InvalidArgument;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\SupertypeChecker;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -20,12 +21,16 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResult;
 
 final class StringSubsetType implements StringSubsetTypeInterface, JsonSerializable {
 
-	/** @param list<string> $subsetValues */
+	/**
+	 * @param non-empty-list<string> $subsetValues
+	 * @throws InvalidArgument|DuplicateSubsetValue
+	 */
 	public function __construct(
 		private readonly StringTypeInterface  $stringType,
 		private readonly EscapeCharHandler    $escapeCharHandler,
 		public readonly array                 $subsetValues
 	) {
+		/** @phpstan-ignore identical.alwaysFalse */
 		if ($subsetValues === []) {
 			InvalidArgument::of(
 				'StringSubset[]',
@@ -35,6 +40,7 @@ final class StringSubsetType implements StringSubsetTypeInterface, JsonSerializa
 		}
 		$selected = [];
 		foreach($subsetValues as $value) {
+			/** @phpstan-ignore function.alreadyNarrowedType */
 			if (!is_string($value)) {
 				InvalidArgument::of(
 					'String',

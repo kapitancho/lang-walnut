@@ -21,7 +21,7 @@ final readonly class VariableScope implements VariableScopeInterface {
 	}
 
 	public function typeOf(VariableName $name): Type|null {
-		return $this->typesMap[$name->identifier]?->type ?? null;
+		return $this->typesMap[$name->identifier]->type ?? null;
 	}
 
 	/**  @param iterable<VariableName, Type> $types */

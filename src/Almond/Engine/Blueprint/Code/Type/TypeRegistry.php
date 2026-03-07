@@ -83,7 +83,7 @@ interface TypeRegistry extends TypeFinder {
 	): IntegerType;
 
 	/**
-	 * @param list<Number> $values
+	 * @param non-empty-list<Number> $values
 	 * @throws InvalidArgument|DuplicateSubsetValue
 	 */
 	public function integerSubset(array $values): IntegerSubsetType;
@@ -98,13 +98,13 @@ interface TypeRegistry extends TypeFinder {
 	): RealType;
 
 	/**
-	 * @param list<Number> $values
+	 * @param non-empty-list<Number> $values
 	 * @throws InvalidArgument|DuplicateSubsetValue
 	 */
 	public function realSubset(array $values): RealSubsetType;
 
 	/**
-	 * @param list<string> $values
+	 * @param non-empty-list<string> $values
 	 * @throws InvalidArgument|DuplicateSubsetValue
 	 */
 	public function stringSubset(array $values): StringSubsetType;

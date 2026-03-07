@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn;
 
 use BcMath\Number;
-use InvalidArgumentException;
 use JsonSerializable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerSubsetType as IntegerSubsetTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType as IntegerTypeInterface;
@@ -24,12 +23,13 @@ final class IntegerSubsetType implements IntegerSubsetTypeInterface, JsonSeriali
 	private readonly IntegerTypeInterface $underlyingType;
 
 	/**
-	 * @param list<Number> $subsetValues
-	 * @throws InvalidArgumentException
+	 * @param non-empty-list<Number> $subsetValues
+	 * @throws InvalidArgument|DuplicateSubsetValue
 	 */
 	public function __construct(
 		public readonly array $subsetValues
 	) {
+		/** @phpstan-ignore identical.alwaysFalse */
 		if ($subsetValues === []) {
 			InvalidArgument::of(
 				'IntegerSubset[]',
@@ -39,6 +39,7 @@ final class IntegerSubsetType implements IntegerSubsetTypeInterface, JsonSeriali
 		}
 		$selected = [];
 		foreach($subsetValues as $value) {
+			/** @phpstan-ignore instanceof.alwaysTrue */
 			if (!$value instanceof Number || ((string)$value !== (string)$value->floor())) {
 				InvalidArgument::of(
 					'String',

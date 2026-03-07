@@ -111,6 +111,7 @@ final class EnumerationType implements EnumerationTypeInterface, JsonSerializabl
     public function subsetType(array $values): EnumerationSubsetTypeInterface {
 	    $selected = array_map(
 		    fn($valueName): EnumerationValueInterface =>
+		    /** @phpstan-ignore instanceof.alwaysTrue */
 		    $valueName instanceof EnumerationValueName ?
 			    $this->value($valueName) :
 			    InvalidArgument::of(

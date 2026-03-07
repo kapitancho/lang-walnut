@@ -19,7 +19,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 final readonly class Enumeration extends NativeMethod {
 
 	protected function validateTargetType(Type $targetType, mixed $origin): null|string {
-		return $targetType instanceof EnumerationSubsetType || $targetType instanceof EnumerationType ||
+		return $targetType instanceof EnumerationSubsetType ||
 		($targetType instanceof MetaType && $targetType->value === MetaTypeValue::Enumeration) ?
 			null : sprintf(
 				"Target type must be an Enumeration type, but got %s",

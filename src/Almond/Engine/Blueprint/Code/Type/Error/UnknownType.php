@@ -17,6 +17,7 @@ final class UnknownType extends EngineException {
 		);
 	}
 
+	/** @throws self */
 	public static function of(TypeName $typeName): never {
 		throw new self($typeName);
 	}

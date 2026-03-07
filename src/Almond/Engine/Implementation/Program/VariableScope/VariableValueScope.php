@@ -27,11 +27,11 @@ final readonly class VariableValueScope implements VariableValueScopeInterface {
 	}
 
 	public function typeOf(VariableName $name): Type|null {
-		return $this->valuesMap[$name->identifier]?->type ?? null;
+		return $this->valuesMap[$name->identifier]->type ?? null;
 	}
 
 	public function valueOf(VariableName $name): Value|null {
-		return $this->valuesMap[$name->identifier]?->value ?? null;
+		return $this->valuesMap[$name->identifier]->value ?? null;
 	}
 
 	/**  @param iterable<VariableName, Type> $types */

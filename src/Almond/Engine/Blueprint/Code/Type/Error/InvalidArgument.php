@@ -19,6 +19,7 @@ final class InvalidArgument extends EngineException {
 		);
 	}
 
+	/** @throws self */
 	public static function of(
 		string $expectedType,
 		mixed $actualValue,

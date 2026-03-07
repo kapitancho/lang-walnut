@@ -21,11 +21,15 @@ final readonly class EnumerationSubsetType implements EnumerationSubsetTypeInter
 	/** @var array<string, EnumerationValue> */
 	public array $subsetValues;
 
-    /** @param array<string, EnumerationValue> $subsetValues */
+    /**
+     * @param non-empty-array<string, EnumerationValue> $subsetValues
+     * @throws InvalidArgument|DuplicateSubsetValue
+     */
     public function __construct(
         public EnumerationTypeInterface $enumeration,
         array $subsetValues
     ) {
+		/** @phpstan-ignore identical.alwaysFalse */
 	    if ($subsetValues === []) {
 		    InvalidArgument::of(
 			    'EnumerationValueName[]',
@@ -39,6 +43,7 @@ final readonly class EnumerationSubsetType implements EnumerationSubsetTypeInter
 			    DuplicateSubsetValue::of($this, $value);
 		    }
 		    // @codeCoverageIgnoreStart
+		    /** @phpstan-ignore instanceof.alwaysTrue */
 		    if (!$value instanceof EnumerationValue) {
 			    InvalidArgument::of(
 				    'EnumerationValue',

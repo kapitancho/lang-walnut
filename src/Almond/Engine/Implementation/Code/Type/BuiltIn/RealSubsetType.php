@@ -22,12 +22,13 @@ final class RealSubsetType implements RealSubsetTypeInterface, JsonSerializable 
 	private readonly RealType $underlyingType;
 
 	/**
-	 * @param list<Number> $subsetValues
+	 * @param non-empty-list<Number> $subsetValues
 	 * @throws InvalidArgument|DuplicateSubsetValue
 	 */
 	public function __construct(
 		public readonly array $subsetValues
 	) {
+		/** @phpstan-ignore identical.alwaysFalse */
 		if ($subsetValues === []) {
 			InvalidArgument::of(
 				'RealSubset[]',
@@ -37,6 +38,7 @@ final class RealSubsetType implements RealSubsetTypeInterface, JsonSerializable 
 		}
 		$selected = [];
 		foreach($subsetValues as $value) {
+			/** @phpstan-ignore instanceof.alwaysTrue */
 			if (!$value instanceof Number) {
 				InvalidArgument::of(
 					'String',
