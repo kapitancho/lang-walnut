@@ -5,6 +5,7 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Code\Expression;
 use JsonSerializable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\ConstantExpression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
@@ -14,7 +15,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 
-//TODO: not a trait but a separate class
 abstract readonly class SequentialExpressionBase implements Expression, JsonSerializable {
 
 	/** @param array<Expression> $expressions */
@@ -38,26 +38,32 @@ abstract readonly class SequentialExpressionBase implements Expression, JsonSeri
 
 		$expressionTypes = [];
 		$returnTypes = [];
+		$earlyReturnResult = null;
 		foreach($this->expressions as $key => $expression) {
-			if ($expression instanceof ConstantExpression) {
-				$set[(string)$expression] = true;
-			} else {
-				$dynamic++;
-			}
-
 			$step = $expression->validateInContext($validationContext);
 			if ($step instanceof ValidationFailure) {
 				if (!$expression->isScopeSafe()) {
 					return $step;
 				}
 				$failure = $failure === null ? $step : $failure->mergeWith($step);
-			} else {
-				$expressionTypes[$key] = $step->expressionType;
+			} elseif (!$earlyReturnResult) {
+				if ($expression instanceof ConstantExpression) {
+					$set[(string)$expression] = true;
+				} else {
+					$dynamic++;
+				}
 				$returnTypes[$key] = $step->returnType;
+				if ($step->expressionType instanceof NothingType) {
+					$earlyReturnResult = $validationContext->withExpressionType($step->expressionType)
+						->withReturnType(
+							$this->typeRegistry->union(array_values($returnTypes))
+						);
+				}
+				$expressionTypes[$key] = $step->expressionType;
 				$validationContext = $step;
 			}
 		}
-		return $failure ?? $validationContext
+		return $failure ?? $earlyReturnResult ?? $validationContext
 			->withExpressionType(
 				$this->buildExpressionType(
 					$expressionTypes, count($set), $dynamic

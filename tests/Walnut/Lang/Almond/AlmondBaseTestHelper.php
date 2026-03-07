@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Test\Almond;
 
 use PHPUnit\Framework\TestCase;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\FunctionValueFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\UserlandFunctionFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Userland\UserlandTypeBuilder;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\EnumerationValueName;
@@ -28,6 +29,7 @@ abstract class AlmondBaseTestHelper extends TestCase {
 	protected readonly ExpressionRegistry $expressionRegistry;
 	protected readonly ValidationFactory $validationFactory;
 	protected readonly UserlandFunctionFactory $userlandFunctionFactory;
+	protected readonly FunctionValueFactory $functionValueFactory;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -39,6 +41,7 @@ abstract class AlmondBaseTestHelper extends TestCase {
 		$this->expressionRegistry = $this->programContext->expressionRegistry;
 		$this->validationFactory = $this->programContext->validationFactory;
 		$this->userlandFunctionFactory = $this->programContext->userlandFunctionFactory;
+		$this->functionValueFactory = $this->programContext->functionValueFactory;
 
 		$this->addCoreToContext();
 	}

@@ -135,7 +135,8 @@ final readonly class UserlandFunction implements UserlandFunctionInterface {
 					"Failed to resolve dependency of type '%s' for function execution: %s",
 					$this->dependency->type,
 					$dependencyValue->message
-				)
+				),
+				$dependencyValue
 			);
 		}
 		$returnValue = $this->functionBody->execute(

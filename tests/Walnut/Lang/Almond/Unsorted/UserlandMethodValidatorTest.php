@@ -16,7 +16,7 @@ final class UserlandMethodValidatorTest extends CodeExecutionTestHelper {
 
 	public function testUserlandMethodValidatorBadDependency(): void {
 		$this->executeErrorCodeSnippet(
-			'No implementation found for the requested type "[~MyString]".' ,
+			'Cannot provide dependency value for type "[~MyString]".' ,
 			"MyString('hello')->length",
 		<<<NUT
 			MyString := #String;
@@ -47,7 +47,7 @@ final class UserlandMethodValidatorTest extends CodeExecutionTestHelper {
 
 	public function testUserlandMethodValidatorErrorCast(): void {
 		$this->executeErrorCodeSnippet(
-			'No implementation found for the requested type "[~T3]".',
+			'Cannot provide dependency value for type "[~T3]".',
 			"T1->asT2;", <<<NUT
 			T1 := ();
 			T2 := ();

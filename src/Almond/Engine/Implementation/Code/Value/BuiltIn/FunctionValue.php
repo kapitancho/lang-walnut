@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\Value\BuiltIn;
 
+use JsonSerializable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\UserlandFunction;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
@@ -17,7 +18,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationRequest;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResult;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\VariableScope\VariableValueScope;
 
-final readonly class FunctionValue implements FunctionValueInterface {
+final readonly class FunctionValue implements FunctionValueInterface, JsonSerializable {
 	public FunctionType $type;
 
 	public function __construct(

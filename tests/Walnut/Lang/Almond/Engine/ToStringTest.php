@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Test\Almond\Engine;
 
 use BcMath\Number;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\NameAndType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\MetaTypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\EnumerationValueName;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\MethodName;
@@ -41,12 +42,12 @@ final class ToStringTest extends AlmondBaseTestHelper {
 			'mutable{Integer, 42}' => $vr->mutable($this->typeRegistry->integer(), $vr->integer(42)),
 			"@'error'" => $vr->error($vr->string('error')),
 			"type{Boolean}" => $vr->type($this->typeRegistry->boolean),
-			/*TODO: "^Null => Any %% Integer :: null" => $vr->function(
-				$this->typeRegistry->nameAndType(
+			"^Null => Any %% Integer :: null" => $this->functionValueFactory->function(
+				new NameAndType(
 					$this->typeRegistry->null,
 					null
 				),
-				$this->typeRegistry->nameAndType(
+				new NameAndType(
 					$this->typeRegistry->integer(),
 					null
 				),
@@ -56,7 +57,7 @@ final class ToStringTest extends AlmondBaseTestHelper {
 						$vr->null
 					)
 				)
-			),*/
+			),
         ] as $string => $value) {
 			$this->assertEquals($string, (string)$value);
 		}

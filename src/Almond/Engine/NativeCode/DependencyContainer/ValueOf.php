@@ -42,7 +42,6 @@ final readonly class ValueOf extends NamedNativeMethod {
 						'errorMessage' => $this->valueRegistry->string(
 							match($result->errorType) {
 								DE::circularDependency => 'Circular dependency',
-								DE::ambiguous => 'Ambiguous dependency',
 								DE::notFound => 'Dependency not found',
 								DE::unsupportedType => 'Unsupported type',
 								DE::errorWhileCreatingValue => 'Error returned while creating value',

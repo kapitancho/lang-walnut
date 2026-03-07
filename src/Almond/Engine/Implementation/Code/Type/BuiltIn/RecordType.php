@@ -48,7 +48,7 @@ final class RecordType implements RecordTypeInterface, JsonSerializable {
 				}
 				$itemResult = $item instanceof UnknownPropertyInterface ?
 					$itemRequest->withError(
-						sprintf("The record value should contain the key %d", $key),
+						sprintf("The record value should contain the key %s", $key),
 						$refType
 					) :
 					$refType->hydrate($itemRequest->forValue($item));

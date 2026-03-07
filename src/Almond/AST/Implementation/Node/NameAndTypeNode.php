@@ -18,7 +18,9 @@ final readonly class NameAndTypeNode implements NameAndTypeNodeInterface {
 
 	/** @return iterable<Node> */
 	public function children(): iterable {
-		//TODO: $name
+		if ($this->name) {
+			yield $this->name;
+		}
 		yield $this->type;
 	}
 

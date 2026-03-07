@@ -31,6 +31,7 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 	public function constant(Value $value): ConstantExpressionInterface {
 		return new ConstantExpression(
 			$this->validationFactory,
+			$this->valueRegistry,
 			$value
 		);
 	}

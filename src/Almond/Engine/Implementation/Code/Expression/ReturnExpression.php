@@ -24,7 +24,7 @@ final readonly class ReturnExpression implements Expression, JsonSerializable {
 		if ($result instanceof ValidationFailure) {
 			return $result;
 		}
-		return $result->withExpressionType(
+		return $validationContext->withExpressionType(
 			$this->typeRegistry->nothing
 		)->withReturnType($this->typeRegistry->union([
 			$result->returnType,
@@ -32,10 +32,7 @@ final readonly class ReturnExpression implements Expression, JsonSerializable {
 		]));
 	}
 
-	// TODO: consider if this is true: Return expressions are always scope safe because they terminate execution flow.
-	//public function isScopeSafe(): bool { return true; }
-
-	public function isScopeSafe(): bool { return $this->returnedExpression->isScopeSafe(); }
+	public function isScopeSafe(): bool { return true; }
 
 	public function validateDependencies(DependencyContext $dependencyContext): DependencyContext {
 		return $this->returnedExpression->validateDependencies($dependencyContext);

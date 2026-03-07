@@ -30,11 +30,12 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationError as Va
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Program\Validation\ValidationError;
+use WeakMap;
 
 final class DependencyContainer implements DependencyContainerInterface {
 
-	/** @var array<Type, Value|DependencyError> $cache */
-	private array $cache;
+	/** @var WeakMap<Type, Value|DependencyError> $cache */
+	private WeakMap $cache;
 	/** @var SplObjectStorage<Type, Type> $visited */
 	private SplObjectStorage $visited;
 
@@ -43,7 +44,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 		private readonly ValueRegistry $valueRegistry,
 		private readonly MethodContext $methodContext
 	) {
-		$this->cache = [];
+		$this->cache = new WeakMap();
 		$this->visited = new SplObjectStorage;
 	}
 
@@ -52,8 +53,9 @@ final class DependencyContainer implements DependencyContainerInterface {
 		return $value instanceof DependencyErrorInterface ? new ValidationError(
 			ValidationErrorType::dependencyNotFound,
 			sprintf(
-				'No implementation found for the requested type "%s".',
-				$type
+				'Cannot provide dependency value for type "%s". Reason: %s',
+				$type,
+				$value->errorType->errorInfo()
 			),
 			$origin
 		) : null;
@@ -66,8 +68,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 				$type
 			);
 		}
-		$typeStr = (string)$type;
-		$cached = $this->cache[$typeStr] ?? null;
+		$cached = $this->cache[$type] ?? null;
 		if ($cached) {
 			return $cached;
 		}
@@ -80,7 +81,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 				sprintf("The value %s is not a subtype of %s", $result->type, $type)
 			);
 		}
-		$this->cache[$typeStr] = $result;
+		$this->cache[$type] = $result;
 		$this->visited->offsetUnset($type);
 		return $result;
 
@@ -213,8 +214,13 @@ final class DependencyContainer implements DependencyContainerInterface {
 		}
 		try {
 			$result = $this->methodContext->executeCast($dependencyContainerType->value, $type->name);
-		} catch (ExecutionException) {
-			return new DependencyError(DependencyContainerErrorType::errorWhileCreatingValue, $type);
+		} catch (ExecutionException $e) {
+			return new DependencyError(
+				$e->relatedError instanceof DependencyError ?
+					DependencyContainerErrorType::circularDependency :
+					DependencyContainerErrorType::runtimeError,
+				$type
+			);
 		}
 		if (
 			$result instanceof ErrorValue &&

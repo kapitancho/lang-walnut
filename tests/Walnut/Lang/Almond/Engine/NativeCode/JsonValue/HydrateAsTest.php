@@ -412,7 +412,7 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 
 	public function testHydrateAsRecordFromRecordMissingProperty(): void {
 		$result = $this->executeCodeSnippet("[a: 1, b: 2]->hydrateAs(type[a: Integer, b: Integer, c: Real]);");
-		$this->assertEquals("@HydrationError![\n\tvalue: [a: 1, b: 2],\n\terrors: [\n\t\t[\n\t\t\thydrationPath: 'value',\n\t\t\terrorMessage: 'One or more items in the record failed to hydrate',\n\t\t\ttargetType: type[a: Integer, b: Integer, c: Real]\n\t\t],\n\t\t[\n\t\t\thydrationPath: 'value.c',\n\t\t\terrorMessage: 'The record value should contain the key 0',\n\t\t\ttargetType: type{Real}\n\t\t]\n\t]\n]", $result);
+		$this->assertEquals("@HydrationError![\n\tvalue: [a: 1, b: 2],\n\terrors: [\n\t\t[\n\t\t\thydrationPath: 'value',\n\t\t\terrorMessage: 'One or more items in the record failed to hydrate',\n\t\t\ttargetType: type[a: Integer, b: Integer, c: Real]\n\t\t],\n\t\t[\n\t\t\thydrationPath: 'value.c',\n\t\t\terrorMessage: 'The record value should contain the key c',\n\t\t\ttargetType: type{Real}\n\t\t]\n\t]\n]", $result);
 	}
 
 	public function testHydrateAsRecordWithRestTypeFromRecord(): void {

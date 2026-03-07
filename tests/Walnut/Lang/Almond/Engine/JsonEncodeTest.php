@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Test\Almond\Engine;
 
 use BcMath\Number;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\NameAndType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\MetaTypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\EnumerationValueName;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\MethodName;
@@ -53,13 +54,13 @@ final class JsonEncodeTest extends AlmondBaseTestHelper {
 				=> $vr->mutable($this->typeRegistry->integer(), $vr->integer(42)),
 			'{"valueType":"Error","errorValue":{"valueType":"String","value":"error"}}' => $vr->error($vr->string('error')),
 			'{"valueType":"Type","value":{"type":"Boolean"}}' => $vr->type($this->typeRegistry->boolean),
-	        /*TODO: '{"valueType":"Function","parameter":{"type":{"type":"Null"},"name":null},"dependency":{"type":{"type":"Integer","range":{"intervals":[{"start":"MinusInfinity","end":"PlusInfinity"}]}},"name":null},"returnType":{"type":"Any"},"body":{"expression":{"expressionType":"constant","value":{"valueType":"Null"}}}}'
-			        => $vr->function(
-		        $this->typeRegistry->nameAndType(
+	        '{"valueType":"Function","parameter":{"type":{"type":"Null"},"name":null},"dependency":{"type":{"type":"Integer","range":{"intervals":[{"start":"MinusInfinity","end":"PlusInfinity"}]}},"name":null},"returnType":{"type":"Any"},"body":{"expression":{"expressionType":"constant","value":{"valueType":"Null"}}}}'
+		        => $this->functionValueFactory->function(
+		        new NameAndType(
 					$this->typeRegistry->null,
 			        null
 		        ),
-		        $this->typeRegistry->nameAndType(
+		        new NameAndType(
 					$this->typeRegistry->integer(),
 					null
 		        ),
@@ -69,7 +70,7 @@ final class JsonEncodeTest extends AlmondBaseTestHelper {
 						$vr->null
 					)
 				)
-			),*/
+			),
         ] as $string => $value) {
 			$this->assertEquals($string, json_encode($value));
 		}

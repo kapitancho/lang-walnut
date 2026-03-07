@@ -3,7 +3,10 @@
 namespace Walnut\Lang\Almond\Engine\Blueprint\Program\Execution;
 
 use Exception;
+use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyError;
 
 final class ExecutionException extends Exception {
-	//TODO: Implement ExecutionException
+	public function __construct(string $message, public readonly DependencyError|null $relatedError = null) {
+		parent::__construct($message);
+	}
 }

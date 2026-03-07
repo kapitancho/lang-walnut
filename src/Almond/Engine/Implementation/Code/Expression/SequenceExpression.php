@@ -9,12 +9,14 @@ final readonly class SequenceExpression extends SequentialExpressionBase {
 
 	/** @param array<Type> $expressionTypes */
 	protected function buildExpressionType(array $expressionTypes, int $set, int $dynamic): Type {
-		return array_last($expressionTypes);
+		return count($expressionTypes) ?
+			array_last($expressionTypes) : $this->typeRegistry->null;
 	}
 
 	/** @param array<Value> $expressionValues */
 	protected function buildExpressionValue(array $expressionValues): Value {
-		return array_last($expressionValues);
+		return count($expressionValues) ?
+			array_last($expressionValues) : $this->valueRegistry->null;
 	}
 
 	public function __toString(): string {

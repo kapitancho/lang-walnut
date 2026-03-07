@@ -11,6 +11,11 @@ final class SequenceExpressionTest extends CodeExecutionTestHelper {
 		$this->assertEquals("2", $result);
 	}
 
+	public function testSequenceEmpty(): void {
+		$result = $this->executeCodeSnippet("{};");
+		$this->assertEquals("null", $result);
+	}
+
 	public function testSequenceReturn(): void {
 		$result = $this->executeCodeSnippet("{=> 1; 2};");
 		$this->assertEquals("1", $result);

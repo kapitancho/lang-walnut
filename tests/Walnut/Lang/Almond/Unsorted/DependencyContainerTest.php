@@ -8,7 +8,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 
 	public function testCycle(): void {
 		$this->executeErrorCodeSnippet(
-			'No implementation found for the requested type "B".',
+			'Cannot provide dependency value for type "B".',
 			"f();",
 		<<<NUT
 		 A := #Integer;
@@ -44,7 +44,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 
 	public function testRecordWithError(): void {
 		$this->executeErrorCodeSnippet(
-			'No implementation found for the requested type "[~A, ~B]".',
+			'Cannot provide dependency value for type "[~A, ~B]".',
 			"f();",
 		<<<NUT
 		A := #Integer; ==> A :: A(42);
@@ -57,7 +57,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 
 	public function testRecordCannotFindItem(): void {
 		$this->executeErrorCodeSnippet(
-			'No implementation found for the requested type "[~A, ~B]',
+			'Cannot provide dependency value for type "[~A, ~B]',
 			"f();",
 		<<<NUT
 		A := #Integer; ==> A :: A(42);
@@ -80,7 +80,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 
 	public function testTupleError(): void {
 		$this->executeErrorCodeSnippet(
-			'No implementation found for the requested type "[A, B]".',
+			'Cannot provide dependency value for type "[A, B]".',
 		"f();",
 		<<<NUT
 		A := #Integer; ==> A :: A(42);
@@ -93,7 +93,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 
 	public function testTupleCannotFindItem(): void {
 		$this->executeErrorCodeSnippet(
-			'No implementation found for the requested type "[A, B]".',
+			'Cannot provide dependency value for type "[A, B]".',
 		"f();",
 		<<<NUT
 		A := #Integer; ==> A :: A(42);
@@ -116,7 +116,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 
 	public function testDataWithError(): void {
 		$this->executeErrorCodeSnippet(
-			'No implementation found for the requested type "B".',
+			'Cannot provide dependency value for type "B".',
 			"f();",
 		<<<NUT
 		A := Integer; ==> A :: A!42;
@@ -139,7 +139,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 
 	public function testOpenWithError(): void {
 		$this->executeErrorCodeSnippet(
-			'No implementation found for the requested type "B".',
+			'Cannot provide dependency value for type "B".',
 			"f();",
 		<<<NUT
 		A := #Integer; ==> A :: A(42);
@@ -163,7 +163,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 
 	public function testOpenWithConstructorError(): void {
 		$this->executeErrorCodeSnippet(
-			'No implementation found for the requested type "B".',
+			'Cannot provide dependency value for type "B".',
 			"f();",
 		<<<NUT
 		A := #Integer; ==> A :: A(42);
@@ -187,7 +187,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 
 	public function testSealedWithNoDependency(): void {
 		$this->executeErrorCodeSnippet(
-			'No implementation found for the requested type "A".',
+			'Cannot provide dependency value for type "A".',
 			"f();",
 		<<<NUT
 		A := \$Integer;
@@ -199,7 +199,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 
 	public function testSealedWithError(): void {
 		$this->executeErrorCodeSnippet(
-			'No implementation found for the requested type "B".',
+			'Cannot provide dependency value for type "B".',
 			"f();",
 		<<<NUT
 		A := \$Integer; ==> A :: A(42);
@@ -224,7 +224,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 
 	public function testSealedWithConstructorError(): void {
 		$this->executeErrorCodeSnippet(
-			'No implementation found for the requested type "B".',
+			'Cannot provide dependency value for type "B".',
 			"f();",
 		<<<NUT
 		A := \$Integer; ==> A :: A(42);

@@ -4,6 +4,7 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn;
 
 use JsonSerializable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MutableType as MutableTypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\CoreType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\SupertypeChecker;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\Hydrator\HydrationFailure;
@@ -36,8 +37,8 @@ final readonly class MutableType implements MutableTypeInterface, JsonSerializab
 			$ofType instanceof MutableTypeInterface =>
 				$this->valueType->isSubtypeOf($ofType->valueType) &&
 	            $ofType->valueType->isSubtypeOf($this->valueType),
-			//TODO: $ofType instanceof AliasType && $ofType->name->equals(CoreType::JsonValue->typeName()) =>
-				//$this->valueType->isSubtypeOf($ofType),
+			$ofType instanceof AliasType && $ofType->name->equals(CoreType::JsonValue->typeName()) =>
+				$this->valueType->isSubtypeOf($ofType),
 			$ofType instanceof SupertypeChecker => $ofType->isSupertypeOf($this),
 			default => false
 		};

@@ -106,8 +106,7 @@ final readonly class MethodCallExpression implements Expression, JsonSerializabl
 					$this->methodName,
 					$this->parameter,
 					$e->getMessage()
-				),
-				previous: $e
+				)
 			);
 		}
 		// @codeCoverageIgnoreEnd
