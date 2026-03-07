@@ -13,7 +13,7 @@ final readonly class CompositePreBuildValidator implements PreBuildValidator {
 	private array $validators;
 
 	public function __construct(PreBuildValidator ... $validators) {
-		$this->validators = $validators;
+		$this->validators = array_values($validators);
 	}
 
 	public function validate(PreBuildValidationRequest $request): PreBuildValidationSuccess|PreBuildValidationFailure {

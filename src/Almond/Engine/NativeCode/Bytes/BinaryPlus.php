@@ -50,7 +50,10 @@ final readonly class BinaryPlus extends NativeMethod {
 				return $this->valueRegistry->bytes($target->literalValue . $parameter->literalValue);
 			}
 			if ($parameter instanceof IntegerValue && $parameter->literalValue >= 0 && $parameter->literalValue <= 255) {
-				return $this->valueRegistry->bytes($target->literalValue . chr((int)(string)$parameter->literalValue));
+				return $this->valueRegistry->bytes($target->literalValue .
+					/** @phpstan-ignore argument.type */
+					chr((int)(string)$parameter->literalValue)
+				);
 			}
 			// @codeCoverageIgnoreStart
 			throw new ExecutionException("Invalid parameter value");

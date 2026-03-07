@@ -76,9 +76,10 @@ final readonly class BinaryModulo extends ArrayNativeMethod {
 
 	protected function getExecutor(): callable {
 		return function(TupleValue $target, IntegerValue $parameter): TupleValue {
+			/** @var int<1, max> $chunkSize */
 			$chunkSize = (int)(string)$parameter->literalValue;
 			$chunks = array_chunk($target->values, $chunkSize);
-			$last = $chunks[array_key_last($chunks)];
+			$last = array_last($chunks);
 
 			return $this->valueRegistry->tuple(
 				count($chunks) > 0 && count($last) < $chunkSize ?

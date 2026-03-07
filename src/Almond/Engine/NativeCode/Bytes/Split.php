@@ -30,6 +30,7 @@ final readonly class Split extends NativeMethod {
 
 	protected function getExecutor(): callable {
 		return function(BytesValue $target, BytesValue $parameter): TupleValue {
+			/** @phpstan-ignore argument.type */
 			$result = explode($parameter->literalValue, $target->literalValue);
 			return $this->valueRegistry->tuple(
 				array_map(fn(string $piece): BytesValue =>

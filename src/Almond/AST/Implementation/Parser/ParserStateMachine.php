@@ -1102,6 +1102,7 @@ final readonly class ParserStateMachine {
 					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->type->integerSubsetType([
 						$this->nodeBuilder->value->integerValue(
+							/** @phpstan-ignore argument.type */
 							new Number($token->patternMatch->text)
 						)
 					]);
@@ -1112,6 +1113,7 @@ final readonly class ParserStateMachine {
 					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->type->realSubsetType([
 						$this->nodeBuilder->value->realValue(
+							/** @phpstan-ignore argument.type */
 							new Number($token->patternMatch->text)
 						)
 					]);
@@ -2305,6 +2307,7 @@ final readonly class ParserStateMachine {
 			416 => ['name' => 'integer value', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->i++;
+					/** @phpstan-ignore argument.type */
 					$this->s->generated = $this->nodeBuilder->value->integerValue(new Number($token->patternMatch->text));
 					$this->s->pop();
 				},
@@ -2312,6 +2315,7 @@ final readonly class ParserStateMachine {
 			417 => ['name' => 'real value', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->i++;
+					/** @phpstan-ignore argument.type */
 					$this->s->generated = $this->nodeBuilder->value->realValue(new Number($token->patternMatch->text));
 					$this->s->pop();
 				},
@@ -3053,6 +3057,7 @@ final readonly class ParserStateMachine {
 					$this->s->result['subsetStartPosition'] ??= $this->s->result['startPosition'];
 					$this->s->result['startPosition'] = $token->sourcePosition;
 
+					/** @phpstan-ignore argument.type */
 					$val = new Number($token->patternMatch->text);
 					$this->s->i++;
 					$this->s->result['subsetValues'][] = $this->nodeBuilder->value->integerValue($val);
@@ -3151,6 +3156,7 @@ final readonly class ParserStateMachine {
 					$this->s->result['subsetStartPosition'] ??= $this->s->result['startPosition'];
 					$this->s->result['startPosition'] = $token->sourcePosition;
 
+					/** @phpstan-ignore argument.type */
 					$val = new Number($token->patternMatch->text);
 					$this->s->i++;
 					$this->s->result['subsetValues'][] = $this->nodeBuilder->value->realValue($val);

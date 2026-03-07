@@ -20,7 +20,7 @@ use WeakMap;
 
 final class NodeCodeMapper implements CodeMapper, SourceNodeLocator {
 
-	/** @var WeakMap<Expression|Value|Type|FunctionBody|UserlandMethod, SourceNode> */
+	/** @var WeakMap<Expression|Value|Type|FunctionBody|UserlandMethod|TypeName|VariableName|MethodName|EnumerationValueName, SourceNode> */
 	private WeakMap $nodeMap;
 
 	public function __construct(

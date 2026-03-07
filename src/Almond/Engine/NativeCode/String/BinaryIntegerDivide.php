@@ -48,6 +48,7 @@ final readonly class BinaryIntegerDivide extends NativeMethod {
 
 	protected function getExecutor(): callable {
 		return function(StringValue $target, IntegerValue $parameter): TupleValue {
+			/** @var int<1, max> $splitLength */
 			$splitLength = (int)(string)$parameter->literalValue;
 			$result = mb_str_split($target->literalValue, $splitLength);
 			if (count($result) > 0 && mb_strlen($result[array_key_last($result)]) < $splitLength) {

@@ -78,7 +78,9 @@ final readonly class FILTER extends MutableNativeMethod {
 				}
 				$target->value = match(true) {
 					$v instanceof TupleValue => $this->valueRegistry->tuple($result),
-					$v instanceof RecordValue => $this->valueRegistry->record($result),
+					$v instanceof RecordValue =>
+						/** @phpstan-ignore argument.type */
+						$this->valueRegistry->record($result),
 					$v instanceof SetValue => $this->valueRegistry->set($result),
 				};
 				return $target;

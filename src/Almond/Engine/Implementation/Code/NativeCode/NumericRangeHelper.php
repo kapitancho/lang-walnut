@@ -313,8 +313,8 @@ trait NumericRangeHelper {
 		}
 		$values = array_values($deduplicated);
 
-		$min = $hasMinusInfinity ? MinusInfinity::value : $values[array_key_first($values)];
-		$max = $hasPlusInfinity ? PlusInfinity::value : $values[array_key_last($values)];
+		$min = $hasMinusInfinity ? MinusInfinity::value : array_first($values);
+		$max = $hasPlusInfinity ? PlusInfinity::value : array_last($values);
 
 		return new NumberInterval($min, $max);
 	}
@@ -355,8 +355,8 @@ trait NumericRangeHelper {
 		usort($values,
 			fn(NumberIntervalEndpoint $a, NumberIntervalEndpoint $b): int => $a->value <=> $b->value
 		);
-		$min = $hasMinusInfinity ? MinusInfinity::value : $values[array_key_first($values)];
-		$max = $hasPlusInfinity ? PlusInfinity::value : $values[array_key_last($values)];
+		$min = $hasMinusInfinity ? MinusInfinity::value : array_first($values);
+		$max = $hasPlusInfinity ? PlusInfinity::value : array_last($values);
 		return new NumberInterval($min, $max);
 	}
 

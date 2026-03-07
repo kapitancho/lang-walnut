@@ -29,6 +29,7 @@ final readonly class Chunk extends NativeMethod {
 
 	protected function getExecutor(): callable {
 		return function(BytesValue $target, IntegerValue $parameter): TupleValue {
+			/** @var int<1, max> $splitLength */
 			$splitLength = (int)(string)$parameter->literalValue;
 			$result = str_split($target->literalValue, $splitLength);
 			return $this->valueRegistry->tuple(

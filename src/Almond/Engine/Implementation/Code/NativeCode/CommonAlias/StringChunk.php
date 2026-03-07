@@ -48,6 +48,7 @@ readonly class StringChunk extends NativeMethod {
 
 	protected function getExecutor(): callable {
 		return function(StringValue $target, IntegerValue $parameter): TupleValue {
+			/** @var int<1, max> $splitLength */
 			$splitLength = (int)(string)$parameter->literalValue;
 			$result = mb_str_split($target->literalValue, $splitLength);
 			return $this->valueRegistry->tuple(

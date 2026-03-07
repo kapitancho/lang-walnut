@@ -24,7 +24,7 @@ final readonly class VariableScope implements VariableScopeInterface {
 		return $this->typesMap[$name->identifier]->type ?? null;
 	}
 
-	/**  @param iterable<VariableName, Type> $types */
+	/**  @param iterable<VariableName, VariableTypeInterface> $types */
 	public function withAddedVariableTypes(iterable $types): VariableScope {
 		$typesMap = $this->typesMap;
 		foreach ($types as $name => $type) {

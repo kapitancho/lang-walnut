@@ -14,7 +14,7 @@ interface VariableScope {
 
 	public function typeOf(VariableName $name): Type|null;
 
-	/**  @param iterable<VariableName, Type> $types */
+	/**  @param iterable<VariableName, VariableType> $types */
 	public function withAddedVariableTypes(iterable $types): VariableScope;
 	public function withAddedVariableType(VariableName $name, Type $type): VariableScope;
 }

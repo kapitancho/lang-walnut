@@ -57,7 +57,9 @@ final readonly class ConstantExpression implements ConstantExpressionInterface, 
 		return match(true) {
 			$value instanceof FunctionValue => $value->withVariableValueScope($variableValueScope),
 			$value instanceof TupleValue => $this->valueRegistry->tuple($l($value)),
-			$value instanceof RecordValue => $this->valueRegistry->record($l($value)),
+			$value instanceof RecordValue =>
+				/** @phpstan-ignore argument.type */
+				$this->valueRegistry->record($l($value)),
 			$value instanceof SetValue => $this->valueRegistry->set($l($value)),
 			$value instanceof DataValue => $this->valueRegistry->data(
 				$value->type->name,

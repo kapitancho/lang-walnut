@@ -97,6 +97,7 @@ abstract readonly class NativeMethod implements NativeMethodInterface {
 		if ($failure) {
 			return $failure;
 		}
+		/** @phpstan-ignore-next-line */
 		$validatorResult = $validator($usedTargetType, $usedParameterType, $origin);
 		return $validatorResult instanceof Type ?
 			$this->validationFactory->validationSuccess($validatorResult) : $validatorResult;
@@ -133,15 +134,16 @@ abstract readonly class NativeMethod implements NativeMethodInterface {
 			throw new ExecutionException("Invalid parameter value");
 			// @codeCoverageIgnoreEnd
 		}
+		/** @phpstan-ignore-next-line */
 		return $executor($target, $parameter);
 	}
 
 	protected function isTargetValueValid(Value $target, callable $executor): bool {
-		return $this->matchesCallableParameter($executor, $target, 0);
+		return (bool)$this->matchesCallableParameter($executor, $target, 0);
 	}
 
 	protected function isParameterValueValid(Value $parameter, callable $executor): bool {
-		return $this->matchesCallableParameter($executor, $parameter, 1);
+		return (bool)$this->matchesCallableParameter($executor, $parameter, 1);
 	}
 
 	/** @return callable(TTargetValue, TParameterValue): Value */

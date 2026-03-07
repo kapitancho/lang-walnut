@@ -36,7 +36,7 @@ final readonly class BinaryIntegerDivide extends NativeMethod {
 					(string)$parameterType->numberRange->max->value === '0' => new Number(-1),
 					default => $parameterType->numberRange->max->value
 				};
-				$min = $parameterType->numberRange->max === PlusInfinity::value ?
+				$min = $pMax === PlusInfinity::value ?
 					new NumberIntervalEndpoint(
 						new Number(0),
 						true

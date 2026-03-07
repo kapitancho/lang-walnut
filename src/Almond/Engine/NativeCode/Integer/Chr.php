@@ -35,7 +35,10 @@ final readonly class Chr extends NativeMethod {
 	protected function getExecutor(): callable {
 		return fn(IntegerValue $target, NullValue $parameter): BytesValue =>
 			$this->valueRegistry->bytes(
-				chr((int)(string)$target->literalValue)
+				chr(
+					/** @phpstan-ignore argument.type */
+					(int)(string)$target->literalValue
+				)
 			);
 	}
 }

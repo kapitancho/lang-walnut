@@ -38,6 +38,7 @@ final readonly class BytesEscapeCharHandler implements EscapeCharHandler {
 				'n' => "\n",
 				't' => "\t",
 				'``' => '"',
+				/** @phpstan-ignore argument.type */
 				default => chr(hexdec($matches[1]))
 			},
 			$withoutQuotes

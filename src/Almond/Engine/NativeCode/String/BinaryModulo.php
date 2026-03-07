@@ -64,6 +64,7 @@ final readonly class BinaryModulo extends NativeMethod {
 
 	protected function getExecutor(): callable {
 		return function(StringValue $target, IntegerValue $parameter): StringValue {
+			/** @var int<1, max> $splitLength */
 			$splitLength = (int)(string)$parameter->literalValue;
 			$result = mb_str_split($target->literalValue, $splitLength);
 			$last = $result[array_key_last($result)] ?? '';

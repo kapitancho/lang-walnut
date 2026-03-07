@@ -5,13 +5,14 @@ namespace Walnut\Lang\Almond\Engine\Blueprint\Program\Validation;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\VariableName;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\VariableScope\VariableScope;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\VariableScope\VariableType;
 
 interface ValidationContext extends ValidationResult {
 	public VariableScope $variableScope { get; }
 	public Type $expressionType { get; }
 	public Type $returnType { get; }
 
-	/**  @param iterable<VariableName, Type> $types */
+	/**  @param iterable<VariableName, VariableType> $types */
 	public function withAddedVariableTypes(iterable $types): ValidationContext;
 	public function withAddedVariableType(VariableName $name, Type $type): ValidationContext;
 	public function withExpressionType(Type $type): ValidationContext;

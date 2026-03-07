@@ -34,6 +34,7 @@ final readonly class BinaryBitwiseAnd extends NativeMethod {
 
 			$result = '';
 			for ($i = 0; $i < $maxLen; $i++) {
+				/** @phpstan-ignore argument.type */
 				$result .= chr(ord($targetBytes[$i]) & ord($paramBytes[$i]));
 			}
 

@@ -11,7 +11,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 
 final class UserlandMethodStorage implements UserlandMethodRegistryInterface, UserlandMethodStorageInterface {
 
-	/** @var array<string, UserlandMethod[]> */
+	/** @var array<string, list<UserlandMethod>> */
 	private array $userlandMethods = [];
 	/** @var array<string, UserlandFunction> */
 	private array $typeValidators = [];
@@ -21,7 +21,7 @@ final class UserlandMethodStorage implements UserlandMethodRegistryInterface, Us
 		return $this->userlandMethods[$methodName->identifier] ?? [];
 	}
 
-	/** @return array<string, UserlandMethod[]> */
+	/** @return array<string, list<UserlandMethod>> */
 	public function allMethods(): array {
 		return $this->userlandMethods;
 	}

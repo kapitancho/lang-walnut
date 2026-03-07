@@ -186,6 +186,8 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 							if ($val instanceof Value) {
 								$executionContext = $executionContext->withAddedVariableValue(
 									new VariableName($variableName . $index),
+									//TODO: what is UnknownProperty?
+									/** @phpstan-ignore argument.type */
 									$v->valueOf($index)
 								);
 							}
@@ -256,6 +258,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 				$executionContext = $executionContext->withAddedVariableValue(
 					new VariableName('$_'),
 					$tv instanceof RecordValue ?
+						/** @phpstan-ignore argument.type */
 						$this->valueRegistry->record($restValues) :
 						$this->valueRegistry->tuple(array_values($restValues))
 				);

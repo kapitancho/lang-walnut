@@ -49,6 +49,7 @@ final readonly class BinaryIntegerDivide extends ArrayNativeMethod {
 
 	protected function getExecutor(): callable {
 		return function(TupleValue $target, IntegerValue $parameter): TupleValue {
+			/** @var int<1, max> $chunkSize */
 			$chunkSize = (int)(string)$parameter->literalValue;
 			$chunks = array_chunk($target->values, $chunkSize);
 			if (count($chunks) > 0 && count($chunks[array_key_last($chunks)]) < $chunkSize) {

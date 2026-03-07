@@ -34,7 +34,7 @@ use WeakMap;
 
 final class DependencyContainer implements DependencyContainerInterface {
 
-	/** @var WeakMap<Type, Value|DependencyError> $cache */
+	/** @var WeakMap<Type, Value|DependencyErrorInterface> $cache */
 	private WeakMap $cache;
 	/** @var SplObjectStorage<Type, Type> $visited */
 	private SplObjectStorage $visited;
@@ -87,7 +87,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 
 	}
 
-	private function findValueByType(Type $type): Value|DependencyError {
+	private function findValueByType(Type $type): Value|DependencyErrorInterface {
 		return match(true) {
 			$type instanceof AtomType => $type->value,
 			$type instanceof DataType => $this->findDataValue($type),
@@ -102,9 +102,9 @@ final class DependencyContainer implements DependencyContainerInterface {
 		};
 	}
 
-	private function findDataValue(DataType $type): Value|DependencyError {
+	private function findDataValue(DataType $type): Value|DependencyErrorInterface {
 		$found = $this->findValueByNamedType($type);
-		if ($found instanceof DependencyError) {
+		if ($found instanceof DependencyErrorInterface) {
 			$baseValue = $this->findValueByType($type->valueType);
 			if ($baseValue instanceof Value) {
 				return $this->valueRegistry->data(
@@ -137,7 +137,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 		foreach($recordType->types as $key => $field) {
 			$foundValue = $this->valueForType($field);
 
-			if ($foundValue instanceof DependencyError) {
+			if ($foundValue instanceof DependencyErrorInterface) {
 				return new DependencyError(
 					DependencyContainerErrorType::errorWhileCreatingValue,
 					$field,
@@ -149,9 +149,9 @@ final class DependencyContainer implements DependencyContainerInterface {
 		return $this->valueRegistry->record($found);
 	}
 
-	private function findSealedOrOpenType(SealedType|OpenType $type): Value|DependencyError {
+	private function findSealedOrOpenType(SealedType|OpenType $type): Value|DependencyErrorInterface {
 		$found = $this->findValueByNamedType($type);
-		if ($found instanceof DependencyError) {
+		if ($found instanceof DependencyErrorInterface) {
 			$constructor = $this->valueRegistry->core->constructor;
 			$method = $this->methodContext->methodForValue(
 				$constructor,
@@ -185,7 +185,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 		}
 		return $found;
 	}
-	private function attemptToFindAlias(AliasType $aliasType): Value|DependencyError {
+	private function attemptToFindAlias(AliasType $aliasType): Value|DependencyErrorInterface {
 		$baseType = $aliasType->aliasedType;
 		return $this->findValueByType($baseType);
 	}
@@ -216,7 +216,7 @@ final class DependencyContainer implements DependencyContainerInterface {
 			$result = $this->methodContext->executeCast($dependencyContainerType->value, $type->name);
 		} catch (ExecutionException $e) {
 			return new DependencyError(
-				$e->relatedError instanceof DependencyError ?
+				$e->relatedError instanceof DependencyErrorInterface ?
 					DependencyContainerErrorType::circularDependency :
 					DependencyContainerErrorType::runtimeError,
 				$type
