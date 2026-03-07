@@ -2,12 +2,12 @@
 
 namespace Walnut\Lang\Almond\AST\Implementation\Node\Type;
 
-use BcMath\Number;
 use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\RealSubsetTypeNode as RealSubsetTypeNodeInterface;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Value\RealValueNode;
 
 final readonly class RealSubsetTypeNode implements RealSubsetTypeNodeInterface {
-	/** @param list<Number> $values */
+	/** @param list<RealValueNode> $values */
 	public function __construct(
 		public SourceLocation $sourceLocation,
 		public array $values

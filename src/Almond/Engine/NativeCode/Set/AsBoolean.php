@@ -29,7 +29,7 @@ final readonly class AsBoolean extends SetNativeMethod {
 
 	protected function getExecutor(): callable {
 		return fn(SetValue $target, NullValue $parameter): BooleanValue =>
-			$this->valueRegistry->boolean(count($target->values));
+			$this->valueRegistry->boolean(count($target->values) > 0);
 	}
 
 }

@@ -12,6 +12,8 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NumberIntervalEndpointNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NumberIntervalNode as NumberIntervalNodeInterface;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\TypeNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Value\IntegerValueNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Value\RealValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\StringValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Number\MinusInfinity;
 use Walnut\Lang\Almond\AST\Blueprint\Number\PlusInfinity;
@@ -187,6 +189,7 @@ final class TypeNodeBuilder implements TypeNodeBuilderInterface {
 		return new IntegerTypeNode($this->getSourceLocation(), $minValue, $maxValue);
 	}
 
+	/** @param list<IntegerValueNode> $values */
 	public function integerSubsetType(array $values): IntegerSubsetTypeNode {
 		return new IntegerSubsetTypeNode($this->getSourceLocation(), $values);
 	}
@@ -203,6 +206,7 @@ final class TypeNodeBuilder implements TypeNodeBuilderInterface {
 		return new RealTypeNode($this->getSourceLocation(), $minValue, $maxValue);
 	}
 
+	/** @param list<RealValueNode> $values */
 	public function realSubsetType(array $values): RealSubsetTypeNode {
 		return new RealSubsetTypeNode($this->getSourceLocation(), $values);
 	}

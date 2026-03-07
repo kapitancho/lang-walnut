@@ -38,7 +38,7 @@ final readonly class BinaryMultiply extends SetNativeMethod {
 					$result[] = $this->valueRegistry->tuple([$targetValue, $parameterValue]);
 				}
 			}
-			return $this->valueRegistry->set(array_values($result));
+			return $this->valueRegistry->set($result);
 		};
 	}
 

@@ -26,7 +26,9 @@ final readonly class BinaryMultiply extends FunctionCompose {
 				default => null,
 			};
 			$firstCheckType = $fError && $exe->isSubtypeOf($fError) ?
-				$this->withoutExternalError($this->typeRegistry, $r) : $r;
+				/** @phpstan-ignore argument.type */
+				$this->withoutExternalError($this->typeRegistry, $r) :
+				$r;
 			$firstErrorType = $fError && $exe->isSubtypeOf($fError) ? $exe : null;
 
 			if (!$firstCheckType->isSubtypeOf($parameterType->parameterType)) {

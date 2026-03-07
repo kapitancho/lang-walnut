@@ -47,8 +47,8 @@ final readonly class Partition extends ArrayFilterBase {
 				}
 			}
 			return $this->valueRegistry->record([
-				'matching' => $this->valueRegistry->tuple(array_values($matching)),
-				'notMatching' => $this->valueRegistry->tuple(array_values($notMatching)),
+				'matching' => $this->valueRegistry->tuple($matching),
+				'notMatching' => $this->valueRegistry->tuple($notMatching),
 			]);
 		};
 	}

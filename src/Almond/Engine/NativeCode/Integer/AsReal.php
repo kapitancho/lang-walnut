@@ -28,6 +28,6 @@ final readonly class AsReal extends NativeMethod {
 
 	protected function getExecutor(): callable {
 		return fn(IntegerValue $target, NullValue $parameter): RealValue =>
-			$this->valueRegistry->real((string)$target->literalValue);
+			$this->valueRegistry->real($target->literalValue);
 	}
 }

@@ -68,7 +68,7 @@ final readonly class VariableValueScope implements VariableValueScopeInterface {
 
 	public function __toString(): string {
 		return '[' . implode(', ', array_map(
-			fn(VariableValue $variableValue) =>
+			fn(VariableValueInterface $variableValue): string =>
 				sprintf('%s: %s = %s', $variableValue->name, $variableValue->type, $variableValue->value),
 			$this->valuesMap
 		)) . ']';

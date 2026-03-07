@@ -42,6 +42,8 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Type\TupleTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\TypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\TypeTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\UnionTypeNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Value\IntegerValueNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Value\RealValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\StringValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Number\MinusInfinity;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NumberIntervalEndpointNode;
@@ -80,7 +82,7 @@ interface TypeNodeBuilder {
 		Number|MinusInfinity $minValue = MinusInfinity::value,
 		Number|PlusInfinity $maxValue = PlusInfinity::value
 	): IntegerTypeNode;
-	/** @param list<Number> $values */
+	/** @param list<IntegerValueNode> $values */
 	public function integerSubsetType(array $values): IntegerSubsetTypeNode;
 
 	/** @param NumberIntervalNode[] $intervals */
@@ -89,7 +91,7 @@ interface TypeNodeBuilder {
 		Number|MinusInfinity $minValue = MinusInfinity::value,
 		Number|PlusInfinity $maxValue = PlusInfinity::value
 	): RealTypeNode;
-	/** @param list<Number> $values */
+	/** @param list<RealValueNode> $values */
 	public function realSubsetType(array $values): RealSubsetTypeNode;
 
 	public function stringType(

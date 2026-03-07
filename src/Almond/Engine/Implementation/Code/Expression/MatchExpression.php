@@ -5,6 +5,7 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Code\Expression;
 use JsonSerializable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\ConstantExpression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\MatchExpressionDefault;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\MatchExpressionOperation;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\MatchExpressionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;

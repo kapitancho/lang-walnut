@@ -161,8 +161,8 @@ final readonly class TypeBuilder implements TypeCompilerInterface {
 					//$typeNode->minValue, $typeNode->maxValue
 				),
 				$typeNode instanceof IntegerSubsetTypeNode => $this->typeRegistry->integerSubset(
-					array_map(fn(IntegerValueNode $stringValueNode): Number =>
-					$stringValueNode->value, $typeNode->values)
+					array_map(fn(IntegerValueNode $integerValueNode): Number =>
+						$integerValueNode->value, $typeNode->values)
 				),
 				$typeNode instanceof RealFullTypeNode => $this->typeRegistry->realFull(...
 					array_map(
@@ -184,8 +184,8 @@ final readonly class TypeBuilder implements TypeCompilerInterface {
 					)
 				),
 				$typeNode instanceof RealSubsetTypeNode => $this->typeRegistry->realSubset(
-					array_map(fn(RealValueNode $stringValueNode): Number =>
-						$stringValueNode->value, $typeNode->values)
+					array_map(fn(RealValueNode $realValueNode): Number =>
+						$realValueNode->value, $typeNode->values)
 				),
 				$typeNode instanceof StringTypeNode => $this->typeRegistry->string(
 					$typeNode->minLength,
