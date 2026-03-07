@@ -45,6 +45,7 @@ final readonly class ValueOf extends NamedNativeMethod {
 								DE::notFound => 'Dependency not found',
 								DE::unsupportedType => 'Unsupported type',
 								DE::errorWhileCreatingValue => 'Error returned while creating value',
+								DE::runtimeError => 'Runtime error',
 							} . (is_string($result->message) ? ": " . $result->message : "")
 						)
 					])

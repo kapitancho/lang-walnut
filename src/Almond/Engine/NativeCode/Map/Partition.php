@@ -29,7 +29,6 @@ final readonly class Partition extends MapFilterBase {
 					),
 					$targetType->restType
 				);
-				$targetType = $targetType->asMapType();
 			}
 			$pType = $this->toBaseType($parameterType->returnType);
 			$partitionType = $recordReturnType ?? $this->typeRegistry->map($targetType->itemType, 0, $targetType->range->maxLength);

@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\Array;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
@@ -30,16 +29,15 @@ final readonly class ZipMap extends ArrayNativeMethod {
 	protected function getValidator(): callable {
 		return function(ArrayType $targetType, Type $parameterType): Type {
 			$itemType = $targetType->itemType;
+			/** @var ArrayType $parameterType */
 			$parameterType = $this->toBaseType($parameterType);
-			$pType = $parameterType instanceof TupleType ? $parameterType->asArrayType() : $parameterType;
-			/** @var ArrayType $pType */
 			return $this->typeRegistry->map(
-				$pType->itemType,
-				min(1, $targetType->range->minLength, $pType->range->minLength),
+				$parameterType->itemType,
+				min(1, $targetType->range->minLength, $parameterType->range->minLength),
 				match(true) {
-					$targetType->range->maxLength === PlusInfinity::value => $pType->range->maxLength,
-					$pType->range->maxLength === PlusInfinity::value => $targetType->range->maxLength,
-					default => min($targetType->range->maxLength, $pType->range->maxLength)
+					$targetType->range->maxLength === PlusInfinity::value => $parameterType->range->maxLength,
+					$parameterType->range->maxLength === PlusInfinity::value => $targetType->range->maxLength,
+					default => min($targetType->range->maxLength, $parameterType->range->maxLength)
 				},
 				$itemType
 			);

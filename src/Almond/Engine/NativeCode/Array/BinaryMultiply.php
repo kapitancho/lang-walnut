@@ -21,7 +21,7 @@ final readonly class BinaryMultiply extends ArrayNativeMethod {
 	}
 
 	protected function getValidator(): callable {
-		return function(ArrayType|TupleType $targetType, IntegerType $parameterType): Type {
+		return function(ArrayType $targetType, IntegerType $parameterType): Type {
 			if ($targetType instanceof TupleType) {
 				if ($targetType->restType instanceof NothingType) {
 					$minValue = $parameterType->numberRange->min;
@@ -36,7 +36,6 @@ final readonly class BinaryMultiply extends ArrayNativeMethod {
 						return $this->typeRegistry->tuple($result, null);
 					}
 				}
-				$targetType = $targetType->asArrayType();
 			}
 			$minValue = $parameterType->numberRange->min;
 			return $this->typeRegistry->array(

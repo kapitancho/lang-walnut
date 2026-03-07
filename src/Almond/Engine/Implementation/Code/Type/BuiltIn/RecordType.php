@@ -104,7 +104,7 @@ final class RecordType implements RecordTypeInterface, JsonSerializable {
 
 	public MapTypeInterface $mapType { get => $this->mapType ??= $this->asMapType(); }
 
-	public function asMapType(): MapTypeInterface {
+	private function asMapType(): MapTypeInterface {
 		$l = count($this->types);
 		$min = count(array_filter($this->types, static fn($type) => !($type instanceof OptionalKeyType)));
 		$types = array_map(

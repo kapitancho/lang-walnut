@@ -10,11 +10,11 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<ArrayType|TupleType, NullType, TupleValue, NullValue> */
+/** @extends NativeMethod<ArrayType, NullType, TupleValue, NullValue> */
 readonly class ArrayReverse extends NativeMethod {
 
 	protected function getValidator(): callable {
-		return function(ArrayType|TupleType $targetType, NullType $parameterType, mixed $origin): ArrayType|TupleType {
+		return function(ArrayType $targetType, NullType $parameterType, mixed $origin): ArrayType {
 			if ($targetType instanceof TupleType) {
 				if ($targetType->restType instanceof NothingType) {
 					return $this->typeRegistry->tuple(
@@ -22,7 +22,7 @@ readonly class ArrayReverse extends NativeMethod {
 						null
 					);
 				}
-				return $targetType->asArrayType();
+				return $targetType->arrayType;
 			}
 			return $targetType;
 		};

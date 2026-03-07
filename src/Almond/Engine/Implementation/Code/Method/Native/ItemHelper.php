@@ -53,10 +53,10 @@ final readonly class ItemHelper {
 		mixed $origin
 	): ValidationSuccess|ValidationFailure {
 		$valueType = $this->toBaseType($targetType->valueType);
-		if ($valueType instanceof TupleType || $valueType instanceof ArrayType) {
+		if ($valueType instanceof ArrayType) {
 			return $this->validateArrayItem($valueType, $parameterType, $origin);
 		}
-		if ($valueType instanceof RecordType || $valueType instanceof MapType) {
+		if ($valueType instanceof MapType) {
 			return $this->validateMapItem($valueType, $parameterType, $origin);
 		}
 		return $this->validationFactory->error(
@@ -67,13 +67,12 @@ final readonly class ItemHelper {
 	}
 
 	public function validateArrayItem(
-		ArrayType|TupleType $targetType,
+		ArrayType $targetType,
 		Type $parameterType,
 		mixed $origin
 	): ValidationSuccess|ValidationFailure {
 		if ($parameterType instanceof IntegerType) {
-			$arrayType = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
-			$returnType = $arrayType->itemType;
+			$returnType = $targetType->itemType;
 			if ($targetType instanceof TupleType) {
 				$min = $parameterType->numberRange->min;
 				$max = $parameterType->numberRange->max;
@@ -99,7 +98,7 @@ final readonly class ItemHelper {
 
 			return $this->validationFactory->validationSuccess(
 				$parameterType->numberRange->max !== PlusInfinity::value &&
-				$arrayType->range->minLength > $parameterType->numberRange->max->value ?
+				$targetType->range->minLength > $parameterType->numberRange->max->value ?
 					$returnType :
 					$this->typeRegistry->result(
 						$returnType,
@@ -115,7 +114,7 @@ final readonly class ItemHelper {
 	}
 
 	public function validateMapItem(
-		IntersectionType|MapType|RecordType|MetaType|AliasType $targetType,
+		IntersectionType|MapType|MetaType|AliasType $targetType,
 		Type $parameterType,
 		mixed $origin
 	): ValidationSuccess|ValidationFailure {
@@ -138,12 +137,11 @@ final readonly class ItemHelper {
 				$this->typeRegistry->intersection($types)
 			);
 		}
-		$mapType = $targetType instanceof RecordType ? $targetType->asMapType() : $targetType;
+		$mapType = $targetType;
 		if ($targetType instanceof MetaType && $targetType->value === MetaTypeValue::Record) {
 			$mapType = $this->typeRegistry->map();
 		}
-		//$mapItemNotFound = $this->typeRegistry->core->mapItemNotFound;
-		$mapItemNotFound = $this->typeRegistry->typeByName(new TypeName('MapItemNotFound'));
+		$mapItemNotFound = $this->typeRegistry->core->mapItemNotFound;
 
 		$parameterType = $this->toBaseType($parameterType);
 		if ($parameterType instanceof StringType) {

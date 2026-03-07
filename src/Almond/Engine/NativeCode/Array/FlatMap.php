@@ -5,7 +5,6 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Array;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
@@ -45,9 +44,6 @@ final readonly class FlatMap extends ArrayNativeMethod {
 			$returnType = $r instanceof ResultType ? $r->returnType : $r;
 
 			$returnType = $this->toBaseType($returnType);
-			if ($returnType instanceof TupleType) {
-				$returnType = $returnType->asArrayType();
-			}
 			$minLength = ((int)(string)$targetType->range->minLength) * ((int)(string)$returnType->range->minLength);
 			$maxLength = $targetType->range->maxLength === PlusInfinity::value ||
 				$returnType->range->maxLength === PlusInfinity::value ?

@@ -25,7 +25,7 @@ final readonly class Format extends MapNativeMethod {
 	}
 
 	protected function getValidator(): callable {
-		return function(MapType|RecordType $targetType, StringType $parameterType): Type {
+		return function(MapType $targetType, StringType $parameterType): Type {
 			$paramMin = false;
 			$paramMax = false;
 			$isSafe = false;

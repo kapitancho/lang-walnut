@@ -20,7 +20,7 @@ final readonly class WithoutByKey extends MapNativeMethod {
 	use SubsetTypeHelper;
 
 	protected function getValidator(): callable {
-		return function(MapType|RecordType $targetType, StringType $parameterType, mixed $origin): Type {
+		return function(MapType $targetType, StringType $parameterType, mixed $origin): Type {
 			$r = $this->typeRegistry;
 			if ($targetType instanceof RecordType) {
 				if ($parameterType instanceof StringSubsetType) {
@@ -74,7 +74,6 @@ final readonly class WithoutByKey extends MapNativeMethod {
 						$r->core->mapItemNotFound
 					) : $returnType;
 				}
-				$targetType = $targetType->asMapType();
 			}
 			$keyType = $targetType->keyType;
 			if ($keyType instanceof StringSubsetType && $parameterType instanceof StringSubsetType) {

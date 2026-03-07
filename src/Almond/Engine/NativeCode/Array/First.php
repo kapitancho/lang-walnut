@@ -15,7 +15,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayN
 final readonly class First extends ArrayNativeMethod {
 
 	protected function getValidator(): callable {
-		return function(ArrayType|TupleType $targetType, NullType $parameterType): Type {
+		return function(ArrayType $targetType, NullType $parameterType): Type {
 			if ($targetType instanceof TupleType) {
 				return count($targetType->types) > 0 ?
 					$targetType->types[0] : $this->typeRegistry->result(

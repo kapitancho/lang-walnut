@@ -9,11 +9,11 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\WithMethod;
 
-/** @extends WithMethod<RecordType, RecordType|MapType, RecordValue, RecordValue> */
+/** @extends WithMethod<RecordType, MapType, RecordValue, RecordValue> */
 final readonly class With extends WithMethod {
 
 	protected function getValidator(): callable {
-		return function(RecordType $targetType, RecordType|MapType $parameterType): Type {
+		return function(RecordType $targetType, MapType $parameterType): Type {
 			if ($parameterType instanceof RecordType) {
 				return $this->getCombinedRecordType(
 					$targetType,
@@ -21,7 +21,7 @@ final readonly class With extends WithMethod {
 				);
 			}
 			return $this->getCombinedMapType(
-				$targetType->asMapType(),
+				$targetType,
 				$parameterType
 			);
 		};

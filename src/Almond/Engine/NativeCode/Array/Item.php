@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\Array;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
@@ -12,11 +11,11 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationSuccess;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Method\Native\ItemHelper;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<ArrayType|TupleType, Type, TupleValue, Value> */
+/** @extends NativeMethod<ArrayType, Type, TupleValue, Value> */
 final readonly class Item extends NativeMethod {
 
 	protected function getValidator(): callable {
-		return function(ArrayType|TupleType $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
+		return function(ArrayType $targetType, Type $parameterType, mixed $origin): ValidationSuccess|ValidationFailure {
 			$itemHelper = new ItemHelper(
 				$this->validationFactory,
 				$this->typeRegistry,

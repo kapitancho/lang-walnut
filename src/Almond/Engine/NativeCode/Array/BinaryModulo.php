@@ -21,7 +21,7 @@ final readonly class BinaryModulo extends ArrayNativeMethod {
 	}
 
 	protected function getValidator(): callable {
-		return function(ArrayType|TupleType $targetType, IntegerType $parameterType): Type {
+		return function(ArrayType $targetType, IntegerType $parameterType): Type {
 			if (
 				$targetType instanceof TupleType &&
 				$targetType->restType instanceof NothingType &&
@@ -38,28 +38,27 @@ final readonly class BinaryModulo extends ArrayNativeMethod {
 					null
 				);
 			}
-			$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 			if (
-				$type->range->maxLength !== PlusInfinity::value &&
-				$parameterType->numberRange->min->value > $type->range->maxLength
+				$targetType->range->maxLength !== PlusInfinity::value &&
+				$parameterType->numberRange->min->value > $targetType->range->maxLength
 			) {
 				return $targetType;
 			}
 			if (
-				$type->range->maxLength !== PlusInfinity::value &&
-				(string)$type->range->minLength === (string)$type->range->maxLength &&
+				$targetType->range->maxLength !== PlusInfinity::value &&
+				(string)$targetType->range->minLength === (string)$targetType->range->maxLength &&
 				$parameterType->numberRange->max !== PlusInfinity::value &&
 				(string)$parameterType->numberRange->max->value === (string)$parameterType->numberRange->min->value
 			) {
-				$size = $type->range->maxLength->mod($parameterType->numberRange->min->value);
-				return $this->typeRegistry->array($type->itemType, $size, $size);
+				$size = $targetType->range->maxLength->mod($parameterType->numberRange->min->value);
+				return $this->typeRegistry->array($targetType->itemType, $size, $size);
 			}
 			return $this->typeRegistry->array(
-				$type->itemType,
+				$targetType->itemType,
 				0,
 				match(true) {
-					$parameterType->numberRange->max === PlusInfinity::value => $type->range->maxLength,
-					$type->range->maxLength === PlusInfinity::value => max(
+					$parameterType->numberRange->max === PlusInfinity::value => $targetType->range->maxLength,
+					$targetType->range->maxLength === PlusInfinity::value => max(
 						0,
 						$parameterType->numberRange->max->value->sub(1),
 					),
@@ -67,7 +66,7 @@ final readonly class BinaryModulo extends ArrayNativeMethod {
 						0,
 						min(
 							$parameterType->numberRange->max->value->sub(1),
-							$type->range->maxLength
+							$targetType->range->maxLength
 						)
 					)
 				}

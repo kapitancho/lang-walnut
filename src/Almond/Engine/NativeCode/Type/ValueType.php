@@ -14,8 +14,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\MetaTypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
-use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNativeMethod;
 
 /** @extends TypeNativeMethod<OpenType|SealedType|DataType|MutableType|OptionalKeyType|MetaType, NullType, NullValue> */

@@ -4,7 +4,6 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\String;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
@@ -12,13 +11,12 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<StringType, ArrayType|TupleType, StringValue, TupleValue> */
+/** @extends NativeMethod<StringType, ArrayType, StringValue, TupleValue> */
 final readonly class ConcatList extends NativeMethod {
 
 	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
-		$arrayType = $parameterType instanceof TupleType ? $parameterType->asArrayType() : $parameterType;
-		/** @var ArrayType $arrayType */
-		return $this->toBaseType($arrayType->itemType) instanceof StringType ?
+		/** @var ArrayType $parameterType */
+		return $this->toBaseType($parameterType->itemType) instanceof StringType ?
 			null : sprintf(
 				"Expected an Array<String> as parameter type, got %s",
 				$parameterType
@@ -26,10 +24,7 @@ final readonly class ConcatList extends NativeMethod {
 	}
 
 	protected function getValidator(): callable {
-		return function(StringType $targetType, ArrayType|TupleType $parameterType): StringType {
-			if ($parameterType instanceof TupleType) {
-				$parameterType = $parameterType->asArrayType();
-			}
+		return function(StringType $targetType, ArrayType $parameterType): StringType {
 			$itemType = $this->toBaseType($parameterType->itemType);
 			/** @var StringType $itemType */
 			return $this->typeRegistry->string(

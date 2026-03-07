@@ -23,7 +23,7 @@ final readonly class Take extends ArrayNativeMethod {
 	}
 
 	protected function getValidator(): callable {
-		return function(ArrayType|TupleType $targetType, IntegerType $parameterType): Type {
+		return function(ArrayType $targetType, IntegerType $parameterType): Type {
 			if ($targetType instanceof TupleType && $parameterType instanceof IntegerSubsetType && count($parameterType->subsetValues) === 1) {
 				$param = (int)(string)$parameterType->subsetValues[0];
 				return $this->typeRegistry->tuple(
@@ -31,16 +31,15 @@ final readonly class Take extends ArrayNativeMethod {
 					$param > count($targetType->types) ? $targetType->restType : $this->typeRegistry->nothing
 				);
 			}
-			$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 			$maxLength = match(true) {
-				$parameterType->numberRange->max === PlusInfinity::value => $type->range->maxLength,
-				$type->range->maxLength === PlusInfinity::value,
-				$type->range->maxLength > $parameterType->numberRange->max->value => $parameterType->numberRange->max->value,
-				default => $type->range->maxLength,
+				$parameterType->numberRange->max === PlusInfinity::value => $targetType->range->maxLength,
+				$targetType->range->maxLength === PlusInfinity::value,
+				$targetType->range->maxLength > $parameterType->numberRange->max->value => $parameterType->numberRange->max->value,
+				default => $targetType->range->maxLength,
 			};
 			return $this->typeRegistry->array(
-				$type->itemType,
-				min($parameterType->numberRange->min->value, $type->range->minLength),
+				$targetType->itemType,
+				min($parameterType->numberRange->min->value, $targetType->range->minLength),
 				$maxLength
 			);
 		};

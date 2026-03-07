@@ -4,7 +4,6 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
@@ -13,9 +12,6 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNat
 abstract readonly class MapCallbackBase extends MapNativeMethod {
 
 	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
-		if ($targetType instanceof RecordType) {
-			$targetType = $targetType->asMapType();
-		}
 		/** @var MapType $targetType */
 		/** @var FunctionType $parameterType */
 		if (!$targetType->itemType->isSubtypeOf($parameterType->parameterType)) {

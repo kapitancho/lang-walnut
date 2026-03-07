@@ -18,7 +18,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MutableNativeMethod;
 
-/** @extends MutableNativeMethod<SetType|RecordType|MapType, Type, Value> */
+/** @extends MutableNativeMethod<SetType|MapType, Type, Value> */
 final readonly class ADD extends MutableNativeMethod {
 
 	protected function validateTargetValueType(Type $valueType): null|string {

@@ -92,7 +92,6 @@ abstract readonly class WithMethod extends NativeMethod {
 			}
 		}
 		if ($valueType instanceof ArrayType) {
-			$pType = $pType instanceof TupleType ? $pType->asArrayType() : $pType;
 			if ($pType instanceof ArrayType) {
 				if (!$pType->itemType->isSubtypeOf($valueType->itemType)) {
 					return $this->validationFactory->error(
@@ -143,7 +142,6 @@ abstract readonly class WithMethod extends NativeMethod {
 			}
 		}
 		if ($valueType instanceof MapType) {
-			$pType = $pType instanceof RecordType ? $pType->asMapType() : $pType;
 			if ($pType instanceof MapType) {
 				if (!$pType->keyType->isSubtypeOf($valueType->keyType)) {
 					return $this->validationFactory->error(

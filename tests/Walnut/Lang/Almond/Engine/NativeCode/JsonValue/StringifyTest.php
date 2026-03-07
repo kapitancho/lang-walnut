@@ -2,7 +2,7 @@
 
 namespace Walnut\Lang\Test\Almond\Engine\NativeCode\JsonValue;
 
-use Walnut\Lang\Test\CodeExecutionTestHelper;
+use Walnut\Lang\Test\Almond\Engine\CodeExecutionTestHelper;
 
 final class StringifyTest extends CodeExecutionTestHelper {
 

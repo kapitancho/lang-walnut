@@ -22,8 +22,7 @@ final readonly class ZipMap extends SetNativeMethod {
 	}
 
 	protected function getValidator(): callable {
-		return function(SetType $targetType, ArrayType|TupleType $parameterType): MapType {
-			$parameterType = $parameterType instanceof TupleType ? $parameterType->asArrayType() : $parameterType;
+		return function(SetType $targetType, ArrayType $parameterType): MapType {
 			return $this->typeRegistry->map(
 				$parameterType->itemType,
 				min($targetType->range->minLength, $parameterType->range->minLength),

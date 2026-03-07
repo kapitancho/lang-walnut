@@ -9,7 +9,7 @@ interface UserlandMethodRegistry {
 	/** @return UserlandMethod[] */
 	public function methodsByName(MethodName $methodName): array;
 
-	/** @return UserlandMethod */
+	/** @return UserlandMethod[] */
 	public function allMethods(): array;
 
 	/** @return array<string, UserlandFunction> */

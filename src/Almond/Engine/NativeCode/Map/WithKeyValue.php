@@ -28,7 +28,7 @@ final readonly class WithKeyValue extends MapNativeMethod {
 	}
 
 	protected function getValidator(): callable {
-		return function(MapType|RecordType $targetType, RecordType $parameterType): Type {
+		return function(MapType $targetType, RecordType $parameterType): Type {
 			$keyType = $parameterType->types['key'] ?? null;
 			if ($targetType instanceof RecordType) {
 				if ($keyType instanceof StringSubsetType && count($keyType->subsetValues) === 1) {
@@ -41,7 +41,6 @@ final readonly class WithKeyValue extends MapNativeMethod {
 						$targetType->restType
 					);
 				}
-				$targetType = $targetType->asMapType();
 			}
 			$valueType = $parameterType->types['value'] ?? null;
 			return $this->typeRegistry->map(

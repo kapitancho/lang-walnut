@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
@@ -17,9 +16,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 abstract readonly class ArrayNativeMethod extends NativeMethod {
 
 	protected function validateTargetType(Type $targetType, mixed $origin): null|string {
-		if ($targetType instanceof TupleType) {
-			$targetType = $targetType->asArrayType();
-		}
 		if ($targetType instanceof ArrayType) {
 			$itemType = $this->toBaseType($targetType->itemType);
 			$expectedType = $this->getExpectedArrayItemType();
@@ -47,18 +43,6 @@ abstract readonly class ArrayNativeMethod extends NativeMethod {
 	/** @return Type|list<Type> */
 	protected function getExpectedArrayItemType(): Type|array {
 		return $this->typeRegistry->any;
-	}
-
-	protected function checkValidatorTargetType(Type $targetType, callable $validator): bool|Type {
-		$base = parent::checkValidatorTargetType($targetType, $validator);
-		if (!$base && $targetType instanceof TupleType) {
-			$arrayType = $targetType->asArrayType();
-			$aBase = parent::checkValidatorTargetType($arrayType, $validator);
-			if ($aBase) {
-				return $aBase === true ? $arrayType : $aBase;
-			}
-		}
-		return $base;
 	}
 
 }

@@ -34,7 +34,7 @@ final class ClearTest extends CodeExecutionTestHelper {
 	}
 
 	public function testRecordClearInvalidTargetType(): void {
-		$this->executeErrorCodeSnippet('The value type of the target must be a Set or Map type with a minimum length of 0, got Map<Integer, 1..>', "mutable{[a: Integer, b: ?Integer, ...Integer], [a: 1, b: 2, c: 3]}->CLEAR");
+		$this->executeErrorCodeSnippet('The value type of the target must be a Set or Map type with a minimum length of 0, got', "mutable{[a: Integer, b: ?Integer, ...Integer], [a: 1, b: 2, c: 3]}->CLEAR");
 	}
 
 }

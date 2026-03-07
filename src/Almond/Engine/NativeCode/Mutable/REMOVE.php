@@ -19,7 +19,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MutableNativeMethod;
 
-/** @extends MutableNativeMethod<MapType|RecordType|SetType, Type, Value> */
+/** @extends MutableNativeMethod<MapType|SetType, Type, Value> */
 final readonly class REMOVE extends MutableNativeMethod {
 
 	protected function validateTargetValueType(Type $valueType): null|string {
@@ -97,7 +97,7 @@ final readonly class REMOVE extends MutableNativeMethod {
 
 	protected function getValidator(): callable {
 		return function(MutableType $targetType, Type $parameterType, mixed $origin): Type|ValidationFailure {
-			/** @var SetType|RecordType|MapType $valueType */
+			/** @var SetType|MapType $valueType */
 			$valueType = $this->toBaseType($targetType->valueType);
 			if ($valueType instanceof SetType) {
 				return $this->typeRegistry->result(
@@ -127,10 +127,6 @@ final readonly class REMOVE extends MutableNativeMethod {
 						);
 					}
 				}
-				return $this->typeRegistry->result(
-					$valueType->asMapType()->itemType,
-					$this->typeRegistry->core->mapItemNotFound
-				);
 			}
 			return $this->typeRegistry->result(
 				$valueType->itemType,
@@ -155,7 +151,7 @@ final readonly class REMOVE extends MutableNativeMethod {
 				);
 			}
 			if (
-				($targetType instanceof MapType || $targetType instanceof RecordType) &&
+				$targetType instanceof MapType &&
 				$target->value instanceof RecordValue &&
 				$parameter instanceof StringValue
 			) {

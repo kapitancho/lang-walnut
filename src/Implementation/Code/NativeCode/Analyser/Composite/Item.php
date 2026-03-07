@@ -54,7 +54,7 @@ trait Item {
 
 	private function analyseArrayItem(
 		TypeRegistry $typeRegistry,
-		ArrayType|TupleType $targetType,
+		ArrayType $targetType,
 		Type $parameterType
 	): Type {
 		if ($parameterType instanceof IntegerType) {
@@ -96,7 +96,7 @@ trait Item {
 
 	private function analyseMapItem(
 		TypeRegistry $typeRegistry,
-		IntersectionType|MapType|RecordType|MetaType|AliasType $targetType,
+		IntersectionType|MapType|MetaType|AliasType $targetType,
 		Type $parameterType
 	): Type {
 		if ($targetType instanceof AliasType) {
@@ -104,10 +104,10 @@ trait Item {
 		}
 		if ($targetType instanceof IntersectionType) {
 			//TODO: this is not a long-term fix.
-			/** @var list<MapType|RecordType|MetaType> $intersectionTypes */
+			/** @var list<MapType|MetaType> $intersectionTypes */
 			$intersectionTypes = $targetType->types;
 			$types = array_map(
-				fn(MapType|RecordType|MetaType|AliasType $type) => $this->analyseMapItem($typeRegistry, $type, $parameterType),
+				fn(MapType|MetaType|AliasType $type) => $this->analyseMapItem($typeRegistry, $type, $parameterType),
 				$intersectionTypes
 			);
 			return $typeRegistry->intersection($types);

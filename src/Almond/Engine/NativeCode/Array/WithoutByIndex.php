@@ -26,7 +26,7 @@ final readonly class WithoutByIndex extends ArrayNativeMethod {
 	}
 
 	protected function getValidator(): callable {
-		return function(ArrayType|TupleType $targetType, IntegerType $parameterType, mixed $origin): Type {
+		return function(ArrayType $targetType, IntegerType $parameterType, mixed $origin): Type {
 			if ($targetType instanceof TupleType && $parameterType instanceof IntegerSubsetType && count($parameterType->subsetValues) === 1) {
 				$param = (int)(string)$parameterType->subsetValues[0];
 				if ($param >= 0) {
@@ -51,21 +51,20 @@ final readonly class WithoutByIndex extends ArrayNativeMethod {
 						$returnType;
 				}
 			}
-			$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
 			$returnType = $this->typeRegistry->record([
-				'element' => $type->itemType,
+				'element' => $targetType->itemType,
 				'array' => $this->typeRegistry->array(
-					$type->itemType,
-					max(0, $type->range->minLength - 1),
-					$type->range->maxLength === PlusInfinity::value ?
-						PlusInfinity::value : max($type->range->maxLength - 1, 0)
+					$targetType->itemType,
+					max(0, $targetType->range->minLength - 1),
+					$targetType->range->maxLength === PlusInfinity::value ?
+						PlusInfinity::value : max($targetType->range->maxLength - 1, 0)
 				)
 			], null);
 			return $parameterType->numberRange->min instanceof NumberIntervalEndpoint &&
 				($parameterType->numberRange->min->value + ($parameterType->numberRange->min->inclusive ? 0 : 1)) >= 0 &&
 				$parameterType->numberRange->max instanceof NumberIntervalEndpoint &&
 				($parameterType->numberRange->max->value - ($parameterType->numberRange->max->inclusive ? 0 : 1)) <
-					$type->range->maxLength ?
+					$targetType->range->maxLength ?
 					$returnType :
 					$this->typeRegistry->result(
 						$returnType,

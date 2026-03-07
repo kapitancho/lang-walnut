@@ -18,7 +18,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayN
 final readonly class Length extends ArrayNativeMethod {
 
 	protected function getValidator(): callable {
-		return function(ArrayType|TupleType $targetType, NullType $parameterType): IntegerType {
+		return function(ArrayType $targetType, NullType $parameterType): IntegerType {
 			if ($targetType instanceof TupleType) {
 				$l = count($targetType->types);
 				return $this->typeRegistry->integer(

@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\DatabaseConnector;
 
 use BcMath\Number;
-use PDO;
 use PDOException;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SealedType;

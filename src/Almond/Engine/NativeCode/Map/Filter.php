@@ -17,7 +17,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\MapFilte
 final readonly class Filter extends MapFilterBase {
 
 	protected function getValidator(): callable {
-		return function(MapType|RecordType $targetType, FunctionType $parameterType, mixed $origin): Type {
+		return function(MapType $targetType, FunctionType $parameterType, mixed $origin): Type {
 			$recordReturnType = null;
 			if ($targetType instanceof RecordType) {
 				$recordReturnType = $this->typeRegistry->record(
@@ -30,7 +30,6 @@ final readonly class Filter extends MapFilterBase {
 					),
 					$targetType->restType
 				);
-				$targetType = $targetType->asMapType();
 			}
 			$pType = $this->toBaseType($parameterType->returnType);
 			$returnType = $recordReturnType ?? $this->typeRegistry->map(

@@ -11,7 +11,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
 
-/** @extends MapNativeMethod<Type, MapType|RecordType, RecordValue> */
+/** @extends MapNativeMethod<Type, MapType, RecordValue> */
 final readonly class Zip extends MapNativeMethod {
 
 	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
@@ -23,7 +23,7 @@ final readonly class Zip extends MapNativeMethod {
 	}
 
 	protected function getValidator(): callable {
-		return function(MapType|RecordType $targetType, Type $parameterType): Type {
+		return function(MapType $targetType, Type $parameterType): Type {
 			$pType = $this->toBaseType($parameterType);
 			if ($targetType instanceof RecordType && $pType instanceof RecordType) {
 				$resultType = [];
@@ -55,22 +55,20 @@ final readonly class Zip extends MapNativeMethod {
 					], null)
 				);
 			}
-			$type = $targetType instanceof RecordType ? $targetType->asMapType() : $targetType;
-			$pType = $pType instanceof RecordType ? $pType->asMapType() : $pType;
 			/** @var MapType $pType */
 			return $this->typeRegistry->map(
 				$this->typeRegistry->tuple([
-					$type->itemType,
+					$targetType->itemType,
 					$pType->itemType,
 				], null),
-				min($type->range->minLength, $pType->range->minLength),
+				min($targetType->range->minLength, $pType->range->minLength),
 				match(true) {
-					$type->range->maxLength === PlusInfinity::value => $pType->range->maxLength,
-					$pType->range->maxLength === PlusInfinity::value => $type->range->maxLength,
-					default => min($type->range->maxLength, $pType->range->maxLength)
+					$targetType->range->maxLength === PlusInfinity::value => $pType->range->maxLength,
+					$pType->range->maxLength === PlusInfinity::value => $targetType->range->maxLength,
+					default => min($targetType->range->maxLength, $pType->range->maxLength)
 				},
 				$this->typeRegistry->intersection([
-					$type->keyType,
+					$targetType->keyType,
 					$pType->keyType
 				])
 			);

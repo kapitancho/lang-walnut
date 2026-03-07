@@ -10,7 +10,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
-/** @extends ArrayNativeMethod<Type, ArrayType|TupleType, TupleValue> */
+/** @extends ArrayNativeMethod<Type, ArrayType, TupleValue> */
 final readonly class Zip extends ArrayNativeMethod {
 
 	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
@@ -22,7 +22,7 @@ final readonly class Zip extends ArrayNativeMethod {
 	}
 
 	protected function getValidator(): callable {
-		return function(ArrayType|TupleType $targetType, Type $parameterType): Type {
+		return function(ArrayType $targetType, Type $parameterType): Type {
 			$pType = $this->toBaseType($parameterType);
 			if ($targetType instanceof TupleType && $pType instanceof TupleType) {
 				$resultType = [];
@@ -44,19 +44,17 @@ final readonly class Zip extends ArrayNativeMethod {
 					], null)
 				);
 			}
-			$type = $targetType instanceof TupleType ? $targetType->asArrayType() : $targetType;
-			$pType = $pType instanceof TupleType ? $pType->asArrayType() : $pType;
 			/** @var ArrayType $pType */
 			return $this->typeRegistry->array(
 				$this->typeRegistry->tuple([
-					$type->itemType,
+					$targetType->itemType,
 					$pType->itemType,
 				], null),
-				min($type->range->minLength, $pType->range->minLength),
+				min($targetType->range->minLength, $pType->range->minLength),
 				match(true) {
-					$type->range->maxLength === PlusInfinity::value => $pType->range->maxLength,
-					$pType->range->maxLength === PlusInfinity::value => $type->range->maxLength,
-					default => min($type->range->maxLength, $pType->range->maxLength)
+					$targetType->range->maxLength === PlusInfinity::value => $pType->range->maxLength,
+					$pType->range->maxLength === PlusInfinity::value => $targetType->range->maxLength,
+					default => min($targetType->range->maxLength, $pType->range->maxLength)
 				}
 			);
 		};

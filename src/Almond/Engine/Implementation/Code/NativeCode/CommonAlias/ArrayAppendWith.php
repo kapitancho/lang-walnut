@@ -3,18 +3,16 @@
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonAlias;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
-/** @extends ArrayNativeMethod<Type, ArrayType|TupleType, TupleValue> */
+/** @extends ArrayNativeMethod<Type, ArrayType, TupleValue> */
 abstract readonly class ArrayAppendWith extends ArrayNativeMethod {
 
 	protected function getValidator(): callable {
-		return function(ArrayType $targetType, ArrayType|TupleType $parameterType): ArrayType {
-			$parameterType = $parameterType instanceof TupleType ? $parameterType->asArrayType() : $parameterType;
+		return function(ArrayType $targetType, ArrayType $parameterType): ArrayType {
 			return $this->typeRegistry->array(
 				$this->typeRegistry->union([$targetType->itemType, $parameterType->itemType]),
 				$targetType->range->minLength + $parameterType->range->minLength,

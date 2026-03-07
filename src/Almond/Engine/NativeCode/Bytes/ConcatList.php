@@ -4,7 +4,6 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Bytes;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BytesType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BytesValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
@@ -12,7 +11,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<BytesType, ArrayType|TupleType, BytesValue, TupleValue> */
+/** @extends NativeMethod<BytesType, ArrayType, BytesValue, TupleValue> */
 final readonly class ConcatList extends NativeMethod {
 
 	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
@@ -22,10 +21,7 @@ final readonly class ConcatList extends NativeMethod {
 	}
 
 	protected function getValidator(): callable {
-		return function(BytesType $targetType, ArrayType|TupleType $parameterType): BytesType {
-			if ($parameterType instanceof TupleType) {
-				$parameterType = $parameterType->asArrayType();
-			}
+		return function(BytesType $targetType, ArrayType $parameterType): BytesType {
 			$itemType = $this->toBaseType($parameterType->itemType);
 			if ($itemType instanceof BytesType) {
 				return $this->typeRegistry->bytes(
