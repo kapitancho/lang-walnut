@@ -11,7 +11,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\MapFilterKeyValueBase;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
 
-/** @extends MapNativeMethod<AnyType, FunctionType, FunctionValue> */
 final readonly class FilterKeyValue extends MapFilterKeyValueBase {
 
 	protected function getValidator(): callable {

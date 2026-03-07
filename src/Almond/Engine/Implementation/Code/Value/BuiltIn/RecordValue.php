@@ -48,7 +48,6 @@ final class RecordValue implements RecordValueInterface, JsonSerializable {
         );
     }
 
-	/** @throws UnknownProperty */
 	public function valueOf(string $key): Value|UnknownProperty {
 		return $this->values[$key] ?? new UnknownProperty($key, $this);
 	}

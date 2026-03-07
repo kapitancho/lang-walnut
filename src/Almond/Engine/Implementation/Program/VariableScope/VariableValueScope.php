@@ -5,16 +5,18 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Program\VariableScope;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\VariableName;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\VariableScope\VariableType as VariableTypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\VariableScope\VariableValue as VariableValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\VariableScope\VariableValueScope as VariableValueScopeInterface;
 
 final readonly class VariableValueScope implements VariableValueScopeInterface {
-	/** @var list<VariableValue> $values */
+	/** @var list<VariableValueInterface> $values */
 	public array $values;
 
-	/** @var list<VariableType> $types */
+	/** @var list<VariableTypeInterface> $types */
 	public array $types;
 
-	/** @param array<string, VariableValue> $valuesMap */
+	/** @param array<string, VariableValueInterface> $valuesMap */
 	public function __construct(private array $valuesMap) {
 		$this->types = $this->values = array_values($this->valuesMap);
 	}

@@ -5,12 +5,13 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Set;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNativeMethod;
 
-/** @extends SetNativeMethod<NullType, NullValue> */
+/** @extends SetNativeMethod<Type, NullType, NullValue> */
 final readonly class Length extends SetNativeMethod {
 
 	protected function getValidator(): callable {

@@ -56,14 +56,18 @@ final class UserlandTypeStorage implements UserlandTypeRegistryInterface, Userla
 
 	private function addNull(): void {
 		$nullName = new TypeName('Null');
+		/** @phpstan-ignore assign.readOnlyProperty */
 		$this->null = new NullType($nullName);
 		$this->addAtom($nullName, $this->null);
 	}
 
 	private function addBoolean(): void {
 		$booleanName = new TypeName('Boolean');
+		/** @phpstan-ignore assign.readOnlyProperty */
 		$this->boolean = new BooleanType($booleanName);
+		/** @phpstan-ignore assign.readOnlyProperty */
 		$this->true = $this->boolean->trueType;
+		/** @phpstan-ignore assign.readOnlyProperty */
 		$this->false = $this->boolean->falseType;
 		$this->addEnumeration($booleanName, $this->boolean);
 	}

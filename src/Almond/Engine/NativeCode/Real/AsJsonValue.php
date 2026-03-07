@@ -6,11 +6,12 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<IntegerType|RealType, NullType, IntegerType|RealValue, NullValue> */
+/** @extends NativeMethod<IntegerType|RealType, NullType, IntegerValue|RealValue, NullValue> */
 final readonly class AsJsonValue extends NativeMethod {
 
 	protected function getValidator(): callable {

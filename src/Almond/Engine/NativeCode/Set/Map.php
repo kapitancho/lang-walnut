@@ -13,7 +13,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\SetCallbackBase;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNativeMethod;
 
-/** @extends SetNativeMethod<FunctionType, FunctionValue> */
 final readonly class Map extends SetCallbackBase {
 
 	protected function getValidator(): callable {

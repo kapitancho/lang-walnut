@@ -9,7 +9,7 @@ use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Validator\PreBuildValidationFail
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\Validator\PreBuildValidationResponse;
 
 final readonly class PreBuildValidationFailure implements PreBuildValidationFailureInterface {
-	/** @param list<PreBuildValidationErrorInterface> $errors */
+	/** @param non-empty-list<PreBuildValidationErrorInterface> $errors */
 	public function __construct(public array $errors) {}
 
 	/** @param list<SourceNode> $sourceNodes */

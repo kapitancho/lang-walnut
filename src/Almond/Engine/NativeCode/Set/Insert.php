@@ -9,7 +9,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNativeMethod;
 
-/** @extends SetNativeMethod<Type, Value> */
+/** @extends SetNativeMethod<Type, Type, Value> */
 final readonly class Insert extends SetNativeMethod {
 
 	protected function getValidator(): callable {

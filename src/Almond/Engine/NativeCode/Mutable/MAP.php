@@ -15,7 +15,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MutableNativeMethod;
 
-/** @extends MutableNativeMethod<MutableType, FunctionType, MutableValue, FunctionValue> */
+/** @extends MutableNativeMethod<Type, FunctionType, FunctionValue> */
 final readonly class MAP extends MutableNativeMethod {
 
 	protected function validateTargetType(Type $targetType, mixed $origin): null|string {

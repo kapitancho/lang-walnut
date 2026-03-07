@@ -8,5 +8,4 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonAlias\ArrayChunk;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
-/** @extends ArrayNativeMethod<Type, IntegerType, IntegerValue> */
 final readonly class Chunk extends ArrayChunk {}

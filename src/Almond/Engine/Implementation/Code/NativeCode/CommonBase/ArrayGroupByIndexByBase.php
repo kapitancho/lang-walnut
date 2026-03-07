@@ -8,7 +8,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 
-/** @extends ArrayNativeMethod<Type, FunctionType, FunctionValue> */
 abstract readonly class ArrayGroupByIndexByBase extends ArrayCallbackBase {
 
 	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {

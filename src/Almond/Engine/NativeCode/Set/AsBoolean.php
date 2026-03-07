@@ -7,13 +7,14 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FalseType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TrueType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BooleanValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNativeMethod;
 
-/** @extends SetNativeMethod<NullType, NullValue> */
+/** @extends SetNativeMethod<Type, NullType, NullValue> */
 final readonly class AsBoolean extends SetNativeMethod {
 
 	protected function getValidator(): callable {

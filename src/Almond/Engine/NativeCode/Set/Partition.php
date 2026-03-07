@@ -13,7 +13,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\SetFilterBase;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNativeMethod;
 
-/** @extends SetNativeMethod<FunctionType, FunctionValue> */
 final readonly class Partition extends SetFilterBase {
 
 	protected function getValidator(): callable {

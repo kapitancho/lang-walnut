@@ -32,7 +32,7 @@ final readonly class FalseType implements FalseTypeInterface, JsonSerializable {
 			new EnumerationValueName('false'),
 			false
 		);
-		$this->subsetValues = [$this->value];
+		$this->subsetValues = ['false' => $this->value];
 	}
 
 	public function hydrate(HydrationRequest $request): HydrationSuccess|HydrationFailure {

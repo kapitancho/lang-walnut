@@ -9,7 +9,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\WithMethod;
 
-/** @extends WithMethod<RecordType, MapType, RecordValue, RecordValue> */
 final readonly class With extends WithMethod {
 
 	protected function getValidator(): callable {

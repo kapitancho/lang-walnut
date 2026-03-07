@@ -137,7 +137,9 @@ abstract readonly class NumericClamp extends NativeMethod {
 		IntegerValue|RealValue $target,
 		RecordValue $parameter
 	): IntegerValue|RealValue|ErrorValue {
+		/** @var RealValue|null $minValue */
 		$minValue = $parameter->values['min'] ?? null;
+		/** @var RealValue|null $maxValue */
 		$maxValue = $parameter->values['max'] ?? null;
 
 		$minClamp = $minValue === null || (

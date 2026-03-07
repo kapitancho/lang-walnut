@@ -15,7 +15,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
 
-/** @extends MapNativeMethod<AnyType, MapType, FunctionType> */
+/** @extends MapNativeMethod<AnyType, FunctionType, FunctionValue> */
 final readonly class RemapKeys extends MapNativeMethod {
 
 	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {

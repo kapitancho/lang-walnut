@@ -44,7 +44,6 @@ final class TupleValue implements TupleValueInterface, JsonSerializable {
         );
     }
 
-	/** @throws UnknownProperty */
 	public function valueOf(int $index): Value|UnknownProperty {
 		return $this->values[$index] ?? new UnknownProperty($index, $this);
 	}

@@ -11,7 +11,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value as ValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\WithMethod;
 
-/** @extends WithMethod<OpenType, Type, OpenValue, ValueInterface> */
 final readonly class With extends WithMethod {
 
 	protected function getValidator(): callable {

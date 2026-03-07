@@ -9,7 +9,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<StringType, NullType, StringValue, NullValue */
+/** @extends NativeMethod<StringType, NullType, StringValue, NullValue> */
 final readonly class HtmlEscape extends NativeMethod {
 
 	protected function getValidator(): callable {

@@ -8,7 +8,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<StringType, StringType|NullType, StringValue, StringValue|NullValue */
+/** @extends NativeMethod<StringType, StringType|NullType, StringValue, StringValue|NullValue> */
 final readonly class TrimRight extends NativeMethod {
 
 	protected function getValidator(): callable {

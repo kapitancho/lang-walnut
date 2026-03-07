@@ -15,7 +15,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNativeMethod;
 
-/** @extends MapNativeMethod<Type, NullType, NullValue> */
+/** @extends ArrayNativeMethod<Type, NullType, NullValue> */
 final readonly class AsBoolean extends ArrayNativeMethod {
 
 	protected function getValidator(): callable {

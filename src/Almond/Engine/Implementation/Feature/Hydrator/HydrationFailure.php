@@ -7,7 +7,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Feature\Hydrator\HydrationFailure as Hyd
 
 final readonly class HydrationFailure implements HydrationFailureInterface {
 
-	/** @param list<HydrationError> $errors */
+	/** @param non-empty-list<HydrationError> $errors */
 	public function __construct(public array $errors) {}
 
 	public function mergeFailure(HydrationFailureInterface $failure): HydrationFailureInterface {

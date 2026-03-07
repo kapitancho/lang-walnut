@@ -18,7 +18,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<Type, NullType, Value, NullValue */
+/** @extends NativeMethod<Type, NullType, Value, NullValue> */
 final readonly class Stringify extends NativeMethod {
 
 	protected function getValidator(): callable {

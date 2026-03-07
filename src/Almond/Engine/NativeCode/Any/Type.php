@@ -9,7 +9,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<Type, NullType, Value, NullValue> */
+/** @extends NativeMethod<TypeInterface, NullType, Value, NullValue> */
 final readonly class Type extends NativeMethod {
 
 	protected function getValidator(): callable {

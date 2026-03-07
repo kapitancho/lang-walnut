@@ -5,6 +5,7 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Set;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
@@ -15,7 +16,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNativeMethod;
 
-/** @extends SetNativeMethod<FunctionType, FunctionValue> */
+/** @extends SetNativeMethod<StringType, FunctionType, FunctionValue> */
 final readonly class FlipMap extends SetNativeMethod {
 
 	protected function getExpectedSetItemType(): Type|array {

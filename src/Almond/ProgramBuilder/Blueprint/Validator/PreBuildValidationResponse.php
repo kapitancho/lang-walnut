@@ -14,5 +14,5 @@ interface PreBuildValidationResponse {
 		array $sourceNodes
 	): PreBuildValidationFailure;
 
-	public function mergeWith(PreBuildValidationResponse $response): PreBuildValidationResponse;
+	public function mergeWith(PreBuildValidationSuccess|PreBuildValidationFailure $response): PreBuildValidationSuccess|PreBuildValidationFailure;
 }

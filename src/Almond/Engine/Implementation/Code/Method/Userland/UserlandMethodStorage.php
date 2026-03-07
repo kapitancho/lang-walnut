@@ -21,7 +21,7 @@ final class UserlandMethodStorage implements UserlandMethodRegistryInterface, Us
 		return $this->userlandMethods[$methodName->identifier] ?? [];
 	}
 
-	/** @return UserlandMethod[] */
+	/** @return array<string, UserlandMethod[]> */
 	public function allMethods(): array {
 		return $this->userlandMethods;
 	}

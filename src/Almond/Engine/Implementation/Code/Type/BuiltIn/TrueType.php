@@ -32,7 +32,7 @@ final readonly class TrueType implements TrueTypeInterface, JsonSerializable {
 		    new EnumerationValueName('true'),
 		    true
 	    );
-		$this->subsetValues = [$this->value];
+		$this->subsetValues = ['true' => $this->value];
     }
 
 	public function hydrate(HydrationRequest $request): HydrationSuccess|HydrationFailure {

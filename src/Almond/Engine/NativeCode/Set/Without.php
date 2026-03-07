@@ -8,7 +8,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNativeMethod;
 
-/** @extends SetNativeMethod<Type, Value> */
+/** @extends SetNativeMethod<Type, Type, Value> */
 final readonly class Without extends SetNativeMethod {
 
 	protected function getValidator(): callable {

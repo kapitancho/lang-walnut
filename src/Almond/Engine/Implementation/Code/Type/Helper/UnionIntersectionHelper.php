@@ -16,7 +16,7 @@ trait UnionIntersectionHelper {
 		if (array_any($types, fn($type) => !$type instanceof RecordType)) {
 			return false;
 		}
-		/** @var \Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\RecordType[] $types */
+		/** @var RecordType[] $types */
 		$allKeys = array_values(
 			array_unique(
 				array_merge(...

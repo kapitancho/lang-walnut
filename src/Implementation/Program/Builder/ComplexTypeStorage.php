@@ -67,22 +67,22 @@ final class ComplexTypeStorage implements ComplexTypeRegistry {
 
 
 	/** @throws UnknownType */
-	public function alias(TypeNameIdentifier $typeName): \Walnut\Lang\Implementation\Type\AliasType {
+	public function alias(TypeNameIdentifier $typeName): AliasType {
 		return $this->aliasTypes[$typeName->identifier] ?? UnknownType::withName($typeName);
 	}
 
 	/** @throws UnknownType */
-	public function data(TypeNameIdentifier $typeName): \Walnut\Lang\Implementation\Type\DataType {
+	public function data(TypeNameIdentifier $typeName): DataType {
 		return $this->dataTypes[$typeName->identifier] ?? UnknownType::withName($typeName, 'data');
 	}
 
 	/** @throws UnknownType */
-	public function open(TypeNameIdentifier $typeName): \Walnut\Lang\Implementation\Type\OpenType {
+	public function open(TypeNameIdentifier $typeName): OpenType {
 		return $this->openTypes[$typeName->identifier] ?? UnknownType::withName($typeName, 'open');
 	}
 
 	/** @throws UnknownType */
-	public function sealed(TypeNameIdentifier $typeName): \Walnut\Lang\Implementation\Type\SealedType {
+	public function sealed(TypeNameIdentifier $typeName): SealedType {
 		return $this->sealedTypes[$typeName->identifier] ?? UnknownType::withName($typeName, 'sealed');
 	}
 

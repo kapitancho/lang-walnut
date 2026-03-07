@@ -10,7 +10,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResult;
 final readonly class ValidationFailure implements ValidationFailureInterface {
 
 	/**
-	 * @param list<ValidationErrorInterface> $errors
+	 * @param non-empty-list<ValidationErrorInterface> $errors
 	 */
 	public function __construct(public array $errors) {}
 

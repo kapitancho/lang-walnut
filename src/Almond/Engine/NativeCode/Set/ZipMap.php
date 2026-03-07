@@ -5,6 +5,7 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Set;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue;
@@ -14,7 +15,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\SetNativeMethod;
 
-/** @extends SetNativeMethod<ArrayType|TupleType, TupleValue> */
+/** @extends SetNativeMethod<StringType, ArrayType|TupleType, TupleValue> */
 final readonly class ZipMap extends SetNativeMethod {
 
 	protected function getExpectedSetItemType(): Type|array {

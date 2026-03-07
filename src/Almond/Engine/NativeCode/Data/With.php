@@ -9,7 +9,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\WithMethod;
 
-/** @extends WithMethod<DataType, Type, DataValue, Value> */
 final readonly class With extends WithMethod {
 
 	protected function getValidator(): callable {
