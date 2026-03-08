@@ -44,7 +44,10 @@ final readonly class NativeMethodLoader implements NativeMethodLoaderInterface {
 			|> $this->loadClassByName(...);
 	}
 
-	/** @return list<NativeMethod> */
+	/**
+	 * @param list<TypeName> $typeNames
+	 * @return list<NativeMethod>
+	 */
 	public function loadNativeMethods(array $typeNames, MethodName $methodName): array {
 		$methods = [];
 		foreach ($typeNames as $typeName) {

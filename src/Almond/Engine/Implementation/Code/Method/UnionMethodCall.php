@@ -28,6 +28,7 @@ final readonly class UnionMethodCall implements Method {
 		mixed $origin
 	): ValidationSuccess|ValidationFailure {
 		$types = [];
+		/** @var ValidationFailure|null $failure */
 		$failure = null;
 		foreach($this->methods as [$methodType, $method]) {
 			$tResult = $method->validate($methodType, $parameterType, $origin);

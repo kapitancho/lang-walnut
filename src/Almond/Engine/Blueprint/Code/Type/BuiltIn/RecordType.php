@@ -8,7 +8,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\UnknownProperty;
 
 interface RecordType extends MapType {
 	/**
-      * @param array<string, Type> $types
+      * @var array<string, Type> $types
       */
 	public array $types { get; }
 	public Type $restType { get; }

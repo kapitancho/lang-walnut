@@ -159,6 +159,7 @@ final readonly class MatchExpression implements Expression, JsonSerializable {
 			),
 			MatchExpressionType::if => sprintf(
 				"?when (%s) { %s }%s",
+				/** @phpstan-ignore-next-line */
 				$this->target->target,
 				$this->pairs[0]->valueExpression,
 				/** @phpstan-ignore-next-line */

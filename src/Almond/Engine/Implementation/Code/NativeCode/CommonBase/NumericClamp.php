@@ -73,20 +73,30 @@ abstract readonly class NumericClamp extends NativeMethod {
 		if ($maxType !== null) {
 			$maxType = $this->toBaseType($maxType);
 		}
+		/** @var OptionalKeyType|IntegerType|RealType|null $minType */
+		/** @var OptionalKeyType|IntegerType|RealType|null $maxType */
 
+		/** @var NumberIntervalEndpoint|MinusInfinity $minFrom */
 		$minFrom = $minType === null || $minType instanceof OptionalKeyType ? MinusInfinity::value : $minType->numberRange->min;
 		$numFrom = $targetType->numberRange->min;
+		/** @var NumberIntervalEndpoint|MinusInfinity $maxFrom */
 		$maxFrom = match(true) {
 			$maxType === null => $numFrom,
-			$maxType instanceof OptionalKeyType => $this->toBaseType($maxType->valueType)->numberRange->min,
+			$maxType instanceof OptionalKeyType =>
+				/** @phpstan-ignore-next-line */
+				$this->toBaseType($maxType->valueType)->numberRange->min,
 			default => $maxType->numberRange->min
 		};
 
+		/** @var NumberIntervalEndpoint|PlusInfinity $maxTo */
 		$maxTo = $maxType === null || $maxType instanceof OptionalKeyType ? PlusInfinity::value : $maxType->numberRange->max;
 		$numTo = $targetType->numberRange->max;
+		/** @var NumberIntervalEndpoint|PlusInfinity $minTo */
 		$minTo = match(true) {
 			$minType === null => $numTo,
-			$minType instanceof OptionalKeyType => $this->toBaseType($minType->valueType)->numberRange->max,
+			$minType instanceof OptionalKeyType =>
+				/** @phpstan-ignore-next-line */
+				$this->toBaseType($minType->valueType)->numberRange->max,
 			default => $minType->numberRange->max
 		};
 

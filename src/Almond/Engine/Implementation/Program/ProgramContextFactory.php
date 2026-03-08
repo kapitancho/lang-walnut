@@ -7,6 +7,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\ProgramContextFactory as Program
 
 final class ProgramContextFactory implements ProgramContextFactoryInterface {
 
+	/** @param array<string, string> $nativeExtensionNamespaces */
 	public function newProgramContext(array $nativeExtensionNamespaces = []): ProgramContextInterface {
 		return new ProgramContext($nativeExtensionNamespaces);
 	}

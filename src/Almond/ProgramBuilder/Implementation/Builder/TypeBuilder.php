@@ -72,6 +72,7 @@ final readonly class TypeBuilder implements TypeCompilerInterface {
 	/** @throws BuildException */
 	public function type(TypeNode $typeNode): Type {
 		try {
+			/** @var Type $result */
 			$result = match(true) {
 				$typeNode instanceof AnyTypeNode => $this->typeRegistry->any,
 				$typeNode instanceof NothingTypeNode => $this->typeRegistry->nothing,

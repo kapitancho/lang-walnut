@@ -7,6 +7,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Builder\SourceLocator;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Module\ModuleNode;
 use Walnut\Lang\Almond\AST\Blueprint\Parser\ParserException;
 use Walnut\Lang\Almond\AST\Blueprint\Parser\ParserStateRunner as ParserStateRunnerInterface;
+use Walnut\Lib\Walex\Token;
 
 final readonly class ParserStateRunner implements ParserStateRunnerInterface {
 	public function __construct(
@@ -30,6 +31,7 @@ final readonly class ParserStateRunner implements ParserStateRunnerInterface {
 		$ctr = 0;
 		$stateRepeatProtection = 0;
 		while($s->i < $l) {
+			/** @var Token $token */
 			$token = $tokens[$s->i];
 			if (++$ctr > 200000) {
 				// @codeCoverageIgnoreStart
@@ -56,6 +58,7 @@ final readonly class ParserStateRunner implements ParserStateRunnerInterface {
                     ), $token, $sourceLocator->moduleName
 				);
 			}
+			/** @phpstan-ignore function.alreadyNarrowedType */
 			if (is_callable($transition)) {
 				$lastI = $s->i;
 				$lastState = $s->state;

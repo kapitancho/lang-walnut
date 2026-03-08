@@ -50,6 +50,10 @@ final readonly class IntersectionTypeNormalizer {
         return new IntersectionType($this, $parsedTypes);
     }
 
+	/**
+	 * @param list<Type> $types
+	 * @return list<Type>
+	 */
     private function parseTypes(array $types): array {
         $queue = [];
         foreach ($types as $type) {
@@ -127,11 +131,11 @@ final readonly class IntersectionTypeNormalizer {
 	                    array_splice($queue, $ql, 1);
 	                    $tx = $this->intersectTupleWithArray($txBase, $qBase);
                     } else if ($qBase instanceof ArrayType && $txBase instanceof ArrayType) {
-	                    $newRange = $q->range->tryRangeIntersectionWith($tx->range);
+	                    $newRange = $qBase->range->tryRangeIntersectionWith($txBase->range);
 	                    if ($newRange) {
 		                    array_splice($queue, $ql, 1);
 		                    $tx = $this->typeRegistry->array(
-			                    $this->normalize($q->itemType, $tx->itemType),
+			                    $this->normalize($qBase->itemType, $txBase->itemType),
 			                    $newRange->minLength,
 			                    $newRange->maxLength
 		                    );
@@ -140,12 +144,12 @@ final readonly class IntersectionTypeNormalizer {
 	                    array_splice($queue, $ql, 1);
 
 						$returnTypes = [
-							$qBase instanceof ResultType ? $q->returnType : $q,
-							$txBase instanceof ResultType ? $tx->returnType : $tx,
+							$qBase instanceof ResultType ? $qBase->returnType : $q,
+							$txBase instanceof ResultType ? $txBase->returnType : $tx,
 						];
 						$errorTypes = [
-							$qBase instanceof ResultType ? $q->errorType : $this->typeRegistry->nothing,
-							$txBase instanceof ResultType ? $tx->errorType : $this->typeRegistry->nothing,
+							$qBase instanceof ResultType ? $qBase->errorType : $this->typeRegistry->nothing,
+							$txBase instanceof ResultType ? $txBase->errorType : $this->typeRegistry->nothing,
 						];
 						$returnType = $this->normalize(... $returnTypes);
 						$errorType = $this->normalize(... $errorTypes);
@@ -153,12 +157,12 @@ final readonly class IntersectionTypeNormalizer {
 							$this->typeRegistry->result($returnType, $errorType);
                     } else if ($qBase instanceof ShapeType && $txBase instanceof ShapeType) {
 	                    array_splice($queue, $ql, 1);
-	                    $shapeType = $this->normalize($q->refType, $tx->refType);
+	                    $shapeType = $this->normalize($qBase->refType, $txBase->refType);
 						$tx = $this->typeRegistry->shape($shapeType);
                     } else if ($qBase instanceof IntegerSubsetType && $txBase instanceof IntegerSubsetType) {
 	                    array_splice($queue, $ql, 1);
 	                    $intersectedValues = array_values(
-		                    array_intersect($q->subsetValues, $tx->subsetValues)
+		                    array_intersect($qBase->subsetValues, $txBase->subsetValues)
 	                    );
 	                    $tx = $intersectedValues ? $this->typeRegistry->integerSubset(
 		                    $intersectedValues
@@ -166,7 +170,7 @@ final readonly class IntersectionTypeNormalizer {
                     } else if ($qBase instanceof RealSubsetType && $txBase instanceof RealSubsetType) {
 	                    array_splice($queue, $ql, 1);
 	                    $intersectedValues = array_values(
-		                    array_intersect($q->subsetValues, $tx->subsetValues)
+		                    array_intersect($qBase->subsetValues, $txBase->subsetValues)
 	                    );
 	                    $tx = $intersectedValues ? $this->typeRegistry->realSubset(
 		                    $intersectedValues
@@ -176,8 +180,8 @@ final readonly class IntersectionTypeNormalizer {
 	                    ($txBase instanceof IntegerType || $txBase instanceof RealType)
                     ) {
 						$targetIsInteger = $qBase instanceof IntegerType || $txBase instanceof IntegerType;
-						$range1 = new NumberRange($targetIsInteger, ... $q->numberRange->intervals);
-						$range2 = new NumberRange($targetIsInteger, ... $tx->numberRange->intervals);
+						$range1 = new NumberRange($targetIsInteger, ... $qBase->numberRange->intervals);
+						$range2 = new NumberRange($targetIsInteger, ... $txBase->numberRange->intervals);
 	                    $newRange = $range1->intersectionWith($range2);
 	                    if ($newRange) {
 		                    array_splice($queue, $ql, 1);
@@ -189,17 +193,18 @@ final readonly class IntersectionTypeNormalizer {
                     } else if ($qBase instanceof StringSubsetType && $txBase instanceof StringSubsetType) {
                         array_splice($queue, $ql, 1);
                         $intersectedValues = array_values(
-                            array_intersect($q->subsetValues, $tx->subsetValues)
+                            array_intersect($qBase->subsetValues, $txBase->subsetValues)
                         );
                         $tx = $intersectedValues ? $this->typeRegistry->stringSubset(
                             $intersectedValues
                         ) : $this->typeRegistry->nothing;
-                    } elseif ($qBase instanceof EnumerationSubsetType && $txBase instanceof EnumerationSubsetType && $q->enumeration->name->equals($tx->enumeration->name)) {
+                    } elseif ($qBase instanceof EnumerationSubsetType && $txBase instanceof EnumerationSubsetType && $qBase->enumeration->name->equals($txBase->enumeration->name)) {
 	                    array_splice($queue, $ql, 1);
+						/** @var list<EnumerationValue> $intersectedValues */
                         $intersectedValues = array_values(
-							array_intersect($q->subsetValues, $tx->subsetValues)
+							array_intersect($qBase->subsetValues, $txBase->subsetValues)
 						);
-						$tx = $intersectedValues ? $q->enumeration->subsetType(
+						$tx = $intersectedValues ? $qBase->enumeration->subsetType(
 							array_map(fn(EnumerationValue $enumerationValue): EnumerationValueName => $enumerationValue->name, $intersectedValues)
 						) : $this->typeRegistry->nothing;
                     }

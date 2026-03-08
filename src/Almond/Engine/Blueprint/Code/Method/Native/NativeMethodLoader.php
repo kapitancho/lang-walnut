@@ -9,6 +9,9 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 
 interface NativeMethodLoader {
 	public function loadNativeMethod(TypeName $typeName, MethodName $methodName): NativeMethod|UnknownMethod;
-	/** @return list<NativeMethod> */
+	/**
+	 * @param list<TypeName> $typeNames
+	 * @return list<NativeMethod>
+	 */
 	public function loadNativeMethods(array $typeNames, MethodName $methodName): array;
 }

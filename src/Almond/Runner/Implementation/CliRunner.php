@@ -26,6 +26,7 @@ final readonly class CliRunner {
 			return $compilationResult;
 		} else {
 			try {
+				/** @var string $cliResult */
 				$cliResult = $compilationResult->program->getEntryPoint(
 					new TypeName('CliEntryPoint')
 				)->call(

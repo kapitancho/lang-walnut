@@ -7,12 +7,12 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 
 final readonly class RecordExpression extends SequentialExpressionBase {
 
-	/** @param array<Type> $expressionTypes */
+	/** @param array<string, Type> $expressionTypes */
 	protected function buildExpressionType(array $expressionTypes, int $set, int $dynamic): Type {
 		return $this->typeRegistry->record($expressionTypes, null);
 	}
 
-	/** @param array<Value> $expressionValues */
+	/** @param array<string, Value> $expressionValues */
 	protected function buildExpressionValue(array $expressionValues): Value {
 		return $this->valueRegistry->record($expressionValues);
 	}

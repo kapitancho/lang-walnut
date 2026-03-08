@@ -54,7 +54,7 @@ final readonly class ShapeType implements ShapeTypeInterface, SupertypeChecker, 
 	private function isShapeOf(Type $ofType): bool {
 		$baseType = $this->toBaseType($this->refType);
 		if ($baseType instanceof IntersectionType) {
-			return array_all($baseType->types, fn($checkType) =>
+			return array_all($baseType->types, fn(Type $checkType): bool =>
 				$this->typeRegistry->shape($checkType)->isShapeOf($ofType));
 		}
 		$refTypes = $baseType instanceof UnionType ? $baseType->types : [];

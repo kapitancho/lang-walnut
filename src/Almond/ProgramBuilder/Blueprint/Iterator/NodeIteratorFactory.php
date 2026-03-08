@@ -39,7 +39,7 @@ interface NodeIteratorFactory {
 	 * @template T of Node
 	 * @param NodeIterator $source
 	 * @param class-string<T> $nodeClass
-	 * @return Iterator<Node>
+	 * @return Iterator<T>
 	 */
 	public function filterByType(NodeIterator $source, string $nodeClass): Iterator;
 

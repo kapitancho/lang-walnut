@@ -241,6 +241,10 @@ abstract readonly class WithMethod extends NativeMethod {
 		);
 	}
 
+	/**
+	 * @param callable(Value): Value $constructor
+	 * @throws ExecutionException
+	 */
 	protected function executeDataOpenType(
 		DataValue|OpenValue $target,
 		Value $parameter,

@@ -86,8 +86,9 @@ final readonly class EnumerationSubsetType implements EnumerationSubsetTypeInter
         };
     }
 
+	/** @param array<string, EnumerationValue> $subset */
     private static function isSubset(array $subset, array $superset): bool {
-	    return array_all($subset, fn(EnumerationValue $value, string $key) => isset($superset[$key]));
+	    return array_all($subset, fn(EnumerationValue $value, string $key): bool => isset($superset[$key]));
     }
 
 	public function __toString(): string {

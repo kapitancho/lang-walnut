@@ -42,6 +42,10 @@ final readonly class UnionTypeNormalizer {
         return new UnionType($this, $parsedTypes);
     }
 
+	/**
+	 * @param list<Type> $types
+	 * @return list<Type>
+	 */
     private function parseTypes(array $types): array {
         $queue = [];
         foreach ($types as $type) {
@@ -123,11 +127,14 @@ final readonly class UnionTypeNormalizer {
                     } else if ($q instanceof EnumerationSubsetType && $tx instanceof EnumerationSubsetType &&
 	                    $q->enumeration->name->equals($tx->enumeration->name)) {
                         array_splice($queue, $ql, 1);
+						/** @var array<string, EnumerationValue> $allValues */
+						$allValues = array_merge($q->subsetValues, $tx->subsetValues);
                         $tx = $q->enumeration->subsetType(
                             array_values(
                                 array_unique(
 									array_map(static fn(EnumerationValue $value): EnumerationValueName =>
-										$value->name, array_merge($q->subsetValues, $tx->subsetValues)
+										$value->name,
+										$allValues
 									)
                                 )
                             )

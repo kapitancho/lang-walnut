@@ -31,6 +31,7 @@ abstract readonly class SequentialExpressionBase implements Expression, JsonSeri
 	public function validateInContext(
 		ValidationContext $validationContext,
 	): ValidationContext|ValidationFailure {
+		/** @var ValidationFailure|null $failure */
 		$failure = null;
 
 		$set = [];

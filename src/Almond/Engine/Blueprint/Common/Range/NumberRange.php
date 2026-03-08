@@ -8,9 +8,9 @@ use Stringable;
 
 final readonly class NumberRange implements Stringable, JsonSerializable {
 
-	/** @var array<NumberInterval> */
+	/** @var non-empty-list<NumberInterval> */
 	public array $intervals;
-	/** @var array<NumberInterval> */
+	/** @var non-empty-list<NumberInterval> */
 	public array $adjustedIntervals;
 
 	public NumberIntervalEndpoint|MinusInfinity $min;
@@ -23,7 +23,7 @@ final readonly class NumberRange implements Stringable, JsonSerializable {
 		if (count($intervals) === 0) {
 			throw new InvalidNumberRange;
 		}
-		$this->intervals = $intervals;
+		$this->intervals = array_values($intervals);
 
 		$this->adjustedIntervals = self::adjustIntervals($isIntegerRange, $intervals);
 		$firstValue = array_first($this->adjustedIntervals);
@@ -32,7 +32,10 @@ final readonly class NumberRange implements Stringable, JsonSerializable {
 		$this->max = $lastValue->end;
 	}
 
-	/** @param non-empty-array<NumberInterval> $intervals */
+	/**
+	 * @param non-empty-array<NumberInterval> $intervals
+	 * @return non-empty-list<NumberInterval>
+	 */
 	private static function adjustIntervals(bool $asIntegerRange, array $intervals): array {
 		usort($intervals, fn(NumberInterval $a, NumberInterval $b) => match(true) {
 			$a->start instanceof MinusInfinity => -1, $b->start instanceof MinusInfinity => 1,

@@ -84,6 +84,7 @@ final readonly class ProgramContext implements ProgramContextInterface, TypeFind
 
 	public ProgramValidator $programValidator;
 
+	/** @param array<string, string> $nativeExtensionNamespaces */
 	public function __construct(array $nativeExtensionNamespaces = []) {
 		// Storage + registry pairs:
 		$this->userlandTypeRegistry = $this->userlandTypeStorage = new UserlandTypeStorage();

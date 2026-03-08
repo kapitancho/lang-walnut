@@ -25,6 +25,7 @@ final readonly class ParserStateMachine {
 		private EscapeCharHandler $bytesEscapeCharHandler
 	) {}
 
+	/** @return array<int, array{name: string, transitions: array<string, int|(callable(LT, ParserState): void)>}> */
 	public function getAllStates(): array {
 		return [
 			-1 => ['name' => 'EOF', 'transitions' => [
@@ -271,6 +272,7 @@ final readonly class ParserStateMachine {
 					$this->nodeBuilder->moduleLevel->definition(
 						$this->s->generated = $this->nodeBuilder->moduleLevel->addMethod(
 							$this->s->result['typeName'],
+							/** @phpstan-ignore binaryOp.invalid */
 							$this->nodeBuilder->name->methodName('as' . $this->s->result['castToTypeName']->name),
 							$this->nodeBuilder->type->nameAndType(
 								$this->nodeBuilder->type->nullType,

@@ -74,6 +74,7 @@ final readonly class SortHelper {
 		);
 	}
 
+	/** @param callable(list<Value>): Value $valueBuilder */
 	public function execute(
 		TupleValue|RecordValue|SetValue $target,
 		Value $parameter,
@@ -111,7 +112,7 @@ final readonly class SortHelper {
 				}
 				$sort($rawValues, SORT_STRING);
 				return $valueBuilder(array_map(
-					fn(string $value) => $this->valueRegistry->string($value),
+					fn(string $value): StringValue => $this->valueRegistry->string($value),
 					$rawValues
 				));
 			}

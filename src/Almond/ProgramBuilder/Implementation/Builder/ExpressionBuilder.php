@@ -141,6 +141,7 @@ final readonly class ExpressionBuilder implements ExpressionCompilerInterface {
 
 	/** @throws BuildException */
 	public function expression(ExpressionNode $expressionNode): Expression {
+		/** @var Expression $result */
 		$result = match(true) {
 			$expressionNode instanceof ConstantExpressionNode =>
 				$this->expressionRegistry->constant(

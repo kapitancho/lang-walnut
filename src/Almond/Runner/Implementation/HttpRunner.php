@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Almond\Runner\Implementation;
 
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\InvalidEntryPointDependency;
@@ -33,6 +34,7 @@ final readonly class HttpRunner {
 			return $compilationResult;
 		} else {
 			try {
+				/** @var RecordValue $httpResult */
 				$httpResult = $compilationResult->program->getEntryPoint(
 					new TypeName('HttpRequestHandler')
 				)->call(

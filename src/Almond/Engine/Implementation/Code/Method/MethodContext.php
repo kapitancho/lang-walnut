@@ -6,6 +6,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Method;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodContext as MethodContextInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodFinder as MethodFinderInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\UnknownMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeFinder;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
@@ -24,7 +25,8 @@ final class MethodContext implements MethodContextInterface {
 		private readonly MethodFinderInterface $methodFinder,
 	) {}
 
-	private Type $nullType {
+	private NullType $nullType {
+		/** @phpstan-ignore-next-line */
 		get => $this->nullType ??= $this->typeFinder->typeByName(new TypeName('Null'));
 	}
 

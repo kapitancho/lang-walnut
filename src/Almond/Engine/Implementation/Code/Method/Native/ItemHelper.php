@@ -80,8 +80,8 @@ final readonly class ItemHelper {
 					if ($parameterType instanceof IntegerSubsetType) {
 						$returnType = $this->typeRegistry->union(
 							array_map(
-								fn(Number $value) =>
-									$targetType->types[(string)$value] ?? $targetType->restType,
+								fn(Number $value): Type =>
+									$targetType->types[(int)(string)$value] ?? $targetType->restType,
 								$parameterType->subsetValues
 							)
 						);
@@ -152,7 +152,7 @@ final readonly class ItemHelper {
 					$fType;
 				$returnType = $this->typeRegistry->union(
 					array_map(
-						fn(string $value) => $tConv(
+						fn(string $value): Type => $tConv(
 							$targetType->types[$value] ??
 							$targetType->restType
 						),

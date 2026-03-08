@@ -21,7 +21,9 @@ final class ParserState implements ParserStateInterface {
 	public function pop(): array {
 		$return = [$this->result, $this->callStack];
 		if (count($this->resultStack) > 0) {
+			/** @phpstan-ignore assign.propertyType */
 			$this->result = array_pop($this->resultStack);
+			/** @phpstan-ignore assign.propertyType */
 			$this->state = array_pop($this->callStack);
 		}
 		return $return;

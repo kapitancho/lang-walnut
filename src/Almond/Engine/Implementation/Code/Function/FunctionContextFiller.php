@@ -238,13 +238,15 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 		) {
 			$restValues = $tv->values;
 			$values = $tv->values;
-			foreach($target->type->valueType->types as $fieldName => $fieldType) {
+			/** @var list<Type>|array<string, Type> $tTypes */
+			$tTypes = $target->type->valueType->types;
+			foreach($tTypes as $fieldName => $fieldType) {
 				unset($restValues[$fieldName]);
 				$value = $values[$fieldName] ??
 					$this->valueRegistry->error(
 						$this->valueRegistry->core->mapItemNotFound(
 							$this->valueRegistry->record([
-								'key' => $this->valueRegistry->string($fieldName)
+								'key' => $this->valueRegistry->string((string)$fieldName)
 							])
 						)
 					)

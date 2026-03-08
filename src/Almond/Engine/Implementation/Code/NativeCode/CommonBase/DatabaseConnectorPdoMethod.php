@@ -30,6 +30,7 @@ abstract readonly class DatabaseConnectorPdoMethod extends NamedNativeMethod {
 	}
 
 	protected function getPdo(string $dsn): PDO {
+		/** @var array<string, PDO> $pdoInstances */
 		static $pdoInstances = [];
 		if (!isset($pdoInstances[$dsn])) {
 			$pdoInstances[$dsn] = new PDO($dsn, options: [
