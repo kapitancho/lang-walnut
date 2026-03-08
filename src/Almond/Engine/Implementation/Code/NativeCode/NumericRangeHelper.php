@@ -311,6 +311,7 @@ trait NumericRangeHelper {
 				$deduplicated[$key] = $value;
 			}
 		}
+		/** @var non-empty-list<NumberIntervalEndpoint> $values */
 		$values = array_values($deduplicated);
 
 		$min = $hasMinusInfinity ? MinusInfinity::value : array_first($values);
@@ -352,6 +353,7 @@ trait NumericRangeHelper {
 				}
 			}
 		}
+		/** @var non-empty-list<NumberIntervalEndpoint> $values */
 		usort($values,
 			fn(NumberIntervalEndpoint $a, NumberIntervalEndpoint $b): int => $a->value <=> $b->value
 		);

@@ -161,6 +161,7 @@ final readonly class MatchExpression implements Expression, JsonSerializable {
 				"?when (%s) { %s }%s",
 				$this->target->target,
 				$this->pairs[0]->valueExpression,
+				/** @phpstan-ignore-next-line */
 				(string)$this->default->valueExpression === 'null' ? '' : $else),
 		};
 	}

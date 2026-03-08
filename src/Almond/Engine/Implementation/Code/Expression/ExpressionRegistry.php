@@ -159,7 +159,7 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 					$then
 				)
 			],
-			new MatchExpressionDefault($else)
+			$else ? new MatchExpressionDefault($else) : null
 		);
 	}
 

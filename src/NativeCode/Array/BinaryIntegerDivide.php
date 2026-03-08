@@ -80,7 +80,7 @@ final readonly class BinaryIntegerDivide implements NativeMethod {
 			$chunkSize = (int)(string)$parameter->literalValue;
 			if ($chunkSize > 0) {
 				$chunks = array_chunk($target->values, $chunkSize);
-				if (count($chunks) > 0 && count($chunks[array_key_last($chunks)]) < $chunkSize) {
+				if (count($chunks) > 0 && count(array_last($chunks)) < $chunkSize) {
 					array_pop($chunks);
 				}
 				return $programRegistry->valueRegistry->tuple(

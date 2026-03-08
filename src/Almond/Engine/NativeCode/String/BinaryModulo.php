@@ -67,7 +67,7 @@ final readonly class BinaryModulo extends NativeMethod {
 			/** @var int<1, max> $splitLength */
 			$splitLength = (int)(string)$parameter->literalValue;
 			$result = mb_str_split($target->literalValue, $splitLength);
-			$last = $result[array_key_last($result)] ?? '';
+			$last = array_last($result) ?? '';
 			return $this->valueRegistry->string(
 				mb_strlen($last) < $splitLength ? $last : ''
 			);

@@ -56,7 +56,7 @@ final readonly class MainMethodRegistry implements MethodFinder {
 					$unique[$uKey] = $method;
 				}
 				if (count($unique) === 1) {
-					return $unique[array_key_first($unique)][1];//$methods[0][1];
+					return array_first($unique)[1];//$methods[0][1];
 				}
 				$method = $this->registry->methodForType($targetType, $methodName);
 				return $method instanceof Method ? $method :

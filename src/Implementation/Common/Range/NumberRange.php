@@ -30,8 +30,8 @@ final readonly class NumberRange implements NumberRangeInterface, JsonSerializab
 		$this->intervals = $intervals;
 
 		$this->adjustedIntervals = self::adjustIntervals($isIntegerRange, $intervals);
-		$firstValue = $this->adjustedIntervals[array_key_first($this->adjustedIntervals)];
-		$lastValue = $this->adjustedIntervals[array_key_last($this->adjustedIntervals)];
+		$firstValue = array_first($this->adjustedIntervals);
+		$lastValue = array_last($this->adjustedIntervals);
 		$this->min = $firstValue->start;
 		$this->max = $lastValue->end;
 	}

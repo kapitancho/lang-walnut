@@ -106,7 +106,7 @@ final readonly class BinaryModulo implements NativeMethod {
 			$chunkSize = (int)(string)$parameter->literalValue;
 			if ($chunkSize > 0) {
 				$chunks = array_chunk($target->values, $chunkSize);
-				$last = $chunks[array_key_last($chunks)];
+				$last = array_last($chunks);
 
 				return $programRegistry->valueRegistry->tuple(
 					count($chunks) > 0 && count($last) < $chunkSize ?
