@@ -186,7 +186,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 							if ($val instanceof Value) {
 								$executionContext = $executionContext->withAddedVariableValue(
 									new VariableName($variableName . $index),
-									//TODO: what is UnknownProperty?
+									//TODO: what if UnknownProperty?
 									/** @phpstan-ignore argument.type */
 									$v->valueOf($index)
 								);
