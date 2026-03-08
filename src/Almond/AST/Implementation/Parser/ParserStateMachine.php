@@ -1133,6 +1133,7 @@ final readonly class ParserStateMachine {
 				T::call_end->name => function(LT $token) {
 					if ($startPosition = $this->s->result['startPosition'] ?? null) {
 						$sourceLocation = new SourceLocation(
+							/** @phpstan-ignore property.nonObject */
 							$this->s->generated->sourceLocation->moduleName,
 							$startPosition,
 							$token->sourcePosition,

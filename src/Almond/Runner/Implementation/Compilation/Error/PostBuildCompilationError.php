@@ -3,6 +3,12 @@
 namespace Walnut\Lang\Almond\Runner\Implementation\Compilation\Error;
 
 use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\FunctionBody;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\UserlandFunction;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationError;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\SourceNodeLocator;
@@ -43,8 +49,13 @@ final class PostBuildCompilationError implements CompilationError {
 	/** @var list<SourceLocation> */
 	public array $sourceLocations {
 		get {
-			$sourceNode = $this->validationError->origin ?
-				$this->sourceLocator->getSourceNode($this->validationError->origin) : null;
+			$o = $this->validationError->origin;
+			$sourceNode = match(true) {
+				$o instanceof Expression, $o instanceof Value, $o instanceof Type,
+				$o instanceof FunctionBody, $o instanceof UserlandMethod, $o instanceof UserlandFunction =>
+					$this->sourceLocator->getSourceNode($o),
+				default => null
+			};
 			return $sourceNode ? [$sourceNode->sourceLocation] : [];
 		}
 	}
