@@ -140,10 +140,13 @@ final readonly class WithValues extends TypeNativeMethod {
 				return $this->valueRegistry->type($result);
 			}
 			if ($typeValue instanceof EnumerationType) {
+				/** @var list<EnumerationValue> $values */
 				$values = $parameter->values;
 				$r = [];
 				foreach($values as $value) {
-					if ($value instanceof EnumerationValue && $value->enumeration == $typeValue) {
+					/** @phpstan-ignore instanceof.alwaysTrue */
+					if ($value instanceof EnumerationValue &&
+						$value->enumeration->name->identifier === $typeValue->name->identifier) {
 						$r[] = $value->name;
 					} else {
 						return $this->valueRegistry->error(

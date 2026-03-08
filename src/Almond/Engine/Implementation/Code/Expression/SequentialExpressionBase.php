@@ -46,6 +46,7 @@ abstract readonly class SequentialExpressionBase implements Expression, JsonSeri
 				if (!$expression->isScopeSafe()) {
 					return $step;
 				}
+				/** @var ValidationFailure|null $failure */
 				$failure = $failure === null ? $step : $failure->mergeWith($step);
 			} elseif (!$earlyReturnResult) {
 				if ($expression instanceof ConstantExpression) {

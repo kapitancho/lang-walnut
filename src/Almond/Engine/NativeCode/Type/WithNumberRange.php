@@ -24,6 +24,7 @@ final readonly class WithNumberRange extends TypeNativeMethod {
 	}
 
 	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		/** @var TypeType $targetType */
 		if ($this->toBaseType($targetType->refType) instanceof IntegerType) {
 			return $parameterType->isSubtypeOf($this->typeRegistry->core->integerNumberRange) ?
 				null : sprintf("Parameter type must be a subtype of IntegerNumberRange, got: %s", $parameterType);
@@ -50,16 +51,22 @@ final readonly class WithNumberRange extends TypeNativeMethod {
 			/** @var IntegerType|RealType $typeValue */
 			$typeValue = $this->toBaseType($target->typeValue);
 			$intervals = [];
+			/** @phpstan-ignore-next-line */
 			foreach($parameter->value->values['intervals']->values as $interval) {
+				/** @phpstan-ignore-next-line */
 				['start' => $start, 'end' => $end] = $interval->value->values;
 				$vStart = $start instanceof AtomValue ? MinusInfinity::value :
 					new NumberIntervalEndpoint(
+						/** @phpstan-ignore-next-line */
 						$start->value->values['value']->literalValue,
+						/** @phpstan-ignore-next-line */
 						$start->value->values['inclusive']->literalValue
 					);
 				$vEnd = $end instanceof AtomValue ? PlusInfinity::value :
 					new NumberIntervalEndpoint(
+						/** @phpstan-ignore-next-line */
 						$end->value->values['value']->literalValue,
+						/** @phpstan-ignore-next-line */
 						$end->value->values['inclusive']->literalValue
 					);
 				$intervals[] = new NumberInterval(

@@ -5,7 +5,9 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Array;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
@@ -32,6 +34,7 @@ final readonly class Unique extends ArrayNativeMethod {
 
 	protected function getExecutor(): callable {
 		return function(TupleValue $target, NullValue $parameter): TupleValue {
+			/** @var list<StringValue|IntegerValue|RealValue> $values */
 			$values = $target->values;
 			$rawValues = [];
 			$hasStrings = false;

@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\DatabaseConnector;
 
-use BcMath\Number;
 use PDO;
 use PDOException;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
@@ -36,16 +35,13 @@ final readonly class Query extends DatabaseConnectorPdoMethod {
 					new TypeName('DatabaseQueryCommand')
 				)
 			)) {
-				$dsn = $target->value->valueOf('connection')
-					->value->values['dsn']->literalValue;
+				[$dsn, $query, $bound] = $this->getValues($target, $parameter);
 				try {
-					$stmt = $this->getPdo($dsn)->prepare($parameter->values['query']->literalValue);
-					$stmt->execute(array_map(fn(Value $value): string|int|null =>
-					($v = $value)->literalValue instanceof Number ? (string)$v->literalValue : $v->literalValue,
-						$parameter->values['boundParameters']->values
-					));
+					$stmt = $this->getPdo($dsn)->prepare($query);
+					$stmt->execute($bound);
 					$result = [];
 					foreach($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+						/** @var array<string, string|float|int|null> $row */
 						$result[] = $this->valueRegistry->record(
 							array_map(
 								fn(string|float|int|null $value): Value => match(gettype($value)) {

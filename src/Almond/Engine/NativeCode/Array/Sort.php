@@ -40,7 +40,9 @@ final readonly class Sort extends ArrayNativeMethod {
 			return $sortHelper->execute(
 				$target,
 				$parameter,
-				fn(array $values) => $this->valueRegistry->tuple(array_values($values))
+				fn(array $values): TupleValue =>
+					/** @phpstan-ignore arrayValues.list */
+					$this->valueRegistry->tuple(array_values($values))
 			);
 		};
 	}

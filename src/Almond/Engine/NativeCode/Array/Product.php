@@ -54,7 +54,7 @@ final readonly class Product extends ArrayNativeMethod {
 
 	protected function getExecutor(): callable {
 		return function(TupleValue $target, NullValue $parameter): Value {
-			$product = 1;
+			$product = new Number(1);
 			$hasReal = false;
 			/** @var IntegerValue|RealValue $item */
 			foreach ($target->values as $item) {

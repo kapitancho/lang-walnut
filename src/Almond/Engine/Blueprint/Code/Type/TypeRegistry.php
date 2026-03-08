@@ -17,6 +17,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MetaType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MutableType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalKeyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
@@ -47,6 +48,7 @@ interface TypeRegistry extends TypeFinder {
 	public TrueType $true { get; }
 	public function function(Type $parameterType, Type $returnType): FunctionType;
 	public function mutable(Type $valueType): MutableType;
+	public function optionalKey(Type $valueType): OptionalKeyType;
 	public function shape(Type $refType): ShapeType;
 	public function impure(Type $valueType): Type;
 	public function result(Type $returnType, Type $errorType): ResultType;

@@ -22,9 +22,9 @@ final readonly class Partition extends MapFilterBase {
 				$recordReturnType = $this->typeRegistry->record(
 					array_map(
 						fn(Type $type): OptionalKeyType =>
-						$type instanceof OptionalKeyType ?
-							$type :
-							$this->typeRegistry->optionalKey($type),
+							$type instanceof OptionalKeyType ?
+								$type :
+								$this->typeRegistry->optionalKey($type),
 						$targetType->types
 					),
 					$targetType->restType

@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\String;
 
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -28,9 +29,11 @@ final readonly class Substring extends NativeMethod {
 
 	protected function getValidator(): callable {
 		return function(StringType $targetType, RecordType $parameterType): StringType {
+			/** @var IntegerType $lengthType */
+			$lengthType = $parameterType->types['length'];
 			return $this->typeRegistry->string(0, min(
 				$targetType->range->maxLength,
-				$parameterType->types['length']->numberRange->max->value
+				$lengthType->numberRange->max->value
 			));
 		};
 	}

@@ -25,10 +25,12 @@ final readonly class JsonDecode extends NativeMethod {
 	private function phpToValue(string|int|float|bool|null|array|object $value): Value {
 		return match(true) {
 			is_array($value) => $this->valueRegistry->tuple(
+				/** @phpstan-ignore-next-line */
 				array_map(fn(string|int|float|bool|null|array|object $item): Value
 					=> $this->phpToValue($item), $value)
 			),
 			is_object($value) => $this->valueRegistry->record(
+				/** @phpstan-ignore-next-line */
 				array_map(fn(string|int|float|bool|null|array|object $item): Value
 					=> $this->phpToValue($item), (array)$value)
 			),

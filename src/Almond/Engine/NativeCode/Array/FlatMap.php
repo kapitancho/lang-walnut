@@ -43,12 +43,13 @@ final readonly class FlatMap extends ArrayNativeMethod {
 			$errorType = $r instanceof ResultType ? $r->errorType : null;
 			$returnType = $r instanceof ResultType ? $r->returnType : $r;
 
+			/** @var ArrayType $returnType */
 			$returnType = $this->toBaseType($returnType);
-			$minLength = ((int)(string)$targetType->range->minLength) * ((int)(string)$returnType->range->minLength);
+			$minLength = $targetType->range->minLength * $returnType->range->minLength;
 			$maxLength = $targetType->range->maxLength === PlusInfinity::value ||
 				$returnType->range->maxLength === PlusInfinity::value ?
 				PlusInfinity::value :
-				((int)(string)$targetType->range->maxLength) * ((int)(string)$returnType->range->maxLength);
+				$targetType->range->maxLength * $returnType->range->maxLength;
 
 			$resultArray = $this->typeRegistry->array(
 				$returnType->itemType,

@@ -31,9 +31,12 @@ final readonly class UnionMethodCall implements Method {
 		/** @var ValidationFailure|null $failure */
 		$failure = null;
 		foreach($this->methods as [$methodType, $method]) {
+			/** @var Type $methodType */
+			/** @var Method $method */
 			$tResult = $method->validate($methodType, $parameterType, $origin);
 			if ($tResult instanceof ValidationFailure) {
-				$failure = $failure ? $failure->mergeWith($tResult) : $tResult;
+				/** @var ValidationFailure|null $failure */
+				$failure = $failure ? $failure->mergeWith($tResult) : $failure;
 			} else {
 				$types[] = $tResult->type;
 			}

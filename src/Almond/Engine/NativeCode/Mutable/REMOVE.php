@@ -44,6 +44,7 @@ final readonly class REMOVE extends MutableNativeMethod {
 	}
 
 	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		/** @var MutableType $targetType */
 		$valueType = $this->toBaseType($targetType->valueType);
 		if ($valueType instanceof SetType) {
 			return null;

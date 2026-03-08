@@ -54,8 +54,12 @@ final readonly class ADD extends MutableNativeMethod {
 				'key' => $this->typeRegistry->string(),
 				'value' => $this->typeRegistry->any
 			], null))) {
+				/** @var RecordType $p */
+				/** @var Type $kk */
 				$kk = $p->types['key'] ?? null;
+				/** @var Type $kk */
 				$vv = $p->types['value'] ?? null;
+				/** @phpstan-ignore booleanAnd.leftAlwaysTrue */
 				if ($kk && $vv) {
 					if ($kk instanceof StringSubsetType) {
 						foreach ($kk->subsetValues as $subsetValue) {
@@ -134,13 +138,15 @@ final readonly class ADD extends MutableNativeMethod {
 				return $target;
 			}
 			if ($targetType instanceof RecordType && $mv instanceof RecordValue && $parameter instanceof RecordValue) {
+				/** @var string|null $kk */
 				$kk = $parameter->values['key']->literalValue ?? null;
+				/** @var Value|null $vv */
 				$vv = $parameter->values['value'] ?? null;
 				if ($kk && $vv) {
 					if ($vv->type->isSubtypeOf($targetType->types[$kk] ?? $targetType->restType)) {
-						$mv = $target->value->values;
-						$mv[$kk] = $vv;
-						$target->value = $this->valueRegistry->record($mv);
+						$mVals = $mv->values;
+						$mVals[$kk] = $vv;
+						$target->value = $this->valueRegistry->record($mVals);
 						return $target;
 					}
 				}
@@ -152,9 +158,13 @@ final readonly class ADD extends MutableNativeMethod {
 					'value' => $targetType->itemType
 				], null);
 				if ($parameter->type->isSubtypeOf($recordType)) {
-					$mv = $target->value->values;
-					$mv[$parameter->values['key']->literalValue] = $parameter->values['value'];
-					$target->value = $this->valueRegistry->record($mv);
+					/** @var RecordValue $parameter */
+					/** @var string $key */
+					$key = $parameter->values['key']->literalValue;
+
+					$mVals = $mv->values;
+					$mVals[$key] = $parameter->values['value'];
+					$target->value = $this->valueRegistry->record($mVals);
 					return $target;
 				}
 				return $target;

@@ -29,11 +29,13 @@ final readonly class WithKeyValue extends MapNativeMethod {
 
 	protected function getValidator(): callable {
 		return function(MapType $targetType, RecordType $parameterType): Type {
-			$keyType = $parameterType->types['key'] ?? null;
+			/** @var Type $keyType */
+			$keyType = $parameterType->typeOf('key');
+			/** @var Type $valueType */
+			$valueType = $parameterType->typeOf('value');
 			if ($targetType instanceof RecordType) {
 				if ($keyType instanceof StringSubsetType && count($keyType->subsetValues) === 1) {
 					$keyValue = $keyType->subsetValues[0];
-					$valueType = $parameterType->types['value'] ?? null;
 					return $this->typeRegistry->record(
 						$targetType->types + [
 							$keyValue => $valueType
@@ -42,19 +44,18 @@ final readonly class WithKeyValue extends MapNativeMethod {
 					);
 				}
 			}
-			$valueType = $parameterType->types['value'] ?? null;
 			return $this->typeRegistry->map(
-				$this->typeRegistry->union(array_filter([
+				$this->typeRegistry->union([
 					$targetType->itemType,
 					$valueType
-				])),
+				]),
 				$targetType->range->minLength,
 				$targetType->range->maxLength === PlusInfinity::value ?
 					PlusInfinity::value : $targetType->range->maxLength + 1,
-				$this->typeRegistry->union(array_filter([
+				$this->typeRegistry->union([
 					$targetType->keyType,
 					$keyType
-				]))
+				])
 			);
 		};
 	}

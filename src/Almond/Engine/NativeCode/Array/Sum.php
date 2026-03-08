@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Array;
 
+use BcMath\Number;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
@@ -53,7 +54,7 @@ final readonly class Sum extends ArrayNativeMethod {
 
 	protected function getExecutor(): callable {
 		return function(TupleValue $target, NullValue $parameter): Value {
-			$sum = 0;
+			$sum = new Number(0);
 			$hasReal = false;
 			/** @var IntegerValue|RealValue $item */
 			foreach ($target->values as $item) {

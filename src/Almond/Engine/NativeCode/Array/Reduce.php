@@ -59,12 +59,14 @@ final readonly class Reduce extends ArrayNativeMethod {
 		return null;
 	}
 
+	/** @return array{Type, Type, Type, Type|null} */
 	private function getAllTypes(Type $parameterType): array {
 		/** @var RecordType $parameterType */
 		$parameterType = $this->toBaseType($parameterType);
 		/** @var FunctionType $reducerType */
 		$reducerType = $this->toBaseType($parameterType->types['reducer']);
 		$initialType = $this->toBaseType($parameterType->types['initial']);
+		/** @var RecordType $reducerParamType */
 		$reducerParamType = $this->toBaseType($reducerType->parameterType);
 		$resultType = $reducerParamType->types['result'] ?? $this->typeRegistry->any;
 

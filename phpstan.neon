@@ -1,14 +1,25 @@
 parameters:
-    level: 9
+    level: 10
     paths:
-        - src
+        - src/Almond
     excludePaths:
-    phpVersion: 80400
+    phpVersion: 80500
     reportUnmatchedIgnoredErrors: false
     ignoreErrors:
-        - '#has an uninitialized readonly property#'
-        - '#Readonly property.*is assigned outside of the constructor#'
-        - '#Access to an undefined property#'
-        - '#Call to an undefined method#'
-        - '#no value type specified in iterable type array#'
-        - '#expects.*list.*given#'
+         - '#has an uninitialized readonly property#'
+         - '#Readonly property.*is assigned outside of the constructor#'
+         - '#Access to an undefined property#'
+         - '#Call to an undefined method#'
+         - '#no value type specified in iterable type array#'
+         - '#expects.*list.*given#'
+         - '#getValidator\(\) should return#'
+         - '#getExecutor\(\) should return#'
+         -
+             identifier: argument.type
+             path: src/Almond/AST/Implementation/Parser/ParserStateMachine.php
+         -
+             identifier: offsetAccess.nonOffsetAccessible
+             path: src/Almond/AST/Implementation/Parser/ParserStateMachine.php
+         -
+             identifier: property.nonObject
+             path: src/Almond/AST/Implementation/Parser/ParserStateMachine.php

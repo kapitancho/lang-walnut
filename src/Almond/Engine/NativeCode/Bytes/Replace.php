@@ -55,7 +55,12 @@ final readonly class Replace extends NativeMethod {
 					}
 					if ($match instanceof SealedValue && $match->type->name->equals(CoreType::RegExp->typeName())) {
 						return $this->valueRegistry->bytes(
-							(string)preg_replace($match->value->literalValue, $replacement->literalValue, $source)
+							(string)preg_replace(
+								/** @phpstan-ignore-next-line */
+								$match->value->literalValue,
+								$replacement->literalValue,
+								$source
+							)
 						);
 					}
 				}

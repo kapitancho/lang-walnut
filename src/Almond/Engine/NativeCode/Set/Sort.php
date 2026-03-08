@@ -40,7 +40,9 @@ final readonly class Sort extends SetNativeMethod {
 			return $sortHelper->execute(
 				$target,
 				$parameter,
-				fn(array $values) => $this->valueRegistry->set(array_values($values))
+				fn(array $values) =>
+					/** @phpstan-ignore arrayValues.list */
+					$this->valueRegistry->set(array_values($values))
 			);
 		};
 	}

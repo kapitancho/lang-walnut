@@ -60,7 +60,9 @@ final readonly class SORT extends MutableNativeMethod {
 					$parameter,
 					match(true) {
 						$v instanceof TupleValue => fn(array $values) => $this->valueRegistry->tuple($values),
-						$v instanceof RecordValue => fn(array $values) => $this->valueRegistry->record($values),
+						$v instanceof RecordValue =>
+							/** @phpstan-ignore-next-line */
+							fn(array $values) => $this->valueRegistry->record($values),
 						$v instanceof SetValue => fn(array $values) => $this->valueRegistry->set($values),
 					},
 				);

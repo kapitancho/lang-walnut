@@ -27,6 +27,8 @@ final readonly class CreateIfMissing extends FileMethod {
 
 	protected function getExecutor(): callable {
 		return function(SealedValue $target, StringValue|BytesValue $parameter) {
+			/** @var string $path */
+			/** @phpstan-ignore-next-line */
 			$path = $target->value->valueOf('path')->literalValue;
 			if (!file_exists($path)) {
 				if (!is_writable(dirname($path)) || (@file_put_contents($path, $parameter->literalValue)) === false) {

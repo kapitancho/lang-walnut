@@ -23,6 +23,8 @@ final readonly class Content extends FileMethod {
 
 	protected function getExecutor(): callable {
 		return function(SealedValue $target, NullValue $parameter) {
+			/** @var string $path */
+			/** @phpstan-ignore-next-line */
 			$path = $target->value->valueOf('path')->literalValue;
 			if (!file_exists($path) || !is_readable($path) || ($contents = file_get_contents($path)) === false) {
 				return $this->valueRegistry->error(

@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\Array;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\UnknownProperty;
@@ -29,13 +30,16 @@ final readonly class Slice extends ArrayNativeMethod {
 
 	protected function getValidator(): callable {
 		return function(ArrayType $targetType, RecordType $parameterType): Type {
+			$l = $parameterType->types['length'] ?? null;
+			/** @var IntegerType|null $lengthType */
+			$lengthType = $l ? $this->toBaseType($l) : null;
 			return $this->typeRegistry->array(
 				$targetType->itemType,
 				0,
 				min(
 					$targetType->range->maxLength,
-					($l = $parameterType->types['length'] ?? null) ?
-						$this->toBaseType($l)->numberRange->max->value :
+					$lengthType ?
+						$lengthType->numberRange->max->value :
 						$targetType->range->maxLength
 				)
 			);

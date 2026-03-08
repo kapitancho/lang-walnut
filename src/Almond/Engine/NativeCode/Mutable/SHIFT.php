@@ -9,6 +9,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\MutableValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MutableNativeMethod;
 
@@ -36,7 +37,9 @@ final readonly class SHIFT extends MutableNativeMethod {
 
 	protected function getExecutor(): callable {
 		return function(MutableValue $target, NullValue $parameter): Value {
-			$values = $target->value->values;
+			/** @var TupleValue $mv */
+			$mv = $target->value;
+			$values = $mv->values;
 			if (count($values) > 0) {
 				$value = array_shift($values);
 				$target->value = $this->valueRegistry->tuple($values);

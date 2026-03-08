@@ -14,6 +14,7 @@ final readonly class Apply extends NativeMethod {
 	use TupleAsRecord;
 
 	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		/** @var FunctionType $parameterType */
 		$p = $parameterType->parameterType;
 		$adjustedTargetType = $this->adjustParameterType(
 			$this->typeRegistry,

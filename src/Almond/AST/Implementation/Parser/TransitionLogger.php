@@ -2,7 +2,6 @@
 
 namespace Walnut\Lang\Almond\AST\Implementation\Parser;
 
-use Closure;
 use Walnut\Lang\Almond\AST\Blueprint\Parser\ParserState;
 use Walnut\Lib\Walex\SpecialRuleTag;
 use Walnut\Lib\Walex\Token;

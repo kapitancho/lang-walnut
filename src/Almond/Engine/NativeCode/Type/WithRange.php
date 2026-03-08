@@ -7,7 +7,9 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\OpenValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\MinusInfinity;
@@ -48,19 +50,24 @@ final readonly class WithRange extends TypeNativeMethod {
 		return function(TypeValue $target, Value $parameter): TypeValue {
 			/** @var IntegerType|RealType $typeValue */
 			$typeValue = $this->toBaseType($target->typeValue);
+			/** @var OpenValue $parameter */
+			/** @var RecordValue $range */
+			$range = $parameter->value;
 			if ($typeValue instanceof IntegerType) {
-				$range = $parameter->value->values;
-				$minValue = $range['minValue'];
-				$maxValue = $range['maxValue'];
+				/** @var IntegerValue|AtomValue $minValue */
+				$minValue = $range->valueOf('minValue');
+				/** @var IntegerValue|AtomValue $minValue */
+				$maxValue = $range->valueOf('maxValue');
 				$result = $this->typeRegistry->integer(
 					$minValue instanceof IntegerValue ? $minValue->literalValue : MinusInfinity::value,
 					$maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
 				);
 				return $this->valueRegistry->type($result);
 			}
-			$range = $parameter->value->values;
-			$minValue = $range['minValue'];
-			$maxValue = $range['maxValue'];
+			/** @var RealValue|IntegerValue|AtomValue $minValue */
+			$minValue = $range->valueOf('minValue');
+			/** @var RealValue|IntegerValue|AtomValue $minValue */
+			$maxValue = $range->valueOf('maxValue');
 			$result = $this->typeRegistry->real(
 				$minValue instanceof RealValue || $minValue instanceof IntegerValue ? $minValue->literalValue : MinusInfinity::value,
 				$maxValue instanceof RealValue || $maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,

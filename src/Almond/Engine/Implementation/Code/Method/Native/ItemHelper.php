@@ -169,6 +169,7 @@ final readonly class ItemHelper {
 			/*if ($returnType instanceof NothingType) {
 				throw new AnalyserException(sprintf("[%s] No property exists that matches the type: %s", __CLASS__, $parameterType));
 			}*/
+			/** @var Type $returnType */
 			return $this->validationFactory->validationSuccess(
 				$this->typeRegistry->result($returnType, $mapItemNotFound)
 			);

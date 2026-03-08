@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\Bytes;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BytesType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BytesValue;
@@ -29,9 +30,11 @@ final readonly class Slice extends NativeMethod {
 		return function(BytesType $targetType, Type $parameterType): BytesType {
 			/** @var RecordType $parameterType */
 			$parameterType = $this->toBaseType($parameterType);
+			/** @var IntegerType $lengthType */
+			$lengthType = $parameterType->types['length'];
 			return $this->typeRegistry->bytes(0, min(
 				$targetType->range->maxLength,
-				$parameterType->types['length']->numberRange->max->value
+				$lengthType->numberRange->max->value
 			));
 		};
 	}

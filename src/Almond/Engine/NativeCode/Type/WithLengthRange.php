@@ -9,6 +9,8 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\OpenValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
@@ -51,9 +53,13 @@ final readonly class WithLengthRange extends TypeNativeMethod {
 		return function(TypeValue $target, Value $parameter): TypeValue {
 			/** @var StringType|ArrayType|MapType|SetType $typeValue */
 			$typeValue = $this->toBaseType($target->typeValue);
-			$range = $parameter->value->values;
-			$minValue = $range['minLength'];
-			$maxValue = $range['maxLength'];
+			/** @var OpenValue $parameter */
+			/** @var RecordValue $range */
+			$range = $parameter->value;
+			/** @var IntegerValue $minValue */
+			$minValue = $range->valueOf('minLength');
+			/** @var IntegerValue|AtomValue $minValue */
+			$maxValue = $range->valueOf('maxLength');
 
 			if ($typeValue instanceof StringType) {
 				$result = $this->typeRegistry->string(

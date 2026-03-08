@@ -25,6 +25,8 @@ final readonly class Fire extends NativeMethod {
 
 	protected function getExecutor(): callable {
 		return function (SealedValue $target, Value $parameter): Value {
+			/** @var TupleValue|null $listeners */
+			/** @phpstan-ignore-next-line */
 			$listeners = $target->value->values['listeners'] ?? null;
 			if ($listeners instanceof TupleValue) {
 				foreach($listeners->values as $listener) {

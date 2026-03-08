@@ -88,8 +88,9 @@ final readonly class Format extends MapNativeMethod {
 				// Replace placeholders {key}, {name}, {age}, etc.
 				$result = (string)preg_replace_callback(
 					'/\{([a-zA-Z_][a-zA-Z0-9_]*)\}/',
-					function ($matches) use ($stringValues, $target, $parameter) {
+					function ($matches) use ($stringValues, $target, $parameter): string {
 						$key = $matches[1];
+						/** @phpstan-ignore-next-line */
 						return $stringValues[$key] ?? throw new ExecutionEarlyReturn(
 							$this->valueRegistry->error(
 								$this->valueRegistry->core->cannotFormatString(

@@ -25,6 +25,8 @@ final readonly class ReplaceContent extends FileMethod {
 
 	protected function getExecutor(): callable {
 		return function(SealedValue $target, StringValue|BytesValue $parameter) {
+			/** @var string $path */
+			/** @phpstan-ignore-next-line */
 			$path = $target->value->valueOf('path')->literalValue;
 			$result = @file_put_contents($path, $parameter->literalValue);
 			if ($result === false) {

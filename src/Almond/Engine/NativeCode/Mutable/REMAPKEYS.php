@@ -31,6 +31,7 @@ final readonly class REMAPKEYS extends MutableNativeMethod {
 	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		/** @var MutableType $targetType */
 		/** @var MapType $valueType */
+		/** @var FunctionType $parameterType */
 		$valueType = $this->toBaseType($targetType->valueType);
 		if ($valueType->keyType->isSubtypeOf($parameterType->parameterType)) {
 			$r = $parameterType->returnType;

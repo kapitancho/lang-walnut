@@ -4,6 +4,7 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Bytes;
 
 use BcMath\Number;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BytesType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\BytesValue;
@@ -31,13 +32,16 @@ final readonly class SliceRange extends NativeMethod {
 		return function(BytesType $targetType, Type $parameterType): BytesType {
 			/** @var RecordType $parameterType */
 			$parameterType = $this->toBaseType($parameterType);
+			/** @var IntegerType $startType */
+			$startType = $parameterType->types['start'];
+			/** @var IntegerType $endType */
 			$endType = $parameterType->types['end'];
 			/** @var int|Number|PlusInfinity $maxLength */
 			$maxLength = $endType->numberRange->max === PlusInfinity::value ? PlusInfinity::value :
 				min(
 					$targetType->range->maxLength,
 					$endType->numberRange->max->value -
-					$parameterType->types['start']->numberRange->min->value
+					$startType->numberRange->min->value
 				);
 			return $this->typeRegistry->bytes(0, $maxLength);
 		};
@@ -46,10 +50,10 @@ final readonly class SliceRange extends NativeMethod {
 	protected function getExecutor(): callable {
 		return function(BytesValue $target, Value $parameter): BytesValue {
 			/** @var RecordValue $parameter */
-			$start = $parameter->valueOf('start');
-			$end = $parameter->valueOf('end');
 			/** @var IntegerValue $start */
+			$start = $parameter->valueOf('start');
 			/** @var IntegerValue $end */
+			$end = $parameter->valueOf('end');
 			$length = (int)(string)$end->literalValue - (int)(string)$start->literalValue;
 			return $this->valueRegistry->bytes(
 				substr(

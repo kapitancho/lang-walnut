@@ -62,7 +62,7 @@ final readonly class Format extends ArrayNativeMethod {
 		return function(TupleValue $target, StringValue $parameter): Value {
 			$template = $parameter->literalValue;
 
-			// Convert all array elements to strings
+			/** @var list<string> $stringValues */
 			$stringValues = [];
 			foreach ($target->values as $index => $value) {
 				try {
@@ -82,8 +82,9 @@ final readonly class Format extends ArrayNativeMethod {
 				// Replace placeholders {0}, {1}, {2}, etc.
 				$result = (string)preg_replace_callback(
 					'/\{(\d+)\}/',
-					function ($matches) use ($stringValues, $target, $parameter) {
+					function (array $matches) use ($stringValues, $target, $parameter): string {
 						$index = (int)$matches[1];
+						/** @phpstan-ignore-next-line */
 						return $stringValues[$index] ?? throw new ExecutionEarlyReturn(
 							$this->valueRegistry->error(
 								$this->valueRegistry->core->cannotFormatString(

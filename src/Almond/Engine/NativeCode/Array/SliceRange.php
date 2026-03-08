@@ -30,16 +30,18 @@ final readonly class SliceRange extends ArrayNativeMethod {
 
 	protected function getValidator(): callable {
 		return function(ArrayType $targetType, RecordType $parameterType): Type {
+			/** @var IntegerType $startType */
+			$startType = $this->toBaseType($parameterType->types['start']);
 			/** @var IntegerType $endType */
 			$endType = $this->toBaseType($parameterType->types['end']);
 			$maxLength = $endType->numberRange->max === PlusInfinity::value ? PlusInfinity::value :
 				min(
 					$targetType->range->maxLength,
-					$parameterType->types['start']->numberRange->min === MinusInfinity::value ?
+					$startType->numberRange->min === MinusInfinity::value ?
 						// @codeCoverageIgnoreStart
 						$targetType->range->maxLength :
 						// @codeCoverageIgnoreEnd
-						$endType->numberRange->max->value - $this->toBaseType($parameterType->types['start'])->numberRange->min->value
+						$endType->numberRange->max->value - $startType->numberRange->min->value
 				);
 			return $this->typeRegistry->array(
 				$targetType->itemType,

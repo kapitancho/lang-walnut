@@ -25,6 +25,8 @@ final readonly class AppendContent extends FileMethod {
 
 	protected function getExecutor(): callable {
 		return function(SealedValue $target, StringValue|BytesValue $parameter) {
+			/** @var string $path */
+			/** @phpstan-ignore-next-line */
 			$path = $target->value->valueOf('path')->literalValue;
 			$result = @file_put_contents($path, $parameter->literalValue, FILE_APPEND);
 			if ($result === false) {

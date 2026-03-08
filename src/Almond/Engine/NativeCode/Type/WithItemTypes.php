@@ -10,6 +10,8 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\UnionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\MetaTypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
@@ -97,8 +99,11 @@ final readonly class WithItemTypes extends TypeNativeMethod {
 				if ($typeValue instanceof TupleType || (
 					$typeValue instanceof MetaType && $typeValue->value === MetaTypeValue::Tuple
 				)) {
+					/** @var TupleValue $parameter */
+					/** @var list<TypeValue> $types */
+					$types = $parameter->values;
 					$result = $this->typeRegistry->tuple(
-						array_map(fn(TypeValue $tv): Type => $tv->typeValue, $parameter->values),
+						array_map(fn(TypeValue $tv): Type => $tv->typeValue, $types),
 						$typeValue instanceof TupleType ? $typeValue->restType : $this->typeRegistry->nothing,
 					);
 					return $this->valueRegistry->type($result);
@@ -106,16 +111,22 @@ final readonly class WithItemTypes extends TypeNativeMethod {
 				if ($typeValue instanceof IntersectionType || (
 					$typeValue instanceof MetaType && $typeValue->value === MetaTypeValue::Intersection
 				)) {
+					/** @var TupleValue $parameter */
+					/** @var list<TypeValue> $types */
+					$types = $parameter->values;
 					$result = $this->typeRegistry->intersection(
-						array_map(fn(TypeValue $tv): Type => $tv->typeValue, $parameter->values),
+						array_map(fn(TypeValue $tv): Type => $tv->typeValue, $types),
 					);
 					return $this->valueRegistry->type($result);
 				}
 				if ($typeValue instanceof UnionType || (
 					$typeValue instanceof MetaType && $typeValue->value === MetaTypeValue::Union
 				)) {
+					/** @var TupleValue $parameter */
+					/** @var list<TypeValue> $types */
+					$types = $parameter->values;
 					$result = $this->typeRegistry->union(
-						array_map(fn(TypeValue $tv): Type => $tv->typeValue, $parameter->values),
+						array_map(fn(TypeValue $tv): Type => $tv->typeValue, $types),
 					);
 					return $this->valueRegistry->type($result);
 				}
@@ -133,8 +144,11 @@ final readonly class WithItemTypes extends TypeNativeMethod {
 				if ($typeValue instanceof RecordType || (
 					$typeValue instanceof MetaType && $typeValue->value === MetaTypeValue::Record
 				)) {
+					/** @var RecordValue $parameter */
+					/** @var array<string, TypeValue> $types */
+					$types = $parameter->values;
 					$result = $this->typeRegistry->record(
-						array_map(fn(TypeValue $tv): Type => $tv->typeValue, $parameter->values),
+						array_map(fn(TypeValue $tv): Type => $tv->typeValue, $types),
 						$typeValue instanceof RecordType ? $typeValue->restType : $this->typeRegistry->nothing,
 					);
 					return $this->valueRegistry->type($result);

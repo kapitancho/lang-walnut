@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Almond\AST\Blueprint\Node\Type;
 
 
-use BcMath\Number;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\RealValueNode;
 
 interface RealSubsetTypeNode extends TypeNode {

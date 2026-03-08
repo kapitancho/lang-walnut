@@ -34,6 +34,7 @@ final readonly class MatchesRegexp extends NativeMethod {
 		return fn(StringValue $target, SealedValue $parameter): BooleanValue =>
 			$this->valueRegistry->boolean(
 				(bool)@preg_match(
+					/** @phpstan-ignore-next-line */
 					$parameter->value->literalValue,
 					$target->literalValue,
 				)

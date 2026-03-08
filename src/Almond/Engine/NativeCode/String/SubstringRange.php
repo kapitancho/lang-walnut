@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\String;
 
 use BcMath\Number;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -30,13 +31,16 @@ final readonly class SubstringRange extends NativeMethod {
 
 	protected function getValidator(): callable {
 		return function(StringType $targetType, RecordType $parameterType): StringType {
+			/** @var IntegerType $startType */
+			$startType = $parameterType->types['start'];
+			/** @var IntegerType $endType */
 			$endType = $parameterType->types['end'];
 			/** @var int|Number|PlusInfinity $maxLength */
 			$maxLength = $endType->numberRange->max === PlusInfinity::value ? PlusInfinity::value :
 				min(
 					$targetType->range->maxLength,
 					$endType->numberRange->max->value -
-					$parameterType->types['start']->numberRange->min->value
+					$startType->numberRange->min->value
 				);
 			return $this->typeRegistry->string(0, $maxLength);
 		};
@@ -45,10 +49,10 @@ final readonly class SubstringRange extends NativeMethod {
 	protected function getExecutor(): callable {
 		return function(StringValue $target, Value $parameter): StringValue {
 			/** @var RecordValue $parameter */
-			$start = $parameter->valueOf('start');
-			$end = $parameter->valueOf('end');
 			/** @var IntegerValue $start */
+			$start = $parameter->valueOf('start');
 			/** @var IntegerValue $end */
+			$end = $parameter->valueOf('end');
 			$length = (int)(string)$end->literalValue - (int)(string)$start->literalValue;
 			return $this->valueRegistry->string(
 				mb_substr(
