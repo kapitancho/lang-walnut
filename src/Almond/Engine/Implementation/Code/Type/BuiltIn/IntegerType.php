@@ -51,9 +51,14 @@ final readonly class IntegerType implements IntegerTypeInterface, JsonSerializab
 		};
 	}
 
-	public function contains(int|Number $value): bool {
+	public function contains(int|float|Number $value): bool {
 		if (is_int($value)) {
 			$value = new Number($value);
+		} elseif (is_float($value)) {
+			if ((float)(int)$value !== $value) {
+				return false;
+			}
+			$value = new Number((string)$value);
 		}
 		return $this->numberRange->contains($value);
 	}

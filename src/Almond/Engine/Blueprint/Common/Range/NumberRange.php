@@ -61,7 +61,7 @@ final readonly class NumberRange implements Stringable, JsonSerializable {
 	}
 
 	public function contains(Number $value): bool {
-		return array_any($this->intervals, fn($interval) => $interval->contains($value));
+		return array_any($this->intervals, fn(NumberInterval $interval) => $interval->contains($value));
 	}
 
 	public function containsInterval(NumberInterval $interval): bool {

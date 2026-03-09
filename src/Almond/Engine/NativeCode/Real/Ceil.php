@@ -18,7 +18,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 final readonly class Ceil extends NativeMethod {
 
 	protected function getValidator(): callable {
-		return fn(RealType $targetType, NullType $parameterType, mixed $origin): IntegerType =>
+		return fn(IntegerType|RealType $targetType, NullType $parameterType, mixed $origin): IntegerType =>
 			$this->typeRegistry->integerFull(... array_map(
 				fn(NumberInterval $interval) => new NumberInterval(
 					$interval->start === MinusInfinity::value ? MinusInfinity::value :

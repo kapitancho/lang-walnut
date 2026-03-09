@@ -44,9 +44,9 @@ final readonly class Product extends ArrayNativeMethod {
 					default => PlusInfinity::value,
 				};
 				$interval = new NumberInterval($start, $end);
-				return $itemType instanceof RealType ?
-					$this->typeRegistry->realFull($interval) :
-					$this->typeRegistry->integerFull($interval);
+				return $itemType instanceof IntegerType ?
+					$this->typeRegistry->integerFull($interval) :
+					$this->typeRegistry->realFull($interval);
 			}
 			return $this->typeRegistry->real();
 		};

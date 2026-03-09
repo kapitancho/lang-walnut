@@ -106,8 +106,8 @@ final readonly class OpenApiSchema extends TypeNativeMethod {
 			$type instanceof BooleanType => $this->valueRegistry->record([
 				'type' => $this->valueRegistry->string('boolean')
 			]),
-			$type instanceof RealType => $this->realToOpenApiSchema($type),
 			$type instanceof IntegerType => $this->integerToOpenApiSchema($type),
+			$type instanceof RealType => $this->realToOpenApiSchema($type),
 			$type instanceof StringSubsetType => $this->valueRegistry->record([
 				'type' => $this->valueRegistry->string('string'),
 				'enum' => $this->valueRegistry->tuple(

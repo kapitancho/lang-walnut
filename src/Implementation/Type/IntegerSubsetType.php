@@ -65,8 +65,8 @@ final class IntegerSubsetType implements IntegerSubsetTypeInterface, JsonSeriali
 			($ofType instanceof SupertypeChecker && $ofType->isSupertypeOf($this));
 	}
 
-	public function contains(int|Number $value): bool {
-		if (is_int($value)) {
+	public function contains(int|float|Number $value): bool {
+		if (is_float($value) || is_int($value)) {
 			$value = new Number($value);
 		}
 		return in_array($value, $this->subsetValues);
