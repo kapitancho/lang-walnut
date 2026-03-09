@@ -11,11 +11,11 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<IntegerType|RealType, IntegerType|RealType, IntegerValue|RealValue, IntegerValue|RealValue> */
+/** @extends NativeMethod<RealType, RealType, RealValue, RealValue> */
 final readonly class BinaryPower extends NativeMethod {
 
 	protected function getValidator(): callable {
-		return function(IntegerType|RealType $targetType, IntegerType|RealType $parameterType): Type {
+		return function(RealType $targetType, RealType $parameterType): Type {
 			if ((string)$parameterType->numberRange === '1') {
 				return $targetType;
 			}
@@ -38,7 +38,7 @@ final readonly class BinaryPower extends NativeMethod {
 	}
 
 	protected function getExecutor(): callable {
-		return fn(IntegerValue|RealValue $target, IntegerValue|RealValue $parameter): RealValue =>
+		return fn(RealValue $target, RealValue $parameter): RealValue =>
 			$this->valueRegistry->real(
 				str_contains($parameter->literalValue, '.') ?
 					((float)(string)$target->literalValue) ** ((float)(string)$parameter->literalValue) :

@@ -24,22 +24,9 @@ final class IntegerValue implements IntegerValueInterface, JsonSerializable {
 		get => $this->typeRegistry->integerSubset([$this->literalValue]);
 	}
 
-	private function normalize(Number $value): string {
-		$v = $value->value;
-		if (str_contains($v, '.')) {
-			$v = rtrim($v, '0');
-			$v = rtrim($v, '.');
-		}
-		return $v;
-	}
-
-	public function asRealValue(): RealValue {
-		return new RealValue($this->typeRegistry, $this->literalValue);
-	}
-
 	public function equals(Value $other): bool {
-		return ($other instanceof RealValueInterface || $other instanceof IntegerValueInterface) &&
-			$this->normalize($this->literalValue) === $this->normalize($other->literalValue);
+		return $other instanceof RealValueInterface &&
+			$this->literalValue->compare($other->literalValue) === 0;
 	}
 
 	public function validate(ValidationRequest $request): ValidationResult {

@@ -23,8 +23,8 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\OptionalKeyType as OptionalKeyTypeImpl;
 
 /**
- * @template TTargetType of IntegerType|RealType
- * @template TTargetValue of IntegerValue|RealValue
+ * @template TTargetType of RealType
+ * @template TTargetValue of RealValue
  * @extends NativeMethod<TTargetType, RecordType, TTargetValue, RecordValue>
  */
 abstract readonly class NumericClamp extends NativeMethod {
@@ -62,9 +62,9 @@ abstract readonly class NumericClamp extends NativeMethod {
 	}
 
 	protected function doValidate(
-		IntegerType|RealType $targetType,
+		RealType $targetType,
 		RecordType $parameterType,
-	): IntegerType|RealType|ResultType {
+	): RealType|ResultType {
 		$minType = $parameterType->types['min'] ?? null;
 		if ($minType !== null) {
 			$minType = $this->toBaseType($minType);
@@ -73,8 +73,8 @@ abstract readonly class NumericClamp extends NativeMethod {
 		if ($maxType !== null) {
 			$maxType = $this->toBaseType($maxType);
 		}
-		/** @var OptionalKeyType|IntegerType|RealType|null $minType */
-		/** @var OptionalKeyType|IntegerType|RealType|null $maxType */
+		/** @var OptionalKeyType|RealType|null $minType */
+		/** @var OptionalKeyType|RealType|null $maxType */
 
 		/** @var NumberIntervalEndpoint|MinusInfinity $minFrom */
 		$minFrom = $minType === null || $minType instanceof OptionalKeyType ? MinusInfinity::value : $minType->numberRange->min;
@@ -117,10 +117,7 @@ abstract readonly class NumericClamp extends NativeMethod {
 			$maxType = $this->toBaseType($maxType->valueType);
 		}
 		$mayHaveError = false;
-		if (
-			($minType instanceof IntegerType || $minType instanceof RealType) &&
-			($maxType instanceof IntegerType || $maxType instanceof RealType)
-		) {
+		if ($minType instanceof RealType && $maxType instanceof RealType) {
 			if (
 				$minType->numberRange->max !== PlusInfinity::value &&
 				$maxType->numberRange->min !== MinusInfinity::value &&
@@ -144,9 +141,9 @@ abstract readonly class NumericClamp extends NativeMethod {
 	}
 
 	protected function doDivide(
-		IntegerValue|RealValue $target,
+		RealValue $target,
 		RecordValue $parameter
-	): IntegerValue|RealValue|ErrorValue {
+	): RealValue|ErrorValue {
 		/** @var RealValue|null $minValue */
 		$minValue = $parameter->values['min'] ?? null;
 		/** @var RealValue|null $maxValue */

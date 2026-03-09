@@ -13,17 +13,17 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNativeMethod;
 
-/** @extends TypeNativeMethod<IntegerType|RealType, NullType, NullValue> */
+/** @extends TypeNativeMethod<RealType, NullType, NullValue> */
 final readonly class MinValue extends TypeNativeMethod {
 
 	protected function validateTargetRefType(Type $targetRefType): null|string {
-		return $targetRefType instanceof IntegerType || $targetRefType instanceof RealType ?
+		return $targetRefType instanceof RealType ?
 			null : sprintf("Target ref type must be an Integer or Real type, got: %s", $targetRefType);
 	}
 
 	protected function getValidator(): callable {
 		return function(TypeType $targetType, NullType $parameterType): Type {
-			/** @var IntegerType|RealType $refType */
+			/** @var RealType $refType */
 			$refType = $this->toBaseType($targetType->refType);
 			return $this->typeRegistry->union([
 				$refType instanceof IntegerType ?
@@ -36,7 +36,7 @@ final readonly class MinValue extends TypeNativeMethod {
 
 	protected function getExecutor(): callable {
 		return function(TypeValue $target, NullValue $parameter): Value {
-			/** @var IntegerType|RealType $typeValue */
+			/** @var RealType $typeValue */
 			$typeValue = $this->toBaseType($target->typeValue);
 			if ($typeValue instanceof IntegerType) {
 				return $typeValue->numberRange->min === MinusInfinity::value ?

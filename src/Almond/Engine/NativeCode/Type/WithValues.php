@@ -24,8 +24,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNa
 final readonly class WithValues extends TypeNativeMethod {
 
 	protected function validateTargetRefType(Type $targetRefType): null|string {
-		return $targetRefType instanceof IntegerType ||
-			$targetRefType instanceof RealType ||
+		return $targetRefType instanceof RealType ||
 			$targetRefType instanceof StringType ||
 			$targetRefType instanceof EnumerationType ||
 			($targetRefType instanceof MetaType && $targetRefType->value === MetaTypeValue::Enumeration) ?
@@ -124,10 +123,10 @@ final readonly class WithValues extends TypeNativeMethod {
 				return $this->valueRegistry->type($result);
 			}
 			if ($typeValue instanceof RealType) {
-				/** @var list<RealValue|IntegerValue> $values */
+				/** @var list<RealValue> $values */
 				$values = $parameter->values;
 				$result = $this->typeRegistry->realSubset(
-					array_map(fn(RealValue|IntegerValue $value): Number => $value->literalValue, $values)
+					array_map(fn(RealValue $value): Number => $value->literalValue, $values)
 				);
 				return $this->valueRegistry->type($result);
 			}

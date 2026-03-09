@@ -14,11 +14,11 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<IntegerType|RealType, NullType, IntegerValue|RealValue, NullValue> */
+/** @extends NativeMethod<RealType, NullType, RealValue, NullValue> */
 final readonly class Ceil extends NativeMethod {
 
 	protected function getValidator(): callable {
-		return fn(IntegerType|RealType $targetType, NullType $parameterType, mixed $origin): IntegerType =>
+		return fn(RealType $targetType, NullType $parameterType, mixed $origin): IntegerType =>
 			$this->typeRegistry->integerFull(... array_map(
 				fn(NumberInterval $interval) => new NumberInterval(
 					$interval->start === MinusInfinity::value ? MinusInfinity::value :
@@ -38,7 +38,7 @@ final readonly class Ceil extends NativeMethod {
 	}
 
 	protected function getExecutor(): callable {
-		return fn(RealValue|IntegerValue $target, NullValue $parameter) =>
+		return fn(RealValue $target, NullValue $parameter) =>
 			$this->valueRegistry->integer($target->literalValue->ceil());
 	}
 }

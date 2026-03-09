@@ -13,11 +13,11 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<IntegerType|RealType, NullType, IntegerValue|RealValue, NullValue> */
+/** @extends NativeMethod<RealType, NullType, RealValue, NullValue> */
 final readonly class Sqrt extends NativeMethod {
 
 	protected function getValidator(): callable {
-		return function(IntegerType|RealType $targetType, NullType $parameterType): Type {
+		return function(RealType $targetType, NullType $parameterType): Type {
 			$real = $this->typeRegistry->real(0);
 			$minValue = $targetType->numberRange->min;
 			return $minValue === MinusInfinity::value || $minValue->value < 0 ?
@@ -30,7 +30,7 @@ final readonly class Sqrt extends NativeMethod {
 	}
 
 	protected function getExecutor(): callable {
-		return function(IntegerValue|RealValue $target, NullValue $parameter): Value {
+		return function(RealValue $target, NullValue $parameter): Value {
 			$val = (string)$target->literalValue;
 			return $val >= 0 ?
 				$this->valueRegistry->real($target->literalValue->sqrt()) :

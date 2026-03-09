@@ -10,16 +10,16 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<IntegerType|RealType, NullType, IntegerValue|RealValue, NullValue> */
+/** @extends NativeMethod<RealType, NullType, RealValue, NullValue> */
 final readonly class AsReal extends NativeMethod {
 
 	protected function getValidator(): callable {
-		return fn(IntegerType|RealType $targetType, NullType $parameterType): IntegerType|RealType =>
+		return fn(RealType $targetType, NullType $parameterType): RealType =>
 			$targetType;
 	}
 
 	protected function getExecutor(): callable {
-		return fn(IntegerValue|RealValue $target, NullValue $parameter): RealValue =>
+		return fn(RealValue $target, NullValue $parameter): RealValue =>
 			$this->valueRegistry->real($target->literalValue);
 	}
 }

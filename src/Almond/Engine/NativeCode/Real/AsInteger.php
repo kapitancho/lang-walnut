@@ -18,12 +18,12 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<IntegerType|RealType, NullType, IntegerValue|RealValue, NullValue> */
+/** @extends NativeMethod<RealType, NullType, RealValue, NullValue> */
 final readonly class AsInteger extends NativeMethod {
 
 	protected function getValidator(): callable {
-		return function(RealType|IntegerType $targetType, NullType $parameterType, mixed $origin): IntegerType {
-			if ($targetType instanceof IntegerSubsetType || $targetType instanceof RealSubsetType) {
+		return function(RealType $targetType, NullType $parameterType, mixed $origin): IntegerType {
+			if ($targetType instanceof RealSubsetType) {
 				return $this->typeRegistry->integerSubset(
 					array_map(fn(Number $v) => $v > 0 ? $v->floor() : $v->ceil(),
 						$targetType->subsetValues)
@@ -50,7 +50,7 @@ final readonly class AsInteger extends NativeMethod {
 	}
 
 	protected function getExecutor(): callable {
-		return fn(RealValue|IntegerValue $target, NullValue $parameter): IntegerValue =>
+		return fn(RealValue $target, NullValue $parameter): IntegerValue =>
 			$this->valueRegistry->integer(
 				$target->literalValue->round(0, RoundingMode::TowardsZero)
 			);

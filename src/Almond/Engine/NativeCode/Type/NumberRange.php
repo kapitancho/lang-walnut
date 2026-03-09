@@ -16,11 +16,11 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNativeMethod;
 
-/** @extends TypeNativeMethod<IntegerType|RealType, NullType, NullValue> */
+/** @extends TypeNativeMethod<RealType, NullType, NullValue> */
 final readonly class NumberRange extends TypeNativeMethod {
 
 	protected function validateTargetRefType(Type $targetRefType): null|string {
-		return $targetRefType instanceof IntegerType || $targetRefType instanceof RealType ?
+		return $targetRefType instanceof RealType ?
 			null : sprintf("Target ref type must be an Integer or Real type, got: %s", $targetRefType);
 	}
 
@@ -37,7 +37,7 @@ final readonly class NumberRange extends TypeNativeMethod {
 	protected function getExecutor(): callable {
 		return function(TypeValue $target, NullValue $parameter): Value {
 			$typeValue = $this->toBaseType($target->typeValue);
-			/** @var IntegerType|RealType $typeValue */
+			/** @var RealType $typeValue */
 			$isInteger = $typeValue instanceof IntegerType;
 
 			$vb = $isInteger ?

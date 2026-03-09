@@ -38,9 +38,9 @@ final class UnionTypeNormalizerTest extends AlmondBaseTestHelper {
             )
         );
         $this->assertEquals(
-            'Real[3.14, 5]', (string)$this->union(
+            'Real[3.14, 5.1]', (string)$this->union(
             $this->valueRegistry->real(3.14)->type,
-            $this->valueRegistry->real(5)->type,
+            $this->valueRegistry->real(5.1)->type,
             )
         );
     }

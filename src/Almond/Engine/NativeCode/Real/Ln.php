@@ -14,11 +14,11 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<IntegerType|RealType, NullType, IntegerValue|RealValue, NullValue> */
+/** @extends NativeMethod<RealType, NullType, RealValue, NullValue> */
 final readonly class Ln extends NativeMethod {
 
 	protected function getValidator(): callable {
-		return function(IntegerType|RealType $targetType, NullType $parameterType): Type {
+		return function(RealType $targetType, NullType $parameterType): Type {
 			$min = $targetType->numberRange->min;
 			$max = $targetType->numberRange->max;
 			$real = $this->typeRegistry->real(max: $max === PlusInfinity::value ? PlusInfinity::value : $max->value);
@@ -32,7 +32,7 @@ final readonly class Ln extends NativeMethod {
 	}
 
 	protected function getExecutor(): callable {
-		return function(IntegerValue|RealValue $target, NullValue $parameter): Value {
+		return function(RealValue $target, NullValue $parameter): Value {
 			$val = (string)$target->literalValue;
 			return $val > 0 ? $this->valueRegistry->real(
 				log((float)$val)

@@ -17,12 +17,12 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<IntegerType|RealType, NullType, IntegerValue|RealValue, NullValue> */
+/** @extends NativeMethod<RealType, NullType, RealValue, NullValue> */
 final readonly class AsString extends NativeMethod {
 
 	protected function getValidator(): callable {
-		return function(IntegerType|RealType $targetType, NullType $parameterType): StringType {
-			if ($targetType instanceof IntegerSubsetType || $targetType instanceof RealSubsetType) {
+		return function(RealType $targetType, NullType $parameterType): StringType {
+			if ($targetType instanceof RealSubsetType) {
 				return $this->typeRegistry->stringSubset(
 					array_map(
 						fn(Number $value) => (string)$value,
@@ -44,7 +44,7 @@ final readonly class AsString extends NativeMethod {
 	}
 
 	protected function getExecutor(): callable {
-		return fn(IntegerValue|RealValue $target, NullValue $parameter): StringValue =>
+		return fn(RealValue $target, NullValue $parameter): StringValue =>
 			$this->valueRegistry->string((string)$target->literalValue);
 	}
 

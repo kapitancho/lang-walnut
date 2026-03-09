@@ -16,6 +16,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue as ErrorVa
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\MutableValue as MutableValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\OpenValue as OpenValueInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue as RealValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SealedValue as SealedValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue as TupleValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\IncompatibleValueType;
@@ -153,7 +154,12 @@ final readonly class ValueRegistry implements ValueRegistryInterface {
 			is_int($value) ? new Number($value) : $value
 		);
 	}
-	public function real(Number|float $value): RealValue {
+	public function real(Number|float $value): RealValueInterface {
+		$value = is_float($value) ? new Number((string)$value) : $value;
+		//TODO: check if $value is actual an integer and if yes, create new IntegerValue instead of RealValue
+		if ($value->compare($value->floor()) === 0) {
+			return $this->integer($value->floor());
+		}
 		return new RealValue(
 			$this->typeRegistry,
 			is_float($value) ? new Number((string)$value) : $value

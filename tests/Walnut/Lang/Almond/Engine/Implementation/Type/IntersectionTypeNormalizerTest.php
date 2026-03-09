@@ -39,11 +39,11 @@ final class IntersectionTypeNormalizerTest extends AlmondBaseTestHelper {
             'Real[3.14]', (string)$this->intersection(
                 $this->typeRegistry->union([
                     $this->valueRegistry->real(3.14)->type,
-                    $this->valueRegistry->real(5)->type
+                    $this->valueRegistry->real(5.1)->type
                 ]),
                 $this->typeRegistry->union([
                     $this->valueRegistry->real(3.14)->type,
-                    $this->valueRegistry->real(7)->type
+                    $this->valueRegistry->real(7.1)->type
                 ]),
             )
         );

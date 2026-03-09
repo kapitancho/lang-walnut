@@ -9,12 +9,12 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NumericRangeHelper;
 
-/** @extends NativeMethod<IntegerType, IntegerType|RealType, IntegerValue, IntegerValue|RealValue> */
+/** @extends NativeMethod<IntegerType, RealType, IntegerValue, RealValue> */
 final readonly class BinaryPlus extends NativeMethod {
 	use NumericRangeHelper;
 
 	protected function getValidator(): callable {
-		return function(IntegerType $targetType, IntegerType|RealType $parameterType, mixed $origin): IntegerType|RealType {
+		return function(IntegerType $targetType, RealType $parameterType, mixed $origin): RealType {
 			$fixType = $this->getPlusFixType($targetType, $parameterType);
 			if ($fixType !== null) {
 				return $fixType;
@@ -33,7 +33,7 @@ final readonly class BinaryPlus extends NativeMethod {
 	}
 
 	protected function getExecutor(): callable {
-		return fn(IntegerValue $target, IntegerValue|RealValue $parameter): IntegerValue|RealValue =>
+		return fn(IntegerValue $target, RealValue $parameter): RealValue =>
 			$parameter instanceof IntegerValue ?
 				$this->valueRegistry->integer(
 					$target->literalValue + $parameter->literalValue

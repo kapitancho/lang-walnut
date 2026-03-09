@@ -17,17 +17,17 @@ final readonly class BinaryDivide extends NumericBinaryDivide {
 	protected function getValidator(): callable {
 		return fn(
 			IntegerType $targetType,
-			IntegerType|RealType $parameterType,
+			RealType $parameterType,
 			mixed $origin
-		): IntegerType|RealType|ResultType =>
+		): RealType|ResultType =>
 		$this->doValidate($targetType, $parameterType);
 	}
 
 	protected function getExecutor(): callable {
 		return fn(
 			IntegerValue $target,
-			IntegerValue|RealValue $parameter
-		): IntegerValue|RealValue|ErrorValue =>
+			RealValue $parameter
+		): RealValue|ErrorValue =>
 		$this->doDivide($target, $parameter);
 	}
 

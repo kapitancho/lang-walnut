@@ -8,8 +8,11 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AliasType as AliasType
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType as AnyTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BooleanType as BooleanTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FalseType as FalseTypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType as IntegerTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType as NothingTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType as NullTypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealSubsetType as RealSubsetTypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType as RealTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType as ResultTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TrueType as TrueTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\DuplicateSubsetValue;
@@ -204,16 +207,18 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 
 	public function integerFull(
 		NumberInterval ... $intervals
-	): IntegerType {
-		$numberRange = new NumberRange(true, ...
-			count($intervals) === 0 ?
-				[new NumberInterval(MinusInfinity::value, PlusInfinity::value)] :
-				$intervals
-		);
-		return new IntegerType($numberRange);
+	): IntegerTypeInterface {
+		/** @phpstan-ignore-next-line */
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
+		return $this->getNumericSubset(... $intervals) ??
+			new IntegerType(new NumberRange(true, ...
+				count($intervals) === 0 ?
+					[new NumberInterval(MinusInfinity::value, PlusInfinity::value)] :
+					$intervals
+			));
 	}
 
-	public function nonZeroInteger(): IntegerType {
+	public function nonZeroInteger(): IntegerTypeInterface {
 		return $this->integerFull(
 			new NumberInterval(MinusInfinity::value, new NumberIntervalEndpoint(new Number(0), false)),
 			new NumberInterval(new NumberIntervalEndpoint(new Number(0), false), PlusInfinity::value)
@@ -224,17 +229,15 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 	public function integer(
 		int|Number|MinusInfinity $min = MinusInfinity::value,
 		int|Number|PlusInfinity $max = PlusInfinity::value
-	): IntegerType {
+	): IntegerTypeInterface {
 		$rangeMin = is_int($min) ? new Number($min) : $min;
 		$rangeMax = is_int($max) ? new Number($max) : $max;
-		return new IntegerType(
-			new NumberRange(true,
-				new NumberInterval(
-					$rangeMin === MinusInfinity::value ? MinusInfinity::value :
-						new NumberIntervalEndpoint($rangeMin, true),
-					$rangeMax === PlusInfinity::value ? PlusInfinity::value :
-						new NumberIntervalEndpoint($rangeMax, true)
-				)
+		return $this->integerFull(
+			new NumberInterval(
+				$rangeMin === MinusInfinity::value ? MinusInfinity::value :
+					new NumberIntervalEndpoint($rangeMin, true),
+				$rangeMax === PlusInfinity::value ? PlusInfinity::value :
+					new NumberIntervalEndpoint($rangeMax, true)
 			)
 		);
 	}
@@ -247,18 +250,33 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 		return new IntegerSubsetType($values);
 	}
 
+	private function getNumericSubset(... $intervals): RealTypeInterface|null {
+		$subset = [];
+		foreach ($intervals as $interval) {
+			if (!(
+				$interval->start instanceof NumberIntervalEndpoint &&
+				$interval->end instanceof NumberIntervalEndpoint &&
+				$interval->start->value->compare($interval->end->value) === 0
+			)) {
+				return null;
+			}
+			$subset[] = $interval->start->value;
+		}
+		return count($subset) > 0 ? $this->realSubset($subset) : null;
+	}
+
 	public function realFull(
 		NumberInterval ... $intervals
-	): RealType {
-		$numberRange = new NumberRange(false, ...
+	): RealTypeInterface {
+		return $this->getNumericSubset(... $intervals) ??
+			new RealType(new NumberRange(false, ...
 			count($intervals) === 0 ?
 				[new NumberInterval(MinusInfinity::value, PlusInfinity::value)] :
 				$intervals
-		);
-		return new RealType($numberRange);
+			));
 	}
 
-	public function nonZeroReal(): RealType {
+	public function nonZeroReal(): RealTypeInterface {
 		return $this->realFull(
 			new NumberInterval(MinusInfinity::value, new NumberIntervalEndpoint(new Number(0), false)),
 			new NumberInterval(new NumberIntervalEndpoint(new Number(0), false), PlusInfinity::value)
@@ -268,17 +286,15 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 	public function real(
 		float|Number|MinusInfinity $min = MinusInfinity::value,
 		float|Number|PlusInfinity $max = PlusInfinity::value
-	): RealType {
+	): RealTypeInterface {
 		$rangeMin = is_float($min) ? new Number((string)$min) : $min;
 		$rangeMax = is_float($max) ? new Number((string)$max) : $max;
-		return new RealType(
-			new NumberRange(false,
-				new NumberInterval(
-					$rangeMin === MinusInfinity::value ? MinusInfinity::value :
-						new NumberIntervalEndpoint($rangeMin, true),
-					$rangeMax === PlusInfinity::value ? PlusInfinity::value :
-						new NumberIntervalEndpoint($rangeMax, true)
-				)
+		return $this->realFull(
+			new NumberInterval(
+				$rangeMin === MinusInfinity::value ? MinusInfinity::value :
+					new NumberIntervalEndpoint($rangeMin, true),
+				$rangeMax === PlusInfinity::value ? PlusInfinity::value :
+					new NumberIntervalEndpoint($rangeMax, true)
 			)
 		);
 	}
@@ -287,7 +303,11 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 	 * @param non-empty-list<Number> $values
 	 * @throws InvalidArgument|DuplicateSubsetValue
 	 */
-	public function realSubset(array $values): RealSubsetType {
+	public function realSubset(array $values): RealSubsetTypeInterface {
+		$allIntegers = array_all($values, fn(Number $value) => (string)$value === (string)$value->floor());
+		if ($allIntegers) {
+			return $this->integerSubset($values);
+		}
 		return new RealSubsetType($values);
 	}
 

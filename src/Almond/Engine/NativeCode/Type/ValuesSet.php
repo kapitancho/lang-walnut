@@ -20,7 +20,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNativeMethod;
 
-/** @extends TypeNativeMethod<MetaType|IntegerSubsetType|RealSubsetType|StringSubsetType|EnumerationSubsetType, NullType, NullValue> */
+/** @extends TypeNativeMethod<MetaType|RealSubsetType|StringSubsetType|EnumerationSubsetType, NullType, NullValue> */
 final readonly class ValuesSet extends TypeNativeMethod {
 
 	protected function validateTargetRefType(Type $targetRefType): null|string {
@@ -35,10 +35,9 @@ final readonly class ValuesSet extends TypeNativeMethod {
 				)
 			};
 		}
-		return $targetRefType instanceof IntegerSubsetType ||
-		$targetRefType instanceof RealSubsetType ||
-		$targetRefType instanceof StringSubsetType ||
-		$targetRefType instanceof EnumerationSubsetType ?
+		return $targetRefType instanceof RealSubsetType ||
+			$targetRefType instanceof StringSubsetType ||
+			$targetRefType instanceof EnumerationSubsetType ?
 			null : sprintf(
 				"Target ref type must be a EnumerationSubset, IntegerSubset, RealSubset or StringSubset type, got: %s",
 				$targetRefType
@@ -60,7 +59,7 @@ final readonly class ValuesSet extends TypeNativeMethod {
 				};
 				return $this->typeRegistry->set($t, 1);
 			}
-			/** @var IntegerSubsetType|RealSubsetType|StringSubsetType|EnumerationSubsetType $refType */
+			/** @var RealSubsetType|StringSubsetType|EnumerationSubsetType $refType */
 			$l = count($refType->subsetValues);
 			return $this->typeRegistry->set($refType, $l, $l);
 		};

@@ -33,8 +33,8 @@ trait NumericRangeHelper {
 	}
 
 	private function getMinusRange(
-		IntegerType|RealType $targetType,
-		IntegerType|RealType $parameterType
+		RealType $targetType,
+		RealType $parameterType
 	): NumberInterval {
 		$min =
 			$targetType->numberRange->min === MinusInfinity::value ||
@@ -59,9 +59,9 @@ trait NumericRangeHelper {
 	}
 
 	private function getPlusFixType(
-		IntegerType|RealType $targetType,
-		IntegerType|RealType $parameterType
-	): IntegerType|RealType|null {
+		RealType $targetType,
+		RealType $parameterType
+	): RealType|null {
 		if ((string)$parameterType->numberRange === '0') {
 			return $targetType;
 		}
@@ -72,15 +72,12 @@ trait NumericRangeHelper {
 	}
 
 	private function getResultSubsetType(
-		IntegerType|RealType $targetType,
-		IntegerType|RealType $parameterType,
+		RealType $targetType,
+		RealType $parameterType,
 		callable $operation,
 		bool $forceRealType = false
-	): IntegerSubsetType|RealSubsetType|null {
-		if (
-			($targetType instanceof RealSubsetType || $targetType instanceof IntegerSubsetType) &&
-			($parameterType instanceof RealSubsetType || $parameterType instanceof IntegerSubsetType)
-		) {
+	): RealSubsetType|null {
+		if ($targetType instanceof RealSubsetType && $parameterType instanceof RealSubsetType) {
 			$sumValues = [];
 			foreach ($targetType->subsetValues as $targetSubsetValue) {
 				foreach ($parameterType->subsetValues as $parameterSubsetValue) {
@@ -98,9 +95,9 @@ trait NumericRangeHelper {
 	}
 
 	private function getPlusSubsetType(
-		IntegerType|RealType $targetType,
-		IntegerType|RealType $parameterType
-	): IntegerSubsetType|RealSubsetType|null {
+		RealType $targetType,
+		RealType $parameterType
+	): RealSubsetType|null {
 		return $this->getResultSubsetType(
 			$targetType, $parameterType,
 			fn(Number $a, Number $b): Number => $a->add($b)
@@ -108,9 +105,9 @@ trait NumericRangeHelper {
 	}
 
 	private function getMinusSubsetType(
-		IntegerType|RealType $targetType,
-		IntegerType|RealType $parameterType
-	): IntegerSubsetType|RealSubsetType|null {
+		RealType $targetType,
+		RealType $parameterType
+	): RealSubsetType|null {
 		return $this->getResultSubsetType(
 			$targetType, $parameterType,
 			fn(Number $a, Number $b): Number => $a->sub($b)
@@ -118,16 +115,16 @@ trait NumericRangeHelper {
 	}
 
 	private function getMultiplySubsetType(
-		IntegerType|RealType $targetType,
-		IntegerType|RealType $parameterType
-	): IntegerSubsetType|RealSubsetType|null {
+		RealType $targetType,
+		RealType $parameterType
+	): RealSubsetType|null {
 		return $this->getResultSubsetType(
 			$targetType, $parameterType,
 			fn(Number $a, Number $b): Number => $a->mul($b)
 		);
 	}
 
-	private function subsetWithoutZero(RealSubsetType|IntegerSubsetType $type): RealSubsetType|IntegerSubsetType {
+	private function subsetWithoutZero(RealSubsetType $type): RealSubsetType {
 		$values = array_filter(
 			$type->subsetValues,
 			fn($value): bool => (string)$value !== '0'
@@ -141,12 +138,12 @@ trait NumericRangeHelper {
 	}
 
 	private function getModuloSubsetType(
-		IntegerType|RealType $targetType,
-		IntegerType|RealType $parameterType
-	): ResultType|IntegerSubsetType|RealSubsetType|null {
+		RealType $targetType,
+		RealType $parameterType
+	): ResultType|RealSubsetType|null {
 		$hasZeroParameterValue = false;
 		if ($parameterType->contains(0)) {
-			if ($parameterType instanceof IntegerSubsetType || $parameterType instanceof RealSubsetType) {
+			if ($parameterType instanceof RealSubsetType) {
 				if (count($parameterType->subsetValues) === 1) {
 					return null;
 				}
@@ -164,12 +161,12 @@ trait NumericRangeHelper {
 	}
 
 	private function getDivideSubsetType(
-		IntegerType|RealType $targetType,
-		IntegerType|RealType $parameterType
-	): ResultType|IntegerSubsetType|RealSubsetType|null {
+		RealType $targetType,
+		RealType $parameterType
+	): ResultType|RealSubsetType|null {
 		$hasZeroParameterValue = false;
 		if ($parameterType->contains(0)) {
-			if ($parameterType instanceof IntegerSubsetType || $parameterType instanceof RealSubsetType) {
+			if ($parameterType instanceof RealSubsetType) {
 				if (count($parameterType->subsetValues) === 1) {
 					return null;
 				}
@@ -187,8 +184,8 @@ trait NumericRangeHelper {
 	}
 
 	private function getPlusRange(
-		IntegerType|RealType $targetType,
-		IntegerType|RealType $parameterType
+		RealType $targetType,
+		RealType $parameterType
 	): NumberInterval {
 		$min =
 			$targetType->numberRange->min === MinusInfinity::value ||
@@ -213,9 +210,9 @@ trait NumericRangeHelper {
 	}
 
 	private function getMultiplyFixType(
-		IntegerType|RealType $targetType,
-		IntegerType|RealType $parameterType
-	): IntegerType|RealType|null {
+		RealType $targetType,
+		RealType $parameterType
+	): RealType|null {
 		if ((string)$parameterType->numberRange === '1') {
 			return $targetType;
 		}
@@ -251,8 +248,8 @@ trait NumericRangeHelper {
 	}
 
 	private function getDivideRange(
-		IntegerType|RealType $targetType,
-		IntegerType|RealType $parameterType
+		RealType $targetType,
+		RealType $parameterType
 	): NumberInterval {
 		$tMin = $targetType->numberRange->min;
 		$tMax = $targetType->numberRange->max;
@@ -321,8 +318,8 @@ trait NumericRangeHelper {
 	}
 
 	private function getMultiplyRange(
-		IntegerType|RealType $targetType,
-		IntegerType|RealType $parameterType
+		RealType $targetType,
+		RealType $parameterType
 	): NumberInterval {
 		$tMin = $targetType->numberRange->min;
 		$tMax = $targetType->numberRange->max;
@@ -363,7 +360,7 @@ trait NumericRangeHelper {
 	}
 
 	private function getSquareRange(
-		IntegerType|RealType $targetType,
+		RealType $targetType,
 	): NumberInterval {
 		$minValue = $targetType->numberRange->min;
 		$maxValue = $targetType->numberRange->max;

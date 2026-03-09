@@ -34,8 +34,8 @@ final class RealValue implements RealValueInterface, JsonSerializable {
 	}
 
 	public function equals(Value $other): bool {
-		return ($other instanceof RealValueInterface || $other instanceof IntegerValueInterface) &&
-			$this->normalize($this->literalValue) === $this->normalize($other->literalValue);
+		return $other instanceof RealValueInterface &&
+			$this->literalValue->compare($other->literalValue) === 0;
 	}
 
 	public function validate(ValidationRequest $request): ValidationResult {

@@ -95,7 +95,7 @@ final readonly class SortHelper {
 			foreach($values as $key => $value) {
 				if ($value instanceof StringValue) {
 					$hasStrings = true;
-				} elseif ($value instanceof IntegerValue || $value instanceof RealValue) {
+				} elseif ($value instanceof RealValue) {
 					$hasNumbers = true;
 				} else {
 					// @codeCoverageIgnoreStart

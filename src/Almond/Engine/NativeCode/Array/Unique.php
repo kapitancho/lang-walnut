@@ -34,7 +34,7 @@ final readonly class Unique extends ArrayNativeMethod {
 
 	protected function getExecutor(): callable {
 		return function(TupleValue $target, NullValue $parameter): TupleValue {
-			/** @var list<StringValue|IntegerValue|RealValue> $values */
+			/** @var list<StringValue|RealValue> $values */
 			$values = $target->values;
 			$rawValues = [];
 			$hasStrings = false;

@@ -10,16 +10,16 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<IntegerType, IntegerType|RealType, IntegerValue, IntegerValue|RealValue> */
+/** @extends NativeMethod<IntegerType, RealType, IntegerValue, RealValue> */
 final readonly class BinaryLessThanEqual extends NativeMethod {
 
 	protected function getValidator(): callable {
-		return fn(IntegerType $targetType, IntegerType|RealType $parameterType): BooleanType =>
+		return fn(IntegerType $targetType, RealType $parameterType): BooleanType =>
 			$this->typeRegistry->boolean;
 	}
 
 	protected function getExecutor(): callable {
-		return fn(IntegerValue $target, IntegerValue|RealValue $parameter): BooleanValue =>
+		return fn(IntegerValue $target, RealValue $parameter): BooleanValue =>
 			$this->valueRegistry->boolean(
 				$target->literalValue <= $parameter->literalValue
 			);

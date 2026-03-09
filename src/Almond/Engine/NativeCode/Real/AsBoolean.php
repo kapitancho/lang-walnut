@@ -16,11 +16,11 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<IntegerType|RealType, NullType, IntegerValue|RealValue, NullValue> */
+/** @extends NativeMethod<RealType, NullType, RealValue, NullValue> */
 final readonly class AsBoolean extends NativeMethod {
 
 	protected function getValidator(): callable {
-		return fn(IntegerType|RealType $targetType, NullType $parameterType): BooleanType|TrueType|FalseType =>
+		return fn(RealType $targetType, NullType $parameterType): BooleanType|TrueType|FalseType =>
 			match(true) {
 				(string)$targetType->numberRange === '0' => $this->typeRegistry->false,
 				$targetType->numberRange->min !== MinusInfinity::value && (
@@ -40,7 +40,7 @@ final readonly class AsBoolean extends NativeMethod {
 	}
 
 	protected function getExecutor(): callable {
-		return fn(IntegerValue|RealValue $target, NullValue $parameter): BooleanValue =>
+		return fn(RealValue $target, NullValue $parameter): BooleanValue =>
 			$this->valueRegistry->boolean((float)(string)$target->literalValue !== 0.0);
 	}
 }

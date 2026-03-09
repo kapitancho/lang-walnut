@@ -11,12 +11,12 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NumericRangeHelper;
 
-/** @extends NativeMethod<IntegerType|RealType, IntegerType|RealType, IntegerValue|RealValue, IntegerValue|RealValue> */
+/** @extends NativeMethod<RealType, RealType, RealValue, RealValue> */
 final readonly class BinaryModulo extends NativeMethod {
 	use NumericRangeHelper;
 
 	protected function getValidator(): callable {
-		return function(IntegerType|RealType $targetType, IntegerType|RealType $parameterType): Type {
+		return function(RealType $targetType, RealType $parameterType): Type {
 			$subsetType = $this->getModuloSubsetType(
 				$targetType, $parameterType
 			);
@@ -34,7 +34,7 @@ final readonly class BinaryModulo extends NativeMethod {
 	}
 
 	protected function getExecutor(): callable {
-		return function(IntegerValue|RealValue $target, IntegerValue|RealValue $parameter): Value {
+		return function(RealValue $target, RealValue $parameter): Value {
 			if ((float)(string)$parameter->literalValue === 0.0) {
 				return $this->valueRegistry->error(
 					$this->valueRegistry->core->notANumber

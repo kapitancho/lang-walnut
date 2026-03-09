@@ -4,6 +4,7 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn;
 
 use BcMath\Number;
 use JsonSerializable;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType as IntegerTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType as RealTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\SupertypeChecker;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -23,7 +24,7 @@ final readonly class RealType implements RealTypeInterface, JsonSerializable {
 
 	public function hydrate(HydrationRequest $request): HydrationSuccess|HydrationFailure {
 		$value = $request->value;
-		if ($value instanceof RealValue || $value instanceof IntegerValue) {
+		if ($value instanceof RealValue) {
 			if ($this->contains($value->literalValue)) {
 				return $request->ok($value);
 			}
@@ -44,6 +45,7 @@ final readonly class RealType implements RealTypeInterface, JsonSerializable {
 
 	public function isSubtypeOf(Type $ofType): bool {
 		return match(true) {
+			$ofType instanceof IntegerTypeInterface => false,
 			$ofType instanceof RealTypeInterface => $ofType->numberRange->containsRange($this->numberRange),
 			$ofType instanceof SupertypeChecker => $ofType->isSupertypeOf($this),
 			default => false

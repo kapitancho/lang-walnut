@@ -12,17 +12,17 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\Native
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NumericRangeHelper;
 
 /**
- * @template TTargetType of IntegerType|RealType
- * @template TTargetValue of IntegerValue|RealValue
- * @extends NativeMethod<TTargetType, IntegerType|RealType, TTargetValue, IntegerValue|RealValue>
+ * @template TTargetType of RealType
+ * @template TTargetValue of RealValue
+ * @extends NativeMethod<TTargetType, RealType, TTargetValue, RealValue>
  */
 abstract readonly class NumericBinaryDivide extends NativeMethod {
 	use NumericRangeHelper;
 
 	protected function doValidate(
-		IntegerType|RealType $targetType,
-		IntegerType|RealType $parameterType,
-	): IntegerType|RealType|ResultType {
+		RealType $targetType,
+		RealType $parameterType,
+	): RealType|ResultType {
 		if ($parameterType instanceof IntegerType && (string)$parameterType->numberRange === '1') {
 			return $targetType;
 		}
@@ -41,9 +41,9 @@ abstract readonly class NumericBinaryDivide extends NativeMethod {
 	}
 
 	protected function doDivide(
-		IntegerValue|RealValue $target,
-		IntegerValue|RealValue $parameter
-	): IntegerValue|RealValue|ErrorValue {
+		RealValue $target,
+		RealValue $parameter
+	): RealValue|ErrorValue {
 		if ((float)(string)$parameter->literalValue === 0.0) {
 			return $this->valueRegistry->error(
 				$this->valueRegistry->core->notANumber

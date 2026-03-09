@@ -18,7 +18,7 @@ final class AsStringTest extends CodeExecutionTestHelper {
 
 	public function testAsStringInteger(): void {
 		$result = $this->executeCodeSnippet("5.0->asString;");
-		$this->assertEquals("'5.0'", $result);
+		$this->assertEquals("'5'", $result);
 	}
 
 	public function testAsStringTypePositive(): void {

@@ -20,10 +20,10 @@ final readonly class Max extends ArrayMinMax {
 
 	protected function getExecutor(): callable {
 		return function(TupleValue $target, NullValue $parameter): Value {
-			/** @var RealValue|IntegerValue $bestV */
+			/** @var RealValue $bestV */
 			$bestV = $target->values[0];
 			$best = $bestV->literalValue;
-			/** @var RealValue|IntegerValue $item */
+			/** @var RealValue $item */
 			foreach ($target->values as $item) {
 				$value = $item->literalValue;
 				if ($value > $best) {

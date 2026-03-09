@@ -29,7 +29,7 @@ final readonly class Product extends ArrayNativeMethod {
 	protected function getValidator(): callable {
 		return function(ArrayType $targetType, NullType $parameterType): Type {
 			$itemType = $this->toBaseType($targetType->itemType);
-			if ($itemType instanceof RealType || $itemType instanceof IntegerType) {
+			if ($itemType instanceof RealType) {
 				$start = match(true) {
 					$itemType->numberRange->min !== MinusInfinity::value &&
 						$itemType->numberRange->min->value > 0 => new NumberIntervalEndpoint(new Number(0), false),
@@ -56,7 +56,7 @@ final readonly class Product extends ArrayNativeMethod {
 		return function(TupleValue $target, NullValue $parameter): Value {
 			$product = new Number(1);
 			$hasReal = false;
-			/** @var IntegerValue|RealValue $item */
+			/** @var RealValue $item */
 			foreach ($target->values as $item) {
 				$v = $item->literalValue;
 				if (str_contains((string)$v, '.')) {

@@ -20,7 +20,7 @@ final readonly class Clamp extends NumericClamp {
 			IntegerType $targetType,
 			RecordType $parameterType,
 			mixed $origin
-		): IntegerType|RealType|ResultType =>
+		): RealType|ResultType =>
 			$this->doValidate($targetType, $parameterType);
 	}
 
@@ -28,7 +28,7 @@ final readonly class Clamp extends NumericClamp {
 		return fn(
 			IntegerValue $target,
 			RecordValue $parameter
-		): IntegerValue|RealValue|ErrorValue =>
+		): RealValue|ErrorValue =>
 			$this->doDivide($target, $parameter);
 	}
 

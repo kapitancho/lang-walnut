@@ -12,11 +12,11 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<IntegerType|RealType, NullType, IntegerValue|RealValue, NullValue> */
+/** @extends NativeMethod<RealType, NullType, RealValue, NullValue> */
 final readonly class RoundAsInteger extends NativeMethod {
 
 	protected function getValidator(): callable {
-		return fn(IntegerType|RealType $targetType, NullType $parameterType): IntegerType =>
+		return fn(RealType $targetType, NullType $parameterType): IntegerType =>
 			$this->typeRegistry->integer(
 				$targetType->numberRange->min === MinusInfinity::value ? MinusInfinity::value :
 					$targetType->numberRange->min->value->round(),
@@ -26,7 +26,7 @@ final readonly class RoundAsInteger extends NativeMethod {
 	}
 
 	protected function getExecutor(): callable {
-		return fn(IntegerValue|RealValue $target, NullValue $parameter): IntegerValue =>
+		return fn(RealValue $target, NullValue $parameter): IntegerValue =>
 			$this->valueRegistry->integer($target->literalValue->round());
 	}
 }

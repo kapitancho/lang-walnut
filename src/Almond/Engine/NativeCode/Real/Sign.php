@@ -14,11 +14,11 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
-/** @extends NativeMethod<IntegerType|RealType, NullType, IntegerValue|RealValue, NullValue> */
+/** @extends NativeMethod<RealType, NullType, RealValue, NullValue> */
 final readonly class Sign extends NativeMethod {
 
 	protected function getValidator(): callable {
-		return function(IntegerType|RealType $targetType, NullType $parameterType): IntegerSubsetType {
+		return function(RealType $targetType, NullType $parameterType): IntegerSubsetType {
 			$min = $targetType->numberRange->min;
 			$max = $targetType->numberRange->max;
 
@@ -37,7 +37,7 @@ final readonly class Sign extends NativeMethod {
 	}
 
 	protected function getExecutor(): callable {
-		return function(IntegerValue|RealValue $target, NullValue $parameter): IntegerValue {
+		return function(RealValue $target, NullValue $parameter): IntegerValue {
 			$val = (string)$target->literalValue;
 			if ($val > 0) {
 				return $this->valueRegistry->integer(1);

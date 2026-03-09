@@ -17,7 +17,7 @@ final readonly class AsReal extends NativeMethod {
 
 	protected function getValidator(): callable {
 		return function(IntegerType $targetType, NullType $parameterType): RealSubsetType|RealType {
-			if ($targetType instanceof IntegerSubsetType || $targetType instanceof RealSubsetType) {
+			if ($targetType instanceof RealSubsetType) {
 				return $this->typeRegistry->realSubset($targetType->subsetValues);
 			}
 			return $this->typeRegistry->realFull(...

@@ -16,11 +16,11 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNativeMethod;
 
-/** @extends TypeNativeMethod<IntegerType|RealType, Type, Value> */
+/** @extends TypeNativeMethod<RealType, Type, Value> */
 final readonly class WithRange extends TypeNativeMethod {
 
 	protected function validateTargetRefType(Type $targetRefType): null|string {
-		return $targetRefType instanceof IntegerType || $targetRefType instanceof RealType ?
+		return $targetRefType instanceof RealType ?
 			null : sprintf("Target ref type must be an Integer or Real type, got: %s", $targetRefType);
 	}
 
@@ -36,7 +36,7 @@ final readonly class WithRange extends TypeNativeMethod {
 
 	protected function getValidator(): callable {
 		return function(TypeType $targetType, Type $parameterType): TypeType {
-			/** @var IntegerType|RealType $refType */
+			/** @var RealType $refType */
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof IntegerType) {
 				return $this->typeRegistry->type($this->typeRegistry->integer());
@@ -48,7 +48,7 @@ final readonly class WithRange extends TypeNativeMethod {
 
 	protected function getExecutor(): callable {
 		return function(TypeValue $target, Value $parameter): TypeValue {
-			/** @var IntegerType|RealType $typeValue */
+			/** @var RealType $typeValue */
 			$typeValue = $this->toBaseType($target->typeValue);
 			/** @var OpenValue $parameter */
 			/** @var RecordValue $range */
@@ -64,13 +64,13 @@ final readonly class WithRange extends TypeNativeMethod {
 				);
 				return $this->valueRegistry->type($result);
 			}
-			/** @var RealValue|IntegerValue|AtomValue $minValue */
+			/** @var RealValue|AtomValue $minValue */
 			$minValue = $range->valueOf('minValue');
-			/** @var RealValue|IntegerValue|AtomValue $minValue */
+			/** @var RealValue|AtomValue $minValue */
 			$maxValue = $range->valueOf('maxValue');
 			$result = $this->typeRegistry->real(
-				$minValue instanceof RealValue || $minValue instanceof IntegerValue ? $minValue->literalValue : MinusInfinity::value,
-				$maxValue instanceof RealValue || $maxValue instanceof IntegerValue ? $maxValue->literalValue : PlusInfinity::value,
+				$minValue instanceof RealValue ? $minValue->literalValue : MinusInfinity::value,
+				$maxValue instanceof RealValue ? $maxValue->literalValue : PlusInfinity::value,
 			);
 			return $this->valueRegistry->type($result);
 		};

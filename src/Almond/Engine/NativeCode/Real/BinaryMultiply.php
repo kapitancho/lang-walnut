@@ -10,12 +10,12 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NumericRangeHelper;
 
-/** @extends NativeMethod<IntegerType|RealType, IntegerType|RealType, IntegerValue|RealValue, IntegerValue|RealValue> */
+/** @extends NativeMethod<RealType, RealType, RealValue, RealValue> */
 final readonly class BinaryMultiply extends NativeMethod {
 	use NumericRangeHelper;
 
 	protected function getValidator(): callable {
-		return function(IntegerType|RealType $targetType, IntegerType|RealType $parameterType): Type {
+		return function(RealType $targetType, RealType $parameterType): Type {
 			$fixType = $this->getMultiplyFixType($targetType, $parameterType);
 			if ($fixType !== null) {
 				return $fixType;
@@ -37,7 +37,7 @@ final readonly class BinaryMultiply extends NativeMethod {
 	}
 
 	protected function getExecutor(): callable {
-		return fn(IntegerValue|RealValue $target, IntegerValue|RealValue $parameter): RealValue =>
+		return fn(RealValue $target, RealValue $parameter): RealValue =>
 			$this->valueRegistry->real(
 				$target->literalValue * $parameter->literalValue
 			);

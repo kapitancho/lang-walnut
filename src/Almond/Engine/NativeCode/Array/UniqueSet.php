@@ -36,7 +36,7 @@ final readonly class UniqueSet extends ArrayNativeMethod {
 
 	protected function getExecutor(): callable {
 		return function(TupleValue $target, NullValue $parameter): SetValue {
-			/** @var list<StringValue|IntegerValue|RealValue> $values */
+			/** @var list<StringValue|RealValue> $values */
 			$values = $target->values;
 			$rawValues = [];
 			$hasStrings = false;
