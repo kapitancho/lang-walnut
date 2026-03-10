@@ -20,6 +20,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MetaType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MutableType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ValueType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OpenType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealSubsetType;
@@ -67,6 +68,7 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 		AliasType::class => [/*'Alias'*/],
 		FunctionType::class => ['Function'],
 		MutableType::class => ['Mutable'],
+		ValueType::class => ['Value'],
 		ShapeType::class => ['Shape'],
 		TypeType::class => ['Type'],
 		UnionType::class => [/*'Union'*/],

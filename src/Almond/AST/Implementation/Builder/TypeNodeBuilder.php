@@ -22,6 +22,7 @@ use Walnut\Lang\Almond\AST\Implementation\Node\Type\AnyTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\ArrayTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\BooleanTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\BytesTypeNode;
+use Walnut\Lang\Almond\AST\Implementation\Node\Type\EitherTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\EnumerationSubsetTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\FalseTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\FunctionTypeNode;
@@ -34,6 +35,7 @@ use Walnut\Lang\Almond\AST\Implementation\Node\Type\MapTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\MetaTypeTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\MutableTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\NamedTypeNode;
+use Walnut\Lang\Almond\AST\Implementation\Node\Type\ValueTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\NothingTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\NullTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\NumberIntervalNode;
@@ -107,12 +109,20 @@ final class TypeNodeBuilder implements TypeNodeBuilderInterface {
 		return new ResultTypeNode($this->getSourceLocation(), $returnType, $errorType);
 	}
 
+	public function eitherType(TypeNode $valueType, TypeNode $errorType): EitherTypeNode {
+		return new EitherTypeNode($this->getSourceLocation(), $valueType, $errorType);
+	}
+
 	public function impureType(TypeNode $valueType): ImpureTypeNode {
 		return new ImpureTypeNode($this->getSourceLocation(), $valueType);
 	}
 
 	public function mutableType(TypeNode $valueType): MutableTypeNode {
 		return new MutableTypeNode($this->getSourceLocation(), $valueType);
+	}
+
+	public function valueType(TypeNode $valueType): ValueTypeNode {
+		return new ValueTypeNode($this->getSourceLocation(), $valueType);
 	}
 
 	public function metaTypeType(string $value): MetaTypeTypeNode {

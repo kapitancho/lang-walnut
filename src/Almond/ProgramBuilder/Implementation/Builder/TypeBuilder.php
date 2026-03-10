@@ -8,6 +8,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Type\AnyTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\ArrayTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\BooleanTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\BytesTypeNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Type\EitherTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\EnumerationSubsetTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\FalseTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\FunctionTypeNode;
@@ -20,6 +21,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Type\MapTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\MetaTypeTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\MutableTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NamedTypeNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Type\ValueTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NothingTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NullTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NumberIntervalNode;
@@ -137,7 +139,16 @@ final readonly class TypeBuilder implements TypeCompilerInterface {
 					$this->type($typeNode->errorType)
 				),
 
+				$typeNode instanceof EitherTypeNode => $this->typeRegistry->either(
+					$this->type($typeNode->valueType),
+					$this->type($typeNode->errorType)
+				),
+
 				$typeNode instanceof MutableTypeNode => $this->typeRegistry->mutable(
+					$this->type($typeNode->valueType)
+				),
+
+				$typeNode instanceof ValueTypeNode => $this->typeRegistry->valueType(
 					$this->type($typeNode->valueType)
 				),
 

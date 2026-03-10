@@ -8,6 +8,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EnumerationType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OpenType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ValueType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SealedType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\UnknownEnumerationValue;
@@ -37,6 +38,9 @@ final readonly class Construct extends NativeMethod {
 					$this->typeRegistry->nothing,
 					$targetType
 				);
+			}
+			if ($refType instanceof ValueType) {
+				return $this->typeRegistry->valueType($targetType);
 			}
 			if ($refType instanceof OpenType || $refType instanceof SealedType || $refType instanceof EnumerationType) {
 				$constructorMethod = $this->methodContext->methodForType(
@@ -142,6 +146,9 @@ final readonly class Construct extends NativeMethod {
 			$parameterType = $parameter->typeValue;
 			if ($parameterType instanceof ResultType && $parameterType->returnType instanceof NothingType) {
 				return $this->valueRegistry->error($target);
+			}
+			if ($parameterType instanceof ValueType) {
+				return $this->valueRegistry->value($target);
 			}
 			if ($parameterType instanceof OpenType || $parameterType instanceof SealedType || $parameterType instanceof EnumerationType) {
 				$constructorMethod = $this->methodContext->methodForValue(

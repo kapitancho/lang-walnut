@@ -22,6 +22,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ValueType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ShapeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringSubsetType;
@@ -52,6 +53,8 @@ interface TypeRegistry extends TypeFinder {
 	public function shape(Type $refType): ShapeType;
 	public function impure(Type $valueType): Type;
 	public function result(Type $returnType, Type $errorType): ResultType;
+	public function either(Type $valueType, Type $errorType): ResultType;
+	public function valueType(Type $valueType): ValueType;
 
 	public function type(Type $targetType): TypeType;
 	public function metaType(MetaTypeValue $value): MetaType;

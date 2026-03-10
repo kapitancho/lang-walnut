@@ -49,6 +49,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\RealSubsetType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\RealType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\ResultType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\ValueType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\SetType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\ShapeType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\StringSubsetType;
@@ -119,6 +120,10 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 		);
 	}
 
+	public function valueType(Type $valueType): ValueType {
+		return new ValueType($valueType);
+	}
+
 	public function result(Type $returnType, Type $errorType): ResultType {
 		if ($returnType instanceof ResultTypeInterface) {
 			$errorType = $this->union([$errorType, $returnType->errorType]);
@@ -126,6 +131,13 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 		}
 		return new ResultType(
 			$returnType,
+			$errorType
+		);
+	}
+
+	public function either(Type $valueType, Type $errorType): ResultType {
+		return $this->result(
+			$this->valueType($valueType),
 			$errorType
 		);
 	}
@@ -394,6 +406,7 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 			'Map' => $this->map(),
 			'Set' => $this->set(),
 			'Error' => $this->result($this->nothing, $this->any),
+			'Value' => $this->valueType($this->any),
 			'Impure' => $this->impure($this->any),
 			'Mutable' => $this->mutable($this->any),
 			'Type' => $this->type($this->any),

@@ -28,6 +28,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Value\BuiltIn\BytesValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Value\BuiltIn\DataValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Value\BuiltIn\ErrorValue;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Value\BuiltIn\ValueValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Value\BuiltIn\IntegerValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Value\BuiltIn\MutableValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Value\BuiltIn\OpenValue;
@@ -70,6 +71,12 @@ final readonly class ValueRegistry implements ValueRegistryInterface {
 
 	public function error(Value $value): ErrorValueInterface {
 		return new ErrorValue(
+			$this->typeRegistry, $value
+		);
+	}
+
+	public function value(Value $value): ValueValue {
+		return new ValueValue(
 			$this->typeRegistry, $value
 		);
 	}
