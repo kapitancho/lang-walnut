@@ -18,15 +18,15 @@ final class ValueTypeTest extends CodeExecutionTestHelper {
 		$this->assertEquals("type[a: String]", $result);
 	}
 
-	public function testValueTypeOptionalKey(): void {
-		$result = $this->executeCodeSnippet("getValueType(type{OptionalKey<Boolean>});",
-			valueDeclarations: "getValueType = ^t: Type<OptionalKey<Named>> => Type :: t->valueType;");
+	public function testValueTypeOptional(): void {
+		$result = $this->executeCodeSnippet("getValueType(type{Optional<Boolean>});",
+			valueDeclarations: "getValueType = ^t: Type<Optional<Named>> => Type :: t->valueType;");
 		$this->assertEquals("type{Boolean}", $result);
 	}
 
-	public function testValueTypeOptionalKeyDirect(): void {
+	public function testValueTypeOptionalDirect(): void {
 		$result = $this->executeCodeSnippet("getValueType(type{Boolean});",
-			valueDeclarations: "getValueType = ^t: Type<OptionalKey<Named>> => Type :: t->valueType;");
+			valueDeclarations: "getValueType = ^t: Type<Optional<Named>> => Type :: t->valueType;");
 		$this->assertEquals("type{Boolean}", $result);
 	}
 

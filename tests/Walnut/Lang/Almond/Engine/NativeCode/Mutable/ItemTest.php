@@ -36,7 +36,7 @@ final class ItemTest extends CodeExecutionTestHelper {
 		$this->assertEquals("10", $result);
 	}
 
-	public function testItemMutableRecordOptionalKeyPresent(): void {
+	public function testItemMutableRecordOptionalPresent(): void {
 		$result = $this->executeCodeSnippet(
 			"getValue(mutable{[a: String, b: ?Real], [a: 'hello', b: 2]});",
 			valueDeclarations: "getValue = ^m: Mutable<[a: String, b: ?Real]> => Result<Real, MapItemNotFound> :: m->item('b');"
@@ -44,7 +44,7 @@ final class ItemTest extends CodeExecutionTestHelper {
 		$this->assertEquals("2", $result);
 	}
 
-	public function testItemMutableRecordOptionalKeyMissing(): void {
+	public function testItemMutableRecordOptionalMissing(): void {
 		$result = $this->executeCodeSnippet(
 			"getValue(mutable{[a: String, b: ?Real], [a: 'hello']});",
 			valueDeclarations: "getValue = ^m: Mutable<[a: String, b: ?Real]> => Result<Real, MapItemNotFound> :: m->item('b');"

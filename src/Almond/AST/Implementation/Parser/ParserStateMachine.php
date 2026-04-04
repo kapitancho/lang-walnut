@@ -2479,7 +2479,7 @@ final readonly class ParserStateMachine {
 
 			4381 => ['name' => 'type value short optional key', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->type->optionalKeyType(
+					$this->s->generated = $this->nodeBuilder->type->optionalType(
 						$this->s->generated
 					);
 					$this->s->stay(443);
@@ -2488,7 +2488,7 @@ final readonly class ParserStateMachine {
 			4382 => ['name' => 'type value short type optional key', 'transitions' => [
 				T::type_start->name => 4383,
 				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->type->optionalKeyType($this->nodeBuilder->type->anyType);
+					$this->s->generated = $this->nodeBuilder->type->optionalType($this->nodeBuilder->type->anyType);
 					$this->s->stay(443);
 				},
 			]],
@@ -2500,7 +2500,7 @@ final readonly class ParserStateMachine {
 			]],
 			4384 => ['name' => 'type value short type optional return point', 'transitions' => [
 				T::type_end->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->type->optionalKeyType($this->s->generated);
+					$this->s->generated = $this->nodeBuilder->type->optionalType($this->s->generated);
 					$this->s->move(443);
 				}
 			]],
@@ -2511,7 +2511,7 @@ final readonly class ParserStateMachine {
 					$this->s->move(4000);
 				},
 				T::type_keyword->name => $c = function(LT $token) {
-					if ($token->rule->tag === T::type_keyword->name && $token->patternMatch->text === 'OptionalKey') {
+					if ($token->rule->tag === T::type_keyword->name && $token->patternMatch->text === 'Optional') {
 						$this->s->move(4382);
 						return;
 					}
@@ -2549,7 +2549,7 @@ final readonly class ParserStateMachine {
 
 			4401 => ['name' => 'type value type optional key', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->type->optionalKeyType(
+					$this->s->generated = $this->nodeBuilder->type->optionalType(
 						$this->s->generated
 					);
 					$this->s->stay(442);
@@ -2558,7 +2558,7 @@ final readonly class ParserStateMachine {
 			4402 => ['name' => 'type value type type optional key', 'transitions' => [
 				T::type_start->name => 4403,
 				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->type->optionalKeyType($this->nodeBuilder->type->anyType);
+					$this->s->generated = $this->nodeBuilder->type->optionalType($this->nodeBuilder->type->anyType);
 					$this->s->stay(442);
 				},
 			]],
@@ -2570,7 +2570,7 @@ final readonly class ParserStateMachine {
 			]],
 			4404 => ['name' => 'type value type optional return point', 'transitions' => [
 				T::type_end->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->type->optionalKeyType($this->s->generated);
+					$this->s->generated = $this->nodeBuilder->type->optionalType($this->s->generated);
 					$this->s->move(442);
 				}
 			]],
@@ -2582,7 +2582,7 @@ final readonly class ParserStateMachine {
 					$this->s->move(4000);
 				},
 				T::type_keyword->name => $c = function(LT $token) {
-					if ($token->rule->tag === T::type_keyword->name && $token->patternMatch->text === 'OptionalKey') {
+					if ($token->rule->tag === T::type_keyword->name && $token->patternMatch->text === 'Optional') {
 						$this->s->move(4402);
 						return;
 					}
@@ -3447,7 +3447,7 @@ final readonly class ParserStateMachine {
 
 			7561 => ['name' => 'type type optional key', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->result['type'] = $this->nodeBuilder->type->optionalKeyType(
+					$this->s->result['type'] = $this->nodeBuilder->type->optionalType(
 						$this->s->generated
 					);
 					$this->s->stay(759);
@@ -3456,7 +3456,7 @@ final readonly class ParserStateMachine {
 			7562 => ['name' => 'type type optional key', 'transitions' => [
 				T::type_start->name => 7563,
 				'' => function(LT $token) {
-					$this->s->result['type'] = $this->nodeBuilder->type->optionalKeyType($this->nodeBuilder->type->anyType);
+					$this->s->result['type'] = $this->nodeBuilder->type->optionalType($this->nodeBuilder->type->anyType);
 					$this->s->stay(759);
 				},
 			]],
@@ -3468,7 +3468,7 @@ final readonly class ParserStateMachine {
 			]],
 			7564 => ['name' => 'type type optional return point', 'transitions' => [
 				T::type_end->name => function(LT $token) {
-					$this->s->result['type'] = $this->nodeBuilder->type->optionalKeyType($this->s->generated);
+					$this->s->result['type'] = $this->nodeBuilder->type->optionalType($this->s->generated);
 					$this->s->move(759);
 				}
 			]],
@@ -3479,7 +3479,7 @@ final readonly class ParserStateMachine {
 					$this->s->move(4000);
 				},
 				T::type_keyword->name => function(LT $token) {
-					if ($token->rule->tag === T::type_keyword->name && $token->patternMatch->text === 'OptionalKey') {
+					if ($token->rule->tag === T::type_keyword->name && $token->patternMatch->text === 'Optional') {
 						$this->s->move(7562);
 						return;
 					}
@@ -3749,7 +3749,7 @@ final readonly class ParserStateMachine {
 				T::type_start->name => 790,
 				'' => function(LT $token) {
 					$this->s->result['compositeValues'][$this->s->result['current_key']] =
-						$this->nodeBuilder->type->optionalKeyType(
+						$this->nodeBuilder->type->optionalType(
 							$this->nodeBuilder->type->anyType
 						);
 					$this->s->stay(844);
@@ -3773,14 +3773,14 @@ final readonly class ParserStateMachine {
 			793 => ['name' => 'type optional return', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->result['compositeValues'][$this->s->result['current_key']] =
-						$this->nodeBuilder->type->optionalKeyType($this->s->generated);
+						$this->nodeBuilder->type->optionalType($this->s->generated);
 					$this->s->stay(844);
 				},
 			]],
 			794 => ['name' => 'type optional ? return point', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->result['compositeValues'][$this->s->result['current_key']] =
-						$this->nodeBuilder->type->optionalKeyType($this->s->generated);
+						$this->nodeBuilder->type->optionalType($this->s->generated);
 					$this->s->stay(844);
 				}
 			]],
@@ -3937,7 +3937,7 @@ final readonly class ParserStateMachine {
 				'' => function(LT $token) {
 					$this->s->result['current_key'] ??=
                         $this->s->result['first_token']->patternMatch->text;
-					if ($token->rule->tag === T::type_keyword->name && $token->patternMatch->text === 'OptionalKey') {
+					if ($token->rule->tag === T::type_keyword->name && $token->patternMatch->text === 'Optional') {
 						$this->s->move(789);
 						return;
 					}

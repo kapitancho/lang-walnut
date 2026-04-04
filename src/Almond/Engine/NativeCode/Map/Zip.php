@@ -4,7 +4,7 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalKeyType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
@@ -34,17 +34,17 @@ final readonly class Zip extends MapNativeMethod {
 					$tg = $targetType->types[$key] ?? $targetType->restType;
 					$pr = $pType->types[$key] ?? $pType->restType;
 					$isOptional = false;
-					if ($tg instanceof OptionalKeyType) {
+					if ($tg instanceof OptionalType) {
 						$tg = $tg->valueType;
 						$isOptional = true;
 					}
-					if ($pr instanceof OptionalKeyType) {
+					if ($pr instanceof OptionalType) {
 						$pr = $pr->valueType;
 						$isOptional = true;
 					}
 					if (!$tg instanceof NothingType && !$pr instanceof NothingType) {
 						$tuple = $this->typeRegistry->tuple([$tg, $pr], null);
-						$resultType[$key] = $isOptional ? $this->typeRegistry->optionalKey($tuple) : $tuple;
+						$resultType[$key] = $isOptional ? $this->typeRegistry->optional($tuple) : $tuple;
 					}
 				}
 				return $this->typeRegistry->record($resultType,

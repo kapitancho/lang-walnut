@@ -2,7 +2,7 @@
 
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper;
 
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalKeyType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -72,7 +72,7 @@ trait TupleAsRecord {
 		foreach($recordType->types as $key => $rType) {
 			$value = $tupleValue->valueOf($index++);
 			if ($value instanceof UnknownProperty) {
-				if (!($rType instanceof OptionalKeyType)) {
+				if (!($rType instanceof OptionalType)) {
 					return null;
 				}
 			} else {

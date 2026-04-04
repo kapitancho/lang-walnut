@@ -117,7 +117,7 @@ final class OpenApiSchemaTest extends CodeExecutionTestHelper {
 	}
 
 	public function testOpenApiSchemaRecordWithOptional(): void {
-		$result = $this->executeCodeSnippet("type{[name: String, age: OptionalKey<Integer>]}->openApiSchema;");
+		$result = $this->executeCodeSnippet("type{[name: String, age: Optional<Integer>]}->openApiSchema;");
 		$this->assertStringContainsString("name", $result);
 		$this->assertStringContainsString("age", $result);
 		$this->assertStringContainsString("required", $result);

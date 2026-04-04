@@ -16,7 +16,7 @@ final class ItemTest extends CodeExecutionTestHelper {
 		$this->assertEquals("5", $result);
 	}
 
-	public function testItemOptionalKey(): void {
+	public function testItemOptional(): void {
 		$result = $this->executeCodeSnippet(
 			"getItem(MyTuple![a: 'hello', b: 2]);",
 			"MyTuple := [a: String, b: ?Real];",
@@ -25,7 +25,7 @@ final class ItemTest extends CodeExecutionTestHelper {
 		$this->assertEquals("2", $result);
 	}
 
-	public function testItemOptionalKeyMissing(): void {
+	public function testItemOptionalMissing(): void {
 		$result = $this->executeCodeSnippet(
 			"getItem(MyTuple![a: 'hello']);",
 			"MyTuple := [a: String, b: ?Real];",

@@ -41,8 +41,8 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 		$this->assertEquals("X!42", $result);
 	}
 
-	public function testHydrateAsOptionalKey(): void {
-		$result = $this->executeCodeSnippet("42->hydrateAs(type{OptionalKey<X>});", "X := Integer;");
+	public function testHydrateAsOptional(): void {
+		$result = $this->executeCodeSnippet("42->hydrateAs(type{Optional<X>});", "X := Integer;");
 		$this->assertEquals("X!42", $result);
 	}
 
@@ -425,12 +425,12 @@ final class HydrateAsTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@HydrationError![\n\tvalue: [a: 1, b: 2, c: 'hello'],\n\terrors: [\n\t\t[\n\t\t\thydrationPath: 'value',\n\t\t\terrorMessage: 'The record value may not contain the key c',\n\t\t\ttargetType: type[a: Integer, b: Integer]\n\t\t]\n\t]\n]", $result);
 	}
 
-	public function testHydrateAsRecordWithOptionalKeyFromRecordWithKey(): void {
+	public function testHydrateAsRecordWithOptionalFromRecordWithKey(): void {
 		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 'hello']->hydrateAs(type[a: Integer, b: Integer, c: ?String]);");
 		$this->assertEquals("[a: 1, b: 2, c: 'hello']", $result);
 	}
 
-	public function testHydrateAsRecordWithOptionalKeyFromRecordWithoutKey(): void {
+	public function testHydrateAsRecordWithOptionalFromRecordWithoutKey(): void {
 		$result = $this->executeCodeSnippet("[a: 1, b: 2]->hydrateAs(type[a: Integer, b: Integer, c: ?String]);");
 		$this->assertEquals("[a: 1, b: 2]", $result);
 	}

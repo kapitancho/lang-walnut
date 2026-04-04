@@ -3,7 +3,7 @@
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalKeyType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
@@ -20,7 +20,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberInterval;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\OptionalKeyType as OptionalKeyTypeImpl;
 
 /**
  * @template TTargetType of RealType
@@ -51,8 +50,8 @@ abstract readonly class NumericClamp extends NativeMethod {
 
 	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		$expectedType = $this->typeRegistry->record([
-			'min' => new OptionalKeyTypeImpl($this->typeRegistry->real()),
-			'max' => new OptionalKeyTypeImpl($this->typeRegistry->real()),
+			'min' => $this->typeRegistry->optional($this->typeRegistry->real()),
+			'max' => $this->typeRegistry->optional($this->typeRegistry->real()),
 		], null);
 		return $parameterType->isSubtypeOf($expectedType) ?
 			null : sprintf(
@@ -73,28 +72,28 @@ abstract readonly class NumericClamp extends NativeMethod {
 		if ($maxType !== null) {
 			$maxType = $this->toBaseType($maxType);
 		}
-		/** @var OptionalKeyType|RealType|null $minType */
-		/** @var OptionalKeyType|RealType|null $maxType */
+		/** @var OptionalType|RealType|null $minType */
+		/** @var OptionalType|RealType|null $maxType */
 
 		/** @var NumberIntervalEndpoint|MinusInfinity $minFrom */
-		$minFrom = $minType === null || $minType instanceof OptionalKeyType ? MinusInfinity::value : $minType->numberRange->min;
+		$minFrom = $minType === null || $minType instanceof OptionalType ? MinusInfinity::value : $minType->numberRange->min;
 		$numFrom = $targetType->numberRange->min;
 		/** @var NumberIntervalEndpoint|MinusInfinity $maxFrom */
 		$maxFrom = match(true) {
 			$maxType === null => $numFrom,
-			$maxType instanceof OptionalKeyType =>
+			$maxType instanceof OptionalType =>
 				/** @phpstan-ignore-next-line */
 				$this->toBaseType($maxType->valueType)->numberRange->min,
 			default => $maxType->numberRange->min
 		};
 
 		/** @var NumberIntervalEndpoint|PlusInfinity $maxTo */
-		$maxTo = $maxType === null || $maxType instanceof OptionalKeyType ? PlusInfinity::value : $maxType->numberRange->max;
+		$maxTo = $maxType === null || $maxType instanceof OptionalType ? PlusInfinity::value : $maxType->numberRange->max;
 		$numTo = $targetType->numberRange->max;
 		/** @var NumberIntervalEndpoint|PlusInfinity $minTo */
 		$minTo = match(true) {
 			$minType === null => $numTo,
-			$minType instanceof OptionalKeyType =>
+			$minType instanceof OptionalType =>
 				/** @phpstan-ignore-next-line */
 				$this->toBaseType($minType->valueType)->numberRange->max,
 			default => $minType->numberRange->max
@@ -110,10 +109,10 @@ abstract readonly class NumericClamp extends NativeMethod {
 			$this->isBetween($minTo, $numTo, $maxTo) => $minTo,
 			default => $maxTo
 		};
-		if ($minType instanceof OptionalKeyType) {
+		if ($minType instanceof OptionalType) {
 			$minType = $this->toBaseType($minType->valueType);
 		}
-		if ($maxType instanceof OptionalKeyType) {
+		if ($maxType instanceof OptionalType) {
 			$maxType = $this->toBaseType($maxType->valueType);
 		}
 		$mayHaveError = false;

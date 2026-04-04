@@ -11,7 +11,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayNativeMethod;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\OptionalKeyType as OptionalKeyTypeImpl;
 
 /** @extends ArrayNativeMethod<Type, RecordType, RecordValue> */
 final readonly class Slice extends ArrayNativeMethod {
@@ -19,7 +18,7 @@ final readonly class Slice extends ArrayNativeMethod {
 	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		$expectedType = $this->typeRegistry->record([
 			"start" => $this->typeRegistry->integer(0),
-			"length" => new OptionalKeyTypeImpl($this->typeRegistry->integer(0)),
+			"length" => $this->typeRegistry->optional($this->typeRegistry->integer(0)),
 		], null);
 		return $parameterType->isSubtypeOf($expectedType) ? null : sprintf(
 			"Parameter type %s is not a subtype %s",

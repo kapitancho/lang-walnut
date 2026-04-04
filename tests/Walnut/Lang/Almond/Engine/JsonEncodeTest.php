@@ -178,7 +178,7 @@ final class JsonEncodeTest extends AlmondBaseTestHelper {
 			'{"type":"Intersection","types":[{"type":"Atom","name":"MyAtom"},{"type":"Enumeration","name":"MyEnum","values":{"A":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"A"},"B":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"B"},"C":{"valueType":"EnumerationValue","typeName":"MyEnum","valueIdentifier":"C"}}}]}' => $tr->intersection([
 				$tr->userland->atom($i('MyAtom')), $tr->userland->enumeration($i('MyEnum'))
 			]),
-			'{"type":"OptionalKey","valueType":{"type":"Integer","range":{"intervals":[{"start":"MinusInfinity","end":"PlusInfinity"}]}}}' => $tr->optionalKey($tr->integer()),
+			'{"type":"Optional","valueType":{"type":"Integer","range":{"intervals":[{"start":"MinusInfinity","end":"PlusInfinity"}]}}}' => $tr->optional($tr->integer()),
 
 	        '{"type":"MetaType","metaType":"Union"}' => $tr->metaType(MetaTypeValue::Union),
 	        //'MyAtom' => $tr->proxyType($i('MyAtom'))

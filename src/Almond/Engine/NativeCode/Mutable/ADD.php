@@ -5,7 +5,7 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Mutable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MutableType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalKeyType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringSubsetType;
@@ -74,7 +74,7 @@ final readonly class ADD extends MutableNativeMethod {
 									return sprintf(
 										"The value type %s for key '%s' is not a subtype of %s",
 										$vv, $subsetValue,
-										$mType instanceof OptionalKeyType ? $mType->valueType : $mType
+										$mType instanceof OptionalType ? $mType->valueType : $mType
 									);
 								}
 							}

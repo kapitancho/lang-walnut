@@ -30,7 +30,7 @@ final class ClearTest extends CodeExecutionTestHelper {
 
 	public function testRecordClear(): void {
 		$result = $this->executeCodeSnippet("mutable{[a: ?String, b: ?Integer, ...Integer], [a: 'hello', b: 2, c: 3]}->CLEAR;");
-		$this->assertEquals("mutable{[\n	a: OptionalKey<String>,\n	b: OptionalKey<Integer>,\n... Integer\n], [:]}", $result);
+		$this->assertEquals("mutable{[\n	a: Optional<String>,\n	b: Optional<Integer>,\n... Integer\n], [:]}", $result);
 	}
 
 	public function testRecordClearInvalidTargetType(): void {

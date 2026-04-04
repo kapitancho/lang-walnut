@@ -5,7 +5,7 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Mutable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MutableType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalKeyType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringSubsetType;
@@ -29,7 +29,7 @@ final readonly class REMOVE extends MutableNativeMethod {
 		if ($valueType instanceof RecordType) {
 			if (
 				!$valueType->restType instanceof NothingType ||
-				array_any($valueType->types, fn(Type $type) => $type instanceof OptionalKeyType)
+				array_any($valueType->types, fn(Type $type) => $type instanceof OptionalType)
 			) {
 				return null;
 			}
@@ -55,7 +55,7 @@ final readonly class REMOVE extends MutableNativeMethod {
 				foreach($parameterType->subsetValues as $subsetValue) {
 					$rt = $valueType->types[$subsetValue] ?? null;
 					if ($rt) {
-						if (!$rt instanceof OptionalKeyType) {
+						if (!$rt instanceof OptionalType) {
 							return sprintf(
 								"Cannot remove required record key '%s' of type %s",
 								$subsetValue, $rt
@@ -113,7 +113,7 @@ final readonly class REMOVE extends MutableNativeMethod {
 					foreach($parameterType->subsetValues as $subsetValue) {
 						$rt = $valueType->types[$subsetValue] ?? null;
 						if ($rt) {
-							if ($rt instanceof OptionalKeyType) {
+							if ($rt instanceof OptionalType) {
 								$returnTypes[] = $rt->valueType;
 							}
 						} else {

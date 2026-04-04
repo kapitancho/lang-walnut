@@ -38,7 +38,7 @@ use Walnut\Lang\Almond\AST\Implementation\Node\Type\NamedTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\NothingTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\NullTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\NumberIntervalNode;
-use Walnut\Lang\Almond\AST\Implementation\Node\Type\OptionalKeyTypeNode;
+use Walnut\Lang\Almond\AST\Implementation\Node\Type\OptionalTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\ProxyTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\RealFullTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\RealSubsetTypeNode;
@@ -171,8 +171,8 @@ final class TypeNodeBuilder implements TypeNodeBuilderInterface {
 		);
 	}
 
-	public function optionalKeyType(TypeNode $valueType): OptionalKeyTypeNode {
-		return new OptionalKeyTypeNode($this->getSourceLocation(),
+	public function optionalType(TypeNode $valueType): OptionalTypeNode {
+		return new OptionalTypeNode($this->getSourceLocation(),
 			$valueType
 		);
 	}

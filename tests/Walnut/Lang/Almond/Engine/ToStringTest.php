@@ -159,7 +159,7 @@ final class ToStringTest extends AlmondBaseTestHelper {
 			'(MyAtom&MyEnum)' => $tr->intersection([
 				$tr->userland->atom($i('MyAtom')), $tr->userland->enumeration($i('MyEnum'))
 			]),
-			'OptionalKey<Integer>' => $tr->optionalKey($tr->integer()),
+			'Optional<Integer>' => $tr->optional($tr->integer()),
 
 	        'Union' => $tr->metaType(MetaTypeValue::Union),
 	        //'MyAtom' => $tr->proxyType($i('MyAtom'))

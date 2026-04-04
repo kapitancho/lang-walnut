@@ -94,7 +94,7 @@ AllTypes = [
 
     any: Any,
     /* nothing: Nothing */
-    optionalKeyType: ?Any,
+    optionalType: ?Any,
 
     anyType: Type,
     anyReal: Type<Real>,
@@ -221,7 +221,7 @@ AllTypes = [
 
         any: -12,
         /* nothing: Nothing */
-        /* optionalKeyType: ?Any,*/
+        /* optionalType: ?Any,*/
 
         anyType: `String,
         anyReal: `Integer,

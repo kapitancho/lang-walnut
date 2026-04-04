@@ -50,7 +50,7 @@ final class RemoveTest extends CodeExecutionTestHelper {
 
 	public function testRecordRemoveRestPresent(): void {
 		$result = $this->executeCodeSnippet("v = mutable{[a: Integer, b: ?Integer, ...Integer], [a: 1, b: 2, c: 3]}; [v->REMOVE('c'), v];");
-		$this->assertEquals("[\n	3,\n	mutable{[\n		a: Integer,\n		b: OptionalKey<Integer>,\n	... Integer\n	], [a: 1, b: 2]}\n]", $result);
+		$this->assertEquals("[\n	3,\n	mutable{[\n		a: Integer,\n		b: Optional<Integer>,\n	... Integer\n	], [a: 1, b: 2]}\n]", $result);
 	}
 
 	public function testRecordRemoveOptionalMissing(): void {
@@ -60,7 +60,7 @@ final class RemoveTest extends CodeExecutionTestHelper {
 
 	public function testRecordRemoveOptionalPresent(): void {
 		$result = $this->executeCodeSnippet("v = mutable{[a: Integer, b: ?Integer, ...Integer], [a: 1, b: 2, c: 3]}; [v->REMOVE('b'), v];");
-		$this->assertEquals("[\n	2,\n	mutable{[\n		a: Integer,\n		b: OptionalKey<Integer>,\n	... Integer\n	], [a: 1, c: 3]}\n]", $result);
+		$this->assertEquals("[\n	2,\n	mutable{[\n		a: Integer,\n		b: Optional<Integer>,\n	... Integer\n	], [a: 1, c: 3]}\n]", $result);
 	}
 
 	// The record type has neither optional fields nor a rest type

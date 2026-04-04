@@ -27,7 +27,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NamedTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NothingTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NullTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NumberIntervalNode;
-use Walnut\Lang\Almond\AST\Blueprint\Node\Type\OptionalKeyTypeNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Type\OptionalTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\ProxyTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\RealFullTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\RealSubsetTypeNode;
@@ -72,7 +72,7 @@ interface TypeNodeBuilder {
 	public function shapeType(TypeNode $refType): ShapeTypeNode;
 	public function typeType(TypeNode $refType): TypeTypeNode;
 	public function proxyType(TypeNameNode $typeName): ProxyTypeNode;
-	public function optionalKeyType(TypeNode $valueType): OptionalKeyTypeNode;
+	public function optionalType(TypeNode $valueType): OptionalTypeNode;
 	public function functionType(TypeNode $parameterType, TypeNode $returnType): FunctionTypeNode;
 
 	public function numberInterval(

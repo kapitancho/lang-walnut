@@ -7,7 +7,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MetaType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MutableType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OpenType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalKeyType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SealedType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\MetaTypeValue;
@@ -16,13 +16,13 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\TypeNativeMethod;
 
-/** @extends TypeNativeMethod<OpenType|SealedType|DataType|MutableType|OptionalKeyType|MetaType, NullType, NullValue> */
+/** @extends TypeNativeMethod<OpenType|SealedType|DataType|MutableType|OptionalType|MetaType, NullType, NullValue> */
 final readonly class ValueType extends TypeNativeMethod {
 
 	protected function validateTargetRefType(Type $targetRefType): null|string {
 		if ($targetRefType instanceof OpenType || $targetRefType instanceof SealedType ||
 			$targetRefType instanceof DataType || $targetRefType instanceof MutableType ||
-			$targetRefType instanceof OptionalKeyType
+			$targetRefType instanceof OptionalType
 		) {
 			return null;
 		}
@@ -40,7 +40,7 @@ final readonly class ValueType extends TypeNativeMethod {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof OpenType || $refType instanceof SealedType ||
 				$refType instanceof DataType || $refType instanceof MutableType ||
-				$refType instanceof OptionalKeyType
+				$refType instanceof OptionalType
 			) {
 				return $this->typeRegistry->type($refType->valueType);
 			}
@@ -55,7 +55,7 @@ final readonly class ValueType extends TypeNativeMethod {
 				$typeValue instanceof OpenType ||
 				$typeValue instanceof SealedType ||
 				$typeValue instanceof MutableType ||
-				$typeValue instanceof OptionalKeyType
+				$typeValue instanceof OptionalType
 			) {
 				return $this->valueRegistry->type($typeValue->valueType);
 			}

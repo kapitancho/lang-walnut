@@ -43,11 +43,11 @@ MySealed := $String;
             }
         ],
         ^ => TestResult :: TestResult[
-            name: 'Type<OptionalKey>->valueType',
+            name: 'Type<Optional>->valueType',
             expected: `String<2>,
             actual: ^ :: {
-                fn = ^ t: Type<[a: OptionalKey<String>]> => Type<String> :: t->itemTypes.a->valueType;
-                fn(`[a: OptionalKey<String<2>>])
+                fn = ^ t: Type<[a: Optional<String>]> => Type<String> :: t->itemTypes.a->valueType;
+                fn(`[a: Optional<String<2>>])
             }
         ],
 

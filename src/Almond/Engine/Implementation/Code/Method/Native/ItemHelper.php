@@ -12,7 +12,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntersectionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MetaType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OpenType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalKeyType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
@@ -147,7 +147,7 @@ final readonly class ItemHelper {
 		if ($parameterType instanceof StringType) {
 			$returnType = $mapType->itemType;
 			if ($targetType instanceof RecordType && $parameterType instanceof StringSubsetType) {
-				$tConv = fn(Type $fType): Type => $fType instanceof OptionalKeyType ?
+				$tConv = fn(Type $fType): Type => $fType instanceof OptionalType ?
 					$this->typeRegistry->result($fType->valueType, $mapItemNotFound) :
 					$fType;
 				$returnType = $this->typeRegistry->union(

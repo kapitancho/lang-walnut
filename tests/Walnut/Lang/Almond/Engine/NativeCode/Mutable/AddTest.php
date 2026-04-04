@@ -60,22 +60,22 @@ final class AddTest extends CodeExecutionTestHelper {
 
 	public function testRecordAddOptionalNew(): void {
 		$result = $this->executeCodeSnippet("mutable{[a: Real, b: ?Integer, ...String], [a: 1, c: 'hello']}->ADD[key: 'b', value: 22];");
-		$this->assertEquals("mutable{[\n	a: Real,\n	b: OptionalKey<Integer>,\n... String\n], [a: 1, c: 'hello', b: 22]}", $result);
+		$this->assertEquals("mutable{[\n	a: Real,\n	b: Optional<Integer>,\n... String\n], [a: 1, c: 'hello', b: 22]}", $result);
 	}
 
 	public function testRecordAddExistingField(): void {
 		$result = $this->executeCodeSnippet("mutable{[a: Real, b: ?Integer, ...String], [a: 1, b: 2, c: 'hello']}->ADD[key: 'a', value: 3.14];");
-		$this->assertEquals("mutable{[\n	a: Real,\n	b: OptionalKey<Integer>,\n... String\n], [a: 3.14, b: 2, c: 'hello']}", $result);
+		$this->assertEquals("mutable{[\n	a: Real,\n	b: Optional<Integer>,\n... String\n], [a: 3.14, b: 2, c: 'hello']}", $result);
 	}
 
 	public function testRecordAddExistingOptional(): void {
 		$result = $this->executeCodeSnippet("mutable{[a: Real, b: ?Integer, ...String], [a: 1, b: 2, c: 'hello']}->ADD[key: 'b', value: 22];");
-		$this->assertEquals("mutable{[\n	a: Real,\n	b: OptionalKey<Integer>,\n... String\n], [a: 1, b: 22, c: 'hello']}", $result);
+		$this->assertEquals("mutable{[\n	a: Real,\n	b: Optional<Integer>,\n... String\n], [a: 1, b: 22, c: 'hello']}", $result);
 	}
 
 	public function testRecordAddExistingRest(): void {
 		$result = $this->executeCodeSnippet("mutable{[a: Real, b: ?Integer, ...String], [a: 1, b: 2, c: 'hello']}->ADD[key: 'c', value: 'world'];");
-		$this->assertEquals("mutable{[\n	a: Real,\n	b: OptionalKey<Integer>,\n... String\n], [a: 1, b: 2, c: 'world']}", $result);
+		$this->assertEquals("mutable{[\n	a: Real,\n	b: Optional<Integer>,\n... String\n], [a: 1, b: 2, c: 'world']}", $result);
 	}
 
 	public function testRecordAddInvalidParameterType(): void {
@@ -107,7 +107,7 @@ final class AddTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("r('b');",
 			valueDeclarations: "r = ^s: String => Mutable<[a: Real, b: ?Integer, ...Integer]> :: mutable{[a: Real, b: ?Integer, ...Integer], [a: 1, b: 2, c: 3]}->ADD[key: s, value: 42];"
 		);
-		$this->assertEquals("mutable{[\n	a: Real,\n	b: OptionalKey<Integer>,\n... Integer\n], [a: 1, b: 42, c: 3]}", $result);
+		$this->assertEquals("mutable{[\n	a: Real,\n	b: Optional<Integer>,\n... Integer\n], [a: 1, b: 42, c: 3]}", $result);
 	}
 
 	public function testRecordAddMapTypeInvalidValueType(): void {
@@ -118,7 +118,7 @@ final class AddTest extends CodeExecutionTestHelper {
 	}
 
 	public function testRecordAddMapTypeInvalidRestRelation(): void {
-		$this->executeErrorCodeSnippet("The rest type Integer is not a subtype of the type OptionalKey<String> for key 'b'",
+		$this->executeErrorCodeSnippet("The rest type Integer is not a subtype of the type Optional<String> for key 'b'",
 			"r('b');",
 			valueDeclarations: "r = ^s: String => Mutable<[a: Real, b: ?String, ...Integer]> :: mutable{[a: Real, b: ?String, ...Integer], [a: 1, b: 'hello', c: 3]}->ADD[key: s, value: 20];"
 		);

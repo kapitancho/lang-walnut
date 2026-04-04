@@ -24,9 +24,9 @@ final class WithTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet(
 			"recWith[[a: 'a', b: 'b', c: 'c', x: 3.14], [b: 2.17, e: 'e', y: false]];",
 			"
-			TypeA = [a: String, b: String, c: String, d: OptionalKey<Integer>, e: OptionalKey<Integer>, f: OptionalKey<Integer>, ... Real];
-			TypeB = [b: Real, c: OptionalKey<Real>, e: String, f: OptionalKey<String>, ... Boolean];
-			TypeC = [a: String|Boolean, b: Real, c: String|Real, d: OptionalKey<Integer|Boolean>, e: String, f: OptionalKey<Integer|String>, ... Real|Boolean];
+			TypeA = [a: String, b: String, c: String, d: Optional<Integer>, e: Optional<Integer>, f: Optional<Integer>, ... Real];
+			TypeB = [b: Real, c: Optional<Real>, e: String, f: Optional<String>, ... Boolean];
+			TypeC = [a: String|Boolean, b: Real, c: String|Real, d: Optional<Integer|Boolean>, e: String, f: Optional<Integer|String>, ... Real|Boolean];
 			", "recWith = ^[TypeA, TypeB] => TypeC :: #.0->with(#.1);");
 		$this->assertEquals(
 			str_replace(' ', '', "[a: 'a', b: 2.17, c: 'c', x: 3.14, e: 'e', y: false]"),

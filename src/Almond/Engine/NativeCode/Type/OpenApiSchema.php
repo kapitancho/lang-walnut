@@ -11,7 +11,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MutableType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalKeyType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
@@ -148,13 +148,13 @@ final readonly class OpenApiSchema extends TypeNativeMethod {
 					'type' => $this->valueRegistry->string('object'),
 					'properties' => $this->valueRegistry->record(
 						array_map(
-							fn(Type $type) => $this->typeToOpenApiSchema($type instanceof OptionalKeyType ? $type->valueType : $type),
+							fn(Type $type) => $this->typeToOpenApiSchema($type instanceof OptionalType ? $type->valueType : $type),
 							$type->types
 						)
 					)
 				],
 				... (count($requiredFields = array_keys(
-					array_filter($type->types, static fn(Type $type): bool => !($type instanceof OptionalKeyType))
+					array_filter($type->types, static fn(Type $type): bool => !($type instanceof OptionalType))
 				)) > 0 ? ['required' => $this->valueRegistry->tuple(
 					array_map(
 						fn(string $requiredField): StringValue => $this->valueRegistry->string($requiredField),

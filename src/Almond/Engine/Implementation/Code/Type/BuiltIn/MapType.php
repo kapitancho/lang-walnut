@@ -109,7 +109,7 @@ final readonly class MapType implements MapTypeInterface, JsonSerializable {
 
 		$nonOptional = count(array_filter(
 			$ofType->types,
-			static fn(Type $type) => !($type instanceof OptionalKeyType)
+			static fn(Type $type) => !($type instanceof OptionalType)
 		));
 		if ($this->range->minLength < $nonOptional) {
 			return false;

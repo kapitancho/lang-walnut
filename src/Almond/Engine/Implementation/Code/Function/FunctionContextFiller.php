@@ -7,7 +7,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\NameAndType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\DataType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OpenType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalKeyType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SealedType;
@@ -40,7 +40,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 		ValidationContext $validationContext,
 		NameAndType $target, NameAndType $parameter, NameAndType $dependency,
 	): ValidationContext {
-		$tConv = fn(Type $type): Type => $type instanceof OptionalKeyType ?
+		$tConv = fn(Type $type): Type => $type instanceof OptionalType ?
 			$this->typeRegistry->result($type->valueType, $this->typeRegistry->core->mapItemNotFound) :
 			$type;
 

@@ -17,8 +17,8 @@ final readonly class DUMP extends NativeMethod {
 	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
 		if ($parameterType instanceof RecordType) {
 			$expectedParamType = $this->typeRegistry->record([
-				'html' => $this->typeRegistry->optionalKey($this->typeRegistry->boolean),
-				'newLine' => $this->typeRegistry->optionalKey($this->typeRegistry->boolean),
+				'html' => $this->typeRegistry->optional($this->typeRegistry->boolean),
+				'newLine' => $this->typeRegistry->optional($this->typeRegistry->boolean),
 			], null);
 			return $parameterType->isSubtypeOf($expectedParamType) ?
 				null : sprintf(

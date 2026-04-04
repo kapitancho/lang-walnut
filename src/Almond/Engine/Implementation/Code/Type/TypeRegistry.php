@@ -46,7 +46,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\MetaType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\MutableType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\NothingType;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\OptionalKeyType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\ProxyNamedType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\RealSubsetType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\RealType;
@@ -107,8 +107,8 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 		return new MutableType($valueType);
 	}
 
-	public function optionalKey(Type $valueType): OptionalKeyType {
-		return new OptionalKeyType($valueType);
+	public function optional(Type $valueType): OptionalType {
+		return new OptionalType($valueType);
 	}
 
 	public function shape(Type $refType): ShapeType {

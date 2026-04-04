@@ -42,8 +42,8 @@ final class MapTypeTest extends AlmondBaseTestHelper {
 			4 => $this->typeRegistry->record(['a' => $this->typeRegistry->real(), 'b' => $this->typeRegistry->integer(), 'c' => $this->typeRegistry->real(2)], $this->typeRegistry->string()),
 			5 => $this->typeRegistry->record(['a' => $this->typeRegistry->string(), 'b' => $this->typeRegistry->integer(), 'c' => $this->typeRegistry->real(2)], null),
 			6 => $this->typeRegistry->record(['a' => $this->typeRegistry->string(), 'b' => $this->typeRegistry->integer(), 'c' => $this->typeRegistry->real(2)], $this->typeRegistry->integer(0)),
-			7 => $this->typeRegistry->record(['a' => $this->typeRegistry->real(), 'b' => $this->typeRegistry->integer(), 'c' => $this->typeRegistry->optionalKey($this->typeRegistry->real(2))], null),
-			8 => $this->typeRegistry->record(['a' => $this->typeRegistry->real(), 'b' => $this->typeRegistry->integer(), 'c' => $this->typeRegistry->optionalKey($this->typeRegistry->real(2))], $this->typeRegistry->integer(0)),
+			7 => $this->typeRegistry->record(['a' => $this->typeRegistry->real(), 'b' => $this->typeRegistry->integer(), 'c' => $this->typeRegistry->optional($this->typeRegistry->real(2))], null),
+			8 => $this->typeRegistry->record(['a' => $this->typeRegistry->real(), 'b' => $this->typeRegistry->integer(), 'c' => $this->typeRegistry->optional($this->typeRegistry->real(2))], $this->typeRegistry->integer(0)),
 		];
 
 		$matrix = [

@@ -27,7 +27,7 @@ final class ItemTest extends CodeExecutionTestHelper {
 		$this->assertEquals("2", $result);
 	}
 
-	public function testItemOptionalKey(): void {
+	public function testItemOptional(): void {
 		$result = $this->executeCodeSnippet(
 			"getItem[a: 'hello', b: 2];",
 			valueDeclarations: "getItem = ^m: [a: String, b: ?Real] => Result<Real, MapItemNotFound> :: m->item('b');"
@@ -35,7 +35,7 @@ final class ItemTest extends CodeExecutionTestHelper {
 		$this->assertEquals("2", $result);
 	}
 
-	public function testItemOptionalKeyMissing(): void {
+	public function testItemOptionalMissing(): void {
 		$result = $this->executeCodeSnippet(
 			"getItem[a: 'hello'];",
 			valueDeclarations: "getItem = ^m: [a: String, b: ?Real] => Result<Real, MapItemNotFound> :: m->item('b');"

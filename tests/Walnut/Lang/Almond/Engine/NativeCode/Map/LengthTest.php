@@ -32,7 +32,7 @@ final class LengthTest extends CodeExecutionTestHelper {
 		$this->assertEquals("3", $result);
 	}
 
-	public function testLengthOfRecordWithOptionalKeyType(): void {
+	public function testLengthOfRecordWithOptionalType(): void {
 		$result = $this->executeCodeSnippet(
 			"g[a: 1];",
 			valueDeclarations: "g = ^p: [a: Integer, b: ?Real, ...String] => Integer<1..> :: p->length;"

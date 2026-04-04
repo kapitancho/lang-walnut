@@ -3,10 +3,10 @@
 namespace Walnut\Lang\Almond\AST\Implementation\Node\Type;
 
 use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation;
-use Walnut\Lang\Almond\AST\Blueprint\Node\Type\OptionalKeyTypeNode as OptionalKeyTypeNodeInterface;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Type\OptionalTypeNode as OptionalTypeNodeInterface;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\TypeNode;
 
-final readonly class OptionalKeyTypeNode implements OptionalKeyTypeNodeInterface {
+final readonly class OptionalTypeNode implements OptionalTypeNodeInterface {
 	public function __construct(
 		public SourceLocation $sourceLocation,
 		public TypeNode $valueType
@@ -20,7 +20,7 @@ final readonly class OptionalKeyTypeNode implements OptionalKeyTypeNodeInterface
 		return [
 			'sourceLocation' => $this->sourceLocation,
 			'nodeCategory' => 'Type',
-			'nodeName' => 'OptionalKeyType',
+			'nodeName' => 'OptionalType',
 			'valueType' => $this->valueType
 		];
 	}

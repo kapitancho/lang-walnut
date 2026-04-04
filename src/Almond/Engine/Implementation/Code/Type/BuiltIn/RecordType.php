@@ -6,7 +6,7 @@ use JsonSerializable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType as MapTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalKeyType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType as RecordTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\SupertypeChecker;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -41,7 +41,7 @@ final class RecordType implements RecordTypeInterface, JsonSerializable {
 				$usedKeys[$key] = true;
 				$itemRequest = $request->withAddedPathSegment(".$key");
 
-				$isOptional = $refType instanceof OptionalKeyType;
+				$isOptional = $refType instanceof OptionalType;
 				$item = $value->valueOf($key);
 				if ($isOptional && $item instanceof UnknownPropertyInterface) {
 					continue;
@@ -106,9 +106,9 @@ final class RecordType implements RecordTypeInterface, JsonSerializable {
 
 	private function asMapType(): MapTypeInterface {
 		$l = count($this->types);
-		$min = count(array_filter($this->types, static fn($type) => !($type instanceof OptionalKeyType)));
+		$min = count(array_filter($this->types, static fn($type) => !($type instanceof OptionalType)));
 		$types = array_map(
-			static fn(Type $type): Type => $type instanceof OptionalKeyType ? $type->valueType : $type,
+			static fn(Type $type): Type => $type instanceof OptionalType ? $type->valueType : $type,
 			$this->types
 		);
 		return $this->typeRegistry->map(
@@ -147,7 +147,7 @@ final class RecordType implements RecordTypeInterface, JsonSerializable {
 			$usedKeys[$key] = true;
 		}
 		return array_all($ofTypes, fn($type, $key) =>
-			$type instanceof OptionalKeyType ||
+			$type instanceof OptionalType ||
 			isset($usedKeys[$key]) ||
 			(isset($this->types[$key]) && !$this->types[$key]->isSubtypeOf($type))
 		);
@@ -165,12 +165,12 @@ final class RecordType implements RecordTypeInterface, JsonSerializable {
 			return false;
 		}
 		foreach($this->types as $type) {
-			$t = $type instanceof OptionalKeyType ? $type->valueType : $type;
+			$t = $type instanceof OptionalType ? $type->valueType : $type;
 			if (!$t->isSubtypeOf($itemType)) {
 				return false;
 			}
 		}
-		$min = count(array_filter($this->types, static fn($type) => !($type instanceof OptionalKeyType)));
+		$min = count(array_filter($this->types, static fn($type) => !($type instanceof OptionalType)));
 		$cnt = count($this->types);
 		if ($min < $ofType->range->minLength) {
 			return false;

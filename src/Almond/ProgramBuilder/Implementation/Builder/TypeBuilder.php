@@ -24,7 +24,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NamedTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NothingTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NullTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NumberIntervalNode;
-use Walnut\Lang\Almond\AST\Blueprint\Node\Type\OptionalKeyTypeNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Type\OptionalTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\ProxyTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\RealFullTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\RealSubsetTypeNode;
@@ -131,7 +131,7 @@ final readonly class TypeBuilder implements TypeCompilerInterface {
 				$typeNode instanceof ImpureTypeNode => $this->typeRegistry->impure(
 					$this->type($typeNode->valueType)
 				),
-				$typeNode instanceof OptionalKeyTypeNode => $this->typeRegistry->optionalKey(
+				$typeNode instanceof OptionalTypeNode => $this->typeRegistry->optional(
 					$this->type($typeNode->valueType)
 				),
 				$typeNode instanceof ValueTypeNode => $this->typeRegistry->value(

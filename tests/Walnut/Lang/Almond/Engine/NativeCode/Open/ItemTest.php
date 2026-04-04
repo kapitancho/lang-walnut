@@ -59,12 +59,12 @@ final class ItemTest extends CodeExecutionTestHelper {
 		$this->assertEquals("5", $result);
 	}
 
-	public function testRecordOptionalKeyItemInRange(): void {
+	public function testRecordOptionalItemInRange(): void {
 		$result = $this->executeCodeSnippet("{MyRecord[a: 3, b: 5]}->item('b');", "MyRecord := #[a: Integer, b: ?Real];");
 		$this->assertEquals("5", $result);
 	}
 
-	public function testRecordOptionalKeyItemMissing(): void {
+	public function testRecordOptionalItemMissing(): void {
 		$result = $this->executeCodeSnippet("{MyRecord[a: 3]}->item('b');", "MyRecord := #[a: Integer, b: ?Real];");
 		$this->assertEquals("@MapItemNotFound![key: 'b']", $result);
 	}

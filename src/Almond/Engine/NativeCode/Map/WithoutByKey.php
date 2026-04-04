@@ -3,7 +3,7 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalKeyType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
@@ -43,12 +43,12 @@ final readonly class WithoutByKey extends MapNativeMethod {
 					$elementTypes = [];
 					foreach ($parameterType->subsetValues as $subsetValue) {
 						if (array_key_exists($subsetValue, $recordTypes)) {
-							if ($recordTypes[$subsetValue] instanceof OptionalKeyType) {
+							if ($recordTypes[$subsetValue] instanceof OptionalType) {
 								$elementTypes[] = $recordTypes[$subsetValue]->valueType;
 								$canBeMissing = true;
 							} else {
 								$elementTypes[] = $recordTypes[$subsetValue];
-								$recordTypes[$subsetValue] = $r->optionalKey(
+								$recordTypes[$subsetValue] = $r->optional(
 									$recordTypes[$subsetValue]
 								);
 							}
@@ -61,9 +61,9 @@ final readonly class WithoutByKey extends MapNativeMethod {
 						'element' => $r->union($elementTypes),
 						'map' => $r->record(
 							array_map(
-								fn(Type $type): OptionalKeyType => $type instanceof OptionalKeyType ?
+								fn(Type $type): OptionalType => $type instanceof OptionalType ?
 									$type :
-									$r->optionalKey($type),
+									$r->optional($type),
 								$targetType->types
 							),
 							$targetType->restType

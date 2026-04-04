@@ -71,7 +71,7 @@ use Walnut\Lang\Almond\AST\Implementation\Node\Type\NamedTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\NothingTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\NullTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\NumberIntervalEndpointNode;
-use Walnut\Lang\Almond\AST\Implementation\Node\Type\OptionalKeyTypeNode;
+use Walnut\Lang\Almond\AST\Implementation\Node\Type\OptionalTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\ProxyTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\RealFullTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\RealSubsetTypeNode;
@@ -1492,20 +1492,20 @@ class ParserTest extends TestCase {
 		yield ['[a: Null, b: Any]', RecordTypeNode::class, fn($t) => count($t->types) === 2 && $t->types['a'] instanceof NullTypeNode && $t->types['b'] instanceof AnyTypeNode && $t->restType instanceOf NothingTypeNode];
 		yield ['[a: Null, b: Any, ...]', RecordTypeNode::class, fn($t) => count($t->types) === 2 && $t->types['a'] instanceof NullTypeNode && $t->types['b'] instanceof AnyTypeNode && $t->restType instanceOf AnyTypeNode];
 		yield ['[a: Null, b: Any, ... Boolean]', RecordTypeNode::class, fn($t) => count($t->types) === 2 && $t->types['a'] instanceof NullTypeNode && $t->types['b'] instanceof AnyTypeNode && $t->restType instanceOf BooleanTypeNode];
-		yield ['[a: Null, b: Any, c: ?Null, d: OptionalKey<Null>, e: OptionalKey, ... Boolean]', RecordTypeNode::class, fn($t) => count($t->types) === 5 &&
+		yield ['[a: Null, b: Any, c: ?Null, d: Optional<Null>, e: Optional, ... Boolean]', RecordTypeNode::class, fn($t) => count($t->types) === 5 &&
 			$t->types['a'] instanceof NullTypeNode &&
 			$t->types['b'] instanceof AnyTypeNode &&
-			$t->types['c'] instanceof OptionalKeyTypeNode && $t->types['c']->valueType instanceof NullTypeNode &&
-			$t->types['d'] instanceof OptionalKeyTypeNode && $t->types['d']->valueType instanceof NullTypeNode &&
-			$t->types['e'] instanceof OptionalKeyTypeNode && $t->types['e']->valueType instanceof AnyTypeNode &&
+			$t->types['c'] instanceof OptionalTypeNode && $t->types['c']->valueType instanceof NullTypeNode &&
+			$t->types['d'] instanceof OptionalTypeNode && $t->types['d']->valueType instanceof NullTypeNode &&
+			$t->types['e'] instanceof OptionalTypeNode && $t->types['e']->valueType instanceof AnyTypeNode &&
 			$t->restType instanceOf BooleanTypeNode];
 		yield ["['a': Null, 'b': Any, ... Boolean]", RecordTypeNode::class, fn($t) => count($t->types) === 2 && $t->types['a'] instanceof NullTypeNode && $t->types['b'] instanceof AnyTypeNode && $t->restType instanceOf BooleanTypeNode];
 
-		yield ["Type<?String>", TypeTypeNode::class, fn(TypeTypeNode $t) => $t->refType instanceof OptionalKeyTypeNode && $t->refType->valueType instanceof StringTypeNode];
-		yield ["Type<?String<4>>", TypeTypeNode::class, fn(TypeTypeNode $t) => $t->refType instanceof OptionalKeyTypeNode && $t->refType->valueType instanceof StringTypeNode];
-		yield ["Type<OptionalKey>", TypeTypeNode::class, fn(TypeTypeNode $t) => $t->refType instanceof OptionalKeyTypeNode && $t->refType->valueType instanceof AnyTypeNode];
-		yield ["Type<OptionalKey<String>>", TypeTypeNode::class, fn(TypeTypeNode $t) => $t->refType instanceof OptionalKeyTypeNode && $t->refType->valueType instanceof StringTypeNode];
-		yield ["Type<OptionalKey< String<5> >>", TypeTypeNode::class, fn(TypeTypeNode $t) => $t->refType instanceof OptionalKeyTypeNode && $t->refType->valueType instanceof StringTypeNode];
+		yield ["Type<?String>", TypeTypeNode::class, fn(TypeTypeNode $t) => $t->refType instanceof OptionalTypeNode && $t->refType->valueType instanceof StringTypeNode];
+		yield ["Type<?String<4>>", TypeTypeNode::class, fn(TypeTypeNode $t) => $t->refType instanceof OptionalTypeNode && $t->refType->valueType instanceof StringTypeNode];
+		yield ["Type<Optional>", TypeTypeNode::class, fn(TypeTypeNode $t) => $t->refType instanceof OptionalTypeNode && $t->refType->valueType instanceof AnyTypeNode];
+		yield ["Type<Optional<String>>", TypeTypeNode::class, fn(TypeTypeNode $t) => $t->refType instanceof OptionalTypeNode && $t->refType->valueType instanceof StringTypeNode];
+		yield ["Type<Optional< String<5> >>", TypeTypeNode::class, fn(TypeTypeNode $t) => $t->refType instanceof OptionalTypeNode && $t->refType->valueType instanceof StringTypeNode];
 
 		yield ['MyEnum[Value1]', EnumerationSubsetTypeNode::class, fn($v) => $v->name->equals(new TypeNameNode($l, 'MyEnum')) && count($v->values) === 1 &&
 			$v->values[0]->equals(new EnumerationValueNameNode($l, 'Value1'))];
@@ -1552,8 +1552,8 @@ class ParserTest extends TestCase {
 		];
 
 		//yield ["['a': Null, 'b': Any, ... Boolean]", RecordTypeNode::class, fn($t) => count($t->types) === 2 && $t->types['a'] instanceof NullTypeNode && $t->types[1] instanceof AnyTypeNode && $t->restType instanceOf BooleanTypeNode];
-		//yield ['OptionalKey', OptionalKeyTypeNode::class, fn($t) => $t->valueType instanceOf AnyTypeNode];
-		//yield ['OptionalKey<Boolean>', OptionalKeyTypeNode::class, fn($t) => $t->valueType instanceOf BooleanTypeNode];
+		//yield ['Optional', OptionalTypeNode::class, fn($t) => $t->valueType instanceOf AnyTypeNode];
+		//yield ['Optional<Boolean>', OptionalTypeNode::class, fn($t) => $t->valueType instanceOf BooleanTypeNode];
 	}
 
 	#[DataProvider('constants')]
@@ -1598,16 +1598,16 @@ class ParserTest extends TestCase {
 		yield ['`Atom', TypeValueNode::class, fn($v) => $v->type instanceof MetaTypeTypeNode && $v->type->value === MetaTypeValue::Atom->name];
 		yield ['`[Any]', TypeValueNode::class, fn($v) => $v->type instanceof TupleTypeNode && count($v->type->types) === 1 && $v->type->types[0] instanceof AnyTypeNode];
 
-		yield ["`?String", TypeValueNode::class, fn($v) => $v->type instanceof OptionalKeyTypeNode && $v->type->valueType instanceof StringTypeNode];
-		yield ["`?String<4>", TypeValueNode::class, fn($v) => $v->type instanceof OptionalKeyTypeNode && $v->type->valueType instanceof StringTypeNode];
-		yield ["`OptionalKey", TypeValueNode::class, fn($v) => $v->type instanceof OptionalKeyTypeNode && $v->type->valueType instanceof AnyTypeNode];
-		yield ["`OptionalKey<String>", TypeValueNode::class, fn($v) => $v->type instanceof OptionalKeyTypeNode && $v->type->valueType instanceof StringTypeNode];
-		yield ["`OptionalKey<String<4>>", TypeValueNode::class, fn($v) => $v->type instanceof OptionalKeyTypeNode && $v->type->valueType instanceof StringTypeNode];
-		yield ["type{?String}", TypeValueNode::class, fn($v) => $v->type instanceof OptionalKeyTypeNode && $v->type->valueType instanceof StringTypeNode];
-		yield ["type{?String<4>}", TypeValueNode::class, fn($v) => $v->type instanceof OptionalKeyTypeNode && $v->type->valueType instanceof StringTypeNode];
-		yield ["type{OptionalKey}", TypeValueNode::class, fn($v) => $v->type instanceof OptionalKeyTypeNode && $v->type->valueType instanceof AnyTypeNode];
-		yield ["type{OptionalKey<String>}", TypeValueNode::class, fn($v) => $v->type instanceof OptionalKeyTypeNode && $v->type->valueType instanceof StringTypeNode];
-		yield ["type{OptionalKey<String<4>>}", TypeValueNode::class, fn($v) => $v->type instanceof OptionalKeyTypeNode && $v->type->valueType instanceof StringTypeNode];
+		yield ["`?String", TypeValueNode::class, fn($v) => $v->type instanceof OptionalTypeNode && $v->type->valueType instanceof StringTypeNode];
+		yield ["`?String<4>", TypeValueNode::class, fn($v) => $v->type instanceof OptionalTypeNode && $v->type->valueType instanceof StringTypeNode];
+		yield ["`Optional", TypeValueNode::class, fn($v) => $v->type instanceof OptionalTypeNode && $v->type->valueType instanceof AnyTypeNode];
+		yield ["`Optional<String>", TypeValueNode::class, fn($v) => $v->type instanceof OptionalTypeNode && $v->type->valueType instanceof StringTypeNode];
+		yield ["`Optional<String<4>>", TypeValueNode::class, fn($v) => $v->type instanceof OptionalTypeNode && $v->type->valueType instanceof StringTypeNode];
+		yield ["type{?String}", TypeValueNode::class, fn($v) => $v->type instanceof OptionalTypeNode && $v->type->valueType instanceof StringTypeNode];
+		yield ["type{?String<4>}", TypeValueNode::class, fn($v) => $v->type instanceof OptionalTypeNode && $v->type->valueType instanceof StringTypeNode];
+		yield ["type{Optional}", TypeValueNode::class, fn($v) => $v->type instanceof OptionalTypeNode && $v->type->valueType instanceof AnyTypeNode];
+		yield ["type{Optional<String>}", TypeValueNode::class, fn($v) => $v->type instanceof OptionalTypeNode && $v->type->valueType instanceof StringTypeNode];
+		yield ["type{Optional<String<4>>}", TypeValueNode::class, fn($v) => $v->type instanceof OptionalTypeNode && $v->type->valueType instanceof StringTypeNode];
 
 		yield ['MyAtom', AtomValueNode::class, fn($v) => $v->name->equals(new TypeNameNode($l, 'MyAtom'))];
 		yield ['MyEnum.Value', EnumerationValueNode::class, fn($v) => $v->name->equals(new TypeNameNode($l, 'MyEnum')) && $v->enumValue->equals(new EnumerationValueNameNode($l, 'Value'))];

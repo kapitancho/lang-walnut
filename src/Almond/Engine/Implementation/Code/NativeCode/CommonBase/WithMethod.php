@@ -7,7 +7,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\DataType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OpenType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalKeyType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -21,7 +21,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\OptionalKeyType as OptionalKeyTypeImpl;
 
 /** @extends NativeMethod<Type, Type, Value, Value> */
 abstract readonly class WithMethod extends NativeMethod {
@@ -186,21 +185,21 @@ abstract readonly class WithMethod extends NativeMethod {
 		$recTypes = [];
 		foreach ($targetType->types as $tKey => $tType) {
 			$pType = $parameterType->types[$tKey] ?? null;
-			if ($tType instanceof OptionalKeyType) {
-				$recTypes[$tKey] = $pType instanceof OptionalKeyType ?
-					new OptionalKeyTypeImpl(
+			if ($tType instanceof OptionalType) {
+				$recTypes[$tKey] = $pType instanceof OptionalType ?
+					$this->typeRegistry->optional(
 						$this->typeRegistry->union([
 							$tType->valueType,
 							$pType->valueType
 						])
-					) : $pType ?? new OptionalKeyTypeImpl(
+					) : $pType ?? $this->typeRegistry->optional(
 						$this->typeRegistry->union([
 							$tType->valueType,
 							$parameterType->restType
 						])
 					);
 			} else {
-				$recTypes[$tKey] = $pType instanceof OptionalKeyType ?
+				$recTypes[$tKey] = $pType instanceof OptionalType ?
 					$this->typeRegistry->union([
 						$tType,
 						$pType->valueType

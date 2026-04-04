@@ -4,7 +4,7 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalKeyType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -22,10 +22,10 @@ final readonly class Filter extends MapFilterBase {
 			if ($targetType instanceof RecordType) {
 				$recordReturnType = $this->typeRegistry->record(
 					array_map(
-						fn(Type $type): OptionalKeyType =>
-						$type instanceof OptionalKeyType ?
+						fn(Type $type): OptionalType =>
+						$type instanceof OptionalType ?
 							$type :
-							$this->typeRegistry->optionalKey($type),
+							$this->typeRegistry->optional($type),
 						$targetType->types
 					),
 					$targetType->restType

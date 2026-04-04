@@ -198,10 +198,10 @@ class NativeCodeTypeMapperTest extends AlmondBaseTestHelper {
 		);
 	}
 
-	public function testOptionalKey(): void {
+	public function testOptional(): void {
 		$this->assertEquals(
 			['Any'],
-			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->optionalKey(
+			$this->nativeCodeTypeMapper->getTypesFor($this->typeRegistry->optional(
 				$this->typeRegistry->integer(),
 			))
 		);
