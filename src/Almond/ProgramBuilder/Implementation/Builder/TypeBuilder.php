@@ -9,6 +9,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Type\ArrayTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\BooleanTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\BytesTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\EnumerationSubsetTypeNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Type\ErrorTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\FalseTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\FunctionTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\ImpureTypeNode;
@@ -131,6 +132,9 @@ final readonly class TypeBuilder implements TypeCompilerInterface {
 				),
 				$typeNode instanceof OptionalKeyTypeNode => $this->typeRegistry->optionalKey(
 					$this->type($typeNode->valueType)
+				),
+				$typeNode instanceof ErrorTypeNode => $this->typeRegistry->error(
+					$this->type($typeNode->errorType)
 				),
 				$typeNode instanceof ResultTypeNode => $this->typeRegistry->result(
 					$this->type($typeNode->returnType),

@@ -168,8 +168,7 @@ final class UnionTypeNormalizerTest extends AlmondBaseTestHelper {
 			$this->typeRegistry->integer(1, 15),
 		));
 		self::assertEquals("Result<Integer<1..15>, Integer<5..10>>", (string)$this->union(
-			$this->typeRegistry->result(
-                $this->typeRegistry->nothing,
+			$this->typeRegistry->error(
 				$this->typeRegistry->integer(5, 10)
 			),
 			$this->typeRegistry->integer(1, 15),

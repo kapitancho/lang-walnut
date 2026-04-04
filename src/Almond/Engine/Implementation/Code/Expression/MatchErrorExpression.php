@@ -52,8 +52,7 @@ final readonly class MatchErrorExpression implements Expression, JsonSerializabl
 
 				$innerContext = $innerContext->withAddedVariableType(
 					$this->target->variableName,
-					$this->typeRegistry->result(
-						$this->typeRegistry->nothing,
+					$this->typeRegistry->error(
 						$errorType
 					),
 				);

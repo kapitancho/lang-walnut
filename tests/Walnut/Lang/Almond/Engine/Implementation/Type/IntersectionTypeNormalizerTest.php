@@ -210,8 +210,7 @@ final class IntersectionTypeNormalizerTest extends AlmondBaseTestHelper {
 			$this->typeRegistry->integer(1, 15),
 		));
 		self::assertEquals("Nothing", (string)$this->intersection(
-			$this->typeRegistry->result(
-                $this->typeRegistry->nothing,
+			$this->typeRegistry->error(
 				$this->typeRegistry->integer(5, 10)
 			),
 			$this->typeRegistry->integer(1, 15),

@@ -34,8 +34,7 @@ final readonly class Fire extends NativeMethod {
 						if ($parameter->type->isSubtypeOf($listener->type->parameterType)) {
 							$result = $listener->execute($parameter);
 							if ($result->type->isSubtypeOf(
-								$this->typeRegistry->result(
-									$this->typeRegistry->nothing,
+								$this->typeRegistry->error(
 									$this->typeRegistry->core->externalError
 								)
 							)) {

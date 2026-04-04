@@ -33,8 +33,7 @@ final readonly class Construct extends NativeMethod {
 			$cType = $this->valueRegistry->core->constructor->type;
 			$refType = $parameterType->refType;
 			if ($refType instanceof ResultType && $refType->returnType instanceof NothingType) {
-				return $this->typeRegistry->result(
-					$this->typeRegistry->nothing,
+				return $this->typeRegistry->error(
 					$targetType
 				);
 			}

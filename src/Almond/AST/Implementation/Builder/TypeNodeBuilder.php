@@ -23,6 +23,7 @@ use Walnut\Lang\Almond\AST\Implementation\Node\Type\ArrayTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\BooleanTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\BytesTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\EnumerationSubsetTypeNode;
+use Walnut\Lang\Almond\AST\Implementation\Node\Type\ErrorTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\FalseTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\FunctionTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\ImpureTypeNode;
@@ -101,6 +102,10 @@ final class TypeNodeBuilder implements TypeNodeBuilderInterface {
 
 	public function namedType(TypeNameNode $name): NamedTypeNode {
 		return new NamedTypeNode($this->getSourceLocation(), $name);
+	}
+
+	public function errorType(TypeNode $errorType): ErrorTypeNode {
+		return new ErrorTypeNode($this->getSourceLocation(), $errorType);
 	}
 
 	public function resultType(TypeNode $returnType, TypeNode $errorType): ResultTypeNode {

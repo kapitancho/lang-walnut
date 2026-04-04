@@ -12,6 +12,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Type\ArrayTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\BooleanTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\BytesTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\EnumerationSubsetTypeNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Type\ErrorTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\FalseTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\FunctionTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\ImpureTypeNode;
@@ -59,6 +60,7 @@ interface TypeNodeBuilder {
 	/** @param list<EnumerationValueNameNode> $values */
 	public function enumerationSubsetType(TypeNameNode $name, array $values): EnumerationSubsetTypeNode;
 	public function namedType(TypeNameNode $name): NamedTypeNode;
+	public function errorType(TypeNode $errorType): ErrorTypeNode;
 	public function resultType(TypeNode $returnType, TypeNode $errorType): ResultTypeNode;
 	public function impureType(TypeNode $valueType): ImpureTypeNode;
 	public function mutableType(TypeNode $valueType): MutableTypeNode;

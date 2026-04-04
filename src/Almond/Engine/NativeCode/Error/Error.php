@@ -1,6 +1,6 @@
 <?php
 
-namespace Walnut\Lang\Almond\Engine\NativeCode\Result;
+namespace Walnut\Lang\Almond\Engine\NativeCode\Error;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;

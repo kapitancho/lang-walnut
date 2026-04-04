@@ -3585,8 +3585,7 @@ final readonly class ParserStateMachine {
 			771 => ['name' => 'type error', 'transitions' => [
 				T::type_start->name => 772,
 				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->type->resultType(
-						$this->nodeBuilder->type->nothingType,
+					$this->s->generated = $this->nodeBuilder->type->errorType(
 						$this->nodeBuilder->type->anyType,
 					);
 					$this->s->pop();
@@ -3609,8 +3608,7 @@ final readonly class ParserStateMachine {
 			]],
 			775 => ['name' => 'type error return', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->type->resultType(
-						$this->nodeBuilder->type->nothingType,
+					$this->s->generated = $this->nodeBuilder->type->errorType(
 						$this->s->result['type'] ?? $this->nodeBuilder->type->anyType,
 					);
 					$this->s->pop();

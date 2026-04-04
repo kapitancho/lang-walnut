@@ -132,7 +132,7 @@ abstract readonly class NumericClamp extends NativeMethod {
 		try {
 			$interval = new NumberInterval($from, $to);
 		} catch (InvalidNumberInterval) {
-			return$this->typeRegistry->result($this->typeRegistry->nothing, $errorType);
+			return $this->typeRegistry->error($errorType);
 		}
 
 		$isInteger = $targetType instanceof IntegerType && $isIntRange;

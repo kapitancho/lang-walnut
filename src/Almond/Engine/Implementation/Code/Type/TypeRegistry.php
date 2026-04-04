@@ -7,6 +7,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AliasType as AliasTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType as AnyTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BooleanType as BooleanTypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ErrorType as ErrorTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FalseType as FalseTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType as IntegerTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType as NothingTypeInterface;
@@ -36,6 +37,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\AnyType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\BytesType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\ErrorType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\IntegerSubsetType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\IntegerType;
@@ -119,10 +121,17 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 		);
 	}
 
-	public function result(Type $returnType, Type $errorType): ResultType {
+	public function error(Type $errorType): ErrorTypeInterface {
+		return new ErrorType($this, $errorType);
+	}
+
+	public function result(Type $returnType, Type $errorType): ResultTypeInterface {
 		if ($returnType instanceof ResultTypeInterface) {
 			$errorType = $this->union([$errorType, $returnType->errorType]);
 			$returnType = $returnType->returnType;
+		}
+		if ($returnType instanceof NothingTypeInterface) {
+			return $this->error($errorType);
 		}
 		return new ResultType(
 			$returnType,
@@ -393,7 +402,7 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 			'Array' => $this->array(),
 			'Map' => $this->map(),
 			'Set' => $this->set(),
-			'Error' => $this->result($this->nothing, $this->any),
+			'Error' => $this->error($this->any),
 			'Impure' => $this->impure($this->any),
 			'Mutable' => $this->mutable($this->any),
 			'Type' => $this->type($this->any),

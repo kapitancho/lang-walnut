@@ -8,6 +8,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BooleanType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BytesType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FalseType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerSubsetType;
@@ -51,6 +52,8 @@ interface TypeRegistry extends TypeFinder {
 	public function optionalKey(Type $valueType): OptionalKeyType;
 	public function shape(Type $refType): ShapeType;
 	public function impure(Type $valueType): Type;
+
+	public function error(Type $errorType): ErrorType;
 	public function result(Type $returnType, Type $errorType): ResultType;
 
 	public function type(Type $targetType): TypeType;

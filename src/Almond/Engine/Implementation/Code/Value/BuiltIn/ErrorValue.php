@@ -18,10 +18,7 @@ final class ErrorValue implements ErrorValueInterface, JsonSerializable {
     ) {}
 
 	public ResultType $type {
-        get => $this->typeRegistry->result(
-            $this->typeRegistry->nothing,
-            $this->errorValue->type
-        );
+        get => $this->typeRegistry->error($this->errorValue->type);
     }
 
     public function equals(Value $other): bool {

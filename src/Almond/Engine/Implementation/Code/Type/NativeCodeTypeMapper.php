@@ -11,6 +11,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BytesType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\DataType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EnumerationSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EnumerationType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FalseType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerSubsetType;
@@ -72,6 +73,7 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 		UnionType::class => [/*'Union'*/],
 		IntersectionType::class => [/*'Intersection'*/],
 		NothingType::class => ['Nothing'],
+		ErrorType::class => ['Error', 'Result'],
 		ResultType::class => ['Result'],
 		AnyType::class => [],
 	];
