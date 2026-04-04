@@ -24,6 +24,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ValueValue as ValueValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\EnumerationValueName;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 
@@ -34,6 +35,7 @@ interface ValueRegistry {
 	public function type(Type $refType): TypeValue;
 
 	public function boolean(bool $value): BooleanValue;
+	public function value(Value $value): ValueValueInterface;
 	public function error(Value $value): ErrorValueInterface;
 	public function mutable(Type $type, Value $value): MutableValue;
 

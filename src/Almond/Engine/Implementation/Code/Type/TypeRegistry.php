@@ -16,6 +16,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealSubsetType as Real
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType as RealTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType as ResultTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TrueType as TrueTypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ValueType as ValueTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\DuplicateSubsetValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\InvalidArgument;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\UnknownType;
@@ -58,6 +59,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\StringType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\UnionType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\ValueType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\IntersectionTypeNormalizer;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\UnionTypeNormalizer;
 
@@ -119,6 +121,10 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 				new TypeName('ExternalError')
 			)
 		);
+	}
+
+	public function value(Type $valueType): ValueTypeInterface {
+		return new ValueType($valueType);
 	}
 
 	public function error(Type $errorType): ErrorTypeInterface {
@@ -403,6 +409,7 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 			'Map' => $this->map(),
 			'Set' => $this->set(),
 			'Error' => $this->error($this->any),
+			'Value' => $this->value($this->any),
 			'Impure' => $this->impure($this->any),
 			'Mutable' => $this->mutable($this->any),
 			'Type' => $this->type($this->any),

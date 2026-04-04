@@ -43,6 +43,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Type\TupleTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\TypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\TypeTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\UnionTypeNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Type\ValueTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\IntegerValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\RealValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\StringValueNode;
@@ -60,6 +61,7 @@ interface TypeNodeBuilder {
 	/** @param list<EnumerationValueNameNode> $values */
 	public function enumerationSubsetType(TypeNameNode $name, array $values): EnumerationSubsetTypeNode;
 	public function namedType(TypeNameNode $name): NamedTypeNode;
+	public function valueType(TypeNode $valueType): ValueTypeNode;
 	public function errorType(TypeNode $errorType): ErrorTypeNode;
 	public function resultType(TypeNode $returnType, TypeNode $errorType): ResultTypeNode;
 	public function impureType(TypeNode $valueType): ImpureTypeNode;

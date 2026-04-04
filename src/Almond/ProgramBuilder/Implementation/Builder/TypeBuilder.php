@@ -40,6 +40,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Type\TupleTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\TypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\TypeTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\UnionTypeNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Type\ValueTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\IntegerValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\RealValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\StringValueNode;
@@ -131,6 +132,9 @@ final readonly class TypeBuilder implements TypeCompilerInterface {
 					$this->type($typeNode->valueType)
 				),
 				$typeNode instanceof OptionalKeyTypeNode => $this->typeRegistry->optionalKey(
+					$this->type($typeNode->valueType)
+				),
+				$typeNode instanceof ValueTypeNode => $this->typeRegistry->value(
 					$this->type($typeNode->valueType)
 				),
 				$typeNode instanceof ErrorTypeNode => $this->typeRegistry->error(

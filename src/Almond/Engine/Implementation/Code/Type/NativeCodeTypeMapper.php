@@ -36,6 +36,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TrueType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\UnionType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ValueType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\NamedType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\NativeCodeTypeMapper as NativeCodeTypeMapperInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -73,6 +74,7 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 		UnionType::class => [/*'Union'*/],
 		IntersectionType::class => [/*'Intersection'*/],
 		NothingType::class => ['Nothing'],
+		ValueType::class => ['Value'],
 		ErrorType::class => ['Error', 'Result'],
 		ResultType::class => ['Result'],
 		AnyType::class => [],

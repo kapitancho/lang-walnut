@@ -65,6 +65,9 @@ final readonly class ValueBuilder implements ValueCompilerInterface {
 					$this->type($valueNode->type),
 					$this->value($valueNode->value),
 				),
+				$valueNode instanceof ValueValueNode => $this->valueRegistry->value(
+					$this->value($valueNode->value),
+				),
 				$valueNode instanceof ErrorValueNode => $this->valueRegistry->error(
 					$this->value($valueNode->value),
 				),

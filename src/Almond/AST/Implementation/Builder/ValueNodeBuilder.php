@@ -30,6 +30,7 @@ use Walnut\Lang\Almond\AST\Implementation\Node\Value\StringValueNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Value\TrueValueNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Value\TupleValueNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Value\TypeValueNode;
+use Walnut\Lang\Almond\AST\Implementation\Node\Value\ValueValueNode;
 
 final class ValueNodeBuilder implements ValueNodeBuilderInterface {
 
@@ -73,6 +74,10 @@ final class ValueNodeBuilder implements ValueNodeBuilderInterface {
 
 	public function typeValue(TypeNode $type): TypeValueNode {
 		return new TypeValueNode($this->getSourceLocation(), $type);
+	}
+
+	public function valueValue(ValueNode $value): ValueValueNode {
+		return new ValueValueNode($this->getSourceLocation(), $value);
 	}
 
 	public function errorValue(ValueNode $value): ErrorValueNode {

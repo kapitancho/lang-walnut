@@ -26,6 +26,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Value\TrueValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\TupleValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\TypeValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\ValueNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Value\ValueValueNode;
 
 interface ValueNodeBuilder {
 	public NullValueNode $nullValue { get; }
@@ -36,6 +37,7 @@ interface ValueNodeBuilder {
 	public function stringValue(string $value): StringValueNode;
 	public function bytesValue(string $value): BytesValueNode;
 	public function typeValue(TypeNode $type): TypeValueNode;
+	public function valueValue(ValueNode $value): ValueValueNode;
 	public function errorValue(ValueNode $value): ErrorValueNode;
 	public function mutableValue(TypeNode $type, ValueNode $value): MutableValueNode;
 	public function atomValue(TypeNameNode $name): AtomValueNode;

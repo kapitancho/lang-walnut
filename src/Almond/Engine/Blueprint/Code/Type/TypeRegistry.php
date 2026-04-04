@@ -30,6 +30,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TrueType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ValueType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\DuplicateSubsetValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\InvalidArgument;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Userland\UserlandTypeRegistry;
@@ -53,6 +54,7 @@ interface TypeRegistry extends TypeFinder {
 	public function shape(Type $refType): ShapeType;
 	public function impure(Type $valueType): Type;
 
+	public function value(Type $valueType): ValueType;
 	public function error(Type $errorType): ErrorType;
 	public function result(Type $returnType, Type $errorType): ResultType;
 

@@ -53,6 +53,7 @@ use Walnut\Lang\Almond\AST\Implementation\Node\Type\TrueTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\TupleTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\TypeTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\UnionTypeNode;
+use Walnut\Lang\Almond\AST\Implementation\Node\Type\ValueTypeNode;
 
 final class TypeNodeBuilder implements TypeNodeBuilderInterface {
 
@@ -102,6 +103,10 @@ final class TypeNodeBuilder implements TypeNodeBuilderInterface {
 
 	public function namedType(TypeNameNode $name): NamedTypeNode {
 		return new NamedTypeNode($this->getSourceLocation(), $name);
+	}
+
+	public function valueType(TypeNode $valueType): ValueTypeNode {
+		return new ValueTypeNode($this->getSourceLocation(), $valueType);
 	}
 
 	public function errorType(TypeNode $errorType): ErrorTypeNode {

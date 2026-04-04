@@ -1082,6 +1082,7 @@ final readonly class ParserStateMachine {
 						'Type' => 756,
 						'Impure' => 761,
 						'Mutable' => 766,
+						'Value' => 7701,
 						'Error' => 771,
 						'Result' => 776,
 						'Any', 'Nothing', 'Boolean', 'True', 'False', 'Null',
@@ -3577,6 +3578,38 @@ final readonly class ParserStateMachine {
 			770 => ['name' => 'type mutable return', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->type->mutableType(
+						$this->s->result['type'] ?? $this->nodeBuilder->type->anyType,
+					);
+					$this->s->pop();
+				},
+			]],
+			7701 => ['name' => 'type error', 'transitions' => [
+				T::type_start->name => 7702,
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->type->valueType(
+						$this->nodeBuilder->type->anyType,
+					);
+					$this->s->pop();
+				},
+			]],
+			7702 => ['name' => 'type value type', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(7703);
+					$this->s->stay(4000);
+				},
+			]],
+			7703 => ['name' => 'type value return point', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->result['type'] = $this->s->generated;
+					$this->s->stay(7704);
+				}
+			]],
+			7704 => ['name' => 'type value separator', 'transitions' => [
+				T::type_end->name => 7705
+			]],
+			7705 => ['name' => 'type value return', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->type->valueType(
 						$this->s->result['type'] ?? $this->nodeBuilder->type->anyType,
 					);
 					$this->s->pop();

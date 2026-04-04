@@ -19,6 +19,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\OpenValue as OpenValu
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue as RealValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SealedValue as SealedValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue as TupleValueInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ValueValue as ValueValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\IncompatibleValueType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry as ValueRegistryInterface;
@@ -38,6 +39,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\Value\BuiltIn\SetValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Value\BuiltIn\TypeValue;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Value\BuiltIn\ValueValue;
 
 final readonly class ValueRegistry implements ValueRegistryInterface {
 
@@ -66,6 +68,12 @@ final readonly class ValueRegistry implements ValueRegistryInterface {
 
 	public function boolean(bool $value): BooleanValue {
 		return $value ? $this->true : $this->false;
+	}
+
+	public function value(Value $value): ValueValueInterface {
+		return new ValueValue(
+			$this->typeRegistry, $value
+		);
 	}
 
 	public function error(Value $value): ErrorValueInterface {
