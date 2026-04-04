@@ -25,6 +25,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Type\MetaTypeTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\MutableTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NamedTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NothingTypeNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Type\EmptyTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NullTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NumberIntervalNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\OptionalTypeNode;
@@ -130,6 +131,7 @@ interface TypeNodeBuilder {
 
 	public AnyTypeNode $anyType { get; }
 	public NothingTypeNode $nothingType { get; }
+	public EmptyTypeNode $emptyType { get; }
 	public NullTypeNode $nullType { get; }
 	public TrueTypeNode $trueType { get; }
 	public FalseTypeNode $falseType { get; }

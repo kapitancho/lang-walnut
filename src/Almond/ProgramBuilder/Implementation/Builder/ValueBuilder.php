@@ -12,6 +12,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Value\FalseValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\FunctionValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\IntegerValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\MutableValueNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Value\EmptyValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\NullValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\RealValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\RecordValueNode;
@@ -54,6 +55,7 @@ final readonly class ValueBuilder implements ValueCompilerInterface {
 	public function value(ValueNode $valueNode): Value {
 		try {
 			$result = match(true) {
+				$valueNode instanceof EmptyValueNode => $this->valueRegistry->empty,
 				$valueNode instanceof NullValueNode => $this->valueRegistry->null,
 				$valueNode instanceof TrueValueNode => $this->valueRegistry->true,
 				$valueNode instanceof FalseValueNode => $this->valueRegistry->false,

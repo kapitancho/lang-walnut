@@ -9,6 +9,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\DataType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EnumerationSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EnumerationType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FalseType as FalseTypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EmptyType as EmptyTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType as NullTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OpenType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SealedType;
@@ -24,10 +25,12 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Userland\UserlandTypeStorage a
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\EnumerationValueName;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\BooleanType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\EmptyType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\NullType;
 
 final class UserlandTypeStorage implements UserlandTypeRegistryInterface, UserlandTypeStorageInterface {
 
+	public readonly EmptyTypeInterface $empty;
 	public readonly NullTypeInterface $null;
 	public readonly BooleanTypeInterface $boolean;
 	public readonly TrueTypeInterface $true;
@@ -50,8 +53,16 @@ final class UserlandTypeStorage implements UserlandTypeRegistryInterface, Userla
 	private array $sealedTypes = [];
 
 	public function __construct() {
+		$this->addEmpty();
 		$this->addNull();
 		$this->addBoolean();
+	}
+
+	private function addEmpty(): void {
+		$emptyName = new TypeName('Empty');
+		/** @phpstan-ignore assign.readOnlyProperty */
+		$this->empty = new EmptyType($emptyName);
+		$this->addAtom($emptyName, $this->empty);
 	}
 
 	private function addNull(): void {

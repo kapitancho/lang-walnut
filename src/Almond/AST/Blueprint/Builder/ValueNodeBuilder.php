@@ -17,6 +17,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Value\FalseValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\FunctionValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\IntegerValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\MutableValueNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Value\EmptyValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\NullValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\RealValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\RecordValueNode;
@@ -29,6 +30,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Value\ValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\ValueValueNode;
 
 interface ValueNodeBuilder {
+	public EmptyValueNode $emptyValueNode { get; }
 	public NullValueNode $nullValue { get; }
 	public TrueValueNode $trueValue { get; }
 	public FalseValueNode $falseValue { get; }

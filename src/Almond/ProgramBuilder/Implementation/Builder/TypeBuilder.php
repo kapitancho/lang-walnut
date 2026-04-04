@@ -22,6 +22,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Type\MetaTypeTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\MutableTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NamedTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NothingTypeNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Type\EmptyTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NullTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\NumberIntervalNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\OptionalTypeNode;
@@ -81,6 +82,7 @@ final readonly class TypeBuilder implements TypeCompilerInterface {
 				$typeNode instanceof TrueTypeNode => $this->typeRegistry->true,
 				$typeNode instanceof FalseTypeNode => $this->typeRegistry->false,
 				$typeNode instanceof BooleanTypeNode => $this->typeRegistry->boolean,
+				$typeNode instanceof EmptyTypeNode => $this->typeRegistry->empty,
 				$typeNode instanceof NullTypeNode => $this->typeRegistry->null,
 				$typeNode instanceof UnionTypeNode => $this->typeRegistry->union([
 					$this->type($typeNode->left),

@@ -14,7 +14,7 @@ final readonly class AtomValueTypeExistsValidator implements PreBuildValidator {
 	public function validate(PreBuildValidationRequest $request): PreBuildValidationSuccess|PreBuildValidationFailure {
 		$result = $request->result;
 
-		$atomTypes = [];
+		$atomTypes = ['Null' => true, 'Empty' => true];
 		foreach ($request->nodeIteratorFactory->filterByType(
 			$request->nodeIteratorFactory->recursive($request->rootNode),
 			AddAtomTypeNode::class

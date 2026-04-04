@@ -15,6 +15,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\EnumerationValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue as ErrorValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\IntegerValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\MutableValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\EmptyValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\OpenValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue;
@@ -29,6 +30,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\EnumerationValueName;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 
 interface ValueRegistry {
+	public EmptyValue $empty { get; }
 	public NullValue $null { get; }
 	public BooleanValue $true { get; }
 	public BooleanValue $false { get; }

@@ -17,6 +17,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MetaType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MutableType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EmptyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealSubsetType;
@@ -44,6 +45,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 interface TypeRegistry extends TypeFinder {
 	public AnyType $any { get; }
 	public NothingType $nothing { get; }
+	public EmptyType $empty { get; }
 	public NullType $null { get; }
 	public BooleanType $boolean { get; }
 	public FalseType $false { get; }

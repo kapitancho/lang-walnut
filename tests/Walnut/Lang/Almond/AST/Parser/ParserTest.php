@@ -16,6 +16,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation;
 use Walnut\Lang\Almond\AST\Blueprint\Node\SourceNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\ErrorTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\ValueTypeNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Value\EmptyValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Number\MinusInfinity;
 use Walnut\Lang\Almond\AST\Blueprint\Number\PlusInfinity;
 use Walnut\Lang\Almond\AST\Blueprint\Parser\ParserException;
@@ -1585,6 +1586,7 @@ class ParserTest extends TestCase {
 		yield ['"Hello"', BytesValueNode::class, fn($v) => $v->value == 'Hello'];
 		yield ['true', TrueValueNode::class];
 		yield ['false', FalseValueNode::class];
+		yield ['empty', EmptyValueNode::class];
 		yield ['null', NullValueNode::class];
 		yield ['[]', TupleValueNode::class, fn($v) => count($v->values) == 0];
 		yield ['[42]', TupleValueNode::class, fn($v) => count($v->values) == 1 && $v->values[0]->value == new Number('42')];

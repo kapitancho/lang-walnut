@@ -36,6 +36,7 @@ use Walnut\Lang\Almond\AST\Implementation\Node\Type\MetaTypeTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\MutableTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\NamedTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\NothingTypeNode;
+use Walnut\Lang\Almond\AST\Implementation\Node\Type\EmptyTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\NullTypeNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\NumberIntervalNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Type\OptionalTypeNode;
@@ -68,6 +69,9 @@ final class TypeNodeBuilder implements TypeNodeBuilderInterface {
 	}
 	public NothingTypeNode $nothingType {
 		get { return new NothingTypeNode($this->getSourceLocation()); }
+	}
+	public EmptyTypeNode $emptyType {
+		get { return new EmptyTypeNode($this->getSourceLocation()); }
 	}
 	public NullTypeNode $nullType {
 		get { return new NullTypeNode($this->getSourceLocation()); }

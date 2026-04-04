@@ -11,6 +11,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ErrorType as ErrorType
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FalseType as FalseTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType as IntegerTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType as NothingTypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EmptyType as EmptyTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType as NullTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealSubsetType as RealSubsetTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType as RealTypeInterface;
@@ -67,14 +68,13 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 
 	public AnyTypeInterface $any;
 	public NothingTypeInterface $nothing;
+	public EmptyTypeInterface $empty;
 	public NullTypeInterface $null;
 	public BooleanTypeInterface $boolean;
 	public FalseTypeInterface $false;
 	public TrueTypeInterface $true;
 
 	public TypeRegistryCoreInterface $core;
-
-
 	private IntersectionTypeNormalizer $intersectionTypeNormalizer;
 	private UnionTypeNormalizer $unionTypeNormalizer;
 
@@ -83,6 +83,7 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 		public UserlandTypeRegistry $userland,
 		private EscapeCharHandler $escapeCharHandler,
 	) {
+		$this->empty = $this->userland->empty;
 		$this->null = $this->userland->null;
 		$this->nothing = new NothingType();
 		$this->any = new AnyType();
@@ -413,6 +414,7 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 			'Impure' => $this->impure($this->any),
 			'Mutable' => $this->mutable($this->any),
 			'Type' => $this->type($this->any),
+			'Empty' => $this->empty,
 			'Null' => $this->null,
 			'True' => $this->true,
 			'False' => $this->false,

@@ -14,6 +14,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\DataValue as DataValu
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\EnumerationValue as EnumerationValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue as ErrorValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\MutableValue as MutableValueInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\EmptyValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\OpenValue as OpenValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RealValue as RealValueInterface;
@@ -43,6 +44,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\Value\BuiltIn\ValueValue;
 
 final readonly class ValueRegistry implements ValueRegistryInterface {
 
+	public EmptyValue $empty;
 	public NullValue $null;
 	public BooleanValue $true;
 	public BooleanValue $false;
@@ -55,6 +57,7 @@ final readonly class ValueRegistry implements ValueRegistryInterface {
 		private EscapeCharHandler       $stringEscapeCharHandler,
 		private EscapeCharHandler       $bytesEscapeCharHandler,
 	) {
+		$this->empty = $this->typeRegistry->empty->value;
 		$this->null = $this->typeRegistry->null->value;
 		$this->true = $this->typeRegistry->true->value;
 		$this->false = $this->typeRegistry->false->value;

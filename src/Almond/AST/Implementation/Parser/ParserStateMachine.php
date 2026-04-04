@@ -1063,7 +1063,7 @@ final readonly class ParserStateMachine {
 						'Optional' => 7711,
 						'Error' => 771,
 						'Shape' => 820,
-						'Any', 'Nothing', 'Boolean', 'True', 'False', 'Null',
+						'Any', 'Nothing', 'Boolean', 'True', 'False', 'Empty', 'Null',
 						'MutableValue', 'Enumeration' => 706,
 						default => 784
 					};
@@ -1088,7 +1088,7 @@ final readonly class ParserStateMachine {
 						'Optional' => 7711,
 						'Error' => 771,
 						'Result' => 776,
-						'Any', 'Nothing', 'Boolean', 'True', 'False', 'Null',
+						'Any', 'Nothing', 'Boolean', 'True', 'False', 'Empty', 'Null',
 						'MutableValue', 'Enumeration' => 706,
 						default => 785
 					};
@@ -1729,7 +1729,7 @@ final readonly class ParserStateMachine {
 						$this->s->move(344);
 					} elseif ($token->patternMatch->text === 'val') {
 						$this->s->move(359);
-					} elseif (in_array($token->patternMatch->text, ['true', 'false', 'null', 'type'], true)) {
+					} elseif (in_array($token->patternMatch->text, ['true', 'false', 'empty', 'null', 'type'], true)) {
 						$this->s->result['startPosition'] = $token->sourcePosition;
 						$this->s->stay(3301);
 					} else {
@@ -2173,6 +2173,7 @@ final readonly class ParserStateMachine {
 					$this->s->result['startPosition'] = $token->sourcePosition;
 					/** @phpstan-ignore match.unhandled */
 					match($token->patternMatch->text) {
+						'empty' => $this->s->stay(4005),
 						'null' => $this->s->stay(405),
 						'true' => $this->s->stay(406),
 						'false' => $this->s->stay(407),
@@ -2224,6 +2225,13 @@ final readonly class ParserStateMachine {
 				T::tuple_end->name => function(LT $token) {
 					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->value->setValue([]);
+					$this->s->pop();
+				},
+			]],
+			4005 => ['name' => 'empty value', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->i++;
+					$this->s->generated = $this->nodeBuilder->value->emptyValueNode;
 					$this->s->pop();
 				},
 			]],
@@ -2929,6 +2937,7 @@ final readonly class ParserStateMachine {
 						'True' => $this->nodeBuilder->type->trueType,
 						'False' => $this->nodeBuilder->type->falseType,
 						'Null' => $this->nodeBuilder->type->nullType,
+						'Empty' => $this->nodeBuilder->type->emptyType,
 						/*
 						'String' => $this->nodeBuilder->type->stringType(),
 						'Integer' => $this->nodeBuilder->type->integerType(),

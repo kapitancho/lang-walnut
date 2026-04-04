@@ -22,6 +22,7 @@ use Walnut\Lang\Almond\AST\Implementation\Node\Value\FalseValueNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Value\FunctionValueNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Value\IntegerValueNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Value\MutableValueNode;
+use Walnut\Lang\Almond\AST\Implementation\Node\Value\EmptyValueNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Value\NullValueNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Value\RealValueNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Value\RecordValueNode;
@@ -40,6 +41,11 @@ final class ValueNodeBuilder implements ValueNodeBuilderInterface {
 		return $this->sourceLocator->getSourceLocation();
 	}
 
+	public EmptyValueNode $emptyValueNode {
+		get {
+			return new EmptyValueNode($this->getSourceLocation());
+		}
+	}
 	public NullValueNode $nullValue {
 		get {
 			return new NullValueNode($this->getSourceLocation());
