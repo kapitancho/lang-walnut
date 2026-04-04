@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn;
 
 use JsonSerializable;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType as AnyTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ErrorType as ErrorTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType as NothingTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType as ResultTypeInterface;
@@ -48,10 +49,8 @@ final readonly class ErrorType implements ErrorTypeInterface, JsonSerializable {
     }
 
 	public function __toString(): string {
-		return sprintf(
-			"Error<%s>",
-			$this->errorType
-		);
+		return $this->errorType instanceof AnyTypeInterface ?
+			'Error' : sprintf("Error<%s>", $this->errorType);
 	}
 
 	public function validate(ValidationRequest $request): ValidationResult {

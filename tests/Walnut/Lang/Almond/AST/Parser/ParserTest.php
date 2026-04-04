@@ -15,6 +15,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Module\AddSealedTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation;
 use Walnut\Lang\Almond\AST\Blueprint\Node\SourceNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Type\ErrorTypeNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Type\ValueTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Number\MinusInfinity;
 use Walnut\Lang\Almond\AST\Blueprint\Number\PlusInfinity;
 use Walnut\Lang\Almond\AST\Blueprint\Parser\ParserException;
@@ -756,6 +757,8 @@ class ParserTest extends TestCase {
 		];
 		yield ['@x', ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameNode($l, 'Error')) &&
 			$e->parameter instanceof VariableNameExpressionNode && $e->parameter->variableName->equals(new VariableNameNode($l, 'x'))];
+		yield ['Value(x)', ConstructorCallExpressionNode::class, fn(ConstructorCallExpressionNode $e) => $e->typeName->equals(new TypeNameNode($l, 'Value')) &&
+			$e->parameter instanceof VariableNameExpressionNode && $e->parameter->variableName->equals(new VariableNameNode($l, 'x'))];
 		yield [':: x', ScopedExpressionNode::class, fn(ScopedExpressionNode $e) =>
 			$e->targetExpression instanceof VariableNameExpressionNode && $e->targetExpression->variableName->equals(new VariableNameNode($l, 'x'))];
 
@@ -1466,6 +1469,12 @@ class ParserTest extends TestCase {
 		yield ['Error', ErrorTypeNode::class, fn($t) => $t->errorType instanceOf AnyTypeNode];
 		yield ['\\Error', ErrorTypeNode::class, fn($t) => $t->errorType instanceOf AnyTypeNode];
 		yield ['Error<Boolean>', ErrorTypeNode::class, fn($t) => $t->errorType instanceOf BooleanTypeNode];
+		yield ['Value', ValueTypeNode::class, fn($t) => $t->valueType instanceOf AnyTypeNode];
+		yield ['\\Value', ValueTypeNode::class, fn($t) => $t->valueType instanceOf AnyTypeNode];
+		yield ['Value<Boolean>', ValueTypeNode::class, fn($t) => $t->valueType instanceOf BooleanTypeNode];
+		yield ['Optional', OptionalTypeNode::class, fn($t) => $t->valueType instanceOf AnyTypeNode];
+		yield ['\\Optional', OptionalTypeNode::class, fn($t) => $t->valueType instanceOf AnyTypeNode];
+		yield ['Optional<Boolean>', OptionalTypeNode::class, fn($t) => $t->valueType instanceOf BooleanTypeNode];
 		yield ['Impure', ImpureTypeNode::class, fn($t) => $t->valueType instanceOf AnyTypeNode];
 		yield ['\\Impure', ImpureTypeNode::class, fn($t) => $t->valueType instanceOf AnyTypeNode];
 		yield ['Impure<Boolean>', ImpureTypeNode::class, fn($t) => $t->valueType instanceOf BooleanTypeNode];

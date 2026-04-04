@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn;
 
 use JsonSerializable;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType as AnyTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ValueType as ValueTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\SupertypeChecker;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -38,7 +39,8 @@ final readonly class ValueType implements ValueTypeInterface, JsonSerializable {
 	}
 
 	public function __toString(): string {
-		return sprintf("Value<%s>", $this->valueType);
+		return $this->valueType instanceof AnyTypeInterface ?
+			'Value' : sprintf("Value<%s>", $this->valueType);
 	}
 
 	public function validate(ValidationRequest $request): ValidationResult {

@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn;
 
 use JsonSerializable;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType as AnyTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType as OptionalTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\SupertypeChecker;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -35,7 +36,8 @@ final readonly class OptionalType implements OptionalTypeInterface, SupertypeChe
 	}
 
 	public function __toString(): string {
-		return sprintf("Optional<%s>", $this->valueType);
+		return $this->valueType instanceof AnyTypeInterface ?
+			'Optional' : sprintf("Optional<%s>", $this->valueType);
 	}
 
 	public function validate(ValidationRequest $request): ValidationResult {

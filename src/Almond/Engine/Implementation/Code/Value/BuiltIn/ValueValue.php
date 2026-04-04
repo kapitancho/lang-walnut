@@ -5,13 +5,13 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Code\Value\BuiltIn;
 use JsonSerializable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ValueType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ValueValue as WrappedValueInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ValueValue as ValueValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationRequest;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResult;
 
-final class ValueValue implements WrappedValueInterface, JsonSerializable {
+final class ValueValue implements ValueValueInterface, JsonSerializable {
 	public function __construct(
 		private readonly TypeRegistry $typeRegistry,
 		public readonly Value $value
@@ -39,8 +39,8 @@ final class ValueValue implements WrappedValueInterface, JsonSerializable {
 
 	public function jsonSerialize(): array {
 		return [
-			'valueType' => 'Wrapped',
-			'wrappedValue' => $this->value
+			'valueType' => 'Value',
+			'value' => $this->value
 		];
 	}
 }

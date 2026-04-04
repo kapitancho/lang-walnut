@@ -52,6 +52,7 @@ final class JsonEncodeTest extends AlmondBaseTestHelper {
 			'{"valueType":"Set","value":[{"valueType":"Integer","value":1},{"valueType":"String","value":"abc"}]}' => $vr->set([$vr->integer(1), $vr->string('abc')]),
 			'{"valueType":"Mutable","targetType":{"type":"Integer","range":{"intervals":[{"start":"MinusInfinity","end":"PlusInfinity"}]}},"value":{"valueType":"Integer","value":42}}'
 				=> $vr->mutable($this->typeRegistry->integer(), $vr->integer(42)),
+			'{"valueType":"Value","value":{"valueType":"String","value":"value"}}' => $vr->value($vr->string('value')),
 			'{"valueType":"Error","errorValue":{"valueType":"String","value":"error"}}' => $vr->error($vr->string('error')),
 			'{"valueType":"Type","value":{"type":"Boolean"}}' => $vr->type($this->typeRegistry->boolean),
 	        '{"valueType":"Function","parameter":{"type":{"type":"Null"},"name":null},"dependency":{"type":{"type":"Integer","range":{"intervals":[{"start":"MinusInfinity","end":"PlusInfinity"}]}},"name":null},"returnType":{"type":"Any"},"body":{"expression":{"expressionType":"constant","value":{"valueType":"Null"}}}}'
@@ -167,7 +168,9 @@ final class JsonEncodeTest extends AlmondBaseTestHelper {
 
 			'{"type":"Mutable","valueType":{"type":"Integer","range":{"intervals":[{"start":"MinusInfinity","end":"PlusInfinity"}]}}}' => $tr->mutable($tr->integer()),
 			'{"type":"Result","returnType":{"type":"Integer","range":{"intervals":[{"start":"MinusInfinity","end":"PlusInfinity"}]}},"errorType":{"type":"String","range":{"minLength":0,"maxLength":"+Infinity"}}}' => $tr->result($tr->integer(), $tr->string()),
-			'{"type":"Type","refType":{"type":"Boolean"}}' => $tr->type($tr->boolean),
+	        '{"type":"Error","errorType":{"type":"Integer","range":{"intervals":[{"start":"MinusInfinity","end":"PlusInfinity"}]}}}' => $tr->error($tr->integer()),
+	        '{"type":"Value","valueType":{"type":"Integer","range":{"intervals":[{"start":"MinusInfinity","end":"PlusInfinity"}]}}}' => $tr->value($tr->integer()),
+	        '{"type":"Type","refType":{"type":"Boolean"}}' => $tr->type($tr->boolean),
 			'{"type":"Function","parameter":{"type":"Null"},"return":{"type":"Any"}}' => $tr->function($tr->null,$tr->any),
 
 			'{"type":"Any"}' => $tr->any,

@@ -41,6 +41,7 @@ final class ToStringTest extends AlmondBaseTestHelper {
 	        "[1; 'abc']" => $vr->set([$vr->integer(1), $vr->string('abc')]),
 			'mutable{Integer, 42}' => $vr->mutable($this->typeRegistry->integer(), $vr->integer(42)),
 			"@'error'" => $vr->error($vr->string('error')),
+			"Value('value')" => $vr->value($vr->string('value')),
 			"type{Boolean}" => $vr->type($this->typeRegistry->boolean),
 			"^Null => Any %% Integer :: null" => $this->functionValueFactory->function(
 				new NameAndType(
@@ -148,6 +149,12 @@ final class ToStringTest extends AlmondBaseTestHelper {
 
 			'Mutable<Integer>' => $tr->mutable($tr->integer()),
 			'Result<Integer, String>' => $tr->result($tr->integer(), $tr->string()),
+			'Error<String>' => $tr->error($tr->string()),
+			'Error' => $tr->error($tr->any),
+			'Value<String>' => $tr->value($tr->string()),
+			'Value' => $tr->value($tr->any),
+			'Optional<String>' => $tr->optional($tr->string()),
+			'Optional' => $tr->optional($tr->any),
 			'Type<Boolean>' => $tr->type($tr->boolean),
 			'^Null => Any' => $tr->function($tr->null,$tr->any),
 
