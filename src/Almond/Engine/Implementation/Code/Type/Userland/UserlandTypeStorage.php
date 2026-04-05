@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\Type\Userland;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AliasType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType as AnyTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AtomType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BooleanType as BooleanTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\DataType;
@@ -10,6 +11,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EnumerationSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EnumerationType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FalseType as FalseTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EmptyType as EmptyTypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType as NothingTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType as NullTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OpenType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SealedType;
@@ -24,12 +26,16 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Userland\UserlandTypeRegistry 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Userland\UserlandTypeStorage as UserlandTypeStorageInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\EnumerationValueName;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\AnyType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\BooleanType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\EmptyType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\NothingType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\NullType;
 
 final class UserlandTypeStorage implements UserlandTypeRegistryInterface, UserlandTypeStorageInterface {
 
+	public readonly AnyTypeInterface $any;
+	public readonly NothingTypeInterface $nothing;
 	public readonly EmptyTypeInterface $empty;
 	public readonly NullTypeInterface $null;
 	public readonly BooleanTypeInterface $boolean;
@@ -53,6 +59,8 @@ final class UserlandTypeStorage implements UserlandTypeRegistryInterface, Userla
 	private array $sealedTypes = [];
 
 	public function __construct() {
+		$this->any = new AnyType;
+		$this->nothing = new NothingType;
 		$this->addEmpty();
 		$this->addNull();
 		$this->addBoolean();
@@ -61,7 +69,7 @@ final class UserlandTypeStorage implements UserlandTypeRegistryInterface, Userla
 	private function addEmpty(): void {
 		$emptyName = new TypeName('Empty');
 		/** @phpstan-ignore assign.readOnlyProperty */
-		$this->empty = new EmptyType($emptyName);
+		$this->empty = new EmptyType($this->nothing, $emptyName);
 		$this->addAtom($emptyName, $this->empty);
 	}
 

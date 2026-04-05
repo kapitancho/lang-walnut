@@ -13,6 +13,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntegerType as Integer
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType as NothingTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EmptyType as EmptyTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType as NullTypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType as OptionalTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealSubsetType as RealSubsetTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType as RealTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType as ResultTypeInterface;
@@ -36,7 +37,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberInterval;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberRange;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\AnyType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\ArrayType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\BytesType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\ErrorType;
@@ -46,7 +46,6 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\MetaType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\MutableType;
-use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\NothingType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\ProxyNamedType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\RealSubsetType;
@@ -83,10 +82,10 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 		public UserlandTypeRegistry $userland,
 		private EscapeCharHandler $escapeCharHandler,
 	) {
+		$this->any = $this->userland->any;
+		$this->nothing = $this->userland->nothing;
 		$this->empty = $this->userland->empty;
 		$this->null = $this->userland->null;
-		$this->nothing = new NothingType();
-		$this->any = new AnyType();
 		$this->boolean = $this->userland->boolean;
 		$this->false = $this->userland->false;
 		$this->true = $this->userland->true;
@@ -108,7 +107,13 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 		return new MutableType($valueType);
 	}
 
-	public function optional(Type $valueType): OptionalType {
+	public function optional(Type $valueType): OptionalTypeInterface {
+		if ($valueType instanceof NothingTypeInterface) {
+			return $this->empty;
+		}
+		if ($valueType instanceof OptionalTypeInterface) {
+			return $valueType;
+		}
 		return new OptionalType($valueType);
 	}
 

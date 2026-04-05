@@ -60,4 +60,54 @@ final class IfErrorTest extends CodeExecutionTestHelper {
 		);
 	}
 
+	public function testIfErrorWithReturnTypeInteger(): void {
+		$result = $this->executeCodeSnippet(
+			"ifError('hello');",
+			valueDeclarations: "
+				ifError = ^p: String => String :: p->ifError(^e: Any => Any :: e);
+			"
+		);
+		$this->assertEquals("'hello'", $result);
+	}
+
+	public function testIfErrorWithReturnTypeAny(): void {
+		$result = $this->executeCodeSnippet(
+			"ifError('hello');",
+			valueDeclarations: "
+				ifError = ^p: Any => Any :: p->ifError(^e: Any => Any :: e);
+			"
+		);
+		$this->assertEquals("'hello'", $result);
+	}
+
+	public function testIfErrorWithReturnTypeResult(): void {
+		$result = $this->executeCodeSnippet(
+			"ifError('hello');",
+			valueDeclarations: "
+				ifError = ^p: Result<String, Integer> => String|Real :: p->ifError(^e: Integer => Real :: e);
+			"
+		);
+		$this->assertEquals("'hello'", $result);
+	}
+
+	public function testIfErrorWithReturnTypeResultError(): void {
+		$result = $this->executeCodeSnippet(
+			"ifError(@42);",
+			valueDeclarations: "
+				ifError = ^p: Result<String, Integer> => String|Real :: p->ifError(^e: Integer => Real :: e);
+			"
+		);
+		$this->assertEquals("42", $result);
+	}
+
+	public function testIfErrorWithReturnTypeError(): void {
+		$result = $this->executeCodeSnippet(
+			"ifError(@42);",
+			valueDeclarations: "
+				ifError = ^p: Error<Integer> => Real :: p->ifError(^e: Integer => Real :: e);
+			"
+		);
+		$this->assertEquals("42", $result);
+	}
+
 }

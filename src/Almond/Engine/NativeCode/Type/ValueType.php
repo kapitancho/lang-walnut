@@ -10,6 +10,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OpenType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SealedType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ValueType as ValueTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\MetaTypeValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
@@ -22,7 +23,8 @@ final readonly class ValueType extends TypeNativeMethod {
 	protected function validateTargetRefType(Type $targetRefType): null|string {
 		if ($targetRefType instanceof OpenType || $targetRefType instanceof SealedType ||
 			$targetRefType instanceof DataType || $targetRefType instanceof MutableType ||
-			$targetRefType instanceof OptionalType
+			$targetRefType instanceof OptionalType ||
+			$targetRefType instanceof ValueTypeInterface
 		) {
 			return null;
 		}
@@ -40,7 +42,8 @@ final readonly class ValueType extends TypeNativeMethod {
 			$refType = $this->toBaseType($targetType->refType);
 			if ($refType instanceof OpenType || $refType instanceof SealedType ||
 				$refType instanceof DataType || $refType instanceof MutableType ||
-				$refType instanceof OptionalType
+				$refType instanceof OptionalType ||
+				$refType instanceof ValueTypeInterface
 			) {
 				return $this->typeRegistry->type($refType->valueType);
 			}
@@ -55,7 +58,8 @@ final readonly class ValueType extends TypeNativeMethod {
 				$typeValue instanceof OpenType ||
 				$typeValue instanceof SealedType ||
 				$typeValue instanceof MutableType ||
-				$typeValue instanceof OptionalType
+				$typeValue instanceof OptionalType ||
+				$typeValue instanceof ValueTypeInterface
 			) {
 				return $this->valueRegistry->type($typeValue->valueType);
 			}

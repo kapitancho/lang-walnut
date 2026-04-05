@@ -287,6 +287,30 @@ final class MapTest extends CodeExecutionTestHelper {
 		$this->assertEquals("@null", $result);
 	}
 
+	// Value tests
+
+	public function testMapValueOk(): void {
+		$result = $this->executeCodeSnippet(
+			"doValue(Value(42));",
+			valueDeclarations: "
+				doValue = ^v: Result<Value<Integer>, Null> => Result<Value<Integer>, Null> ::
+					v->map(^x: Integer => Integer :: x + 3);
+			"
+		);
+		$this->assertEquals("Value(45)", $result);
+	}
+
+	public function testMapValueNull(): void {
+		$result = $this->executeCodeSnippet(
+			"doValue(@null);",
+			valueDeclarations: "
+				doValue = ^v: Result<Value<Integer>, Null> => Result<Value<Integer>, Null> ::
+					v->map(^x: Integer => Integer :: x + 3);
+			"
+		);
+		$this->assertEquals("@null", $result);
+	}
+
 	// Error cases
 
 	public function testMapArrayInvalidReturnType(): void {

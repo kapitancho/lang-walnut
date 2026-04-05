@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Userland;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AliasType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AtomType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BooleanType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\DataType;
@@ -10,6 +11,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EnumerationSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EnumerationType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FalseType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EmptyType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OpenType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SealedType;
@@ -24,6 +26,8 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 
 interface UserlandTypeRegistry {
 
+	public AnyType $any { get; }
+	public NothingType $nothing { get; }
 	public EmptyType $empty { get; }
 	public NullType $null { get; }
 	public BooleanType $boolean { get; }

@@ -43,4 +43,57 @@ final class BinaryOrElseTest extends CodeExecutionTestHelper {
 		$this->assertEquals("'ERROR'", $result);
 	}
 
+	public function testBinaryOrElseOptionalTransform(): void {
+		$result = $this->executeCodeSnippet(
+			"makeEmpty(404) ?? 504;",
+			valueDeclarations: "
+				makeEmpty = ^code: Integer => Optional<String> :: empty;
+			"
+		);
+		$this->assertEquals("504", $result);
+	}
+
+	public function testBinaryOrElseOptionalNoTransform(): void {
+		$result = $this->executeCodeSnippet(
+			"makeEmpty(404) ?? 504;",
+			valueDeclarations: "
+				makeEmpty = ^code: Integer => Optional<String> :: code->asString;
+			"
+		);
+		$this->assertEquals("'404'", $result);
+	}
+
+	public function testBinaryOrElseTypeCheckBoth(): void {
+		$result = $this->executeCodeSnippet(
+			"orElse[empty, @false];",
+			valueDeclarations: "
+				orElse = ^[a: Optional<String>, b: Result<Integer, Boolean>] 
+					=> String|Integer|3.14 :: #a ?? #b ?? 3.14;
+			"
+		);
+		$this->assertEquals("3.14", $result);
+	}
+
+	public function testBinaryOrElseTypeCheckFirst(): void {
+		$result = $this->executeCodeSnippet(
+			"orElse['hello', @false];",
+			valueDeclarations: "
+				orElse = ^[a: Optional<String>, b: Result<Integer, Boolean>] 
+					=> String|Integer|3.14 :: #a ?? #b ?? 3.14;
+			"
+		);
+		$this->assertEquals("'hello'", $result);
+	}
+
+	public function testBinaryOrElseTypeCheckSecond(): void {
+		$result = $this->executeCodeSnippet(
+			"orElse[empty, 42];",
+			valueDeclarations: "
+				orElse = ^[a: Optional<String>, b: Result<Integer, Boolean>] 
+					=> String|Integer|3.14 :: #a ?? #b ?? 3.14;
+			"
+		);
+		$this->assertEquals("42", $result);
+	}
+
 }

@@ -129,6 +129,50 @@ final class FilterTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[2; 3]", $result);
 	}
 
+	public function testFilterValueOk(): void {
+		$result = $this->executeCodeSnippet(
+			"doValue(Value(3));",
+			valueDeclarations: "
+				doValue = ^a: Result<Value<Integer<1..4>>, Null> => Result<Optional<Value<Integer<1..4>>>, Null> ::
+					a->filter(^item: Integer => Boolean :: item > 2);
+			"
+		);
+		$this->assertEquals("Value(3)", $result);
+	}
+
+	public function testFilterValueEmpty(): void {
+		$result = $this->executeCodeSnippet(
+			"doValue(Value(2));",
+			valueDeclarations: "
+				doValue = ^a: Result<Value<Integer<1..4>>, Null> => Result<Optional<Value<Integer<1..4>>>, Null> ::
+					a->filter(^item: Integer => Boolean :: item > 2);
+			"
+		);
+		$this->assertEquals("empty", $result);
+	}
+
+	public function testFilterValueNull(): void {
+		$result = $this->executeCodeSnippet(
+			"doValue(@null);",
+			valueDeclarations: "
+				doValue = ^a: Result<Value<Integer<1..4>>, Null> => Result<Optional<Value<Integer<1..4>>>, Null> ::
+					a->filter(^item: Integer => Boolean :: item > 2);
+			"
+		);
+		$this->assertEquals("@null", $result);
+	}
+
+	public function testFilterValueError(): void {
+		$result = $this->executeCodeSnippet(
+			"doValue(Value(3));",
+			valueDeclarations: "
+				doValue = ^a: Result<Value<Integer<1..4>>, Null> => Result<Optional<Value<Integer<1..4>>>, Null|True> ::
+					a->filter(^item: Integer => Result<Boolean, True> :: @true);
+			"
+		);
+		$this->assertEquals("@true", $result);
+	}
+
 	public function testFilterSetUnionError(): void {
 		$result = $this->executeCodeSnippet(
 			"doSet[2; 0; 3];",

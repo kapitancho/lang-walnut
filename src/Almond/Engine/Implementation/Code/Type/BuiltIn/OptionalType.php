@@ -4,6 +4,8 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn;
 
 use JsonSerializable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType as AnyTypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EmptyType as EmptyTypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType as NothingTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType as OptionalTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\SupertypeChecker;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -25,6 +27,7 @@ final readonly class OptionalType implements OptionalTypeInterface, SupertypeChe
 
 	public function isSubtypeOf(Type $ofType): bool {
 		return match(true) {
+			$ofType instanceof EmptyTypeInterface => $this->valueType instanceof NothingTypeInterface,
 			$ofType instanceof OptionalTypeInterface => $this->valueType->isSubtypeOf($ofType->valueType),
 			$ofType instanceof SupertypeChecker => $ofType->isSupertypeOf($this),
 			default => false

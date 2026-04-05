@@ -30,6 +30,12 @@ final class ValueTypeTest extends CodeExecutionTestHelper {
 		$this->assertEquals("type{Boolean}", $result);
 	}
 
+	public function testValueTypeValue(): void {
+		$result = $this->executeCodeSnippet("getValueType(type{Value<Boolean>});",
+			valueDeclarations: "getValueType = ^t: Type<Value<Named>> => Type :: t->valueType;");
+		$this->assertEquals("type{Boolean}", $result);
+	}
+
 	public function testValueTypeSealed(): void {
 		$result = $this->executeCodeSnippet("type{MySealed}->valueType;", "MySealed := $[a: String];");
 		$this->assertEquals("type[a: String]", $result);

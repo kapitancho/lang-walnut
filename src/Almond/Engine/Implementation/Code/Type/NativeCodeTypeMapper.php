@@ -9,6 +9,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AtomType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BooleanType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\BytesType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\DataType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EmptyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EnumerationSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EnumerationType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ErrorType;
@@ -23,6 +24,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MutableType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NullType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OpenType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RealType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
@@ -59,6 +61,8 @@ final readonly class NativeCodeTypeMapper implements NativeCodeTypeMapperInterfa
 		BooleanType::class => ['Boolean', 'Enumeration'],
 		TrueType::class => ['True', 'Boolean', 'Enumeration'],
 		FalseType::class => ['False', 'Boolean', 'Enumeration'],
+		EmptyType::class => ['Empty', 'Optional', 'Atom'],
+		OptionalType::class => ['Optional'],
 		NullType::class => ['Null', 'Atom'],
 		EnumerationType::class => ['Enumeration'],
 		EnumerationSubsetType::class => ['Enumeration'],

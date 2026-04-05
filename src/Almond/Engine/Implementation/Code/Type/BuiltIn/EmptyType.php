@@ -5,6 +5,8 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn;
 use JsonSerializable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AtomType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EmptyType as EmptyTypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType as NothingTypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType as OptionalTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\SupertypeChecker;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\AtomValue;
@@ -21,7 +23,8 @@ final readonly class EmptyType implements EmptyTypeInterface, JsonSerializable, 
 	public AtomValue&EmptyValueInterface $value;
 
 	public function __construct(
-		public TypeName $name,
+		public NothingTypeInterface $valueType,
+		public TypeName             $name,
 	) {
 		$this->value = new EmptyValue($this);
 	}
@@ -35,7 +38,7 @@ final readonly class EmptyType implements EmptyTypeInterface, JsonSerializable, 
 
 	public function isSubtypeOf(Type $ofType): bool {
 		return match(true) {
-			$ofType instanceof EmptyTypeInterface => true,
+			$ofType instanceof EmptyTypeInterface, $ofType instanceof OptionalTypeInterface => true,
 			$ofType instanceof SupertypeChecker => $ofType->isSupertypeOf($this),
 			default => false
 		};
