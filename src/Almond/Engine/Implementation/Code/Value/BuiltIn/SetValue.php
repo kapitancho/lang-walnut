@@ -7,6 +7,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\InvalidArgument;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\EmptyValue as EmptyValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue as SetValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyContext;
@@ -38,6 +39,9 @@ final class SetValue implements SetValueInterface, JsonSerializable {
 					$value,
 					'TupleValue must be constructed with a list of Value instances'
 				);
+			}
+			if ($value instanceof EmptyValueInterface) {
+				continue;
 			}
 			$set[(string)$value] = $value;
 		}

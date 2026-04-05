@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\Expression;
 
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 
@@ -9,9 +10,15 @@ final readonly class SetExpression extends SequentialExpressionBase {
 
 	/** @param array<Type> $expressionTypes */
 	protected function buildExpressionType(array $expressionTypes, int $set, int $dynamic): Type {
+		$hasOptional = false;
+		$setItemType = $this->typeRegistry->union($expressionTypes);
+		if ($setItemType instanceof OptionalType) {
+			$hasOptional = true;
+			$setItemType = $setItemType->valueType;
+		}
 		return $this->typeRegistry->set(
-			$this->typeRegistry->union($expressionTypes),
-			min(max(1, $set), count($this->expressions)),
+			$setItemType,
+			$hasOptional ? 0 : min(max(1, $set), count($this->expressions)),
 			$set + $dynamic
 		);
 	}
