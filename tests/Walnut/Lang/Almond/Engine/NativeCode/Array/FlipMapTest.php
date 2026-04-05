@@ -31,6 +31,19 @@ final class FlipMapTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[a: 1, bcd: 3, ef: 2]", $result);
 	}
 
+	public function testFlipMapReturnTypeNoErrorOptional(): void {
+		$result = $this->executeCodeSnippet("flipMap['a', 'bcd', 'ef']",
+			valueDeclarations: "
+				flipMap = ^p: Array<String<1..3>, 2..5> => Map<String<1..3>:Integer, ..5> :: 
+					p->flipMap(^s: String => Optional<Integer> :: {
+						v = s->length;
+						?whenTypeOf(v) { `3: empty, ~: v }
+					});
+			"
+		);
+		$this->assertEquals("[a: 1, ef: 2]", $result);
+	}
+
 	public function testFlipMapReturnTypeResultNoError(): void {
 		$result = $this->executeCodeSnippet("flipMap['a', 'bcd', 'ef']",
 			valueDeclarations: "
@@ -39,6 +52,19 @@ final class FlipMapTest extends CodeExecutionTestHelper {
 			"
 		);
 		$this->assertEquals("[a: 1, bcd: 3, ef: 2]", $result);
+	}
+
+	public function testFlipMapReturnTypeResultNoErrorEmpty(): void {
+		$result = $this->executeCodeSnippet("flipMap['a', 'bcd', 'ef']",
+			valueDeclarations: "
+				flipMap = ^p: Array<String<1..3>, 2..5> => Result<Map<String<1..3>:Integer, ..5>, String> :: 
+					p->flipMap(^s: String => Result<Optional<Integer>, String> :: {
+						v = s->length;
+						?whenTypeOf(v) { `3: empty, ~: v }
+					});
+			"
+		);
+		$this->assertEquals("[a: 1, ef: 2]", $result);
 	}
 
 	public function testFlipMapReturnTypeResultError(): void {

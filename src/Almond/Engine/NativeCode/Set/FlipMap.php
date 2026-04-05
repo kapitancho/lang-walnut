@@ -3,10 +3,12 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\Set;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\EmptyValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue;
@@ -39,9 +41,12 @@ final readonly class FlipMap extends SetNativeMethod {
 			$r = $parameterType->returnType;
 			$errorType = $r instanceof ResultType ? $r->errorType : null;
 			$returnType = $r instanceof ResultType ? $r->returnType : $r;
+			if ($isOptional = $returnType instanceof OptionalType) {
+				$returnType = $returnType->valueType;
+			}
 			$t = $this->typeRegistry->map(
 				$returnType,
-				$targetType->range->minLength,
+				$isOptional ? 0 : $targetType->range->minLength,
 				$targetType->range->maxLength,
 				$targetType->itemType
 			);
@@ -57,6 +62,9 @@ final readonly class FlipMap extends SetNativeMethod {
 				$r = $parameter->execute($value);
 				if ($r instanceof ErrorValue) {
 					return $r;
+				}
+				if ($r instanceof EmptyValue) {
+					continue;
 				}
 				$result[$value->literalValue] = $r;
 			}

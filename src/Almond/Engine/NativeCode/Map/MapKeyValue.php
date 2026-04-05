@@ -4,6 +4,7 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\EmptyValue;
@@ -37,9 +38,12 @@ final readonly class MapKeyValue extends MapNativeMethod {
 			$r = $parameterType->returnType;
 			$errorType = $r instanceof ResultType ? $r->errorType : null;
 			$returnType = $r instanceof ResultType ? $r->returnType : $r;
+			if ($isOptional = $returnType instanceof OptionalType) {
+				$returnType = $returnType->valueType;
+			}
 			$t = $this->typeRegistry->map(
 				$returnType,
-				$targetType->range->minLength,
+				$isOptional ? 0 : $targetType->range->minLength,
 				$targetType->range->maxLength,
 				$targetType->keyType
 			);
