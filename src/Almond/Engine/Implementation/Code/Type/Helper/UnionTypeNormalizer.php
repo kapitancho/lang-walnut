@@ -4,6 +4,7 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AliasType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EnumerationSubsetType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType as OptionalTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ShapeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\UnionType as UnionTypeInterface;
@@ -65,6 +66,14 @@ final readonly class UnionTypeNormalizer {
                     $q = $queue[$ql];
                     if ($q->isSubtypeOf($tx)) {
                         array_splice($queue, $ql, 1);
+                    } else if ($q instanceof OptionalTypeInterface || $tx instanceof OptionalTypeInterface) {
+	                    array_splice($queue, $ql, 1);
+	                    $tx = $this->typeRegistry->optional(
+		                    $this->normalize(
+			                    $q instanceof OptionalTypeInterface ? $q->valueType : $q,
+			                    $tx instanceof OptionalTypeInterface ? $tx->valueType : $tx,
+		                    )
+	                    );
                     } else if ($q instanceof ResultType || $tx instanceof ResultType) {
 	                    array_splice($queue, $ql, 1);
 

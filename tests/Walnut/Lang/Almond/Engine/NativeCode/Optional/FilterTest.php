@@ -107,12 +107,11 @@ final class FilterTest extends CodeExecutionTestHelper {
 		$this->assertEquals("empty", $result);
 	}
 
-	/*
 	public function testFilterValueError(): void {
 		$result = $this->executeCodeSnippet(
 			"doValue(Value(3));",
 			valueDeclarations: "
-				doValue = ^a: Optional<Value<Integer<1..4>>> => Optional<Result<Value<Integer<1..4>>, Null>> ::
+				doValue = ^a: Optional<Value<Integer<1..4>>> => Result<Optional<Value<Integer<1..4>>>, Null> ::
 					a->filter(^item: Integer => Result<Boolean, Null> :: @null);
 			"
 		);
@@ -123,13 +122,12 @@ final class FilterTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet(
 			"doValue(empty);",
 			valueDeclarations: "
-				doValue = ^a: Optional<Value<Integer<1..4>>> => Optional<Result<Value<Integer<1..4>>, Null>> ::
+				doValue = ^a: Optional<Value<Integer<1..4>>> => Result<Optional<Value<Integer<1..4>>>, Null> ::
 					a->filter(^item: Integer => Result<Boolean, Null> :: @null);
 			"
 		);
 		$this->assertEquals("empty", $result);
 	}
-	*/
 
 	public function testInvalidType(): void {
 		$this->executeErrorCodeSnippet(

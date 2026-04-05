@@ -107,12 +107,15 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 		return new MutableType($valueType);
 	}
 
-	public function optional(Type $valueType): OptionalTypeInterface {
+	public function optional(Type $valueType): Type {
 		if ($valueType instanceof NothingTypeInterface) {
 			return $this->empty;
 		}
 		if ($valueType instanceof OptionalTypeInterface) {
 			return $valueType;
+		}
+		if ($valueType instanceof ResultTypeInterface) {
+			return $this->result($this->optional($valueType->returnType), $valueType->errorType);
 		}
 		return new OptionalType($valueType);
 	}

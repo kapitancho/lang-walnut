@@ -10,6 +10,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType as OptionalTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ShapeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -140,6 +141,15 @@ final readonly class IntersectionTypeNormalizer {
 			                    $newRange->maxLength
 		                    );
 	                    }
+                    } else if ($qBase instanceof OptionalTypeInterface || $txBase instanceof OptionalTypeInterface) {
+	                    array_splice($queue, $ql, 1);
+	                    $innerType = $this->normalize(
+		                    $qBase instanceof OptionalTypeInterface ? $qBase->valueType : $q,
+		                    $txBase instanceof OptionalTypeInterface ? $txBase->valueType : $tx,
+	                    );
+	                    $tx = $qBase instanceof OptionalTypeInterface && $txBase instanceof OptionalTypeInterface
+		                    ? $this->typeRegistry->optional($innerType)
+		                    : $innerType;
                     } else if ($qBase instanceof ResultType || $txBase instanceof ResultType) {
 	                    array_splice($queue, $ql, 1);
 
