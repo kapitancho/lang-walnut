@@ -8,7 +8,7 @@ final class FindFirstKeyValueTest extends CodeExecutionTestHelper {
 
 	public function testFindFirstKeyValueEmpty(): void {
 		$result = $this->executeCodeSnippet("[:]->findFirstKeyValue(^Any => Boolean :: true);");
-		$this->assertEquals("@ItemNotFound", $result);
+		$this->assertEquals("empty", $result);
 	}
 
 	public function testFindFirstKeyValueNonEmpty(): void {
@@ -20,7 +20,7 @@ final class FindFirstKeyValueTest extends CodeExecutionTestHelper {
 	public function testFindFirstKeyValueKeyType(): void {
 		$result = $this->executeCodeSnippet(
 			"fn[a: 1, b: 2];",
-			valueDeclarations: "fn = ^m: Map<String<1>:Integer> => Result<[key: String<1>, value: Integer], ItemNotFound> :: 
+			valueDeclarations: "fn = ^m: Map<String<1>:Integer> => Optional<[key: String<1>, value: Integer]> ::
 				m->findFirstKeyValue(^[key: String<1>, value: Integer] => Boolean :: #value > #key->length);"
 		);
 		$this->assertEquals("[key: 'b', value: 2]", $result);

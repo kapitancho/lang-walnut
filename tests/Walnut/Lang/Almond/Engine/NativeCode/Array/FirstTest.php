@@ -8,7 +8,7 @@ final class FirstTest extends CodeExecutionTestHelper {
 
 	public function testFirstEmpty(): void {
 		$result = $this->executeCodeSnippet("[]->first;");
-		$this->assertEquals("@ItemNotFound", $result);
+		$this->assertEquals("empty", $result);
 	}
 
 	public function testFirstNonEmpty(): void {
@@ -32,7 +32,7 @@ final class FirstTest extends CodeExecutionTestHelper {
 	public function testFirstReturnTypeMaybeEmpty(): void {
 		$result = $this->executeCodeSnippet(
 			"getFirst['a', 'b', 'c'];",
-			valueDeclarations: "getFirst = ^arr: Array<String> => Result<String, ItemNotFound> :: arr->first;"
+			valueDeclarations: "getFirst = ^arr: Array<String> => Optional<String> :: arr->first;"
 		);
 		$this->assertEquals("'a'", $result);
 	}
@@ -40,9 +40,9 @@ final class FirstTest extends CodeExecutionTestHelper {
 	public function testFirstReturnTypeMaybeEmptyError(): void {
 		$result = $this->executeCodeSnippet(
 			"getFirst[];",
-			valueDeclarations: "getFirst = ^arr: Array<String> => Result<String, ItemNotFound> :: arr->first;"
+			valueDeclarations: "getFirst = ^arr: Array<String> => Optional<String> :: arr->first;"
 		);
-		$this->assertEquals("@ItemNotFound", $result);
+		$this->assertEquals("empty", $result);
 	}
 
 	public function testFirstWithMinLengthTwo(): void {
@@ -72,7 +72,7 @@ final class FirstTest extends CodeExecutionTestHelper {
 	public function testFirstEmptyTupleRest(): void {
 		$result = $this->executeCodeSnippet(
 			"getTupleFirst[3.14, 42, -59.3];",
-			valueDeclarations: "getTupleFirst = ^t: [...Real] => Result<Real, ItemNotFound> :: t->first;"
+			valueDeclarations: "getTupleFirst = ^t: [...Real] => Optional<Real> :: t->first;"
 		);
 		$this->assertEquals("3.14", $result);
 	}
@@ -80,9 +80,9 @@ final class FirstTest extends CodeExecutionTestHelper {
 	public function testFirstEmptyTupleRestEmpty(): void {
 		$result = $this->executeCodeSnippet(
 			"getTupleFirst[];",
-			valueDeclarations: "getTupleFirst = ^t: [...Real] => Result<Real, ItemNotFound> :: t->first;"
+			valueDeclarations: "getTupleFirst = ^t: [...Real] => Optional<Real> :: t->first;"
 		);
-		$this->assertEquals("@ItemNotFound", $result);
+		$this->assertEquals("empty", $result);
 	}
 
 	public function testInvalidParameterType(): void {

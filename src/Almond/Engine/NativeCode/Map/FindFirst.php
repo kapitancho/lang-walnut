@@ -4,7 +4,7 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
@@ -13,11 +13,8 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\CommonBase\MapFilte
 final readonly class FindFirst extends MapFilterBase {
 
 	protected function getValidator(): callable {
-		return function(MapType $targetType, FunctionType $parameterType, mixed $origin): ResultType {
-			return $this->typeRegistry->result(
-				$targetType->itemType,
-				$this->typeRegistry->core->itemNotFound
-			);
+		return function(MapType $targetType, FunctionType $parameterType, mixed $origin): Type {
+			return $this->typeRegistry->optional($targetType->itemType);
 		};
 	}
 
@@ -30,9 +27,7 @@ final readonly class FindFirst extends MapFilterBase {
 					return $value;
 				}
 			}
-			return $this->valueRegistry->error(
-				$this->valueRegistry->core->itemNotFound
-			);
+			return $this->valueRegistry->empty;
 		};
 	}
 

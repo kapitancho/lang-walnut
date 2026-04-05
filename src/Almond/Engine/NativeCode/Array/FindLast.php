@@ -14,10 +14,7 @@ final readonly class FindLast extends ArrayFilterBase {
 
 	protected function getValidator(): callable {
 		return function(ArrayType $targetType, FunctionType $parameterType, mixed $origin): Type {
-			return $this->typeRegistry->result(
-				$targetType->itemType,
-				$this->typeRegistry->core->itemNotFound
-			);
+			return $this->typeRegistry->optional($targetType->itemType);
 		};
 	}
 
@@ -31,9 +28,7 @@ final readonly class FindLast extends ArrayFilterBase {
 					return $values[$i];
 				}
 			}
-			return $this->valueRegistry->error(
-				$this->valueRegistry->core->itemNotFound
-			);
+			return $this->valueRegistry->empty;
 		};
 	}
 

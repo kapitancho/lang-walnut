@@ -3,7 +3,6 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\Map;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
@@ -13,11 +12,8 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\MapNat
 final readonly class KeyOf extends MapNativeMethod {
 
 	protected function getValidator(): callable {
-		return fn(MapType $targetType, Type $parameterType): ResultType =>
-			$this->typeRegistry->result(
-				$targetType->keyType,
-				$this->typeRegistry->core->itemNotFound
-			);
+		return fn(MapType $targetType, Type $parameterType): Type =>
+			$this->typeRegistry->optional($targetType->keyType);
 	}
 
 	protected function getExecutor(): callable {
@@ -27,9 +23,7 @@ final readonly class KeyOf extends MapNativeMethod {
 					return $this->valueRegistry->string($key);
 				}
 			}
-			return $this->valueRegistry->error(
-				$this->valueRegistry->core->itemNotFound
-			);
+			return $this->valueRegistry->empty;
 		};
 	}
 

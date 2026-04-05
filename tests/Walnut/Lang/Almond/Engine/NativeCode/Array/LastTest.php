@@ -8,7 +8,7 @@ final class LastTest extends CodeExecutionTestHelper {
 
 	public function testLastEmpty(): void {
 		$result = $this->executeCodeSnippet("[]->last;");
-		$this->assertEquals("@ItemNotFound", $result);
+		$this->assertEquals("empty", $result);
 	}
 
 	public function testLastNonEmpty(): void {
@@ -32,7 +32,7 @@ final class LastTest extends CodeExecutionTestHelper {
 	public function testLastReturnTypeMaybeEmpty(): void {
 		$result = $this->executeCodeSnippet(
 			"getLast['a', 'b', 'c'];",
-			valueDeclarations: "getLast = ^arr: Array<String> => Result<String, ItemNotFound> :: arr->last;"
+			valueDeclarations: "getLast = ^arr: Array<String> => Optional<String> :: arr->last;"
 		);
 		$this->assertEquals("'c'", $result);
 	}
@@ -40,9 +40,9 @@ final class LastTest extends CodeExecutionTestHelper {
 	public function testLastReturnTypeMaybeEmptyError(): void {
 		$result = $this->executeCodeSnippet(
 			"getLast[];",
-			valueDeclarations: "getLast = ^arr: Array<String> => Result<String, ItemNotFound> :: arr->last;"
+			valueDeclarations: "getLast = ^arr: Array<String> => Optional<String> :: arr->last;"
 		);
-		$this->assertEquals("@ItemNotFound", $result);
+		$this->assertEquals("empty", $result);
 	}
 
 	public function testLastWithMinLengthTwo(): void {
@@ -81,7 +81,7 @@ final class LastTest extends CodeExecutionTestHelper {
 	public function testLastEmptyTupleRest(): void {
 		$result = $this->executeCodeSnippet(
 			"getTupleLast[3.14, 42, -59.3];",
-			valueDeclarations: "getTupleLast = ^t: [...Real] => Result<Real, ItemNotFound> :: t->last;"
+			valueDeclarations: "getTupleLast = ^t: [...Real] => Optional<Real> :: t->last;"
 		);
 		$this->assertEquals("-59.3", $result);
 	}
@@ -89,9 +89,9 @@ final class LastTest extends CodeExecutionTestHelper {
 	public function testLastEmptyTupleRestEmpty(): void {
 		$result = $this->executeCodeSnippet(
 			"getTupleLast[];",
-			valueDeclarations: "getTupleLast = ^t: [...Real] => Result<Real, ItemNotFound> :: t->last;"
+			valueDeclarations: "getTupleLast = ^t: [...Real] => Optional<Real> :: t->last;"
 		);
-		$this->assertEquals("@ItemNotFound", $result);
+		$this->assertEquals("empty", $result);
 	}
 
 	public function testInvalidParameterType(): void {

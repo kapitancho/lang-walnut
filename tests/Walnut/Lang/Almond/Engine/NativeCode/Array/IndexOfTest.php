@@ -8,7 +8,7 @@ final class IndexOfTest extends CodeExecutionTestHelper {
 
 	public function testIndexOfEmpty(): void {
 		$result = $this->executeCodeSnippet("[]->indexOf(5);");
-		$this->assertEquals("@ItemNotFound", $result);
+		$this->assertEquals("empty", $result);
 	}
 
 	public function testIndexOfNonEmpty(): void {
@@ -18,14 +18,14 @@ final class IndexOfTest extends CodeExecutionTestHelper {
 
 	public function testIndexOfType(): void {
 		$result = $this->executeCodeSnippet("i[1, 2, 5, 10, 5];",
-			valueDeclarations: "i = ^a: Array<Integer> => Result<Integer, ItemNotFound> :: a->indexOf(5);"
+			valueDeclarations: "i = ^a: Array<Integer> => Optional<Integer> :: a->indexOf(5);"
 		);
 		$this->assertEquals("2", $result);
 	}
 
 	public function testIndexOfTypeRanged(): void {
 		$result = $this->executeCodeSnippet("i[1, 2, 5, 10, 5];",
-			valueDeclarations: "i = ^a: Array<Integer, 2..6> => Result<Integer<0..5>, ItemNotFound> :: a->indexOf(5);"
+			valueDeclarations: "i = ^a: Array<Integer, 2..6> => Optional<Integer<0..5>> :: a->indexOf(5);"
 		);
 		$this->assertEquals("2", $result);
 	}

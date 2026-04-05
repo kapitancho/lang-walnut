@@ -18,15 +18,13 @@ final readonly class First extends ArrayNativeMethod {
 		return function(ArrayType $targetType, NullType $parameterType): Type {
 			if ($targetType instanceof TupleType) {
 				return count($targetType->types) > 0 ?
-					$targetType->types[0] : $this->typeRegistry->result(
-						$targetType->restType,
-						$this->typeRegistry->core->itemNotFound
+					$targetType->types[0] : $this->typeRegistry->optional(
+						$targetType->restType
 					);
 			}
 			return $targetType->range->minLength > 0 ?
-				$targetType->itemType : $this->typeRegistry->result(
-					$targetType->itemType,
-					$this->typeRegistry->core->itemNotFound
+				$targetType->itemType : $this->typeRegistry->optional(
+					$targetType->itemType
 				);
 		};
 	}
@@ -37,9 +35,7 @@ final readonly class First extends ArrayNativeMethod {
 			if (count($values) > 0) {
 				return $values[0];
 			}
-			return $this->valueRegistry->error(
-				$this->valueRegistry->core->itemNotFound
-			);
+			return $this->valueRegistry->empty;
 		};
 	}
 

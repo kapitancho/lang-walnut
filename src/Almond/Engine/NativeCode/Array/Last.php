@@ -27,15 +27,13 @@ final readonly class Last extends ArrayNativeMethod {
 							$targetType->restType
 						]);
 				}
-				return $this->typeRegistry->result(
-					$targetType->restType,
-					$this->typeRegistry->core->itemNotFound
+				return $this->typeRegistry->optional(
+					$targetType->restType
 				);
 			}
 			return $targetType->range->minLength > 0 ?
-				$targetType->itemType : $this->typeRegistry->result(
-					$targetType->itemType,
-					$this->typeRegistry->core->itemNotFound
+				$targetType->itemType : $this->typeRegistry->optional(
+					$targetType->itemType
 				);
 		};
 	}
@@ -47,9 +45,7 @@ final readonly class Last extends ArrayNativeMethod {
 			if ($count > 0) {
 				return $values[$count - 1];
 			}
-			return $this->valueRegistry->error(
-				$this->valueRegistry->core->itemNotFound
-			);
+			return $this->valueRegistry->empty;
 		};
 	}
 }
