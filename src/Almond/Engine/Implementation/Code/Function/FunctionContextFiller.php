@@ -7,7 +7,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\NameAndType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\DataType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OpenType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SealedType;
@@ -40,10 +39,6 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 		ValidationContext $validationContext,
 		NameAndType $target, NameAndType $parameter, NameAndType $dependency,
 	): ValidationContext {
-		$tConv = fn(Type $type): Type => $type instanceof OptionalType ?
-			$this->typeRegistry->result($type->valueType, $this->typeRegistry->core->mapItemNotFound) :
-			$type;
-
 		$targetType = $target->type;
 		$parameterType = $parameter->type;
 		$dependencyType = $dependency->type;
@@ -91,7 +86,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 						try {
 							$validationContext = $validationContext->withAddedVariableType(
 								new VariableName($variableName . $fieldName),
-								$tConv($fieldType)
+								$fieldType
 							);
 						} catch (IdentifierException) {}
 					}
@@ -112,7 +107,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 			foreach($targetType->valueType->types as $fieldName => $fieldType) {
 				$validationContext = $validationContext->withAddedVariableType(
 					new VariableName('$' . $fieldName),
-					$tConv($fieldType)
+					$fieldType
 				);
 			}
 			if (!$targetType->valueType->restType instanceof NothingType) {
@@ -207,17 +202,10 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 					foreach($t->types as $fieldName => $fieldType) {
 						unset($recordValues[$fieldName]);
 						try {
-							$rValue = $values[$fieldName] ??
-								$this->valueRegistry->error(
-									$this->valueRegistry->core->mapItemNotFound(
-										$this->valueRegistry->record([
-											'key' => $this->valueRegistry->string($fieldName)
-										])
-									)
-								);
+							$rValue = $values[$fieldName] ?? $this->valueRegistry->empty;
 							$executionContext = $executionContext->withAddedVariableValue(
 								new VariableName($variableName . $fieldName),
-								($rValue)
+								$rValue
 							);
 							// @codeCoverageIgnoreStart
 						} catch(IdentifierException) {}
@@ -242,15 +230,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 			$tTypes = $target->type->valueType->types;
 			foreach($tTypes as $fieldName => $fieldType) {
 				unset($restValues[$fieldName]);
-				$value = $values[$fieldName] ??
-					$this->valueRegistry->error(
-						$this->valueRegistry->core->mapItemNotFound(
-							$this->valueRegistry->record([
-								'key' => $this->valueRegistry->string((string)$fieldName)
-							])
-						)
-					)
-				;
+				$value = $values[$fieldName] ?? $this->valueRegistry->empty;
 				$executionContext = $executionContext->withAddedVariableValue(
 					new VariableName('$' . $fieldName),
 					$value
