@@ -3,9 +3,11 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\Set;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\EmptyValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SetValue;
@@ -19,9 +21,12 @@ final readonly class Map extends SetCallbackBase {
 			$r = $parameterType->returnType;
 			$errorType = $r instanceof ResultType ? $r->errorType : null;
 			$returnType = $r instanceof ResultType ? $r->returnType : $r;
+			if ($isOptional = $returnType instanceof OptionalType) {
+				$returnType = $returnType->valueType;
+			}
 			$t = $this->typeRegistry->set(
 				$returnType,
-				$targetType->range->minLength < 1 ? 0 : 1,
+				$isOptional ? 0 : ($targetType->range->minLength < 1 ? 0 : 1),
 				$targetType->range->maxLength,
 			);
 			return $errorType ? $this->typeRegistry->result($t, $errorType) : $t;
@@ -35,6 +40,9 @@ final readonly class Map extends SetCallbackBase {
 				$r = $parameter->execute($value);
 				if ($r instanceof ErrorValue) {
 					return $r;
+				}
+				if ($r instanceof EmptyValue) {
+					continue;
 				}
 				$result[] = $r;
 			}
