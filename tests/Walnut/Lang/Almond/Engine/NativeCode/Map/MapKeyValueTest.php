@@ -16,6 +16,14 @@ final class MapKeyValueTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[a: 2, b: 3, c: 6, d: 11, eee: 8]", $result);
 	}
 
+	public function testMapKeyValueNonEmptyEmptyValue(): void {
+		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 5, d: 10, eee: 5]->mapKeyValue(^[key: String, value: Integer] => Optional<Integer> :: {
+			x = {#key->length} + #value;
+			?whenTypeOf(x) { `Integer<10..>: empty, ~: x }
+		});");
+		$this->assertEquals("[a: 2, b: 3, c: 6, eee: 8]", $result);
+	}
+
 	public function testMapKeyValueKeyType(): void {
 		$result = $this->executeCodeSnippet(
 			"fn[a: 1, b: 2];",

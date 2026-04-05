@@ -7,6 +7,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\InvalidArgument;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\EmptyValue as EmptyValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue as RecordValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyContext;
@@ -16,6 +17,9 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\Type\UnknownProperty;
 
 final class RecordValue implements RecordValueInterface, JsonSerializable {
 
+	/** @var array<string, Value> */
+	public readonly array $values;
+
 	/**
 	 * @param TypeRegistry $typeRegistry
 	 * @param array<string, Value> $values
@@ -24,9 +28,10 @@ final class RecordValue implements RecordValueInterface, JsonSerializable {
 	 */
     public function __construct(
         private readonly TypeRegistry $typeRegistry,
-	    public readonly array $values
+	    array $values
     ) {
-		foreach($this->values as $key => $value) {
+		$v = [];
+		foreach($values as $key => $value) {
 			/** @phpstan-ignore-next-line instanceof.alwaysTrue */
 			if (!$value instanceof Value) {
 				InvalidArgument::of(
@@ -39,7 +44,12 @@ final class RecordValue implements RecordValueInterface, JsonSerializable {
 					)
 				);
 			}
+			if ($value instanceof EmptyValueInterface) {
+				continue;
+			}
+			$v[$key] = $value;
 		}
+		$this->values = $v;
     }
 
 	public RecordType $type {

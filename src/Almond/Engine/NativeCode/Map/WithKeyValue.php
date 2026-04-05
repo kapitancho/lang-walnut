@@ -6,6 +6,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\EmptyValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
@@ -66,9 +67,13 @@ final readonly class WithKeyValue extends MapNativeMethod {
 			/** @var StringValue $pKey */
 			$pKey = $p['key'];
 			/** @var Value $pValue */
-			$pValue = $p['value'];
+			$pValue = $p['value'] ?? $this->valueRegistry->empty;
 			$values = $target->values;
-			$values[$pKey->literalValue] = $pValue;
+			if ($pValue instanceof EmptyValue) {
+				unset($values[$pKey->literalValue]);
+			} else {
+				$values[$pKey->literalValue] = $pValue;
+			}
 			return $this->valueRegistry->record($values);
 		};
 	}

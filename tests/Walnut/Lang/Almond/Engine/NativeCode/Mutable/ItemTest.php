@@ -13,7 +13,7 @@ final class ItemTest extends CodeExecutionTestHelper {
 
 	public function testItemMutableArrayOutOfBounds(): void {
 		$result = $this->executeCodeSnippet("mutable{Array<Integer>, [1, 2, 3]}->item(5);");
-		$this->assertEquals("@IndexOutOfRange![index: 5]", $result);
+		$this->assertEquals("empty", $result);
 	}
 
 	public function testItemMutableTupleValid(): void {
@@ -28,7 +28,7 @@ final class ItemTest extends CodeExecutionTestHelper {
 
 	public function testItemMutableMapMissingKey(): void {
 		$result = $this->executeCodeSnippet("mutable{Map<String:Integer>, [a: 1, b: 2]}->item('z');");
-		$this->assertEquals("@MapItemNotFound![key: 'z']", $result);
+		$this->assertEquals("empty", $result);
 	}
 
 	public function testItemMutableRecordValid(): void {
@@ -39,7 +39,7 @@ final class ItemTest extends CodeExecutionTestHelper {
 	public function testItemMutableRecordOptionalPresent(): void {
 		$result = $this->executeCodeSnippet(
 			"getValue(mutable{[a: String, b: ?Real], [a: 'hello', b: 2]});",
-			valueDeclarations: "getValue = ^m: Mutable<[a: String, b: ?Real]> => Result<Real, MapItemNotFound> :: m->item('b');"
+			valueDeclarations: "getValue = ^m: Mutable<[a: String, b: ?Real]> => Optional<Real> :: m->item('b');"
 		);
 		$this->assertEquals("2", $result);
 	}
@@ -47,9 +47,9 @@ final class ItemTest extends CodeExecutionTestHelper {
 	public function testItemMutableRecordOptionalMissing(): void {
 		$result = $this->executeCodeSnippet(
 			"getValue(mutable{[a: String, b: ?Real], [a: 'hello']});",
-			valueDeclarations: "getValue = ^m: Mutable<[a: String, b: ?Real]> => Result<Real, MapItemNotFound> :: m->item('b');"
+			valueDeclarations: "getValue = ^m: Mutable<[a: String, b: ?Real]> => Optional<Real> :: m->item('b');"
 		);
-		$this->assertEquals("@MapItemNotFound![key: 'b']", $result);
+		$this->assertEquals("empty", $result);
 	}
 
 	public function testItemInvalidTargetType(): void {

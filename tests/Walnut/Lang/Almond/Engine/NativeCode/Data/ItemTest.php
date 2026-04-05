@@ -8,7 +8,7 @@ final class ItemTest extends CodeExecutionTestHelper {
 
 	public function testTupleItemOutOfRange(): void {
 		$result = $this->executeCodeSnippet("{MyTuple![3, 5]}->item(4);", "MyTuple := [Integer, Real];");
-		$this->assertEquals("@IndexOutOfRange![index: 4]", $result);
+		$this->assertEquals("empty", $result);
 	}
 
 	public function testTupleItemInRange(): void {
@@ -16,11 +16,20 @@ final class ItemTest extends CodeExecutionTestHelper {
 		$this->assertEquals("5", $result);
 	}
 
+	public function testItemEmpty(): void {
+		$result = $this->executeCodeSnippet(
+			"getItem(MyTuple![a: 'hello']);",
+			"MyTuple := [a: String, b: Empty];",
+			"getItem = ^m: MyTuple => Optional<Real> :: m->item('b');"
+		);
+		$this->assertEquals("empty", $result);
+	}
+
 	public function testItemOptional(): void {
 		$result = $this->executeCodeSnippet(
 			"getItem(MyTuple![a: 'hello', b: 2]);",
 			"MyTuple := [a: String, b: ?Real];",
-			"getItem = ^m: MyTuple => Result<Real, MapItemNotFound> :: m->item('b');"
+			"getItem = ^m: MyTuple => Optional<Real> :: m->item('b');"
 		);
 		$this->assertEquals("2", $result);
 	}
@@ -29,9 +38,18 @@ final class ItemTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet(
 			"getItem(MyTuple![a: 'hello']);",
 			"MyTuple := [a: String, b: ?Real];",
-			valueDeclarations: "getItem = ^m: MyTuple => Result<Real, MapItemNotFound> :: m->item('b');"
+			valueDeclarations: "getItem = ^m: MyTuple => Optional<Real> :: m->item('b');"
 		);
-		$this->assertEquals("@MapItemNotFound![key: 'b']", $result);
+		$this->assertEquals("empty", $result);
+	}
+
+	public function testItemOptionalMissingExplicit(): void {
+		$result = $this->executeCodeSnippet(
+			"getItem(MyTuple![a: 'hello', b: empty]);",
+			"MyTuple := [a: String, b: ?Real];",
+			valueDeclarations: "getItem = ^m: MyTuple => Optional<Real> :: m->item('b');"
+		);
+		$this->assertEquals("empty", $result);
 	}
 
 	public function testTupleItemTypeWithRestSubset(): void {
@@ -53,7 +71,7 @@ final class ItemTest extends CodeExecutionTestHelper {
 	public function testTupleItemTypeWithRestRange(): void {
 		$result = $this->executeCodeSnippet("getValue[t: MyTuple![6, true, false], idx: 2];",
 			"MyTuple := [Integer, ... Boolean];",
-			"getValue = ^[t: MyTuple, idx: Integer<1..>] => Result<Boolean, IndexOutOfRange> :: #t->item(#idx);"
+			"getValue = ^[t: MyTuple, idx: Integer<1..>] => Optional<Boolean> :: #t->item(#idx);"
 		);
 		$this->assertEquals("false", $result);
 	}
@@ -61,14 +79,14 @@ final class ItemTest extends CodeExecutionTestHelper {
 	public function testTupleItemTypeWithRestInteger(): void {
 		$result = $this->executeCodeSnippet("getValue[t: MyTuple![6, true, false], idx: 2];",
 			"MyTuple := [Integer, ... Boolean];",
-			"getValue = ^[t: MyTuple, idx: Integer<0..>] => Result<Integer|Boolean, IndexOutOfRange> :: #t->item(#idx);"
+			"getValue = ^[t: MyTuple, idx: Integer<0..>] => Optional<Integer|Boolean> :: #t->item(#idx);"
 		);
 		$this->assertEquals("false", $result);
 	}
 
 	public function testRecordItemOutOfRange(): void {
 		$result = $this->executeCodeSnippet("{MyRecord![a: 3, b: 5]}->item('d');", "MyRecord := [a: Integer, b: Real];");
-		$this->assertEquals("@MapItemNotFound![key: 'd']", $result);
+		$this->assertEquals("empty", $result);
 	}
 
 	public function testRecordItemInRange(): void {
@@ -87,7 +105,7 @@ final class ItemTest extends CodeExecutionTestHelper {
 	public function testRecordItemTypeWithRestRange(): void {
 		$result = $this->executeCodeSnippet("getValue[t: MyRecord![a: 6, b: true, c: false], key: 'c'];",
 			"MyRecord := [a: Integer, ... Boolean];",
-			"getValue = ^[t: MyRecord, key: String['c', 'd', 'f']] => Result<Boolean, MapItemNotFound> :: #t->item(#key);"
+			"getValue = ^[t: MyRecord, key: String['c', 'd', 'f']] => Optional<Boolean> :: #t->item(#key);"
 		);
 		$this->assertEquals("false", $result);
 	}
@@ -95,7 +113,7 @@ final class ItemTest extends CodeExecutionTestHelper {
 	public function testRecordItemTypeWithRestString(): void {
 		$result = $this->executeCodeSnippet("getValue[t: MyRecord![a: 6, b: true, c: false], key: 'c'];",
 			"MyRecord := [a: Integer, ... Boolean];",
-			"getValue = ^[t: MyRecord, key: String] => Result<Integer|Boolean, MapItemNotFound> :: #t->item(#key);"
+			"getValue = ^[t: MyRecord, key: String] => Optional<Integer|Boolean> :: #t->item(#key);"
 		);
 		$this->assertEquals("false", $result);
 	}

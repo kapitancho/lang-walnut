@@ -6,6 +6,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\EmptyValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\FunctionValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\RecordValue;
@@ -36,6 +37,9 @@ final readonly class Map extends MapCallbackBase {
 				$r = $parameter->execute($value);
 				if ($r instanceof ErrorValue) {
 					return $r;
+				}
+				if ($r instanceof EmptyValue) {
+					continue;
 				}
 				$result[$key] = $r;
 			}

@@ -16,6 +16,14 @@ final class MapTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[a: 4, b: 5, c: 8, d: 13, e: 8]", $result);
 	}
 
+	public function testMapNonEmptyEmptyValue(): void {
+		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 5, d: 10, e: 5]->map(^i: Integer => Optional<Integer> :: {
+			x = i + 3;
+			?whenTypeOf(x) { `Integer<10..>: empty, ~: x }
+		});");
+		$this->assertEquals("[a: 4, b: 5, c: 8, e: 8]", $result);
+	}
+
 	public function testMapNonEmptyError(): void {
 		$result = $this->executeCodeSnippet("[a: 1, b: 2, c: 5, d: 10, e: 5]->map(^Integer => Result<Integer, String> :: @'error');");
 		$this->assertEquals("@'error'", $result);

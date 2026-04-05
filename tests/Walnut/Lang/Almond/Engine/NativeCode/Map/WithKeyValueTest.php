@@ -21,6 +21,11 @@ final class WithKeyValueTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[a: 'a', b: 5, c: 2]", $result);
 	}
 
+	public function testWithKeyValueUnset(): void {
+		$result = $this->executeCodeSnippet("[a: 'a', b: 1, c: 2]->withKeyValue[value: empty, key: 'b'];");
+		$this->assertEquals("[a: 'a', c: 2]", $result);
+	}
+
 	public function testWithKeyValueKeyType(): void {
 		$result = $this->executeCodeSnippet(
 			"fn[a: 1, b: 2];",

@@ -12,7 +12,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\IntersectionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MetaType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OpenType;
-use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\RecordType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringSubsetType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
@@ -28,7 +27,6 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry;
-use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
@@ -100,10 +98,7 @@ final readonly class ItemHelper {
 				$parameterType->numberRange->max !== PlusInfinity::value &&
 				$targetType->range->minLength > $parameterType->numberRange->max->value ?
 					$returnType :
-					$this->typeRegistry->result(
-						$returnType,
-						$this->typeRegistry->typeByName(new TypeName('IndexOutOfRange'))
-					)
+					$this->typeRegistry->optional($returnType)
 			);
 		}
 		return $this->validationFactory->error(
@@ -141,21 +136,15 @@ final readonly class ItemHelper {
 		if ($targetType instanceof MetaType && $targetType->value === MetaTypeValue::Record) {
 			$mapType = $this->typeRegistry->map();
 		}
-		$mapItemNotFound = $this->typeRegistry->core->mapItemNotFound;
-
 		$parameterType = $this->toBaseType($parameterType);
 		if ($parameterType instanceof StringType) {
 			$returnType = $mapType->itemType;
 			if ($targetType instanceof RecordType && $parameterType instanceof StringSubsetType) {
-				$tConv = fn(Type $fType): Type => $fType instanceof OptionalType ?
-					$this->typeRegistry->result($fType->valueType, $mapItemNotFound) :
-					$fType;
 				$returnType = $this->typeRegistry->union(
 					array_map(
-						fn(string $value): Type => $tConv(
+						fn(string $value): Type =>
 							$targetType->types[$value] ??
-							$targetType->restType
-						),
+							$targetType->restType,
 						$parameterType->subsetValues
 					)
 				);
@@ -171,7 +160,7 @@ final readonly class ItemHelper {
 			}*/
 			/** @var Type $returnType */
 			return $this->validationFactory->validationSuccess(
-				$this->typeRegistry->result($returnType, $mapItemNotFound)
+				$this->typeRegistry->optional($returnType)
 			);
 		}
 		return $this->validationFactory->error(
@@ -205,11 +194,7 @@ final readonly class ItemHelper {
 	): Value {
 		if ($parameter instanceof IntegerValue) {
 			$values = $target->values;
-			return $values[(int)(string)$parameter->literalValue] ?? $this->valueRegistry->error(
-				$this->valueRegistry->data(new TypeName('IndexOutOfRange'),
-					$this->valueRegistry->record(['index' => $parameter])
-				)
-			);
+			return $values[(int)(string)$parameter->literalValue] ?? $this->valueRegistry->empty;
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid parameter value");
@@ -223,11 +208,7 @@ final readonly class ItemHelper {
 	): Value {
 		if ($parameter instanceof StringValue) {
 			$values = $target->values;
-			return $values[$parameter->literalValue] ?? $this->valueRegistry->error(
-				$this->valueRegistry->core->mapItemNotFound(
-					$this->valueRegistry->record(['key' => $parameter])
-				)
-			);
+			return $values[$parameter->literalValue] ?? $this->valueRegistry->empty;
 		}
 		// @codeCoverageIgnoreStart
 		throw new ExecutionException("Invalid parameter value");

@@ -30,7 +30,7 @@ final class ItemTest extends CodeExecutionTestHelper {
 	public function testItemOptional(): void {
 		$result = $this->executeCodeSnippet(
 			"getItem[a: 'hello', b: 2];",
-			valueDeclarations: "getItem = ^m: [a: String, b: ?Real] => Result<Real, MapItemNotFound> :: m->item('b');"
+			valueDeclarations: "getItem = ^m: [a: String, b: ?Real] => Optional<Real> :: m->item('b');"
 		);
 		$this->assertEquals("2", $result);
 	}
@@ -38,33 +38,33 @@ final class ItemTest extends CodeExecutionTestHelper {
 	public function testItemOptionalMissing(): void {
 		$result = $this->executeCodeSnippet(
 			"getItem[a: 'hello'];",
-			valueDeclarations: "getItem = ^m: [a: String, b: ?Real] => Result<Real, MapItemNotFound> :: m->item('b');"
+			valueDeclarations: "getItem = ^m: [a: String, b: ?Real] => Optional<Real> :: m->item('b');"
 		);
-		$this->assertEquals("@MapItemNotFound![key: 'b']", $result);
+		$this->assertEquals("empty", $result);
 	}
 
 	public function testItemMapType(): void {
 		$result = $this->executeCodeSnippet(
 			"getItem[a: 'hello'];",
-			valueDeclarations: "getItem = ^m: Map<String|Real> => Result<String|Real, MapItemNotFound> :: m->item('b');"
+			valueDeclarations: "getItem = ^m: Map<String|Real> => Optional<String|Real> :: m->item('b');"
 		);
-		$this->assertEquals("@MapItemNotFound![key: 'b']", $result);
+		$this->assertEquals("empty", $result);
 	}
 
 	public function testItemMetaType(): void {
 		$result = $this->executeCodeSnippet(
 			"getItem[a: 'hello'];",
-			valueDeclarations: "getItem = ^m: Any => Result<Any, MapItemNotFound> :: {
+			valueDeclarations: "getItem = ^m: Any => Optional<Any> :: {
 				mx = m->as(`Record) ?? [:];
 				mx->item('b');
 			};"
 		);
-		$this->assertEquals("@MapItemNotFound![key: 'b']", $result);
+		$this->assertEquals("empty", $result);
 	}
 
 	public function testItemNonEmptyIndexOutOfRange(): void {
 		$result = $this->executeCodeSnippet("getItem('r');", valueDeclarations: "getItem = ^s: String :: [a: 1, b: 2, c: 5, d: 10, e: 5]->item(s);");
-		$this->assertEquals("@MapItemNotFound![key: 'r']", $result);
+		$this->assertEquals("empty", $result);
 	}
 
 	public function testItemIntersection(): void {
