@@ -176,7 +176,7 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 				}
 				if ($t instanceof TupleType && $v instanceof TupleValue) {
 					foreach($t->types as $index => $typeItem) {
-						$rValue = $values[$index] ?? $this->valueRegistry->empty;
+						$rValue = $v->values[$index] ?? $this->valueRegistry->empty;
 						$executionContext = $executionContext->withAddedVariableValue(
 							new VariableName($variableName . $index),
 							$rValue

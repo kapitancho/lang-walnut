@@ -31,7 +31,7 @@ final class ContainsTest extends CodeExecutionTestHelper {
 
 	public function testContainsEmptyValue(): void {
 		$result = $this->executeCodeSnippet(
-			"getArray[empty, 'hello', true]->contains(empty);",
+			"getArray[a: empty, b: 'hello', c: true]->contains(empty);",
 			valueDeclarations: "getArray = ^s: [a: Optional<Integer>, b: String, c: Optional<Boolean>]
 				=> Array<Integer|String|Boolean, ..3> :: [s.a, s.b, s.c];"
 		);

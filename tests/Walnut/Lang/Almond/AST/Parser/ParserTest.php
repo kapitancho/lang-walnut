@@ -1463,7 +1463,7 @@ class ParserTest extends TestCase {
 		yield ['\\Shape', ShapeTypeNode::class, fn($t) => $t->refType instanceOf AnyTypeNode];
 		yield ['Shape<Boolean>', ShapeTypeNode::class, fn($t) => $t->refType instanceOf BooleanTypeNode];
 		yield ['{Boolean}', ShapeTypeNode::class, fn($t) => $t->refType instanceOf BooleanTypeNode];
-		yield ['Result', ResultTypeNode::class, fn($t) => $t->returnType instanceof OptionalTypeNode && $t->errorType instanceOf AnyTypeNode];
+		yield ['Result', ResultTypeNode::class, fn($t) => $t->returnType instanceof AnyTypeNode && $t->errorType instanceOf AnyTypeNode];
 		yield ['\\Result', ResultTypeNode::class, fn($t) => $t->returnType instanceOf AnyTypeNode && $t->errorType instanceOf AnyTypeNode];
 		yield ['Result<Null>', ResultTypeNode::class, fn($t) => $t->returnType instanceOf NullTypeNode && $t->errorType instanceOf AnyTypeNode];
 		yield ['Result<Null, Boolean>', ResultTypeNode::class, fn($t) => $t->returnType instanceOf NullTypeNode && $t->errorType instanceOf BooleanTypeNode];

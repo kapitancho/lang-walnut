@@ -65,7 +65,7 @@ final class BinaryOrElseTest extends CodeExecutionTestHelper {
 
 	public function testBinaryOrElseTypeCheckBoth(): void {
 		$result = $this->executeCodeSnippet(
-			"orElse[empty, @false];",
+			"orElse[a: empty, b: @false];",
 			valueDeclarations: "
 				orElse = ^[a: Optional<String>, b: Result<Integer, Boolean>] 
 					=> String|Integer|3.14 :: #a ?? #b ?? 3.14;
@@ -76,7 +76,7 @@ final class BinaryOrElseTest extends CodeExecutionTestHelper {
 
 	public function testBinaryOrElseTypeCheckFirst(): void {
 		$result = $this->executeCodeSnippet(
-			"orElse['hello', @false];",
+			"orElse[a: 'hello', b: @false];",
 			valueDeclarations: "
 				orElse = ^[a: Optional<String>, b: Result<Integer, Boolean>] 
 					=> String|Integer|3.14 :: #a ?? #b ?? 3.14;
@@ -87,7 +87,7 @@ final class BinaryOrElseTest extends CodeExecutionTestHelper {
 
 	public function testBinaryOrElseTypeCheckSecond(): void {
 		$result = $this->executeCodeSnippet(
-			"orElse[empty, 42];",
+			"orElse[a: empty, b: 42];",
 			valueDeclarations: "
 				orElse = ^[a: Optional<String>, b: Result<Integer, Boolean>] 
 					=> String|Integer|3.14 :: #a ?? #b ?? 3.14;
