@@ -70,7 +70,9 @@ final readonly class ItemTypes extends TypeNativeMethod {
 			if ($refType->value === MetaTypeValue::Record) {
 				return $this->typeRegistry->map(
 					$this->typeRegistry->type(
-						$this->typeRegistry->any,
+						$this->typeRegistry->optional(
+							$this->typeRegistry->any
+						),
 					),
 					0,
 					PlusInfinity::value,

@@ -24,8 +24,19 @@ final class ItemTypesTest extends CodeExecutionTestHelper {
 
 	public function testItemTypesMetaTypeRecord(): void {
 		$result = $this->executeCodeSnippet("getItemTypes(type{[a: Integer, b: Real, ...String]});",
-			valueDeclarations: "getItemTypes = ^Type<Record> => Map<Type> :: #->itemTypes;");
+			valueDeclarations: "getItemTypes = ^Type<Record> => Map<Type<Optional<Any>>> :: #->itemTypes;");
 		$this->assertEquals("[a: type{Integer}, b: type{Real}]", $result);
+	}
+
+	public function testItemTypesRecordWithOptional(): void {
+		$result = $this->executeCodeSnippet("type{[a: Integer, b: Optional<String>, c: Empty]}->itemTypes;");
+		$this->assertEquals("[\n\ta: type{Integer},\n\tb: type{Optional<String>},\n\tc: type{Empty}\n]", $result);
+	}
+
+	public function testItemTypesMetaTypeRecordWithOptional(): void {
+		$result = $this->executeCodeSnippet("getItemTypes(type{[a: Integer, b: Optional<String>, c: Empty]});",
+			valueDeclarations: "getItemTypes = ^Type<Record> => Map<Type<Optional<Any>>> :: #->itemTypes;");
+		$this->assertEquals("[\n\ta: type{Integer},\n\tb: type{Optional<String>},\n\tc: type{Empty}\n]", $result);
 	}
 
 	public function testItemTypesIntersection(): void {

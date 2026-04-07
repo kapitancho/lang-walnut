@@ -33,11 +33,13 @@ final class WithRestTypeTest extends CodeExecutionTestHelper {
 	}
 
 	public function testWithRestTypeTupleInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', "type{[String, ... Real]}->withRestType(42);");
+		$this->executeErrorCodeSnippet('Invalid parameter type: Integer[42]',
+			"type{[String, ... Real]}->withRestType(42);");
 	}
 
 	public function testWithRestTypeRecordInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type', "type{[a: String, ... Real]}->withRestType(42);");
+		$this->executeErrorCodeSnippet('Invalid parameter type: Integer[42]',
+			"type{[a: String, ... Real]}->withRestType(42);");
 	}
 
 }

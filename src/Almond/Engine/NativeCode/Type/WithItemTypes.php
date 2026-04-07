@@ -35,21 +35,41 @@ final readonly class WithItemTypes extends TypeNativeMethod {
 	}
 
 	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
-		return $parameterType->isSubtypeOf(
-			$this->typeRegistry->array(
-				$this->typeRegistry->type($this->typeRegistry->any)
+		$ta = $this->typeRegistry->type($this->typeRegistry->any);
+		$toa = $this->typeRegistry->type(
+			$this->typeRegistry->optional(
+				$this->typeRegistry->any
 			)
-		) || $parameterType->isSubtypeOf(
-			$this->typeRegistry->map(
-				$this->typeRegistry->type($this->typeRegistry->any),
-				0,
-				PlusInfinity::value,
-				$this->typeRegistry->string()
-			)
-		) ? null : sprintf(
-			"The parameter type must be an Array type or a Map type, got: %s",
-			$parameterType
 		);
+
+		/** @var TypeType $targetType */
+		$targetRefType = $targetType->refType;
+		if ($targetRefType instanceof TupleType ||
+			($targetRefType instanceof MetaType && $targetRefType->value === MetaTypeValue::Tuple)
+		) {
+			return $parameterType->isSubtypeOf(
+				$this->typeRegistry->array($ta)
+			) ? null : sprintf(
+				"The parameter type must be a subtype of Array<Type<Any>>, got: %s",
+				$parameterType
+			);
+		} elseif ($targetRefType instanceof RecordType ||
+			($targetRefType instanceof MetaType && $targetRefType->value === MetaTypeValue::Record)
+		) {
+			return $parameterType->isSubtypeOf(
+				$this->typeRegistry->map($toa)
+			) ? null : sprintf(
+				"The parameter type must be a subtype of Map<Type<Optional<Any>>>, got: %s",
+				$parameterType
+			);
+		} else {
+			return $parameterType->isSubtypeOf(
+				$this->typeRegistry->array($toa, 1)
+			) ? null : sprintf(
+				"The parameter type must be a subtype of Array<Type<Optional<Any>>, 1..>, got: %s",
+				$parameterType
+			);
+		}
 	}
 
 	protected function getValidator(): callable {
@@ -59,24 +79,22 @@ final readonly class WithItemTypes extends TypeNativeMethod {
 				$this->typeRegistry->array(
 					$this->typeRegistry->type($this->typeRegistry->any)
 				)
-			)) {
-				if ($refType instanceof TupleType || (
+			) && ($refType instanceof TupleType || (
 					$refType instanceof MetaType && $refType->value === MetaTypeValue::Tuple
-				)) {
-					return $this->typeRegistry->type(
-						$this->typeRegistry->metaType(MetaTypeValue::Tuple)
-					);
-				}
-				if ($refType instanceof IntersectionType || (
-					$refType instanceof MetaType && $refType->value === MetaTypeValue::Intersection
-				)) {
-					return $this->typeRegistry->type(
-						$this->typeRegistry->metaType(MetaTypeValue::Intersection)
-					);
-				}
-				/** @var UnionType|MetaType $refType */
+			))) {
 				return $this->typeRegistry->type(
-					$this->typeRegistry->metaType(MetaTypeValue::Union)
+					$this->typeRegistry->metaType(MetaTypeValue::Tuple)
+				);
+			}
+			if ($parameterType->isSubtypeOf(
+				$this->typeRegistry->array(
+					$this->typeRegistry->type(
+						$this->typeRegistry->optional($this->typeRegistry->any)
+					)
+				)
+			)) {
+				return $this->typeRegistry->type(
+					$this->typeRegistry->optional($this->typeRegistry->any)
 				);
 			}
 			/** @var RecordType|MetaType $refType */
@@ -108,6 +126,17 @@ final readonly class WithItemTypes extends TypeNativeMethod {
 					);
 					return $this->valueRegistry->type($result);
 				}
+			}
+			if ($parameter->type->isSubtypeOf(
+				$this->typeRegistry->array(
+					$this->typeRegistry->type(
+						$this->typeRegistry->optional(
+							$this->typeRegistry->any
+						)
+					),
+					1
+				)
+			)) {
 				if ($typeValue instanceof IntersectionType || (
 					$typeValue instanceof MetaType && $typeValue->value === MetaTypeValue::Intersection
 				)) {
@@ -134,7 +163,9 @@ final readonly class WithItemTypes extends TypeNativeMethod {
 			if ($parameter->type->isSubtypeOf(
 				$this->typeRegistry->map(
 					$this->typeRegistry->type(
-						$this->typeRegistry->any
+						$this->typeRegistry->optional(
+							$this->typeRegistry->any
+						)
 					),
 					0,
 					PlusInfinity::value,

@@ -48,9 +48,34 @@ final class WithItemTypesTest extends CodeExecutionTestHelper {
 			"type{String}->withItemTypes[type{Integer}, type{Boolean}];");
 	}
 
-	public function testWithItemTypesInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet('The parameter type must be an Array type or a Map type, got: Integer[1]',
+	public function testWithItemTypesRecordWithOptional(): void {
+		$result = $this->executeCodeSnippet("type{[a: String]}->withItemTypes[a: type{Integer}, b: type{Optional<String>}, c: type{Empty}];");
+		$this->assertEquals("type[\n\ta: Integer,\n\tb: Optional<String>,\n\tc: Empty\n]", $result);
+	}
+
+	public function testWithItemTypesUnionWithEmpty(): void {
+		$result = $this->executeCodeSnippet("type{Union}->withItemTypes[type{String}, type{Real}, type{Empty}];");
+		$this->assertEquals("type{Optional<(String|Real)>}", $result);
+	}
+
+	public function testWithItemTypesIntersectionWithOptional(): void {
+		$result = $this->executeCodeSnippet("type{Intersection}->withItemTypes[type{Real}, type{Optional<String>}];");
+		$this->assertEquals("type{(Real&String)}", $result);
+	}
+
+	public function testWithItemTypesInvalidParameterTypeRecord(): void {
+		$this->executeErrorCodeSnippet('The parameter type must be a subtype of Map<Type<Optional<Any>>>, got: Integer[1]',
 			"type{[a: String, ... Real]}->withItemTypes(1);");
+	}
+
+	public function testWithItemTypesInvalidParameterTypeTuple(): void {
+		$this->executeErrorCodeSnippet('The parameter type must be a subtype of Array<Type<Any>>, got: Integer[1]',
+			"type{[String, ... Real]}->withItemTypes(1);");
+	}
+
+	public function testWithItemTypesInvalidParameterTypeUnion(): void {
+		$this->executeErrorCodeSnippet('The parameter type must be a subtype of Array<Type<Optional<Any>>, 1..>, got: Integer[1]',
+			"type{Union}->withItemTypes(1);");
 	}
 
 }

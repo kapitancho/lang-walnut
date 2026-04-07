@@ -22,6 +22,15 @@ final readonly class WithRestType extends TypeNativeMethod {
 			null : sprintf("Target ref type must be a Tuple type or a Record type, got: %s", $targetRefType);
 	}
 
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		return $parameterType->isSubtypeOf(
+			$this->typeRegistry->type($this->typeRegistry->any)
+		) ? null : sprintf(
+			"The parameter type must be a subtype of Type<Any>, got: %s",
+			$parameterType
+		);
+	}
+
 	protected function getValidator(): callable {
 		return function(TypeType $targetType, TypeType $parameterType): TypeType {
 			/** @var TupleType|RecordType|MetaType $refType */

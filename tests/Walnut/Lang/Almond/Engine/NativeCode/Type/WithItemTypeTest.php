@@ -26,8 +26,23 @@ final class WithItemTypeTest extends CodeExecutionTestHelper {
 			"type{String}->withItemType(`Integer);");
 	}
 
+	public function testWithItemTypeArrayWithRange(): void {
+		$result = $this->executeCodeSnippet("`Array<String, 2..3>->withItemType(`Integer);");
+		$this->assertEquals("type{Array<Integer, 2..3>}", $result);
+	}
+
+	public function testWithItemTypeMapWithRange(): void {
+		$result = $this->executeCodeSnippet("`Map<String, 2..3>->withItemType(`Integer);");
+		$this->assertEquals("type{Map<Integer, 2..3>}", $result);
+	}
+
+	public function testWithItemTypeSetWithRange(): void {
+		$result = $this->executeCodeSnippet("`Set<String, 2..3>->withItemType(`Integer);");
+		$this->assertEquals("type{Set<Integer, 2..3>}", $result);
+	}
+
 	public function testWithItemTypeInvalidParameterType(): void {
-		$this->executeErrorCodeSnippet('Invalid parameter type',
+		$this->executeErrorCodeSnippet('Invalid parameter type: Integer[1]',
 			"type{Set<String>}->withItemType(1)");
 	}
 
