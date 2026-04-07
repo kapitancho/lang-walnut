@@ -7,6 +7,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\InvalidArgument;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\EmptyValue as EmptyValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TupleValue as TupleValueInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyContext;
@@ -16,6 +17,9 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\Type\UnknownProperty;
 
 final class TupleValue implements TupleValueInterface, JsonSerializable {
 
+	/** @var list<Value> */
+	public readonly array $values;
+
 	/**
 	 * @param TypeRegistry $typeRegistry
 	 * @param list<Value> $values
@@ -24,9 +28,10 @@ final class TupleValue implements TupleValueInterface, JsonSerializable {
 	 */
     public function __construct(
         private readonly TypeRegistry $typeRegistry,
-	    public readonly array $values
+	    array $values
     ) {
-		foreach($this->values as $value) {
+		$v = [];
+		foreach($values as $value) {
 			/** @phpstan-ignore-next-line instanceof.alwaysTrue */
 			if (!$value instanceof Value) {
 				InvalidArgument::of(
@@ -35,7 +40,12 @@ final class TupleValue implements TupleValueInterface, JsonSerializable {
 					'TupleValue must be constructed with a list of Value instances'
 				);
 			}
+			if ($value instanceof EmptyValueInterface) {
+				continue;
+			}
+			$v[] = $value;
 		}
+		$this->values = $v;
     }
 
 	public TupleType $type {

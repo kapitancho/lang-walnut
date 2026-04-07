@@ -176,19 +176,11 @@ final readonly class FunctionContextFiller implements FunctionContextFillerInter
 				}
 				if ($t instanceof TupleType && $v instanceof TupleValue) {
 					foreach($t->types as $index => $typeItem) {
-						try {
-							$val = $v->valueOf($index);
-							if ($val instanceof Value) {
-								$executionContext = $executionContext->withAddedVariableValue(
-									new VariableName($variableName . $index),
-									//TODO: what if UnknownProperty?
-									/** @phpstan-ignore argument.type */
-									$v->valueOf($index)
-								);
-							}
-							// @codeCoverageIgnoreStart
-						} catch(IdentifierException) {}
-						// @codeCoverageIgnoreEnd
+						$rValue = $values[$index] ?? $this->valueRegistry->empty;
+						$executionContext = $executionContext->withAddedVariableValue(
+							new VariableName($variableName . $index),
+							$rValue
+						);
 					}
 					if (!$t->restType instanceof NothingType) {
 						$executionContext = $executionContext->withAddedVariableValue(
