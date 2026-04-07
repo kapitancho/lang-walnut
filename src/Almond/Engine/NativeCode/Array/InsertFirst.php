@@ -12,6 +12,15 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\ArrayN
 /** @extends ArrayNativeMethod<Type, Type, Value> */
 final readonly class InsertFirst extends ArrayNativeMethod {
 
+	protected function validateParameterType(Type $parameterType, Type $targetType): null|string {
+		return $this->typeRegistry->empty->isSubtypeOf(
+			$parameterType
+		) ? sprintf(
+			"The parameter type cannot be of type Optional, %s given",
+			$parameterType
+		): null;
+	}
+
 	protected function getValidator(): callable {
 		return fn(ArrayType $targetType, Type $parameterType): ArrayType =>
 			$this->typeRegistry->array(

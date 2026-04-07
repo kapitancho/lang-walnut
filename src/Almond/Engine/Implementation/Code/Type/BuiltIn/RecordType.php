@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn;
 
+use InvalidArgumentException;
 use JsonSerializable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\MapType as MapTypeInterface;
@@ -18,19 +19,34 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\Hydrator\HydrationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\Hydrator\HydrationRequest;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\Hydrator\HydrationSuccess;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationRequest;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResult;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\UnknownProperty;
 
 final class RecordType implements RecordTypeInterface, JsonSerializable {
 
+	/** @var list<Type> $types */
+	public readonly array $types;
+
 	/**  @param array<string, Type> $types */
 	public function __construct(
 		private readonly TypeRegistry $typeRegistry,
 
-		public array         $types,
-		public Type          $restType
-	) {}
+		array $types,
+		public readonly Type $restType
+	) {
+		foreach ($types as $type) {
+			if (!$type instanceof Type) {
+				// @codeCoverageIgnoreStart
+				throw new InvalidArgumentException(
+					'RecordType must be constructed with a list of Type instances'
+				);
+				// @codeCoverageIgnoreEnd
+			}
+		}
+		$this->types = $types;
+	}
 
 	public function hydrate(HydrationRequest $request): HydrationSuccess|HydrationFailure {
 		$value = $request->value;
@@ -215,12 +231,26 @@ final class RecordType implements RecordTypeInterface, JsonSerializable {
 		return mb_strlen($result) > 40 ? $this->asString(true) : $result;
 	}
 
+	private function validateItemType(Type $type, ValidationRequest $context): ValidationResult {
+		if (!$this->typeRegistry->empty->isSubtypeOf($type)) {
+			return $context->ok();
+		}
+		return $context->withError(
+			ValidationErrorType::itemTypeMismatch,
+			sprintf("Record item type cannot be Optional, %s given.",
+				$type
+			),
+			$type
+		);
+	}
+
 	public function validate(ValidationRequest $request): ValidationResult {
 		$result = $request->ok();
 		foreach ($this->types as $type) {
 			$result = $type->validate($result);
 		}
-		return $this->restType->validate($result);
+		$result = $this->restType->validate($result);
+		return $this->validateItemType($this->restType, $result);
 	}
 
 	public function jsonSerialize(): array {

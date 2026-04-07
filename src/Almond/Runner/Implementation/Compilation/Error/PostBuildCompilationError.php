@@ -29,6 +29,7 @@ final class PostBuildCompilationError implements CompilationError {
 			ValidationErrorType::mutableTypeMismatch => CompilationErrorType::mutableTypeMismatch,
 			ValidationErrorType::undefinedVariable => CompilationErrorType::undefinedVariable,
 			ValidationErrorType::mapKeyTypeMismatch => CompilationErrorType::mapKeyTypeMismatch,
+			ValidationErrorType::itemTypeMismatch => CompilationErrorType::itemTypeMismatch,
 			ValidationErrorType::shapeMismatch => CompilationErrorType::shapeMismatch,
 			ValidationErrorType::undefinedMethod => CompilationErrorType::undefinedMethod,
 			ValidationErrorType::invalidTargetType => CompilationErrorType::invalidTargetType,
