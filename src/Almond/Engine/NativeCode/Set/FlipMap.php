@@ -39,11 +39,11 @@ final readonly class FlipMap extends SetNativeMethod {
 				);
 			}
 			$r = $parameterType->returnType;
+			if ($isOptional = $r instanceof OptionalType) {
+				$r = $r->valueType;
+			}
 			$errorType = $r instanceof ResultType ? $r->errorType : null;
 			$returnType = $r instanceof ResultType ? $r->returnType : $r;
-			if ($isOptional = $returnType instanceof OptionalType) {
-				$returnType = $returnType->valueType;
-			}
 			$t = $this->typeRegistry->map(
 				$returnType,
 				$isOptional ? 0 : $targetType->range->minLength,

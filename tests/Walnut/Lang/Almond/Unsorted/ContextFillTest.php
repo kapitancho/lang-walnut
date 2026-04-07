@@ -9,7 +9,7 @@ final class ContextFillTest extends CodeExecutionTestHelper {
 	public function testAliasRecordAsTarget(): void {
 		$result = $this->executeCodeSnippet("{[a: -9, b: 'Hello']}->test;", <<<NUT
 		MyAlias = [a: Integer, b: ?String, c: ?Boolean];
-		MyAlias->test() :: [\$a, \$b, \$c, \$];
+		MyAlias->test() :: [\$a, \$b, \$c ?? @MapItemNotFound![key: 'c'], \$];
 	NUT);
 		$this->assertEquals("[\n\t-9,\n\t'Hello',\n\t@MapItemNotFound![key: 'c'],\n\t[a: -9, b: 'Hello']\n]", $result);
 	}
@@ -18,7 +18,7 @@ final class ContextFillTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("test[a: -9, b: 'Hello'];", <<<NUT
 		MyAlias = [a: Integer, b: ?String, c: ?Boolean];
 	NUT, <<<NUT
-		test = ^o: MyAlias :: [#a, #b, #c, #];
+		test = ^o: MyAlias :: [#a, #b, #c ?? @MapItemNotFound![key: 'c'], #];
 	NUT);
 		$this->assertEquals("[\n\t-9,\n\t'Hello',\n\t@MapItemNotFound![key: 'c'],\n\t[a: -9, b: 'Hello']\n]", $result);
 	}
@@ -26,7 +26,7 @@ final class ContextFillTest extends CodeExecutionTestHelper {
 	public function testOpenRecordAsTarget(): void {
 		$result = $this->executeCodeSnippet("{MyOpen[a: -9, b: 'Hello']}->test;", <<<NUT
 		MyOpen := #[a: Integer, b: ?String, c: ?Boolean];
-		MyOpen->test() :: [\$a, \$b, \$c, \$\$];
+		MyOpen->test() :: [\$a, \$b, \$c ?? @MapItemNotFound![key: 'c'], \$\$];
 	NUT);
 		$this->assertEquals("[\n\t-9,\n\t'Hello',\n\t@MapItemNotFound![key: 'c'],\n\t[a: -9, b: 'Hello']\n]", $result);
 	}
@@ -35,7 +35,7 @@ final class ContextFillTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("test(MyOpen[a: -9, b: 'Hello']);", <<<NUT
 		MyOpen := #[a: Integer, b: ?String, c: ?Boolean];
 	NUT, <<<NUT
-		test = ^o: MyOpen :: [#a, #b, #c, #->value];
+		test = ^o: MyOpen :: [#a, #b, #c ?? @MapItemNotFound![key: 'c'], #->value];
 	NUT);
 		$this->assertEquals("[\n\t-9,\n\t'Hello',\n\t@MapItemNotFound![key: 'c'],\n\t[a: -9, b: 'Hello']\n]", $result);
 	}
@@ -43,7 +43,7 @@ final class ContextFillTest extends CodeExecutionTestHelper {
 	public function testSealedRecordAsTarget(): void {
 		$result = $this->executeCodeSnippet("{MySealed[a: -9, b: 'Hello']}->test;", <<<NUT
 		MySealed := $[a: Integer, b: ?String, c: ?Boolean];
-		MySealed->test() :: [\$a, \$b, \$c, \$\$];
+		MySealed->test() :: [\$a, \$b, \$c ?? @MapItemNotFound![key: 'c'], \$\$];
 	NUT);
 		$this->assertEquals("[\n\t-9,\n\t'Hello',\n\t@MapItemNotFound![key: 'c'],\n\t[a: -9, b: 'Hello']\n]", $result);
 	}

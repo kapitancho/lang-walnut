@@ -19,11 +19,11 @@ final readonly class Map extends SetCallbackBase {
 	protected function getValidator(): callable {
 		return function(SetType $targetType, FunctionType $parameterType, mixed $origin): Type {
 			$r = $parameterType->returnType;
+			if ($isOptional = $r instanceof OptionalType) {
+				$r = $r->valueType;
+			}
 			$errorType = $r instanceof ResultType ? $r->errorType : null;
 			$returnType = $r instanceof ResultType ? $r->returnType : $r;
-			if ($isOptional = $returnType instanceof OptionalType) {
-				$returnType = $returnType->valueType;
-			}
 			$t = $this->typeRegistry->set(
 				$returnType,
 				$isOptional ? 0 : ($targetType->range->minLength < 1 ? 0 : 1),

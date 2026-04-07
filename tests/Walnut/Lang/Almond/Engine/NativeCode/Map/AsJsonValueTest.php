@@ -18,7 +18,7 @@ final class AsJsonValueTest extends CodeExecutionTestHelper {
 
 	public function testAsJsonValueInvalid(): void {
 		$result = $this->executeCodeSnippet("[a: 1, b: ^ :: 1, c: 'a']->asJsonValue;");
-		$this->assertEquals("@InvalidJsonValue![value: ^Null => Any :: 1]", $result);
+		$this->assertEquals("@InvalidJsonValue![value: ^Null => Optional :: 1]", $result);
 	}
 
 	public function testAsJsonValueTypeNoResult(): void {
@@ -39,7 +39,7 @@ final class AsJsonValueTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet("j[a: 1, b: ^ :: 1, c: 'a']",
 			valueDeclarations: "j = ^a: Map => Result<JsonValue, InvalidJsonValue> :: a->asJsonValue;"
 		);
-		$this->assertEquals("@InvalidJsonValue![value: ^Null => Any :: 1]", $result);
+		$this->assertEquals("@InvalidJsonValue![value: ^Null => Optional :: 1]", $result);
 	}
 
 	public function testAsJsonValueInvalidParameterType(): void {

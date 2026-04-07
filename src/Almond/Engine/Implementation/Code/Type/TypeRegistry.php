@@ -107,15 +107,12 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 		return new MutableType($valueType);
 	}
 
-	public function optional(Type $valueType): Type {
+	public function optional(Type $valueType): OptionalTypeInterface {
 		if ($valueType instanceof NothingTypeInterface) {
 			return $this->empty;
 		}
 		if ($valueType instanceof OptionalTypeInterface) {
 			return $valueType;
-		}
-		if ($valueType instanceof ResultTypeInterface) {
-			return $this->result($this->optional($valueType->returnType), $valueType->errorType);
 		}
 		return new OptionalType($valueType);
 	}
@@ -140,10 +137,18 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 		return new ErrorType($this, $errorType);
 	}
 
-	public function result(Type $returnType, Type $errorType): ResultTypeInterface {
+	public function result(Type $returnType, Type $errorType): ResultTypeInterface|OptionalTypeInterface {
 		if ($returnType instanceof ResultTypeInterface) {
 			$errorType = $this->union([$errorType, $returnType->errorType]);
 			$returnType = $returnType->returnType;
+		}
+		if ($returnType instanceof OptionalTypeInterface) {
+			return $this->optional(
+				$this->result(
+					$returnType->valueType,
+					$errorType
+				)
+			);
 		}
 		if ($returnType instanceof NothingTypeInterface) {
 			return $this->error($errorType);
@@ -344,6 +349,7 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 			$itemType = $this->nothing;
 		}
 		return new ArrayType(
+			$this->empty,
 			$itemType ?? $this->any,
 			new LengthRange(
 				is_int($minLength) ? new Number($minLength) : $minLength,
@@ -365,6 +371,7 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 		}
 		$str = $this->string();
 		return new MapType(
+			$this->empty,
 			$str,
 			$keyType ?? $this->string(),
 			$itemType ?? $this->any,
@@ -385,6 +392,7 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 			$itemType = $this->nothing;
 		}
 		return new SetType(
+			$this->empty,
 			$itemType ?? $this->any,
 			new LengthRange(
 				is_int($minLength) ? new Number($minLength) : $minLength,

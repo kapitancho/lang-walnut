@@ -4,6 +4,7 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn;
 
 use JsonSerializable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ArrayType as ArrayTypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EmptyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TupleType as TupleTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\SupertypeChecker;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -14,13 +15,15 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\Hydrator\HydrationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\Hydrator\HydrationRequest;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\Hydrator\HydrationSuccess;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationRequest;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResult;
 
 final readonly class ArrayType implements ArrayTypeInterface, JsonSerializable {
 
     public function __construct(
-		public Type $itemType,
+		private EmptyType  $emptyType,
+		public Type        $itemType,
 		public LengthRange $range
     ) {}
 
@@ -113,8 +116,23 @@ final readonly class ArrayType implements ArrayTypeInterface, JsonSerializable {
 		return str_replace(["<Any, ..>", "<Any, ", ", ..>"], ["", "<", ">"], $type);
 	}
 
+	private function validateItemType(ValidationRequest $context): ValidationResult {
+		if (!$this->emptyType->isSubtypeOf($this->itemType)) {
+			return $context->ok();
+		}
+		return $context->withError(
+			ValidationErrorType::itemTypeMismatch,
+			sprintf("Array item type cannot be Optional, %s given.",
+				$this->itemType
+			),
+			$this
+		);
+	}
+
 	public function validate(ValidationRequest $request): ValidationResult {
-		return $this->itemType->validate($request);
+		return $request
+				|> $this->validateItemType(...)
+				|> $this->itemType->validate(...);
 	}
 
 	public function jsonSerialize(): array {

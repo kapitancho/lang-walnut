@@ -948,7 +948,9 @@ final readonly class ParserStateMachine {
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->type->functionType(
 						$this->s->generated,
-						$this->nodeBuilder->type->anyType
+						$this->nodeBuilder->type->optionalType(
+							$this->nodeBuilder->type->anyType
+						)
 					);
 					$this->s->pop();
 				}
@@ -2648,14 +2650,20 @@ final readonly class ParserStateMachine {
 					$return = $this->s->generated;
 					$this->s->generated = $this->nodeBuilder->value->functionValue(
 						$this->nodeBuilder->type->nameAndType(
-							$this->s->result['parameter'] ?? $this->nodeBuilder->type->anyType,
+							$this->s->result['parameter'] ??
+								$this->nodeBuilder->type->optionalType(
+									$this->nodeBuilder->type->anyType
+								),
 							$this->s->result['parameter_name'] ?? null
 						),
 						$this->nodeBuilder->type->nameAndType(
 							$this->s->result['dependency'] ?? $this->nodeBuilder->type->nothingType,
 							$this->s->result['dependency_name'] ?? null
 						),
-						$this->s->result['return'] ?? $this->nodeBuilder->type->anyType,
+						$this->s->result['return'] ??
+							$this->nodeBuilder->type->optionalType(
+								$this->nodeBuilder->type->anyType
+							),
 						$this->nodeBuilder->functionBody($return)
 					);
 					$this->s->pop();
@@ -2731,7 +2739,10 @@ final readonly class ParserStateMachine {
 			606 => ['name' => 'function value parameter name', 'transitions' => [
 				T::colon->name => 607,
 				'' => function(LT $token) {
-					$this->s->result['parameter_type'] = $this->nodeBuilder->type->anyType;
+					$this->s->result['parameter_type'] =
+						$this->nodeBuilder->type->optionalType(
+							$this->nodeBuilder->type->anyType
+						);
 					$this->s->stay(610);
 				}
 			]],
@@ -2774,7 +2785,9 @@ final readonly class ParserStateMachine {
 					$this->s->move(4000);
 				},
 				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->type->anyType;
+					$this->s->generated = $this->nodeBuilder->type->optionalType(
+						$this->nodeBuilder->type->anyType
+					);
 					$this->s->pop();
 				},
 			]],
@@ -3404,8 +3417,10 @@ final readonly class ParserStateMachine {
 			756 => ['name' => 'type type', 'transitions' => [
 				T::type_start->name => 757,
 				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->type->TypeType(
-						$this->nodeBuilder->type->anyType
+					$this->s->generated = $this->nodeBuilder->type->typeType(
+						$this->nodeBuilder->type->optionalType(
+							$this->nodeBuilder->type->anyType
+						)
 					);
 					$this->s->pop();
 				},
@@ -3456,8 +3471,11 @@ final readonly class ParserStateMachine {
 			]],
 			760 => ['name' => 'type type return', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->type->TypeType(
-						$this->s->result['type'] ?? $this->nodeBuilder->type->anyType,
+					$this->s->generated = $this->nodeBuilder->type->typeType(
+						$this->s->result['type'] ??
+							$this->nodeBuilder->type->optionalType(
+								$this->nodeBuilder->type->anyType
+							)
 					);
 					$this->s->pop();
 				},

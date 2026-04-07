@@ -52,13 +52,13 @@ interface TypeRegistry extends TypeFinder {
 	public TrueType $true { get; }
 	public function function(Type $parameterType, Type $returnType): FunctionType;
 	public function mutable(Type $valueType): MutableType;
-	public function optional(Type $valueType): Type;
+	public function optional(Type $valueType): OptionalType;
 	public function shape(Type $refType): ShapeType;
 	public function impure(Type $valueType): Type;
 
 	public function value(Type $valueType): ValueType;
 	public function error(Type $errorType): ErrorType;
-	public function result(Type $returnType, Type $errorType): ResultType;
+	public function result(Type $returnType, Type $errorType): ResultType|OptionalType;
 
 	public function type(Type $targetType): TypeType;
 	public function metaType(MetaTypeValue $value): MetaType;

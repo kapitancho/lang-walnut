@@ -40,11 +40,11 @@ final readonly class MapIndexValue extends ArrayNativeMethod {
 	protected function getValidator(): callable {
 		return function(ArrayType $targetType, FunctionType $parameterType, mixed $origin): Type {
 			$r = $parameterType->returnType;
+			if ($isOptional = $r instanceof OptionalType) {
+				$r = $r->valueType;
+			}
 			$errorType = $r instanceof ResultType ? $r->errorType : null;
 			$returnType = $r instanceof ResultType ? $r->returnType : $r;
-			if ($isOptional = $returnType instanceof OptionalType) {
-				$returnType = $returnType->valueType;
-			}
 			$t = $this->typeRegistry->array(
 				$returnType,
 				$isOptional ? 0 : $targetType->range->minLength,

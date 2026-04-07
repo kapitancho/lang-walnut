@@ -37,11 +37,11 @@ final readonly class FlipMap extends ArrayNativeMethod {
 		return function(ArrayType $targetType, FunctionType $parameterType, mixed $origin): Type {
 			$itemType = $targetType->itemType;
 			$r = $parameterType->returnType;
+			if ($isOptional = $r instanceof OptionalType) {
+				$r = $r->valueType;
+			}
 			$errorType = $r instanceof ResultType ? $r->errorType : null;
 			$returnType = $r instanceof ResultType ? $r->returnType : $r;
-			if ($isOptional = $returnType instanceof OptionalType) {
-				$returnType = $returnType->valueType;
-			}
 			$t = $this->typeRegistry->map(
 				$returnType,
 				$isOptional ? 0 :

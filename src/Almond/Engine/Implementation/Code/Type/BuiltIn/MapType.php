@@ -21,6 +21,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResult;
 final readonly class MapType implements MapTypeInterface, JsonSerializable {
 
     public function __construct(
+		private EmptyType $emptyType,
 		private StringType $stringType,
 
 		public Type        $keyType,
@@ -84,10 +85,25 @@ final readonly class MapType implements MapTypeInterface, JsonSerializable {
 		);
 	}
 
+	private function validateItemType(ValidationRequest $context): ValidationResult {
+		if (!$this->emptyType->isSubtypeOf($this->itemType)) {
+			return $context->ok();
+		}
+		return $context->withError(
+			ValidationErrorType::itemTypeMismatch,
+			sprintf("Map item type cannot be Optional, %s given.",
+				$this->itemType
+			),
+			$this
+		);
+	}
+
 	public function validate(ValidationRequest $request): ValidationResult {
-		$result = $this->validateKeyType($request);
-		$result = $this->keyType->validate($result);
-		return $this->itemType->validate($result);
+		return $request
+			|> $this->validateKeyType(...)
+			|> $this->keyType->validate(...)
+			|> $this->validateItemType(...)
+			|> $this->itemType->validate(...);
 	}
 
 	public function isSubtypeOf(Type $ofType): bool {

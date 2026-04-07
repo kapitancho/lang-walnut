@@ -59,9 +59,9 @@ final class UserlandTypeStorage implements UserlandTypeRegistryInterface, Userla
 	private array $sealedTypes = [];
 
 	public function __construct() {
-		$this->any = new AnyType;
 		$this->nothing = new NothingType;
 		$this->addEmpty();
+		$this->any = new AnyType($this->empty);
 		$this->addNull();
 		$this->addBoolean();
 	}

@@ -52,7 +52,7 @@ class CodeExecutionTestHelper extends TestCase {
 		string $valueDeclarations = '',
 		array  $parameters = []
 	): string|array {
-		$this->sourceCode = "module test: $typeDeclarations => { $valueDeclarations myFn = ^Array<String> => Any :: { $code }; myFn(#)->printed; };";
+		$this->sourceCode = "module test: $typeDeclarations => { $valueDeclarations myFn = ^Array<String> => Optional<Any> :: { $code }; myFn(#)->printed; };";
 		$result = $this->cliRunner->run($parameters);
 		if ($result instanceof CliExecutionResultInterface) {
 			return $result->returnValue;

@@ -4,6 +4,7 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn;
 
 use JsonSerializable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType as AnyTypeInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EmptyType as EmptyTypeInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\SupertypeChecker;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\Hydrator\HydrationFailure;
@@ -13,6 +14,10 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationRequest;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResult;
 
 final readonly class AnyType implements AnyTypeInterface, JsonSerializable, SupertypeChecker {
+
+	public function __construct(
+		private readonly EmptyTypeInterface $empty
+	) {}
 
 	public function isSubtypeOf(Type $ofType): bool {
 		return match(true) {
@@ -27,7 +32,7 @@ final readonly class AnyType implements AnyTypeInterface, JsonSerializable, Supe
 	}
 
 	public function isSupertypeOf(Type $ofType): bool {
-		return true;
+		return !$this->empty->isSubtypeOf($ofType);
 	}
 
 	public function __toString(): string {

@@ -15,7 +15,7 @@ final class FunctionTest extends CodeExecutionTestHelper {
 				Fn->item(^v => Fn) :: $;
 			"
 		);
-		$this->assertEquals("^v: Any => Fn :: aqua", $result);
+		$this->assertEquals("^v: Optional => Fn :: aqua", $result);
 	}
 
 	public function testCallCall(): void {

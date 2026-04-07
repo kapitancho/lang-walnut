@@ -37,7 +37,7 @@ final readonly class TypeType implements TypeTypeInterface, JsonSerializable {
 					'Array' => $tr->array(),
 					'Map' => $tr->map(),
 					'Mutable' => $tr->mutable($tr->any),
-					'Type' => $tr->type($tr->any),
+					'Type' => $tr->type($tr->optional($tr->any)),
 					'Null' => $tr->null,
 					'True' => $tr->true,
 					'False' => $tr->false,
@@ -86,7 +86,7 @@ final readonly class TypeType implements TypeTypeInterface, JsonSerializable {
 	}
 
 	public function __toString(): string {
-		if ($this->refType instanceof AnyType) {
+		if ($this->refType instanceof OptionalType && $this->refType->valueType instanceof AnyType) {
 			return "Type";
 		}
 		return sprintf(

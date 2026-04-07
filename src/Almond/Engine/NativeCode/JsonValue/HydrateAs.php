@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\JsonValue;
 
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
@@ -20,7 +21,8 @@ final readonly class HydrateAs extends NativeMethod {
 	protected function getValidator(): callable {
 		return fn(Type $targetType, TypeType $parameterType): ResultType =>
 			$this->typeRegistry->result(
-				$parameterType->refType,
+				$parameterType->refType instanceof OptionalType ?
+					$parameterType->refType->valueType : $parameterType->refType,
 				$this->typeRegistry->core->hydrationError
 			);
 	}

@@ -46,7 +46,7 @@ final class AsJsonValueTest extends CodeExecutionTestHelper {
 
 	public function testAsJsonValueOpenSafeWithCast(): void {
 		$result = $this->executeCodeSnippet("getJson(MyOpen[a: 1, b: MyNested[x: ^ :: 1]]);", "
-			MyNested := #[x: ^Null => Any];
+			MyNested := #[x: ^Null];
 			MyOpen := #[a: Integer, b: MyNested];
 			MyNested ==> JsonValue :: 1;
 		", "
