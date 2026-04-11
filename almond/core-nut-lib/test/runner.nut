@@ -3,9 +3,9 @@ module $test/runner:
 TestResult := #[
     name: String,
     expected: Any,
-    actual: ^ => Any,
-    before: ?^ => Any,
-    after: ?^ => Any
+    actual: ^ => Optional,
+    before: ?^ => Optional,
+    after: ?^ => Optional
 ];
 
 TestCase = ^ => TestResult;

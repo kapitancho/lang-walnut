@@ -1,0 +1,6 @@
+{
+  "sourceRoot": "walnut-src",
+  "packages": {
+    "core": "core-nut-lib"
+  }
+}

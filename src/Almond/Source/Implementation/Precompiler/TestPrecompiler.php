@@ -35,7 +35,7 @@ final readonly class TestPrecompiler implements CodePrecompiler {
 					testResult = testCase->invoke;
 					before = testResult.before;
 					beforeResult = ?whenTypeOf(before) {
-						`^Null => Any: before()
+						`^Null => Optional<Any>: before()
 					};
 					?whenIsError(beforeResult) {
 						=> [
@@ -48,7 +48,7 @@ final readonly class TestPrecompiler implements CodePrecompiler {
 					actualResult = testResult.actual();
 					after = testResult.after;
 					afterResult = ?whenTypeOf(after) {
-						`^Null => Any: after()
+						`^Null => Optional<Any>: after()
 					};
 					?whenIsError(afterResult) {
 						=> [
