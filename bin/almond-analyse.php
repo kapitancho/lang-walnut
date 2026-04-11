@@ -1,12 +1,10 @@
 #!/usr/bin/env php
 <?php
 require __DIR__ . '/inc/autoload.php';
+require __DIR__ . '/inc/compiler-builder.php';
 
 use Walnut\Lang\Almond\ProgramBuilder\Implementation\CodeMapper\NodeCodeMapper;
 use Walnut\Lang\Almond\Runner\Blueprint\Compilation\Error\CompilationFailure;
-use Walnut\Lang\Almond\Runner\Implementation\Compiler;
-use Walnut\Lang\Almond\Source\Implementation\PackageConfiguration\PackageConfiguration;
-use Walnut\Lang\Almond\Source\Implementation\SourceFinder\PackageBasedSourceFinder;
 
 // Parse arguments
 $showErrorsOnly = false;
@@ -20,26 +18,14 @@ for ($i = 1; $i < count($argv); $i++) {
     }
 }
 
-$sourceRoot = __DIR__ . '/../almond/walnut-src';
-$root = $sourceRoot . '/';
+$compiler   = buildCompilerFromNutcfg()->withCodeMapper(new NodeCodeMapper());
+$sourceRoot = sourceRootFromNutcfg();
+$root       = $sourceRoot . '/';
 
 if (!file_exists($root . $folder)) {
     echo "Folder $folder does not exist in $sourceRoot" . PHP_EOL;
     exit(1);
 }
-
-$compiler = Compiler::builder()
-    ->withCodeMapper(new NodeCodeMapper())
-    ->withAddedSourceFinder(
-        new PackageBasedSourceFinder(
-            new PackageConfiguration(
-                $sourceRoot,
-                [
-                    'core' => __DIR__ . '/../almond/core-nut-lib',
-                ]
-            )
-        )
-    );
 
 $errorCount = 0;
 $fileCount = 0;
