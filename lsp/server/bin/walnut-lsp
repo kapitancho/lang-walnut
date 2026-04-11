@@ -15,6 +15,7 @@ use Walnut\Lang\Lsp\Implementation\Feature\AlmondDiagnosticsProvider;
 use Walnut\Lang\Lsp\Implementation\Feature\AlmondFoldingRangeProvider;
 use Walnut\Lang\Lsp\Implementation\Feature\AlmondHoverProvider;
 use Walnut\Lang\Lsp\Implementation\Feature\AlmondInlayHintProvider;
+use Walnut\Lang\Lsp\Implementation\Feature\AlmondSignatureHelpProvider;
 use Walnut\Lang\Lsp\Implementation\Server\JsonRpcLspServer;
 use Walnut\Lang\Lsp\Implementation\Support\LspPositionConverter;
 use Walnut\Lang\Lsp\Implementation\Transport\StdioTransport;
@@ -34,6 +35,7 @@ $server = new JsonRpcLspServer(
     completionProvider:       new AlmondCompletionProvider($converter),
     foldingRangeProvider:     new AlmondFoldingRangeProvider(),
     inlayHintProvider:        new AlmondInlayHintProvider($converter),
+    signatureHelpProvider:    new AlmondSignatureHelpProvider($converter),
     compilationCache:         new TwoLevelCompilationCache(),
     documentStoreFactory:     new InMemoryDocumentStoreFactory(),
     compilationIndexFactory:  new DefaultCompilationIndexFactory(),

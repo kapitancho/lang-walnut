@@ -19,6 +19,7 @@ use Walnut\Lang\Lsp\Blueprint\Feature\DiagnosticsProvider;
 use Walnut\Lang\Lsp\Blueprint\Feature\FoldingRangeProvider;
 use Walnut\Lang\Lsp\Blueprint\Feature\HoverProvider;
 use Walnut\Lang\Lsp\Blueprint\Feature\InlayHintProvider;
+use Walnut\Lang\Lsp\Blueprint\Feature\SignatureHelpProvider;
 use Walnut\Lang\Lsp\Blueprint\Server\LspServer;
 use Walnut\Lang\Lsp\Blueprint\Transport\LspTransport;
 use Walnut\Lang\Lsp\Implementation\Document\BasicCompilationSnapshot;
@@ -52,6 +53,7 @@ final class JsonRpcLspServer implements LspServer {
         private readonly CompletionProvider      $completionProvider,
         private readonly FoldingRangeProvider    $foldingRangeProvider,
         private readonly InlayHintProvider       $inlayHintProvider,
+        private readonly SignatureHelpProvider   $signatureHelpProvider,
         private readonly CompilationCache        $compilationCache,
         private readonly DocumentStoreFactory    $documentStoreFactory,
         private readonly CompilationIndexFactory $compilationIndexFactory,
@@ -93,7 +95,7 @@ final class JsonRpcLspServer implements LspServer {
                 'textDocument/completion'     => $this->handleCompletion($params),
                 'textDocument/foldingRange'   => $this->handleFoldingRange($params),
                 'textDocument/inlayHint'      => $this->handleInlayHint($params),
-                'textDocument/signatureHelp'  => null,
+                'textDocument/signatureHelp'  => $this->handleSignatureHelp($params),
                 default                       => null,
             };
         } catch (\Throwable $e) {
@@ -194,6 +196,10 @@ final class JsonRpcLspServer implements LspServer {
                 ],
                 'foldingRangeProvider' => true,
                 'inlayHintProvider'    => true,
+                'signatureHelpProvider' => [
+                    'triggerCharacters'   => ['('],
+                    'retriggerCharacters' => [','],
+                ],
             ],
             'serverInfo' => ['name' => 'walnut-lsp', 'version' => '0.1.0'],
         ];
@@ -307,6 +313,19 @@ final class JsonRpcLspServer implements LspServer {
             $params['position']['character'],
             $params['context']['triggerCharacter'] ?? '',
             $liveSourceText,
+        );
+    }
+
+    /** @param array<string, mixed> $params */
+    private function handleSignatureHelp(array $params): array|null {
+        $snapshot = $this->bestSnapshot($params['textDocument']['uri']);
+        if ($snapshot === null) {
+            return null;
+        }
+        return $this->signatureHelpProvider->signatureHelp(
+            $snapshot,
+            $params['position']['line'],
+            $params['position']['character'],
         );
     }
 

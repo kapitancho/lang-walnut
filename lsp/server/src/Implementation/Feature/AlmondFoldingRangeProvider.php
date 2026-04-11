@@ -5,7 +5,11 @@ declare(strict_types=1);
 namespace Walnut\Lang\Lsp\Implementation\Feature;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\FunctionBody;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Expression\GroupExpression;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Expression\RecordExpression;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Expression\SequenceExpression;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Expression\SetExpression;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Expression\TupleExpression;
 use Walnut\Lang\Lsp\Blueprint\Document\CompilationSnapshot;
 use Walnut\Lang\Lsp\Blueprint\Feature\FoldingRangeProvider;
 
@@ -16,7 +20,13 @@ final readonly class AlmondFoldingRangeProvider implements FoldingRangeProvider 
         $items = [];
 
         foreach ($snapshot->codeIndex->allElements($snapshot->moduleName) as [, , $element]) {
-            if (!($element instanceof SequenceExpression) && !($element instanceof FunctionBody)) {
+            if (!($element instanceof SequenceExpression)
+                && !($element instanceof FunctionBody)
+                && !($element instanceof GroupExpression)
+                && !($element instanceof TupleExpression)
+                && !($element instanceof RecordExpression)
+                && !($element instanceof SetExpression)
+            ) {
                 continue;
             }
 
