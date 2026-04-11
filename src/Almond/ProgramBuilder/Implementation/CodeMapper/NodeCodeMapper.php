@@ -66,6 +66,28 @@ final class NodeCodeMapper implements CodeMapper, SourceNodeLocator, PositionalL
 		return $this->getSourceNode($element)?->sourceLocation;
 	}
 
+	public function findFirst(string $moduleName, callable $predicate): mixed {
+		$entries = $this->positionalIndex[$moduleName] ?? [];
+		usort($entries, static fn(array $a, array $b): int => $a[0] <=> $b[0]);
+		foreach ($entries as [$start, $end, $element]) {
+			if ($predicate($element, $start, $end)) {
+				return $element;
+			}
+		}
+		return null;
+	}
+
+	public function findLast(string $moduleName, callable $predicate): mixed {
+		$entries = $this->positionalIndex[$moduleName] ?? [];
+		usort($entries, static fn(array $a, array $b): int => $b[0] <=> $a[0]); // descending
+		foreach ($entries as [$start, $end, $element]) {
+			if ($predicate($element, $start, $end)) {
+				return $element;
+			}
+		}
+		return null;
+	}
+
 	public function elementsAtOffset(string $moduleName, int $offset): array {
 		$entries = $this->positionalIndex[$moduleName] ?? [];
 

@@ -20,4 +20,24 @@ interface PositionalLocator {
 	 * @return list<Expression|Type|Value|FunctionBody|UserlandMethod|TypeName|VariableName|MethodName|EnumerationValueName>
 	 */
 	public function elementsAtOffset(string $moduleName, int $offset): array;
+
+	/**
+	 * Returns the first element in $moduleName for which $predicate returns true,
+	 * iterating in ascending start-offset order.
+	 * $predicate receives ($element, int $startOffset, int $endOffset).
+	 *
+	 * @param callable(Expression|Type|Value|FunctionBody|UserlandMethod|TypeName|VariableName|MethodName|EnumerationValueName, int, int): bool $predicate
+	 * @return Expression|Type|Value|FunctionBody|UserlandMethod|TypeName|VariableName|MethodName|EnumerationValueName|null
+	 */
+	public function findFirst(string $moduleName, callable $predicate): mixed;
+
+	/**
+	 * Returns the last element in $moduleName for which $predicate returns true,
+	 * iterating in descending start-offset order (i.e. finds the closest-before match).
+	 * $predicate receives ($element, int $startOffset, int $endOffset).
+	 *
+	 * @param callable(Expression|Type|Value|FunctionBody|UserlandMethod|TypeName|VariableName|MethodName|EnumerationValueName, int, int): bool $predicate
+	 * @return Expression|Type|Value|FunctionBody|UserlandMethod|TypeName|VariableName|MethodName|EnumerationValueName|null
+	 */
+	public function findLast(string $moduleName, callable $predicate): mixed;
 }
