@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Walnut\Lang\Lsp\Implementation\Server;
 
-use Walnut\Lang\Almond\Engine\Implementation\Program\Validation\BacktraceValidationResultCollector;
-use Walnut\Lang\Almond\ProgramBuilder\Implementation\CodeMapper\NodeCodeMapper;
 use Walnut\Lang\Almond\Runner\Implementation\Compiler;
 use Walnut\Lang\Almond\Source\Implementation\PackageConfiguration\PackageConfiguration;
 use Walnut\Lang\Almond\Source\Implementation\SourceFinder\InMemorySourceFinder;
 use Walnut\Lang\Almond\Source\Implementation\SourceFinder\PackageBasedSourceFinder;
+use Walnut\Lang\Lsp\Blueprint\Compilation\CompilationIndexFactory;
 use Walnut\Lang\Lsp\Blueprint\Document\CompilationCache;
 use Walnut\Lang\Lsp\Blueprint\Document\CompilationSnapshot;
 use Walnut\Lang\Lsp\Blueprint\Document\DocumentStore;
+use Walnut\Lang\Lsp\Blueprint\Document\DocumentStoreFactory;
 use Walnut\Lang\Lsp\Blueprint\Feature\CompletionProvider;
 use Walnut\Lang\Lsp\Blueprint\Feature\DefinitionProvider;
 use Walnut\Lang\Lsp\Blueprint\Feature\DiagnosticsProvider;
@@ -20,12 +20,6 @@ use Walnut\Lang\Lsp\Blueprint\Feature\HoverProvider;
 use Walnut\Lang\Lsp\Blueprint\Server\LspServer;
 use Walnut\Lang\Lsp\Blueprint\Transport\LspTransport;
 use Walnut\Lang\Lsp\Implementation\Document\BasicCompilationSnapshot;
-use Walnut\Lang\Lsp\Implementation\Document\InMemoryDocumentStore;
-use Walnut\Lang\Lsp\Implementation\Document\TwoLevelCompilationCache;
-use Walnut\Lang\Lsp\Implementation\Feature\AlmondCompletionProvider;
-use Walnut\Lang\Lsp\Implementation\Feature\AlmondDefinitionProvider;
-use Walnut\Lang\Lsp\Implementation\Feature\AlmondDiagnosticsProvider;
-use Walnut\Lang\Lsp\Implementation\Feature\AlmondHoverProvider;
 
 /**
  * Main LSP server loop.
@@ -34,24 +28,30 @@ use Walnut\Lang\Lsp\Implementation\Feature\AlmondHoverProvider;
  * appropriate handler.  All LSP lifecycle, document sync, and feature
  * requests are handled here.
  *
- * Construction is done lazily after `initialize` (which carries
- * the workspace root and client capabilities).
+ * The server is wired at the composition root (walnut-lsp entry point).
+ * Runtime workspace state (document store, package source finder, compiler
+ * with added source finders) is initialised during the initialize handshake
+ * because it depends on the workspace URI and nutcfg.json content.
  */
 final class JsonRpcLspServer implements LspServer {
 
     private bool $shutdownCalled = false;
 
-    private DocumentStore          $documentStore;
-    private CompilationCache       $compilationCache;
-    private DiagnosticsProvider    $diagnosticsProvider;
-    private HoverProvider          $hoverProvider;
-    private DefinitionProvider     $definitionProvider;
-    private CompletionProvider     $completionProvider;
-    private Compiler               $compiler;
+    // ---- Workspace state: set during handleInitialize ----
+    private DocumentStore               $documentStore;
+    private Compiler                    $compiler;          // base + workspace source finders added
     private PackageBasedSourceFinder|null $packageSourceFinder = null;
 
     public function __construct(
-        private readonly LspTransport $transport,
+        private readonly LspTransport            $transport,
+        private readonly DiagnosticsProvider     $diagnosticsProvider,
+        private readonly HoverProvider           $hoverProvider,
+        private readonly DefinitionProvider      $definitionProvider,
+        private readonly CompletionProvider      $completionProvider,
+        private readonly CompilationCache        $compilationCache,
+        private readonly DocumentStoreFactory    $documentStoreFactory,
+        private readonly CompilationIndexFactory $compilationIndexFactory,
+        private readonly Compiler                $baseCompiler,
     ) {}
 
     public function run(): void {
@@ -76,19 +76,19 @@ final class JsonRpcLspServer implements LspServer {
 
         try {
             $result = match ($method) {
-                'initialize'                 => $this->handleInitialize($params),
-                'initialized'               => null,
-                'shutdown'                  => $this->handleShutdown(),
-                'exit'                      => $this->handleExit(),
-                'textDocument/didOpen'      => $this->handleDidOpen($params),
-                'textDocument/didChange'    => $this->handleDidChange($params),
-                'textDocument/didClose'     => $this->handleDidClose($params),
-                'textDocument/didSave'      => null,
-                'textDocument/hover'        => $this->handleHover($params),
-                'textDocument/definition'   => $this->handleDefinition($params),
-                'textDocument/completion'   => $this->handleCompletion($params),
-                'textDocument/signatureHelp' => null,
-                default                     => null,
+                'initialize'                  => $this->handleInitialize($params),
+                'initialized'                 => null,
+                'shutdown'                    => $this->handleShutdown(),
+                'exit'                        => $this->handleExit(),
+                'textDocument/didOpen'        => $this->handleDidOpen($params),
+                'textDocument/didChange'      => $this->handleDidChange($params),
+                'textDocument/didClose'       => $this->handleDidClose($params),
+                'textDocument/didSave'        => null,
+                'textDocument/hover'          => $this->handleHover($params),
+                'textDocument/definition'     => $this->handleDefinition($params),
+                'textDocument/completion'     => $this->handleCompletion($params),
+                'textDocument/signatureHelp'  => null,
+                default                       => null,
             };
         } catch (\Throwable $e) {
             fwrite(STDERR, sprintf(
@@ -123,16 +123,11 @@ final class JsonRpcLspServer implements LspServer {
             : getcwd() . '/walnut-src';
 
         // documentSourceRoot is used for URI→module-name conversion.
-        // It may be overridden below once we know the real source directory.
+        // May be overridden once nutcfg.json has been read.
         $documentSourceRoot = $sourceRoot;
 
-        $this->compilationCache    = new TwoLevelCompilationCache();
-        $this->diagnosticsProvider = new AlmondDiagnosticsProvider();
-        $this->hoverProvider       = new AlmondHoverProvider();
-        $this->definitionProvider  = new AlmondDefinitionProvider();
-        $this->completionProvider  = new AlmondCompletionProvider();
+        $this->compiler = $this->baseCompiler;
 
-        $this->compiler = Compiler::builder();
         $nutcfgPath = $sourceRoot . '/../nutcfg.json';
         if (file_exists($nutcfgPath)) {
             // Build a PackageBasedSourceFinder with ABSOLUTE paths so we never
@@ -154,7 +149,7 @@ final class JsonRpcLspServer implements LspServer {
                 $absSourceRoot = $almondDir . '/' . $relSourceRoot;
             }
 
-            // Align the documentStore root with the resolved source root so that
+            // Align the document store root with the resolved source root so that
             // URI→module-name extraction gives the right short names (e.g. "f1", not
             // "Users/…/almond/walnut-src/f1").
             $documentSourceRoot = $absSourceRoot;
@@ -162,22 +157,22 @@ final class JsonRpcLspServer implements LspServer {
             // Remap each package path: prefer almond/<relPath> when it exists.
             $absPackageRoots = [];
             foreach (($nutcfg['packages'] ?? []) as $name => $relPath) {
-                $almondPath   = $almondDir   . '/' . $relPath;
-                $projectPath  = $projectRoot . '/' . $relPath;
+                $almondPath  = $almondDir   . '/' . $relPath;
+                $projectPath = $projectRoot . '/' . $relPath;
                 $absPackageRoots[$name] = is_dir($almondPath) ? $almondPath : $projectPath;
             }
 
             fwrite(STDERR, "[walnut-lsp] source root    $absSourceRoot\n");
             fflush(STDERR);
 
-            // Store separately — added LAST in recompileAndPublish so in-memory
+            // Stored separately — added LAST in recompileAndPublish so in-memory
             // sources take priority over disk when the same module is open.
             $this->packageSourceFinder = new PackageBasedSourceFinder(
                 new PackageConfiguration($absSourceRoot, $absPackageRoots)
             );
         }
 
-        $this->documentStore = new InMemoryDocumentStore($documentSourceRoot);
+        $this->documentStore = $this->documentStoreFactory->create($documentSourceRoot);
 
         return [
             'capabilities' => [
@@ -313,8 +308,8 @@ final class JsonRpcLspServer implements LspServer {
 
     private function recompileAndPublish(string $uri, int $version, string $content): void {
         $moduleName  = $this->documentStore->uriToModuleName($uri);
-        $codeIndex   = new NodeCodeMapper();
-        $collector   = new BacktraceValidationResultCollector();
+        $codeIndex   = $this->compilationIndexFactory->createCodeIndex();
+        $collector   = $this->compilationIndexFactory->createValidationCollector();
 
         $t0 = hrtime(true);
         fwrite(STDERR, "[walnut-lsp] compile start  $moduleName v$version\n");

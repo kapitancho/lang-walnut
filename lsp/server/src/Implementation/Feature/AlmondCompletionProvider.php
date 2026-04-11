@@ -14,7 +14,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\VariableName;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\ProgramContext;
 use Walnut\Lang\Lsp\Blueprint\Document\CompilationSnapshot;
 use Walnut\Lang\Lsp\Blueprint\Feature\CompletionProvider;
-use Walnut\Lang\Lsp\Implementation\Support\LspPositionConverter;
+use Walnut\Lang\Lsp\Blueprint\Support\LspLocationConverter;
 
 final readonly class AlmondCompletionProvider implements CompletionProvider {
 
@@ -22,7 +22,6 @@ final readonly class AlmondCompletionProvider implements CompletionProvider {
     private const int KIND_METHOD   = 2;
     private const int KIND_VARIABLE = 6;
     private const int KIND_CLASS    = 7;
-    private const int KIND_KEYWORD  = 14;
 
     /**
      * Built-in Walnut types that do not appear in userlandTypeRegistry but are
@@ -33,6 +32,10 @@ final readonly class AlmondCompletionProvider implements CompletionProvider {
         'Null', 'Nothing', 'Any', 'Optional', 'Error', 'Result',
         'Array', 'Map', 'Set', 'Tuple', 'Record',
     ];
+
+    public function __construct(
+        private LspLocationConverter $converter,
+    ) {}
 
     public function completions(
         CompilationSnapshot $snapshot,
@@ -71,7 +74,7 @@ final readonly class AlmondCompletionProvider implements CompletionProvider {
     ): array {
         // Compute offset from the LIVE text so line/char resolve correctly even
         // when the snapshot is one version behind.
-        $offset = LspPositionConverter::positionToOffset($liveSourceText, $line, $character);
+        $offset = $this->converter->positionToOffset($liveSourceText, $line, $character);
 
         // The '>' is at offset-1, '-' at offset-2.  The expression target ends before that.
         if ($offset < 3
@@ -161,7 +164,7 @@ final readonly class AlmondCompletionProvider implements CompletionProvider {
 
     /** @return list<array<string, mixed>> */
     private function variableCompletions(CompilationSnapshot $snapshot, int $line, int $character): array {
-        $offset = LspPositionConverter::positionToOffset($snapshot->sourceText, $line, $character);
+        $offset = $this->converter->positionToOffset($snapshot->sourceText, $line, $character);
 
         $elements = $snapshot->codeIndex->elementsAtOffset($snapshot->moduleName, $offset);
 

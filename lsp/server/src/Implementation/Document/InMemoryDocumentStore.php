@@ -59,6 +59,6 @@ final class InMemoryDocumentStore implements DocumentStore {
     private function pathToUri(string $path): string {
         // Encode each segment individually to preserve slashes.
         // On Unix the path starts with '/', producing file:///segment/...
-        return 'file://' . implode('/', array_map('rawurlencode', explode('/', $path)));
+        return 'file://' . implode('/', array_map(rawurlencode(...), explode('/', $path)));
     }
 }

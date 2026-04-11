@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Walnut\Lang\Lsp\Implementation\Feature;
 
-use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation;
 use Walnut\Lang\Almond\Runner\Blueprint\Compilation\Error\CompilationFailure;
 use Walnut\Lang\Lsp\Blueprint\Document\CompilationSnapshot;
 use Walnut\Lang\Lsp\Blueprint\Feature\DiagnosticsProvider;
+use Walnut\Lang\Lsp\Blueprint\Support\LspLocationConverter;
 
 /**
  * Translates Almond compilation errors into LSP Diagnostic objects.
@@ -20,6 +20,10 @@ use Walnut\Lang\Lsp\Blueprint\Feature\DiagnosticsProvider;
  */
 final readonly class AlmondDiagnosticsProvider implements DiagnosticsProvider {
 
+    public function __construct(
+        private LspLocationConverter $converter,
+    ) {}
+
     public function diagnosticsFor(CompilationSnapshot $snapshot): array {
         $result = $snapshot->compilationResult;
 
@@ -27,6 +31,7 @@ final readonly class AlmondDiagnosticsProvider implements DiagnosticsProvider {
             return [];
         }
 
+        $sourceRoot  = $this->converter->sourceRootFromSnapshot($snapshot);
         $diagnostics = [];
 
         foreach ($result->errors as $error) {
@@ -43,16 +48,13 @@ final readonly class AlmondDiagnosticsProvider implements DiagnosticsProvider {
             // If there is no source location (e.g. moduleDependencyMissing), show
             // the error at the very start of the file so it is not silently dropped.
             $range = $primaryLocation !== null
-                ? $this->locationToRange($primaryLocation)
+                ? $this->converter->locationToRange($primaryLocation)
                 : ['start' => ['line' => 0, 'character' => 0], 'end' => ['line' => 0, 'character' => 0]];
 
             $related = array_map(
-                fn(SourceLocation $loc): array => [
-                    'location' => [
-                        'uri'   => $snapshot->uri, // TODO: resolve cross-file URIs
-                        'range' => $this->locationToRange($loc),
-                    ],
-                    'message' => $error->errorMessage,
+                fn($loc): array => [
+                    'location' => $this->converter->locationToLspLocation($loc, $sourceRoot),
+                    'message'  => $error->errorMessage,
                 ],
                 array_slice($locations, 1)
             );
@@ -73,18 +75,5 @@ final readonly class AlmondDiagnosticsProvider implements DiagnosticsProvider {
         }
 
         return $diagnostics;
-    }
-
-    private function locationToRange(SourceLocation $location): array {
-        return [
-            'start' => [
-                'line'      => $location->startPosition->line - 1,   // LSP is 0-based
-                'character' => $location->startPosition->column - 1,
-            ],
-            'end' => [
-                'line'      => $location->endPosition->line - 1,
-                'character' => $location->endPosition->column - 1,
-            ],
-        ];
     }
 }

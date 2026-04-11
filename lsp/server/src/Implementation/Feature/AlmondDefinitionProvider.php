@@ -11,14 +11,18 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\Expression\VariableAssignmentE
 use Walnut\Lang\Almond\Engine\Implementation\Code\Expression\VariableNameExpression;
 use Walnut\Lang\Lsp\Blueprint\Document\CompilationSnapshot;
 use Walnut\Lang\Lsp\Blueprint\Feature\DefinitionProvider;
-use Walnut\Lang\Lsp\Implementation\Support\LspPositionConverter;
+use Walnut\Lang\Lsp\Blueprint\Support\LspLocationConverter;
 
 final readonly class AlmondDefinitionProvider implements DefinitionProvider {
 
+    public function __construct(
+        private LspLocationConverter $converter,
+    ) {}
+
     public function definition(CompilationSnapshot $snapshot, int $line, int $character): array|null {
-        $offset      = LspPositionConverter::positionToOffset($snapshot->sourceText, $line, $character);
-        $elements    = $snapshot->codeIndex->elementsAtOffset($snapshot->moduleName, $offset);
-        $sourceRoot  = LspPositionConverter::sourceRootFromSnapshot($snapshot);
+        $offset       = $this->converter->positionToOffset($snapshot->sourceText, $line, $character);
+        $elements     = $snapshot->codeIndex->elementsAtOffset($snapshot->moduleName, $offset);
+        $sourceRoot   = $this->converter->sourceRootFromSnapshot($snapshot);
         $typeRegistry = $snapshot->compilationResult->programContext->userlandTypeRegistry;
 
         foreach ($elements as $element) {
@@ -26,7 +30,7 @@ final readonly class AlmondDefinitionProvider implements DefinitionProvider {
             if ($element instanceof TypeName) {
                 $location = $this->typeDefinitionLocation($typeRegistry, $element, $snapshot);
                 if ($location !== null) {
-                    return LspPositionConverter::locationToLspLocation($location, $sourceRoot);
+                    return $this->converter->locationToLspLocation($location, $sourceRoot);
                 }
             }
 
@@ -34,7 +38,7 @@ final readonly class AlmondDefinitionProvider implements DefinitionProvider {
             if ($element instanceof UserlandMethod) {
                 $location = $snapshot->codeIndex->getSourceLocation($element);
                 if ($location !== null) {
-                    return LspPositionConverter::locationToLspLocation($location, $sourceRoot);
+                    return $this->converter->locationToLspLocation($location, $sourceRoot);
                 }
             }
 
@@ -51,7 +55,7 @@ final readonly class AlmondDefinitionProvider implements DefinitionProvider {
                 if ($assignment !== null) {
                     $location = $snapshot->codeIndex->getSourceLocation($assignment);
                     if ($location !== null) {
-                        return LspPositionConverter::locationToLspLocation($location, $sourceRoot);
+                        return $this->converter->locationToLspLocation($location, $sourceRoot);
                     }
                 }
             }

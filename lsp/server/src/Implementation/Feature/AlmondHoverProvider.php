@@ -11,12 +11,16 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Userland\UserlandTypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 use Walnut\Lang\Lsp\Blueprint\Document\CompilationSnapshot;
 use Walnut\Lang\Lsp\Blueprint\Feature\HoverProvider;
-use Walnut\Lang\Lsp\Implementation\Support\LspPositionConverter;
+use Walnut\Lang\Lsp\Blueprint\Support\LspLocationConverter;
 
 final readonly class AlmondHoverProvider implements HoverProvider {
 
+    public function __construct(
+        private LspLocationConverter $converter,
+    ) {}
+
     public function hover(CompilationSnapshot $snapshot, int $line, int $character): array|null {
-        $offset   = LspPositionConverter::positionToOffset($snapshot->sourceText, $line, $character);
+        $offset   = $this->converter->positionToOffset($snapshot->sourceText, $line, $character);
         $elements = $snapshot->codeIndex->elementsAtOffset($snapshot->moduleName, $offset);
 
         // Priority 1: narrowest Expression with a tracked type
@@ -31,7 +35,7 @@ final readonly class AlmondHoverProvider implements HoverProvider {
             $location = $snapshot->codeIndex->getSourceLocation($element);
             return [
                 'contents' => ['kind' => 'markdown', 'value' => "```walnut\n{$type}\n```"],
-                'range'    => $location !== null ? LspPositionConverter::locationToRange($location) : null,
+                'range'    => $location !== null ? $this->converter->locationToRange($location) : null,
             ];
         }
 
@@ -46,7 +50,7 @@ final readonly class AlmondHoverProvider implements HoverProvider {
             $sig = $this->methodSignature($element);
             return [
                 'contents' => ['kind' => 'markdown', 'value' => "```walnut\n{$sig}\n```"],
-                'range'    => $location !== null ? LspPositionConverter::locationToRange($location) : null,
+                'range'    => $location !== null ? $this->converter->locationToRange($location) : null,
             ];
         }
 
@@ -62,7 +66,7 @@ final readonly class AlmondHoverProvider implements HoverProvider {
             $location = $snapshot->codeIndex->getSourceLocation($element);
             return [
                 'contents' => ['kind' => 'markdown', 'value' => "```walnut\n{$namedType}\n```"],
-                'range'    => $location !== null ? LspPositionConverter::locationToRange($location) : null,
+                'range'    => $location !== null ? $this->converter->locationToRange($location) : null,
             ];
         }
 
