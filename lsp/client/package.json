@@ -1,0 +1,57 @@
+{
+  "name": "walnut-language-support",
+  "displayName": "Walnut Language Support",
+  "description": "Language server integration for the Walnut programming language (.nut files)",
+  "version": "0.1.0",
+  "publisher": "walnut",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onLanguage:walnut"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "walnut",
+        "aliases": ["Walnut", "walnut"],
+        "extensions": [".nut"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "configuration": {
+      "title": "Walnut Language Server",
+      "properties": {
+        "walnut.server.phpPath": {
+          "type": "string",
+          "default": "php",
+          "description": "Path to the PHP executable used to run the Walnut language server."
+        },
+        "walnut.server.path": {
+          "type": "string",
+          "default": "",
+          "description": "Absolute path to the walnut-lsp server entry point. Defaults to the bundled server."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run compile",
+    "lint": "eslint src --ext ts"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.3.0"
+  }
+}

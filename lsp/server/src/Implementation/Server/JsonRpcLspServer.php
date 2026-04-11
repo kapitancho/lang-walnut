@@ -1,0 +1,389 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Walnut\Lang\Lsp\Implementation\Server;
+
+use Walnut\Lang\Almond\Engine\Implementation\Program\Validation\BacktraceValidationResultCollector;
+use Walnut\Lang\Almond\ProgramBuilder\Implementation\CodeMapper\NodeCodeMapper;
+use Walnut\Lang\Almond\Runner\Implementation\Compiler;
+use Walnut\Lang\Almond\Source\Implementation\PackageConfiguration\PackageConfiguration;
+use Walnut\Lang\Almond\Source\Implementation\SourceFinder\InMemorySourceFinder;
+use Walnut\Lang\Almond\Source\Implementation\SourceFinder\PackageBasedSourceFinder;
+use Walnut\Lang\Lsp\Blueprint\Document\CompilationCache;
+use Walnut\Lang\Lsp\Blueprint\Document\CompilationSnapshot;
+use Walnut\Lang\Lsp\Blueprint\Document\DocumentStore;
+use Walnut\Lang\Lsp\Blueprint\Feature\CompletionProvider;
+use Walnut\Lang\Lsp\Blueprint\Feature\DefinitionProvider;
+use Walnut\Lang\Lsp\Blueprint\Feature\DiagnosticsProvider;
+use Walnut\Lang\Lsp\Blueprint\Feature\HoverProvider;
+use Walnut\Lang\Lsp\Blueprint\Server\LspServer;
+use Walnut\Lang\Lsp\Blueprint\Transport\LspTransport;
+use Walnut\Lang\Lsp\Implementation\Document\BasicCompilationSnapshot;
+use Walnut\Lang\Lsp\Implementation\Document\InMemoryDocumentStore;
+use Walnut\Lang\Lsp\Implementation\Document\TwoLevelCompilationCache;
+use Walnut\Lang\Lsp\Implementation\Feature\AlmondCompletionProvider;
+use Walnut\Lang\Lsp\Implementation\Feature\AlmondDefinitionProvider;
+use Walnut\Lang\Lsp\Implementation\Feature\AlmondDiagnosticsProvider;
+use Walnut\Lang\Lsp\Implementation\Feature\AlmondHoverProvider;
+
+/**
+ * Main LSP server loop.
+ *
+ * Reads JSON-RPC messages from the transport and dispatches them to the
+ * appropriate handler.  All LSP lifecycle, document sync, and feature
+ * requests are handled here.
+ *
+ * Construction is done lazily after `initialize` (which carries
+ * the workspace root and client capabilities).
+ */
+final class JsonRpcLspServer implements LspServer {
+
+    private bool $shutdownCalled = false;
+
+    private DocumentStore          $documentStore;
+    private CompilationCache       $compilationCache;
+    private DiagnosticsProvider    $diagnosticsProvider;
+    private HoverProvider          $hoverProvider;
+    private DefinitionProvider     $definitionProvider;
+    private CompletionProvider     $completionProvider;
+    private Compiler               $compiler;
+    private PackageBasedSourceFinder|null $packageSourceFinder = null;
+
+    public function __construct(
+        private readonly LspTransport $transport,
+    ) {}
+
+    public function run(): void {
+        while (true) {
+            $message = $this->transport->receive();
+            if ($message === null) {
+                break;
+            }
+            $this->handleMessage($message);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Dispatcher
+    // -------------------------------------------------------------------------
+
+    /** @param array<string, mixed> $message */
+    private function handleMessage(array $message): void {
+        $method = $message['method'] ?? null;
+        $id     = $message['id']     ?? null;
+        $params = $message['params'] ?? [];
+
+        try {
+            $result = match ($method) {
+                'initialize'                 => $this->handleInitialize($params),
+                'initialized'               => null,
+                'shutdown'                  => $this->handleShutdown(),
+                'exit'                      => $this->handleExit(),
+                'textDocument/didOpen'      => $this->handleDidOpen($params),
+                'textDocument/didChange'    => $this->handleDidChange($params),
+                'textDocument/didClose'     => $this->handleDidClose($params),
+                'textDocument/didSave'      => null,
+                'textDocument/hover'        => $this->handleHover($params),
+                'textDocument/definition'   => $this->handleDefinition($params),
+                'textDocument/completion'   => $this->handleCompletion($params),
+                'textDocument/signatureHelp' => null,
+                default                     => null,
+            };
+        } catch (\Throwable $e) {
+            fwrite(STDERR, sprintf(
+                "[walnut-lsp] ERROR %s %s: %s\n  at %s:%d\n",
+                $method ?? '(unknown)',
+                $id !== null ? "id=$id" : '(notification)',
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine(),
+            ));
+            fflush(STDERR);
+            if ($id !== null) {
+                $this->sendError($id, -32603, 'Internal error: ' . $e->getMessage());
+            }
+            return;
+        }
+
+        if ($id !== null) {
+            $this->sendResult($id, $result);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Lifecycle
+    // -------------------------------------------------------------------------
+
+    /** @param array<string, mixed> $params */
+    private function handleInitialize(array $params): array {
+        $rootUri    = $params['rootUri'] ?? null;
+        $sourceRoot = $rootUri !== null
+            ? rawurldecode(str_replace('file://', '', $rootUri)) . '/walnut-src'
+            : getcwd() . '/walnut-src';
+
+        $this->documentStore       = new InMemoryDocumentStore($sourceRoot);
+        $this->compilationCache    = new TwoLevelCompilationCache();
+        $this->diagnosticsProvider = new AlmondDiagnosticsProvider();
+        $this->hoverProvider       = new AlmondHoverProvider();
+        $this->definitionProvider  = new AlmondDefinitionProvider();
+        $this->completionProvider  = new AlmondCompletionProvider();
+
+        $this->compiler = Compiler::builder();
+        $nutcfgPath = $sourceRoot . '/../nutcfg.json';
+        if (file_exists($nutcfgPath)) {
+            // Build a PackageBasedSourceFinder with ABSOLUTE paths so we never
+            // depend on getcwd().  For each package, prefer the almond/ copy
+            // (which has JsonValue, updated HydrationError, etc.) when it exists.
+            $projectRoot = dirname((string) realpath($nutcfgPath));
+            $almondDir   = $projectRoot . '/almond';
+
+            $nutcfg = json_decode((string) file_get_contents($nutcfgPath), true);
+
+            // Default source root is always the project's own walnut-src (user files).
+            $absSourceRoot = $projectRoot . '/' . ($nutcfg['sourceRoot'] ?? 'walnut-src');
+
+            // Remap each package path: prefer almond/<relPath> when it exists.
+            $absPackageRoots = [];
+            foreach (($nutcfg['packages'] ?? []) as $name => $relPath) {
+                $almondPath   = $almondDir   . '/' . $relPath;
+                $projectPath  = $projectRoot . '/' . $relPath;
+                $absPackageRoots[$name] = is_dir($almondPath) ? $almondPath : $projectPath;
+            }
+
+            fwrite(STDERR, "[walnut-lsp] source root    $absSourceRoot\n");
+            fflush(STDERR);
+
+            // Store separately — added LAST in recompileAndPublish so in-memory
+            // sources take priority over disk when the same module is open.
+            $this->packageSourceFinder = new PackageBasedSourceFinder(
+                new PackageConfiguration($absSourceRoot, $absPackageRoots)
+            );
+        }
+
+        return [
+            'capabilities' => [
+                'textDocumentSync' => [
+                    'openClose' => true,
+                    'change'    => 1, // Full text sync
+                    'save'      => false,
+                ],
+                'hoverProvider'      => true,
+                'definitionProvider' => true,
+                'completionProvider' => [
+                    'triggerCharacters' => ['>'],
+                ],
+            ],
+            'serverInfo' => ['name' => 'walnut-lsp', 'version' => '0.1.0'],
+        ];
+    }
+
+    private function handleShutdown(): null {
+        $this->shutdownCalled = true;
+        return null;
+    }
+
+    private function handleExit(): never {
+        exit($this->shutdownCalled ? 0 : 1);
+    }
+
+    // -------------------------------------------------------------------------
+    // Document sync
+    // -------------------------------------------------------------------------
+
+    /** @param array<string, mixed> $params */
+    private function handleDidOpen(array $params): null {
+        $doc     = $params['textDocument'];
+        $uri     = $doc['uri'];
+        $version = $doc['version'];
+        $content = $doc['text'];
+
+        $this->documentStore->update($uri, $version, $content);
+        $this->recompileAndPublish($uri, $version, $content);
+        return null;
+    }
+
+    /** @param array<string, mixed> $params */
+    private function handleDidChange(array $params): null {
+        $uri     = $params['textDocument']['uri'];
+        $version = $params['textDocument']['version'];
+        // Full-text sync: last entry holds the complete new text
+        $content = array_last($params['contentChanges'])['text'] ?? '';
+
+        $this->documentStore->update($uri, $version, $content);
+
+        // Skip recompiling this version if a newer message is already waiting in
+        // the input buffer — avoids queueing multiple compilations during fast typing.
+        if ($this->transport->hasMore()) {
+            $moduleName = $this->documentStore->uriToModuleName($uri);
+            fwrite(STDERR, "[walnut-lsp] skip compile    $moduleName v$version (newer msg queued)\n");
+            fflush(STDERR);
+            return null;
+        }
+
+        $this->recompileAndPublish($uri, $version, $content);
+        return null;
+    }
+
+    /** @param array<string, mixed> $params */
+    private function handleDidClose(array $params): null {
+        $uri = $params['textDocument']['uri'];
+        $this->documentStore->remove($uri);
+        $this->compilationCache->evict($uri);
+        $this->transport->send([
+            'jsonrpc' => '2.0',
+            'method'  => 'textDocument/publishDiagnostics',
+            'params'  => ['uri' => $uri, 'diagnostics' => []],
+        ]);
+        return null;
+    }
+
+    // -------------------------------------------------------------------------
+    // Feature handlers
+    // -------------------------------------------------------------------------
+
+    /** @param array<string, mixed> $params */
+    private function handleHover(array $params): array|null {
+        $snapshot = $this->bestSnapshot($params['textDocument']['uri']);
+        if ($snapshot === null) {
+            return null;
+        }
+        return $this->hoverProvider->hover(
+            $snapshot,
+            $params['position']['line'],
+            $params['position']['character'],
+        );
+    }
+
+    /** @param array<string, mixed> $params */
+    private function handleDefinition(array $params): array|null {
+        $snapshot = $this->bestSnapshot($params['textDocument']['uri']);
+        if ($snapshot === null) {
+            return null;
+        }
+        return $this->definitionProvider->definition(
+            $snapshot,
+            $params['position']['line'],
+            $params['position']['character'],
+        );
+    }
+
+    /** @param array<string, mixed> $params */
+    private function handleCompletion(array $params): array {
+        $uri      = $params['textDocument']['uri'];
+        $snapshot = $this->bestSnapshot($uri);
+        if ($snapshot === null) {
+            return [];
+        }
+        // documentStore is updated immediately on didChange (before recompile),
+        // so it holds the editor's current text even when the snapshot is one
+        // version behind (e.g. the user just typed '->' which caused a parse error).
+        $liveSourceText = $this->documentStore->get($uri) ?? $snapshot->sourceText;
+
+        return $this->completionProvider->completions(
+            $snapshot,
+            $params['position']['line'],
+            $params['position']['character'],
+            $params['context']['triggerCharacter'] ?? '',
+            $liveSourceText,
+        );
+    }
+
+    // -------------------------------------------------------------------------
+    // Compilation
+    // -------------------------------------------------------------------------
+
+    private function recompileAndPublish(string $uri, int $version, string $content): void {
+        $moduleName  = $this->documentStore->uriToModuleName($uri);
+        $codeIndex   = new NodeCodeMapper();
+        $collector   = new BacktraceValidationResultCollector();
+
+        $t0 = hrtime(true);
+        fwrite(STDERR, "[walnut-lsp] compile start  $moduleName v$version\n");
+        fflush(STDERR);
+
+        // Source finder order matters: in-memory sources take priority over disk,
+        // so the user's unsaved edits are compiled rather than the last saved file.
+        // EmptyPrecompiler appends '.nut' to the module name before lookup, so
+        // InMemorySourceFinder must be keyed with the '.nut' extension too.
+        $compiler = $this->compiler
+            ->withAddedSourceFinder(new InMemorySourceFinder([$moduleName . '.nut' => $content]))
+            ->withAddedSourceFinder($this->buildPeerSourceFinder($moduleName));
+
+        // Package/disk finder appended last so it only serves files not open in the editor.
+        if ($this->packageSourceFinder !== null) {
+            $compiler = $compiler->withAddedSourceFinder($this->packageSourceFinder);
+        }
+
+        $compilationResult = $compiler
+            ->withStartModule($moduleName)
+            ->withCodeMapper($codeIndex)
+            ->withValidationResultCollector($collector)
+            ->compile();
+
+        $ms = intdiv(hrtime(true) - $t0, 1_000_000);
+        fwrite(STDERR, "[walnut-lsp] compile done   $moduleName v$version ({$ms}ms)\n");
+        fflush(STDERR);
+
+        $snapshot = new BasicCompilationSnapshot(
+            uri:               $uri,
+            moduleName:        $moduleName,
+            version:           $version,
+            sourceText:        $content,
+            compilationResult: $compilationResult,
+            codeIndex:         $codeIndex,
+            contextScope:      $collector,
+        );
+        $this->compilationCache->store($snapshot);
+
+        $diagnostics = $this->diagnosticsProvider->diagnosticsFor($snapshot);
+        fwrite(STDERR, "[walnut-lsp] diagnostics    $moduleName v$version (" . count($diagnostics) . " issue(s))\n");
+        fflush(STDERR);
+
+        $this->transport->send([
+            'jsonrpc' => '2.0',
+            'method'  => 'textDocument/publishDiagnostics',
+            'params'  => ['uri' => $uri, 'version' => $version, 'diagnostics' => $diagnostics],
+        ]);
+    }
+
+    /**
+     * Build an InMemorySourceFinder containing the best available source text for
+     * every open file EXCEPT the one currently being compiled.
+     * This allows cross-module type checking to use the most recent valid state.
+     */
+    private function buildPeerSourceFinder(string $excludeModuleName): InMemorySourceFinder {
+        $sources = [];
+        foreach ($this->compilationCache->listUris() as $uri) {
+            $snapshot = $this->compilationCache->lastValid($uri)
+                     ?? $this->compilationCache->lastParsed($uri)
+                     ?? $this->compilationCache->live($uri);
+            if ($snapshot !== null && $snapshot->moduleName !== $excludeModuleName) {
+                // Key with '.nut' extension — EmptyPrecompiler appends it before lookup.
+                $sources[$snapshot->moduleName . '.nut'] = $snapshot->sourceText;
+            }
+        }
+        return new InMemorySourceFinder($sources);
+    }
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
+    private function bestSnapshot(string $uri): CompilationSnapshot|null {
+        return $this->compilationCache->lastParsed($uri)
+            ?? $this->compilationCache->live($uri);
+    }
+
+    private function sendResult(int|string $id, mixed $result): void {
+        $this->transport->send(['jsonrpc' => '2.0', 'id' => $id, 'result' => $result]);
+    }
+
+    private function sendError(int|string $id, int $code, string $message): void {
+        $this->transport->send([
+            'jsonrpc' => '2.0',
+            'id'      => $id,
+            'error'   => ['code' => $code, 'message' => $message],
+        ]);
+    }
+}

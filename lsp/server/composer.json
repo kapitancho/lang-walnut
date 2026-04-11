@@ -1,0 +1,26 @@
+{
+    "name": "walnut/lang-lsp-server",
+    "description": "Walnut Language Server Protocol server",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.5",
+        "walnut/lang": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Walnut\\Lang\\Lsp\\": "src/"
+        }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../../"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "optimize-autoloader": true
+    }
+}
