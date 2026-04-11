@@ -24,6 +24,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyCo
 use Walnut\Lang\Almond\Engine\Blueprint\Program\ProgramContext as ProgramContextInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory as ValidationFactoryInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResult;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResultCollector;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\VariableScope\VariableScopeFactory as VariableScopeFactoryInterface;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Expression\ExpressionRegistry;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Function\FunctionContextFiller;
@@ -85,7 +86,10 @@ final readonly class ProgramContext implements ProgramContextInterface, TypeFind
 	public ProgramValidator $programValidator;
 
 	/** @param array<string, string> $nativeExtensionNamespaces */
-	public function __construct(array $nativeExtensionNamespaces = []) {
+	public function __construct(
+		ValidationResultCollector $validationResultCollector,
+		array $nativeExtensionNamespaces = []
+	) {
 		// Storage + registry pairs:
 		$this->userlandTypeRegistry = $this->userlandTypeStorage = new UserlandTypeStorage();
 		$this->userlandMethodRegistry = $this->userlandMethodStorage = new UserlandMethodStorage();
@@ -97,7 +101,10 @@ final readonly class ProgramContext implements ProgramContextInterface, TypeFind
 		$stringEscapeCharHandler = new StringEscapeCharHandler();
 		$bytesEscapeCharHandler = new BytesEscapeCharHandler();
 
-		$this->validationFactory = new ValidationFactory($this);
+		$this->validationFactory = new ValidationFactory(
+			$validationResultCollector,
+			$this
+		);
 
 		$this->nativeMethodRegistry = new NativeMethodRegistry(
 			new NativeCodeTypeMapper(),

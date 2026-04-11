@@ -19,7 +19,7 @@ final readonly class BinaryPlus extends SetNativeMethod {
 					$targetType->itemType,
 					$parameterType->itemType
 				]),
-				$targetType->range->minLength + $parameterType->range->minLength,
+				min($targetType->range->minLength, $parameterType->range->minLength),
 				$parameterType->range->maxLength === PlusInfinity::value ||
 				$targetType->range->maxLength === PlusInfinity::value ?
 					PlusInfinity::value : $targetType->range->maxLength + $parameterType->range->maxLength

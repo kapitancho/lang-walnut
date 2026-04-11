@@ -8,7 +8,9 @@ use Walnut\Lang\Almond\AST\Implementation\Builder\NodeBuilderFactory;
 use Walnut\Lang\Almond\AST\Implementation\Parser\NodeImporter;
 use Walnut\Lang\Almond\AST\Implementation\Parser\TransitionLogger;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResult;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResultCollector;
 use Walnut\Lang\Almond\Engine\Implementation\Program\ProgramContextFactory;
+use Walnut\Lang\Almond\Engine\Implementation\Program\Validation\NoopValidationResultCollector;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\BuildException;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\CodeMapper;
 use Walnut\Lang\Almond\ProgramBuilder\Blueprint\SourceNodeLocator;
@@ -40,13 +42,15 @@ final readonly class Compiler {
 		private string                       $startModule,
 		private CodeMapper&SourceNodeLocator $codeMapper,
 		private CompositeSourceFinder        $sourceFinder,
+		private ValidationResultCollector    $validationResultCollector,
 	) {}
 
 	public static function builder(): self {
 		return new self(
 			'main',
 			new NoopCodeMapper(),
-			new CompositeSourceFinder()
+			new CompositeSourceFinder(),
+			new NoopValidationResultCollector()
 		);
 	}
 
@@ -80,9 +84,14 @@ final readonly class Compiler {
 		]);
 	}
 
+	public function withValidationResultCollector(ValidationResultCollector $validationResultCollector): self {
+		return clone($this, ['validationResultCollector' => $validationResultCollector]);
+	}
+
 	public function compile(): CompiledProgram|CompilationFailure {
 		//Engine:
-		$programContext = new ProgramContextFactory()->newProgramContext();
+		$programContext = new ProgramContextFactory()
+			->newProgramContext($this->validationResultCollector);
 
 		//Source:
 		$lookupContext = new CachedModuleLookupContext(

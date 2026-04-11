@@ -11,6 +11,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory as ValidationFactoryInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResult as ValidationResultInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResultCollector;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\VariableScope\VariableScope as VariableScopeInterface;
 use Walnut\Lang\Almond\Engine\Implementation\Program\VariableScope\VariableScope;
 
@@ -19,6 +20,7 @@ final class ValidationFactory implements ValidationFactoryInterface {
 	public readonly ValidationResultInterface $emptyValidationResult;
 
 	public function __construct(
+		private readonly ValidationResultCollector $validationResultCollector,
 		private readonly TypeFinder $typeFinder,
 	) {
 		$this->emptyValidationResult = new ValidationResult([]);
@@ -26,6 +28,7 @@ final class ValidationFactory implements ValidationFactoryInterface {
 
 	public ValidationContextInterface $emptyValidationContext {
 		get => $this->emptyValidationContext ??= new ValidationContext(
+			$this->validationResultCollector,
 			new VariableScope([]),
 			$this->initialExpressionType,
 			$this->initialReturnType
@@ -46,6 +49,7 @@ final class ValidationFactory implements ValidationFactoryInterface {
 
 	public function fromVariableScope(VariableScopeInterface $variableScope): ValidationContextInterface {
 		return new ValidationContext(
+			$this->validationResultCollector,
 			$variableScope,
 			$this->initialExpressionType,
 			$this->initialReturnType
