@@ -88,6 +88,10 @@ final class NodeCodeMapper implements CodeMapper, SourceNodeLocator, PositionalL
 		return null;
 	}
 
+	public function allElements(string $moduleName): array {
+		return $this->positionalIndex[$moduleName] ?? [];
+	}
+
 	public function elementsAtOffset(string $moduleName, int $offset): array {
 		$entries = $this->positionalIndex[$moduleName] ?? [];
 

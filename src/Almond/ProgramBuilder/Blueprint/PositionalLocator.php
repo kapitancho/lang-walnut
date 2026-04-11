@@ -40,4 +40,12 @@ interface PositionalLocator {
 	 * @return Expression|Type|Value|FunctionBody|UserlandMethod|TypeName|VariableName|MethodName|EnumerationValueName|null
 	 */
 	public function findLast(string $moduleName, callable $predicate): mixed;
+
+	/**
+	 * Returns all indexed entries for $moduleName as [startOffset, endOffset, element] triples.
+	 * Order is unspecified. Use this for full-module scans (folding ranges, inlay hints, etc.).
+	 *
+	 * @return list<array{0: int, 1: int, 2: Expression|Type|Value|FunctionBody|UserlandMethod|TypeName|VariableName|MethodName|EnumerationValueName}>
+	 */
+	public function allElements(string $moduleName): array;
 }

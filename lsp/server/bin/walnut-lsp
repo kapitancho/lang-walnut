@@ -12,7 +12,9 @@ use Walnut\Lang\Lsp\Implementation\Document\TwoLevelCompilationCache;
 use Walnut\Lang\Lsp\Implementation\Feature\AlmondCompletionProvider;
 use Walnut\Lang\Lsp\Implementation\Feature\AlmondDefinitionProvider;
 use Walnut\Lang\Lsp\Implementation\Feature\AlmondDiagnosticsProvider;
+use Walnut\Lang\Lsp\Implementation\Feature\AlmondFoldingRangeProvider;
 use Walnut\Lang\Lsp\Implementation\Feature\AlmondHoverProvider;
+use Walnut\Lang\Lsp\Implementation\Feature\AlmondInlayHintProvider;
 use Walnut\Lang\Lsp\Implementation\Server\JsonRpcLspServer;
 use Walnut\Lang\Lsp\Implementation\Support\LspPositionConverter;
 use Walnut\Lang\Lsp\Implementation\Transport\StdioTransport;
@@ -30,6 +32,8 @@ $server = new JsonRpcLspServer(
     hoverProvider:            new AlmondHoverProvider($converter),
     definitionProvider:       new AlmondDefinitionProvider($converter),
     completionProvider:       new AlmondCompletionProvider($converter),
+    foldingRangeProvider:     new AlmondFoldingRangeProvider(),
+    inlayHintProvider:        new AlmondInlayHintProvider($converter),
     compilationCache:         new TwoLevelCompilationCache(),
     documentStoreFactory:     new InMemoryDocumentStoreFactory(),
     compilationIndexFactory:  new DefaultCompilationIndexFactory(),

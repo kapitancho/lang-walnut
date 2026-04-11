@@ -15,7 +15,7 @@ use Walnut\Lang\Lsp\Blueprint\Document\CompilationSnapshot;
  * Almond positions are 1-based (line, column) plus a byte offset.
  *
  * Note: character/column offsets are treated as bytes here, which is
- * correct for ASCII content; full UTF-16 support is a future TODO.
+ * correct for ASCII content; full UTF-16 support is a not yet supported.
  */
 interface LspLocationConverter {
 

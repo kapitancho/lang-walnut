@@ -16,7 +16,9 @@ use Walnut\Lang\Lsp\Blueprint\Document\DocumentStoreFactory;
 use Walnut\Lang\Lsp\Blueprint\Feature\CompletionProvider;
 use Walnut\Lang\Lsp\Blueprint\Feature\DefinitionProvider;
 use Walnut\Lang\Lsp\Blueprint\Feature\DiagnosticsProvider;
+use Walnut\Lang\Lsp\Blueprint\Feature\FoldingRangeProvider;
 use Walnut\Lang\Lsp\Blueprint\Feature\HoverProvider;
+use Walnut\Lang\Lsp\Blueprint\Feature\InlayHintProvider;
 use Walnut\Lang\Lsp\Blueprint\Server\LspServer;
 use Walnut\Lang\Lsp\Blueprint\Transport\LspTransport;
 use Walnut\Lang\Lsp\Implementation\Document\BasicCompilationSnapshot;
@@ -48,6 +50,8 @@ final class JsonRpcLspServer implements LspServer {
         private readonly HoverProvider           $hoverProvider,
         private readonly DefinitionProvider      $definitionProvider,
         private readonly CompletionProvider      $completionProvider,
+        private readonly FoldingRangeProvider    $foldingRangeProvider,
+        private readonly InlayHintProvider       $inlayHintProvider,
         private readonly CompilationCache        $compilationCache,
         private readonly DocumentStoreFactory    $documentStoreFactory,
         private readonly CompilationIndexFactory $compilationIndexFactory,
@@ -87,6 +91,8 @@ final class JsonRpcLspServer implements LspServer {
                 'textDocument/hover'          => $this->handleHover($params),
                 'textDocument/definition'     => $this->handleDefinition($params),
                 'textDocument/completion'     => $this->handleCompletion($params),
+                'textDocument/foldingRange'   => $this->handleFoldingRange($params),
+                'textDocument/inlayHint'      => $this->handleInlayHint($params),
                 'textDocument/signatureHelp'  => null,
                 default                       => null,
             };
@@ -181,11 +187,13 @@ final class JsonRpcLspServer implements LspServer {
                     'change'    => 1, // Full text sync
                     'save'      => false,
                 ],
-                'hoverProvider'      => true,
-                'definitionProvider' => true,
-                'completionProvider' => [
+                'hoverProvider'        => true,
+                'definitionProvider'   => true,
+                'completionProvider'   => [
                     'triggerCharacters' => ['>'],
                 ],
+                'foldingRangeProvider' => true,
+                'inlayHintProvider'    => true,
             ],
             'serverInfo' => ['name' => 'walnut-lsp', 'version' => '0.1.0'],
         ];
@@ -300,6 +308,27 @@ final class JsonRpcLspServer implements LspServer {
             $params['context']['triggerCharacter'] ?? '',
             $liveSourceText,
         );
+    }
+
+    /** @param array<string, mixed> $params */
+    private function handleFoldingRange(array $params): array {
+        $snapshot = $this->bestSnapshot($params['textDocument']['uri']);
+        if ($snapshot === null) {
+            return [];
+        }
+        return $this->foldingRangeProvider->foldingRanges($snapshot);
+    }
+
+    /** @param array<string, mixed> $params */
+    private function handleInlayHint(array $params): array {
+        $snapshot = $this->bestSnapshot($params['textDocument']['uri']);
+        if ($snapshot === null) {
+            return [];
+        }
+        $range = $params['range'] ?? [];
+        $startLine = $range['start']['line'] ?? 0;
+        $endLine   = $range['end']['line']   ?? PHP_INT_MAX;
+        return $this->inlayHintProvider->inlayHints($snapshot, $startLine, $endLine);
     }
 
     // -------------------------------------------------------------------------
