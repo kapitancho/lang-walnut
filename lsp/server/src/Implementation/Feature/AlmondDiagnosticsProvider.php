@@ -35,10 +35,16 @@ final readonly class AlmondDiagnosticsProvider implements DiagnosticsProvider {
             $locations = $error->sourceLocations;
             $primaryLocation = array_first($locations);
 
-            if ($primaryLocation === null || $primaryLocation->moduleName !== $snapshot->moduleName) {
-                // Error is in a dependency — skip (reported when that file is compiled)
+            if ($primaryLocation !== null && $primaryLocation->moduleName !== $snapshot->moduleName) {
+                // Error location is in a dependency file — skip (reported when that file is compiled)
                 continue;
             }
+
+            // If there is no source location (e.g. moduleDependencyMissing), show
+            // the error at the very start of the file so it is not silently dropped.
+            $range = $primaryLocation !== null
+                ? $this->locationToRange($primaryLocation)
+                : ['start' => ['line' => 0, 'character' => 0], 'end' => ['line' => 0, 'character' => 0]];
 
             $related = array_map(
                 fn(SourceLocation $loc): array => [
@@ -52,7 +58,7 @@ final readonly class AlmondDiagnosticsProvider implements DiagnosticsProvider {
             );
 
             $diagnostic = [
-                'range'    => $this->locationToRange($primaryLocation),
+                'range'    => $range,
                 'severity' => 1,
                 'code'     => $error->errorType->name,
                 'source'   => 'walnut',

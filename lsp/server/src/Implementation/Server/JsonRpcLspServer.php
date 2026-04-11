@@ -122,7 +122,10 @@ final class JsonRpcLspServer implements LspServer {
             ? rawurldecode(str_replace('file://', '', $rootUri)) . '/walnut-src'
             : getcwd() . '/walnut-src';
 
-        $this->documentStore       = new InMemoryDocumentStore($sourceRoot);
+        // documentSourceRoot is used for URI→module-name conversion.
+        // It may be overridden below once we know the real source directory.
+        $documentSourceRoot = $sourceRoot;
+
         $this->compilationCache    = new TwoLevelCompilationCache();
         $this->diagnosticsProvider = new AlmondDiagnosticsProvider();
         $this->hoverProvider       = new AlmondHoverProvider();
@@ -140,8 +143,21 @@ final class JsonRpcLspServer implements LspServer {
 
             $nutcfg = json_decode((string) file_get_contents($nutcfgPath), true);
 
-            // Default source root is always the project's own walnut-src (user files).
-            $absSourceRoot = $projectRoot . '/' . ($nutcfg['sourceRoot'] ?? 'walnut-src');
+            $relSourceRoot = $nutcfg['sourceRoot'] ?? 'walnut-src';
+            $absSourceRoot = $projectRoot . '/' . $relSourceRoot;
+
+            // If the source root doesn't exist at the project level but the almond/
+            // directory contains it (runtime copy), prefer the almond/ copy.
+            // This handles the case where VSCode is opened at the repository root
+            // but user Walnut files live in almond/<sourceRoot>/.
+            if (!is_dir($absSourceRoot) && is_dir($almondDir . '/' . $relSourceRoot)) {
+                $absSourceRoot = $almondDir . '/' . $relSourceRoot;
+            }
+
+            // Align the documentStore root with the resolved source root so that
+            // URI→module-name extraction gives the right short names (e.g. "f1", not
+            // "Users/…/almond/walnut-src/f1").
+            $documentSourceRoot = $absSourceRoot;
 
             // Remap each package path: prefer almond/<relPath> when it exists.
             $absPackageRoots = [];
@@ -160,6 +176,8 @@ final class JsonRpcLspServer implements LspServer {
                 new PackageConfiguration($absSourceRoot, $absPackageRoots)
             );
         }
+
+        $this->documentStore = new InMemoryDocumentStore($documentSourceRoot);
 
         return [
             'capabilities' => [

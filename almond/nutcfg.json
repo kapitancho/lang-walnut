@@ -1,6 +1,7 @@
 {
   "sourceRoot": "walnut-src",
   "packages": {
-    "core": "core-nut-lib"
+    "core": "core-nut-lib",
+    "proba": "vv"
   }
 }
