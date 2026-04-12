@@ -56,6 +56,13 @@ interface CompilationSnapshot {
     /** True when the compilation result contains no errors of any kind. */
     public bool $isValid { get; }
 
-    /** True when the source was parsed without parse errors (isValid implies isParsed). */
+    /**
+     * True when the engine build completed for this module and the codeIndex is
+     * populated.  This is the prerequisite for structural LSP features (semantic
+     * tokens, folding ranges, hover, go-to-definition).
+     *
+     * Note: isValid implies isParsed, but isParsed does NOT imply isValid —
+     * a snapshot with type errors can still have a fully-populated codeIndex.
+     */
     public bool $isParsed { get; }
 }

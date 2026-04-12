@@ -17,9 +17,17 @@ final class BasicCompilationSnapshot implements CompilationSnapshot {
         get => !($this->compilationResult instanceof CompilationFailure);
     }
 
+    /**
+     * True when the engine build ran to completion for this module, meaning the
+     * codeIndex is populated and structural LSP features (semantic tokens, folding
+     * ranges, hover, etc.) can work.
+     *
+     * This is more accurate than checking for the absence of parse errors: a build
+     * exception or pre-build validation failure also produces an empty codeIndex
+     * even though no parse error occurred, and should not overwrite lastParsed.
+     */
     public bool $isParsed {
-        get => !($this->compilationResult instanceof CompilationFailure)
-            || !$this->hasParseErrors();
+        get => count($this->codeIndex->allElements($this->moduleName)) > 0;
     }
 
     public function __construct(
@@ -31,17 +39,4 @@ final class BasicCompilationSnapshot implements CompilationSnapshot {
         public readonly PositionalLocator&SourceNodeLocator $codeIndex,
         public readonly ValidationContextScope         $contextScope,
     ) {}
-
-    private function hasParseErrors(): bool {
-        if (!($this->compilationResult instanceof CompilationFailure)) {
-            return false;
-        }
-        return array_any(
-            $this->compilationResult->errors,
-            static fn($error): bool => match ($error->errorType->name) {
-                'parseError', 'moduleDependencyLoop', 'moduleDependencyMissing' => true,
-                default => false,
-            }
-        );
-    }
 }

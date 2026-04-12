@@ -74,7 +74,9 @@ final readonly class LspPositionConverter implements LspLocationConverter {
             $baseName = substr($moduleName, 0, -5);
             $path = sprintf('%s/%s.test.nut', $sourceRoot, $baseName);
         } else {
-            $path = sprintf('%s/%s.nut', $sourceRoot, $moduleName);
+            // "foo" could be foo.nut or foo.nut.html — prefer the template when it exists
+            $templatePath = sprintf('%s/%s.nut.html', $sourceRoot, $moduleName);
+            $path = file_exists($templatePath) ? $templatePath : sprintf('%s/%s.nut', $sourceRoot, $moduleName);
         }
         return 'file://' . implode('/', array_map(rawurlencode(...), explode('/', $path)));
     }

@@ -65,6 +65,11 @@ final class InMemoryDocumentStore implements DocumentStore {
             $baseName = substr($moduleName, 0, -5);
             return $this->pathToUri($this->sourceRoot . '/' . $baseName . '.test.nut');
         }
+        // "foo" could be foo.nut or foo.nut.html — prefer the template when it exists
+        $templatePath = $this->sourceRoot . '/' . $moduleName . '.nut.html';
+        if (file_exists($templatePath)) {
+            return $this->pathToUri($templatePath);
+        }
         return $this->pathToUri($this->sourceRoot . '/' . $moduleName . '.nut');
     }
 
