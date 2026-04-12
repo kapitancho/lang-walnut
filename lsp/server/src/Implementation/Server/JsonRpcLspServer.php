@@ -19,6 +19,7 @@ use Walnut\Lang\Lsp\Blueprint\Feature\DiagnosticsProvider;
 use Walnut\Lang\Lsp\Blueprint\Feature\FoldingRangeProvider;
 use Walnut\Lang\Lsp\Blueprint\Feature\HoverProvider;
 use Walnut\Lang\Lsp\Blueprint\Feature\InlayHintProvider;
+use Walnut\Lang\Lsp\Blueprint\Feature\SemanticTokensProvider;
 use Walnut\Lang\Lsp\Blueprint\Feature\SignatureHelpProvider;
 use Walnut\Lang\Lsp\Blueprint\Server\LspServer;
 use Walnut\Lang\Lsp\Blueprint\Transport\LspTransport;
@@ -54,6 +55,7 @@ final class JsonRpcLspServer implements LspServer {
         private readonly FoldingRangeProvider    $foldingRangeProvider,
         private readonly InlayHintProvider       $inlayHintProvider,
         private readonly SignatureHelpProvider   $signatureHelpProvider,
+        private readonly SemanticTokensProvider  $semanticTokensProvider,
         private readonly CompilationCache        $compilationCache,
         private readonly DocumentStoreFactory    $documentStoreFactory,
         private readonly CompilationIndexFactory $compilationIndexFactory,
@@ -93,7 +95,8 @@ final class JsonRpcLspServer implements LspServer {
                 'textDocument/hover'          => $this->handleHover($params),
                 'textDocument/definition'     => $this->handleDefinition($params),
                 'textDocument/completion'     => $this->handleCompletion($params),
-                'textDocument/foldingRange'   => $this->handleFoldingRange($params),
+                'textDocument/semanticTokens/full' => $this->handleSemanticTokensFull($params),
+                'textDocument/foldingRange'        => $this->handleFoldingRange($params),
                 'textDocument/inlayHint'      => $this->handleInlayHint($params),
                 'textDocument/signatureHelp'  => $this->handleSignatureHelp($params),
                 default                       => null,
@@ -193,6 +196,13 @@ final class JsonRpcLspServer implements LspServer {
                 'definitionProvider'   => true,
                 'completionProvider'   => [
                     'triggerCharacters' => ['>'],
+                ],
+                'semanticTokensProvider' => [
+                    'legend' => [
+                        'tokenTypes'     => $this->semanticTokensProvider->tokenTypes(),
+                        'tokenModifiers' => $this->semanticTokensProvider->tokenModifiers(),
+                    ],
+                    'full' => true,
                 ],
                 'foldingRangeProvider' => true,
                 'inlayHintProvider'    => true,
@@ -314,6 +324,15 @@ final class JsonRpcLspServer implements LspServer {
             $params['context']['triggerCharacter'] ?? '',
             $liveSourceText,
         );
+    }
+
+    /** @param array<string, mixed> $params */
+    private function handleSemanticTokensFull(array $params): array {
+        $snapshot = $this->bestSnapshot($params['textDocument']['uri']);
+        if ($snapshot === null) {
+            return ['data' => []];
+        }
+        return ['data' => $this->semanticTokensProvider->semanticTokens($snapshot)];
     }
 
     /** @param array<string, mixed> $params */

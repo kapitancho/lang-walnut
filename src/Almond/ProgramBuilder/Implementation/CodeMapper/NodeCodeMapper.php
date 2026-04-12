@@ -55,14 +55,14 @@ final class NodeCodeMapper implements CodeMapper, SourceNodeLocator, PositionalL
 		$this->positionalIndex = [];
 	}
 
-	public function getSourceNode(Expression|Value|Type|FunctionBody|UserlandMethod|UserlandFunction $element): SourceNode|null {
+	public function getSourceNode(Expression|Value|Type|FunctionBody|UserlandMethod|UserlandFunction|TypeName|VariableName|MethodName|EnumerationValueName $element): SourceNode|null {
 		if ($element instanceof UserlandFunction) {
 			$element = $element->functionBody;
 		}
 		return $this->nodeMap[$element] ?? null;
 	}
 
-	public function getSourceLocation(Expression|Value|Type|FunctionBody|UserlandMethod|UserlandFunction $element): SourceLocation|null {
+	public function getSourceLocation(Expression|Value|Type|FunctionBody|UserlandMethod|UserlandFunction|TypeName|VariableName|MethodName|EnumerationValueName $element): SourceLocation|null {
 		return $this->getSourceNode($element)?->sourceLocation;
 	}
 

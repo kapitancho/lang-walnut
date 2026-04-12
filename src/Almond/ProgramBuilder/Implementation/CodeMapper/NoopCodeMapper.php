@@ -23,11 +23,11 @@ final readonly class NoopCodeMapper implements CodeMapper, SourceNodeLocator {
 		Expression|Value|Type|FunctionBody|UserlandMethod|TypeName|VariableName|MethodName|EnumerationValueName $element
 	): void {}
 
-	public function getSourceNode(Expression|Value|Type|UserlandMethod|UserlandFunction|FunctionBody $element): SourceNode|null {
+	public function getSourceNode(Expression|Value|Type|FunctionBody|UserlandMethod|UserlandFunction|TypeName|VariableName|MethodName|EnumerationValueName $element): SourceNode|null {
 		return null;
 	}
 
-	public function getSourceLocation(Expression|Value|Type|UserlandMethod|UserlandFunction|FunctionBody $element): SourceLocation|null {
+	public function getSourceLocation(Expression|Value|Type|FunctionBody|UserlandMethod|UserlandFunction|TypeName|VariableName|MethodName|EnumerationValueName $element): SourceLocation|null {
 		return null;
 	}
 }

@@ -10,8 +10,12 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\UserlandFunction;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\EnumerationValueName;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\MethodName;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
+use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\VariableName;
 
 interface SourceNodeLocator {
-	public function getSourceNode(Expression|Value|Type|FunctionBody|UserlandMethod|UserlandFunction $element): SourceNode|null;
-	public function getSourceLocation(Expression|Value|Type|FunctionBody|UserlandMethod|UserlandFunction $element): SourceLocation|null;
+	public function getSourceNode(Expression|Value|Type|FunctionBody|UserlandMethod|UserlandFunction|TypeName|VariableName|MethodName|EnumerationValueName $element): SourceNode|null;
+	public function getSourceLocation(Expression|Value|Type|FunctionBody|UserlandMethod|UserlandFunction|TypeName|VariableName|MethodName|EnumerationValueName $element): SourceLocation|null;
 }
