@@ -23,8 +23,13 @@ COPY http/         http/
 COPY composer.json composer.json
 COPY VERSION       VERSION
 
+# The build script clones static-php-cli and runs composer install using the
+# host Alpine PHP 8.4. That PHP lacks iconv by default, which causes the
+# static-php-cli composer install to fail. Install it first.
+RUN apk add --no-cache php84-iconv
+
 # EMBED=1 tells build-static.sh to embed /go/src/app/dist/ into the binary.
-# PHP_EXTENSIONS is a comma-separated list of extensions to compile in statically.
+# PHP_EXTENSIONS controls what gets compiled into the output binary (not the host).
 # build-static.sh is in the image root at /go/src/app/ — use the absolute path.
 RUN EMBED=1 PHP_EXTENSIONS="mbstring,bcmath,iconv" /go/src/app/build-static.sh
 
