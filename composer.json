@@ -5,7 +5,6 @@
     "autoload": {
         "psr-4": {
             "Walnut\\Lang\\Test\\": "tests/Walnut/Lang",
-            "Walnut\\Lang\\Lsp\\": "lsp/server/src/",
             "Walnut\\Lang\\": "src"
         }
     },

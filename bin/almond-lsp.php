@@ -8,20 +8,20 @@ ini_set('log_errors', '1');
 ini_set('error_log', 'php://stderr');
 
 use Walnut\Lang\Almond\Runner\Implementation\Compiler;
-use Walnut\Lang\Lsp\Implementation\Compilation\DefaultCompilationIndexFactory;
-use Walnut\Lang\Lsp\Implementation\Document\InMemoryDocumentStoreFactory;
-use Walnut\Lang\Lsp\Implementation\Document\TwoLevelCompilationCache;
-use Walnut\Lang\Lsp\Implementation\Feature\AlmondCompletionProvider;
-use Walnut\Lang\Lsp\Implementation\Feature\AlmondDefinitionProvider;
-use Walnut\Lang\Lsp\Implementation\Feature\AlmondDiagnosticsProvider;
-use Walnut\Lang\Lsp\Implementation\Feature\AlmondFoldingRangeProvider;
-use Walnut\Lang\Lsp\Implementation\Feature\AlmondHoverProvider;
-use Walnut\Lang\Lsp\Implementation\Feature\AlmondInlayHintProvider;
-use Walnut\Lang\Lsp\Implementation\Feature\AlmondSemanticTokensProvider;
-use Walnut\Lang\Lsp\Implementation\Feature\AlmondSignatureHelpProvider;
-use Walnut\Lang\Lsp\Implementation\Server\JsonRpcLspServer;
-use Walnut\Lang\Lsp\Implementation\Support\LspPositionConverter;
-use Walnut\Lang\Lsp\Implementation\Transport\StdioTransport;
+use Walnut\Lang\Almond\LSP\Implementation\Compilation\DefaultCompilationIndexFactory;
+use Walnut\Lang\Almond\LSP\Implementation\Document\InMemoryDocumentStoreFactory;
+use Walnut\Lang\Almond\LSP\Implementation\Document\TwoLevelCompilationCache;
+use Walnut\Lang\Almond\LSP\Implementation\Feature\AlmondCompletionProvider;
+use Walnut\Lang\Almond\LSP\Implementation\Feature\AlmondDefinitionProvider;
+use Walnut\Lang\Almond\LSP\Implementation\Feature\AlmondDiagnosticsProvider;
+use Walnut\Lang\Almond\LSP\Implementation\Feature\AlmondFoldingRangeProvider;
+use Walnut\Lang\Almond\LSP\Implementation\Feature\AlmondHoverProvider;
+use Walnut\Lang\Almond\LSP\Implementation\Feature\AlmondInlayHintProvider;
+use Walnut\Lang\Almond\LSP\Implementation\Feature\AlmondSemanticTokensProvider;
+use Walnut\Lang\Almond\LSP\Implementation\Feature\AlmondSignatureHelpProvider;
+use Walnut\Lang\Almond\LSP\Implementation\Server\JsonRpcLspServer;
+use Walnut\Lang\Almond\LSP\Implementation\Support\LspPositionConverter;
+use Walnut\Lang\Almond\LSP\Implementation\Transport\StdioTransport;
 
 $converter = new LspPositionConverter();
 

@@ -184,8 +184,9 @@ The VS Code extension configures `walnut lsp` as its server command. This means:
 - The `walnut.server.path` VS Code setting points to the PHAR.
 
 All Scenario 3 open items resolved: `phar/stub.php` updated with full subcommand routing;
-`box.json` updated to bundle `almond/` (core-nut-lib + nutcfg.json), `lsp/server/src/`, and `http/`;
-`bin/almond-init.php`, `bin/almond-http.php`, and `bin/almond-lsp.php` created.
+`box.json` updated to bundle `almond/` (core-nut-lib + nutcfg.json), `src/` (including LSP at
+`src/Almond/LSP/`), and `http/`; `bin/almond-init.php`, `bin/almond-http.php`, and
+`bin/almond-lsp.php` created.
 
 ---
 

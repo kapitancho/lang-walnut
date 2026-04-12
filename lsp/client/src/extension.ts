@@ -34,7 +34,7 @@ export function activate(context: vscode.ExtensionContext): void {
     // Resolve the server entry point
     const customServerPath: string = config.get('server.path') || '';
     const serverScript = customServerPath || context.asAbsolutePath(
-        path.join('..', 'server', 'bin', 'walnut-lsp')
+        path.join('..', '..', 'bin', 'almond-lsp.php')
     );
 
     // Server is launched as a child process, communicating via stdio

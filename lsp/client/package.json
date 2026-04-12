@@ -35,7 +35,7 @@
         "walnut.server.path": {
           "type": "string",
           "default": "",
-          "description": "Absolute path to the walnut-lsp server entry point. Defaults to the bundled server."
+          "description": "Absolute path to the almond-lsp.php server entry point. Defaults to bin/almond-lsp.php relative to the extension."
         }
       }
     }

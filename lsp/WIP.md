@@ -5,8 +5,13 @@
 ```
 lsp/
   WIP.md             ← this file
-  server/            ← PHP LSP server (JSON-RPC over stdio)
   client/            ← VS Code extension (TypeScript / npm)
+
+src/Almond/LSP/      ← PHP LSP server (JSON-RPC over stdio)
+
+bin/
+  almond-lsp         ← bash wrapper
+  almond-lsp.php     ← PHP entry point
 ```
 
 ---
@@ -149,44 +154,47 @@ When compiling module M:
 ## PHP server architecture
 
 ```
-server/
-  bin/
-    walnut-lsp              ← PHP stdio entry point
-  src/
-    Blueprint/
-      Transport/
-        LspTransport.php          ← read/write JSON-RPC messages
-      Document/
-        DocumentStore.php         ← live source per URI
-        CompilationCache.php      ← snapshots per URI (live/parsed/valid)
-        CompilationSnapshot.php   ← one compiled result + ValidationContextScope
-      Feature/
-        DiagnosticsProvider.php
-        HoverProvider.php
-        DefinitionProvider.php
-        CompletionProvider.php
-        SignatureHelpProvider.php
-      Server/
-        LspServer.php             ← main loop interface
-    Implementation/
-      Transport/
-        StdioTransport.php        ← fgets(STDIN) / fwrite(STDOUT) framing
-      Document/
-        InMemoryDocumentStore.php
-        TwoLevelCompilationCache.php
-        BasicCompilationSnapshot.php
-        NoopValidationContextScope.php
-      Support/
-        LspPositionConverter.php  ← static helpers: offset↔position, location→LSP
-      Feature/
-        AlmondDiagnosticsProvider.php   ← fully implemented
-        AlmondHoverProvider.php         ← fully implemented
-        AlmondDefinitionProvider.php    ← fully implemented
-        AlmondCompletionProvider.php    ← fully implemented
-      Server/
-        JsonRpcLspServer.php      ← dispatches to providers; wires BacktraceCollector
-  composer.json
+bin/
+  almond-lsp              ← bash wrapper (exec php almond-lsp.php)
+  almond-lsp.php          ← PHP stdio entry point
+
+src/Almond/LSP/
+  Blueprint/
+    Transport/
+      LspTransport.php          ← read/write JSON-RPC messages
+    Document/
+      DocumentStore.php         ← live source per URI
+      CompilationCache.php      ← snapshots per URI (live/parsed/valid)
+      CompilationSnapshot.php   ← one compiled result + ValidationContextScope
+    Feature/
+      DiagnosticsProvider.php
+      HoverProvider.php
+      DefinitionProvider.php
+      CompletionProvider.php
+      SignatureHelpProvider.php
+    Server/
+      LspServer.php             ← main loop interface
+  Implementation/
+    Transport/
+      StdioTransport.php        ← fgets(STDIN) / fwrite(STDOUT) framing
+    Document/
+      InMemoryDocumentStore.php
+      TwoLevelCompilationCache.php
+      BasicCompilationSnapshot.php
+      NoopValidationContextScope.php
+    Support/
+      LspPositionConverter.php  ← static helpers: offset↔position, location→LSP
+    Feature/
+      AlmondDiagnosticsProvider.php   ← fully implemented
+      AlmondHoverProvider.php         ← fully implemented
+      AlmondDefinitionProvider.php    ← fully implemented
+      AlmondCompletionProvider.php    ← fully implemented
+    Server/
+      JsonRpcLspServer.php      ← dispatches to providers; wires BacktraceCollector
 ```
+
+The LSP source lives under `src/Almond/LSP/` (namespace `Walnut\Lang\Almond\LSP\*`) and is
+loaded by the main project autoloader — no separate `composer.json` or `vendor/` needed.
 
 Key design decisions:
 - **`CompilationSnapshot` carries `ValidationContextScope`**: after compile, the snapshot
@@ -217,8 +225,12 @@ client/
     extension.ts          ← activate() spawns PHP server, wires LanguageClient
 ```
 
-The extension spawns `php /path/to/lsp/server/bin/walnut-lsp` as a child process and
+The extension spawns `php /path/to/bin/almond-lsp.php` as a child process and
 connects via `StdioServerTransport` from `vscode-languageclient/node`.
+
+The default path (when `walnut.server.path` is not set) is resolved relative to the
+extension's own directory: `../../bin/almond-lsp.php` — which points to the project-root
+`bin/` when running in development mode from `lsp/client/`.
 
 Language ID: `walnut` (for `.nut` files).
 
@@ -240,7 +252,7 @@ Language ID: `walnut` (for `.nut` files).
 2. ✅ `ValidationResultCollector` / `ValidationContextScope` + `BacktraceValidationResultCollector` (Gaps 2+3)
 3. ⚠️  Method enumeration — partial via `userlandMethodRegistry->allMethods()` (Gap 4)
 
-**PHP server (in `lsp/server/`):**
+**PHP server (in `src/Almond/LSP/`, entry point `bin/almond-lsp.php`):**
 1. ✅ Transport (stdio JSON-RPC framing) — `StdioTransport`
 2. ✅ Document store + compilation cache — `InMemoryDocumentStore`, `TwoLevelCompilationCache`
 3. ✅ Snapshot with `ValidationContextScope` — `BasicCompilationSnapshot`

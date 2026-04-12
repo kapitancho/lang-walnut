@@ -7,11 +7,6 @@
         "php": ">=8.5",
         "walnut/lang": "*"
     },
-    "autoload": {
-        "psr-4": {
-            "Walnut\\Lang\\Lsp\\": "src/"
-        }
-    },
     "repositories": [
         {
             "type": "path",

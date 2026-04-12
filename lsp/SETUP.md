@@ -13,16 +13,14 @@
 
 ## 1. Install server dependencies
 
-The PHP server lives in `lsp/server/` and depends on the main `walnut/lang-walnut` package
-via a local Composer path repository.
+The LSP server implementation is part of the main `walnut/lang` package (`src/Almond/LSP/`).
+Install dependencies from the project root:
 
 ```bash
-cd lsp/server
 composer install
 ```
 
-This produces `lsp/server/vendor/` with the autoloader wired up.
-The server entry point is `lsp/server/bin/walnut-lsp`.
+The server entry point is `bin/almond-lsp.php`.
 
 ---
 
@@ -43,14 +41,11 @@ You can verify the server starts and responds correctly by piping a raw JSON-RPC
 `initialize` request to it:
 
 ```bash
-cd lsp/server
-
-# Build the JSON payload
+# From the project root:
 MSG='{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"rootUri":null,"capabilities":{}}}'
 LEN=${#MSG}
 
-# Send: Content-Length header + blank line + body
-printf "Content-Length: %d\r\n\r\n%s" "$LEN" "$MSG" | php bin/walnut-lsp
+printf "Content-Length: %d\r\n\r\n%s" "$LEN" "$MSG" | php bin/almond-lsp.php
 ```
 
 You should see a JSON-RPC response that begins with `Content-Length:` followed by a
@@ -60,7 +55,7 @@ JSON object containing `"capabilities"`.  The server then waits for more input; 
 ### Longer smoke-test (open a file and check diagnostics)
 
 ```bash
-cd lsp/server
+# From the project root:
 
 send() {
   local msg="$1"
@@ -74,7 +69,7 @@ send() {
   # Give the server a moment to compile and reply, then shut down cleanly
   send '{"jsonrpc":"2.0","id":2,"method":"shutdown","params":{}}'
   send '{"jsonrpc":"2.0","method":"exit","params":{}}'
-} | php bin/walnut-lsp
+} | php bin/almond-lsp.php
 ```
 
 You should see the `initialize` response, then a `textDocument/publishDiagnostics`
@@ -112,13 +107,13 @@ Open any `.nut` file — you should see:
 
 By default the extension resolves the server relative to its own directory:
 ```
-lsp/client/../server/bin/walnut-lsp
+lsp/client/../../bin/almond-lsp.php
 ```
 
-If you need to override this (e.g. server is installed elsewhere):
+If you need to override this (e.g. when using the PHAR distribution):
 1. Open VS Code settings (`Cmd+,` on macOS)
 2. Search for `walnut`
-3. Set **Walnut › Server: Path** to the absolute path of `walnut-lsp`
+3. Set **Walnut › Server: Path** to the absolute path of `almond-lsp.php` (or `walnut.phar`)
 4. Optionally set **Walnut › Server: Php Path** if `php` is not on your `$PATH`
 
 ---
@@ -147,9 +142,10 @@ code --install-extension walnut-language-support-0.1.0.vsix
 After installation, restart VS Code and open a `.nut` file.
 
 > **Note**: The VSIX bundles only the compiled `out/` JS and the `language-configuration.json`.
-> The PHP server (`lsp/server/`) must still be installed separately (step 1) and the
-> `walnut.server.path` setting must point to `bin/walnut-lsp` if the server is not
-> co-located with the extension directory.
+> The PHP server (`bin/almond-lsp.php`) is part of the main `walnut/lang` package — install
+> it with `composer install` from the project root (step 1).  If the project root is not
+> co-located with the extension, set `walnut.server.path` to the absolute path of
+> `bin/almond-lsp.php`.
 
 ---
 
@@ -180,14 +176,14 @@ If VS Code is trying to launch an old/moved server:
 3. `Cmd+Shift+P` → **Developer: Reload Window**
 
 When the path setting is empty the extension resolves the server relative to its own
-install directory (`../server/bin/walnut-lsp`), which is the correct default for the
+install directory (`../../bin/almond-lsp.php`), which is the correct default for the
 development layout in this repo.
 
 ### Common errors
 
 | Symptom | Fix |
 |---------|-----|
-| `vendor/autoload.php: No such file or directory` | Run `composer install` in `lsp/server/` |
+| `vendor/autoload.php: No such file or directory` | Run `composer install` in the project root |
 | `Class ... not found` | Check `composer install` completed without errors; verify `walnut/lang` is in `composer.lock` |
 | Server process exits immediately | PHP version must be ≥ 8.5 — run `php --version` to confirm |
 | No server output at all | Check `walnut.server.phpPath` — is `php` on your `$PATH`? Try setting it to the absolute path |
