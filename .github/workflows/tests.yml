@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        php: ['8.4']
+        php: ['8.5']
 
     steps:
       - uses: actions/checkout@v4
@@ -84,7 +84,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: '8.5'
           extensions: mbstring, bcmath, xdebug
           coverage: xdebug
           tools: composer

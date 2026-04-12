@@ -1,27 +1,16 @@
 #!/usr/bin/env php
 <?php
 
-// Determine version from git tags or fallback
 $version = 'unknown';
-
-// Try to read version from a generated VERSION file (created during build)
 $versionFile = 'phar://' . __FILE__ . '/VERSION';
 if (file_exists($versionFile)) {
-    $version = trim(file_get_contents($versionFile));
+    $version = trim((string) file_get_contents($versionFile));
 }
 
-// Fallback: try git describe if in development
-if ($version === 'unknown' && function_exists('shell_exec')) {
-    $gitVersion = @shell_exec('git describe --tags --always 2>/dev/null');
-    if ($gitVersion) {
-        $version = trim(str_replace('v', '', $gitVersion));
-    }
-}
+$phar = __FILE__;
 
-// Get the first argument
 $firstArg = $GLOBALS['argv'][1] ?? null;
 
-// Handle special flags
 if ($firstArg === '--version' || $firstArg === '-v') {
     echo "Walnut $version\n";
     exit(0);
@@ -31,51 +20,60 @@ if ($firstArg === '--help' || $firstArg === '-h') {
     echo <<<HELP
 Walnut $version
 
-Usage: walnut [command] [options]
+Usage: walnut <command> [options]
 
 Commands:
-  walnut <module> [args...]    Execute a Walnut module (default)
-  walnut test [folder]         Run Walnut tests
-  walnut serve [options]       Start HTTP server with RoadRunner
-  walnut --version             Show version
-  walnut --help                Show this help
+  init                     Initialise a new Walnut project in the current directory
+  cli <module> [args...]   Execute a Walnut module
+  test [folder]            Run .test.nut test files
+  analyse [folder]         Type-check all .nut modules
+  serve [options]          Start the HTTP server
+  lsp                      Start the Language Server (used by VS Code)
+  --version                Print version
+  --help                   Print this help
+
+  When the first argument is not a recognised command, it is treated as a
+  module name and passed directly to 'cli':
+    walnut mymodule arg1 arg2   ≡   walnut cli mymodule arg1 arg2
 
 Examples:
-  walnut myapp arg1 arg2       Execute module 'myapp' with arguments
-  walnut test tests/           Run tests in tests/ folder
-  walnut serve --port 3000     Start server on port 3000
-
-Options for 'serve':
-  --port, -p <port>           Port to listen on (default: 8084)
-  --host, -h <host>           Host to bind to (default: 0.0.0.0)
-  --help                       Show server help
+  walnut init
+  walnut cli main
+  walnut test
+  walnut serve --port 3000
+  walnut analyse --show-errors-only
 
 HELP;
     exit(0);
 }
 
-// Determine which command to run
-$command = 'exec';  // Default command
+$subcommands = ['init', 'cli', 'test', 'analyse', 'serve', 'lsp'];
 
-if (in_array($firstArg, ['test', 'serve'])) {
+$command = 'cli'; // default — treat first arg as a module name
+if (in_array($firstArg, $subcommands, true)) {
     $command = $firstArg;
-    array_splice($GLOBALS['argv'], 1, 1);  // Remove command from argv
+    array_splice($GLOBALS['argv'], 1, 1);
 }
 
-$phar_path = __FILE__;
-
-// Route to appropriate entry point
 switch ($command) {
+    case 'init':
+        require 'phar://' . $phar . '/bin/almond-init.php';
+        break;
     case 'test':
-        require 'phar://' . $phar_path . '/bin/walnut-test';
+        require 'phar://' . $phar . '/bin/almond-test.php';
         break;
-
+    case 'analyse':
+        require 'phar://' . $phar . '/bin/almond-analyse.php';
+        break;
     case 'serve':
-        require 'phar://' . $phar_path . '/bin/walnut-http';
+        require 'phar://' . $phar . '/bin/almond-http.php';
         break;
-
+    case 'lsp':
+        require 'phar://' . $phar . '/bin/almond-lsp.php';
+        break;
+    case 'cli':
     default:
-        require 'phar://' . $phar_path . '/bin/walnut-cli';
+        require 'phar://' . $phar . '/bin/almond-cli.php';
         break;
 }
 

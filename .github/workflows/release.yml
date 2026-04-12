@@ -12,21 +12,17 @@ jobs:
   build-release:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        target: [linux-amd64, darwin-amd64, darwin-arm64]
-
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: '8.5'
           extensions: mbstring, bcmath
           tools: composer, box
 
-      - name: Install dependencies (without dev for CLI PHAR)
+      - name: Install dependencies (without dev)
         run: composer install --no-dev --optimize-autoloader
 
       - name: Generate version from git tag
@@ -36,100 +32,14 @@ jobs:
           echo "$VERSION" > VERSION
           echo "Building version: $VERSION"
 
-      - name: Build CLI PHAR (walnut.phar - pure CLI, no RoadRunner)
+      - name: Build PHAR (Almond engine, includes core-nut-lib)
         run: box compile
 
-      - name: Copy assets (not inside PHAR)
-        run: |
-          cp -r core-nut-lib build/core-nut-lib
-          cp -r empty-src build/walnut-src
-          cp nutcfg.json build/
-
-      - name: Install dev dependencies (for walnut-roadrunner)
-        run: composer install --optimize-autoloader
-
-      - name: Download RoadRunner binary
-        run: |
-          mkdir -p rr-bin
-
-          case "${{ matrix.target }}" in
-            linux-amd64)
-              RR_URL="https://github.com/roadrunner-server/roadrunner/releases/download/v2025.1.4/roadrunner-2025.1.4-linux-amd64.tar.gz"
-              RR_FILE="rr-bin/roadrunner.tar.gz"
-              ;;
-            darwin-amd64)
-              RR_URL="https://github.com/roadrunner-server/roadrunner/releases/download/v2025.1.4/roadrunner-2025.1.4-darwin-amd64.zip"
-              RR_FILE="rr-bin/roadrunner.zip"
-              ;;
-            darwin-arm64)
-              RR_URL="https://github.com/roadrunner-server/roadrunner/releases/download/v2025.1.4/roadrunner-2025.1.4-darwin-arm64.tar.gz"
-              RR_FILE="rr-bin/roadrunner.tar.gz"
-              ;;
-          esac
-
-          curl -L -o "$RR_FILE" "$RR_URL"
-
-          if [[ "$RR_FILE" == *.zip ]]; then
-            unzip -o "$RR_FILE" -d rr-bin
-            # Move binary from subdirectory to rr-bin root
-            mv rr-bin/roadrunner-*/rr rr-bin/rr
-            rm -rf rr-bin/roadrunner-*
-            rm "$RR_FILE"
-          else
-            tar -xzf "$RR_FILE" -C rr-bin --strip-components=1
-            rm "$RR_FILE"
-          fi
-
-          chmod +x rr-bin/rr
-
-      - name: Create walnut-roadrunner distribution
-        run: |
-          mkdir -p walnut-roadrunner-${{ matrix.target }}
-
-          # Copy source code
-          cp -r src/ walnut-roadrunner-${{ matrix.target }}/
-          cp -r http/ walnut-roadrunner-${{ matrix.target }}/
-          cp -r cli/ walnut-roadrunner-${{ matrix.target }}/
-          cp -r vendor/ walnut-roadrunner-${{ matrix.target }}/
-          cp composer.json walnut-roadrunner-${{ matrix.target }}/
-
-          # Copy RoadRunner binary
-          cp rr-bin/rr walnut-roadrunner-${{ matrix.target }}/
-
-          # Copy RoadRunner config
-          cp .rr.yaml walnut-roadrunner-${{ matrix.target }}/
-
-          # Create wrapper script
-          cat > walnut-roadrunner-${{ matrix.target }}/walnut-roadrunner <<'EOF'
-          #!/bin/bash
-          SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-          RR_PATH="$SCRIPT_DIR/rr"
-          CONFIG_PATH="$SCRIPT_DIR/.rr.yaml"
-
-          if [ ! -f "$RR_PATH" ]; then
-              echo "Error: RoadRunner binary not found at $RR_PATH"
-              exit 1
-          fi
-
-          # Start RoadRunner server
-          exec "$RR_PATH" serve -w "$SCRIPT_DIR" -c "$CONFIG_PATH" "$@"
-          EOF
-
-          chmod +x walnut-roadrunner-${{ matrix.target }}/walnut-roadrunner
-
-          # Create archive
-          tar -czf walnut-roadrunner-${{ matrix.target }}.tar.gz walnut-roadrunner-${{ matrix.target }}/
-
-      - name: Upload release assets
+      - name: Upload PHAR artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release-${{ matrix.target }}
-          path: |
-            build/walnut.phar
-            build/core-nut-lib
-            build/nutcfg.json
-            build/walnut-src
-            walnut-roadrunner-${{ matrix.target }}.tar.gz
+          name: release-build
+          path: build/walnut.phar
           retention-days: 7
 
   create-release:
@@ -139,42 +49,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download all artifacts
+      - name: Download PHAR
         uses: actions/download-artifact@v4
         with:
-          path: artifacts
+          name: release-build
+          path: release-assets
 
-      - name: Organize artifacts
-        run: |
-          mkdir -p release-assets
-          mkdir -p walnut-cli-bundle
-
-          # Collect CLI PHAR (single copy from any target, they're all identical)
-          cp artifacts/release-linux-amd64/build/walnut.phar release-assets/walnut.phar
-          cp artifacts/release-linux-amd64/build/walnut.phar walnut-cli-bundle/walnut.phar
-
-          # Collect assets (core-nut-lib, nutcfg.json, walnut-src)
-          cp -r artifacts/release-linux-amd64/build/core-nut-lib release-assets/
-          cp -r artifacts/release-linux-amd64/build/core-nut-lib walnut-cli-bundle/
-          cp artifacts/release-linux-amd64/build/nutcfg.json release-assets/
-          cp artifacts/release-linux-amd64/build/nutcfg.json walnut-cli-bundle/
-          cp -r artifacts/release-linux-amd64/build/walnut-src release-assets/
-          cp -r artifacts/release-linux-amd64/build/walnut-src walnut-cli-bundle/
-
-          # Ensure walnut.phar is executable before tarring
-          chmod +x walnut-cli-bundle/walnut.phar
-          chmod +x release-assets/walnut.phar
-
-          # Create CLI bundle tar.gz
-          tar -czf "release-assets/walnut-cli.tar.gz" walnut-cli-bundle/
-          rm -rf walnut-cli-bundle
-
-          # Collect all RoadRunner bundles
-          cp artifacts/release-linux-amd64/walnut-roadrunner-linux-amd64.tar.gz release-assets/
-          cp artifacts/release-darwin-amd64/walnut-roadrunner-darwin-amd64.tar.gz release-assets/
-          cp artifacts/release-darwin-arm64/walnut-roadrunner-darwin-arm64.tar.gz release-assets/
-
-          ls -lh release-assets/
+      - name: Make PHAR executable
+        run: chmod +x release-assets/walnut.phar
 
       - name: Calculate SHA256 and update Homebrew formula
         run: |
@@ -186,11 +68,9 @@ jobs:
           echo "Version: $VERSION"
           echo "SHA256: $SHA256"
 
-          # Update formula
           sed -i "s/version \".*\"/version \"$VERSION\"/" Formula/walnut.rb
           sed -i "s/sha256 \".*\"/sha256 \"$SHA256\"/" Formula/walnut.rb
 
-          # Show updated formula
           cat Formula/walnut.rb
 
       - name: Commit updated formula
@@ -209,54 +89,38 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: release-assets/*
+          files: release-assets/walnut.phar
           draft: false
           prerelease: false
           body: |
-            ## Artifacts
-
-            ### CLI (Pure - no RoadRunner)
-            - **walnut.phar** (3.0 MB) - Standalone CLI executable
-              - For: Development, testing, scripts
-              - Commands: `walnut mymodule`, `walnut test`, `walnut serve`
-            - **core-nut-lib/** - Bundled core library (required with walnut.phar)
-            - **nutcfg.json** - Default configuration file
-            - **walnut-src/** - Empty template directory for user modules
-
-            ### Server (with RoadRunner)
-            - **walnut-roadrunner-linux-amd64.tar.gz** (18 MB)
-            - **walnut-roadrunner-darwin-amd64.tar.gz** (19 MB)
-            - **walnut-roadrunner-darwin-arm64.tar.gz** (18 MB)
-              - For: Production HTTP server
-              - High-performance with RoadRunner
-
             ## Installation
 
-            ### Standalone CLI
-            ```bash
-            # Download the release files
-            wget https://github.com/walnut-lang/walnut/releases/download/${{ github.ref_name }}/walnut.phar
-            wget https://github.com/walnut-lang/walnut/releases/download/${{ github.ref_name }}/nutcfg.json
-            # Download core-nut-lib directory (from release assets)
+            ### Standalone CLI (PHP required)
 
-            chmod +x walnut.phar
-            ./walnut.phar mymodule arg1 arg2
+            ```bash
+            # Install globally
+            curl -L https://github.com/walnut-lang/walnut/releases/download/${{ github.ref_name }}/walnut.phar \
+              -o /usr/local/bin/walnut
+            chmod +x /usr/local/bin/walnut
+
+            # Create a new project
+            mkdir my-project && cd my-project
+            walnut init
+
+            # Use it
+            walnut cli main
+            walnut test
+            walnut analyse
+            walnut serve
             ```
 
-            ### RoadRunner Server Bundle
-            ```bash
-            # Choose your platform:
-            tar -xzf walnut-roadrunner-linux-amd64.tar.gz
-            # OR
-            tar -xzf walnut-roadrunner-darwin-amd64.tar.gz
-
-            cd walnut-roadrunner-*
-            ./walnut-roadrunner --port 8084
-            ```
+            The PHAR is self-contained — `walnut init` extracts the standard library
+            and writes `nutcfg.json` into your project directory.
 
             ### Via Homebrew
+
             ```bash
             brew tap walnut-lang/walnut
             brew install walnut
-            walnut mymodule
+            walnut init
             ```

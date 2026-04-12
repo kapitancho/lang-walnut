@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+exec php -f "$(dirname "$0")/almond-lsp.php" -- "$@"

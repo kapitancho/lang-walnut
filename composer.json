@@ -5,6 +5,7 @@
     "autoload": {
         "psr-4": {
             "Walnut\\Lang\\Test\\": "tests/Walnut/Lang",
+            "Walnut\\Lang\\Lsp\\": "lsp/server/src/",
             "Walnut\\Lang\\": "src"
         }
     },
@@ -30,10 +31,11 @@
         "phpstan/phpstan": "^2.1"
     },
     "bin": [
-        "bin/walnut-cli",
-        "bin/walnut-init-project",
-        "bin/walnut-test",
-        "bin/walnut-analyse",
-        "bin/walnut-http"
+        "bin/almond-cli",
+        "bin/almond-test",
+        "bin/almond-analyse",
+        "bin/almond-http",
+        "bin/almond-init",
+        "bin/almond-lsp"
     ]
 }

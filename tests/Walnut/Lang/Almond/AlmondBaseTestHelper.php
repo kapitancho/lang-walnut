@@ -18,6 +18,7 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\UnionTypeNormalize
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Value\ValueRegistry;
 use Walnut\Lang\Almond\Engine\Implementation\Program\ProgramContextFactory;
+use Walnut\Lang\Almond\Engine\Implementation\Program\Validation\NoopValidationResultCollector;
 use Walnut\Lang\Almond\Engine\Implementation\Program\Validation\ValidationFactory;
 
 abstract class AlmondBaseTestHelper extends TestCase {
@@ -34,7 +35,7 @@ abstract class AlmondBaseTestHelper extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
-		$this->programContext = new ProgramContextFactory()->newProgramContext();
+		$this->programContext = new ProgramContextFactory()->newProgramContext(new NoopValidationResultCollector());
 		$this->typeRegistry = $this->programContext->typeRegistry;
 		$this->userlandTypeBuilder = $this->programContext->userlandTypeBuilder;
 		$this->valueRegistry = $this->programContext->valueRegistry;
