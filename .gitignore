@@ -9,7 +9,8 @@ db.sqlite
 walnut-src
 CLAUDE.md
 CLAUDE-WALNUT.md
-build
+build/*
+!build/Dockerfile.static
 coverage.xml
 coverage-report/
 .claude

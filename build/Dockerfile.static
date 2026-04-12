@@ -1,0 +1,41 @@
+# Build a fully static Walnut binary for Linux using FrankenPHP's static builder.
+#
+# Usage (from repo root after `composer install --no-dev`):
+#
+#   docker build -f build/Dockerfile.static \
+#     --output type=local,dest=build \
+#     --build-arg TARGETPLATFORM=linux/amd64 \
+#     .
+#
+# The resulting binary is written to build/walnut-linux-<arch>.
+# For arm64 add --platform linux/arm64 to the docker build command and use
+# QEMU (docker buildx with --platform linux/arm64) on an amd64 host.
+
+ARG FRANKENPHP_VERSION=latest
+
+FROM dunglas/frankenphp:static-builder AS builder
+
+# Copy the application sources into the builder image.
+# The static builder embeds everything under /go/src/app/dist/ as the VFS root.
+WORKDIR /go/src/app/dist
+
+COPY src/       src/
+COPY vendor/    vendor/
+COPY bin/       bin/
+COPY almond/    almond/
+COPY http/      http/
+COPY composer.json composer.json
+COPY VERSION    VERSION
+
+# Build the static binary.
+# --embed         compiles all files under dist/ into the binary's VFS
+# The entry point (PHP_EXTENSIONS and EMBED) are set via env vars consumed by
+# the static builder's build script.
+ENV PHP_EXTENSIONS="mbstring bcmath"
+ENV EMBED=/go/src/app/dist
+
+RUN EMBED=$EMBED PHP_EXTENSIONS="$PHP_EXTENSIONS" ./build-static.sh
+
+# Export stage — extracts only the binary.
+FROM scratch AS export
+COPY --from=builder /go/src/app/dist/frankenphp-linux-* /
