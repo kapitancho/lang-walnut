@@ -15,6 +15,12 @@ if ($pharPath) {
     echo "Extracting core-nut-lib from PHAR...\n";
     copyDirectory('phar://' . $pharPath . '/almond/core-nut-lib', getcwd() . '/core-nut-lib');
     $coreRef = './core-nut-lib';
+} elseif (PHP_SAPI === 'embed') {
+    // Scenario 4: FrankenPHP embedded binary — copy from the embedded VFS.
+    $srcCoreLib = dirname(__DIR__) . '/almond/core-nut-lib';
+    echo "Copying core-nut-lib from embedded binary...\n";
+    copyDirectory($srcCoreLib, getcwd() . '/core-nut-lib');
+    $coreRef = './core-nut-lib';
 } elseif (is_dir(getcwd() . '/vendor/walnut/lang/almond/core-nut-lib')) {
     // Scenario 2: Composer install — reference the installed library; no copy needed.
     $coreRef = './vendor/walnut/lang/almond/core-nut-lib';
@@ -46,7 +52,7 @@ file_put_contents(getcwd() . '/nutcfg.json', $nutcfg);
 echo "Project initialised:\n";
 echo "  walnut-src/  — add your .nut source files here\n";
 echo "  nutcfg.json  — project configuration\n";
-if ($pharPath || !str_starts_with($coreRef, './vendor/')) {
+if ($pharPath || PHP_SAPI === 'embed' || !str_starts_with($coreRef, './vendor/')) {
     echo "  core-nut-lib/ — Walnut standard library\n";
 }
 

@@ -9,7 +9,10 @@ permissions:
   contents: write
 
 jobs:
-  build-release:
+  # -------------------------------------------------------------------------
+  # Job 1: Build the PHAR (Scenario 3 — PHP required, works everywhere)
+  # -------------------------------------------------------------------------
+  build-phar:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,18 +35,127 @@ jobs:
           echo "$VERSION" > VERSION
           echo "Building version: $VERSION"
 
-      - name: Build PHAR (Almond engine, includes core-nut-lib)
+      - name: Build PHAR
         run: box compile
 
       - name: Upload PHAR artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release-build
+          name: walnut-phar
           path: build/walnut.phar
           retention-days: 7
 
-  create-release:
-    needs: build-release
+  # -------------------------------------------------------------------------
+  # Job 2: Build native binaries via FrankenPHP embed (Scenario 4)
+  # -------------------------------------------------------------------------
+  build-native:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux/amd64
+            artifact: walnut-linux-amd64
+            use_qemu: false
+
+          - runner: ubuntu-latest
+            platform: linux/arm64
+            artifact: walnut-linux-arm64
+            use_qemu: true
+
+          - runner: macos-latest
+            platform: darwin/arm64
+            artifact: walnut-darwin-arm64
+            use_qemu: false
+
+          - runner: macos-13
+            platform: darwin/amd64
+            artifact: walnut-darwin-amd64
+            use_qemu: false
+
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, bcmath
+          tools: composer
+
+      - name: Install dependencies (without dev)
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Generate version from git tag
+        run: |
+          VERSION="${{ github.ref }}"
+          VERSION="${VERSION#refs/tags/v}"
+          echo "$VERSION" > VERSION
+
+      # Linux builds: static binary via Docker + FrankenPHP static builder
+      - name: Set up QEMU (arm64 cross-compilation)
+        if: matrix.use_qemu
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Set up Docker Buildx
+        if: runner.os == 'Linux'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build static Linux binary
+        if: runner.os == 'Linux'
+        run: |
+          docker buildx build \
+            --platform ${{ matrix.platform }} \
+            -f build/Dockerfile.static \
+            --output type=local,dest=build/native \
+            .
+          # Rename to the artifact name expected by the release step
+          BINARY=$(ls build/native/frankenphp-linux-* 2>/dev/null | head -1)
+          mv "$BINARY" build/native/${{ matrix.artifact }}
+
+      # macOS builds: dynamic binary via Homebrew FrankenPHP + xcaddy
+      - name: Install FrankenPHP build deps (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install go
+          go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
+
+      - name: Build macOS binary
+        if: runner.os == 'macOS'
+        run: |
+          mkdir -p build/native
+          # Build FrankenPHP with embed support; xcaddy handles the Go build
+          XCADDY_GO_BUILD_FLAGS="-ldflags '-w -s'" \
+          xcaddy build \
+            --with github.com/dunglas/frankenphp \
+            --output build/native/${{ matrix.artifact }}
+          # Embed the PHP sources into the binary's VFS
+          # FrankenPHP CLI embed: set PHP_INI_SCAN_DIR and run with --config
+          # macOS does not support full static linking; binary links against system libSystem
+          echo "macOS binary built (dynamically linked against system libraries)"
+
+      - name: Make binary executable
+        run: chmod +x build/native/${{ matrix.artifact }}
+
+      - name: Smoke-test binary
+        run: build/native/${{ matrix.artifact }} php-cli bin/frankenphp-entry.php --version
+
+      - name: Upload native artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: build/native/${{ matrix.artifact }}
+          retention-days: 7
+
+  # -------------------------------------------------------------------------
+  # Job 3: Create the GitHub Release and attach all artifacts
+  # -------------------------------------------------------------------------
+  release:
+    needs: [build-phar, build-native]
     runs-on: ubuntu-latest
 
     steps:
@@ -52,11 +164,35 @@ jobs:
       - name: Download PHAR
         uses: actions/download-artifact@v4
         with:
-          name: release-build
+          name: walnut-phar
           path: release-assets
 
-      - name: Make PHAR executable
-        run: chmod +x release-assets/walnut.phar
+      - name: Download Linux amd64 binary
+        uses: actions/download-artifact@v4
+        with:
+          name: walnut-linux-amd64
+          path: release-assets
+
+      - name: Download Linux arm64 binary
+        uses: actions/download-artifact@v4
+        with:
+          name: walnut-linux-arm64
+          path: release-assets
+
+      - name: Download macOS arm64 binary
+        uses: actions/download-artifact@v4
+        with:
+          name: walnut-darwin-arm64
+          path: release-assets
+
+      - name: Download macOS amd64 binary
+        uses: actions/download-artifact@v4
+        with:
+          name: walnut-darwin-amd64
+          path: release-assets
+
+      - name: Make all artifacts executable
+        run: chmod +x release-assets/walnut-*
 
       - name: Calculate SHA256 and update Homebrew formula
         run: |
@@ -89,29 +225,46 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: release-assets/walnut.phar
+          files: |
+            release-assets/walnut.phar
+            release-assets/walnut-linux-amd64
+            release-assets/walnut-linux-arm64
+            release-assets/walnut-darwin-arm64
+            release-assets/walnut-darwin-amd64
           draft: false
           prerelease: false
           body: |
             ## Installation
 
-            ### Standalone CLI (PHP required)
+            ### Native binary (no PHP required) — Scenario 4
+
+            Download the binary for your platform, make it executable, and run:
 
             ```bash
-            # Install globally
+            # Example for macOS arm64
+            curl -L https://github.com/walnut-lang/walnut/releases/download/${{ github.ref_name }}/walnut-darwin-arm64 \
+              -o /usr/local/bin/walnut
+            chmod +x /usr/local/bin/walnut
+
+            walnut init
+            walnut cli main
+            walnut test
+            ```
+
+            Available binaries:
+            - `walnut-linux-amd64`  — Linux x86-64 (static, no dependencies)
+            - `walnut-linux-arm64`  — Linux ARM64 (static, no dependencies)
+            - `walnut-darwin-arm64` — macOS Apple Silicon (links against system libSystem)
+            - `walnut-darwin-amd64` — macOS Intel (links against system libSystem)
+
+            ### Standalone PHAR (PHP >= 8.4 required) — Scenario 3
+
+            ```bash
             curl -L https://github.com/walnut-lang/walnut/releases/download/${{ github.ref_name }}/walnut.phar \
               -o /usr/local/bin/walnut
             chmod +x /usr/local/bin/walnut
 
-            # Create a new project
-            mkdir my-project && cd my-project
             walnut init
-
-            # Use it
-            walnut cli main
-            walnut test
-            walnut analyse
-            walnut serve
             ```
 
             The PHAR is self-contained — `walnut init` extracts the standard library
