@@ -5,10 +5,10 @@ class Walnut < Formula
   desc "Strongly-typed, interpreted programming language with compile-time type checking"
   homepage "https://github.com/walnut-lang/walnut"
   license "MIT"
-  version "0.3.7"
+  version "0.3.8"
 
   url "https://github.com/walnut-lang/walnut/releases/download/v#{version}/walnut.phar"
-  sha256 "ac85b8c5b836459dfcf6f90ee4855ee85f92ed327a66748342b8f754d306229a"
+  sha256 "30ee46febe4a66ca8b4b879474de9854b2712e75ac08e6cfa81cc2087c09a465"
 
   depends_on "php" => :runtime
 
