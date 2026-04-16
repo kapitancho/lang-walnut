@@ -63,15 +63,9 @@ jobs:
             artifact: walnut-linux-arm64
             use_qemu: true
 
-          - runner: macos-latest
-            platform: darwin/arm64
-            artifact: walnut-darwin-arm64
-            use_qemu: false
-
-          - runner: macos-13
-            platform: darwin/amd64
-            artifact: walnut-darwin-amd64
-            use_qemu: false
+          # macOS: xcaddy alone does not embed PHP into the binary.
+          # Proper macOS builds require cloning FrankenPHP source + Homebrew deps.
+          # Deferred until a proper macOS build script is in place.
 
     runs-on: ${{ matrix.runner }}
 
@@ -117,27 +111,6 @@ jobs:
           BINARY=$(ls build/native/frankenphp-linux-* 2>/dev/null | head -1)
           mv "$BINARY" build/native/${{ matrix.artifact }}
 
-      # macOS builds: dynamic binary via Homebrew FrankenPHP + xcaddy
-      - name: Install FrankenPHP build deps (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          brew install go
-          go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
-
-      - name: Build macOS binary
-        if: runner.os == 'macOS'
-        run: |
-          mkdir -p build/native
-          # Build FrankenPHP with embed support; xcaddy handles the Go build
-          XCADDY_GO_BUILD_FLAGS="-ldflags '-w -s'" \
-          xcaddy build \
-            --with github.com/dunglas/frankenphp \
-            --output build/native/${{ matrix.artifact }}
-          # Embed the PHP sources into the binary's VFS
-          # FrankenPHP CLI embed: set PHP_INI_SCAN_DIR and run with --config
-          # macOS does not support full static linking; binary links against system libSystem
-          echo "macOS binary built (dynamically linked against system libraries)"
-
       - name: Make binary executable
         run: chmod +x build/native/${{ matrix.artifact }}
 
@@ -182,20 +155,6 @@ jobs:
           name: walnut-linux-arm64
           path: release-assets
 
-      - name: Download macOS arm64 binary
-        if: needs.build-native.result == 'success'
-        uses: actions/download-artifact@v4
-        with:
-          name: walnut-darwin-arm64
-          path: release-assets
-
-      - name: Download macOS amd64 binary
-        if: needs.build-native.result == 'success'
-        uses: actions/download-artifact@v4
-        with:
-          name: walnut-darwin-amd64
-          path: release-assets
-
       - name: Make all artifacts executable
         run: chmod +x release-assets/walnut-* 2>/dev/null || true
 
@@ -234,8 +193,6 @@ jobs:
             release-assets/walnut.phar
             release-assets/walnut-linux-amd64
             release-assets/walnut-linux-arm64
-            release-assets/walnut-darwin-arm64
-            release-assets/walnut-darwin-amd64
           fail_on_unmatched_files: false
           draft: false
           prerelease: false
