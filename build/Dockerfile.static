@@ -8,8 +8,12 @@
 #     .
 #
 # For arm64, use --platform linux/arm64 (requires QEMU on an amd64 host).
+# static-builder-musl produces fully-static binaries (no glibc dependency).
 
-FROM dunglas/frankenphp:static-builder AS builder
+FROM dunglas/frankenphp:static-builder-musl AS builder
+
+# Target PHP version — override at build time if needed.
+ENV PHP_VERSION=8.5
 
 # Copy the application sources into the conventional embed directory.
 # The static builder embeds everything under /go/src/app/dist/ into the binary.
@@ -23,14 +27,15 @@ COPY http/         http/
 COPY composer.json composer.json
 COPY VERSION       VERSION
 
-# The build script clones static-php-cli and runs composer install using the
-# host Alpine PHP 8.4. That PHP lacks iconv by default, which causes the
-# static-php-cli composer install to fail. Install it first.
-RUN apk add --no-cache php84-iconv
+# build-static.sh clones static-php-cli and runs its own composer install using
+# the host Alpine PHP. That PHP may lack iconv, causing the install to fail.
+# Dynamically install iconv for whatever PHP version Alpine has.
+RUN PHP_VER=$(php -r 'echo PHP_MAJOR_VERSION . PHP_MINOR_VERSION;') && \
+    apk add --no-cache "php${PHP_VER}-iconv"
 
 # EMBED=1 tells build-static.sh to embed /go/src/app/dist/ into the binary.
 # PHP_EXTENSIONS controls what gets compiled into the output binary (not the host).
-# build-static.sh is in the image root at /go/src/app/ — use the absolute path.
+# build-static.sh lives in the image root at /go/src/app/.
 RUN EMBED=1 PHP_EXTENSIONS="mbstring,bcmath,iconv" /go/src/app/build-static.sh
 
 # Export stage — extracts only the produced binary.
