@@ -52,6 +52,15 @@ final class WithKeyValueTest extends CodeExecutionTestHelper {
 		$this->assertEquals("[a: 'a', b: 1, c: 2, f: 5]", $result);
 	}
 
+	public function testWithKeyRecordReturnType(): void {
+		$result = $this->executeCodeSnippet(
+			"f[a: 1, b: 'hello']",
+			valueDeclarations: "f = ^p: [a: Integer, b: String<5..10>] => [a: Integer, b: Integer<5..10>] ::
+			    p->withKeyValue[key: 'b', value: p.b->length];"
+		);
+		$this->assertEquals("[a: 1, b: 5]", $result);
+	}
+
 	public function testWithKeyValueInvalidParameterValue(): void {
 		$this->executeErrorCodeSnippet("Parameter type [value: String['b']] is not compatible with expected type [key: String, Value: Any].",
 			"[a: 'a', b: 1, c: 2]->withKeyValue[value: 'b']");

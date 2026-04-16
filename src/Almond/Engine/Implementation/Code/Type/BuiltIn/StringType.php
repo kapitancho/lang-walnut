@@ -26,9 +26,9 @@ final readonly class StringType implements StringTypeInterface, JsonSerializable
 		if ($request->value instanceof StringValue) {
 			$l = mb_strlen($request->value->literalValue);
 			if ($this->range->minLength <= $l && (
-					$this->range->maxLength === PlusInfinity::value ||
-					$this->range->maxLength >= $l
-				)) {
+				$this->range->maxLength === PlusInfinity::value ||
+				$this->range->maxLength >= $l
+			)) {
 				return $request->ok($request->value);
 			}
 			return $request->withError(

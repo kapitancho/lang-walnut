@@ -25,7 +25,7 @@ final readonly class MutableType implements MutableTypeInterface, JsonSerializab
 			return $request->ok(
 				$request->valueRegistry->mutable(
 					$this->valueType,
-					$request->value
+					$result->hydratedValue
 				)
 			);
 		}

@@ -23,7 +23,7 @@ final readonly class ValueType implements ValueTypeInterface, JsonSerializable {
 		$result = $this->valueType->hydrate($request);
 		if ($result instanceof HydrationSuccess) {
 			return $request->ok(
-				$request->valueRegistry->value($request->value)
+				$request->valueRegistry->value($result->hydratedValue)
 			);
 		}
 		return $result;

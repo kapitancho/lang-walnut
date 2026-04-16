@@ -38,9 +38,9 @@ final readonly class WithKeyValue extends MapNativeMethod {
 				if ($keyType instanceof StringSubsetType && count($keyType->subsetValues) === 1) {
 					$keyValue = $keyType->subsetValues[0];
 					return $this->typeRegistry->record(
-						$targetType->types + [
+						[
 							$keyValue => $valueType
-						],
+						] + $targetType->types,
 						$targetType->restType
 					);
 				}
