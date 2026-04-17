@@ -9,13 +9,11 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\EnumerationValueName;
 
 final class DuplicateSubsetValue extends EngineException {
 	public function __construct(
-		public readonly Type                               $type,
-		public readonly EnumerationValueName|string|Number $valueName,
+		public readonly string|Number $valueName,
 	) {
 		parent::__construct(
 			sprintf(
-				'The type "%s" already contains the value "%s"',
-				$type,
+				'The value "%s" is already in the subset type',
 				$valueName
 			)
 		);
@@ -23,9 +21,8 @@ final class DuplicateSubsetValue extends EngineException {
 
 	/** @throws self */
 	public static function of(
-		Type $enumerationType,
-		EnumerationValueName|string|Number $valueName,
+		string|Number $valueName,
 	): never {
-		throw new self($enumerationType, $valueName);
+		throw new self($valueName);
 	}
 }

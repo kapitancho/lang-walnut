@@ -49,7 +49,7 @@ final class EnumerationType implements EnumerationTypeInterface, JsonSerializabl
 				);
 		    }
 			if (array_key_exists($value->identifier, $e)) {
-				DuplicateSubsetValue::of($this, $value);
+				DuplicateSubsetValue::of($value);
 			}
 		    // @codeCoverageIgnoreEnd
 		    $e[$value->identifier] = new EnumerationValue(

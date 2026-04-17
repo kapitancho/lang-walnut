@@ -52,10 +52,7 @@ final class RealSubsetType implements RealSubsetTypeInterface, JsonSerializable 
 			}
 			$vs = rtrim(rtrim($vs, '0'), '.');
 			if (isset($selected[$vs])) {
-				DuplicateSubsetValue::of(
-					$this,
-					$value,
-				);
+				DuplicateSubsetValue::of($value);
 			}
 			$selected[$vs] = true;
 		}

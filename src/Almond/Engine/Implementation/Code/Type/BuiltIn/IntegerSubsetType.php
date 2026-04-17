@@ -49,10 +49,7 @@ final class IntegerSubsetType implements IntegerSubsetTypeInterface, JsonSeriali
 			}
 			$vs = (string)$value;
 			if (isset($selected[$vs])) {
-				DuplicateSubsetValue::of(
-					$this,
-					$value,
-				);
+				DuplicateSubsetValue::of($value);
 			}
 			$selected[$vs] = true;
 		}

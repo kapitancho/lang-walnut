@@ -2,13 +2,13 @@
 
 namespace Walnut\Lang\Almond\Engine\Blueprint\Code\Function;
 
+use JsonSerializable;
 use Stringable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\VariableName;
 
-final readonly class NameAndType implements Stringable {
-	public function __construct(public Type $type, public VariableName|null $name) {
-	}
+final readonly class NameAndType implements Stringable, JsonSerializable {
+	public function __construct(public Type $type, public VariableName|null $name) {}
 
 	public function __toString(): string {
 		return $this->name === null ?

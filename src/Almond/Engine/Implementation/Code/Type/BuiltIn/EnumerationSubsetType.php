@@ -40,7 +40,7 @@ final readonly class EnumerationSubsetType implements EnumerationSubsetTypeInter
 	    $subsetValuesMap = [];
 	    foreach($subsetValues as $value) {
 		    if (array_key_exists($value->name->identifier, $subsetValuesMap)) {
-			    DuplicateSubsetValue::of($this, $value);
+			    DuplicateSubsetValue::of($value);
 		    }
 		    // @codeCoverageIgnoreStart
 		    /** @phpstan-ignore instanceof.alwaysTrue */

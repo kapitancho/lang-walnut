@@ -49,7 +49,7 @@ final class DuplicationInSubsetTest extends CodeExecutionTestHelper {
 
 	public function testDuplicateRealSubsetValueWithZeroes(): void {
 		$this->executeErrorCodeSnippet(
-		'The type "Real[1.3, 2, -3.14, 2.000]" already contains the value "2.000"',
+		'The value "2.000" is already in the subset type',
 			"null;",
 			<<<NUT
 				Dup = Real[1.3, 2, -3.14, 2.000];
@@ -59,7 +59,7 @@ final class DuplicationInSubsetTest extends CodeExecutionTestHelper {
 
 	public function testDuplicateRealSubsetValueWithZeroesAfterNonZero(): void {
 		$this->executeErrorCodeSnippet(
-			'The type "Real[1.3, 2.17, -3.14, 2.17000]" already contains the value "2.17000"',
+			'The value "2.17000" is already in the subset type',
 			"null;",
 			<<<NUT
 				Dup = Real[1.3, 2.17, -3.14, 2.17000];
@@ -69,7 +69,7 @@ final class DuplicationInSubsetTest extends CodeExecutionTestHelper {
 
 	public function testDuplicateRealSubsetValueForZero(): void {
 		$this->executeErrorCodeSnippet(
-			'The type "Real[1.3, 0, -3.14, 0.000]" already contains the value "0.000"',
+			'The value "0.000" is already in the subset type',
 			"null;",
 			<<<NUT
 				Dup = Real[1.3, 0, -3.14, 0.000];
