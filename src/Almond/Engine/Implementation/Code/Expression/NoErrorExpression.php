@@ -4,6 +4,7 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Code\Expression;
 
 use JsonSerializable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
@@ -17,7 +18,8 @@ final readonly class NoErrorExpression implements Expression, JsonSerializable {
 
 	public function __construct(
 		private TypeRegistry $typeRegistry,
-		private Expression $targetExpression) {}
+		private Expression $targetExpression
+	) {}
 
 	public function validateInContext(ValidationContext $validationContext): ValidationContext|ValidationFailure {
 		$result = $this->targetExpression->validateInContext($validationContext);
@@ -25,6 +27,18 @@ final readonly class NoErrorExpression implements Expression, JsonSerializable {
 			return $result;
 		}
 		$expressionType = $result->expressionType;
+		if ($expressionType instanceof OptionalType && $expressionType->valueType instanceof ResultType) {
+			return $result->withExpressionType(
+				$this->typeRegistry->optional(
+					$expressionType->valueType->returnType,
+				)
+			)->withReturnType(
+				$this->typeRegistry->result(
+					$result->returnType,
+					$expressionType->valueType->errorType
+				)
+			);
+		}
 		if ($expressionType instanceof ResultType) {
 			return $result->withExpressionType(
 				$expressionType->returnType

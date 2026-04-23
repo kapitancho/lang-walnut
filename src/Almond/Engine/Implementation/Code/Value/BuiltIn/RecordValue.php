@@ -68,7 +68,8 @@ final class RecordValue implements RecordValueInterface, JsonSerializable {
 			$thisValues = $this->values;
 			$otherValues = $other->values;
 			if (count($thisValues) === count($otherValues)) {
-				return array_all($thisValues, fn($value, $index) => $value->equals($otherValues[$index]));
+				return array_all($thisValues, fn($value, $index) =>
+					isset($otherValues[$index]) && $value->equals($otherValues[$index]));
 			}
 		}
 		return false;

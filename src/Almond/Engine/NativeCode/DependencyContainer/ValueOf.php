@@ -3,6 +3,7 @@
 namespace Walnut\Lang\Almond\Engine\NativeCode\DependencyContainer;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AtomType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\CoreType;
@@ -21,7 +22,7 @@ final readonly class ValueOf extends NamedNativeMethod {
 	}
 
 	protected function getValidator(): callable {
-		return fn(AtomType $targetType, TypeType $parameterType): ResultType =>
+		return fn(AtomType $targetType, TypeType $parameterType): ResultType|OptionalType =>
 			$this->typeRegistry->result(
 				$parameterType->refType,
 				$this->typeRegistry->core->dependencyContainerError

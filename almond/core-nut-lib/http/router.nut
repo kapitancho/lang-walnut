@@ -28,7 +28,7 @@ HttpLookupRouter ==> HttpMiddleware %% [~DependencyContainer, ~HttpResponseBuild
                 requestMethod = request.method;
                 pathMethod = routerPath.method;
                 request.target->startsWith(routerPath.path) &&
-                    requestMethod == ?whenIsError(pathMethod) { requestMethod }
+                    requestMethod == pathMethod ?? requestMethod
             }
         );
         ?whenTypeOf(kv) {

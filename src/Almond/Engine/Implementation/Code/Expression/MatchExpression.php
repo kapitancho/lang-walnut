@@ -66,7 +66,7 @@ final readonly class MatchExpression implements Expression, JsonSerializable {
 					$hasDynamicTypes = true;
 				}
 			}
-			if ($this->target instanceof VariableNameExpression) {
+			if ($this->target instanceof VariableNameExpression || $this->target instanceof VariableAssignmentExpression) {
 				if ($this->type !== MatchExpressionType::typeOf) {
 					$innerContext = $innerContext->withAddedVariableType(
 						$this->target->variableName,
@@ -98,9 +98,10 @@ final readonly class MatchExpression implements Expression, JsonSerializable {
 			$defaultContext = $this->default->valueExpression->validateInContext($validationContext);
 			if ($defaultContext instanceof ValidationFailure) {
 				$failure = $failure ? $failure->mergeFailure($defaultContext) : $defaultContext;
+			} else {
+				$expressionTypes[] = $defaultContext->expressionType;
+				$returnTypes[] = $defaultContext->returnType;
 			}
-			$expressionTypes[] = $defaultContext->expressionType;
-			$returnTypes[] = $defaultContext->returnType;
 		} elseif ($hasDynamicTypes || !$validationContext->expressionType->isSubtypeOf(
 			$this->typeRegistry->union($refTypes)
 		)) {

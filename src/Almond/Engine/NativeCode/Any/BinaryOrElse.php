@@ -19,6 +19,12 @@ final readonly class BinaryOrElse extends NativeMethod {
 				return $this->typeRegistry->union([$targetType->returnType, $parameterType]);
 			}
 			if ($targetType instanceof OptionalType) {
+				if ($targetType->valueType instanceof ResultType) {
+					return $this->typeRegistry->union([
+						$targetType->valueType->returnType,
+						$parameterType
+					]);
+				}
 				return $this->typeRegistry->union([$targetType->valueType, $parameterType]);
 			}
 			return $targetType;

@@ -2,8 +2,7 @@ module $tpl:
 
 UnableToRenderTemplate := $[type: Type, reason: ?String];
 UnableToRenderTemplate ==> String ::
-    'Unable to render template of type ' + $type->asString + '; Reason: ' +
-        ?whenIsError($reason) { 'unknown' };
+    'Unable to render template of type ' + $type->asString + '; Reason: ' + ($reason ?? 'unknown');
 
 Template := #Mutable<String>;
 

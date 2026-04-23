@@ -39,7 +39,7 @@ abstract readonly class SequentialExpressionBase implements Expression, JsonSeri
 
 		$expressionTypes = [];
 		$returnTypes = [];
-		$earlyReturnResult = null;
+		/*$earlyReturnResult = null;*/
 		foreach($this->expressions as $key => $expression) {
 			$step = $expression->validateInContext($validationContext);
 			if ($step instanceof ValidationFailure) {
@@ -48,24 +48,24 @@ abstract readonly class SequentialExpressionBase implements Expression, JsonSeri
 				}
 				/** @var ValidationFailure|null $failure */
 				$failure = $failure === null ? $step : $failure->mergeWith($step);
-			} elseif (!$earlyReturnResult) {
+			} else/*if (!$earlyReturnResult)*/ {
 				if ($expression instanceof ConstantExpression) {
 					$set[(string)$expression] = true;
 				} else {
 					$dynamic++;
 				}
 				$returnTypes[$key] = $step->returnType;
-				if ($step->expressionType instanceof NothingType) {
+				/*if ($step->expressionType instanceof NothingType) {
 					$earlyReturnResult = $validationContext->withExpressionType($step->expressionType)
 						->withReturnType(
 							$this->typeRegistry->union(array_values($returnTypes))
 						);
-				}
+				}*/
 				$expressionTypes[$key] = $step->expressionType;
 				$validationContext = $step;
 			}
 		}
-		return $failure ?? $earlyReturnResult ?? $validationContext
+		return $failure /*?? $earlyReturnResult*/ ?? $validationContext
 			->withExpressionType(
 				$this->buildExpressionType(
 					$expressionTypes, count($set), $dynamic

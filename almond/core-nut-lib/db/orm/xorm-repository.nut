@@ -1,7 +1,7 @@
 module $db/orm/xorm-repository %% $db/orm/xorm, $db/connection:
 
 OxRepository := $[~Ox, ~Type];
-OxRepository[~Type, model: Type] @ ExternalError  :: [
+OxRepository[~Type, model: Type<Any>] @ ExternalError  :: [
     ox: {Ox[#model]} *> ('Failed to get orm model'),
     type: #type
 ];
@@ -35,7 +35,7 @@ OxRepository->one(^v: DatabaseValue => *Result<Any, EntryNotFound>) %% ~Database
 
 OxRepository->insertOne(^v: {DatabaseQueryDataRow} => *Result<Null, DuplicateEntry>) %% ~DatabaseConnector :: {
     v = v->shape(`DatabaseQueryDataRow);
-    entryId = v->item($ox->keyField) *> ('Failed to get entry key');
+    entryId = v->item($ox->keyField)->ifEmpty(^ => Error<ExternalError> :: (@null *> ('Failed to get entry key')))?;
     query = $ox->insertQuery
         *> ('Failed to get query for orm model');
     result = {databaseConnector->execute[query: query, boundParameters: v]}
@@ -68,7 +68,7 @@ OxRepository->deleteOne(^v: DatabaseValue => *Result<Null, EntryNotFound>) %% ~D
 
 OxRepository->updateOne(^v: {DatabaseQueryDataRow} => *Result<Null, EntryNotFound>) %% [~DatabaseConnector] :: {
     v = v->shape(`DatabaseQueryDataRow);
-    entryId = v->item($ox->keyField) *> ('Failed to get entry key');
+    entryId = v->item($ox->keyField)->ifEmpty(^ => Error<ExternalError> :: (@null *> ('Failed to get entry key')))?;
     query = $ox->updateQuery
         *> ('Failed to get query for orm model');
     result = %databaseConnector->execute[query: query, boundParameters: v]
