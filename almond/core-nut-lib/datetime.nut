@@ -5,7 +5,7 @@ InvalidDate := ();
 InvalidTime := ();
 InvalidDateAndTime := ();
 
-Date := #[year: Integer, month: Integer<1..12>, day: Integer<1..31>] @ InvalidDate :: {
+Date := #[year: Integer, month: Integer<1..12>, day: Integer<1..31>] @@ InvalidDate :: {
     ?whenValueOf(#day) {
         31: ?whenTypeOf(#month) { `Integer[2, 4, 6, 9, 11]: => @InvalidDate },
         30: ?whenTypeOf(#month) { `Integer[2]: => @InvalidDate },
@@ -26,7 +26,7 @@ Date ==> String :: [
     $day->asString->padLeft[length: 2, padString: '0']
 ]->combineAsString('-');
 
-JsonValue ==> Date @ InvalidDate :: {
+JsonValue ==> Date @@ InvalidDate :: {
      ?whenTypeOf($) {
         `String: $->asDate,
         `[Integer, Integer<1..12>, Integer<1..31>]: Date($),
@@ -35,7 +35,7 @@ JsonValue ==> Date @ InvalidDate :: {
      }
 };
 
-String ==> Date @ InvalidDate :: {
+String ==> Date @@ InvalidDate :: {
      pieces = $->split('-');
      ?whenTypeOf(pieces) {
         type[String<4>, String<2>, String<2>]: {
@@ -59,7 +59,7 @@ Time ==> String :: [
     $second->asString->padLeft[length: 2, padString: '0']
 ]->combineAsString(':');
 
-JsonValue ==> Time @ InvalidTime :: {
+JsonValue ==> Time @@ InvalidTime :: {
      ?whenTypeOf($) {
         `String: $->asTime,
         `[Integer<0..23>, Integer<0..59>, Integer<0..59>]: Time($),
@@ -68,7 +68,7 @@ JsonValue ==> Time @ InvalidTime :: {
      }
 };
 
-String ==> Time @ InvalidTime :: {
+String ==> Time @@ InvalidTime :: {
      pieces = $->split(':');
      dropZeroes = ^s: String => Result<Integer, NotANumber> :: ?whenValueOf(s) {
         '00': 0,
@@ -92,7 +92,7 @@ String ==> Time @ InvalidTime :: {
 
 DateAndTime ==> String :: [$date->asString, $time->asString]->combineAsString(' ');
 
-JsonValue ==> DateAndTime @ InvalidDate|InvalidTime|InvalidDateAndTime :: {
+JsonValue ==> DateAndTime @@ InvalidDate|InvalidTime|InvalidDateAndTime :: {
     ?whenTypeOf($) {
         `String: $->asDateAndTime,
         `[Integer, Integer<1..12>, Integer<1..31>, Integer<0..23>, Integer<0..59>, Integer<0..59>]:
@@ -114,7 +114,7 @@ JsonValue ==> DateAndTime @ InvalidDate|InvalidTime|InvalidDateAndTime :: {
 
 };
 
-String ==> DateAndTime @ InvalidDate|InvalidTime|InvalidDateAndTime :: {
+String ==> DateAndTime @@ InvalidDate|InvalidTime|InvalidDateAndTime :: {
      pieces = $->split(' ');
      ?whenTypeOf(pieces) {
         `[String<10>, String<8>]: DateAndTime[date: pieces.0 -> asDate?, time: pieces.1 -> asTime?],

@@ -66,7 +66,7 @@ MyBrokenViewRenderer = ^[:] => MyBrokenView;
 ==> MyBrokenViewRenderer :: ^[:] => MyBrokenView :: MyBrokenView('Broken View Response');
 
 MyView := #String;
-MyView ==> Template @ UnableToRenderTemplate :: ?whenValueOf($$) {
+MyView ==> Template @@ UnableToRenderTemplate :: ?whenValueOf($$) {
     '': @UnableToRenderTemplate[$->type],
     ~: {
         v = mutable{String, ''};

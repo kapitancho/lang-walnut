@@ -14,13 +14,13 @@ MyEnum := (Value1, Value2, Value3);
 MyData := Integer;
 
 /* Sealed types */
-MyOpen := #[a: Integer, b: Integer] @ MyAtom :: null;
+MyOpen := #[a: Integer, b: Integer] @@ MyAtom :: null;
 MyOpen0 := #[a: Integer, b: Integer];
 MyOpen1 := #[a: Integer, b: Integer];
 MyOpen1[a: Real, b: Real] :: [a: #a->asInteger, b: #b->asInteger];
 
 /* Sealed types */
-MySealed := $[a: Integer, b: Integer] @ MyAtom :: null;
+MySealed := $[a: Integer, b: Integer] @@ MyAtom :: null;
 MySealed0 := $[a: Integer, b: Integer];
 MySealed1 := $[a: Integer, b: Integer];
 MySealed1[a: Real, b: Real] :: [a: #a->asInteger, b: #b->asInteger];

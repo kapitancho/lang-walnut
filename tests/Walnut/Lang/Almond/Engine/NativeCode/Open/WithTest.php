@@ -248,7 +248,7 @@ final class WithTest extends CodeExecutionTestHelper {
 	public function testWithValidatorWithErrorTypeOk(): void {
 		$result = $this->executeCodeSnippet("MyOpen[a:1,b:3,c:5]?->testWith[b:2,c:6];", <<<NUT
 			MyError := ();
-			MyOpen := #[a: Integer, b: Integer, c: Integer] @ MyError :: null;
+			MyOpen := #[a: Integer, b: Integer, c: Integer] @@ MyError :: null;
 			MyOpen->testWith(^param: [b: Integer, c: Integer] => Result<MyOpen, MyError>) :: $->with(param);
 		NUT);
 		$this->assertEquals("MyOpen[a: 1, b: 2, c: 6]", $result);
@@ -257,7 +257,7 @@ final class WithTest extends CodeExecutionTestHelper {
 	public function testWithValidatorWithErrorTypeReturnErrorValue(): void {
 		$result = $this->executeCodeSnippet("MyOpen[a:1,b:3,c:5]?->testWith[b:2,c:6];", <<<NUT
 			MyError := ();
-			MyOpen := #[a: Integer, b: Integer, c: Integer] @ MyError :: ?when(#b == 2) { => @MyError };
+			MyOpen := #[a: Integer, b: Integer, c: Integer] @@ MyError :: ?when(#b == 2) { => @MyError };
 			MyOpen->testWith(^param: [b: Integer, c: Integer] => Result<MyOpen, MyError>) :: $->with(param);
 		NUT);
 		$this->assertEquals("@MyError", $result);
@@ -268,7 +268,7 @@ final class WithTest extends CodeExecutionTestHelper {
 			"Function body return type 'Result<MyOpen, MyError>' is not compatible with declared return type 'MyOpen'",
 			"MyOpen[a:1,b:3,c:5]?->testWith[b:2,c:6];", <<<NUT
 			MyError := ();
-			MyOpen := #[a: Integer, b: Integer, c: Integer] @ MyError :: null;
+			MyOpen := #[a: Integer, b: Integer, c: Integer] @@ MyError :: null;
 			MyOpen->testWith(^param: [b: Integer, c: Integer] => MyOpen) :: $->with(param);
 		NUT);
 	}

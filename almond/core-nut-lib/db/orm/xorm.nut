@@ -14,7 +14,7 @@ OrmModel->filterByKeyField(=> SqlQueryFilter) :: SqlQueryFilter[SqlFieldExpressi
 
 
 Ox := $[~OrmModel, ~FieldTypes];
-Ox[~Type] @ UnknownOrmModel|UnknownFieldTypes :: {
+Ox[~Type] @@ UnknownOrmModel|UnknownFieldTypes :: {
     ormModel = #type->as(`OrmModel);
     ormModel = ?whenTypeOf(ormModel) {
         `OrmModel: ormModel,

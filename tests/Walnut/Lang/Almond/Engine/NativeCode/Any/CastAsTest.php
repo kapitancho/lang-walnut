@@ -20,13 +20,13 @@ final class CastAsTest extends CodeExecutionTestHelper {
 
 	public function testCastAsErrorCastAvailableOk(): void {
 		$result = $this->executeCodeSnippet("MyAtom->as(type{Integer})",
-			"MyAtom := (); MyAtom ==> Integer @ String :: 42;");
+			"MyAtom := (); MyAtom ==> Integer @@ String :: 42;");
 		$this->assertEquals("42", $result);
 	}
 
 	public function testCastAsErrorCastAvailableError(): void {
 		$result = $this->executeCodeSnippet("MyAtom->as(type{Integer})",
-			"MyAtom := (); MyAtom ==> Integer @ String :: @'error';");
+			"MyAtom := (); MyAtom ==> Integer @@ String :: @'error';");
 		$this->assertEquals("@'error'", $result);
 	}
 

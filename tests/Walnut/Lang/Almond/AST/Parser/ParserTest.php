@@ -190,7 +190,7 @@ class ParserTest extends TestCase {
 			$d->valueType instanceOf NullTypeNode && $d->constructorBody === null && $d->errorType === null];
 		yield ['MyOpen := #Null :: null;', AddOpenTypeNode::class, fn($d) => $d->name->equals(new TypeNameNode($l, 'MyOpen')) &&
 			$d->valueType instanceOf NullTypeNode && $d->constructorBody !== null && $d->errorType === null];
-		yield ['MyOpen := #Null @ E :: null;', AddOpenTypeNode::class, fn($d) => $d->name->equals(new TypeNameNode($l, 'MyOpen')) &&
+		yield ['MyOpen := #Null @@ E :: null;', AddOpenTypeNode::class, fn($d) => $d->name->equals(new TypeNameNode($l, 'MyOpen')) &&
 			$d->valueType instanceOf NullTypeNode && $d->constructorBody !== null && $d->errorType instanceof NamedTypeNode && $d->errorType->name->equals(new TypeNameNode($l, 'E'))];
 		yield ['MyOpen := #[Real];', AddOpenTypeNode::class, fn($d) => $d->name->equals(new TypeNameNode($l, 'MyOpen')) &&
 			$d->valueType instanceOf TupleTypeNode && $d->constructorBody === null && $d->errorType === null];
@@ -198,7 +198,7 @@ class ParserTest extends TestCase {
 			$d->valueType instanceOf NullTypeNode && $d->constructorBody === null && $d->errorType === null];
 		yield ['MySealed := $Null :: null;', AddSealedTypeNode::class, fn($d) => $d->name->equals(new TypeNameNode($l, 'MySealed')) &&
 			$d->valueType instanceOf NullTypeNode && $d->constructorBody !== null && $d->errorType === null];
-		yield ['MySealed := $Null @ E :: null;', AddSealedTypeNode::class, fn($d) => $d->name->equals(new TypeNameNode($l, 'MySealed')) &&
+		yield ['MySealed := $Null @@ E :: null;', AddSealedTypeNode::class, fn($d) => $d->name->equals(new TypeNameNode($l, 'MySealed')) &&
 			$d->valueType instanceOf NullTypeNode && $d->constructorBody !== null && $d->errorType instanceof NamedTypeNode && $d->errorType->name->equals(new TypeNameNode($l, 'E'))];
 		yield ['MySealed := $[a: Integer];', AddSealedTypeNode::class, fn($d) => $d->name->equals(new TypeNameNode($l, 'MySealed')) &&
 			$d->valueType instanceOf RecordTypeNode && $d->constructorBody === null && $d->errorType === null];
@@ -239,12 +239,12 @@ class ParserTest extends TestCase {
 			$d->dependency->type->types[0] instanceof NamedTypeNode && $d->dependency->type->types[0]->name->equals(new TypeNameNode($l, 'D')) &&
 			$d->dependency->name === null &&
 			$d->errorType instanceof NothingTypeNode];
-		yield ['A(P) @ C :: null;', AddConstructorMethodNode::class, fn(AddConstructorMethodNode $d) =>
+		yield ['A(P) @@ C :: null;', AddConstructorMethodNode::class, fn(AddConstructorMethodNode $d) =>
 			$d->typeName->equals(new TypeNameNode($l, 'A')) &&
 			$d->parameter->type instanceof NamedTypeNode && $d->parameter->type->name->equals(new TypeNameNode($l, 'P')) && $d->parameter->name === null &&
 			$d->dependency->type instanceof NothingTypeNode &&
 			$d->errorType instanceof NamedTypeNode && $d->errorType->name->equals(new TypeNameNode($l, 'C'))];
-		yield ['A(P) @ C %% D :: null;', AddConstructorMethodNode::class, fn(AddConstructorMethodNode $d) =>
+		yield ['A(P) @@ C %% D :: null;', AddConstructorMethodNode::class, fn(AddConstructorMethodNode $d) =>
 			$d->typeName->equals(new TypeNameNode($l, 'A')) &&
 			$d->parameter->type instanceof NamedTypeNode && $d->parameter->type->name->equals(new TypeNameNode($l, 'P')) && $d->parameter->name === null &&
 			$d->dependency->type instanceof NamedTypeNode && $d->dependency->type->name->equals(new TypeNameNode($l, 'D')) &&
@@ -481,7 +481,7 @@ class ParserTest extends TestCase {
 			$d->parameter->type instanceof NullTypeNode && $d->parameter->name === null &&
 			$d->dependency->type instanceof NothingTypeNode &&
 			$d->returnType instanceof NamedTypeNode && $d->returnType->name->equals(new TypeNameNode($l, 'B'))];
-		yield ['A ==> B @ C :: null;', AddMethodNode::class, fn(AddMethodNode $d) =>
+		yield ['A ==> B @@ C :: null;', AddMethodNode::class, fn(AddMethodNode $d) =>
 			$d->targetType instanceof TypeNameNode && $d->targetType->name === 'A' &&
 			$d->methodName->equals(new MethodNameNode($l, 'asB')) &&
 			$d->parameter->type instanceof NullTypeNode && $d->parameter->name === null &&
@@ -519,7 +519,7 @@ class ParserTest extends TestCase {
 			$d->dependency->type->types[0] instanceof NamedTypeNode && $d->dependency->type->types[0]->name->equals(new TypeNameNode($l, 'D')) &&
 			$d->dependency->name === null &&
 			$d->returnType instanceof NamedTypeNode && $d->returnType->name->equals(new TypeNameNode($l, 'B'))];
-		yield ['A ==> B @ C %% D :: null;', AddMethodNode::class, fn(AddMethodNode $d) =>
+		yield ['A ==> B @@ C %% D :: null;', AddMethodNode::class, fn(AddMethodNode $d) =>
 			$d->targetType instanceof TypeNameNode && $d->targetType->name === 'A' &&
 			$d->methodName->equals(new MethodNameNode($l, 'asB')) &&
 			$d->parameter->type instanceof NullTypeNode && $d->parameter->name === null &&
@@ -535,7 +535,7 @@ class ParserTest extends TestCase {
 			$d->parameter->type instanceof NullTypeNode && $d->parameter->name === null &&
 			$d->dependency->type instanceof NothingTypeNode &&
 			$d->returnType instanceof NamedTypeNode && $d->returnType->name->equals(new TypeNameNode($l, 'B'))];
-		yield ['==> B @ C :: null;', AddMethodNode::class, fn(AddMethodNode $d) =>
+		yield ['==> B @@ C :: null;', AddMethodNode::class, fn(AddMethodNode $d) =>
 			$d->targetType instanceof TypeNameNode && $d->targetType->name === 'DependencyContainer' &&
 			$d->methodName->equals(new MethodNameNode($l, 'asB')) &&
 			$d->parameter->type instanceof NullTypeNode && $d->parameter->name === null &&
@@ -561,7 +561,7 @@ class ParserTest extends TestCase {
 			$d->functionBody->expression instanceof ConstantExpressionNode &&
 			$d->functionBody->expression->value instanceof NullValueNode
 		];
-		yield ['==> B @ C %% D :: null;', AddMethodNode::class, fn(AddMethodNode $d) =>
+		yield ['==> B @@ C %% D :: null;', AddMethodNode::class, fn(AddMethodNode $d) =>
 			$d->targetType instanceof TypeNameNode && $d->targetType->name === 'DependencyContainer' &&
 			$d->methodName->equals(new MethodNameNode($l, 'asB')) &&
 			$d->parameter->type instanceof NullTypeNode && $d->parameter->name === null &&

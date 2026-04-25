@@ -61,7 +61,7 @@ final class AsJsonValueTest extends CodeExecutionTestHelper {
 			"getJson(MyOpen[a: 1, b: MyNested[x: ^ :: 1]]);", "
 			MyNested := #[x: ^Null => Any];
 			MyOpen := #[a: Integer, b: MyNested];
-			MyNested ==> JsonValue @ InvalidJsonValue :: 1;",
+			MyNested ==> JsonValue @@ InvalidJsonValue :: 1;",
 			"
 			getJson = ^value: MyOpen => JsonValue :: value->asJsonValue;
 		");

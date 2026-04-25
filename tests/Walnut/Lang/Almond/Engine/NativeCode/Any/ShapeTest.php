@@ -100,7 +100,7 @@ final class ShapeTest extends CodeExecutionTestHelper {
 			IntPairType := [a: Integer, b: Integer];
 			IntPair = [first: Integer, second: Integer];
 			Incompatible := ();
-			IntPairType ==> IntPair @ Incompatible :: [first: \$a, second: \$b];
+			IntPairType ==> IntPair @@ Incompatible :: [first: \$a, second: \$b];
 		NUT,
 			<<<NUT
 			getIntPair = ^p: IntPairType => Shape<IntPair> :: p;
@@ -117,7 +117,7 @@ final class ShapeTest extends CodeExecutionTestHelper {
 			IntPairType := [a: Integer, b: Integer];
 			IntPair = [first: Integer, second: Integer];
 			Incompatible := ();
-			IntPairType ==> IntPair @ Incompatible :: [first: \$a, second: \$b];
+			IntPairType ==> IntPair @@ Incompatible :: [first: \$a, second: \$b];
 		NUT,
 			<<<NUT
 			getIntPair = ^p: IntPairType => Shape<IntPair> :: p->shape(`IntPair);

@@ -1,7 +1,7 @@
 module $db/orm/xorm-repository %% $db/orm/xorm, $db/connection:
 
 OxRepository := $[~Ox, ~Type];
-OxRepository[~Type, model: Type<Any>] @ ExternalError  :: [
+OxRepository[~Type, model: Type<Any>] @@ ExternalError  :: [
     ox: {Ox[#model]} *> ('Failed to get orm model'),
     type: #type
 ];

@@ -166,7 +166,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testOpenWithInvariantConstructorCallOk(): void {
 		$result = $this->executeCodeSnippet("[A[a: 1, b: 'hi'], getA[a: 1, b: 'hi']];", <<<NUT
-		A := #[a: Integer, b: String] @ Any :: null;
+		A := #[a: Integer, b: String] @@ Any :: null;
 	NUT, <<<NUT
 		getA = ^p: [a: Integer, b: String] => Result<A, Any> :: A(p);
 	NUT);
@@ -178,7 +178,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 			"Function body return type 'Result<A, Any>' is not compatible with declared return type 'A'.",
 			"[A[a: 1, b: 'hi'], getA[a: 1, b: 'hi']];",
 		<<<NUT
-			A := #[a: Integer, b: String] @ Any :: null;
+			A := #[a: Integer, b: String] @@ Any :: null;
 		NUT,
 		<<<NUT
 			getA = ^p: [a: Integer, b: String] => A :: A(p);
@@ -187,7 +187,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testOpenWithInvariantConstructorCallOkErrorValue(): void {
 		$result = $this->executeCodeSnippet("A[a: 1, b: 'hi'];", <<<NUT
-		A := #[a: Integer, b: String] @ Any :: => @'error';
+		A := #[a: Integer, b: String] @@ Any :: => @'error';
 	NUT);
 		$this->assertEquals("@'error'", $result);
 	}
@@ -197,7 +197,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 			"The constructor for type 'A' expects a parameter of type '[a: Integer, b: String]', but type '[a: Integer[1], other: String['hi']]' was provided.",
 			"A[a: 1, other: 'hi'];",
 			<<<NUT
-			A := #[a: Integer, b: String] @ Any :: null;
+			A := #[a: Integer, b: String] @@ Any :: null;
 		NUT);
 	}
 
@@ -214,7 +214,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 	public function testOpenWithConstructorCallOkErrorValue(): void {
 		$result = $this->executeCodeSnippet("[A[f: 'hi', e: 1], getA[f: 'hi', e: 1]];", <<<NUT
 		A := #[a: Integer, b: String];
-		A[f: String, e: Real] @ Any :: @'error';
+		A[f: String, e: Real] @@ Any :: @'error';
 	NUT, <<<NUT
 		getA = ^p: [f: String, e: Real] => Result<A, Any> :: A(p);
 	NUT);
@@ -237,7 +237,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 			"[A[f: 'hi', e: 1], getA[f: 'hi', e: 1]];",
 		<<<NUT
 			A := #[a: Integer, b: String];
-			A[f: String, e: Real] @ Any :: @'error';
+			A[f: String, e: Real] @@ Any :: @'error';
 		NUT,
 		<<<NUT
 			getA = ^p: [f: String, e: Real] => A :: A(p);
@@ -250,13 +250,13 @@ final class ConstructTest extends CodeExecutionTestHelper {
 			"A[f: 'hi', other: 3];",
 		<<<NUT
 			A := #[a: Integer, b: String];
-			A[f: String, e: Real] @ Any :: @'error';
+			A[f: String, e: Real] @@ Any :: @'error';
 		NUT);
 	}
 
 	public function testOpenWithTwoConstructorsCallOk(): void {
 		$result = $this->executeCodeSnippet("A[f: 'hi', e: 1];", <<<NUT
-		A := #[a: Integer, b: String] @ Any :: null;
+		A := #[a: Integer, b: String] @@ Any :: null;
 		A[f: String, e: Real] :: [a: #e->asInteger, b: #f];
 	NUT);
 		$this->assertEquals("A[a: 1, b: 'hi']", $result);
@@ -264,7 +264,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testOpenWithTwoConstructorsCallErrorValueInvariant(): void {
 		$result = $this->executeCodeSnippet("A[f: 'hi', e: 1];", <<<NUT
-		A := #[a: Integer, b: String] @ Any :: => @'error';
+		A := #[a: Integer, b: String] @@ Any :: => @'error';
 		A[f: String, e: Real] :: [a: #e->asInteger, b: #f];
 	NUT);
 		$this->assertEquals("@'error'", $result);
@@ -272,16 +272,16 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testOpenWithTwoConstructorsCallErrorValueConstructor(): void {
 		$result = $this->executeCodeSnippet("A[f: 'hi', e: 1];", <<<NUT
-		A := #[a: Integer, b: String] @ Any :: null;
-		A[f: String, e: Real] @ Any :: @'error';
+		A := #[a: Integer, b: String] @@ Any :: null;
+		A[f: String, e: Real] @@ Any :: @'error';
 	NUT);
 		$this->assertEquals("@'error'", $result);
 	}
 
 	public function testOpenWithTwoConstructorsCallErrorValueBoth(): void {
 		$result = $this->executeCodeSnippet("[A[f: 'hi', e: 1], getA[f: 'hi', e: 1]];", <<<NUT
-		A := #[a: Integer, b: String] @ String['error 1'] :: @'error 1';
-		A[f: String, e: Real] @ String['error 2'] :: @'error 2';
+		A := #[a: Integer, b: String] @@ String['error 1'] :: @'error 1';
+		A[f: String, e: Real] @@ String['error 2'] :: @'error 2';
 	NUT, <<<NUT
 		getA = ^p: [f: String, e: Real] => Result<A, String['error 1', 'error 2']> :: A(p);
 	NUT);
@@ -293,8 +293,8 @@ final class ConstructTest extends CodeExecutionTestHelper {
 			"Function body return type 'Result<A, String['error 2', 'error 1']>' is not compatible with declared return type 'A'.",
 			"[A[f: 'hi', e: 1], getA[f: 'hi', e: 1]];",
 		<<<NUT
-			A := #[a: Integer, b: String] @ String['error 1'] :: @'error 1';
-			A[f: String, e: Real] @ String['error 2'] :: @'error 2';
+			A := #[a: Integer, b: String] @@ String['error 1'] :: @'error 1';
+			A[f: String, e: Real] @@ String['error 2'] :: @'error 2';
 		NUT,
 		<<<NUT
 			getA = ^p: [f: String, e: Real] => A :: A(p);
@@ -306,7 +306,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 			"The parameter type '[f: String['hi'], other: Integer[3]]' is not compatible with declared parameter type '[f: String, e: Real]'.",
 			"A[f: 'hi', other: 3];",
 		<<<NUT
-			A := #[a: Integer, b: String] @ Any :: null;
+			A := #[a: Integer, b: String] @@ Any :: null;
 			A[f: String, e: Real] :: [a: #e->asInteger, b: #f];
 		NUT);
 	}
@@ -334,14 +334,14 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testSealedWithInvariantConstructorCallOk(): void {
 		$result = $this->executeCodeSnippet("A[a: 1, b: 'hi'];", <<<NUT
-		A := $[a: Integer, b: String] @ Any :: null;
+		A := $[a: Integer, b: String] @@ Any :: null;
 	NUT);
 		$this->assertEquals("A[a: 1, b: 'hi']", $result);
 	}
 
 	public function testSealedWithInvariantConstructorCallOkErrorValue(): void {
 		$result = $this->executeCodeSnippet("A[a: 1, b: 'hi'];", <<<NUT
-		A := $[a: Integer, b: String] @ Any :: => @'error';
+		A := $[a: Integer, b: String] @@ Any :: => @'error';
 	NUT);
 		$this->assertEquals("@'error'", $result);
 	}
@@ -351,7 +351,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 			"The constructor for type 'A' expects a parameter of type '[a: Integer, b: String]', but type '[a: Integer[1], other: String['hi']]' was provided.",
 			"A[a: 1, other: 'hi'];",
 			<<<NUT
-			A := $[a: Integer, b: String] @ Any :: null;
+			A := $[a: Integer, b: String] @@ Any :: null;
 		NUT);
 	}
 
@@ -366,7 +366,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 	public function testSealedWithConstructorCallOkErrorValue(): void {
 		$result = $this->executeCodeSnippet("A[f: 'hi', e: 1];", <<<NUT
 		A := $[a: Integer, b: String];
-		A[f: String, e: Real] @ Any :: @'error';
+		A[f: String, e: Real] @@ Any :: @'error';
 	NUT);
 		$this->assertEquals("@'error'", $result);
 	}
@@ -377,13 +377,13 @@ final class ConstructTest extends CodeExecutionTestHelper {
 			"A[f: 'hi', other: 3];",
 			<<<NUT
 			A := $[a: Integer, b: String];
-			A[f: String, e: Real] @ Any :: @'error';
+			A[f: String, e: Real] @@ Any :: @'error';
 		NUT);
 	}
 
 	public function testSealedWithTwoConstructorsCallOk(): void {
 		$result = $this->executeCodeSnippet("A[f: 'hi', e: 1];", <<<NUT
-		A := $[a: Integer, b: String] @ Any :: null;
+		A := $[a: Integer, b: String] @@ Any :: null;
 		A[f: String, e: Real] :: [a: #e->asInteger, b: #f];
 	NUT);
 		$this->assertEquals("A[a: 1, b: 'hi']", $result);
@@ -391,7 +391,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testSealedWithTwoConstructorsCallErrorValueInvariant(): void {
 		$result = $this->executeCodeSnippet("A[f: 'hi', e: 1];", <<<NUT
-		A := $[a: Integer, b: String] @ Any :: => @'error';
+		A := $[a: Integer, b: String] @@ Any :: => @'error';
 		A[f: String, e: Real] :: [a: #e->asInteger, b: #f];
 	NUT);
 		$this->assertEquals("@'error'", $result);
@@ -399,16 +399,16 @@ final class ConstructTest extends CodeExecutionTestHelper {
 
 	public function testSealedWithTwoConstructorsCallErrorValueConstructor(): void {
 		$result = $this->executeCodeSnippet("A[f: 'hi', e: 1];", <<<NUT
-		A := $[a: Integer, b: String] @ Any :: null;
-		A[f: String, e: Real] @ Any :: @'error';
+		A := $[a: Integer, b: String] @@ Any :: null;
+		A[f: String, e: Real] @@ Any :: @'error';
 	NUT);
 		$this->assertEquals("@'error'", $result);
 	}
 
 	public function testSealedWithTwoConstructorsCallErrorValueBoth(): void {
 		$result = $this->executeCodeSnippet("A[f: 'hi', e: 1];", <<<NUT
-		A := $[a: Integer, b: String] @ Any :: @'error 1';
-		A[f: String, e: Real] @ Any :: @'error 2';
+		A := $[a: Integer, b: String] @@ Any :: @'error 1';
+		A[f: String, e: Real] @@ Any :: @'error 2';
 	NUT);
 		$this->assertEquals("@'error 2'", $result);
 	}
@@ -418,7 +418,7 @@ final class ConstructTest extends CodeExecutionTestHelper {
 			"The parameter type '[f: String['hi'], other: Integer[3]]' is not compatible with declared parameter type '[f: String, e: Real]'.",
 			"A[f: 'hi', other: 3];",
 			<<<NUT
-			A := $[a: Integer, b: String] @ Any :: null;
+			A := $[a: Integer, b: String] @@ Any :: null;
 			A[f: String, e: Real] :: [a: #e->asInteger, b: #f];
 		NUT);
 	}

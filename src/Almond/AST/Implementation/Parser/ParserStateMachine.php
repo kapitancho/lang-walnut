@@ -170,6 +170,9 @@ final readonly class ParserStateMachine {
 					$this->s->push(139);
 					$this->s->stay(4000);
 				},
+				T::error_marker->name => $c,
+				T::arithmetic_op_plus->name => $c,
+				T::optional_key->name => $c,
 				T::arithmetic_op_multiply->name => $c,
 				T::type_proxy_keyword->name => $c,
 				T::type_keyword->name => $c,
@@ -248,7 +251,7 @@ final readonly class ParserStateMachine {
 				}
 			]],
 			117 => ['name' => 'cast body marker', 'transitions' => [
-				T::error_marker->name => function(LT $token) {
+				T::error_separator->name => function(LT $token) {
 					$this->s->push(124);
 					$this->s->move(4000);
 				},
@@ -385,7 +388,7 @@ final readonly class ParserStateMachine {
 				}
 			]],
 			131 => ['name' => 'constructor method body', 'transitions' => [
-				T::error_marker->name => function(LT $token) {
+				T::error_separator->name => function(LT $token) {
 					$this->s->push(134);
 					$this->s->move(4000);
 				},
@@ -517,7 +520,7 @@ final readonly class ParserStateMachine {
 				}
 			]],
 			143 => ['name' => 'open error type', 'transitions' => [
-				T::error_marker->name => function(LT $token) {
+				T::error_separator->name => function(LT $token) {
 					$this->s->push(144);
 					$this->s->move(4000);
 				},
@@ -565,7 +568,7 @@ final readonly class ParserStateMachine {
 				}
 			]],
 			148 => ['name' => 'sealed error type', 'transitions' => [
-				T::error_marker->name => function(LT $token) {
+				T::error_separator->name => function(LT $token) {
 					$this->s->push(149);
 					$this->s->move(4000);
 				},
@@ -955,58 +958,60 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				}
 			]],
-			4010 => ['name' => 'type union expression start', 'transitions' => [
-				'' => function(LT $token) {
+			4010 => ['name' => 'type optional expression start', 'transitions' => [
+				T::optional_key->name => function(LT $token) {
+					$this->s->result['startPosition'] = $token->sourcePosition;
 					$this->s->push(4011);
-					$this->s->stay(4020);
-				},
-			]],
-			4011 => ['name' => 'type union expression op', 'transitions' => [
-				T::union->name => function(LT $token) {
-					$this->s->result['expression_left'] = $this->s->generated;
-					$this->s->push(4012);
 					$this->s->move(4020);
 				},
 				'' => function(LT $token) {
+					$this->s->stay(4020);
+				},
+			]],
+			4011 => ['name' => 'type optional expression op expr', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated =
+						$this->nodeBuilder->type->optionalType(
+							$this->s->generated,
+						);
 					$this->s->pop();
 				}
 			]],
-			4012 => ['name' => 'type union expression op expr', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->type->unionType(
-						$this->s->result['expression_left'],
-						$this->s->generated
-					);
-					$this->s->stay(4011);
-				}
-			]],
-			4020 => ['name' => 'type intersection expression start', 'transitions' => [
+
+
+			4020 => ['name' => 'type err expression start', 'transitions' => [
+				T::error_marker->name => function(LT $token) {
+					$this->s->result['expression_left'] = $this->nodeBuilder->type->nothingType;
+					$this->s->push(4022);
+					$this->s->move(4040);
+				},
 				'' => function(LT $token) {
 					$this->s->push(4021);
 					$this->s->stay(4030);
 				},
 			]],
-			4021 => ['name' => 'type intersection expression op', 'transitions' => [
-				T::intersection->name => function(LT $token) {
+			4021 => ['name' => 'type err expression op', 'transitions' => [
+				T::error_marker->name => function(LT $token) {
 					$this->s->result['expression_left'] = $this->s->generated;
 					$this->s->push(4022);
-					$this->s->move(4030);
+					$this->s->move(4040);
 				},
 				'' => function(LT $token) {
 					$this->s->pop();
 				}
 			]],
-			4022 => ['name' => 'type intersection expression op expr', 'transitions' => [
+			4022 => ['name' => 'type err expression op expr', 'transitions' => [
 				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->type->intersectionType(
+					$this->s->generated = $this->nodeBuilder->type->resultType(
 						$this->s->result['expression_left'],
 						$this->s->generated
 					);
-					$this->s->stay(4021);
+					$this->s->pop();
 				}
 			]],
-			4030 => ['name' => 'type impure expression start', 'transitions' => [
-				T::arithmetic_op_multiply->name => function(LT $token) {
+
+			4030 => ['name' => 'type val expression start', 'transitions' => [
+				T::arithmetic_op_plus->name => function(LT $token) {
 					$this->s->result['startPosition'] = $token->sourcePosition;
 					$this->s->push(4031);
 					$this->s->move(4040);
@@ -1015,7 +1020,79 @@ final readonly class ParserStateMachine {
 					$this->s->stay(4040);
 				},
 			]],
-			4031 => ['name' => 'type impure expression op expr', 'transitions' => [
+			4031 => ['name' => 'type val expression op expr', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated =
+						$this->nodeBuilder->type->valueType(
+							$this->s->generated,
+						);
+					$this->s->pop();
+				}
+			]],
+
+
+
+			4040 => ['name' => 'type union expression start', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(4041);
+					$this->s->stay(4050);
+				},
+			]],
+			4041 => ['name' => 'type union expression op', 'transitions' => [
+				T::union->name => function(LT $token) {
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->push(4042);
+					$this->s->move(4050);
+				},
+				'' => function(LT $token) {
+					$this->s->pop();
+				}
+			]],
+			4042 => ['name' => 'type union expression op expr', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->type->unionType(
+						$this->s->result['expression_left'],
+						$this->s->generated
+					);
+					$this->s->stay(4041);
+				}
+			]],
+			4050 => ['name' => 'type intersection expression start', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(4051);
+					$this->s->stay(4060);
+				},
+			]],
+			4051 => ['name' => 'type intersection expression op', 'transitions' => [
+				T::intersection->name => function(LT $token) {
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->push(4052);
+					$this->s->move(4060);
+				},
+				'' => function(LT $token) {
+					$this->s->pop();
+				}
+			]],
+			4052 => ['name' => 'type intersection expression op expr', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->type->intersectionType(
+						$this->s->result['expression_left'],
+						$this->s->generated
+					);
+					$this->s->stay(4051);
+				}
+			]],
+			4060 => ['name' => 'type impure expression start', 'transitions' => [
+				T::arithmetic_op_multiply->name => function(LT $token) {
+					$this->s->result['startPosition'] = $token->sourcePosition;
+					$this->s->push(4061);
+					$this->s->move(4070);
+				},
+				'' => function(LT $token) {
+					$this->s->stay(4070);
+				},
+			]],
+			4061 => ['name' => 'type impure expression op expr', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->generated =
 						$this->nodeBuilder->type->impureType(
@@ -1024,17 +1101,17 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				}
 			]],
-			4040 => ['name' => 'type shape expression start', 'transitions' => [
+			4070 => ['name' => 'type shape expression start', 'transitions' => [
 				T::sequence_start->name => function(LT $token) {
 					$this->s->result['startPosition'] = $token->sourcePosition;
-					$this->s->push(4041);
+					$this->s->push(4071);
 					$this->s->move(4000);
 				},
 				'' => function(LT $token) {
-					$this->s->stay(4050);
+					$this->s->stay(4080);
 				},
 			]],
-			4041 => ['name' => 'type shape expression op expr', 'transitions' => [
+			4071 => ['name' => 'type shape expression op expr', 'transitions' => [
 				T::sequence_end->name => function(LT $token) {
 					$this->s->i++;
 					$this->s->generated =
@@ -1044,7 +1121,7 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				}
 			]],
-			4050 => ['name' => 'type expression start', 'transitions' => [
+			4080 => ['name' => 'type expression start', 'transitions' => [
 				T::type_proxy_keyword->name => function(LT $token) {
 					$this->s->result['startPosition'] ??= $token->sourcePosition;
 					$type = substr($token->patternMatch->text, 1);
@@ -1098,7 +1175,7 @@ final readonly class ParserStateMachine {
 				},
 				T::call_start->name => function(LT $token) {
 					$this->s->result['startPosition'] = $token->sourcePosition;
-					$this->s->push(4051);
+					$this->s->push(4081);
 					$this->s->move(4000);
 				},
 				T::tuple_start->name => function(LT $token) {
@@ -1137,7 +1214,7 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
-			4051 => ['name' => 'type expression braces', 'transitions' => [
+			4081 => ['name' => 'type expression braces', 'transitions' => [
 				T::call_end->name => function(LT $token) {
 					if ($startPosition = $this->s->result['startPosition'] ?? null) {
 						$sourceLocation = new SourceLocation(
@@ -2195,7 +2272,7 @@ final readonly class ParserStateMachine {
 					};
 				},
 				T::string_value->name => function(LT $token) { $this->s->stay(408); },
-				T::byte_array_value->name => function(LT $token) { $this->s->stay(4081); },
+				T::byte_array_value->name => function(LT $token) { $this->s->stay(4096); },
 				T::positive_integer_number->name => function(LT $token) { $this->s->stay(416); },
 				T::integer_number->name => function(LT $token) { $this->s->stay(416); },
 				T::real_number->name => function(LT $token) { $this->s->stay(417); },
@@ -2282,7 +2359,7 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
-			4081 => ['name' => 'byte array value', 'transitions' => [
+			4096 => ['name' => 'byte array value', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->i++;
 					$this->s->generated = $this->nodeBuilder->value->bytesValue(
@@ -2519,20 +2596,7 @@ final readonly class ParserStateMachine {
 				},
 			]],
 
-			4381 => ['name' => 'type value short optional key', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->type->optionalType(
-						$this->s->generated
-					);
-					$this->s->stay(443);
-				}
-			]],
-
 			439 => ['name' => 'type value short', 'transitions' => [
-				T::optional_key->name => function(LT $token) {
-					$this->s->push(4381);
-					$this->s->move(4000);
-				},
 				T::type_keyword->name => $c = function(LT $token) {
 					if (in_array($token->patternMatch->text, [
 						'Function', 'Tuple', 'Record', 'Union', 'Intersection', 'Atom', 'Enumeration',
@@ -2548,8 +2612,11 @@ final readonly class ParserStateMachine {
 					$this->s->push(443);
 					$this->s->stay(4000);
 				},
+				T::optional_key->name => $c,
+				T::arithmetic_op_plus->name => $c,
+				T::error_marker->name => $c,
 				T::call_start->name => $c,
-				T::sequence_start->name => $c, 
+				T::sequence_start->name => $c,
 				T::arithmetic_op_multiply->name => $c,
 				T::tuple_start->name => $c,
 				T::lambda_param->name => $c,
@@ -2566,21 +2633,7 @@ final readonly class ParserStateMachine {
 				T::sequence_start->name => 441,
 			]],
 
-			4401 => ['name' => 'type value type optional key', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->type->optionalType(
-						$this->s->generated
-					);
-					$this->s->stay(442);
-				}
-			]],
-
-
 			441 => ['name' => 'type value type', 'transitions' => [
-				T::optional_key->name => function(LT $token) {
-					$this->s->push(4401);
-					$this->s->move(4000);
-				},
 				T::type_keyword->name => $c = function(LT $token) {
 					if (in_array($token->patternMatch->text, [
 						'Function', 'Tuple', 'Record', 'Union', 'Intersection', 'Atom', 'Enumeration',
@@ -2596,6 +2649,9 @@ final readonly class ParserStateMachine {
 					$this->s->push(442);
 					$this->s->stay(4000);
 				},
+				T::optional_key->name => $c,
+				T::arithmetic_op_plus->name => $c,
+				T::error_marker->name => $c,
 				T::call_start->name => $c,
 				T::sequence_start->name => $c, 
 				T::arithmetic_op_multiply->name => $c,
@@ -2755,6 +2811,9 @@ final readonly class ParserStateMachine {
 					$this->s->push(609);
 					$this->s->stay(4000);
 				},
+				T::arithmetic_op_plus->name => $c,
+				T::optional_key->name => $c,
+				T::error_marker->name => $c,
 				T::positive_integer_number->name => $c,
 				T::integer_number->name => $c,
 				T::real_number->name => $c,
@@ -3459,20 +3518,7 @@ final readonly class ParserStateMachine {
 				},
 			]],
 
-			7561 => ['name' => 'type type optional key', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->result['type'] = $this->nodeBuilder->type->optionalType(
-						$this->s->generated
-					);
-					$this->s->stay(759);
-				}
-			]],
-
 			757 => ['name' => 'type type type', 'transitions' => [
-				T::optional_key->name => function(LT $token) {
-					$this->s->push(7561);
-					$this->s->move(4000);
-				},
 				T::type_keyword->name => function(LT $token) {
 					if (in_array($token->patternMatch->text, [
 						'Function', 'Tuple', 'Record', 'Union', 'Intersection', 'Atom', 'Enumeration',
@@ -3771,13 +3817,6 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
-			794 => ['name' => 'type optional ? return point', 'transitions' => [
-				'' => function(LT $token) {
-					$this->s->result['compositeValues'][$this->s->result['current_key']] =
-						$this->nodeBuilder->type->optionalType($this->s->generated);
-					$this->s->stay(844);
-				}
-			]],
 			820 => ['name' => 'type shape', 'transitions' => [
 				T::type_start->name => 821,
 				'' => function(LT $token) {
@@ -3896,6 +3935,9 @@ final readonly class ParserStateMachine {
 					$this->s->result['first_token'] = $token;
 					$this->s->move(840);
 				},
+				T::arithmetic_op_plus->name => $t,
+				T::optional_key->name => $t,
+				T::error_marker->name => $t,
 				T::positive_integer_number->name => $t,
 				T::integer_number->name => $t,
 				T::real_number->name => $t,
@@ -3925,12 +3967,6 @@ final readonly class ParserStateMachine {
 				T::colon->name => 842,
 			]],
 			842 => ['name' => 'module level record value type', 'transitions' => [
-				T::optional_key->name => function(LT $token) {
-					$this->s->result['current_key'] ??=
-                        $this->s->result['first_token']->patternMatch->text;
-					$this->s->push(794);
-					$this->s->move(4000);
-				},
 				'' => function(LT $token) {
 					$this->s->result['current_key'] ??=
                         $this->s->result['first_token']->patternMatch->text;

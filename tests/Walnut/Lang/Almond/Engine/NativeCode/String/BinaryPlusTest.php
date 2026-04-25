@@ -33,7 +33,7 @@ final class BinaryPlusTest extends CodeExecutionTestHelper {
 
 	public function testBinaryPlusInvalidParameter(): void {
 		$this->executeErrorCodeSnippet('The parameter type A is not a subtype of String or a Shape<String>', "'hello' + A;",
-			"A := (); B := (); A ==> String @ B :: @B;");
+			"A := (); B := (); A ==> String @@ B :: @B;");
 	}
 
 }

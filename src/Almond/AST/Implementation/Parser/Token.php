@@ -66,5 +66,6 @@ enum Token: string {
 	case arithmetic_op_divide = '\/';
 	case default_match = '\~';
 	case property_accessor = '\.';
+	case error_separator = '\@\@';
 	case error_marker = '\@';
 }

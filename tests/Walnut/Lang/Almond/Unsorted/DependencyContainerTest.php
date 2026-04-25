@@ -48,7 +48,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 			"f();",
 		<<<NUT
 		A := #Integer; ==> A :: A(42);
-		B := #String; ==> B @ Null :: @null;
+		B := #String; ==> B @@ Null :: @null;
 		NUT,
 		<<<NUT
 		f = ^ %% [~A, ~B] :: %a->value + {%b->value->length};
@@ -84,7 +84,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		"f();",
 		<<<NUT
 		A := #Integer; ==> A :: A(42);
-		B := #String; ==> B @ Null :: @null;
+		B := #String; ==> B @@ Null :: @null;
 		NUT,
 		<<<NUT
 		f = ^ %% [A, B] :: %0->value + {%1->value->length};
@@ -120,7 +120,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 			"f();",
 		<<<NUT
 		A := Integer; ==> A :: A!42;
-		B := #A @ Null :: => @null;
+		B := #A @@ Null :: => @null;
 		NUT,
 		<<<NUT
 		f = ^ %% B :: %;
@@ -143,7 +143,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 			"f();",
 		<<<NUT
 		A := #Integer; ==> A :: A(42);
-		B := #A @ Null :: => @null;
+		B := #A @@ Null :: => @null;
 		NUT,
 		<<<NUT
 		f = ^ %% B :: %;
@@ -168,7 +168,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		<<<NUT
 		A := #Integer; ==> A :: A(42);
 		B := #Integer;
-		B(v: A) @ Null :: @null;
+		B(v: A) @@ Null :: @null;
 		NUT,
 		<<<NUT
 		f = ^ %% B :: %;
@@ -203,7 +203,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 			"f();",
 		<<<NUT
 		A := \$Integer; ==> A :: A(42);
-		B := \$A @ Null :: => @null;
+		B := \$A @@ Null :: => @null;
 		NUT,
 		<<<NUT
 		f = ^ %% B :: %;
@@ -230,7 +230,7 @@ final class DependencyContainerTest extends CodeExecutionTestHelper {
 		A := \$Integer; ==> A :: A(42);
 		A->value(=> Integer) :: $$;
 		B := \$Integer;
-		B(v: A) @ Null :: @null;
+		B(v: A) @@ Null :: @null;
 		NUT,
 		<<<NUT
 		f = ^ %% B :: %;
