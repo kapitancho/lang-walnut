@@ -4,16 +4,19 @@ namespace Walnut\Lang\Almond\Engine\NativeCode\Any;
 
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\UnknownMethod;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\Userland\UserlandMethod;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EnumerationType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ErrorType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OpenType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\SealedType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\TypeType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ValueType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\UnknownEnumerationValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\EmptyValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\EnumerationValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
@@ -38,7 +41,27 @@ final readonly class Construct extends NativeMethod {
 				return $this->typeRegistry->error($targetType);
 			}
 			if ($refType instanceof ValueType) {
-				return $this->typeRegistry->value($targetType);
+				$okType = $targetType;
+				$hasOptional = false;
+				$errorType = null;
+				if ($okType instanceof OptionalType) {
+					$hasOptional = true;
+					$okType = $okType->valueType;
+				}
+				if ($okType instanceof ResultType) {
+					$errorType = $okType->errorType;
+					$okType = $okType->returnType;
+				} elseif ($okType instanceof AnyType) {
+					$errorType = $okType;
+				}
+				$valueType = $this->typeRegistry->value($okType);
+				if ($errorType) {
+					$valueType = $this->typeRegistry->result($valueType, $errorType);
+				}
+				if ($hasOptional) {
+					$valueType = $this->typeRegistry->optional($valueType);
+				}
+				return $valueType;
 			}
 			if ($refType instanceof OpenType || $refType instanceof SealedType || $refType instanceof EnumerationType) {
 				$constructorMethod = $this->methodContext->methodForType(
@@ -146,7 +169,9 @@ final readonly class Construct extends NativeMethod {
 				return $this->valueRegistry->error($target);
 			}
 			if ($parameterType instanceof ValueType) {
-				return $this->valueRegistry->value($target);
+				return $target instanceof ErrorValue || $target instanceof EmptyValue ?
+					$target :
+					$this->valueRegistry->value($target);
 			}
 			if ($parameterType instanceof OpenType || $parameterType instanceof SealedType || $parameterType instanceof EnumerationType) {
 				$constructorMethod = $this->methodContext->methodForValue(
