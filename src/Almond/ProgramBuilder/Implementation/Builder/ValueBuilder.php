@@ -22,6 +22,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Value\TrueValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\TupleValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\TypeValueNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\ValueNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Value\ValueValueNode;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\FunctionValueFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Function\NameAndType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\UnknownEnumerationValue;

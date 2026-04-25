@@ -958,10 +958,6 @@ class ParserTest extends TestCase {
 			$e->targetExpression->target instanceof VariableNameExpressionNode && $e->targetExpression->target->variableName->equals(new VariableNameNode($l, 'a')) &&
 			$e->targetExpression->methodName->equals(new MethodNameNode($l, 'b')) &&
 			$e->targetExpression->parameter instanceof ConstantExpressionNode && $e->targetExpression->parameter->value instanceof NullValueNode];
-		yield ['+a', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
-			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameNode($l, 'a')) &&
-			$e->methodName->equals(new MethodNameNode($l, 'unaryPlus')) &&
-			$e->parameter instanceof ConstantExpressionNode && $e->parameter->value instanceof NullValueNode];
 		yield ['-a', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
 			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameNode($l, 'a')) &&
 			$e->methodName->equals(new MethodNameNode($l, 'unaryMinus')) &&

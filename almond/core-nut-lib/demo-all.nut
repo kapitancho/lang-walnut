@@ -88,6 +88,9 @@ AllTypes = [
     impure: Impure,
     impureWithType: Impure<Integer>,
 
+    value: Value,
+    valueWithType: Value<String>,
+
     shape: Shape<Integer>,
     shapeAny: Shape,
     proxy: Array<\MyOpen0>,
@@ -215,6 +218,9 @@ AllTypes = [
         impure: 'impure',
         impureWithType: @ExternalError[errorType: 'Error', originalError: 'Error', errorMessage: 'Error'],
 
+        value: +'value',
+        valueWithType: +'value',
+
         shape: 42,
         shapeAny: null,
         proxy: [MyOpen0[a: 3, b: -2]],
@@ -289,6 +295,7 @@ AllTypes = [
         type: `String,
         mutable: mutable{String, 'mutable'},
         error: @'error',
+        value: +'value',
         data: MyData!42,
         function: ^Any => Any :: 'function body'
     ];

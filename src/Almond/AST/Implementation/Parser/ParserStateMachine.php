@@ -1590,11 +1590,6 @@ final readonly class ParserStateMachine {
 					$this->s->push(3131);
 					$this->s->move(3130);
 				},
-				T::arithmetic_op_plus->name => function(LT $token) {
-					$this->s->result['op'] = $this->nodeBuilder->name->methodName('unaryPlus');
-					$this->s->push(3131);
-					$this->s->move(3130);
-				},
 				T::arithmetic_op_minus->name => function(LT $token) {
 					$this->s->result['op'] = $this->nodeBuilder->name->methodName('unaryMinus');
 					$this->s->push(3131);
@@ -1718,6 +1713,7 @@ final readonly class ParserStateMachine {
 				T::type_short->name => $c,
 
 				T::error_marker->name => function(LT $token) { $this->s->move(342); },
+				T::arithmetic_op_plus->name => function(LT $token) { $this->s->move(3421); },
 
 				T::call_start->name => -206,
 				T::sequence_start->name => -202,
@@ -2061,6 +2057,21 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 			]],
+			3421 => ['name' => 'error value value start', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(3422);
+					$this->s->stay(3160);
+				},
+			]],
+			3422 => ['name' => 'error value type return', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->expression->constructorCall(
+						$this->nodeBuilder->name->typeName('Value'),
+						$this->s->generated
+					);
+					$this->s->pop();
+				},
+			]],
 			344 => ['name' => 'mutable value', 'transitions' => [
 				T::sequence_start->name => 345,
 			]],
@@ -2205,7 +2216,11 @@ final readonly class ParserStateMachine {
 				T::error_marker->name => function(LT $token) {
 					$this->s->result['startPosition'] = $token->sourcePosition;
 					$this->s->move(409);
-					},
+				},
+				T::arithmetic_op_plus->name => function(LT $token) {
+					$this->s->result['startPosition'] = $token->sourcePosition;
+					$this->s->move(4091);
+				},
 				/*T::mutable->name => function(LT $token) {
 					$this->s->result['startPosition'] = $token->sourcePosition;
 					$this->s->move(411);
@@ -2285,6 +2300,20 @@ final readonly class ParserStateMachine {
 			410 => ['name' => 'error constant value type return', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->value->errorValue(
+						$this->s->generated
+					);
+					$this->s->pop();
+				},
+			]],
+			4091 => ['name' => 'value constant value value start', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(4092);
+					$this->s->stay(401);
+				},
+			]],
+			4092 => ['name' => 'value constant value type return', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->value->valueValue(
 						$this->s->generated
 					);
 					$this->s->pop();
