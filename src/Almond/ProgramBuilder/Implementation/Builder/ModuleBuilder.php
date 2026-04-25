@@ -55,6 +55,36 @@ final readonly class ModuleBuilder implements ModuleCompilerInterface {
 	}
 
 	/** @throws BuildException */
+	public function addMethod(
+		AddMethodNode $moduleDefinition
+	): UserlandMethod {
+		try {
+			return $this->programContext->userlandMethodBuilder->addMethod(
+				$this->nameBuilder->typeName($moduleDefinition->targetType),
+				$this->nameBuilder->methodName($moduleDefinition->methodName),
+				new NameAndType(
+					$this->type($moduleDefinition->parameter->type),
+					$moduleDefinition->parameter->name ?
+						$this->nameBuilder->variableName($moduleDefinition->parameter->name) : null,
+				),
+				new NameAndType(
+					$this->type($moduleDefinition->dependency->type),
+					$moduleDefinition->dependency->name ?
+						$this->nameBuilder->variableName($moduleDefinition->dependency->name) : null,
+				),
+				$this->type($moduleDefinition->returnType),
+				$this->functionBody($moduleDefinition->functionBody),
+			);
+		} catch (UnknownType $e) {
+			throw new BuildException(
+				$moduleDefinition,
+				$e->getMessage(),
+				$e
+			);
+		}
+	}
+
+	/** @throws BuildException */
 	public function addConstructorMethod(
 		AddConstructorMethodNode $moduleDefinition
 	): UserlandMethod {
@@ -167,22 +197,7 @@ final readonly class ModuleBuilder implements ModuleCompilerInterface {
 						)
 					),
 				$moduleDefinition instanceof AddMethodNode =>
-					$this->programContext->userlandMethodBuilder->addMethod(
-						$this->nameBuilder->typeName($moduleDefinition->targetType),
-						$this->nameBuilder->methodName($moduleDefinition->methodName),
-						new NameAndType(
-							$this->type($moduleDefinition->parameter->type),
-							$moduleDefinition->parameter->name ?
-								$this->nameBuilder->variableName($moduleDefinition->parameter->name) : null,
-						),
-						new NameAndType(
-							$this->type($moduleDefinition->dependency->type),
-							$moduleDefinition->dependency->name ?
-								$this->nameBuilder->variableName($moduleDefinition->dependency->name) : null,
-						),
-						$this->type($moduleDefinition->returnType),
-						$this->functionBody($moduleDefinition->functionBody),
-					),
+					$this->addMethod($moduleDefinition),
 				$moduleDefinition instanceof AddDataTypeNode =>
 					$this->programContext->userlandTypeBuilder->addData(
 						$this->nameBuilder->typeName($moduleDefinition->name),
