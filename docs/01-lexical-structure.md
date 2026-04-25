@@ -73,7 +73,7 @@ The following are reserved keywords in Walnut:
 - `ExternalError` - External error type
 - `Impure` - Impure computation type (shorthand for `Result<T, ExternalError>`)
 - `Shape` - Shape type
-- `OptionalKey` - Optional key type (for records)
+- `Optional` - Optional value type (`?T` is shorthand for `Optional<T>`); also used in record fields where `?T` means "the key may be absent"
 
 ### Meta-Type Keywords
 - `Atom` - Atom meta-type
@@ -220,28 +220,43 @@ null
 
 ```walnut
 ->  /* Method call */
-=>  /* Early return / method call with error check */
-|>  /* Method call with external error check */
 *>  /* Error to external error conversion */
+```
+
+The postfix operators `?` and `*?` (see §1.6.7) compose with method calls
+to propagate errors:
+
+```walnut
+value->method?     /* Propagates if the call returns an error */
+value->method*?    /* Propagates only external errors */
 ```
 
 ### 1.6.7 Other Operators
 
 ```walnut
-.   /* Property access */
-::  /* Scoped expression / function body */
-=>  /* Function return type separator / early return */
-%   /* Modulo / dependency variable prefix */
-#   /* Parameter variable */
-$   /* Target variable */
-%   /* Dependency variable */
-@   /* Error value constructor */
-~   /* Default case / destructuring shorthand */
-!   /* Data value constructor */
-?   /* Optional key prefix */
-^   /* Function type marker */
-`   /* Type value marker (backtick) */
+.    /* Property access */
+::   /* Scoped expression / function body */
+=>   /* Function return type separator / unconditional early return from the enclosing scope */
+%    /* Modulo / dependency variable prefix */
+#    /* Parameter variable */
+$    /* Target variable */
+@    /* Error value constructor */
+@@   /* Error-type marker on constructors, validators, and casts (e.g. `T := #B @@ E :: …`) */
+~    /* Default case / destructuring shorthand */
+!    /* Data value constructor */
+?    /* Postfix: unwrap result, propagate error */
+?T   /* Type prefix: shorthand for `Optional<T>` (in record fields: "key may be absent") */
+*?   /* Postfix: unwrap result, propagate only external errors */
+^    /* Function type marker */
+`    /* Type value marker (backtick) */
 ```
+
+`=>` has a single semantic role besides the function-return-type
+separator: an **unconditional early return from the nearest enclosing
+scope**. That scope may be a function body, a `:: …` scoped expression, a
+match-arm body, or a CLI entry point — the rule is the same in all four.
+There is no distinct "match-default arrow" or "method shorthand"
+reading.
 
 ## 1.7 Punctuation
 

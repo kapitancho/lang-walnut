@@ -680,7 +680,7 @@ Integer->square(Null => Integer<0..>)
 
 **`clamp`** - Clamp an integer to a range defined by min and/or max
 ```walnut
-Integer->clamp([min: OptionalKey<Integer|Real>, max: OptionalKey<Integer|Real>] => Integer|Real|Result<Integer|Real, InvalidIntegerRange|InvalidRealRange>)
+Integer->clamp([min: Optional<Integer|Real>, max: Optional<Integer|Real>] => Integer|Real|Result<Integer|Real, InvalidIntegerRange|InvalidRealRange>)
 
 5->clamp[min: 1, max: 10];   /* 5 */
 15->clamp[min: 1, max: 10];  /* 10 */
@@ -2935,9 +2935,9 @@ Type<Tuple|Record>->restType(Null => Type)
 `[Integer, String, ... Real]->restType;  /* `Real */
 ```
 
-**`valueType`** - Returns the value type of Open, Sealed, Data, Mutable, or OptionalKey types
+**`valueType`** - Returns the value type of Open, Sealed, Data, Mutable, or Optional types
 ```walnut
-Type<Open|Sealed|Data|Mutable|OptionalKey>->valueType(Null => Type)
+Type<Open|Sealed|Data|Mutable|Optional>->valueType(Null => Type)
 
 `Mutable<Integer>->valueType;  /* `Integer */
 ```
@@ -3118,9 +3118,9 @@ Type<Tuple|Record>->withRestType(Type => Type<Tuple|Record>)
 `[Integer, String]->withRestType(`Real);  /* `[Integer, String, ... Real] */
 ```
 
-**`withValueType`** - Returns a new Mutable or OptionalKey type with the specified value type
+**`withValueType`** - Returns a new Mutable or Optional type with the specified value type
 ```walnut
-Type<Mutable|OptionalKey>->withValueType(Type => Type<Mutable|OptionalKey>)
+Type<Mutable|Optional>->withValueType(Type => Type<Mutable|Optional>)
 
 `Mutable<Any>->withValueType(`Integer);  /* `Mutable<Integer> */
 ```

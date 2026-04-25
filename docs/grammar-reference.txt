@@ -274,9 +274,12 @@ MethodCall ::= Expression MethodOp MethodName MethodArgs?
 
 ErrorAsExternalCall ::= Expression '*' '>' '(' Expression ')'
 
-MethodOp ::= '-' '>'   // Regular method call
-           | '=' '>'   // noError method call
-           | '|' '>'   // noExternalError method call
+MethodOp ::= '-' '>'   // Method call (only operator)
+
+// Note: error propagation on a method call is done with the postfix
+// operators '?' and '*?' (see Postfix Operators below):
+//   x->method?      // propagate any error
+//   x->method*?     // propagate only external errors
 
 MethodArgs ::= '(' Expression ')'
              | TupleExpression
@@ -341,10 +344,10 @@ Examples:
   x->method                            // Method call no params
   x->method(y)                         // Method with param
   x->method[a, b]                      // Method with tuple param
-  x=>method                            // noError method call
-  x=>method[a, b]                      // noError with tuple
-  x|>method                            // noExternalError
-  x|>method[a, b]                      // noExternalError with tuple
+  x->method?                           // method call, propagate any error
+  x->method[a, b]?                     // method with tuple, propagate any error
+  x->method*?                          // method call, propagate external errors only
+  x->method[a, b]*?                    // method with tuple, propagate external errors only
   x.y                                  // Property access
   x.0                                  // Tuple index
   x.'name'                             // Property with string
@@ -422,9 +425,12 @@ Note: Binary and unary operations are converted to method calls during parsing.
   a + b  becomes  a->binaryPlus(b)
   -a     becomes  a->unaryMinus()
 
-The operators '=>' and '|>' are special method call operators (see MethodCall).
-The operator '*>' is for errorAsExternal:
-  a *> (expr)  becomes  ?noError(a->errorAsExternal(expr))
+The operator '*>' is for errorAsExternal followed by error propagation:
+  a *> (expr)  becomes  (a->errorAsExternal(expr))?
+
+Postfix operators on any expression (composable with method calls):
+  expr?    propagate if expr is an error; otherwise the expression is the value.
+  expr*?   propagate only if expr is an external error.
 
 ================================================================================
 ## TYPE SYSTEM
@@ -476,7 +482,7 @@ GenericType ::= 'Type' '<' TypeExpr '>'
               | 'Error' '<' TypeExpr '>'
               | 'Mutable' '<' TypeExpr '>'
               | 'Shape' '<' TypeExpr '>'
-              | 'OptionalKey' '<' TypeExpr '>'
+              | 'Optional' '<' TypeExpr '>'
 
 ConstrainedType ::= 'Integer' '<' IntegerConstraint '>'
                   | 'Integer' '[' IntegerSubset ']'
@@ -546,7 +552,7 @@ Examples:
   [Integer, String]                                // Tuple type
   [Integer, String, ...]                           // Tuple with rest
   [id: Integer, name: String]                      // Record type
-  [id: Integer, name?: String]                     // Record with optional key (?T = OptionalKey<T>)
+  [id: Integer, name?: String]                     // Record with optional key (?T = Optional<T>)
   [id: Integer, name: String, ...]                 // Record with rest
   Array                                            // Array (item type Any, no length limit)
   Array<Product>                                   // Array of Product, no length limit
@@ -564,7 +570,7 @@ Examples:
   Result<Integer, String>                          // Result type
   Error<String>                                    // Error type
   Mutable<Integer>                                 // Mutable type
-  OptionalKey<String>                              // Optional key type
+  Optional<String>                                 // Optional value type (?String is the shorthand)
   ^Integer => String                               // Function type
   ^=> String                                       // Function with no param
   Integer | Null                                   // Union type
@@ -596,15 +602,18 @@ Examples:
    - var{~a, ~b} = record (record-style inferred)
    - var{a: x, b: y} = record (record-style explicit)
 
-5. OPTIONAL KEY in record types:
-   - Syntax: fieldName?: TypeExpr
-   - Example: [a: Integer, b?: String]
-   - ?T is short for OptionalKey<T>
-   - This is NOT TypeExpr? (which doesn't exist)
+5. OPTIONAL VALUES (uniform):
+   - ?T is short for Optional<T> in every position.
+   - In record fields: name?: T  ⇔  name: ?T  ⇔  name: Optional<T>;
+     the key may be absent.
+   - In other positions (parameter types, return types, generic args):
+     ?T means "T or empty".
 
-6. METHOD CALL OPERATORS:
-   - Three operators: ->, =>, |>
-   - Four argument styles: (), tuple, set, record
+6. METHOD CALL OPERATOR:
+   - One operator: ->
+   - Argument styles: (), tuple, set, record
+   - Error propagation is via the postfix operators ? and *? (see
+     Postfix Operators).
 
 7. TYPE VALUE:
    - type{T}, type[T1, T2], type[a: T1], `T
@@ -617,7 +626,7 @@ Examples:
    - Pattern is Expression (can be type literals, type tuples, etc.)
 
 10. GENERIC TYPES:
-    - Type<T>, Result<T, E>, Error<E>, Mutable<T>, OptionalKey<T>
+    - Type<T>, Result<T, E>, Error<E>, Mutable<T>, Optional<T>
 
 11. SUBSET CONSTRAINTS:
     - Integer[2, 4, 10] (not Integer<2, 4, 10>)

@@ -1185,39 +1185,36 @@ processValue = ^x: Integer => String :: {
 
 ### Error Returns
 
-#### `?noError` - Return on Any Error
+#### Postfix `?` — Return on Any Error
 
 ```walnut
-?noError(expression)
+expression?
 ```
 
-If the expression is an error, return it immediately:
+If the expression is an error, return it immediately from the enclosing
+function; otherwise the expression evaluates to the unwrapped value.
 
 ```walnut
 process = ^input => Result<Output, Error> :: {
-    validated = validate(input);
-    ?noError(validated);                /* Return if error */
-
-    transformed = transform(validated);
-    ?noError(transformed);              /* Return if error */
-
+    validated = validate(input)?;       /* Return if error */
+    transformed = transform(validated)?;/* Return if error */
     save(transformed)
 };
 ```
 
-#### `?noExternalError` - Return on External Error
+#### Postfix `*?` — Return on External Error
 
 ```walnut
-?noExternalError(expression)
+expression*?
 ```
 
-If the expression is an `ExternalError`, return it immediately:
+If the expression is an `ExternalError`, return it immediately from the
+enclosing function; otherwise the expression evaluates to the value (which
+may still be a non-external error).
 
 ```walnut
 process = ^input => Impure<Output> :: {
-    data = fetchData();
-    ?noExternalError(data);             /* Return if external error */
-
+    data = fetchData()*?;               /* Return if external error */
     process(data)
 };
 ```
@@ -1225,11 +1222,11 @@ process = ^input => Impure<Output> :: {
 ### Examples
 
 ```walnut
-/* From demo-all.nut */
+/* From demo-all.nut, updated style */
 getAllExpressions = ^Any => Any :: [
     return: ?when(0) { => 'return' },
-    noError: ?noError('no error'),
-    noExternalError: ?noExternalError('no external error')
+    noError: 'no error'?,
+    noExternalError: 'no external error'*?
 ];
 ```
 
@@ -1359,8 +1356,8 @@ getAllExpressions = ^Any => Any :: [
 
     /* Early returns */
     return: ?when(0) { => 'return' },
-    noError: ?noError('no error'),
-    noExternalError: ?noExternalError('no external error'),
+    noError: 'no error'?,
+    noExternalError: 'no external error'*?,
 
     /* Variable assignment */
     variableAssignment: variableName = 'variable assignment',
@@ -1398,14 +1395,10 @@ getAllExpressions = ^Any => Any :: [
 ### 1. Use Sequence Expressions for Multi-Step Logic
 
 ```walnut
-/* Good - clear sequence */
+/* Good - clear sequence using postfix ? for early-return */
 processOrder = ^order: Order => Result<Receipt, Error> :: {
-    validated = validateOrder(order);
-    ?noError(validated);
-
-    processed = processPayment(validated);
-    ?noError(processed);
-
+    validated = validateOrder(order)?;
+    processed = processPayment(validated)?;
     generateReceipt(processed)
 };
 ```

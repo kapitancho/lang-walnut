@@ -77,7 +77,12 @@ Error values are created using the `@` operator.
 
 ### 11.2.1 The => Operator
 
-The `=>` operator causes an immediate return from the current function or scoped expression.
+The `=>` operator causes an **unconditional early return from the nearest
+enclosing scope**. The same rule applies in all four positions where it
+appears: a function body, a scoped expression `:: …`, a match-arm body, or
+the module CLI entry point. There is no separate "match-default arrow" or
+"method-call shorthand" reading — only this one rule, plus its other use
+as the function-return-type separator (`^P => R`).
 
 **Syntax:** `=> returnValue`
 
@@ -529,7 +534,7 @@ port = parsePort(configValue) ?? 8080;
 doubled = (getValue() ?? 0)->asString;
 ```
 
-The `??` operator is particularly useful in expressions where you want to provide a default value without using `?whenIsError` or `?noError`.
+The `??` operator is particularly useful in expressions where you want to provide a default value without using `?whenIsError` or the postfix `?` early-return operator.
 
 ### 11.9.5 Custom Error Handling: ifError
 

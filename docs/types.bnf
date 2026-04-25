@@ -111,7 +111,7 @@
 <RecordTypeItem> ::= <FieldName> ":" <RecordFieldTypeExpr>
 <RecordFieldTypeExpr> ::= <TypeExpr>
                    | "?"? <TypeExpr>
-                   | "OptionalKey" "<" <TypeExpr> ">"
+                   | "Optional" "<" <TypeExpr> ">"
 
 <IntegerConstraint> ::= <IntegerRangeConstraint>
                       | <IntegerIntervalList>

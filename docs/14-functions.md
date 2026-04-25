@@ -76,12 +76,16 @@ When a function takes no input (parameter type is `Null`):
 /* Long form */
 ^Null => ReturnType :: body
 
-/* Short form (omit Null) */
-^=> ReturnType :: body
+/* Short form (omit Null). Canonical spelling uses a space: `^ =>` */
+^ => ReturnType :: body
 
 /* Example */
-getTimestamp = ^=> Integer :: 1234567890;
+getTimestamp = ^ => Integer :: 1234567890;
 ```
+
+The spaceless `^=>` is also accepted by the parser, but `^ =>` is the
+recommended form because the spaceless variant is visually noisy and
+easy to misread.
 
 ## Function Types
 

@@ -393,9 +393,14 @@ Cast functions define conversions between types. They are called using the `->as
 
 **With dependencies:** `FromType ==> ToType %% DepType :: body`
 
-**With error handling:** `FromType ==> ToType @ ErrorType :: body`
+**With error handling:** `FromType ==> ToType @@ ErrorType :: body`
 
-**Full form:** `FromType ==> ToType @ ErrorType %% DepType :: body`
+**Full form:** `FromType ==> ToType @@ ErrorType %% DepType :: body`
+
+> When `FromType` is omitted (`==> ToType :: body`), the cast is a
+> **dependency-container provider**: it is shorthand for
+> `DependencyContainer ==> ToType :: body`. See
+> [Dependency Injection](24-dependency-injection.md).
 
 ### Syntactic Sugar
 

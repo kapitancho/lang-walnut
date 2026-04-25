@@ -171,7 +171,9 @@ y = false;                 /* Type: False */
 
 ### Null
 
-A special atom type with a single value `null`.
+A special atom type with a single value `null`. Models JSON-`null` (so it
+appears in `JsonValue`) and serves as the implicit "no argument" value
+passed to a parameterless call.
 
 **Type:** `Null`
 
@@ -179,10 +181,40 @@ A special atom type with a single value `null`.
 
 **Examples:**
 ```walnut
-empty = null;
 optional = null;  /* Type: Null (can be assigned to Integer|Null) */
 
-x = null;                  /* Type: Null */
+x = null;         /* Type: Null */
+```
+
+### Empty
+
+A special type whose only value is `empty`. Models the **absence of a
+value** — distinct from `null`, which is itself a value (JSON-null, "no
+argument").
+
+**Type:** `Empty`
+
+**Value:** `empty`
+
+`Empty` is the only Walnut type that sits **outside** `Any`. It is a
+subtype of every `Optional<T>`, and so `?T` (= `Optional<T>` = `T | Empty`)
+is the canonical "this may or may not be present" type.
+
+#### `null` vs `empty` — choosing between them
+
+|                | `null : Null`            | `empty : Empty`                 |
+| -------------- | ------------------------ | ------------------------------- |
+| Inside `Any`?  | yes (a regular value)    | no (sits outside `Any`)         |
+| Use it for     | JSON-null, "no argument" | absence in `?T` / `Optional<T>` |
+| Subtype of     | `Any`, `Null|…`          | every `Optional<T>`             |
+| Found in       | `JsonValue`, `^=> R`     | record fields with `?T`         |
+
+The two work together cleanly in record types:
+
+```walnut
+[a: Empty,    /* the key 'a' MUST NOT be present                  */
+ b: ?T,       /* the key 'b' may be present-of-type-T or be empty */
+ c: T]        /* the key 'c' MUST be present, of type T            */
 ```
 
 ## Subset Types
@@ -404,9 +436,10 @@ flexible = [id: 1, data: 'misc', count: 5];
 ```
 
 **Optional keys:**
-- `?T` is shorthand for `OptionalKey<T>`
-- Can only be used in record type definitions
-- Optional keys may be missing from record values
+- `?T` in a record field is shorthand for `Optional<T>`. The field's
+  value type is `T | Empty`; the key itself may also be absent.
+- Optional keys may be missing from record values, and a present-but-empty
+  field is also valid.
 
 **Subtyping:**
 - `[a: Integer, b: Real, z: Boolean]` is a subtype of `[z: Boolean, ... Real]`
@@ -625,6 +658,22 @@ A value `v` of type `V` is compatible with `Shape<T>` if:
 - Provides duck-typing capabilities in a strongly-typed system
 - Enables polymorphic behavior across different types
 - The `->shape(typeValue)` method extracts the shaped value
+
+### `->as`, `->shape`, `->isOfType` — choosing between them
+
+Three related methods take a type value `` `T `` and answer different
+questions about a value:
+
+| Want                                                       | Use                  | Returns                          |
+| ---------------------------------------------------------- | -------------------- | -------------------------------- |
+| A boolean check ("does this value satisfy `T`?")           | `value->isOfType(\`T)` | `Boolean`                        |
+| A typed value, error if the type does not match           | `value->as(\`T)`       | `T` *or* `@CastNotAvailable`     |
+| A value reached through a structural / shape cast          | `value->shape(\`T)`    | `T` *or* `@CastNotAvailable`     |
+
+`->as` follows the type hierarchy and any defined cast methods.
+`->shape` additionally accepts data types whose underlying value matches
+`T`, and any value that has a no-error cast `V ==> T`. `->isOfType` is the
+boolean predicate without unwrapping.
 
 ## Type Operators
 

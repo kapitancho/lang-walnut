@@ -317,8 +317,8 @@ Records have record types that capture the type of each field:
 /* Closed record type - exactly these fields */
 Rec1 = [a: Integer, b: String, c: Boolean];
 
-/* Record with optional fields */
-Rec2 = [a: Integer, b: OptionalKey<String>, c: OptionalKey];
+/* Record with optional fields (?T = Optional<T>) */
+Rec2 = [a: Integer, b: ?String, c: ?Any];
 
 /* Open record type - at least field 'a', rest are Real */
 Rec3 = [a: Integer, ... Real];
@@ -780,8 +780,8 @@ myFn = ^String => Result<Integer, NotANumber> :: {
 
 **Error handling:**
 ```walnut
-/* Early return on error */
-result = someValue=>methodThatMayFail;  /* Returns early if error */
+/* Early return on error (postfix ?) */
+result = someValue->methodThatMayFail?;  /* Returns early if error */
 
 /* Check if error */
 ?whenIsError(result) {

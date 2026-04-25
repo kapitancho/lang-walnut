@@ -91,4 +91,4 @@
 <RecordTypeItem> ::= <PropertyName> <WS>* ":" <WS>* <RecordFieldTypeExpr>
 <RecordFieldTypeExpr> ::= <TypeExpr>
                    | "?"? <WS>* <TypeExpr>
-                   | "OptionalKey" <WS>* "<" <WS>* <TypeExpr> <WS>* ">"
+                   | "Optional" <WS>* "<" <WS>* <TypeExpr> <WS>* ">"

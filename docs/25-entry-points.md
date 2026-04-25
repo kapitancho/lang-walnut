@@ -148,8 +148,8 @@ module demo-cli:
 
 => {
     calc = ^Array<String> => Result<Integer, Any> ::
-        ?noError(?noError(#->item(0))->asInteger) +
-        ?noError(?noError(#->item(1))->asInteger);
+        #->item(0)?->asInteger? +
+        #->item(1)?->asInteger?;
 
     s = calc(args);
     ?whenTypeOf(s) {
@@ -610,7 +610,7 @@ module safe-api %% $http/message:
 ApiHandler := ();
 ApiHandler ==> HttpRequestHandler %% [~HttpResponseBuilder, ~Database] ::
     ^request: {HttpRequest} => {HttpResponse} :: {
-        userId = ?noError(request.target->asInteger);
+        userId = request.target->asInteger?;
         ?whenIsError(userId) {
             %httpResponseBuilder(400)->withBody('Invalid user ID')
         } ~ {

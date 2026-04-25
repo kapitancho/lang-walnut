@@ -237,9 +237,14 @@ Walnut builds a dependency graph at compile time:
 
 ### Provider Cast Functions
 
-Dependencies are provided through special cast functions:
+Dependencies are provided through cast functions whose source type is
+`DependencyContainer`. The leading `DependencyContainer` may be omitted —
+`==> TypeName :: value` is **shorthand** for
+`DependencyContainer ==> TypeName :: value`. Both forms are equivalent;
+all DI bindings are simply casts from `DependencyContainer` to the
+provided type.
 
-**Basic syntax:** `==> TypeName :: value`
+**Shorthand syntax:** `==> TypeName :: value`
 
 **Full form:** `DependencyContainer ==> TypeName :: value`
 

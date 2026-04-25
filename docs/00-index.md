@@ -236,4 +236,4 @@ getDiscount = ^price: Real<0..> => Real<0..> :: ?when(price > 100) {
 
 - [GitHub Repository](https://github.com/kapitancho/walnut-lang)
 - [Tutorial](../01-introduction.md)
-- [Example Programs](../../walnut-src/)
+- [Example Programs](../almond/walnut-src/)

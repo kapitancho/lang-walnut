@@ -703,22 +703,24 @@ user2 = [name: 'Bob', age: 25, email: null, phone: null];                       
 user3 = [name: 'Charlie', age: 35, email: 'charlie@example.com', phone: '555-1234'];/* Type: User */
 ```
 
-### 26.4.4 OptionalKey Type
+### 26.4.4 Optional Fields
 
-The `OptionalKey<T>` type (short syntax: `?T`) represents record fields that may or may not be present.
+A record field whose type is `?T` (= `Optional<T>` = `T | Empty`) may be
+absent from the record, or present with the value `empty`.
 
 **Key characteristics:**
-- Fields with `OptionalKey<T>` may be missing from the record
-- Accessing such fields returns `Result<T, MapItemNotFound>`
-- The short syntax `?T` is equivalent to `OptionalKey<T>`
+- Fields with `?T` may be missing from the record.
+- Accessing such fields returns `Result<T, MapItemNotFound>` when the
+  key is missing, or the value (which may be `empty`) when the key is
+  present.
 
 **Syntax:**
 ```walnut
-/* Long form */
-Record = [field: OptionalKey<Type>, ...];
-
-/* Short form (preferred) */
+/* `?T` is shorthand for `Optional<T>` in every position. */
 Record = [field: ?Type, ...];
+
+/* Long form */
+Record = [field: Optional<Type>, ...];
 ```
 
 **Examples:**
@@ -770,7 +772,7 @@ email2 = user2.email;  /* Result<String, MapItemNotFound> containing MapItemNotF
 
 **Subtyping relationships:**
 ```walnut
-/* For any type T: T <: OptionalKey<T> */
+/* For any type T: T <: Optional<T> */
 /* This means a required field is compatible with an optional field */
 RequiredField = [name: String];
 OptionalField = [name: ?String];
@@ -778,7 +780,7 @@ OptionalField = [name: ?String];
 /* RequiredField is a subtype of OptionalField */
 isSubtype = type{RequiredField}->isSubtypeOf(type{OptionalField});  /* true */
 
-/* If T <: R, then OptionalKey<T> <: OptionalKey<R> */
+/* If T <: R, then Optional<T> <: Optional<R> */
 /* This preserves type relationships */
 type{?Integer<1..10>}->isSubtypeOf(type{?Integer});  /* true */
 ```
@@ -818,7 +820,7 @@ getContactMethods = ^User => Array<String> :: {
 
 **Optional fields vs Null:**
 ```walnut
-/* OptionalKey<T> - field may be missing */
+/* ?T (= Optional<T>) - field may be missing */
 User1 = [name: String, email: ?String];
 user1 = [name: 'Alice'];                    /* email field is missing */
 email1 = user1.email;                        /* MapItemNotFound */
@@ -846,7 +848,7 @@ user = [
 ];  /* Type: ExtensibleUser */
 ```
 
-**Type aliases with OptionalKey:**
+**Type aliases with Optional fields:**
 ```walnut
 /* Define reusable optional field types */
 OptionalEmail = ?String<5..254>;

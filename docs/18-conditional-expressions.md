@@ -568,121 +568,72 @@ x: Result<String, SomeError> = ...;
 - **With else branch**: Union of `thenExpr` type and `elseExpr` type
 - **Without else branch**: Union of `thenExpr` type and refined (non-error) `expr` type
 
-## `?noError` - Early Return on Error
+## Postfix `?` — Early Return on Error
 
-The `?noError` expression checks if an expression is an error and immediately returns from the containing function if it is.
-
-### Syntax
+Error propagation is done with the **postfix** operator `?`, not with a
+`?noError(…)` keyword (which no longer exists):
 
 ```walnut
-?noError(expr)
+/* Propagate error if any, otherwise unwrap */
+result = x->sqrt?;
+
+/* Compose with chained method calls */
+DateAndTime[Date[$.0, $.1, $.2]?, Time[$.3, $.4, $.5]?]
 ```
 
 ### Behavior
 
-1. `expr` is evaluated
-2. If the result is of type `Error`, it is immediately returned from the containing function
-3. Otherwise, the expression evaluates to the non-error result
-
-### Examples
-
-```walnut
-/* Basic usage */
-?noError(x->sqrt);
-
-/* From demo-all.nut */
-noError: ?noError('no error')
-
-/* From datetime.nut */
-DateAndTime[?noError(Date[$.0, $.1, $.2]), ?noError(Time[$.3, $.4, $.5])]
-```
+1. `expr?` evaluates `expr`.
+2. If the result is of type `Error`, it is immediately returned from the
+   containing function.
+3. Otherwise, the expression evaluates to the non-error value.
 
 ### Type Refinement
 
 When `expr` is of type `Result<T, E>`:
-- The resulting expression type is refined to `T`
-- The function return type must declare that it can return `Error<E>`
+- The resulting expression type is refined to `T`.
+- The containing function's declared return type must include `Error<E>`.
 
 ```walnut
-/* Function example */
 calculateDistance = ^x: Real => Result<Real, NotANumber> :: {
-    sqrt = ?noError(x->sqrt);  /* sqrt is refined to Real */
+    sqrt = x->sqrt?;     /* sqrt is refined to Real */
     sqrt * 2
 };
 ```
 
-### Shorthand Method Call Syntax
+## Postfix `*?` — Early Return on External Error
 
-The `=>` operator is shorthand for calling a method and wrapping it in `?noError`:
-
-```walnut
-/* These are equivalent: */
-result = ?noError(object->method)
-result = object=>method
-```
-
-### Use Cases
-
-- Simplifying error propagation in functions
-- Early exit on validation failures
-- Chaining operations that may fail
-
-## `?noExternalError` - Early Return on External Error
-
-The `?noExternalError` expression checks if an expression is an `Error` with a value of type `ExternalError` and immediately returns from the containing function if it is.
-
-### Syntax
+`*?` is the external-error counterpart of `?`. It propagates only when the
+expression is an `ExternalError`; other errors are left as-is.
 
 ```walnut
-?noExternalError(expr)
+/* Propagate external errors, leave domain errors as-is */
+content = file->read*?;
 ```
 
 ### Behavior
 
-1. `expr` is evaluated
-2. If the result is of type `Error` AND the error value is of type `ExternalError`, it is immediately returned from the containing function
-3. Otherwise, the expression evaluates to the result (which may still be an error of another type)
-
-### Examples
-
-```walnut
-/* Basic usage */
-?noExternalError(dbQuery->execute);
-
-/* From demo-all.nut */
-noExternalError: ?noExternalError('no external error')
-```
+1. `expr*?` evaluates `expr`.
+2. If the result is an `Error<ExternalError>`, it is immediately returned
+   from the containing function.
+3. Otherwise, the expression evaluates to `expr` (which may still be a
+   non-external error).
 
 ### Type Refinement
 
 When `expr` is of type `Result<T, E|ExternalError>`:
-- The resulting expression type is refined to `Result<T, E>`
-- The function return type must declare that it can return `Error<ExternalError>`
+- The resulting expression type is refined to `Result<T, E>`.
+- The containing function's declared return type must include
+  `Error<ExternalError>`.
 
-### Shorthand Type Syntax
-
-The type `Result<T, ExternalError>` can be written using shorthand:
-- `Impure<T>` - Long form
-- `*T` - Short form
-
-This also works for result types containing other error types:
-- `Result<T, E|ExternalError>` = `Impure<Result<T, E>>` = `*Result<T, E>`
-
-### Shorthand Method Call Syntax
-
-The `|>` operator is shorthand for calling a method and wrapping it in `?noExternalError`:
-
-```walnut
-/* These are equivalent: */
-result = ?noExternalError(object->method)
-result = object|>method
-```
+The type `Result<T, ExternalError>` can be written as `Impure<T>` or `*T`.
 
 ### Use Cases
 
-- Separating external errors (I/O, network, database) from domain errors
-- Allowing external errors to propagate while handling domain errors locally
-- Working with impure operations that may fail due to external factors
+- Separating external errors (I/O, network, database) from domain errors.
+- Allowing external errors to propagate while handling domain errors
+  locally.
+- Working with impure operations that may fail due to external factors.
 
 ## Exhaustiveness Checking
 
@@ -796,12 +747,12 @@ x: Result<String, SomeError> = ...;
    - Transforming errors to values
    - Conditional error processing
 
-6. **Use `?noError`** for:
+6. **Use postfix `?`** for:
    - Propagating errors up the call stack
    - Simplifying error handling chains
    - Early exit on error
 
-7. **Use `?noExternalError`** for:
+7. **Use postfix `*?`** for:
    - Separating external from domain errors
    - Working with impure operations
    - Database, file, or network operations
@@ -867,17 +818,17 @@ result = ?whenIsError(operation()) {
     operation()->transform
 };
 
-/* Pattern 2: Early return on error */
+/* Pattern 2: Early return on error (postfix ?) */
 calculate = ^x: Real => Result<Real, Error> :: {
-    validated = ?noError(x->validate);
-    processed = ?noError(validated->process);
+    validated = x->validate?;
+    processed = validated->process?;
     processed->format
 };
 
-/* Pattern 3: Separate external errors */
+/* Pattern 3: Separate external errors (postfix *?) */
 queryDb = ^id: Integer => *Result<User, NotFound> :: {
-    connection = ?noExternalError(db->connect);
-    result = ?noExternalError(connection->query(id));
+    connection = db->connect*?;
+    result = connection->query(id)*?;
     ?whenIsError(result) {
         @NotFound
     } ~ {
@@ -924,7 +875,7 @@ Walnut's conditional expressions provide powerful pattern matching and control f
 - **`?whenTypeOf`** - Type matching with sophisticated refinement
 - **`?whenIsTrue`** - Multiple boolean condition evaluation
 - **`?whenIsError`** - Error-specific conditional handling
-- **`?noError`** - Early return error propagation
-- **`?noExternalError`** - External error separation
+- **postfix `?`** - Early return on any error
+- **postfix `*?`** - Early return on external error only
 
 All conditional expressions support type refinement where applicable, enabling type-safe operations within branches. Exhaustiveness checking ensures all cases are handled, and the compiler uses this information to refine return types accurately.
