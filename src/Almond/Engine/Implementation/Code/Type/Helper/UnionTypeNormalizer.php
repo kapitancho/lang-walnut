@@ -14,15 +14,26 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\EnumerationValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\EnumerationValueName;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\IntegerSubsetType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\IntegerType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\ProxyNamedType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\RealSubsetType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\RealType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\StringSubsetType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\UnionType;
 
 final readonly class UnionTypeNormalizer {
-    public function __construct(
+	use BaseType;
+
+	private bool $expandProxy;
+
+	public function __construct(
 		private TypeRegistry $typeRegistry,
-    ) {}
+	) {
+		$this->expandProxy = true;
+	}
+
+	public function withoutProxyExpand(): self {
+		return clone($this, ['expandProxy' => false]);
+	}
 
 	/** @return list<Type> */
     public function flatten(Type ... $types): array {
@@ -49,7 +60,12 @@ final readonly class UnionTypeNormalizer {
 	 */
     private function parseTypes(array $types): array {
         $queue = [];
+		$skipQueue = [];
         foreach ($types as $type) {
+			if (!$this->expandProxy && $type instanceof ProxyNamedType) {
+				$skipQueue[] = $type;
+				continue;
+			}
             $xType = $type;
             while ($xType instanceof AliasType) {
                 $xType = $xType->aliasedType;
@@ -57,6 +73,7 @@ final readonly class UnionTypeNormalizer {
             $pTypes = $xType instanceof UnionTypeInterface ?
                 $this->parseTypes($xType->types) : [$type];
             foreach ($pTypes as $tx) {
+
                 foreach ($queue as $qt) {
                     if ($tx->isSubtypeOf($qt)) {
                         continue 2;
@@ -153,6 +170,6 @@ final readonly class UnionTypeNormalizer {
                 $queue[] = $tx;
             }
         }
-        return $queue;
+        return array_merge($skipQueue, $queue);
     }
 }

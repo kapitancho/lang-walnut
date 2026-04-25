@@ -150,6 +150,13 @@ final readonly class ParserStateMachine {
 					$this->s->push(147);
 					$this->s->stay(4000);
 				},
+				T::arithmetic_op_plus->name => $c,
+				T::optional_key->name => $c,
+				T::error_marker->name => $c,
+				T::positive_integer_number->name => $c,
+				T::integer_number->name => $c,
+				T::real_number->name => $c,
+				T::string_value->name => $c,
 				T::arithmetic_op_multiply->name => $c,
 				T::type_keyword->name => $c,
 				T::sequence_start->name => $c, 
@@ -160,6 +167,13 @@ final readonly class ParserStateMachine {
 					$this->s->push(142);
 					$this->s->stay(4000);
 				},
+				T::arithmetic_op_plus->name => $c,
+				T::optional_key->name => $c,
+				T::error_marker->name => $c,
+				T::positive_integer_number->name => $c,
+				T::integer_number->name => $c,
+				T::real_number->name => $c,
+				T::string_value->name => $c,
 				T::arithmetic_op_multiply->name => $c,
 				T::type_keyword->name => $c,
 				T::sequence_start->name => $c, 
@@ -170,6 +184,13 @@ final readonly class ParserStateMachine {
 					$this->s->push(139);
 					$this->s->stay(4000);
 				},
+				T::arithmetic_op_plus->name => $c,
+				T::optional_key->name => $c,
+				T::error_marker->name => $c,
+				T::positive_integer_number->name => $c,
+				T::integer_number->name => $c,
+				T::real_number->name => $c,
+				T::string_value->name => $c,
 				T::error_marker->name => $c,
 				T::arithmetic_op_plus->name => $c,
 				T::optional_key->name => $c,

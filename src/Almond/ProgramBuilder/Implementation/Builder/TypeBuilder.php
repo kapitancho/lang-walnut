@@ -67,7 +67,7 @@ use Walnut\Lang\Almond\ProgramBuilder\Blueprint\CodeMapper;
 
 final readonly class TypeBuilder implements TypeCompilerInterface {
 	public function __construct(
-		private NameBuilder        $nameBuilder,
+		private NameBuilder $nameBuilder,
 		private TypeRegistry $typeRegistry,
 		private CodeMapper $codeMapper,
 	) {}
@@ -87,11 +87,11 @@ final readonly class TypeBuilder implements TypeCompilerInterface {
 				$typeNode instanceof UnionTypeNode => $this->typeRegistry->union([
 					$this->type($typeNode->left),
 					$this->type($typeNode->right)
-				]),
+				], false),
 				$typeNode instanceof IntersectionTypeNode => $this->typeRegistry->intersection([
 					$this->type($typeNode->left),
 					$this->type($typeNode->right)
-				]),
+				], false),
 
 				$typeNode instanceof ArrayTypeNode => $this->typeRegistry->array(
 					$this->type($typeNode->itemType),

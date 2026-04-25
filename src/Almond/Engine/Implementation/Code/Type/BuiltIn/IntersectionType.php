@@ -41,7 +41,7 @@ final readonly class IntersectionType implements SupertypeChecker, IntersectionT
 	}
 
 	public function isSupertypeOf(Type $ofType): bool {
-		return array_any($this->types, fn($type) => $ofType->isSubtypeOf($type));
+		return array_all($this->types, fn($type) => $ofType->isSubtypeOf($type));
 	}
 
 	public function __toString(): string {

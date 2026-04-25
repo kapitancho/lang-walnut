@@ -65,9 +65,9 @@ interface TypeRegistry extends TypeFinder {
 	public function proxy(TypeName $typeName): AliasType;
 
 	/** @param non-empty-list<Type> $types */
-	public function union(array $types): Type;
+	public function union(array $types, bool $expandProxy = true): Type;
 	/** @param non-empty-list<Type> $types */
-	public function intersection(array $types): Type;
+	public function intersection(array $types, bool $expandProxy = true): Type;
 
 
 	/** @throws InvalidLengthRange */

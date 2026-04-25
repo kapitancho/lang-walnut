@@ -21,6 +21,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberRange;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\IntegerSubsetType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\IntegerType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\IntersectionType;
+use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\ProxyNamedType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\RealSubsetType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\RealType;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\StringSubsetType;
@@ -28,9 +29,17 @@ use Walnut\Lang\Almond\Engine\Implementation\Code\Type\BuiltIn\StringSubsetType;
 final readonly class IntersectionTypeNormalizer {
 	use BaseType;
 
-    public function __construct(
+	private bool $expandProxy;
+
+	public function __construct(
 		private TypeRegistry $typeRegistry,
-    ) {}
+	) {
+		$this->expandProxy = true;
+	}
+
+	public function withoutProxyExpand(): self {
+		return clone($this, ['expandProxy' => false]);
+	}
 
 	/** @return list<Type> */
     public function flatten(Type ... $types): array {
@@ -57,7 +66,13 @@ final readonly class IntersectionTypeNormalizer {
 	 */
     private function parseTypes(array $types): array {
         $queue = [];
+	    $skipQueue = [];
         foreach ($types as $type) {
+	        if (!$this->expandProxy && $type instanceof ProxyNamedType) {
+		        $skipQueue[] = $type;
+		        continue;
+	        }
+
             $xType = $this->toBaseType($type);
             $pTypes = $xType instanceof IntersectionTypeInterface ?
                 $this->parseTypes($xType->types) : [$type];
@@ -222,7 +237,7 @@ final readonly class IntersectionTypeNormalizer {
                 $queue[] = $tx;
             }
         }
-        return $queue;
+	    return array_merge($skipQueue, $queue);
     }
 
 	private function intersectTupleWithTuple(TupleType $a, TupleType $b): Type {

@@ -179,22 +179,20 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 
 
 	/** @param list<Type> $types */
-	public function union(array $types, bool $normalize = true): Type {
+	public function union(array $types, bool $expandProxy = true): Type {
 		$types = $this->unionTypeNormalizer->flatten(... $types);
 		if (count($types) === 1 && $types[0] instanceof AliasTypeInterface) {
 			return $types[0];
 		}
-		if ($normalize) {
-			return $this->unionTypeNormalizer->normalize(... $types);
-		}
-		return new UnionType($this->unionTypeNormalizer, $types);
+		$n = $expandProxy ? $this->unionTypeNormalizer : $this->unionTypeNormalizer->withoutProxyExpand();
+		return $n->normalize(... $types);
 	}
 
 	/** @param list<Type> $types */
-	public function intersection(array $types): Type {
+	public function intersection(array $types, bool $expandProxy = true): Type {
 		$types = $this->intersectionTypeNormalizer->flatten(... $types);
-		return $this->intersectionTypeNormalizer->normalize(... $types);
-		//return new IntersectionType($this->intersectionTypeNormalizer, $types);
+		$n = $expandProxy ? $this->intersectionTypeNormalizer : $this->intersectionTypeNormalizer->withoutProxyExpand();
+		return $n->normalize(... $types);
 	}
 
 	/** @throws InvalidLengthRange */
