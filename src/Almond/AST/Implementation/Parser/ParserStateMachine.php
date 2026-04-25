@@ -2755,6 +2755,10 @@ final readonly class ParserStateMachine {
 					$this->s->push(609);
 					$this->s->stay(4000);
 				},
+				T::positive_integer_number->name => $c,
+				T::integer_number->name => $c,
+				T::real_number->name => $c,
+				T::string_value->name => $c,
 				T::type_proxy_keyword->name => $c,
 				T::type_keyword->name => $c,
 				T::sequence_start->name => $c,
@@ -3878,7 +3882,7 @@ final readonly class ParserStateMachine {
 					$this->s->generated = $this->nodeBuilder->type->tupleType([]);
 					$this->s->pop();
 				},
-				T::string_value->name => function(LT $token) {
+				T::string_value->name => function(LT $token) { // !TODO - this is problematic
 					$this->s->result['first_token'] = new LT(
 						$token->rule,
 						new PatternMatch(
@@ -3892,6 +3896,9 @@ final readonly class ParserStateMachine {
 					$this->s->result['first_token'] = $token;
 					$this->s->move(840);
 				},
+				T::positive_integer_number->name => $t,
+				T::integer_number->name => $t,
+				T::real_number->name => $t,
 				T::type_proxy_keyword->name => $t,
 				T::arithmetic_op_multiply->name => $t,
 				T::sequence_start->name => $t,
