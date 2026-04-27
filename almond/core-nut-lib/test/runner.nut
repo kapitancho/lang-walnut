@@ -4,8 +4,8 @@ TestResult := #[
     name: String,
     expected: Any,
     actual: ^ => Optional,
-    before: ?^ => Optional,
-    after: ?^ => Optional
+    before: Optional<^ => Optional>,
+    after: Optional<^ => Optional>
 ];
 
 TestCase = ^ => TestResult;

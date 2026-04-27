@@ -1472,10 +1472,7 @@ class ParserTest extends TestCase {
 		yield ['Optional', OptionalTypeNode::class, fn($t) => $t->valueType instanceOf AnyTypeNode];
 		yield ['\\Optional', OptionalTypeNode::class, fn($t) => $t->valueType instanceOf AnyTypeNode];
 		yield ['Optional<Boolean>', OptionalTypeNode::class, fn($t) => $t->valueType instanceOf BooleanTypeNode];
-		yield ['Impure', ImpureTypeNode::class, fn($t) => $t->valueType instanceOf AnyTypeNode];
-		yield ['\\Impure', ImpureTypeNode::class, fn($t) => $t->valueType instanceOf AnyTypeNode];
-		yield ['Impure<Boolean>', ImpureTypeNode::class, fn($t) => $t->valueType instanceOf BooleanTypeNode];
-		yield ['*Boolean', ImpureTypeNode::class, fn($t) => $t->valueType instanceOf BooleanTypeNode];
+		yield ['Boolean*', ImpureTypeNode::class, fn($t) => $t->valueType instanceOf BooleanTypeNode];
 		yield ['[]', TupleTypeNode::class, fn($t) => count($t->types) === 0 && $t->restType instanceOf NothingTypeNode];
 		yield ['[...]', TupleTypeNode::class, fn($t) => count($t->types) === 0 && $t->restType instanceOf AnyTypeNode];
 		yield ['[... Boolean]', TupleTypeNode::class, fn($t) => count($t->types) === 0 && $t->restType instanceOf BooleanTypeNode];
@@ -1544,14 +1541,14 @@ class ParserTest extends TestCase {
 		yield ['(Boolean&Null)|Type', UnionTypeNode::class, fn($t) => $t->left instanceof IntersectionTypeNode && $t->right instanceof TypeTypeNode &&
 			$t->left->left instanceof BooleanTypeNode && $t->left->right instanceof NullTypeNode];
 
-		yield ['^Boolean&*{Null}|Type=>^String=>Real', FunctionTypeNode::class, fn($t) =>
-			$t->parameterType instanceof UnionTypeNode &&
-			$t->parameterType->left instanceof IntersectionTypeNode &&
-			$t->parameterType->left->left instanceof BooleanTypeNode &&
-			$t->parameterType->left->right instanceof ImpureTypeNode &&
-			$t->parameterType->left->right->valueType instanceof ShapeTypeNode &&
-			$t->parameterType->left->right->valueType->refType instanceof NullTypeNode &&
-			$t->parameterType->right instanceof TypeTypeNode &&
+		yield ['^Boolean&{Null}|Type*=>^String=>Real', FunctionTypeNode::class, fn($t) =>
+			$t->parameterType instanceof ImpureTypeNode &&
+			$t->parameterType->valueType instanceof UnionTypeNode &&
+			$t->parameterType->valueType->left instanceof IntersectionTypeNode &&
+			$t->parameterType->valueType->left->left instanceof BooleanTypeNode &&
+			$t->parameterType->valueType->left->right instanceof ShapeTypeNode &&
+			$t->parameterType->valueType->left->right->refType instanceof NullTypeNode &&
+			$t->parameterType->valueType->right instanceof TypeTypeNode &&
 			$t->returnType instanceof FunctionTypeNode &&
 			$t->returnType->parameterType instanceof StringTypeNode &&
 			$t->returnType->returnType instanceof RealTypeNode

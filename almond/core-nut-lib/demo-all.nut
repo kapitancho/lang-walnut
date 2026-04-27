@@ -85,8 +85,8 @@ AllTypes = [
     error: Error,
     errorWithType: Error<String>,
 
-    impure: Impure,
-    impureWithType: Impure<Integer>,
+    impure: Any*,
+    impureWithType: Integer*,
 
     value: Value,
     valueWithType: Value<String>,

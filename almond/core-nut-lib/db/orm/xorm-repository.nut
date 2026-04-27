@@ -9,7 +9,7 @@ OxRepository[~Type, model: Type<Any>] @@ ExternalError  :: [
 EntryNotFound := [key: DatabaseValue];
 DuplicateEntry := [key: DatabaseValue];
 
-OxRepository->all(=> *Array) %% ~DatabaseConnector :: {
+OxRepository->all(=> Array*) %% ~DatabaseConnector :: {
     query = $ox->selectAllQuery /*'SELECT * FROM <table>'*/
         *> ('Failed to get query for orm model');
     {databaseConnector
@@ -19,7 +19,7 @@ OxRepository->all(=> *Array) %% ~DatabaseConnector :: {
         *> ('Failed to hydrate entries')
 };
 
-OxRepository->one(^v: DatabaseValue => *Result<Any, EntryNotFound>) %% ~DatabaseConnector :: {
+OxRepository->one(^v: DatabaseValue => Result<Any, EntryNotFound>*) %% ~DatabaseConnector :: {
     query = $ox->selectOneQuery /*'SELECT * FROM <table> WHERE id = ?'*/
         *> ('Failed to get query for orm model');
     entries = {databaseConnector
@@ -33,7 +33,7 @@ OxRepository->one(^v: DatabaseValue => *Result<Any, EntryNotFound>) %% ~Database
     }
 };
 
-OxRepository->insertOne(^v: {DatabaseQueryDataRow} => *Result<Null, DuplicateEntry>) %% ~DatabaseConnector :: {
+OxRepository->insertOne(^v: {DatabaseQueryDataRow} => Result<Null, DuplicateEntry>*) %% ~DatabaseConnector :: {
     v = v->shape(`DatabaseQueryDataRow);
     entryId = v->item($ox->keyField)->ifEmpty(^ => Error<ExternalError> :: (@null *> ('Failed to get entry key')))?;
     query = $ox->insertQuery
@@ -55,7 +55,7 @@ OxRepository->insertOne(^v: {DatabaseQueryDataRow} => *Result<Null, DuplicateEnt
     }
 };
 
-OxRepository->deleteOne(^v: DatabaseValue => *Result<Null, EntryNotFound>) %% ~DatabaseConnector :: {
+OxRepository->deleteOne(^v: DatabaseValue => Result<Null, EntryNotFound>*) %% ~DatabaseConnector :: {
     query = $ox->deleteQuery
         *> ('Failed to get query for orm model');
     result = databaseConnector->execute[query: query, boundParameters: [:]->withKeyValue[key: $ox->keyField, value: v]]
@@ -66,7 +66,7 @@ OxRepository->deleteOne(^v: DatabaseValue => *Result<Null, EntryNotFound>) %% ~D
     }
 };
 
-OxRepository->updateOne(^v: {DatabaseQueryDataRow} => *Result<Null, EntryNotFound>) %% [~DatabaseConnector] :: {
+OxRepository->updateOne(^v: {DatabaseQueryDataRow} => Result<Null, EntryNotFound>*) %% [~DatabaseConnector] :: {
     v = v->shape(`DatabaseQueryDataRow);
     entryId = v->item($ox->keyField)->ifEmpty(^ => Error<ExternalError> :: (@null *> ('Failed to get entry key')))?;
     query = $ox->updateQuery

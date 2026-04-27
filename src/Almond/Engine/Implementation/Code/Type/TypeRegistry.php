@@ -425,7 +425,6 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 			'Set' => $this->set(),
 			'Error' => $this->error($this->any),
 			'Value' => $this->value($this->any),
-			'Impure' => $this->impure($this->any),
 			'Mutable' => $this->mutable($this->any),
 			'Type' => $this->type($this->any),
 			'Empty' => $this->empty,

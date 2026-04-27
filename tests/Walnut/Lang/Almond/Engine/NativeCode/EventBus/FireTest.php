@@ -12,7 +12,7 @@ final class FireTest extends CodeExecutionTestHelper {
 			typeDeclarations: "
 				A := ();
 				B := ();
-				EventListener = ^Nothing => *Null;
+				EventListener = ^Nothing => Null*;
 				EventBus := $[listeners: Array<EventListener>];
 			",
 			valueDeclarations: "
@@ -33,13 +33,13 @@ final class FireTest extends CodeExecutionTestHelper {
 			typeDeclarations: "
 				A := ();
 				B := ();
-				EventListener = ^Nothing => *Null;
+				EventListener = ^Nothing => Null*;
 				EventBus := $[listeners: Array<EventListener>];
 			",
 			valueDeclarations: "
 				myCounter = mutable{Array<String>, []};
 				getEventBus = ^ => EventBus :: EventBus[listeners: [
-					^A => *Null :: { myCounter->PUSH('fn1'); {@'error'} *> ('An error occurred') },
+					^A => Null* :: { myCounter->PUSH('fn1'); {@'error'} *> ('An error occurred') },
 					^A|B => Null :: { myCounter->PUSH('fn2'); null },
 					^B => Null :: { myCounter->PUSH('fn3'); null }
 				]];

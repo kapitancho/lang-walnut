@@ -62,21 +62,21 @@ Ox->selectAllQuery(=> DatabaseSqlQuery) :: {
     ]->asDatabaseSqlQuery
 };
 Ox->selectOneQuery(=> DatabaseSqlQuery) :: {
-    {SelectQuery[
+    SelectQuery[
         tableName: $ormModel.table,
         fields: $fieldTypes->forSelect[$ormModel.table],
         joins: [],
         queryFilter: $ormModel->filterByKeyField,
         orderBy: null,
         limit: null
-    ]}->asDatabaseSqlQuery
+    ]->asDatabaseSqlQuery
 };
 Ox->insertQuery(=> DatabaseSqlQuery) ::
-    {InsertQuery[$ormModel.table, $fieldTypes->forWrite]}
-    ->asDatabaseSqlQuery;
+    InsertQuery[$ormModel.table, $fieldTypes->forWrite]
+        ->asDatabaseSqlQuery;
 Ox->updateQuery(=> DatabaseSqlQuery) ::
-    {UpdateQuery[$ormModel.table, $fieldTypes->forWrite, $ormModel->filterByKeyField]}
-    ->asDatabaseSqlQuery;
+    UpdateQuery[$ormModel.table, $fieldTypes->forWrite, $ormModel->filterByKeyField]
+        ->asDatabaseSqlQuery;
 Ox->deleteQuery(=> DatabaseSqlQuery) ::
-    {DeleteQuery[$ormModel.table, $ormModel->filterByKeyField]}
-    ->asDatabaseSqlQuery;
+    DeleteQuery[$ormModel.table, $ormModel->filterByKeyField]
+        ->asDatabaseSqlQuery;

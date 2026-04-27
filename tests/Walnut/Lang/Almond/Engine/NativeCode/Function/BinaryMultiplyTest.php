@@ -241,9 +241,9 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet(
 			"fnC('3');",
 			valueDeclarations: "
-				fn1 = ^s: String => *Integer :: s->asInteger *> ('invalid number');
+				fn1 = ^s: String => Integer* :: s->asInteger *> ('invalid number');
 				fn2 = ^i: Integer => Integer :: i + 2;
-				fnC = ^s: String => *Integer :: {fn1 * fn2}(s);
+				fnC = ^s: String => Integer* :: {fn1 * fn2}(s);
 			"
 		);
 		$this->assertEquals("5", $result);
@@ -253,9 +253,9 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet(
 			"fnC('three');",
 			valueDeclarations: "
-				fn1 = ^s: String => *Integer :: s->asInteger *> ('invalid number');
+				fn1 = ^s: String => Integer* :: s->asInteger *> ('invalid number');
 				fn2 = ^i: Integer => Integer :: i + 2;
-				fnC = ^s: String => *Integer :: {fn1 * fn2}(s);
+				fnC = ^s: String => Integer* :: {fn1 * fn2}(s);
 			"
 		);
 		$this->assertEquals("@ExternalError[\n	errorType: 'NotANumber',\n	originalError: @NotANumber,\n	errorMessage: 'invalid number'\n]", $result);
@@ -266,8 +266,8 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 			"fnC('goodbye');",
 			valueDeclarations: "
 				fn1 = ^s: String => Integer<-3..> :: s->length - 3;
-				fn2 = ^i: Integer<-3..> => *Real<0..> :: i->sqrt *> ('negative number');
-				fnC = ^s: String => *Real<0..> :: {fn1 * fn2}(s);
+				fn2 = ^i: Integer<-3..> => Real<0..>* :: i->sqrt *> ('negative number');
+				fnC = ^s: String => Real<0..>* :: {fn1 * fn2}(s);
 			"
 		);
 		$this->assertEquals("2", $result);
@@ -278,8 +278,8 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 			"fnC('hi');",
 			valueDeclarations: "
 				fn1 = ^s: String => Integer<-3..> :: s->length - 3;
-				fn2 = ^i: Integer<-3..> => *Real<0..> :: i->sqrt *> ('negative number');
-				fnC = ^s: String => *Real<0..> :: {fn1 * fn2}(s);
+				fn2 = ^i: Integer<-3..> => Real<0..>* :: i->sqrt *> ('negative number');
+				fnC = ^s: String => Real<0..>* :: {fn1 * fn2}(s);
 			"
 		);
 		$this->assertEquals("@ExternalError[\n	errorType: 'NotANumber',\n	originalError: @NotANumber,\n	errorMessage: 'negative number'\n]", $result);
@@ -289,9 +289,9 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet(
 			"fnC('25');",
 			valueDeclarations: "
-				fn1 = ^s: String => *Integer :: s->asInteger *> ('invalid number');
-				fn2 = ^i: Integer => *Real<0..> :: i->sqrt *> ('not a number');
-				fnC = ^s: String => *Real<0..> :: {fn1 * fn2}(s);
+				fn1 = ^s: String => Integer* :: s->asInteger *> ('invalid number');
+				fn2 = ^i: Integer => Real<0..>* :: i->sqrt *> ('not a number');
+				fnC = ^s: String => Real<0..>* :: {fn1 * fn2}(s);
 			"
 		);
 		$this->assertEquals("5", $result);
@@ -301,9 +301,9 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet(
 			"fnC('twenty five');",
 			valueDeclarations: "
-				fn1 = ^s: String => *Integer :: s->asInteger *> ('invalid number');
-				fn2 = ^i: Integer => *Real<0..> :: i->sqrt *> ('not a number');
-				fnC = ^s: String => *Real<0..> :: {fn1 * fn2}(s);
+				fn1 = ^s: String => Integer* :: s->asInteger *> ('invalid number');
+				fn2 = ^i: Integer => Real<0..>* :: i->sqrt *> ('not a number');
+				fnC = ^s: String => Real<0..>* :: {fn1 * fn2}(s);
 			"
 		);
 		$this->assertEquals("@ExternalError[\n	errorType: 'NotANumber',\n	originalError: @NotANumber,\n	errorMessage: 'invalid number'\n]", $result);
@@ -313,9 +313,9 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 		$result = $this->executeCodeSnippet(
 			"fnC('-3');",
 			valueDeclarations: "
-				fn1 = ^s: String => *Integer :: s->asInteger *> ('invalid number');
-				fn2 = ^i: Integer => *Real<0..> :: i->sqrt *> ('not a number');
-				fnC = ^s: String => *Real<0..> :: {fn1 * fn2}(s);
+				fn1 = ^s: String => Integer* :: s->asInteger *> ('invalid number');
+				fn2 = ^i: Integer => Real<0..>* :: i->sqrt *> ('not a number');
+				fnC = ^s: String => Real<0..>* :: {fn1 * fn2}(s);
 			"
 		);
 		$this->assertEquals("@ExternalError[\n	errorType: 'NotANumber',\n	originalError: @NotANumber,\n	errorMessage: 'not a number'\n]", $result);
@@ -326,8 +326,8 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 			"fnC('-3');",
 			valueDeclarations: "
 				fn1 = ^s: String => Any :: s->asInteger *> ('invalid number');
-				fn2 = ^i: Any => *Real<0..> :: {i->as(`Integer) *> ('not an integer')}->sqrt *> ('not a number');
-				fnC = ^s: String => *Real<0..> :: {fn1 * fn2}(s);
+				fn2 = ^i: Any => Real<0..>* :: {i->as(`Integer) *> ('not an integer')}->sqrt *> ('not a number');
+				fnC = ^s: String => Real<0..>* :: {fn1 * fn2}(s);
 			"
 		);
 		$this->assertEquals("@ExternalError[\n	errorType: 'NotANumber',\n	originalError: @NotANumber,\n	errorMessage: 'not a number'\n]", $result);
@@ -350,12 +350,12 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 			"fnC('25');",
 			"MyError := ();",
 			"
-				fn1 = ^s: JsonValue => *Result<Integer, NotANumber> :: s->hydrateAs(`String) *> ('Hydration failed')->asInteger;
+				fn1 = ^s: JsonValue => Result<Integer, NotANumber>* :: s->hydrateAs(`String) *> ('Hydration failed')->asInteger;
 				fn2 = ^i: Result<Integer, NotANumber> => Result<Integer, MyError> :: ?whenTypeOf(i) {
 					`Integer: i + 5,
 					`Error<NotANumber>: @MyError
 				};
-				fnC = ^s: JsonValue => *Result<Integer, MyError> :: {fn1 * fn2}(s);
+				fnC = ^s: JsonValue => Result<Integer, MyError>* :: {fn1 * fn2}(s);
 			"
 		);
 		$this->assertEquals("30", $result);
@@ -382,12 +382,12 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 			"fnC(true);",
 			"MyError := ();",
 			"
-				fn1 = ^s: JsonValue => *Result<Integer, NotANumber> :: s->hydrateAs(`String) *> ('Hydration failed')->asInteger;
+				fn1 = ^s: JsonValue => Result<Integer, NotANumber>* :: s->hydrateAs(`String) *> ('Hydration failed')->asInteger;
 				fn2 = ^i: Result<Integer, NotANumber> => Result<Integer, MyError> :: ?whenTypeOf(i) {
 					`Integer: i + 5,
 					`Error<NotANumber>: @MyError
 				};
-				fnC = ^s: JsonValue => *Result<Integer, MyError> :: {fn1 * fn2}(s);
+				fnC = ^s: JsonValue => Result<Integer, MyError>* :: {fn1 * fn2}(s);
 			"
 		);
 		$this->assertStringContainsString("ExternalError", $result);
@@ -398,12 +398,12 @@ final class BinaryMultiplyTest extends CodeExecutionTestHelper {
 			"fnC('eight');",
 			"MyError := ();",
 			"
-				fn1 = ^s: JsonValue => *Result<Integer, NotANumber> :: s->hydrateAs(`String) *> ('Hydration failed')->asInteger;
+				fn1 = ^s: JsonValue => Result<Integer, NotANumber>* :: s->hydrateAs(`String) *> ('Hydration failed')->asInteger;
 				fn2 = ^i: Result<Integer, NotANumber> => Result<Integer, MyError> :: ?whenTypeOf(i) {
 					`Integer: i + 5,
 					`Error<NotANumber>: @MyError
 				};
-				fnC = ^s: JsonValue => *Result<Integer, MyError> :: {fn1 * fn2}(s);
+				fnC = ^s: JsonValue => Result<Integer, MyError>* :: {fn1 * fn2}(s);
 			"
 		);
 		$this->assertEquals("@MyError", $result);

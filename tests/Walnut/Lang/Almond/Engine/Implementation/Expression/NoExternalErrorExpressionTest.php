@@ -13,7 +13,7 @@ final class NoExternalErrorExpressionTest extends CodeExecutionTestHelper {
 
 	public function testNoExternalErrorResultReturn(): void {
 		$declaration = <<<NUT
-			noExternalError = ^v: Impure<String> => Impure<Integer> :: v *?->length;
+			noExternalError = ^v: String* => Integer* :: v *?->length;
 		NUT;
 		$result = $this->executeCodeSnippet("noExternalError('ok');", valueDeclarations: $declaration);
 		$this->assertEquals("2", $result);
@@ -21,7 +21,7 @@ final class NoExternalErrorExpressionTest extends CodeExecutionTestHelper {
 
 	public function testNoExternalErrorResult(): void {
 		$declaration = <<<NUT
-			noExternalError = ^Impure<String> => Impure<Integer> :: #*?->length;
+			noExternalError = ^String* => Integer* :: #*?->length;
 		NUT;
 
 		$result = $this->executeCodeSnippet("@ExternalError[errorType: 'Error', originalError: 'Error', errorMessage: 'Error']*?;", valueDeclarations: $declaration);
@@ -31,7 +31,7 @@ final class NoExternalErrorExpressionTest extends CodeExecutionTestHelper {
 
 	public function testNoExternalErrorUnion(): void {
 		$declaration = <<<NUT
-			noExternalError = ^v: Impure<Result<String, Integer>> => Impure<Boolean> :: v*?->asBoolean;
+			noExternalError = ^v: Result<String, Integer>* => Boolean* :: v*?->asBoolean;
 		NUT;
 
 		$result = $this->executeCodeSnippet("noExternalError(@0);", valueDeclarations: $declaration);
