@@ -51,5 +51,6 @@ interface ProgramContext {
 
 	public ProgramValidator $programValidator { get; }
 
+	public function validateSource(): ProgramSource|ValidationResult;
 	public function validateAndBuildProgram(): Program|ValidationResult;
 }

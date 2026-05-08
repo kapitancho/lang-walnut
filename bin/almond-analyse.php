@@ -40,7 +40,7 @@ foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . $f
         }
 
         try {
-            $result = $compiler->withStartModule($source)->compile();
+            $result = $compiler->withStartModule($source)->compileSource();
         } catch (Throwable $e) {
             $errorCount++;
             if ($showErrorsOnly) {

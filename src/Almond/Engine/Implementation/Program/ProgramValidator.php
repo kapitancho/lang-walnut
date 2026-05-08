@@ -15,17 +15,18 @@ final readonly class ProgramValidator implements ProgramValidatorInterface {
 		public UserlandMethodValidator $userlandMethodValidator,
 	) {}
 
-	public function validateProgram(): ValidationResult {
+	public function validateSource(): ValidationResult {
 		$validationResult = $this->userlandTypeValidator->validateAll();
 		$methodValidationResult = $this->userlandMethodValidator->validateAll();
 		if ($methodValidationResult instanceof ValidationFailure) {
 			$validationResult = $validationResult->mergeFailure($methodValidationResult);
 		}
-		if (!$validationResult->hasErrors()) {
-			$validationResult = $this->userlandMethodValidator
-				->validateAllDependencies()
-				->asValidationResult();
-		}
 		return $validationResult;
+	}
+
+	public function validateDependencies(): ValidationResult {
+		return $this->userlandMethodValidator
+			->validateAllDependencies()
+			->asValidationResult();
 	}
 }

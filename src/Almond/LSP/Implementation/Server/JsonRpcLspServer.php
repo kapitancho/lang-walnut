@@ -400,7 +400,7 @@ final class JsonRpcLspServer implements LspServer {
             ->withStartModule($moduleName)
             ->withCodeMapper($codeIndex)
             ->withValidationResultCollector($collector)
-            ->compile();
+            ->compileSource();
 
         $ms = intdiv(hrtime(true) - $t0, 1_000_000);
         fwrite(STDERR, "[walnut-lsp] compile done   $moduleName v$version ({$ms}ms)\n");

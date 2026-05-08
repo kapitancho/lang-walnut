@@ -8,4 +8,5 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Program;
 interface CompiledProgram extends CompilationResult {
 	public Program $program { get; }
 	public RootNode $rootNode { get; }
+
 }

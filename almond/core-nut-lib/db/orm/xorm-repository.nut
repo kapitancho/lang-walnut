@@ -9,6 +9,8 @@ OxRepository[~Type, model: Type<Any>] @@ ExternalError  :: [
 EntryNotFound := [key: DatabaseValue];
 DuplicateEntry := [key: DatabaseValue];
 
+==> DatabaseConnection :: DatabaseConnection![dsn: ''];
+
 OxRepository->all(=> Array*) %% ~DatabaseConnector :: {
     query = $ox->selectAllQuery /*'SELECT * FROM <table>'*/
         *> ('Failed to get query for orm model');

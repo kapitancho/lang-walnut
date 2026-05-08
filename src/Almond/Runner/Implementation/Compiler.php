@@ -7,6 +7,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Parser\ParserException;
 use Walnut\Lang\Almond\AST\Implementation\Builder\NodeBuilderFactory;
 use Walnut\Lang\Almond\AST\Implementation\Parser\NodeImporter;
 use Walnut\Lang\Almond\AST\Implementation\Parser\TransitionLogger;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\ProgramSource;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResult;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResultCollector;
 use Walnut\Lang\Almond\Engine\Implementation\Program\ProgramContextFactory;
@@ -22,8 +23,11 @@ use Walnut\Lang\Almond\ProgramBuilder\Implementation\ProgramBuilderGateway;
 use Walnut\Lang\Almond\ProgramBuilder\Implementation\Validator\CompositePreBuildValidator;
 use Walnut\Lang\Almond\ProgramBuilder\Implementation\Validator\PreBuildValidationRequestFactory;
 use Walnut\Lang\Almond\ProgramBuilder\Implementation\Validator\PreBuildValidatorProvider;
+use Walnut\Lang\Almond\Runner\Blueprint\Compilation\CompiledSource as CompiledSourceInterface;
 use Walnut\Lang\Almond\Runner\Blueprint\Compilation\Error\CompilationFailure;
+use Walnut\Lang\Almond\Runner\Implementation\Compilation\CompilationContext;
 use Walnut\Lang\Almond\Runner\Implementation\Compilation\CompiledProgram;
+use Walnut\Lang\Almond\Runner\Implementation\Compilation\CompiledSource;
 use Walnut\Lang\Almond\Runner\Implementation\Compilation\Error\CompilationErrorTransformer;
 use Walnut\Lang\Almond\Runner\Implementation\Compilation\Error\CompilationFailureTransformer;
 use Walnut\Lang\Almond\Source\Blueprint\SourceFinder\SourceFinder;
@@ -88,7 +92,7 @@ final readonly class Compiler {
 		return clone($this, ['validationResultCollector' => $validationResultCollector]);
 	}
 
-	public function compile(): CompiledProgram|CompilationFailure {
+	public function compileSource(): CompiledSourceInterface|CompilationFailure {
 		//Engine:
 		$programContext = new ProgramContextFactory()
 			->newProgramContext($this->validationResultCollector);
@@ -160,20 +164,30 @@ final readonly class Compiler {
 		} catch (BuildException $exception) {
 			return $compilationFailureTransformer->fromBuildException($exception);
 		}
-		$program = $programContext->validateAndBuildProgram();
-		if ($program instanceof ValidationResult) {
-			return $compilationFailureTransformer
-				->fromPostBuildValidationFailure(
-					$program,
-					$rootNode
-				);
+
+		$validationResult = $programContext->validateSource();
+		if ($validationResult instanceof ProgramSource) {
+			return new CompiledSource(
+				$validationResult,
+				$programContext,
+				$lookupContext,
+				$rootNode,
+				$compilationFailureTransformer
+			);
 		}
-		return new CompiledProgram(
-			$program,
-			$programContext,
-			$lookupContext,
-			$rootNode
-		);
+
+		return $compilationFailureTransformer
+			->fromPostBuildValidationFailure(
+				$validationResult,
+				$rootNode
+			);
+	}
+
+	public function compile(): CompiledProgram|CompilationFailure {
+		$compilationResult = $this->compileSource();
+		return $compilationResult instanceof CompiledSourceInterface ?
+			$compilationResult->asCompiledProgram() :
+			$compilationResult;
 	}
 
 }

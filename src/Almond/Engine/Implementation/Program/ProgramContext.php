@@ -22,6 +22,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\ValueRegistry as ValueRegistr
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyContainer as DependencyContainerInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\ProgramContext as ProgramContextInterface;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\ProgramSource as ProgramSourceInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory as ValidationFactoryInterface;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResult;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationResultCollector;
@@ -211,15 +212,22 @@ final readonly class ProgramContext implements ProgramContextInterface, TypeFind
 		);
 	}
 
-	public function validateAndBuildProgram(): Program|ValidationResult {
-		$validationResult = $this->programValidator->validateProgram();
+	public function validateSource(): ProgramSource|ValidationResult {
+		$validationResult = $this->programValidator->validateSource();
 		if ($validationResult->hasErrors()) {
 			return $validationResult;
 		}
-		return new Program(
+		return new ProgramSource(
 			$this->typeRegistry,
 			$this->dependencyContainer,
+			$this->programValidator
 		);
+	}
+
+	public function validateAndBuildProgram(): Program|ValidationResult {
+		$validationResult = $this->validateSource();
+		return $validationResult instanceof ProgramSourceInterface ?
+			$validationResult->asProgram() : $validationResult;
 	}
 
 	public function typeByName(TypeName $typeName): Type {
