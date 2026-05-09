@@ -35,16 +35,20 @@ trait TupleAsRecord {
 		TupleType $tupleType,
 		RecordType $recordType
 	): bool {
-		return $tupleType->isSubtypeOf(
-			$typeRegistry->tuple(
-				array_slice(
-					array_values($recordType->types),
-					0,
-					count($tupleType->types)
-				),
-				null
-			)
-		);
+		$index = 0;
+		foreach($recordType->types as $key => $rType) {
+			$type = $tupleType->typeOf($index++);
+			if ($type instanceof UnknownProperty) {
+				if (!($rType instanceof OptionalType)) {
+					return false;
+				}
+			} else {
+				if (!$type->isSubtypeOf($rType)) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	private function adjustParameterValue(

@@ -4,6 +4,9 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Code\Expression;
 
 use JsonSerializable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
@@ -34,40 +37,43 @@ final readonly class MatchErrorExpression implements Expression, JsonSerializabl
 		$expressionType = $this->toBaseType($result->expressionType);
 
 		$returnTypes = [$result->returnType];
-		$onErrorExpressionType = $this->typeRegistry->nothing;
-		$elseExpressionType = $expressionType instanceof ResultType ? $expressionType->returnType : $anyType;
 
-		if ($result->expressionType->isSubtypeOf(
-			$this->typeRegistry->result(
-				$anyType,
-				$anyType
-			)
-		)) {
-			$innerContext = $result;
-			if ($this->target instanceof VariableNameExpression) {
-				$errorType = $expressionType instanceof ResultType ? $expressionType->errorType :
-					// @codeCoverageIgnoreStart
-					$anyType;
-					// @codeCoverageIgnoreEnd
+		$isOptional = false;
+		if ($expressionType instanceof OptionalType) {
+			$isOptional = true;
+			$expressionType = $expressionType->valueType;
+		}
+		[$onErrorExpressionType, $elseExpressionType] = match(true) {
+			$expressionType instanceof AnyType => [$expressionType, $expressionType],
+			$expressionType instanceof ResultType => [$expressionType->errorType, $expressionType->returnType],
+			default => [$this->typeRegistry->nothing, $expressionType]
+		};
+		if ($isOptional) {
+			$elseExpressionType = $this->typeRegistry->optional($elseExpressionType);
+		}
 
-				$innerContext = $innerContext->withAddedVariableType(
-					$this->target->variableName,
-					$this->typeRegistry->error(
-						$errorType
-					),
-				);
-			}
-			$retValue = $this->onError->validateInContext($innerContext);
-			if ($retValue instanceof ValidationFailure) {
-				return $retValue;
-			}
-
+		$innerContext = $result;
+		$isVar = $this->target instanceof VariableNameExpression || $this->target instanceof VariableAssignmentExpression;
+		if ($isVar) {
+			$innerContext = $innerContext->withAddedVariableType(
+				$this->target->variableName,
+				$this->typeRegistry->error(
+					$onErrorExpressionType
+				),
+			);
+		}
+		$retValue = $this->onError->validateInContext($innerContext);
+		if ($retValue instanceof ValidationFailure) {
+			return $retValue;
+		}
+		if (!$onErrorExpressionType instanceof NothingType) {
 			$onErrorExpressionType = $retValue->expressionType;
 			$returnTypes[] = $retValue->returnType;
 		}
+
 		if ($this->else) {
 			$innerContext = $result;
-			if ($this->target instanceof VariableNameExpression) {
+			if ($isVar) {
 				$innerContext = $innerContext->withAddedVariableType(
 					$this->target->variableName,
 					$elseExpressionType,
@@ -77,8 +83,10 @@ final readonly class MatchErrorExpression implements Expression, JsonSerializabl
 			if ($retValue instanceof ValidationFailure) {
 				return $retValue;
 			}
-			$elseExpressionType = $retValue->expressionType;
-			$returnTypes[] = $retValue->returnType;
+			if (!$elseExpressionType instanceof NothingType) {
+				$elseExpressionType = $retValue->expressionType;
+				$returnTypes[] = $retValue->returnType;
+			}
 		}
 		return $result
 			->withExpressionType(

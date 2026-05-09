@@ -102,8 +102,14 @@ final readonly class ParserStateMachine {
 					$this->s->push(126);
 					$this->s->stay(4000);
 				},
-				T::arithmetic_op_multiply->name => $c,
-				T::sequence_start->name => $c, 
+				T::arithmetic_op_plus->name => $c,
+				T::optional_key->name => $c,
+				T::error_marker->name => $c,
+				T::positive_integer_number->name => $c,
+				T::integer_number->name => $c,
+				T::real_number->name => $c,
+				T::string_value->name => $c,
+				T::sequence_start->name => $c,
 				T::lambda_param->name => $c,
 				T::tuple_start->name => $c,
 				T::call_start->name => $c,
@@ -184,9 +190,6 @@ final readonly class ParserStateMachine {
 					$this->s->push(139);
 					$this->s->stay(4000);
 				},
-				T::arithmetic_op_plus->name => $c,
-				T::optional_key->name => $c,
-				T::error_marker->name => $c,
 				T::positive_integer_number->name => $c,
 				T::integer_number->name => $c,
 				T::real_number->name => $c,
@@ -2175,6 +2178,13 @@ final readonly class ParserStateMachine {
 					$this->s->push(346);
 					$this->s->stay(4000);
 				},
+				T::arithmetic_op_plus->name => $c,
+				T::optional_key->name => $c,
+				T::error_marker->name => $c,
+				T::positive_integer_number->name => $c,
+				T::integer_number->name => $c,
+				T::real_number->name => $c,
+				T::string_value->name => $c,
 				T::tuple_start->name => $c,
 				T::lambda_param->name => $c,
 			]],
@@ -2856,16 +2866,25 @@ final readonly class ParserStateMachine {
 					$this->s->stay(610);
 				}
 			]],
-			607 => ['name' => 'function value parameter type', 'transitions' => [
+			607 => ['name' => 'function value parameter type 2', 'transitions' => [
 				T::arithmetic_op_multiply->name => $c = function(LT $token) {
 					$this->s->push(609);
 					$this->s->stay(4000);
 				},
+				T::arithmetic_op_plus->name => $c,
+				T::optional_key->name => $c,
+				T::error_marker->name => $c,
+				T::positive_integer_number->name => $c,
+				T::integer_number->name => $c,
+				T::real_number->name => $c,
+				T::string_value->name => $c,
 				T::type_proxy_keyword->name => $c,
 				T::type_keyword->name => $c,
 				T::sequence_start->name => $c,
 				T::call_start->name => $c,
 				T::tuple_start->name => $c,
+				T::type_proxy_keyword->name => $c,
+				T::type_keyword->name => $c,
 			]],
 			608 => ['name' => 'function value parameter name from type', 'transitions' => [
 				T::type_keyword->name => function(LT $token) {

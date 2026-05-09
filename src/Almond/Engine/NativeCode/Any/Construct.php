@@ -21,6 +21,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\EnumerationValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\StringValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\TypeValue;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ValueValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\EnumerationValueName;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
@@ -54,7 +55,7 @@ final readonly class Construct extends NativeMethod {
 				} elseif ($okType instanceof AnyType) {
 					$errorType = $okType;
 				}
-				$valueType = $this->typeRegistry->value($okType);
+				$valueType = $okType instanceof ValueType ? $okType : $this->typeRegistry->value($okType);
 				if ($errorType) {
 					$valueType = $this->typeRegistry->result($valueType, $errorType);
 				}
@@ -169,7 +170,7 @@ final readonly class Construct extends NativeMethod {
 				return $this->valueRegistry->error($target);
 			}
 			if ($parameterType instanceof ValueType) {
-				return $target instanceof ErrorValue || $target instanceof EmptyValue ?
+				return $target instanceof ErrorValue || $target instanceof EmptyValue || $target instanceof ValueValue ?
 					$target :
 					$this->valueRegistry->value($target);
 			}

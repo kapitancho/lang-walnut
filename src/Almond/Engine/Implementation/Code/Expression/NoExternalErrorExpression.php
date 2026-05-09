@@ -4,6 +4,7 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Code\Expression;
 
 use JsonSerializable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\CoreType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
@@ -31,9 +32,15 @@ final readonly class NoExternalErrorExpression implements Expression, JsonSerial
 		}
 		$expressionType = $result->expressionType;
 		$externalErrorType = $this->typeRegistry->typeByName(new TypeName('ExternalError'));
+		$hasOptional = false;
+		if ($expressionType instanceof OptionalType) {
+			$hasOptional = true;
+			$expressionType = $expressionType->valueType;
+		}
 		if ($expressionType instanceof ResultType && $externalErrorType->isSubtypeOf($expressionType->errorType)) {
+			$wex = $this->withoutExternalError($this->typeRegistry, $expressionType);
 			return $result->withExpressionType(
-				$this->withoutExternalError($this->typeRegistry, $expressionType)
+				$hasOptional ? $this->typeRegistry->optional($wex) : $wex,
 			)->withReturnType(
 				$this->typeRegistry->result(
 					$result->returnType,
