@@ -37,6 +37,10 @@ interface ExpressionRegistry {
 		Expression $condition, Expression $onError, Expression|null $else
 	): Expression;
 
+	public function matchEmpty(
+		Expression $condition, Expression $onEmpty, Expression|null $else
+	): Expression;
+
 	/** @param list<Expression> $expressions */
 	public function sequence(array $expressions): Expression;
 	/** @param list<Expression> $expressions */

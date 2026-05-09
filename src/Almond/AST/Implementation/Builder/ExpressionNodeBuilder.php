@@ -24,6 +24,7 @@ use Walnut\Lang\Almond\AST\Implementation\Node\Expression\ConstructorCallExpress
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\DataExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\FunctionCallExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\GroupExpressionNode;
+use Walnut\Lang\Almond\AST\Implementation\Node\Expression\MatchEmptyExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\MatchErrorExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\MatchExpressionDefaultNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\MatchExpressionPairNode;
@@ -97,6 +98,10 @@ final readonly class ExpressionNodeBuilder implements ExpressionNodeBuilderInter
 
 	public function matchError(ExpressionNode $condition, ExpressionNode $then, ExpressionNode|null $else): MatchErrorExpressionNode {
 		return new MatchErrorExpressionNode($this->getSourceLocation(), $condition, $then, $else);
+	}
+
+	public function matchEmpty(ExpressionNode $condition, ExpressionNode $then, ExpressionNode|null $else): MatchEmptyExpressionNode {
+		return new MatchEmptyExpressionNode($this->getSourceLocation(), $condition, $then, $else);
 	}
 
 	public function scoped(ExpressionNode $targetExpression): ScopedExpressionNode {

@@ -172,6 +172,15 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 		);
 	}
 
+	public function matchEmpty(
+		Expression $condition, Expression $onEmpty, Expression|null $else
+	): MatchEmptyExpression {
+		return new MatchEmptyExpression(
+			$this->typeRegistry,
+			$condition, $onEmpty, $else
+		);
+	}
+
 
 	/** @param list<Expression> $expressions */
 	public function sequence(array $expressions): Expression {

@@ -229,6 +229,8 @@ final class ToStringTest extends AlmondBaseTestHelper {
 			'?when (x) { x } ~ { 0 }' => $er->matchIf($x, $x, $c0),
 			'?whenIsError (x) { 0 }' => $er->matchError($x, $c0, null),
 			'?whenIsError (x) { x } ~ { 0 }' => $er->matchError($x, $x, $c0),
+			'?whenIsEmpty (x) { 0 }' => $er->matchEmpty($x, $c0, null),
+			'?whenIsEmpty (x) { x } ~ { 0 }' => $er->matchEmpty($x, $x, $c0),
 		] as $string => $value) {
 			$this->assertEquals($string, (string)$value);
 		}

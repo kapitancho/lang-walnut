@@ -13,6 +13,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\GroupExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ScopedExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\FunctionCallExpressionNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MatchEmptyExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MatchErrorExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MatchExpressionDefaultNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MatchExpressionPairNode;
@@ -53,6 +54,7 @@ interface ExpressionNodeBuilder {
 	public function matchValue(ExpressionNode $target, array $pairs, MatchExpressionDefaultNode|null $default): MatchValueExpressionNode;
 	public function matchIf(ExpressionNode $condition, ExpressionNode $then, ExpressionNode $else): MatchIfExpressionNode;
 	public function matchError(ExpressionNode $condition, ExpressionNode $then, ExpressionNode|null $else): MatchErrorExpressionNode;
+	public function matchEmpty(ExpressionNode $condition, ExpressionNode $then, ExpressionNode|null $else): MatchEmptyExpressionNode;
 
 	public function scoped(ExpressionNode $targetExpression): ScopedExpressionNode;
 	public function mutable(TypeNode $type, ExpressionNode $value): MutableExpressionNode;

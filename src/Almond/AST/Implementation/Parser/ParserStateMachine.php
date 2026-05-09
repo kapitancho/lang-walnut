@@ -1880,6 +1880,12 @@ final readonly class ParserStateMachine {
 					$this->s->result['startPosition'] = $token->sourcePosition;
 					$this->s->move(352);
 				},
+				T::when_is_empty->name => function(LT $token) {
+					$this->s->result['matchType'] = 'isEmpty';
+					$this->s->result['matchPairs'] = [];
+					$this->s->result['startPosition'] = $token->sourcePosition;
+					$this->s->move(362);
+				},
 				T::when->name => function(LT $token) {
 					$this->s->result['matchType'] = 'matchIf';
 					$this->s->result['matchPairs'] = [];
@@ -2252,6 +2258,57 @@ final readonly class ParserStateMachine {
 			358 => ['name' => 'match error else check', 'transitions' => [
 				'' => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->expression->matchError(
+						$this->s->result['matchTarget'],
+						$this->s->result['matchThen'],
+						$this->s->generated
+					);
+					$this->s->pop();
+				}
+			]],
+			362 => ['name' => 'match empty start', 'transitions' => [
+				T::call_start->name => 363
+			]],
+			363 => ['name' => 'match empty target', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(364);
+					$this->s->stay(3000);
+				}
+			]],
+			364 => ['name' => 'match empty target end', 'transitions' => [
+				T::call_end->name => function(LT $token) {
+					$this->s->result['matchTarget'] = $this->s->generated;
+					$this->s->move(365);
+				}
+			]],
+			365 => ['name' => 'match empty then start', 'transitions' => [
+				T::sequence_start->name => function(LT $token) {
+					$this->s->push(366);
+					$this->s->stay(3000);
+				}
+			]],
+			366 => ['name' => 'match empty else check', 'transitions' => [
+				T::default_match->name => function(LT $token) {
+					$this->s->result['matchThen'] = $this->s->generated;
+					$this->s->move(367);
+				},
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->expression->matchEmpty(
+						$this->s->result['matchTarget'],
+						$this->s->generated,
+						null
+					);
+					$this->s->pop();
+				}
+			]],
+			367 => ['name' => 'match empty start', 'transitions' => [
+				T::sequence_start->name => function(LT $token) {
+					$this->s->push(368);
+					$this->s->stay(3000);
+				}
+			]],
+			368 => ['name' => 'match empty else check', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->expression->matchEmpty(
 						$this->s->result['matchTarget'],
 						$this->s->result['matchThen'],
 						$this->s->generated

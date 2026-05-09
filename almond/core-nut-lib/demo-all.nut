@@ -158,6 +158,8 @@ AllTypes = [
         matchIfThen: ?when('condition') { 'then' },
         matchIsErrorElse: ?whenIsError('condition') { 'then' } ~ { 'else' },
         matchIsError: ?whenIsError('condition') { 'then' },
+        matchIsEmptyElse: ?whenIsEmpty('condition') { 'then' } ~ { 'else' },
+        matchIsEmpty: ?whenIsEmpty('condition') { 'then' },
         functionCall: functionName('parameter'),
         constructorCall: TypeName('parameter'),
         propertyAccess: [property: 'value'].property

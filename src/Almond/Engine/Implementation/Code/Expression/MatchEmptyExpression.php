@@ -9,6 +9,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\NothingType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\OptionalType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\EmptyValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionContext;
@@ -16,14 +17,14 @@ use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 use Walnut\Lang\Almond\Engine\Implementation\Code\Type\Helper\BaseType;
 
-final readonly class MatchErrorExpression implements Expression, JsonSerializable {
+final readonly class MatchEmptyExpression implements Expression, JsonSerializable {
 	use BaseType;
 
 	public function __construct(
 		private TypeRegistry $typeRegistry,
 
 		public Expression $target,
-		public Expression $onError,
+		public Expression $onEmpty,
 		public Expression|null $else,
 	) {}
 
@@ -32,22 +33,14 @@ final readonly class MatchErrorExpression implements Expression, JsonSerializabl
 		if ($result instanceof ValidationFailure) {
 			return $result;
 		}
-		$expressionType = $this->toBaseType($result->expressionType);
+		$elseExpressionType = $this->toBaseType($result->expressionType);
 
 		$returnTypes = [$result->returnType];
 
 		$isOptional = false;
-		if ($expressionType instanceof OptionalType) {
+		if ($elseExpressionType instanceof OptionalType) {
 			$isOptional = true;
-			$expressionType = $expressionType->valueType;
-		}
-		[$onErrorExpressionType, $elseExpressionType] = match(true) {
-			$expressionType instanceof AnyType => [$expressionType, $expressionType],
-			$expressionType instanceof ResultType => [$expressionType->errorType, $expressionType->returnType],
-			default => [$this->typeRegistry->nothing, $expressionType]
-		};
-		if ($isOptional) {
-			$elseExpressionType = $this->typeRegistry->optional($elseExpressionType);
+			$elseExpressionType = $elseExpressionType->valueType;
 		}
 
 		$innerContext = $result;
@@ -55,18 +48,18 @@ final readonly class MatchErrorExpression implements Expression, JsonSerializabl
 		if ($isVar) {
 			$innerContext = $innerContext->withAddedVariableType(
 				$this->target->variableName,
-				$this->typeRegistry->error(
-					$onErrorExpressionType
-				),
+				$this->typeRegistry->empty,
 			);
 		}
-		$retValue = $this->onError->validateInContext($innerContext);
+		$retValue = $this->onEmpty->validateInContext($innerContext);
 		if ($retValue instanceof ValidationFailure) {
 			return $retValue;
 		}
-		if (!$onErrorExpressionType instanceof NothingType) {
-			$onErrorExpressionType = $retValue->expressionType;
+		if ($isOptional) {
+			$onEmptyExpressionType = $retValue->expressionType;
 			$returnTypes[] = $retValue->returnType;
+		} else {
+			$onEmptyExpressionType = $this->typeRegistry->nothing;
 		}
 
 		if ($this->else) {
@@ -89,7 +82,7 @@ final readonly class MatchErrorExpression implements Expression, JsonSerializabl
 		return $result
 			->withExpressionType(
 				$this->typeRegistry->union(
-					[$onErrorExpressionType, $elseExpressionType]
+					[$onEmptyExpressionType, $elseExpressionType]
 				)
 			)
 			->withReturnType(
@@ -104,7 +97,7 @@ final readonly class MatchErrorExpression implements Expression, JsonSerializabl
 	public function validateDependencies(DependencyContext $dependencyContext): DependencyContext {
 		$dependencyContext = $dependencyContext
 			|> $this->target->validateDependencies(...)
-			|> $this->onError->validateDependencies(...);
+			|> $this->onEmpty->validateDependencies(...);
 		if ($this->else !== null) {
 			$dependencyContext = $this->else->validateDependencies($dependencyContext);
 		}
@@ -115,7 +108,7 @@ final readonly class MatchErrorExpression implements Expression, JsonSerializabl
 		$executionContext = $this->target->execute($executionContext);
 		$value = $executionContext->value;
 		$isVar = $this->target instanceof VariableNameExpression || $this->target instanceof VariableAssignmentExpression;
-		if ($value instanceof ErrorValue) {
+		if ($value instanceof EmptyValue) {
 			$innerContext = $executionContext;
 			if ($isVar) {
 				$innerContext = $innerContext->withAddedVariableValue(
@@ -124,7 +117,7 @@ final readonly class MatchErrorExpression implements Expression, JsonSerializabl
 				);
 			}
 			return $executionContext->withValue(
-				$this->onError->execute($innerContext)->value
+				$this->onEmpty->execute($innerContext)->value
 			);
 		}
 		if ($this->else !== null) {
@@ -143,18 +136,18 @@ final readonly class MatchErrorExpression implements Expression, JsonSerializabl
 	}
 
 	public function __toString(): string {
-		return sprintf("?whenIsError (%s) { %s }%s",
+		return sprintf("?whenIsEmpty (%s) { %s }%s",
 			$this->target,
-			$this->onError,
+			$this->onEmpty,
 			$this->else ? sprintf(" ~ { %s }", $this->else) : ''
 		);
 	}
 
 	public function jsonSerialize(): array {
 		return [
-			'expressionType' => 'MatchError',
+			'expressionType' => 'MatchEmpty',
 			'target' => $this->target,
-			'onError' => $this->onError,
+			'onEmpty' => $this->onEmpty,
 			'else' => $this->else
 		];
 	}

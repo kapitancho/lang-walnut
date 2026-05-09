@@ -5,6 +5,7 @@ namespace Walnut\Lang\Test\Almond\AST\Parser;
 use BcMath\Number;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MatchEmptyExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Module\AddAliasTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Module\AddAtomTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Module\AddConstructorMethodNode;
@@ -1127,6 +1128,19 @@ class ParserTest extends TestCase {
 			$e->condition instanceof VariableNameExpressionNode && $e->condition->variableName->equals(new VariableNameNode($l, 'x')) &&
 			$e->onError instanceof SequenceExpressionNode && count($e->onError->expressions) === 1 &&
 			$e->onError->expressions[0] instanceof VariableNameExpressionNode && $e->onError->expressions[0]->variableName->equals(new VariableNameNode($l, 'y')) &&
+			$e->else instanceof SequenceExpressionNode && count($e->else->expressions) === 1 &&
+			$e->else->expressions[0] instanceof VariableNameExpressionNode && $e->else->expressions[0]->variableName->equals(new VariableNameNode($l, 'z'))
+		];
+		yield ['?whenIsEmpty(x) { y }', MatchEmptyExpressionNode::class, fn(MatchEmptyExpressionNode $e) =>
+			$e->condition instanceof VariableNameExpressionNode && $e->condition->variableName->equals(new VariableNameNode($l, 'x')) &&
+			$e->onEmpty instanceof SequenceExpressionNode && count($e->onEmpty->expressions) === 1 &&
+			$e->onEmpty->expressions[0] instanceof VariableNameExpressionNode && $e->onEmpty->expressions[0]->variableName->equals(new VariableNameNode($l, 'y')) &&
+			$e->else === null
+		];
+		yield ['?whenIsEmpty(x) { y } ~ { z }', MatchEmptyExpressionNode::class, fn(MatchEmptyExpressionNode $e) =>
+			$e->condition instanceof VariableNameExpressionNode && $e->condition->variableName->equals(new VariableNameNode($l, 'x')) &&
+			$e->onEmpty instanceof SequenceExpressionNode && count($e->onEmpty->expressions) === 1 &&
+			$e->onEmpty->expressions[0] instanceof VariableNameExpressionNode && $e->onEmpty->expressions[0]->variableName->equals(new VariableNameNode($l, 'y')) &&
 			$e->else instanceof SequenceExpressionNode && count($e->else->expressions) === 1 &&
 			$e->else->expressions[0] instanceof VariableNameExpressionNode && $e->else->expressions[0]->variableName->equals(new VariableNameNode($l, 'z'))
 		];

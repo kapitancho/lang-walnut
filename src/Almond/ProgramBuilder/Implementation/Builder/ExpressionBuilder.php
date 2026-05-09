@@ -12,6 +12,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\DataExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\FunctionCallExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\GroupExpressionNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MatchEmptyExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MatchErrorExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MatchExpressionDefaultNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MatchExpressionPairNode;
@@ -169,6 +170,13 @@ final readonly class ExpressionBuilder implements ExpressionCompilerInterface {
 				$this->expressionRegistry->matchError(
 					$this->expression($expressionNode->condition),
 					$this->expression($expressionNode->onError),
+					$expressionNode->else ?
+						$this->expression($expressionNode->else) : null
+				),
+			$expressionNode instanceof MatchEmptyExpressionNode =>
+				$this->expressionRegistry->matchEmpty(
+					$this->expression($expressionNode->condition),
+					$this->expression($expressionNode->onEmpty),
 					$expressionNode->else ?
 						$this->expression($expressionNode->else) : null
 				),
