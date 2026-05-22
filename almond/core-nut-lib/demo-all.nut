@@ -136,8 +136,10 @@ AllTypes = [
             'evaluated'; 'evaluated and used'
         },
         return: ?when(0) { => 'return' },
-        noError: 'no error'?,
-        noExternalError: 'no external error'*?,
+        earlyReturn: 'early return'!,
+        earlyReturnEmpty: 'early return empty'?!,
+        earlyReturnError: 'early return error'@!,
+        earlyReturnExternalError: 'early return external error'*!,
         variableAssignment: variableName = 'variable assignment',
         multiVariableAssignmentList: var{ variableName1, variableName2 } = [1, 2],
         multiVariableAssignmentDict: var{ key: variableName1, ~variableName2 } = [key: 1, variableName2: 2],

@@ -5,5 +5,5 @@ ViewResponseBody ==> HttpAutoWireResponseBodyFromParameter ::
     ^view: Any => Result<HttpResponse> %% [~HttpResponseBuilder, ~TemplateRenderer] :: {
         %httpResponseBuilder($statusCode)
             ->withHeader[headerName: 'Content-Type', values: [$contentType]]
-            ->withBody(%templateRenderer->render(view)?)
+            ->withBody(%templateRenderer->render(view)!)
     };

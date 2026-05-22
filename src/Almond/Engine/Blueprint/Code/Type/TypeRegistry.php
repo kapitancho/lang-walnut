@@ -58,7 +58,7 @@ interface TypeRegistry extends TypeFinder {
 
 	public function value(Type $valueType): ValueType;
 	public function error(Type $errorType): ErrorType;
-	public function result(Type $returnType, Type $errorType): ResultType|OptionalType;
+	public function result(Type $returnType, Type $errorType): Type;
 
 	public function type(Type $targetType): TypeType;
 	public function metaType(MetaTypeValue $value): MetaType;

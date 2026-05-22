@@ -129,115 +129,226 @@ findUser = ^id: Integer => Result<User, String> ::
 ;
 ```
 
-## 11.3 Conditional Error Return: The ? Operator
+## 11.3 Early Return Operators
 
-### 11.3.1 Basic Usage
+Walnut provides four early return operators that conditionally exit the current scope:
 
-The `expr?` operator (postfix `?`) checks if `expr` is an error value. If it is, it immediately returns that error from the current function. Otherwise, it evaluates to the success value.
+| Operator | Effect | Type Refinement |
+|----------|--------|-----------------|
+| `expr?!` | Early return if empty | Result type loses Empty |
+| `expr@!` | Early return if error | Result type loses Error variant |
+| `expr*!` | Early return if external error | Result type loses ExternalError |
+| `expr!` | Early return if empty or error | Result type becomes non-Result |
 
-**Syntax:** `expression?`
+### 11.3.1 Empty Early Return: `expr?!`
 
-**Examples:**
-```walnut
-/* Without ? operator */
-processData = ^input: String => Result<Integer, String> :: {
-    parsed = parse(input);  /* Returns Result<Integer, String> */
-    ?whenIsError(parsed) {
-        => parsed  /* Return the error */
-    };
-    validated = validate(parsed);  /* Returns Result<Integer, String> */
-    ?whenIsError(validated) {
-        => validated  /* Return the error */
-    };
-    validated
-};
+The `expr?!` operator checks if `expr` is empty. If it is, it immediately returns empty from the current function. Otherwise, it evaluates to the value with the empty type stripped.
 
-/* With ? operator */
-processData = ^input: String => Result<Integer, String> :: {
-    parsed = parse(input)?;      /* Returns error or unwraps */
-    validated = validate(parsed)?;  /* Returns error or unwraps */
-    validated
-};
-```
+**Syntax:** `expression?!`
 
-### 11.3.2 Error Propagation
-
-The `?` operator automatically propagates errors up the call stack.
-
-**Example:**
-```walnut
-readFile = ^path: String => Result<String, String> ::
-    /* ... */
-;
-
-parseJson = ^content: String => Result<JsonValue, String> ::
-    /* ... */
-;
-
-processFile = ^path: String => Result<JsonValue, String> :: {
-    content = readFile(path)?;   /* Propagate read errors */
-    json = parseJson(content)?;  /* Propagate parse errors */
-    json
-};
-```
-
-### 11.3.3 Chaining with the ? Operator
-
-Multiple operations can be chained with the `?` operator.
-
-**Example:**
-```walnut
-pipeline = ^input: String => Result<Integer, String> :: {
-    step1 = parseInput(input)?;
-    step2 = validateInput(step1)?;
-    step3 = transformInput(step2)?;
-    step4 = finalizeInput(step3)?;
-    step4
-};
-```
-
-## 11.4 Method Call with Automatic Error Propagation
-
-### 11.4.1 The ->method()? Pattern
-
-Method calls can be combined with the `?` operator for automatic error propagation.
-
-**Syntax:** `target->methodName(parameter)?`
-
-**Equivalent to:** `(target->methodName(parameter))?`
+**Type refinement:** `Empty | T` → `T`
 
 **Examples:**
 ```walnut
-/* Explicit error unwrapping */
-result = file->read()?;
+processValue = ^x: Integer | Empty => Result<String, String> :: {
+    /* Returns if x is empty */
+    value = x?!;  /* value: Integer */
+    value->asString
+};
 
-/* Chaining method calls */
-content = file->read()->parse()->validate()?;
+/* With Optional type */
+result = optionalValue?!->asString;  /* Returns if optionalValue is empty */
+```
 
-/* Each method call is checked */
-content = {
-    temp1 = file->read()?;
-    temp2 = temp1->parse()?;
-    temp2->validate()?
+### 11.3.2 Error Early Return: `expr@!`
+
+The `expr@!` operator checks if `expr` is a regular error. If it is, it immediately returns that error from the current function. Otherwise, it evaluates to the value with the error type removed.
+
+**Syntax:** `expression@!`
+
+**Type refinement:** `Result<T, E>` → `T | ExternalError`
+
+**Examples:**
+```walnut
+processData = ^input: String => Result<Integer, String | ExternalError> :: {
+    parsed = parse(input)@!;      /* Returns error or unwraps */
+    validated = validate(parsed)@!;  /* Returns error or unwraps */
+    validated
 };
 ```
 
-### 11.4.2 Practical Example
+### 11.3.3 External Error Early Return: `expr*!`
 
+The `expr*!` operator checks if `expr` is an external error. If it is, it immediately returns that external error from the current function. Otherwise, it evaluates to the value with the external error removed.
+
+**Syntax:** `expression*!`
+
+**Type refinement:** `Result<T, E | ExternalError>` → `Result<T, E>`
+
+**Examples:**
 ```walnut
-processOrder = ^orderId: Integer => Result<Response, Error> :: {
-    /* Step by step with error propagation */
-    order = database->findOrder(orderId)?;
-    validated = order->validate()?;
-    processed = validated->process()?;
-    processed->save()?;
-
-    /* Fully chained */
-    database->findOrder(orderId)?
-            ->validate()?
-            ->process()?
-            ->save()?
+processFile = ^path: String => Result<String, String> :: {
+    /* Separate handling for external vs regular errors */
+    content = readFile(path)*!;  /* Returns ExternalError or unwraps */
+    parsed = content->parse();   /* May return regular error */
+    parsed
 };
+```
+
+### 11.3.4 Unhappy Path Early Return: `expr!`
+
+The `expr!` operator checks if `expr` is empty or an error. If it is, it immediately returns the value (empty or error) from the current function. Otherwise, it evaluates to the success value.
+
+**Syntax:** `expression!`
+
+**Type refinement:** `Result<T, E>` → `T`
+
+**Examples:**
+```walnut
+processResult = ^r: Result<Integer, String> => Integer :: {
+    /* Returns if r is error, otherwise unwraps */
+    value = r!;
+    value * 2
+};
+
+/* Piping pattern */
+result = getValue()!->asString;  /* Return on error, otherwise transform */
+```
+
+### 11.3.5 Method Calls with Early Return Operators
+
+Early return operators work with method calls:
+
+**Examples:**
+```walnut
+/* With property access */
+result = obj->field?!->doSomething;
+
+/* With method calls */
+content = file->read()*!;
+validated = content->parse()@!->validate()@!;
+
+/* Chaining multiple early returns */
+result = input
+    ->parse()@!
+    ->validate()@!
+    ->transform()*!
+    ->finalize();
+```
+
+## 11.4 Error Conversion Operators
+
+Walnut provides error conversion operators for transforming between error types without early return:
+
+| Operator | Effect | Syntax |
+|----------|--------|--------|
+| `expr @?` | Convert regular error to empty | Postfix |
+| `expr *?` | Convert external error to empty | Postfix |
+| `expr ?@ errVal` | Convert empty to error with value | Takes error value |
+| `expr @* (msg)` | Convert regular error to external error | Takes error message |
+| `expr ?* (msg)` | Convert empty to external error | Takes error message |
+
+### 11.4.1 Error to Empty: `expr @?`
+
+The `@?` operator (postfix) converts a regular error value into empty.
+
+**Syntax:** `expression @?`
+
+**Behavior:**
+- If `expr` is a regular error: returns `empty`
+- If `expr` is a success value: returns the value unchanged
+
+**Examples:**
+```walnut
+/* Simple usage */
+5 @?              /* 5 */
+@'failed' @?      /* empty */
+
+/* Convert Result to Optional */
+toOptional = ^s: Result<String, Boolean> => ?String :: s @?;
+
+/* Use with fallback */
+value = (@'err' @?) ?? 'default'  /* 'default' */
+```
+
+### 11.4.2 External Error to Empty: `expr *?`
+
+The `*?` operator (postfix) converts an external error value into empty.
+
+**Syntax:** `expression *?`
+
+**Behavior:**
+- If `expr` is an external error: returns `empty`
+- If `expr` is a success value: returns the value unchanged
+
+**Examples:**
+```walnut
+/* Simple usage */
+5 *?                                                                  /* 5 */
+@ExternalError[errorType: 'IO', originalError: 'x', errorMessage: 'fail'] *?  /* empty */
+
+/* Convert impure type to Optional */
+toOptional = ^s: String* => ?String :: s *?;
+```
+
+### 11.4.3 Empty to Error: `expr ?@ errorValue`
+
+The `?@` operator converts empty into a regular error with the specified value.
+
+**Syntax:** `expression ?@ errorValue`
+
+**Behavior:**
+- If `expr` is empty: returns `@errorValue`
+- Otherwise: returns `expr` unchanged
+
+**Examples:**
+```walnut
+/* Simple usage */
+5 ?@ 'missing'              /* 5 */
+empty ?@ 'missing'          /* @'missing' */
+empty ?@ 404                /* @404 */
+
+/* Require a value */
+require = ^s: ?String => Result<String, String> :: s ?@ 'required';
+```
+
+### 11.4.4 Error Escalation: `expr @* (msg)` and `expr ?* (msg)`
+
+The `@*` operator converts a regular error into an external error wrapped with a custom message.
+
+**Syntax:** `expression @* (errorMessage)`
+
+**Behavior:**
+- If `expr` is a regular error: wraps it in an `ExternalError` with the given message
+- Otherwise: returns `expr` unchanged
+
+**Examples:**
+```walnut
+/* Pass through success */
+5 @* ('error')              /* 5 */
+
+/* Wrap error with message */
+@5 @* ('error')             /* @ExternalError[errorType: 'Integer[5]', originalError: @5, errorMessage: 'error'] */
+
+/* Use null for default message */
+@5 @* (null)                /* @ExternalError[..., errorMessage: 'Error'] */
+```
+
+The `?*` operator converts empty into an external error wrapped with a custom message.
+
+**Syntax:** `expression ?* (errorMessage)`
+
+**Behavior:**
+- If `expr` is empty: wraps it in an `ExternalError` with the given message
+- Otherwise: returns `expr` unchanged
+
+**Examples:**
+```walnut
+/* Pass through success */
+5 ?* ('error')              /* 5 */
+
+/* Wrap empty with message */
+empty ?* ('error')          /* @ExternalError[errorType: 'Empty', errorMessage: 'error'] */
 ```
 
 ## 11.5 External Errors
@@ -357,48 +468,75 @@ loadUserData = ^userId: Integer => *UserData %% [~Database, ~FileSystem] :: {
 };
 ```
 
-## 11.7 Error Conversion: *> Operator
+## 11.7 Error Transformation with `*>` Operator
 
-### 11.7.1 Converting Errors to External Errors
+The `*>` operator transforms a result value by wrapping any error in an external error with a descriptive message. This allows you to escalate errors while preserving the original error information.
 
-The `*>` operator converts a regular error into an external error with a custom message.
+### 11.7.1 Basic Error Wrapping
 
 **Syntax:** `expression *> message`
 
+**Type transformation:** 
+- `Result<T, E>` → `Result<T, ExternalError>`
+- On error: wraps error in ExternalError with message
+- On success: returns success value unchanged
+
 **Examples:**
 ```walnut
-processData = ^input: String => *Result<Data, String> :: {
+processData = ^input: String => Result<Data, ExternalError> :: {
     /* Convert parse error to external error */
-    parsed = (parse(input) *> 'Failed to parse input');
+    parsed = parse(input) *> 'Failed to parse input';
 
     /* Continue processing */
-    validated = (validate(parsed) *> 'Validation failed');
+    validated = validate(parsed) *> 'Validation failed';
 
     validated
 };
 ```
 
-### 11.7.2 Error Wrapping
+### 11.7.2 Error Wrapping in Impure Code
 
 ```walnut
 /* Wrap business logic errors as external errors */
 saveUser = ^user: User => *Null :: {
     validation = validateUser(user) *> 'User validation failed';
-    database |> save(user);
+    %database->save(user)*?;
     null
 };
 ```
 
-## 11.8 Error Checking Expressions
+### 11.7.3 Relationship with Other Error Operators
+
+The `*>` operator is distinct from the error conversion operators:
+
+- `expr*>msg`: Wraps errors with message context; useful for escalating errors
+- `expr@*`: Converts error to external error without message wrapping
+- `expr*?`: Converts any error to empty (error → empty)
+
+**Practical difference:**
+```walnut
+/* Using *> for context */
+parsed = parse(data) *> 'Parse step failed';
+
+/* Using @* for simple conversion */
+converted = value@*;
+
+/* Using *? to ignore errors */
+optional = value*?;
+```
+
+## 11.8 Conditional Checking Expressions
 
 ### 11.8.1 ?whenIsError
 
-The `?whenIsError` expression checks if a value is an error and branches accordingly.
+The `?whenIsError` expression checks if a value is a regular error and branches accordingly.
 
 **Syntax:**
 ```walnut
 ?whenIsError(expression) { errorBranch } ~ { successBranch }
 ```
+
+**Type behavior:** In the `errorBranch`, the expression type is known to be an error. In the `successBranch`, the error type is removed.
 
 **Examples:**
 ```walnut
@@ -417,7 +555,61 @@ message = ?whenIsError(result) {
 result  /* Returns original value if not error */
 ```
 
-### 11.8.2 Error Value Access
+### 11.8.2 ?whenIsEmpty
+
+The `?whenIsEmpty` expression checks if a value is empty and branches accordingly.
+
+**Syntax:**
+```walnut
+?whenIsEmpty(expression) { emptyBranch } ~ { successBranch }
+```
+
+**Type behavior:** In the `emptyBranch`, the expression is known to be empty. In the `successBranch`, empty is removed from the type.
+
+**Examples:**
+```walnut
+optional = getValue();
+
+result = ?whenIsEmpty(optional) {
+    'No value available'
+} ~ {
+    'Value: ' + optional->asString
+};
+
+/* Using with early return */
+?whenIsEmpty(required) {
+    => @'Value required'
+};
+```
+
+### 11.8.3 ?whenIsExternalError
+
+The `?whenIsExternalError` expression checks if a value is an external error and branches accordingly.
+
+**Syntax:**
+```walnut
+?whenIsExternalError(expression) { errorBranch } ~ { successBranch }
+```
+
+**Type behavior:** In the `errorBranch`, the expression is an external error. In the `successBranch`, external error is removed.
+
+**Examples:**
+```walnut
+result = fileOperation(path);
+
+handled = ?whenIsExternalError(result) {
+    'I/O failed: ' + result->error
+} ~ {
+    'Data: ' + result->asString
+};
+
+/* With early return */
+?whenIsExternalError(impureResult) {
+    => 'Falling back to default'
+};
+```
+
+### 11.8.4 Error Value Access
 
 When a value is known to be an error, access its error value with the `->error` method.
 
@@ -431,6 +623,14 @@ processResult = ^r: Result<Integer, String> => String ::
     }
 ;
 ```
+
+### 11.8.5 Comparison of Checking Operators
+
+| Operator | Checks | Result on Match | Result on No Match |
+|----------|--------|-----------------|-------------------|
+| `?whenIsError(x)` | Is `x` a regular error? | Error branch | Success branch |
+| `?whenIsEmpty(x)` | Is `x` empty? | Empty branch | Success branch |
+| `?whenIsExternalError(x)` | Is `x` an external error? | Error branch | Success branch |
 
 ## 11.9 Result Methods and Transformations
 
@@ -897,7 +1097,36 @@ This folding behavior means you don't need to manually check each result—the `
 
 The folding stops at the first error, making it efficient and predictable.
 
-## 11.14 Summary
+## 11.14 Complete Operator Reference
+
+### Early Return Operators
+
+| Operator | Condition | Type Effect |
+|----------|-----------|------------|
+| `expr?!` | If empty | Removes Empty |
+| `expr@!` | If regular error | Removes Error |
+| `expr*!` | If external error | Removes ExternalError |
+| `expr!` | If empty or regular error | Removes both |
+
+### Error Conversion Operators
+
+| Operator | Converts | Syntax |
+|----------|----------|--------|
+| `expr @?` | Error → empty | Postfix |
+| `expr *?` | External error → empty | Postfix |
+| `expr ?@ errVal` | Empty → error | Takes error value |
+| `expr @* (msg)` | Error → external error with message | Takes message |
+| `expr ?* (msg)` | Empty → external error with message | Takes message |
+
+### Conditional Checking Expressions
+
+| Expression | Purpose | Type Refinement |
+|-----------|---------|-----------------|
+| `?whenIsError(x)` | Check for regular error | Narrows to error/success |
+| `?whenIsEmpty(x)` | Check for empty | Narrows to empty/success |
+| `?whenIsExternalError(x)` | Check for external error | Narrows to error/success |
+
+## 11.15 Summary
 
 Walnut's error handling system provides:
 
@@ -906,14 +1135,14 @@ Walnut's error handling system provides:
 - **Pattern matching** with `when` for handling both success and error cases
 - **Error fallback operator** (`??`) via `binaryOrElse`
 - **Early returns** with `=>` for explicit control flow
-- **Postfix `?` operator** for automatic error propagation
-- **Postfix `*?` operator** for handling external errors separately
-- **Method chaining** with `->method()?` and `->method()*?` for concise error handling
-- **Error conversion** with `*>` operator
+- **Early return operators** (`?!`, `@!`, `*!`, `!`) for conditional early returns
+- **Error conversion operators** (`@?`, `*?`, `?@`, `@*`, `?*`) for type transformations
+- **Error context operator** (`*>`) for wrapping errors with messages
+- **Method chaining** with early return operators for concise error handling
 - **Type safety** through compile-time checking
 - **Explicit error types** for clear error contracts
 - **Impure types** for marking side-effecting operations
-- **Error checking expressions** with `?whenIsError`
+- **Conditional checking expressions** with `?whenIsError`, `?whenIsEmpty`, `?whenIsExternalError`
 - **Result folding** with collections for elegant error handling in pipelines
 
 This system combines the benefits of:
@@ -921,5 +1150,7 @@ This system combines the benefits of:
 - **Convenient control flow** (like exceptions, but without hidden control flow)
 - **Type safety** (all errors are tracked in function signatures)
 - **Composability** (errors propagate naturally through pipelines)
+- **Flexible error transformation** (multiple conversion pathways)
+- **Fine-grained error control** (distinguish empty, error, and external error)
 
 The result is robust, maintainable error handling that makes error cases visible and forces developers to handle them appropriately.

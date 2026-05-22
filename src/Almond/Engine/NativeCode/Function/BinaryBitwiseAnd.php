@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Almond\Engine\NativeCode\Function;
 
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\EarlyReturnExpressionType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\AnyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\FunctionType;
@@ -54,7 +55,7 @@ final readonly class BinaryBitwiseAnd extends FunctionCompose {
 				new VariableName('second')
 			),
 			new MethodName('invoke'),
-			$this->expressionRegistry->noError(
+			$this->expressionRegistry->earlyReturn(
 				$this->expressionRegistry->methodCall(
 					$this->expressionRegistry->variableName(
 						new VariableName('first')
@@ -63,7 +64,8 @@ final readonly class BinaryBitwiseAnd extends FunctionCompose {
 					$this->expressionRegistry->variableName(
 						new VariableName('#')
 					),
-				)
+				),
+				EarlyReturnExpressionType::onError
 			)
 		);
 	}

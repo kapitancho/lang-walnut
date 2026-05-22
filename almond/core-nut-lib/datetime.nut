@@ -96,7 +96,7 @@ JsonValue ==> DateAndTime @@ InvalidDate|InvalidTime|InvalidDateAndTime :: {
     ?whenTypeOf($) {
         `String: $->asDateAndTime,
         `[Integer, Integer<1..12>, Integer<1..31>, Integer<0..23>, Integer<0..59>, Integer<0..59>]:
-            DateAndTime[Date[$.0, $.1, $.2]?, Time[$.3, $.4, $.5]?],
+            DateAndTime[Date[$.0, $.1, $.2]!, Time[$.3, $.4, $.5]!],
         `[
             year: Integer,
             month: Integer<1..12>,
@@ -104,11 +104,11 @@ JsonValue ==> DateAndTime @@ InvalidDate|InvalidTime|InvalidDateAndTime :: {
             hour: Integer<0..23>,
             minute: Integer<0..59>,
             second: Integer<0..59>
-        ]: DateAndTime[Date[$.year, $.month, $.day]?, Time[$.hour, $.minute, $.second]?],
+        ]: DateAndTime[Date[$.year, $.month, $.day]!, Time[$.hour, $.minute, $.second]!],
         type[
             date: [year: Integer, month: Integer<1..12>, day: Integer<1..31>],
             time: [hour: Integer<0..23>, minute: Integer<0..59>, second: Integer<0..59>]
-        ]: DateAndTime[Date[$.date.year, $.date.month, $.date.day]?, Time[$.time.hour, $.time.minute, $.time.second]?],
+        ]: DateAndTime[Date[$.date.year, $.date.month, $.date.day]!, Time[$.time.hour, $.time.minute, $.time.second]!],
         ~: @InvalidDateAndTime
      }
 
@@ -117,7 +117,7 @@ JsonValue ==> DateAndTime @@ InvalidDate|InvalidTime|InvalidDateAndTime :: {
 String ==> DateAndTime @@ InvalidDate|InvalidTime|InvalidDateAndTime :: {
      pieces = $->split(' ');
      ?whenTypeOf(pieces) {
-        `[String<10>, String<8>]: DateAndTime[date: pieces.0 -> asDate?, time: pieces.1 -> asTime?],
+        `[String<10>, String<8>]: DateAndTime[date: pieces.0 -> asDate!, time: pieces.1 -> asTime!],
         ~: @InvalidDateAndTime
      }
 };

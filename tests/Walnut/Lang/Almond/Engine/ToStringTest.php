@@ -10,6 +10,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\MethodName;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\TypeName;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\VariableName;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\MinusInfinity;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\EarlyReturnExpressionType;
 use Walnut\Lang\Test\Almond\AlmondBaseTestHelper;
 
 final class ToStringTest extends AlmondBaseTestHelper {
@@ -204,8 +205,10 @@ final class ToStringTest extends AlmondBaseTestHelper {
 			'var{a: x, ~y} = 0' => $er->multiVariableAssignment(['a' => new VariableName('x'), 'y' => new VariableName('y')], $c0),
 			':: 0' => $er->scoped($c0),
 			'=> 0' => $er->return($c0),
-			'(0)?' => $er->noError($c0),
-			'(0)*?' => $er->noExternalError($c0),
+			'(0)?!' => $er->earlyReturn($c0, EarlyReturnExpressionType::onEmpty),
+			'(0)@!' => $er->earlyReturn($c0, EarlyReturnExpressionType::onError),
+			'(0)*!' => $er->earlyReturn($c0, EarlyReturnExpressionType::onExternalError),
+			'(0)!' => $er->earlyReturn($c0, EarlyReturnExpressionType::onEmptyAndError),
 			'(0)' => $er->group($c0),
 			'{0; 0}' => $er->sequence([$c0, $c0]),
 			"x->item('a')" => $er->propertyAccess($x, 'a'),
@@ -229,6 +232,8 @@ final class ToStringTest extends AlmondBaseTestHelper {
 			'?when (x) { x } ~ { 0 }' => $er->matchIf($x, $x, $c0),
 			'?whenIsError (x) { 0 }' => $er->matchError($x, $c0, null),
 			'?whenIsError (x) { x } ~ { 0 }' => $er->matchError($x, $x, $c0),
+			'?whenIsExternalError (x) { 0 }' => $er->matchExternalError($x, $c0, null),
+			'?whenIsExternalError (x) { x } ~ { 0 }' => $er->matchExternalError($x, $x, $c0),
 			'?whenIsEmpty (x) { 0 }' => $er->matchEmpty($x, $c0, null),
 			'?whenIsEmpty (x) { x } ~ { 0 }' => $er->matchEmpty($x, $x, $c0),
 		] as $string => $value) {

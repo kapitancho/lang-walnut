@@ -436,7 +436,7 @@ MySealed := $String;
                 IntegerNumberInterval[
                     start: IntegerNumberIntervalEndpoint![value: -3, inclusive: true],
                     end: IntegerNumberIntervalEndpoint![value: 42, inclusive: false]
-                ]?
+                ]!
             ]],
             actual: ^ :: {
                 fn = ^ t: Type<Integer> => IntegerNumberRange :: t->numberRange;
@@ -473,7 +473,7 @@ MySealed := $String;
                 RealNumberInterval[
                     start: RealNumberIntervalEndpoint![value: -3.14, inclusive: true],
                     end: RealNumberIntervalEndpoint![value: 42, inclusive: false]
-                ]?
+                ]!
             ]],
             actual: ^ :: {
                 fn = ^ t: Type<Real> => RealNumberRange :: t->numberRange;

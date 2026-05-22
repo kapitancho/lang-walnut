@@ -137,7 +137,7 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 		return new ErrorType($this, $errorType);
 	}
 
-	public function result(Type $returnType, Type $errorType): ResultTypeInterface|OptionalTypeInterface {
+	public function result(Type $returnType, Type $errorType): Type {
 		if ($returnType instanceof ResultTypeInterface) {
 			$errorType = $this->union([$errorType, $returnType->errorType]);
 			$returnType = $returnType->returnType;
@@ -152,6 +152,9 @@ final readonly class TypeRegistry implements TypeRegistryInterface {
 		}
 		if ($returnType instanceof NothingTypeInterface) {
 			return $this->error($errorType);
+		}
+		if ($errorType instanceof NothingTypeInterface) {
+			return $returnType;
 		}
 		return new ResultType(
 			$returnType,

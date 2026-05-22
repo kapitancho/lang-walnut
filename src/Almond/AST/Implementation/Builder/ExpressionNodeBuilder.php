@@ -22,12 +22,16 @@ use Walnut\Lang\Almond\AST\Implementation\Node\Expression\BooleanXorExpressionNo
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\ConstantExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\ConstructorCallExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\DataExpressionNode;
+use Walnut\Lang\Almond\AST\Implementation\Node\Expression\EmptyAsErrorExpressionNode;
+use Walnut\Lang\Almond\AST\Implementation\Node\Expression\ErrorAsEmptyExpressionNode;
+use Walnut\Lang\Almond\AST\Implementation\Node\Expression\ExternalErrorAsEmptyExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\FunctionCallExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\GroupExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\MatchEmptyExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\MatchErrorExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\MatchExpressionDefaultNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\MatchExpressionPairNode;
+use Walnut\Lang\Almond\AST\Implementation\Node\Expression\MatchExternalErrorExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\MatchIfExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\MatchTrueExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\MatchTypeExpressionNode;
@@ -35,8 +39,8 @@ use Walnut\Lang\Almond\AST\Implementation\Node\Expression\MatchValueExpressionNo
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\MethodCallExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\MultiVariableAssignmentExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\MutableExpressionNode;
-use Walnut\Lang\Almond\AST\Implementation\Node\Expression\NoErrorExpressionNode;
-use Walnut\Lang\Almond\AST\Implementation\Node\Expression\NoExternalErrorExpressionNode;
+use Walnut\Lang\Almond\AST\Implementation\Node\Expression\EarlyReturnExpressionNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\EarlyReturnExpressionType;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\PropertyAccessExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\RecordExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\ReturnExpressionNode;
@@ -48,7 +52,8 @@ use Walnut\Lang\Almond\AST\Implementation\Node\Expression\VariableAssignmentExpr
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\VariableNameExpressionNode;
 
 final readonly class ExpressionNodeBuilder implements ExpressionNodeBuilderInterface {
-	public function __construct(private SourceLocator $sourceLocator) {}
+	public function __construct(private SourceLocator $sourceLocator) {
+	}
 
 	private function getSourceLocation(): SourceLocation {
 		return $this->sourceLocator->getSourceLocation();
@@ -63,7 +68,7 @@ final readonly class ExpressionNodeBuilder implements ExpressionNodeBuilderInter
 	}
 
 	public function constructorCall(
-		TypeNameNode $typeName,
+		TypeNameNode   $typeName,
 		ExpressionNode $parameter
 	): ConstructorCallExpressionNode {
 		return new ConstructorCallExpressionNode(
@@ -100,6 +105,11 @@ final readonly class ExpressionNodeBuilder implements ExpressionNodeBuilderInter
 		return new MatchErrorExpressionNode($this->getSourceLocation(), $condition, $then, $else);
 	}
 
+	public function matchExternalError(ExpressionNode $condition, ExpressionNode $then, ExpressionNode|null $else): MatchExternalErrorExpressionNode {
+		return new MatchExternalErrorExpressionNode($this->getSourceLocation(), $condition, $then, $else);
+	}
+
+
 	public function matchEmpty(ExpressionNode $condition, ExpressionNode $then, ExpressionNode|null $else): MatchEmptyExpressionNode {
 		return new MatchEmptyExpressionNode($this->getSourceLocation(), $condition, $then, $else);
 	}
@@ -112,12 +122,20 @@ final readonly class ExpressionNodeBuilder implements ExpressionNodeBuilderInter
 		return new MutableExpressionNode($this->getSourceLocation(), $type, $value);
 	}
 
-	public function noError(ExpressionNode $targetExpression): NoErrorExpressionNode {
-		return new NoErrorExpressionNode($this->getSourceLocation(), $targetExpression);
+	public function errorAsEmpty(ExpressionNode $targetExpression): ErrorAsEmptyExpressionNode {
+		return new ErrorAsEmptyExpressionNode($this->getSourceLocation(), $targetExpression);
 	}
 
-	public function noExternalError(ExpressionNode $targetExpression): NoExternalErrorExpressionNode {
-		return new NoExternalErrorExpressionNode($this->getSourceLocation(), $targetExpression);
+	public function externalErrorAsEmpty(ExpressionNode $targetExpression): ExternalErrorAsEmptyExpressionNode {
+		return new ExternalErrorAsEmptyExpressionNode($this->getSourceLocation(), $targetExpression);
+	}
+
+	public function emptyAsError(ExpressionNode $targetExpression, ExpressionNode $errorExpression): EmptyAsErrorExpressionNode {
+		return new EmptyAsErrorExpressionNode($this->getSourceLocation(), $targetExpression, $errorExpression);
+	}
+
+	public function earlyReturn(ExpressionNode $targetExpression, EarlyReturnExpressionType $type): EarlyReturnExpressionNode {
+		return new EarlyReturnExpressionNode($this->getSourceLocation(), $targetExpression, $type);
 	}
 
 	public function propertyAccess(ExpressionNode $target, int|string $propertyName): PropertyAccessExpressionNode {

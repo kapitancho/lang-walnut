@@ -13,6 +13,6 @@ TemplateRenderer->render(^view => Result<String, UnableToRenderTemplate>) :: {
         -> map(^tpl: Template => String :: tpl->value->value)
         ->ifError(^e: Any => Error<UnableToRenderTemplate> ::
             @UnableToRenderTemplate[type: view->type, reason: e->printed])
-        ?->value
+        !->value
 
 };

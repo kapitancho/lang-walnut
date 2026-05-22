@@ -9,13 +9,17 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\BooleanXorExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ConstantExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ConstructorCallExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\DataExpressionNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\EmptyAsErrorExpressionNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ErrorAsEmptyExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ExpressionNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ExternalErrorAsEmptyExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\FunctionCallExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\GroupExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MatchEmptyExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MatchErrorExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MatchExpressionDefaultNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MatchExpressionPairNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MatchExternalErrorExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MatchIfExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MatchTrueExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MatchTypeExpressionNode;
@@ -23,8 +27,8 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MatchValueExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MethodCallExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MultiVariableAssignmentExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MutableExpressionNode;
-use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\NoErrorExpressionNode;
-use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\NoExternalErrorExpressionNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\EarlyReturnExpressionNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\EarlyReturnExpressionType as AstEarlyReturnType;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\PropertyAccessExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\RecordExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ReturnExpressionNode;
@@ -39,6 +43,7 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Type\TypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Value\ValueNode;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\ExpressionRegistry;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\EarlyReturnExpressionType as EngineEarlyReturnType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\MatchExpressionDefault;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\MatchExpressionPair;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Error\UnknownType;
@@ -77,6 +82,15 @@ final readonly class ExpressionBuilder implements ExpressionCompilerInterface {
 		return $this->expressionRegistry->matchDefault(
 			$this->expression($matchExpressionDefaultNode->valueExpression)
 		);
+	}
+
+	private function convertEarlyReturnType(AstEarlyReturnType $astType): EngineEarlyReturnType {
+		return match($astType) {
+			AstEarlyReturnType::onEmpty => EngineEarlyReturnType::onEmpty,
+			AstEarlyReturnType::onError => EngineEarlyReturnType::onError,
+			AstEarlyReturnType::onExternalError => EngineEarlyReturnType::onExternalError,
+			AstEarlyReturnType::onEmptyAndError => EngineEarlyReturnType::onEmptyAndError,
+		};
 	}
 
 	/** @throws BuildException */
@@ -173,6 +187,13 @@ final readonly class ExpressionBuilder implements ExpressionCompilerInterface {
 					$expressionNode->else ?
 						$this->expression($expressionNode->else) : null
 				),
+			$expressionNode instanceof MatchExternalErrorExpressionNode =>
+				$this->expressionRegistry->matchExternalError(
+					$this->expression($expressionNode->condition),
+					$this->expression($expressionNode->onError),
+					$expressionNode->else ?
+						$this->expression($expressionNode->else) : null
+				),
 			$expressionNode instanceof MatchEmptyExpressionNode =>
 				$this->expressionRegistry->matchEmpty(
 					$this->expression($expressionNode->condition),
@@ -234,13 +255,35 @@ final readonly class ExpressionBuilder implements ExpressionCompilerInterface {
 					$this->type($expressionNode->type),
 					$this->expression($expressionNode->value),
 				),
-			$expressionNode instanceof NoErrorExpressionNode =>
-				$this->expressionRegistry->noError(
+			$expressionNode instanceof ErrorAsEmptyExpressionNode =>
+				$this->expressionRegistry->matchError(
 					$this->expression($expressionNode->targetExpression),
+					$this->expressionRegistry->constant(
+						$this->valueRegistry->empty
+					),
+					null
 				),
-			$expressionNode instanceof NoExternalErrorExpressionNode =>
-				$this->expressionRegistry->noExternalError(
+			$expressionNode instanceof ExternalErrorAsEmptyExpressionNode =>
+				$this->expressionRegistry->matchExternalError(
 					$this->expression($expressionNode->targetExpression),
+					$this->expressionRegistry->constant(
+						$this->valueRegistry->empty
+					),
+					null
+				),
+			$expressionNode instanceof EmptyAsErrorExpressionNode =>
+				$this->expressionRegistry->matchEmpty(
+					$this->expression($expressionNode->targetExpression),
+					$this->expressionRegistry->constructorCall(
+						$this->nameBuilder->typeName('Error'),
+						$this->expression($expressionNode->errorExpression)
+					),
+					null
+				),
+			$expressionNode instanceof EarlyReturnExpressionNode =>
+				$this->expressionRegistry->earlyReturn(
+					$this->expression($expressionNode->targetExpression),
+					$this->convertEarlyReturnType($expressionNode->type)
 				),
 			$expressionNode instanceof PropertyAccessExpressionNode =>
 				$this->expressionRegistry->propertyAccess(

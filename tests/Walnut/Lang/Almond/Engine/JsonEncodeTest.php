@@ -13,6 +13,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\MinusInfinity;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberInterval;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\NumberIntervalEndpoint;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Range\PlusInfinity;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\EarlyReturnExpressionType;
 use Walnut\Lang\Test\Almond\AlmondBaseTestHelper;
 
 final class JsonEncodeTest extends AlmondBaseTestHelper {
@@ -217,8 +218,10 @@ final class JsonEncodeTest extends AlmondBaseTestHelper {
 			'{"expressionType":"MultiVariableAssignment","variableNames":["x"],"assignedExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->multiVariableAssignment([new VariableName('x')], $c0),
 			'{"expressionType":"MultiVariableAssignment","variableNames":{"a":"x"},"assignedExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->multiVariableAssignment(['a' => new VariableName('x')], $c0),
 			'{"expressionType":"return","returnedExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->return($c0),
-			'{"expressionType":"NoError","targetExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->noError($c0),
-			'{"expressionType":"NoExternalError","targetExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->noExternalError($c0),
+			'{"expressionType":"EarlyReturn","type":"onEmpty","targetExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->earlyReturn($c0, EarlyReturnExpressionType::onEmpty),
+			'{"expressionType":"EarlyReturn","type":"onError","targetExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->earlyReturn($c0, EarlyReturnExpressionType::onError),
+			'{"expressionType":"EarlyReturn","type":"onExternalError","targetExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->earlyReturn($c0, EarlyReturnExpressionType::onExternalError),
+			'{"expressionType":"EarlyReturn","type":"onEmptyAndError","targetExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->earlyReturn($c0, EarlyReturnExpressionType::onEmptyAndError),
 			'{"expressionType":"Group","innerExpression":{"expressionType":"constant","value":{"valueType":"Integer","value":0}}}' => $er->group($c0),
 			'{"expressionType":"Sequence","expressions":[{"expressionType":"constant","value":{"valueType":"Integer","value":0}},{"expressionType":"constant","value":{"valueType":"Integer","value":0}}]}' => $er->sequence([$c0, $c0]),
 			'{"expressionType":"MethodCall","target":{"expressionType":"VariableName","variableName":"x"},"methodName":"item","parameter":{"expressionType":"constant","value":{"valueType":"String","value":"a"}}}' => $er->propertyAccess($x, 'a'),

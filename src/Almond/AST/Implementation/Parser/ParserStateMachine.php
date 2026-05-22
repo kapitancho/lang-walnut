@@ -7,6 +7,7 @@ namespace Walnut\Lang\Almond\AST\Implementation\Parser;
 use BcMath\Number;
 use ReflectionClass;
 use Walnut\Lang\Almond\AST\Blueprint\Builder\NodeBuilder;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\EarlyReturnExpressionType;
 use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation;
 use Walnut\Lang\Almond\AST\Blueprint\Number\MinusInfinity;
 use Walnut\Lang\Almond\AST\Blueprint\Number\PlusInfinity;
@@ -1729,6 +1730,14 @@ final readonly class ParserStateMachine {
 					$this->s->result['expression_left'] = $this->s->generated;
 					$this->s->move(3303);
 				},
+				T::empty_as_error->name => function(LT $token) {
+					$this->s->push(3141);
+					$this->s->result = [];
+					$this->s->result['startPosition'] = $token->sourcePosition;
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->push(3304);
+					$this->s->move(3000);
+				},
 				T::error_as_external->name => function(LT $token) {
 					$this->s->push(3141);
 					$this->s->result = [];
@@ -1736,6 +1745,15 @@ final readonly class ParserStateMachine {
 					$this->s->result['is_no_error'] = true;
 					$this->s->result['expression_left'] = $this->s->generated;
 					$this->s->result['method_name'] = $this->nodeBuilder->name->methodName('errorAsExternal');
+					$this->s->move(3306);
+				},
+				T::empty_as_external->name => function(LT $token) {
+					$this->s->push(3141);
+					$this->s->result = [];
+					$this->s->result['startPosition'] = $token->sourcePosition;
+					$this->s->result['is_no_error'] = true;
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->result['method_name'] = $this->nodeBuilder->name->methodName('emptyAsExternal');
 					$this->s->move(3306);
 				},
 				T::method_marker->name => function(LT $token) {
@@ -1752,18 +1770,44 @@ final readonly class ParserStateMachine {
 					$this->s->result['expression_left'] = $this->s->generated;
 					$this->s->move(3311);
 				},
-				T::external_error_check->name => function(LT $token) {
+				/*T::external_error_check->name => function(LT $token) {
 					$this->s->generated = $this->nodeBuilder->expression->noExternalError(
 						$this->s->generated
 					);
 					$this->s->move(3141);
-				},
-				T::optional_key->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->expression->noError(
+				},*/
+				T::error_as_empty->name => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->expression->errorAsEmpty(
 						$this->s->generated
 					);
 					$this->s->move(3141);
 				},
+				T::external_error_as_empty->name => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->expression->externalErrorAsEmpty(
+						$this->s->generated
+					);
+					$this->s->move(3141);
+				},
+				T::early_return->name => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->expression->earlyReturn(
+						$this->s->generated,
+						EarlyReturnExpressionType::from($token->patternMatch->text)
+					);
+					$this->s->move(3141);
+				},
+				T::boolean_op_not->name => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->expression->earlyReturn(
+						$this->s->generated,
+						EarlyReturnExpressionType::onEmptyAndError
+					);
+					$this->s->move(3141);
+				},
+				/*T::optional_key->name => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->expression->noError(
+						$this->s->generated
+					);
+					$this->s->move(3141);
+				},*/
 				T::tuple_start->name => $c = function(LT $token) {
 					$this->s->push(3141);
 					$this->s->stay(3151);
@@ -1880,6 +1924,12 @@ final readonly class ParserStateMachine {
 					$this->s->result['startPosition'] = $token->sourcePosition;
 					$this->s->move(352);
 				},
+				T::when_is_external_error->name => function(LT $token) {
+					$this->s->result['matchType'] = 'isExternalError';
+					$this->s->result['matchPairs'] = [];
+					$this->s->result['startPosition'] = $token->sourcePosition;
+					$this->s->move(372);
+				},
 				T::when_is_empty->name => function(LT $token) {
 					$this->s->result['matchType'] = 'isEmpty';
 					$this->s->result['matchPairs'] = [];
@@ -1931,9 +1981,19 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				},
 				T::method_marker->name => $c,
-				T::error_as_external->name => $c,
 				T::positive_integer_number->name => $c,
 			]],
+
+			3304 => ['name' => 'empty as error', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->expression->emptyAsError(
+						$this->s->result['expression_left'],
+						$this->s->generated
+					);
+					$this->s->pop();
+				}
+			]],
+
 
 
 			3305 => ['name' => 'method name', 'transitions' => [
@@ -2316,6 +2376,58 @@ final readonly class ParserStateMachine {
 					$this->s->pop();
 				}
 			]],
+			372 => ['name' => 'match external error start', 'transitions' => [
+				T::call_start->name => 373
+			]],
+			373 => ['name' => 'match external error target', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->push(374);
+					$this->s->stay(3000);
+				}
+			]],
+			374 => ['name' => 'match external error target end', 'transitions' => [
+				T::call_end->name => function(LT $token) {
+					$this->s->result['matchTarget'] = $this->s->generated;
+					$this->s->move(375);
+				}
+			]],
+			375 => ['name' => 'match external error then start', 'transitions' => [
+				T::sequence_start->name => function(LT $token) {
+					$this->s->push(376);
+					$this->s->stay(3000);
+				}
+			]],
+			376 => ['name' => 'match external error else check', 'transitions' => [
+				T::default_match->name => function(LT $token) {
+					$this->s->result['matchThen'] = $this->s->generated;
+					$this->s->move(377);
+				},
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->expression->matchExternalError(
+						$this->s->result['matchTarget'],
+						$this->s->generated,
+						null
+					);
+					$this->s->pop();
+				}
+			]],
+			377 => ['name' => 'match external error start', 'transitions' => [
+				T::sequence_start->name => function(LT $token) {
+					$this->s->push(378);
+					$this->s->stay(3000);
+				}
+			]],
+			378 => ['name' => 'match external error else check', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->expression->matchExternalError(
+						$this->s->result['matchTarget'],
+						$this->s->result['matchThen'],
+						$this->s->generated
+					);
+					$this->s->pop();
+				}
+			]],
+
 			359 => ['name' => 'constant value start', 'transitions' => [
 				T::sequence_start->name => function(LT $token) {
 					$this->s->push(360);
@@ -4360,8 +4472,5 @@ final readonly class ParserStateMachine {
 			$useGenerated ? $this->s->generated :
 				$this->nodeBuilder->expression->constant($this->nodeBuilder->value->nullValue)
 		);
-		if ($this->s->result['is_no_error'] ?? false) {
-			$this->s->generated = $this->nodeBuilder->expression->noError($this->s->generated);
-		}
 	}
 }

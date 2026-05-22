@@ -98,11 +98,11 @@ HydrationError->errorMessages(=> Array<String>) :: $errors->map(
 );
 
 /* IO etc. */
-ExternalError := $[errorType: String, originalError: Any, errorMessage: String];
+ExternalError := $[errorType: String, originalError: ?Any, errorMessage: String];
 
 /* RegExp */
 InvalidRegExp := [expression: String];
-RegExp := $String @@ InvalidRegExp :: #->asRegExp?;
+RegExp := $String @@ InvalidRegExp :: #->asRegExp!;
 RegExpMatch := [match: String, groups: Array<String>];
 NoRegExpMatch := ();
 
@@ -111,7 +111,7 @@ Random := ();
 
 /* UUID */
 InvalidUuid := [value: String];
-Uuid := #String<36> @@ InvalidUuid :: #->asUuid?;
+Uuid := #String<36> @@ InvalidUuid :: #->asUuid!;
 
 /* Password handling */
 PasswordString := #[value: String];

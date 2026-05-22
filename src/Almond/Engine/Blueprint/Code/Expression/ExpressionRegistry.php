@@ -16,8 +16,7 @@ interface ExpressionRegistry {
 	public function return(Expression $expression): Expression;
 	public function scoped(Expression $expression): Expression;
 
-	public function noError(Expression $expression): Expression;
-	public function noExternalError(Expression $expression): Expression;
+	public function earlyReturn(Expression $expression, EarlyReturnExpressionType $type): Expression;
 
 	public function booleanOr(Expression $first, Expression $second): Expression;
 	public function booleanAnd(Expression $first, Expression $second): Expression;
@@ -34,6 +33,10 @@ interface ExpressionRegistry {
 	public function matchIf(Expression $condition, Expression $then, Expression|null $else): Expression;
 
 	public function matchError(
+		Expression $condition, Expression $onError, Expression|null $else
+	): Expression;
+
+	public function matchExternalError(
 		Expression $condition, Expression $onError, Expression|null $else
 	): Expression;
 

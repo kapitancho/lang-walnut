@@ -46,7 +46,7 @@ foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . $f
             if ($showErrorsOnly) {
                 echo PHP_EOL, "Analysing ", $source, PHP_EOL;
             }
-            echo "\033[0;31m✗ EXCEPTION\033[0m ", $e->getMessage(), PHP_EOL;
+            echo "\033[0;31m✗ EXCEPTION\033[0m ", $e->getMessage(), '|', PHP_EOL;
             continue;
         }
 
@@ -56,7 +56,7 @@ foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . $f
                 echo PHP_EOL, "Analysing ", $source, PHP_EOL;
             }
             foreach ($result->errors as $error) {
-                echo "\033[0;31m✗ ERROR\033[0m ", $error->errorMessage, PHP_EOL;
+                echo "\033[0;31m✗ ERROR\033[0m ", $error->errorMessage, "\n\t", $error->sourceLocations[0], PHP_EOL;
             }
         } else {
             if (!$showErrorsOnly) {

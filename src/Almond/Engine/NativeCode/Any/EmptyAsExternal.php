@@ -8,6 +8,7 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\ResultType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\StringType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\CoreType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\Type;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\EmptyValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\ErrorValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\NullValue;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\BuiltIn\SealedValue;
@@ -16,46 +17,33 @@ use Walnut\Lang\Almond\Engine\Blueprint\Code\Value\Value;
 use Walnut\Lang\Almond\Engine\Implementation\Code\NativeCode\NativeMethod\NativeMethod;
 
 /** @extends NativeMethod<Type, NullType|StringType, Value, NullValue|StringValue> */
-final readonly class ErrorAsExternal extends NativeMethod {
+final readonly class EmptyAsExternal extends NativeMethod {
 
 	protected function getValidator(): callable {
 		return function (Type $targetType, NullType|StringType $parameterType, mixed $origin): Type {
-			$isOptional = false;
-			if ($targetType instanceof OptionalType) {
-				$isOptional = true;
-				$targetType = $targetType->valueType;
-			}
-			$type = $targetType instanceof ResultType ?
+			return $targetType instanceof OptionalType ?
 				$this->typeRegistry->result(
-					$targetType->returnType,
+					$targetType->valueType,
 					$this->typeRegistry->core->externalError
-				) :
-				$targetType;
-			return $isOptional ?
-				$this->typeRegistry->optional($type) : $type;
+				) : $targetType;
 		};
 	}
 
 	protected function getExecutor(): callable {
 		return function(Value $target, NullValue|StringValue $parameter): Value {
-			if ($target instanceof ErrorValue) {
-				$errorValue = $target->errorValue;
-				if (!($errorValue instanceof SealedValue && $errorValue->type->name->equals(
-						CoreType::ExternalError->typeName()
-					))) {
-					$errorMessage = $parameter instanceof StringValue ? $parameter :
-						$this->valueRegistry->string('Error');
+			if ($target instanceof EmptyValue) {
+				$errorMessage = $parameter instanceof StringValue ? $parameter :
+					$this->valueRegistry->string('Error');
 
-					return $this->valueRegistry->error(
-						$this->valueRegistry->core->externalError(
-							$this->valueRegistry->record([
-								'errorType' => $this->valueRegistry->string((string)$errorValue->type),
-								'originalError' => $target,
-								'errorMessage' => $errorMessage
-							])
-						)
-					);
-				}
+				return $this->valueRegistry->error(
+					$this->valueRegistry->core->externalError(
+						$this->valueRegistry->record([
+							'errorType' => $this->valueRegistry->string('Empty'),
+							'originalError' => $target,
+							'errorMessage' => $errorMessage
+						])
+					)
+				);
 			}
 			return $target;
 		};

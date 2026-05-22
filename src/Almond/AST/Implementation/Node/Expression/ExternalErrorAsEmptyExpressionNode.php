@@ -3,10 +3,10 @@
 namespace Walnut\Lang\Almond\AST\Implementation\Node\Expression;
 
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ExpressionNode;
-use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\NoExternalErrorExpressionNode as NoExternalErrorExpressionNodeInterface;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ExternalErrorAsEmptyExpressionNode as ExternalErrorAsEmptyExpressionNodeInterface;
 use Walnut\Lang\Almond\AST\Blueprint\Node\SourceLocation;
 
-final readonly class NoExternalErrorExpressionNode implements NoExternalErrorExpressionNodeInterface {
+final readonly class ExternalErrorAsEmptyExpressionNode implements ExternalErrorAsEmptyExpressionNodeInterface {
 	public function __construct(
 		public SourceLocation $sourceLocation,
 		public ExpressionNode $targetExpression
@@ -20,7 +20,7 @@ final readonly class NoExternalErrorExpressionNode implements NoExternalErrorExp
 		return [
 			'sourceLocation' => $this->sourceLocation,
 			'nodeCategory' => 'Expression',
-			'nodeName' => 'NoExternalErrorExpression',
+			'nodeName' => 'ExternalErrorAsEmptyExpression',
 			'targetExpression' => $this->targetExpression
 		];
 	}

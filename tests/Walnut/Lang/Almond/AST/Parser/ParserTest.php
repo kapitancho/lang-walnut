@@ -5,6 +5,8 @@ namespace Walnut\Lang\Test\Almond\AST\Parser;
 use BcMath\Number;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ErrorAsEmptyExpressionNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ExternalErrorAsEmptyExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\MatchEmptyExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Module\AddAliasTypeNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Module\AddAtomTypeNode;
@@ -40,8 +42,8 @@ use Walnut\Lang\Almond\AST\Implementation\Node\Expression\MatchValueExpressionNo
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\MethodCallExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\MultiVariableAssignmentExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\MutableExpressionNode;
-use Walnut\Lang\Almond\AST\Implementation\Node\Expression\NoErrorExpressionNode;
-use Walnut\Lang\Almond\AST\Implementation\Node\Expression\NoExternalErrorExpressionNode;
+use Walnut\Lang\Almond\AST\Implementation\Node\Expression\EarlyReturnExpressionNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\EarlyReturnExpressionType;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\PropertyAccessExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\RecordExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\ReturnExpressionNode;
@@ -735,10 +737,18 @@ class ParserTest extends TestCase {
 		];
 		yield ['=> x', ReturnExpressionNode::class, fn(ReturnExpressionNode $e) =>
 			$e->returnedExpression instanceof VariableNameExpressionNode && $e->returnedExpression->variableName->equals(new VariableNameNode($l, 'x'))];
-		yield ['x?', NoErrorExpressionNode::class, fn(NoErrorExpressionNode $e) =>
-			$e->targetExpression instanceof VariableNameExpressionNode && $e->targetExpression->variableName->equals(new VariableNameNode($l, 'x'))];
-		yield ['x*?', NoExternalErrorExpressionNode::class, fn(NoExternalErrorExpressionNode $e) =>
-			$e->targetExpression instanceof VariableNameExpressionNode && $e->targetExpression->variableName->equals(new VariableNameNode($l, 'x'))];
+		yield ['x?!', EarlyReturnExpressionNode::class, fn(EarlyReturnExpressionNode $e) =>
+			$e->targetExpression instanceof VariableNameExpressionNode && $e->targetExpression->variableName->equals(new VariableNameNode($l, 'x')) &&
+			$e->type === EarlyReturnExpressionType::onEmpty];
+		yield ['x@!', EarlyReturnExpressionNode::class, fn(EarlyReturnExpressionNode $e) =>
+			$e->targetExpression instanceof VariableNameExpressionNode && $e->targetExpression->variableName->equals(new VariableNameNode($l, 'x')) &&
+			$e->type === EarlyReturnExpressionType::onError];
+		yield ['x*!', EarlyReturnExpressionNode::class, fn(EarlyReturnExpressionNode $e) =>
+			$e->targetExpression instanceof VariableNameExpressionNode && $e->targetExpression->variableName->equals(new VariableNameNode($l, 'x')) &&
+			$e->type === EarlyReturnExpressionType::onExternalError];
+		yield ['x!', EarlyReturnExpressionNode::class, fn(EarlyReturnExpressionNode $e) =>
+			$e->targetExpression instanceof VariableNameExpressionNode && $e->targetExpression->variableName->equals(new VariableNameNode($l, 'x')) &&
+			$e->type === EarlyReturnExpressionType::onEmptyAndError];
 		yield ['x.y', PropertyAccessExpressionNode::class, fn(PropertyAccessExpressionNode $e) =>
 			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameNode($l, 'x')) &&
 			$e->propertyName === 'y'
@@ -833,18 +843,8 @@ class ParserTest extends TestCase {
 			(string)$e->target->parameter->values['a']->value->value === '1' &&
 			$e->methodName->equals(new MethodNameNode($l, 'a')) &&
 			$e->parameter instanceof ConstantExpressionNode && $e->parameter->value instanceof NullValueNode];
-		yield ['C[a: 1]->a?', NoErrorExpressionNode::class, fn(NoErrorExpressionNode $e) =>
-			$e->targetExpression instanceof MethodCallExpressionNode &&
-			$e->targetExpression->target instanceof ConstructorCallExpressionNode &&
-			$e->targetExpression->target->typeName->equals(new TypeNameNode($l, 'C')) &&
-			$e->targetExpression->target->parameter instanceof RecordExpressionNode &&
-			count($e->targetExpression->target->parameter->values) === 1 &&
-			$e->targetExpression->target->parameter->values['a'] instanceof ConstantExpressionNode &&
-			$e->targetExpression->target->parameter->values['a']->value instanceof IntegerValueNode &&
-			(string)$e->targetExpression->target->parameter->values['a']->value->value === '1' &&
-			$e->targetExpression->methodName->equals(new MethodNameNode($l, 'a')) &&
-			$e->targetExpression->parameter instanceof ConstantExpressionNode && $e->targetExpression->parameter->value instanceof NullValueNode];
-		yield ['C[a: 1]->a*?', NoExternalErrorExpressionNode::class, fn(NoExternalErrorExpressionNode $e) =>
+		yield ['C[a: 1]->a!', EarlyReturnExpressionNode::class, fn(EarlyReturnExpressionNode $e) =>
+			$e->type === EarlyReturnExpressionType::onEmptyAndError &&
 			$e->targetExpression instanceof MethodCallExpressionNode &&
 			$e->targetExpression->target instanceof ConstructorCallExpressionNode &&
 			$e->targetExpression->target->typeName->equals(new TypeNameNode($l, 'C')) &&
@@ -924,19 +924,8 @@ class ParserTest extends TestCase {
 			(string)$e->target->parameter->values['a']->value->value === '1' &&
 			$e->methodName->equals(new MethodNameNode($l, 'a')) &&
 			$e->parameter instanceof ConstantExpressionNode && $e->parameter->value instanceof NullValueNode];
-		yield ['c[a: 1]->a?', NoErrorExpressionNode::class, fn(NoErrorExpressionNode $e) =>
-			$e->targetExpression instanceof MethodCallExpressionNode &&
-			$e->targetExpression->target instanceof FunctionCallExpressionNode &&
-			$e->targetExpression->target->target instanceof VariableNameExpressionNode &&
-			$e->targetExpression->target->target->variableName->equals(new VariableNameNode($l, 'c')) &&
-			$e->targetExpression->target->parameter instanceof RecordExpressionNode &&
-			count($e->targetExpression->target->parameter->values) === 1 &&
-			$e->targetExpression->target->parameter->values['a'] instanceof ConstantExpressionNode &&
-			$e->targetExpression->target->parameter->values['a']->value instanceof IntegerValueNode &&
-			(string)$e->targetExpression->target->parameter->values['a']->value->value === '1' &&
-			$e->targetExpression->methodName->equals(new MethodNameNode($l, 'a')) &&
-			$e->targetExpression->parameter instanceof ConstantExpressionNode && $e->targetExpression->parameter->value instanceof NullValueNode];
-		yield ['c[a: 1]->a*?', NoExternalErrorExpressionNode::class, fn(NoExternalErrorExpressionNode $e) =>
+		yield ['c[a: 1]->a!', EarlyReturnExpressionNode::class, fn(EarlyReturnExpressionNode $e) =>
+			$e->type === EarlyReturnExpressionType::onEmptyAndError &&
 			$e->targetExpression instanceof MethodCallExpressionNode &&
 			$e->targetExpression->target instanceof FunctionCallExpressionNode &&
 			$e->targetExpression->target->target instanceof VariableNameExpressionNode &&
@@ -949,12 +938,8 @@ class ParserTest extends TestCase {
 			$e->targetExpression->methodName->equals(new MethodNameNode($l, 'a')) &&
 			$e->targetExpression->parameter instanceof ConstantExpressionNode && $e->targetExpression->parameter->value instanceof NullValueNode];
 
-		yield ['a->b?', NoErrorExpressionNode::class, fn(NoErrorExpressionNode $e) =>
-			$e->targetExpression instanceof MethodCallExpressionNode &&
-			$e->targetExpression->target instanceof VariableNameExpressionNode && $e->targetExpression->target->variableName->equals(new VariableNameNode($l, 'a')) &&
-			$e->targetExpression->methodName->equals(new MethodNameNode($l, 'b')) &&
-			$e->targetExpression->parameter instanceof ConstantExpressionNode && $e->targetExpression->parameter->value instanceof NullValueNode];
-		yield ['a->b*?', NoExternalErrorExpressionNode::class, fn(NoExternalErrorExpressionNode $e) =>
+		yield ['a->b!', EarlyReturnExpressionNode::class, fn(EarlyReturnExpressionNode $e) =>
+			$e->type === EarlyReturnExpressionType::onEmptyAndError &&
 			$e->targetExpression instanceof MethodCallExpressionNode &&
 			$e->targetExpression->target instanceof VariableNameExpressionNode && $e->targetExpression->target->variableName->equals(new VariableNameNode($l, 'a')) &&
 			$e->targetExpression->methodName->equals(new MethodNameNode($l, 'b')) &&
@@ -1002,11 +987,21 @@ class ParserTest extends TestCase {
 		];
 		yield ['a ?? x', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) => $e->methodName->equals(new MethodNameNode($l, 'binaryOrElse'))];
 
-		yield ['a *> (null)', NoErrorExpressionNode::class, fn(NoErrorExpressionNode $e) =>
-			$e->targetExpression instanceof MethodCallExpressionNode &&
-			$e->targetExpression->target instanceof VariableNameExpressionNode && $e->targetExpression->target->variableName->equals(new VariableNameNode($l, 'a')) &&
-			$e->targetExpression->methodName->equals(new MethodNameNode($l, 'errorAsExternal')) &&
-			$e->targetExpression->parameter instanceof ConstantExpressionNode && $e->targetExpression->parameter->value instanceof NullValueNode];
+		yield ['a *?', ExternalErrorAsEmptyExpressionNode::class, fn(ExternalErrorAsEmptyExpressionNode $e) =>
+			$e->targetExpression instanceof VariableNameExpressionNode && $e->targetExpression->variableName->equals(new VariableNameNode($l, 'a'))];
+
+		yield ['a @?', ErrorAsEmptyExpressionNode::class, fn(ErrorAsEmptyExpressionNode $e) =>
+			$e->targetExpression instanceof VariableNameExpressionNode && $e->targetExpression->variableName->equals(new VariableNameNode($l, 'a'))];
+
+		yield ['a @* (null)', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameNode($l, 'a')) &&
+			$e->methodName->equals(new MethodNameNode($l, 'errorAsExternal')) &&
+			$e->parameter instanceof ConstantExpressionNode && $e->parameter->value instanceof NullValueNode];
+
+		yield ['a ?* (null)', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
+			$e->target instanceof VariableNameExpressionNode && $e->target->variableName->equals(new VariableNameNode($l, 'a')) &&
+			$e->methodName->equals(new MethodNameNode($l, 'emptyAsExternal')) &&
+			$e->parameter instanceof ConstantExpressionNode && $e->parameter->value instanceof NullValueNode];
 
 		yield ['a->b->c', MethodCallExpressionNode::class, fn(MethodCallExpressionNode $e) =>
 			$e->target instanceof MethodCallExpressionNode &&

@@ -114,8 +114,12 @@
 
 <VariableExpression> ::= <InFunctionVar>
 <ErrorExpression> ::= "@" <BasicExpression>
-<NoErrorExpression> ::= <Expression> "?"
-<NoExternalErrorExpression> ::= <Expression> "*" "?"
+<EarlyReturnExpression> ::= <PostfixExpression> ("?" "!" | "@" "!" | "*" "!" | "!")
+<ErrorAsEmptyExpression> ::= <PostfixExpression> "@" "?"
+<ExternalErrorAsEmptyExpression> ::= <PostfixExpression> "*" "?"
+<EmptyAsErrorExpression> ::= <PostfixExpression> "?" "@" <Expression>
+<ErrorAsExternalExpression> ::= <PostfixExpression> "@" "*" "(" <Expression> ")"
+<EmptyAsExternalExpression> ::= <PostfixExpression> "?" "*" "(" <Expression> ")"
 <MutableExpression> ::= "mutable" "{" <TypeExpr> "," <Expression> "}"
 
 <DataExpression> ::= <TypeName> "!" <BasicExpression>
@@ -145,10 +149,12 @@
                   | "val" <TupleConstant>
                   | "val" <RecordConstant>
 
-<MatchExpression> ::= <MatchIf> | <MatchError> | <MatchValue> | <MatchType> | <MatchTrue>
+<MatchExpression> ::= <MatchIf> | <MatchError> | <MatchEmpty> | <MatchExternalError> | <MatchValue> | <MatchType> | <MatchTrue>
 
 <MatchIf> ::= "?when" "(" <Expression> ")" "{" <Expression> "}" ("~" "{" <Expression> "}")?
 <MatchError> ::= "?whenIsError" "(" <Expression> ")" "{" <Expression> "}" ("~" "{" <Expression> "}")?
+<MatchEmpty> ::= "?whenIsEmpty" "(" <Expression> ")" "{" <Expression> "}" ("~" "{" <Expression> "}")?
+<MatchExternalError> ::= "?whenIsExternalError" "(" <Expression> ")" "{" <Expression> "}" ("~" "{" <Expression> "}")?
 <MatchValue> ::= "?whenValueOf" "(" <Expression> ")" "is" "{" <MatchPairs> "}"
 <MatchType> ::= "?whenTypeOf" "(" <Expression> ")" "is" "{" <MatchPairs> "}"
 <MatchTrue> ::= "?whenIsTrue" "{" <MatchPairs> "}"

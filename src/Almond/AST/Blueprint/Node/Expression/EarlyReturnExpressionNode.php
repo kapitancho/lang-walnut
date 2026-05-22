@@ -2,6 +2,7 @@
 
 namespace Walnut\Lang\Almond\AST\Blueprint\Node\Expression;
 
-interface NoExternalErrorExpressionNode extends ExpressionNode {
+interface EarlyReturnExpressionNode extends ExpressionNode {
 	public ExpressionNode $targetExpression { get; }
+	public EarlyReturnExpressionType $type { get; }
 }

@@ -60,11 +60,8 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 		return new ScopedExpression($this->typeRegistry, $expression);
 	}
 
-	public function noError(Expression $expression): Expression {
-		return new NoErrorExpression($this->typeRegistry, $expression);
-	}
-	public function noExternalError(Expression $expression): Expression {
-		return new NoExternalErrorExpression($this->typeRegistry, $expression);
+	public function earlyReturn(Expression $expression, \Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\EarlyReturnExpressionType $type): Expression {
+		return new EarlyReturnExpression($this->typeRegistry, $expression, $type);
 	}
 
 	public function booleanOr(Expression $first, Expression $second): Expression {
@@ -167,6 +164,15 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 		Expression $condition, Expression $onError, Expression|null $else
 	): MatchErrorExpression {
 		return new MatchErrorExpression(
+			$this->typeRegistry,
+			$condition, $onError, $else
+		);
+	}
+
+	public function matchExternalError(
+		Expression $condition, Expression $onError, Expression|null $else
+	): MatchExternalErrorExpression {
+		return new MatchExternalErrorExpression(
 			$this->typeRegistry,
 			$condition, $onError, $else
 		);

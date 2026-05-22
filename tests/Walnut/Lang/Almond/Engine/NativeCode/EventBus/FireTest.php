@@ -39,7 +39,7 @@ final class FireTest extends CodeExecutionTestHelper {
 			valueDeclarations: "
 				myCounter = mutable{Array<String>, []};
 				getEventBus = ^ => EventBus :: EventBus[listeners: [
-					^A => Null* :: { myCounter->PUSH('fn1'); {@'error'} *> ('An error occurred') },
+					^A => Null* :: { myCounter->PUSH('fn1'); {@'error'} @* ('An error occurred')! },
 					^A|B => Null :: { myCounter->PUSH('fn2'); null },
 					^B => Null :: { myCounter->PUSH('fn3'); null }
 				]];
