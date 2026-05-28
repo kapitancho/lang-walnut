@@ -31,18 +31,21 @@ HttpResponseBuilder = ^HttpResponseStatusCode => HttpResponse;
     body: null
 ];
 
-HttpResponse->withHeader(^[headerName: String, values: Array<String, 1..>] => HttpResponse) :: {
+HttpResponse->withHeader(^[headerName: String, values: Array<String, 1..>] => HttpResponse) :: 
+    $->withKeyValue[key: 'headers', value: $headers->withKeyValue[key: #headerName, value: #values]];
+/*{
     [
         protocolVersion: $protocolVersion,
         body: $body,
         headers: $headers->withKeyValue[key: #headerName, value: #values],
         statusCode: $statusCode
     ]
-};
+};*/
 
-HttpResponse->withBody(^body: HttpMessageBody => HttpResponse) :: [
+HttpResponse->withBody(^body: HttpMessageBody => HttpResponse) :: $->withKeyValue[key: 'body', value: body];
+/*[
     protocolVersion: $protocolVersion,
     body: body,
     headers: $headers,
     statusCode: $statusCode
-];
+];*/

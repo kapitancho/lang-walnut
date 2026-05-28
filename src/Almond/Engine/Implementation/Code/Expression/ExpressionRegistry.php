@@ -64,6 +64,21 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 		return new EarlyReturnExpression($this->typeRegistry, $expression, $type);
 	}
 
+	public function emptySkipTarget(string $skipTargetId, Expression $expression): Expression {
+		return new EmptySkipTargetExpression(
+			$skipTargetId,
+			$expression
+		);
+	}
+
+	public function emptySkip(string $skipTargetId, Expression $expression): Expression {
+		return new EmptySkipExpression(
+			$this->typeRegistry,
+			$skipTargetId,
+			$expression
+		);
+	}
+
 	public function booleanOr(Expression $first, Expression $second): Expression {
 		return new BooleanOrExpression(
 			$this->typeRegistry,
@@ -232,7 +247,7 @@ final readonly class ExpressionRegistry implements ExpressionRegistryInterface {
 
 	public function methodCall(Expression $target, MethodName $methodName, Expression $parameter): Expression {
 		return new MethodCallExpression(
-			$this->typeRegistry, $this->methodContext,
+			$this->typeRegistry, $this->validationFactory, $this->methodContext,
 			$target, $methodName, $parameter
 		);
 	}

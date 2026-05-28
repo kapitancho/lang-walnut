@@ -2,7 +2,7 @@ module $db/orm/xorm-repository %% $db/orm/xorm, $db/connection:
 
 OxRepository := $[~Ox, ~Type];
 OxRepository[~Type, model: Type<Any>] @@ ExternalError  :: [
-    ox: {Ox[#model]} @* ('Failed to get orm model'),
+    ox: {Ox[#model]} @* ('Failed to get orm model')!,
     type: #type
 ];
 
@@ -12,23 +12,19 @@ DuplicateEntry := [key: DatabaseValue];
 ==> DatabaseConnection :: DatabaseConnection![dsn: ''];
 
 OxRepository->all(=> Array*) %% ~DatabaseConnector :: {
-    query = $ox->selectAllQuery /*'SELECT * FROM <table>'*/
-        @* ('Failed to get query for orm model');
-    {databaseConnector
-        -> query[query: query, boundParameters: []]}
+    databaseConnector
+        -> query[query: $ox->selectAllQuery, boundParameters: []]
         @* ('Failed to get entries from the database')
         -> map(^row: DatabaseQueryDataRow => Result<Any, HydrationError> :: row->hydrateAs($type))
         @* ('Failed to hydrate entries')
 };
 
 OxRepository->one(^v: DatabaseValue => Result<Any, EntryNotFound>*) %% ~DatabaseConnector :: {
-    query = $ox->selectOneQuery /*'SELECT * FROM <table> WHERE id = ?'*/
-        @* ('Failed to get query for orm model');
-    entries = {databaseConnector
-          -> query[query: query, boundParameters: [:]->withKeyValue[key: $ox->keyField, value: #]]
-        } @* ('Failed to get entry from the database')
-          ->map(^row: DatabaseQueryDataRow => Result<Any, HydrationError> :: row->hydrateAs($type))
-          @* ('Failed to hydrate entries');
+    entries = databaseConnector
+        -> query[query: $ox->selectOneQuery, boundParameters: [:]->withKeyValue[key: $ox->keyField, value: #]]
+            @* ('Failed to get entry from the database')
+        ->map(^row: DatabaseQueryDataRow => Result<Any, HydrationError> :: row->hydrateAs($type))
+            @* ('Failed to hydrate entries')!;
     ?whenTypeOf(entries) {
         `Array<1..>: entries.0,
         ~: @EntryNotFound![key: v]
@@ -37,11 +33,10 @@ OxRepository->one(^v: DatabaseValue => Result<Any, EntryNotFound>*) %% ~Database
 
 OxRepository->insertOne(^v: {DatabaseQueryDataRow} => Result<Null, DuplicateEntry>*) %% ~DatabaseConnector :: {
     v = v->shape(`DatabaseQueryDataRow);
-    entryId = v->item($ox->keyField)->ifEmpty(^ => Error<ExternalError> :: (@null @* ('Failed to get entry key')))!;
-    query = $ox->insertQuery
-        @* ('Failed to get query for orm model');
-    result = {databaseConnector->execute[query: query, boundParameters: v]}
-        /* @* ('Failed to insert entry into the database') */;
+    entryId = v->item($ox->keyField) ?* ('Failed to get entry key')!;
+    result = 
+        databaseConnector->execute[query: $ox->insertQuery, boundParameters: v]
+            @* ('Failed to insert entry into the database');
     ?whenTypeOf(result) {
         `Error<DatabaseQueryFailure> : ?whenIsTrue {
             result->error.error->contains('SQLSTATE[23'): @DuplicateEntry![key: entryId],
@@ -58,10 +53,9 @@ OxRepository->insertOne(^v: {DatabaseQueryDataRow} => Result<Null, DuplicateEntr
 };
 
 OxRepository->deleteOne(^v: DatabaseValue => Result<Null, EntryNotFound>*) %% ~DatabaseConnector :: {
-    query = $ox->deleteQuery
-        @* ('Failed to get query for orm model');
-    result = databaseConnector->execute[query: query, boundParameters: [:]->withKeyValue[key: $ox->keyField, value: v]]
-        -> errorAsExternal('Failed to delete entry from the database');
+    result = 
+        databaseConnector->execute[query: $ox->deleteQuery, boundParameters: [:]->withKeyValue[key: $ox->keyField, value: v]]
+            @* ('Failed to delete entry from the database')!;
     ?whenTypeOf(result) {
         `Integer<1..1> : null,
         ~: @EntryNotFound![key: v]
@@ -70,11 +64,10 @@ OxRepository->deleteOne(^v: DatabaseValue => Result<Null, EntryNotFound>*) %% ~D
 
 OxRepository->updateOne(^v: {DatabaseQueryDataRow} => Result<Null, EntryNotFound>*) %% [~DatabaseConnector] :: {
     v = v->shape(`DatabaseQueryDataRow);
-    entryId = v->item($ox->keyField)->ifEmpty(^ => Error<ExternalError> :: (@null @* ('Failed to get entry key')))!;
-    query = $ox->updateQuery
-        @* ('Failed to get query for orm model');
-    result = %databaseConnector->execute[query: query, boundParameters: v]
-        @* ('Failed to update entry in the database');
+    entryId = v->item($ox->keyField) ?* ('Failed to get entry key')!;
+    result = 
+        %databaseConnector->execute[query: $ox->updateQuery, boundParameters: v]
+            @* ('Failed to update entry in the database');
     ?whenTypeOf(result) {
         `Integer<1..1> : null,
         ~: @EntryNotFound![key: entryId]

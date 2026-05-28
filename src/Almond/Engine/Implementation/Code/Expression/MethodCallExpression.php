@@ -5,18 +5,22 @@ namespace Walnut\Lang\Almond\Engine\Implementation\Code\Expression;
 use JsonSerializable;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Expression\Expression;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Method\MethodContext;
+use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\BuiltIn\EmptyType;
 use Walnut\Lang\Almond\Engine\Blueprint\Code\Type\TypeRegistry;
 use Walnut\Lang\Almond\Engine\Blueprint\Common\Identifier\MethodName;
 use Walnut\Lang\Almond\Engine\Blueprint\Feature\DependencyContainer\DependencyContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionContext;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Execution\ExecutionException;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationContext;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationErrorType;
+use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFactory;
 use Walnut\Lang\Almond\Engine\Blueprint\Program\Validation\ValidationFailure;
 
 final readonly class MethodCallExpression implements Expression, JsonSerializable {
 
 	public function __construct(
 		private TypeRegistry $typeRegistry,
+		private ValidationFactory $validationFactory,
 		private MethodContext $methodContext,
 
 		public Expression $target,
@@ -64,6 +68,20 @@ final readonly class MethodCallExpression implements Expression, JsonSerializabl
 		);
 		if ($validationResult instanceof ValidationFailure) {
 			return $validationResult;
+		}
+		if (
+			$this->methodName->identifier === 'item' &&
+			$validationResult->type instanceof EmptyType
+		) {
+			return $this->validationFactory->error(
+				ValidationErrorType::itemTypeMismatch,
+				sprintf(
+					"Item access on %s with key %s is guaranteed to be empty",
+					$targetExpressionType,
+					$parameterExpressionType
+				),
+				$this
+			);
 		}
 		$returnType = $this->typeRegistry->union([
 			$targetReturnType,

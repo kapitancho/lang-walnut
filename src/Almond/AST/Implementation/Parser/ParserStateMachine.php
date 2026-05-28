@@ -1736,7 +1736,7 @@ final readonly class ParserStateMachine {
 					$this->s->result['startPosition'] = $token->sourcePosition;
 					$this->s->result['expression_left'] = $this->s->generated;
 					$this->s->push(3304);
-					$this->s->move(3000);
+					$this->s->move(3150);
 				},
 				T::error_as_external->name => function(LT $token) {
 					$this->s->push(3141);
@@ -1802,12 +1802,17 @@ final readonly class ParserStateMachine {
 					);
 					$this->s->move(3141);
 				},
-				/*T::optional_key->name => function(LT $token) {
-					$this->s->generated = $this->nodeBuilder->expression->noError(
+				T::optional_key->name => function(LT $token) {
+					$this->s->push(3141);
+					$this->s->result = [];
+					$this->s->result['startPosition'] = $token->sourcePosition;
+					$this->s->result['emptySkipKey'] = md5(serialize($token));
+					$this->s->generated = $this->nodeBuilder->expression->emptySkipTarget(
+						$this->s->result['emptySkipKey'],
 						$this->s->generated
 					);
-					$this->s->move(3141);
-				},*/
+					$this->s->move(3142);
+				},
 				T::tuple_start->name => $c = function(LT $token) {
 					$this->s->push(3141);
 					$this->s->stay(3151);
@@ -1815,6 +1820,44 @@ final readonly class ParserStateMachine {
 				'' => function(LT $token) {
 					$this->s->pop();
 				}
+			]],
+
+			3142 => ['name' => 'empty skip start', 'transitions' => [
+				T::property_accessor->name => function(LT $token) {
+					$this->s->push(3143);
+					$this->s->result = [];
+					$this->s->result['startPosition'] = $token->sourcePosition;
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->move(3303);
+				},
+				T::method_marker->name => function(LT $token) {
+					$this->s->push(3143);
+					$this->s->result = [];
+					$this->s->result['startPosition'] = $token->sourcePosition;
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->move(3305);
+				},
+				T::call_start->name => function(LT $token) {
+					$this->s->push(3143);
+					$this->s->result = [];
+					$this->s->result['startPosition'] = $token->sourcePosition;
+					$this->s->result['expression_left'] = $this->s->generated;
+					$this->s->move(3311);
+				},
+				T::tuple_start->name => $c = function(LT $token) {
+					$this->s->push(3143);
+					$this->s->stay(3151);
+				},
+			]],
+
+			3143 => ['name' => 'empty skip end', 'transitions' => [
+				'' => function(LT $token) {
+					$this->s->generated = $this->nodeBuilder->expression->emptySkip(
+						$this->s->result['emptySkipKey'],
+						$this->s->generated
+					);
+					$this->s->pop();
+				},
 			]],
 
 			3150 => ['name' => 'tuple call expression start', 'transitions' => [

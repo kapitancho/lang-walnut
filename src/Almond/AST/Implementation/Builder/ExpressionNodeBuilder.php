@@ -23,6 +23,8 @@ use Walnut\Lang\Almond\AST\Implementation\Node\Expression\ConstantExpressionNode
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\ConstructorCallExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\DataExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\EmptyAsErrorExpressionNode;
+use Walnut\Lang\Almond\AST\Implementation\Node\Expression\EmptySkipExpressionNode;
+use Walnut\Lang\Almond\AST\Implementation\Node\Expression\EmptySkipTargetExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\ErrorAsEmptyExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\ExternalErrorAsEmptyExpressionNode;
 use Walnut\Lang\Almond\AST\Implementation\Node\Expression\FunctionCallExpressionNode;
@@ -136,6 +138,22 @@ final readonly class ExpressionNodeBuilder implements ExpressionNodeBuilderInter
 
 	public function earlyReturn(ExpressionNode $targetExpression, EarlyReturnExpressionType $type): EarlyReturnExpressionNode {
 		return new EarlyReturnExpressionNode($this->getSourceLocation(), $targetExpression, $type);
+	}
+
+	public function emptySkipTarget(string $skipTargetId, ExpressionNode $targetExpression): EmptySkipTargetExpressionNode {
+		return new EmptySkipTargetExpressionNode(
+			$this->getSourceLocation(),
+			$skipTargetId,
+			$targetExpression
+		);
+	}
+
+	public function emptySkip(string $skipTargetId, ExpressionNode $targetExpression): EmptySkipExpressionNode {
+		return new EmptySkipExpressionNode(
+			$this->getSourceLocation(),
+			$skipTargetId,
+			$targetExpression
+		);
 	}
 
 	public function propertyAccess(ExpressionNode $target, int|string $propertyName): PropertyAccessExpressionNode {

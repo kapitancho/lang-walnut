@@ -10,6 +10,8 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ConstantExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ConstructorCallExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\DataExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\EmptyAsErrorExpressionNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\EmptySkipExpressionNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\EmptySkipTargetExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ErrorAsEmptyExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ExternalErrorAsEmptyExpressionNode;
@@ -284,6 +286,16 @@ final readonly class ExpressionBuilder implements ExpressionCompilerInterface {
 				$this->expressionRegistry->earlyReturn(
 					$this->expression($expressionNode->targetExpression),
 					$this->convertEarlyReturnType($expressionNode->type)
+				),
+			$expressionNode instanceof EmptySkipTargetExpressionNode =>
+				$this->expressionRegistry->emptySkipTarget(
+					$expressionNode->skipTargetId,
+					$this->expression($expressionNode->targetExpression),
+				),
+			$expressionNode instanceof EmptySkipExpressionNode =>
+				$this->expressionRegistry->emptySkip(
+					$expressionNode->skipTargetId,
+					$this->expression($expressionNode->targetExpression),
 				),
 			$expressionNode instanceof PropertyAccessExpressionNode =>
 				$this->expressionRegistry->propertyAccess(

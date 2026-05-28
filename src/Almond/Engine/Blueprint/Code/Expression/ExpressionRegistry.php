@@ -17,6 +17,8 @@ interface ExpressionRegistry {
 	public function scoped(Expression $expression): Expression;
 
 	public function earlyReturn(Expression $expression, EarlyReturnExpressionType $type): Expression;
+	public function emptySkipTarget(string $skipTargetId, Expression $expression): Expression;
+	public function emptySkip(string $skipTargetId, Expression $expression): Expression;
 
 	public function booleanOr(Expression $first, Expression $second): Expression;
 	public function booleanAnd(Expression $first, Expression $second): Expression;

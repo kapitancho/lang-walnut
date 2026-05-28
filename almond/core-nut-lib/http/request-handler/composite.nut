@@ -6,7 +6,7 @@ HttpCompositeRequestHandler ==> HttpRequestHandler :: {
         ?whenTypeOf($middlewares) {
             `Array<{HttpMiddleware}, 1..>: {
                 var{element: middleware, array: remainingMiddlewares} = $middlewares->withoutFirst!;
-                {middleware->shape(`HttpMiddleware)} [
+                middleware->shape(`HttpMiddleware) [
                     request: request,
                     handler: HttpCompositeRequestHandler[$defaultHandler, remainingMiddlewares]
                 ]

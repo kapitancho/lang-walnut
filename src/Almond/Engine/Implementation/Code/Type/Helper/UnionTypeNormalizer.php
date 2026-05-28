@@ -131,6 +131,18 @@ final readonly class UnionTypeNormalizer {
 			                    )
 		                    )
 	                    );
+                    } else if (
+	                    ($q instanceof RealSubsetType && $tx instanceof IntegerSubsetType) ||
+	                    ($q instanceof IntegerSubsetType && $tx instanceof RealSubsetType)
+                    ) {
+	                    array_splice($queue, $ql, 1);
+	                    $tx = $this->typeRegistry->realSubset(
+		                    array_values(
+			                    array_unique(
+				                    array_merge($q->subsetValues, $tx->subsetValues)
+			                    )
+		                    )
+	                    );
                     } else if ($q instanceof IntegerType && $tx instanceof IntegerType) {
                         array_splice($queue, $ql, 1);
 						$newRange = $q->numberRange->unionWith($tx->numberRange);

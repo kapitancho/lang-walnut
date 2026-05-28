@@ -10,6 +10,8 @@ use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ConstantExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ConstructorCallExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\DataExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\EmptyAsErrorExpressionNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\EmptySkipExpressionNode;
+use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\EmptySkipTargetExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ErrorAsEmptyExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\ExternalErrorAsEmptyExpressionNode;
 use Walnut\Lang\Almond\AST\Blueprint\Node\Expression\GroupExpressionNode;
@@ -68,6 +70,8 @@ interface ExpressionNodeBuilder {
 	public function externalErrorAsEmpty(ExpressionNode $targetExpression): ExternalErrorAsEmptyExpressionNode;
 	public function emptyAsError(ExpressionNode $targetExpression, ExpressionNode $errorExpression): EmptyAsErrorExpressionNode;
 	public function earlyReturn(ExpressionNode $targetExpression, EarlyReturnExpressionType $type): EarlyReturnExpressionNode;
+	public function emptySkipTarget(string $skipTargetId, ExpressionNode $targetExpression): EmptySkipTargetExpressionNode;
+	public function emptySkip(string $skipTargetId, ExpressionNode $targetExpression): EmptySkipExpressionNode;
 
 	public function propertyAccess(ExpressionNode $target, int|string $propertyName): PropertyAccessExpressionNode;
 	public function return(ExpressionNode $returnedExpression): ReturnExpressionNode;

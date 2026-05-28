@@ -7,7 +7,7 @@ NoResponseBody ==> HttpAutoWireResponseBodyFromParameter ::
 
 RedirectResponseBody := $[statusCode: HttpResponseStatusCode];
 RedirectResponseBody ==> HttpAutoWireResponseBodyFromParameter ::
-    ^result: Any => Result<HttpResponse, Any> %% ~HttpResponseBuilder :: {
+    ^result: Any => Result<HttpResponse> %% ~HttpResponseBuilder :: {
         redirectValue = result->as(`String)!;
         httpResponseBuilder($statusCode)
             ->withHeader[headerName: 'Location', values: [redirectValue]]
@@ -15,18 +15,15 @@ RedirectResponseBody ==> HttpAutoWireResponseBodyFromParameter ::
 
 JsonResponseBody := $[statusCode: HttpResponseStatusCode];
 JsonResponseBody ==> HttpAutoWireResponseBodyFromParameter ::
-    ^result: Any => Result<HttpResponse, Any> %% ~HttpResponseBuilder :: {
-        jsonValue = result->asJsonValue;
-        ?whenIsError(jsonValue) { jsonValue } ~ {
-            {httpResponseBuilder($statusCode)
-                ->withHeader[headerName: 'Content-Type', values: ['application/json']]}
-                ->withBody(jsonValue->stringify)
-        }
+    ^result: Any => Result<HttpResponse> %% ~HttpResponseBuilder :: {
+        httpResponseBuilder($statusCode)
+            ->withHeader[headerName: 'Content-Type', values: ['application/json']]
+            ->withBody(result->asJsonValue!->stringify)
     };
 
 ContentResponseBody := $[statusCode: HttpResponseStatusCode, contentType: String];
 ContentResponseBody ==> HttpAutoWireResponseBodyFromParameter ::
-    ^result: Any => Result<HttpResponse, Any> %% ~HttpResponseBuilder ::
-        {httpResponseBuilder($statusCode)
-            ->withHeader[headerName: 'Content-Type', values: [$contentType]]}
+    ^result: Any => Result<HttpResponse> %% ~HttpResponseBuilder ::
+        httpResponseBuilder($statusCode)
+            ->withHeader[headerName: 'Content-Type', values: [$contentType]]
             ->withBody(?whenTypeOf(result) { `{String}: result->shape(`String), ~ : => @'Invalid Response Body' });

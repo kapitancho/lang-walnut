@@ -45,6 +45,28 @@ final class UnionTypeNormalizerTest extends AlmondBaseTestHelper {
         );
     }
 
+    public function testMixedRealAndIntegerSubsetTypes(): void {
+        $this->assertEquals(
+            'Real[3.14, 5]', (string)$this->union(
+            $this->valueRegistry->real(3.14)->type,
+            $this->valueRegistry->integer(5)->type,
+            )
+        );
+        $this->assertEquals(
+            'Real[5, 3.14]', (string)$this->union(
+            $this->valueRegistry->integer(5)->type,
+            $this->valueRegistry->real(3.14)->type,
+            )
+        );
+        $this->assertEquals(
+            'Real[3.14, 5, 7]', (string)$this->union(
+            $this->valueRegistry->real(3.14)->type,
+            $this->valueRegistry->integer(5)->type,
+            $this->valueRegistry->integer(7)->type,
+            )
+        );
+    }
+
     public function testEmptyUnion(): void {
         self::assertEquals("Nothing", (string)$this->union());
     }

@@ -7,12 +7,12 @@ use Walnut\Lang\Test\Almond\Engine\CodeExecutionTestHelper;
 final class ItemTest extends CodeExecutionTestHelper {
 
 	public function testTupleItemOutOfRange(): void {
-		$result = $this->executeCodeSnippet("{MyTuple[3, 5]}->item(4);", "MyTuple := #[Integer, Real];");
+		$result = $this->executeCodeSnippet("(MyTuple[3, 5])->item(4);", "MyTuple := #[Integer, Real];");
 		$this->assertEquals("empty", $result);
 	}
 
 	public function testTupleItemInRange(): void {
-		$result = $this->executeCodeSnippet("{MyTuple[3, 5]}->item(1);", "MyTuple := #[Integer, Real];");
+		$result = $this->executeCodeSnippet("(MyTuple[3, 5])->item(1);", "MyTuple := #[Integer, Real];");
 		$this->assertEquals("5", $result);
 	}
 
