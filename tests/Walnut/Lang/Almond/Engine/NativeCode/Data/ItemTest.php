@@ -7,8 +7,11 @@ use Walnut\Lang\Test\Almond\Engine\CodeExecutionTestHelper;
 final class ItemTest extends CodeExecutionTestHelper {
 
 	public function testTupleItemOutOfRange(): void {
-		$result = $this->executeCodeSnippet("(MyTuple![3, 5])->item(4);", "MyTuple := [Integer, Real];");
-		$this->assertEquals("empty", $result);
+		$this->executeErrorCodeSnippet(
+			"Item access on MyTuple with key Integer[4] is guaranteed to be empty",
+			"(MyTuple![3, 5])->item(4);",
+			"MyTuple := [Integer, Real];"
+		);
 	}
 
 	public function testTupleItemInRange(): void {
@@ -17,12 +20,12 @@ final class ItemTest extends CodeExecutionTestHelper {
 	}
 
 	public function testItemEmpty(): void {
-		$result = $this->executeCodeSnippet(
+		$this->executeErrorCodeSnippet(
+			"Item access on MyTuple with key String['b'] is guaranteed to be empty",
 			"getItem(MyTuple![a: 'hello']);",
 			"MyTuple := [a: String, b: Empty];",
 			"getItem = ^m: MyTuple => Optional<Real> :: m->item('b');"
 		);
-		$this->assertEquals("empty", $result);
 	}
 
 	public function testItemOptional(): void {
@@ -85,8 +88,11 @@ final class ItemTest extends CodeExecutionTestHelper {
 	}
 
 	public function testRecordItemOutOfRange(): void {
-		$result = $this->executeCodeSnippet("(MyRecord![a: 3, b: 5])->item('d');", "MyRecord := [a: Integer, b: Real];");
-		$this->assertEquals("empty", $result);
+		$this->executeErrorCodeSnippet(
+			"Item access on MyRecord with key String['d'] is guaranteed to be empty",
+			"(MyRecord![a: 3, b: 5])->item('d');",
+			"MyRecord := [a: Integer, b: Real];"
+		);
 	}
 
 	public function testRecordItemInRange(): void {

@@ -7,8 +7,10 @@ use Walnut\Lang\Test\Almond\Engine\CodeExecutionTestHelper;
 final class ItemTest extends CodeExecutionTestHelper {
 
 	public function testItemEmpty(): void {
-		$result = $this->executeCodeSnippet("[]->item(4);");
-		$this->assertEquals("empty", $result);
+		$this->executeErrorCodeSnippet(
+			"Item access on [] with key Integer[4] is guaranteed to be empty",
+			"[]->item(4);"
+		);
 	}
 
 	public function testItemNonEmpty(): void {
@@ -17,8 +19,10 @@ final class ItemTest extends CodeExecutionTestHelper {
 	}
 
 	public function testItemNonEmptyIndexOutOfRange(): void {
-		$result = $this->executeCodeSnippet("[1, 2, 5, 10, 5]->item(10);");
-		$this->assertEquals("empty", $result);
+		$this->executeErrorCodeSnippet(
+			"with key Integer[10] is guaranteed to be empty",
+			"[1, 2, 5, 10, 5]->item(10);"
+		);
 	}
 
 	public function testItemInvalidParameterValue(): void {
