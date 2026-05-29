@@ -47,7 +47,7 @@ final class EmptySkipExpressionTest extends CodeExecutionTestHelper {
 			get = ^r: ?[inner: ?[value: Integer]] => ?Integer :: r?.inner?.value;
 		NUT;
 		$result = $this->executeCodeSnippet(
-			"get[];",
+			"get[:];",
 			valueDeclarations: $declaration
 		);
 		$this->assertEquals("empty", $result);

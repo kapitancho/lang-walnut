@@ -39,9 +39,6 @@ final readonly class EnumerationSubsetType implements EnumerationSubsetTypeInter
 	    }
 	    $subsetValuesMap = [];
 	    foreach($subsetValues as $value) {
-		    if (array_key_exists($value->name->identifier, $subsetValuesMap)) {
-			    DuplicateSubsetValue::of($value);
-		    }
 		    // @codeCoverageIgnoreStart
 		    /** @phpstan-ignore instanceof.alwaysTrue */
 		    if (!$value instanceof EnumerationValue) {
@@ -51,6 +48,9 @@ final readonly class EnumerationSubsetType implements EnumerationSubsetTypeInter
 			    );
 		    }
 		    // @codeCoverageIgnoreEnd
+		    if (array_key_exists($value->name->identifier, $subsetValuesMap)) {
+			    DuplicateSubsetValue::of($value);
+		    }
 		    $subsetValuesMap[$value->name->identifier] = $value;
 	    }
 		$this->subsetValues = $subsetValuesMap;

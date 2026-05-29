@@ -38,10 +38,9 @@ final readonly class CountValues extends ArrayNativeMethod {
 					1,
 					($max = $baseItemType->numberRange->max) instanceof NumberIntervalEndpoint &&
 					($min = $baseItemType->numberRange->min) instanceof NumberIntervalEndpoint ?
-						max(1,
-							(int)ceil(log10(abs((int)(string)$max->value))),
-							(int)ceil(log10(abs((int)(string)$min->value))) +
-							($min->value < 0 ? 1 : 0)
+						max(
+							strlen((string)(int)(string)$max->value),
+							strlen((string)(int)(string)$min->value)
 						) : 1000
 				);
 			}
